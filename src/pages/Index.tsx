@@ -28,7 +28,7 @@ const Index = () => {
         <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-4xl mx-auto text-center">
             <Badge className="mb-6 bg-primary/10 text-primary border-primary/20">
-              Support & Logistique | Accès Discord Privé | Paiement Sécurisé
+              15 jours gratuits | Sans engagement | Moniteurs automatiques
             </Badge>
             
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
@@ -36,22 +36,25 @@ const Index = () => {
             </h1>
             
             <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-3xl mx-auto">
-              Formation pratique + catalogue produits rentables + stockage & expédition. 
-              Tout ce qu'il faut pour lancer et scaler sur Amazon.
+              Rejoins le Discord VIP et accède aux moniteurs de produits rentables, 
+              guides Amazon FBA, fournisseurs privés, stock checker et bien plus.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button variant="hero" size="xl" asChild>
-                <Link to="/formation">
-                  Découvrir la formation <ArrowRight className="ml-2" />
+                <Link to="/tarifs">
+                  Commencer l'essai gratuit <ArrowRight className="ml-2" />
                 </Link>
               </Button>
               <Button variant="outline" size="xl" asChild>
-                <Link to="/catalogue">
-                  Voir le catalogue
+                <Link to="/services">
+                  Découvrir les avantages
                 </Link>
               </Button>
             </div>
+            <p className="mt-6 text-muted-foreground text-lg">
+              34,99€/mois HT après l'essai gratuit
+            </p>
           </div>
         </div>
       </section>
@@ -59,15 +62,19 @@ const Index = () => {
       {/* 3 Reasons Section */}
       <section className="py-20 bg-muted/30">
         <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl font-bold mb-4">Tout inclus dans l'abonnement</h2>
+            <p className="text-xl text-muted-foreground">34,99€/mois HT pour un accès complet</p>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <Card className="border-2 hover:border-primary transition-colors">
               <CardContent className="pt-8 text-center">
                 <div className="w-16 h-16 bg-gradient-to-br from-primary to-primary-glow rounded-2xl flex items-center justify-center mx-auto mb-6">
-                  <GraduationCap className="w-8 h-8 text-white" />
+                  <TrendingUp className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="text-2xl font-bold mb-4">Formation sans bullshit</h3>
+                <h3 className="text-2xl font-bold mb-4">Moniteurs automatiques</h3>
                 <p className="text-muted-foreground">
-                  Méthode pas à pas, retours concrets. Apprenez ce qui fonctionne vraiment.
+                  Robots qui détectent les produits rentables sur Qogita, Auchan, King Jouet et plus.
                 </p>
               </CardContent>
             </Card>
@@ -75,11 +82,11 @@ const Index = () => {
             <Card className="border-2 hover:border-primary transition-colors">
               <CardContent className="pt-8 text-center">
                 <div className="w-16 h-16 bg-gradient-to-br from-secondary to-accent rounded-2xl flex items-center justify-center mx-auto mb-6">
-                  <Package className="w-8 h-8 text-white" />
+                  <GraduationCap className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="text-2xl font-bold mb-4">Produits sourcés et testés</h3>
+                <h3 className="text-2xl font-bold mb-4">Guides & Formation FBA</h3>
                 <p className="text-muted-foreground">
-                  Catalogue actualisé chaque semaine. Des produits rentables prêts à vendre.
+                  Apprends Amazon FBA de A à Z avec nos guides exclusifs et conseils d'experts.
                 </p>
               </CardContent>
             </Card>
@@ -87,11 +94,11 @@ const Index = () => {
             <Card className="border-2 hover:border-primary transition-colors">
               <CardContent className="pt-8 text-center">
                 <div className="w-16 h-16 bg-gradient-to-br from-primary to-secondary rounded-2xl flex items-center justify-center mx-auto mb-6">
-                  <Warehouse className="w-8 h-8 text-white" />
+                  <Package className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="text-2xl font-bold mb-4">Logistique clé en main</h3>
+                <h3 className="text-2xl font-bold mb-4">Fournisseurs privés</h3>
                 <p className="text-muted-foreground">
-                  Stockage, emballage et expédition à la demande. Focus sur la vente.
+                  Accès à notre listing de fournisseurs testés et produits à fort potentiel.
                 </p>
               </CardContent>
             </Card>
@@ -99,90 +106,125 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Services Overview */}
+      {/* What's Included */}
       <section className="py-20">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
+            <Badge className="mb-4 bg-primary/10 text-primary border-primary/20">
+              Accès complet
+            </Badge>
             <h2 className="text-4xl md:text-5xl font-bold mb-4">
-              Nos Services
+              Ce Que Tu Obtiens
             </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Un écosystème complet pour votre réussite sur Amazon
+              Tous les outils et ressources pour réussir sur Amazon FBA
             </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-            {/* Formation */}
-            <div className="flex flex-col md:flex-row gap-6">
-              <div className="w-16 h-16 bg-gradient-to-br from-primary to-primary-glow rounded-2xl flex items-center justify-center flex-shrink-0">
-                <GraduationCap className="w-8 h-8 text-white" />
-              </div>
-              <div>
-                <h3 className="text-2xl font-bold mb-3">Formation Amazon FBA</h3>
-                <p className="text-muted-foreground mb-4">
-                  Modules étape-par-étape de 0 aux premières ventes et au scaling. Templates Excel, checklists et support via Discord.
-                </p>
-                <Button variant="link" className="p-0" asChild>
-                  <Link to="/formation">
-                    En savoir plus <ArrowRight className="ml-2 w-4 h-4" />
-                  </Link>
-                </Button>
-              </div>
-            </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            <Card className="border-2 border-primary/20">
+              <CardContent className="pt-6">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 bg-gradient-to-br from-primary to-primary-glow rounded-xl flex items-center justify-center flex-shrink-0">
+                    <TrendingUp className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold mb-2">Moniteurs produits</h3>
+                    <p className="text-muted-foreground text-sm">
+                      Notifications temps réel de produits rentables sur Qogita, Auchan, King Jouet...
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
 
-            {/* Discord Community */}
-            <div className="flex flex-col md:flex-row gap-6">
-              <div className="w-16 h-16 bg-gradient-to-br from-secondary to-accent rounded-2xl flex items-center justify-center flex-shrink-0">
-                <Users className="w-8 h-8 text-white" />
-              </div>
-              <div>
-                <h3 className="text-2xl font-bold mb-3">Communauté Discord Privée</h3>
-                <p className="text-muted-foreground mb-4">
-                  Abonnement mensuel avec alertes produits, hacks exclusifs, entraide et networking entre vendeurs.
-                </p>
-                <Button variant="link" className="p-0" asChild>
-                  <a href="https://discord.com/channels/1430928328466108619/1430933836958531699" target="_blank" rel="noopener noreferrer">
-                    Rejoindre maintenant <ArrowRight className="ml-2 w-4 h-4" />
-                  </a>
-                </Button>
-              </div>
-            </div>
+            <Card className="border-2 border-primary/20">
+              <CardContent className="pt-6">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 bg-gradient-to-br from-secondary to-accent rounded-xl flex items-center justify-center flex-shrink-0">
+                    <GraduationCap className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold mb-2">Guides Amazon FBA</h3>
+                    <p className="text-muted-foreground text-sm">
+                      Formation complète de A à Z pour maîtriser Amazon FBA
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
 
-            {/* Catalogue */}
-            <div className="flex flex-col md:flex-row gap-6">
-              <div className="w-16 h-16 bg-gradient-to-br from-primary to-secondary rounded-2xl flex items-center justify-center flex-shrink-0">
-                <Package className="w-8 h-8 text-white" />
-              </div>
-              <div>
-                <h3 className="text-2xl font-bold mb-3">Catalogue Produits Rentables</h3>
-                <p className="text-muted-foreground mb-4">
-                  Produits sourcés et testés. ROI estimé, prix gros et disponibilité en temps réel.
-                </p>
-                <Button variant="link" className="p-0" asChild>
-                  <Link to="/catalogue">
-                    Voir le catalogue <ArrowRight className="ml-2 w-4 h-4" />
-                  </Link>
-                </Button>
-              </div>
-            </div>
+            <Card className="border-2 border-primary/20">
+              <CardContent className="pt-6">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center flex-shrink-0">
+                    <Package className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold mb-2">Fournisseurs privés</h3>
+                    <p className="text-muted-foreground text-sm">
+                      Listing exclusif de produits sourcés et testés
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
 
-            {/* Fulfilment */}
-            <div className="flex flex-col md:flex-row gap-6">
-              <div className="w-16 h-16 bg-gradient-to-br from-secondary to-primary rounded-2xl flex items-center justify-center flex-shrink-0">
-                <Warehouse className="w-8 h-8 text-white" />
-              </div>
-              <div>
-                <h3 className="text-2xl font-bold mb-3">Stockage & Fulfilment</h3>
-                <p className="text-muted-foreground mb-4">
-                  Entreposage sécurisé, préparation sous 24-48h, envois nationaux et préparation FBA.
-                </p>
-                <Button variant="link" className="p-0" asChild>
-                  <Link to="/fulfilment">
-                    En savoir plus <ArrowRight className="ml-2 w-4 h-4" />
-                  </Link>
-                </Button>
-              </div>
-            </div>
+            <Card className="border-2 border-primary/20">
+              <CardContent className="pt-6">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 bg-gradient-to-br from-secondary to-primary rounded-xl flex items-center justify-center flex-shrink-0">
+                    <CheckCircle2 className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold mb-2">Stock Checker</h3>
+                    <p className="text-muted-foreground text-sm">
+                      Vérifie la disponibilité en magasin en temps réel
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="border-2 border-primary/20">
+              <CardContent className="pt-6">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center flex-shrink-0">
+                    <Warehouse className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold mb-2">Service logistique</h3>
+                    <p className="text-muted-foreground text-sm">
+                      Stockage et expédition sous 24h disponibles
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="border-2 border-primary/20">
+              <CardContent className="pt-6">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 bg-gradient-to-br from-secondary to-accent rounded-xl flex items-center justify-center flex-shrink-0">
+                    <TrendingUp className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold mb-2">Réductions exclusives</h3>
+                    <p className="text-muted-foreground text-sm">
+                      Tarifs préférentiels sur emballages et services
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="text-center mt-12">
+            <Button variant="hero" size="xl" asChild>
+              <Link to="/services">
+                Voir tous les avantages <ArrowRight className="ml-2" />
+              </Link>
+            </Button>
           </div>
         </div>
       </section>
@@ -276,15 +318,15 @@ const Index = () => {
       <section className="py-20 bg-gradient-to-r from-primary to-secondary">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-            Prêt à lancer votre business Amazon ?
+            Prêt à démarrer sur Amazon ?
           </h2>
           <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
-            Rejoignez des centaines d'entrepreneurs qui ont transformé leur vie grâce à AMZing FBA
+            Essaie gratuitement pendant 15 jours, sans engagement
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button variant="secondary" size="xl" asChild className="bg-white text-primary hover:bg-white/90">
-              <Link to="/formation">
-                Commencer maintenant
+              <Link to="/tarifs">
+                Commencer l'essai gratuit
               </Link>
             </Button>
             <Button variant="outline" size="xl" className="border-white text-white hover:bg-white/10" asChild>
@@ -293,6 +335,9 @@ const Index = () => {
               </Link>
             </Button>
           </div>
+          <p className="mt-6 text-white/90 text-lg">
+            34,99€/mois HT après l'essai gratuit
+          </p>
         </div>
       </section>
 

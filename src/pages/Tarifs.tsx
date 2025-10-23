@@ -15,222 +15,115 @@ const Tarifs = () => {
           {/* Hero */}
           <div className="text-center mb-16">
             <Badge className="mb-4 bg-primary/10 text-primary border-primary/20">
-              Tarifs transparents
+              Une seule offre, tout inclus
             </Badge>
             <h1 className="text-5xl md:text-6xl font-bold mb-6">
-              Choisissez Votre Pack
+              Accès Discord VIP
             </h1>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Des offres adaptées à votre niveau, de débutant à entrepreneur confirmé
+              Tout ce dont tu as besoin pour réussir sur Amazon FBA en un seul abonnement
             </p>
           </div>
 
-          {/* Pricing Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto mb-16">
-            {/* Starter */}
-            <Card className="border-2">
-              <CardHeader>
-                <CardTitle className="text-2xl">Starter</CardTitle>
-                <CardDescription>Pour tester le marché</CardDescription>
-                <div className="mt-4">
-                  <span className="text-4xl font-bold">97€</span>
-                  <span className="text-muted-foreground">/mois</span>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-3">
-                  <li className="flex items-start gap-2">
-                    <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                    <span>Accès formation complète</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                    <span>Discord privé</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                    <span>Accès catalogue produits</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                    <span>Templates & checklists</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Check className="w-5 h-5 text-muted-foreground flex-shrink-0 mt-0.5" />
-                    <span className="text-muted-foreground">Stockage (50 colis/mois)</span>
-                  </li>
-                </ul>
-              </CardContent>
-              <CardFooter>
-                <Button variant="outline" className="w-full" size="lg">
-                  Choisir Starter
-                </Button>
-              </CardFooter>
-            </Card>
-
-            {/* Business - Most Popular */}
-            <Card className="border-2 border-primary shadow-xl relative">
+          {/* Single Pricing Card */}
+          <div className="max-w-2xl mx-auto mb-16">
+            <Card className="border-2 border-primary shadow-2xl relative">
               <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                <Badge className="bg-gradient-to-r from-primary to-secondary text-white px-4 py-1">
-                  <Star className="w-4 h-4 inline mr-1" />
-                  Plus populaire
+                <Badge className="bg-gradient-to-r from-primary to-secondary text-white px-6 py-2 text-lg">
+                  <Star className="w-5 h-5 inline mr-2" />
+                  15 jours gratuits
                 </Badge>
               </div>
-              <CardHeader>
-                <CardTitle className="text-2xl">Business</CardTitle>
-                <CardDescription>Pour scaler votre activité</CardDescription>
-                <div className="mt-4">
-                  <span className="text-4xl font-bold">297€</span>
-                  <span className="text-muted-foreground">/mois</span>
+              <CardHeader className="text-center pb-8 pt-12">
+                <CardTitle className="text-4xl mb-4">Discord VIP AMZing FBA</CardTitle>
+                <CardDescription className="text-lg">Accès complet à tous les outils et services</CardDescription>
+                <div className="mt-8">
+                  <span className="text-6xl font-bold text-gradient">34,99€</span>
+                  <span className="text-2xl text-muted-foreground">/mois HT</span>
                 </div>
               </CardHeader>
-              <CardContent>
-                <ul className="space-y-3">
-                  <li className="flex items-start gap-2">
-                    <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                    <span className="font-semibold">Tout du pack Starter</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                    <span>Stockage illimité</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                    <span>Préparation FBA incluse</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                    <span>Support prioritaire</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                    <span>Alertes produits avancées</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                    <span>1 session coaching/mois</span>
-                  </li>
-                </ul>
-              </CardContent>
-              <CardFooter>
-                <Button variant="hero" className="w-full" size="lg">
-                  Choisir Business
-                </Button>
-              </CardFooter>
-            </Card>
-
-            {/* Premium */}
-            <Card className="border-2 border-secondary">
-              <CardHeader>
-                <CardTitle className="text-2xl">Premium</CardTitle>
-                <CardDescription>Accompagnement personnalisé</CardDescription>
-                <div className="mt-4">
-                  <span className="text-4xl font-bold">697€</span>
-                  <span className="text-muted-foreground">/mois</span>
+              <CardContent className="px-8">
+                <div className="space-y-4 mb-8">
+                  <div className="flex items-start gap-3">
+                    <Check className="w-6 h-6 text-primary flex-shrink-0 mt-1" />
+                    <div>
+                      <span className="font-semibold text-lg">Moniteurs automatiques</span>
+                      <p className="text-muted-foreground text-sm">Robots qui notifient dès qu'un produit rentable est détecté (Qogita, Auchan, King Jouet...)</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <Check className="w-6 h-6 text-primary flex-shrink-0 mt-1" />
+                    <div>
+                      <span className="font-semibold text-lg">Guides complets Amazon FBA</span>
+                      <p className="text-muted-foreground text-sm">Formation pas à pas de 0 aux premières ventes</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <Check className="w-6 h-6 text-primary flex-shrink-0 mt-1" />
+                    <div>
+                      <span className="font-semibold text-lg">Fournisseurs privés</span>
+                      <p className="text-muted-foreground text-sm">Listing exclusif de produits sourcés et testés</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <Check className="w-6 h-6 text-primary flex-shrink-0 mt-1" />
+                    <div>
+                      <span className="font-semibold text-lg">Stock Checker</span>
+                      <p className="text-muted-foreground text-sm">Vérifie le stock en magasin en temps réel</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <Check className="w-6 h-6 text-primary flex-shrink-0 mt-1" />
+                    <div>
+                      <span className="font-semibold text-lg">Notifications produits</span>
+                      <p className="text-muted-foreground text-sm">Alertes instore et online pour opportunités</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <Check className="w-6 h-6 text-primary flex-shrink-0 mt-1" />
+                    <div>
+                      <span className="font-semibold text-lg">Conseils niches privées</span>
+                      <p className="text-muted-foreground text-sm">Investissements stratégiques et opportunités exclusives</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <Check className="w-6 h-6 text-primary flex-shrink-0 mt-1" />
+                    <div>
+                      <span className="font-semibold text-lg">Réductions exclusives</span>
+                      <p className="text-muted-foreground text-sm">Tarifs préférentiels sur emballages et bordereaux</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <Check className="w-6 h-6 text-primary flex-shrink-0 mt-1" />
+                    <div>
+                      <span className="font-semibold text-lg">Service logistique</span>
+                      <p className="text-muted-foreground text-sm">Stockage et expédition sous 24h disponibles</p>
+                    </div>
+                  </div>
                 </div>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-3">
-                  <li className="flex items-start gap-2">
-                    <Check className="w-5 h-5 text-secondary flex-shrink-0 mt-0.5" />
-                    <span className="font-semibold">Tout du pack Business</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Check className="w-5 h-5 text-secondary flex-shrink-0 mt-0.5" />
-                    <span>Manager dédié</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Check className="w-5 h-5 text-secondary flex-shrink-0 mt-0.5" />
-                    <span>Coaching illimité</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Check className="w-5 h-5 text-secondary flex-shrink-0 mt-0.5" />
-                    <span>Audit compte mensuel</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Check className="w-5 h-5 text-secondary flex-shrink-0 mt-0.5" />
-                    <span>Stratégie personnalisée</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Check className="w-5 h-5 text-secondary flex-shrink-0 mt-0.5" />
-                    <span>Accès anticipé nouveautés</span>
-                  </li>
-                </ul>
               </CardContent>
-              <CardFooter>
-                <Button variant="secondary" className="w-full" size="lg">
-                  Choisir Premium
+              <CardFooter className="px-8 pb-8">
+                <Button variant="hero" className="w-full text-lg py-6" size="lg">
+                  Commencer l'essai gratuit (15 jours)
                 </Button>
               </CardFooter>
             </Card>
           </div>
 
-          {/* Annual Discount */}
+          {/* Trust Section */}
           <Card className="mb-16 bg-gradient-to-r from-primary/10 via-secondary/10 to-primary/10 border-2 border-primary/20">
             <CardContent className="p-8 text-center">
-              <h3 className="text-2xl font-bold mb-2">Économisez avec l'abonnement annuel</h3>
+              <h3 className="text-2xl font-bold mb-2">Sans engagement</h3>
               <p className="text-muted-foreground mb-4">
-                Payez 10 mois, profitez de 12 mois - soit 2 mois offerts sur tous les packs
+                Teste pendant 15 jours gratuitement. Annule à tout moment sans frais.
               </p>
-              <Badge className="bg-primary text-white">-17% sur l'année</Badge>
+              <div className="flex flex-wrap justify-center gap-4">
+                <Badge className="bg-primary/20 text-primary border-primary/30">Paiement sécurisé</Badge>
+                <Badge className="bg-primary/20 text-primary border-primary/30">Sans engagement</Badge>
+                <Badge className="bg-primary/20 text-primary border-primary/30">Support réactif</Badge>
+              </div>
             </CardContent>
           </Card>
-
-          {/* Fulfilment Pricing */}
-          <div className="mb-16">
-            <h2 className="text-4xl font-bold text-center mb-8">Tarifs Stockage & Fulfilment</h2>
-            <p className="text-center text-muted-foreground mb-12 max-w-2xl mx-auto">
-              Tarification transparente pour nos services de logistique
-            </p>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Stockage</CardTitle>
-                  <CardDescription>Par palette et par mois</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-3">
-                    <li className="flex justify-between items-center">
-                      <span>Première palette</span>
-                      <span className="font-bold">80€/mois</span>
-                    </li>
-                    <li className="flex justify-between items-center">
-                      <span>Palettes supplémentaires</span>
-                      <span className="font-bold">60€/mois</span>
-                    </li>
-                    <li className="flex justify-between items-center">
-                      <span>Stockage petit colis</span>
-                      <span className="font-bold">2€/colis/mois</span>
-                    </li>
-                  </ul>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>Préparation & Expédition</CardTitle>
-                  <CardDescription>À l'unité</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-3">
-                    <li className="flex justify-between items-center">
-                      <span>Préparation colis standard</span>
-                      <span className="font-bold">1.50€</span>
-                    </li>
-                    <li className="flex justify-between items-center">
-                      <span>Préparation FBA</span>
-                      <span className="font-bold">2€</span>
-                    </li>
-                    <li className="flex justify-between items-center">
-                      <span>Expédition nationale</span>
-                      <span className="font-bold">À partir de 5€</span>
-                    </li>
-                  </ul>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
 
           {/* FAQ Pricing */}
           <div className="max-w-3xl mx-auto">
