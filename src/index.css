@@ -131,14 +131,28 @@
     transform: translateX(0);
   }
   100% {
-    transform: translateX(-50%);
+    transform: translateX(-33.333%);
   }
 }
 
-.animate-scroll-left {
-  animation: scroll-left 120s linear infinite;
+@keyframes scroll-right {
+  0% {
+    transform: translateX(-33.333%);
+  }
+  100% {
+    transform: translateX(0);
+  }
 }
 
-.animate-scroll-left:hover {
+.animate-scroll-fast {
+  animation: scroll-left 45s linear infinite;
+}
+
+.animate-scroll-reverse {
+  animation: scroll-right 45s linear infinite;
+}
+
+.animate-scroll-fast:hover,
+.animate-scroll-reverse:hover {
   animation-play-state: paused;
 }

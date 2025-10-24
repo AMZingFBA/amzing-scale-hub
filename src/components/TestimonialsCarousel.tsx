@@ -135,31 +135,70 @@ const testimonials = [
 ];
 
 const TestimonialsCarousel = () => {
-  // Duplicate testimonials for seamless loop
-  const duplicatedTestimonials = [...testimonials, ...testimonials];
+  // Split testimonials into two rows for opposite direction scrolling
+  const firstHalf = testimonials.slice(0, 13);
+  const secondHalf = testimonials.slice(13);
+  
+  const duplicatedFirst = [...firstHalf, ...firstHalf, ...firstHalf];
+  const duplicatedSecond = [...secondHalf, ...secondHalf, ...secondHalf];
 
   return (
-    <div className="relative overflow-hidden py-8">
-      <div className="flex animate-scroll-left gap-6">
-        {duplicatedTestimonials.map((testimonial, index) => (
-          <Card key={index} className="flex-shrink-0 w-[400px] hover:shadow-xl transition-shadow">
+    <div className="relative overflow-hidden space-y-6">
+      {/* First row - scrolling left */}
+      <div className="flex animate-scroll-fast gap-6">
+        {duplicatedFirst.map((testimonial, index) => (
+          <Card 
+            key={index} 
+            className="flex-shrink-0 w-[380px] hover:scale-105 transition-all duration-300 hover:shadow-2xl hover:border-primary/50 bg-gradient-to-br from-background to-muted/30"
+          >
             <CardContent className="pt-6">
-              <div className="flex items-center mb-4">
+              <div className="flex items-center mb-3 gap-1">
                 {[...Array(5)].map((_, i) => (
                   <Star
                     key={i}
-                    className={`w-5 h-5 ${
+                    className={`w-4 h-4 ${
                       i < testimonial.rating
-                        ? "text-primary fill-primary"
+                        ? "text-primary fill-primary animate-pulse"
                         : "text-muted-foreground"
                     }`}
                   />
                 ))}
+                <span className="ml-2 text-sm font-bold text-primary">{testimonial.rating}/5</span>
               </div>
-              <p className="text-muted-foreground mb-4 min-h-[120px]">
-                {testimonial.text}
+              <p className="text-muted-foreground mb-4 text-sm leading-relaxed min-h-[100px]">
+                "{testimonial.text}"
               </p>
-              <p className="font-semibold">— {testimonial.name}</p>
+              <p className="font-bold text-primary">— {testimonial.name}</p>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      {/* Second row - scrolling right */}
+      <div className="flex animate-scroll-reverse gap-6">
+        {duplicatedSecond.map((testimonial, index) => (
+          <Card 
+            key={index} 
+            className="flex-shrink-0 w-[380px] hover:scale-105 transition-all duration-300 hover:shadow-2xl hover:border-secondary/50 bg-gradient-to-br from-background to-muted/30"
+          >
+            <CardContent className="pt-6">
+              <div className="flex items-center mb-3 gap-1">
+                {[...Array(5)].map((_, i) => (
+                  <Star
+                    key={i}
+                    className={`w-4 h-4 ${
+                      i < testimonial.rating
+                        ? "text-secondary fill-secondary animate-pulse"
+                        : "text-muted-foreground"
+                    }`}
+                  />
+                ))}
+                <span className="ml-2 text-sm font-bold text-secondary">{testimonial.rating}/5</span>
+              </div>
+              <p className="text-muted-foreground mb-4 text-sm leading-relaxed min-h-[100px]">
+                "{testimonial.text}"
+              </p>
+              <p className="font-bold text-secondary">— {testimonial.name}</p>
             </CardContent>
           </Card>
         ))}
