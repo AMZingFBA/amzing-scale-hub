@@ -2,8 +2,30 @@ import { useAuth } from '@/hooks/use-auth';
 import { Navigate } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Crown } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { 
+  Crown, BookOpen, Bell, CheckCircle, DollarSign, HelpCircle, 
+  Settings, Eye, FileText, Star, Calculator, Sparkles, Package,
+  Truck, Megaphone, Newspaper, MessageCircle, LightbulbIcon, Trophy,
+  ShoppingCart, Info
+} from 'lucide-react';
+
+interface CategoryItemProps {
+  icon: React.ElementType;
+  label: string;
+}
+
+const CategoryItem = ({ icon: Icon, label }: CategoryItemProps) => (
+  <Card className="hover:bg-accent/50 transition-colors cursor-pointer">
+    <CardContent className="p-4">
+      <div className="flex items-center gap-3">
+        <Icon className="w-5 h-5 text-primary" />
+        <span className="font-medium">{label}</span>
+      </div>
+    </CardContent>
+  </Card>
+);
 
 const Dashboard = () => {
   const { user, isVIP, subscription, isLoading } = useAuth();
@@ -51,55 +73,149 @@ const Dashboard = () => {
               </div>
             )}
 
-            <div className="grid gap-6 md:grid-cols-2">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Formations Exclusives</CardTitle>
-                  <CardDescription>Accédez à toutes nos formations premium</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground">
-                    Contenu des formations VIP à venir...
-                  </p>
-                </CardContent>
-              </Card>
+            <Accordion type="multiple" className="space-y-4">
+              {/* INTRODUCTION */}
+              <AccordionItem value="introduction" className="border rounded-lg px-6 bg-card">
+                <AccordionTrigger className="hover:no-underline">
+                  <div className="flex items-center gap-3">
+                    <BookOpen className="w-6 h-6 text-primary" />
+                    <span className="text-xl font-bold">INTRODUCTION</span>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent>
+                  <div className="grid gap-3 pt-2">
+                    <CategoryItem icon={Bell} label="notifications" />
+                    <CategoryItem icon={BookOpen} label="règles" />
+                    <CategoryItem icon={CheckCircle} label="débuter" />
+                    <CategoryItem icon={BookOpen} label="guides" />
+                    <CategoryItem icon={DollarSign} label="affiliation" />
+                    <CategoryItem icon={HelpCircle} label="support" />
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
 
-              <Card>
-                <CardHeader>
-                  <CardTitle>Outils Avancés</CardTitle>
-                  <CardDescription>Outils réservés aux membres VIP</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground">
-                    Outils VIP à venir...
-                  </p>
-                </CardContent>
-              </Card>
+              {/* OUTILS */}
+              <AccordionItem value="outils" className="border rounded-lg px-6 bg-card">
+                <AccordionTrigger className="hover:no-underline">
+                  <div className="flex items-center gap-3">
+                    <Settings className="w-6 h-6 text-primary" />
+                    <span className="text-xl font-bold">OUTILS</span>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent>
+                  <div className="grid gap-3 pt-2">
+                    <CategoryItem icon={Eye} label="création-société" />
+                    <CategoryItem icon={FileText} label="facture-autorisation" />
+                    <CategoryItem icon={DollarSign} label="cashback" />
+                    <CategoryItem icon={Star} label="avis" />
+                    <CategoryItem icon={Calculator} label="fiscalité-simplifiée" />
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
 
-              <Card>
-                <CardHeader>
-                  <CardTitle>Support Prioritaire</CardTitle>
-                  <CardDescription>Assistance rapide et personnalisée</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground">
-                    Contactez notre équipe support VIP...
-                  </p>
-                </CardContent>
-              </Card>
+              {/* PRODUITS GAGNANTS */}
+              <AccordionItem value="produits" className="border rounded-lg px-6 bg-card">
+                <AccordionTrigger className="hover:no-underline">
+                  <div className="flex items-center gap-3">
+                    <Sparkles className="w-6 h-6 text-primary" />
+                    <span className="text-xl font-bold">PRODUITS GAGNANTS</span>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent>
+                  <div className="grid gap-3 pt-2">
+                    <CategoryItem icon={Sparkles} label="produits-find" />
+                    <CategoryItem icon={Sparkles} label="produits-qogita" />
+                    <CategoryItem icon={Sparkles} label="produits-eany" />
+                    <CategoryItem icon={Package} label="grossistes" />
+                    <CategoryItem icon={DollarSign} label="promotions" />
+                    <CategoryItem icon={FileText} label="sitelist" />
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
 
-              <Card>
-                <CardHeader>
-                  <CardTitle>Catalogue Complet</CardTitle>
-                  <CardDescription>Accès à tous les produits</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground">
-                    Parcourez notre catalogue exclusif...
-                  </p>
-                </CardContent>
-              </Card>
-            </div>
+              {/* EXPÉDITION */}
+              <AccordionItem value="expedition" className="border rounded-lg px-6 bg-card">
+                <AccordionTrigger className="hover:no-underline">
+                  <div className="flex items-center gap-3">
+                    <Truck className="w-6 h-6 text-primary" />
+                    <span className="text-xl font-bold">EXPÉDITION</span>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent>
+                  <div className="grid gap-3 pt-2">
+                    <CategoryItem icon={Settings} label="fournitures" />
+                    <CategoryItem icon={Package} label="cartons" />
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+
+              {/* INFORMATIONS */}
+              <AccordionItem value="informations" className="border rounded-lg px-6 bg-card">
+                <AccordionTrigger className="hover:no-underline">
+                  <div className="flex items-center gap-3">
+                    <Bell className="w-6 h-6 text-primary" />
+                    <span className="text-xl font-bold">INFORMATIONS</span>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent>
+                  <div className="grid gap-3 pt-2">
+                    <CategoryItem icon={Megaphone} label="annonces" />
+                    <CategoryItem icon={Newspaper} label="actualités" />
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+
+              {/* COMMUNAUTÉ */}
+              <AccordionItem value="communaute" className="border rounded-lg px-6 bg-card">
+                <AccordionTrigger className="hover:no-underline">
+                  <div className="flex items-center gap-3">
+                    <MessageCircle className="w-6 h-6 text-primary" />
+                    <span className="text-xl font-bold">COMMUNAUTÉ</span>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent>
+                  <div className="grid gap-3 pt-2">
+                    <CategoryItem icon={MessageCircle} label="général" />
+                    <CategoryItem icon={LightbulbIcon} label="suggestions" />
+                    <CategoryItem icon={Trophy} label="succès" />
+                    <CategoryItem icon={DollarSign} label="ventes" />
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+
+              {/* MARKETPLACE */}
+              <AccordionItem value="marketplace" className="border rounded-lg px-6 bg-card">
+                <AccordionTrigger className="hover:no-underline">
+                  <div className="flex items-center gap-3">
+                    <ShoppingCart className="w-6 h-6 text-primary" />
+                    <span className="text-xl font-bold">MARKETPLACE</span>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent>
+                  <div className="grid gap-3 pt-2">
+                    <CategoryItem icon={ShoppingCart} label="acheter" />
+                    <CategoryItem icon={ShoppingCart} label="vendre" />
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+
+              {/* GESTION PRODUITS */}
+              <AccordionItem value="gestion" className="border rounded-lg px-6 bg-card">
+                <AccordionTrigger className="hover:no-underline">
+                  <div className="flex items-center gap-3">
+                    <Package className="w-6 h-6 text-primary" />
+                    <span className="text-xl font-bold">GESTION PRODUITS</span>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent>
+                  <div className="grid gap-3 pt-2">
+                    <CategoryItem icon={Info} label="informations" />
+                    <CategoryItem icon={Package} label="catalogue-produits" />
+                    <CategoryItem icon={MessageCircle} label="questions" />
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
           </div>
         </div>
       </main>
