@@ -277,7 +277,7 @@ const Services = () => {
           </div>
 
           {/* AMZing FBA 360 Detailed Section */}
-          <Card className="border-2 border-primary/20 shadow-2xl mb-16">
+          <Card id="amzing-360" className="border-2 border-primary/20 shadow-2xl mb-16 scroll-mt-24">
             <CardHeader className="bg-gradient-to-r from-primary/10 via-secondary/10 to-primary/10 pb-8">
               <div className="flex items-center gap-3 mb-4">
                 <div className="text-4xl">🚛</div>

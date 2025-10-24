@@ -29,7 +29,7 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
-                <Link to="/services" className="text-muted-foreground hover:text-primary transition-colors">
+                <Link to="/services#amzing-360" className="text-muted-foreground hover:text-primary transition-colors">
                   Stockage & Fulfilment
                 </Link>
               </li>
