@@ -40,8 +40,8 @@ const Formation = () => {
             <Card>
               <CardContent className="pt-6 text-center">
                 <Clock className="w-10 h-10 text-primary mx-auto mb-3" />
-                <h3 className="font-bold mb-2">8+ heures</h3>
-                <p className="text-sm text-muted-foreground">de vidéos</p>
+                <h3 className="font-bold mb-2">Cours privé</h3>
+                <p className="text-sm text-muted-foreground">à la demande sous 24h</p>
               </CardContent>
             </Card>
             <Card>
@@ -116,11 +116,15 @@ const Formation = () => {
                     </li>
                     <li className="flex items-start gap-2">
                       <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                      <span>Outils d'analyse (Jungle Scout, Helium 10)</span>
+                      <span>Outils d'analyse (Jungle Scout, Helium 10, Seller Amp)</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                       <span>Critères de sélection et calcul ROI</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                      <span>Utilisation de Sellertoolkit</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
@@ -143,7 +147,7 @@ const Formation = () => {
                   <ul className="space-y-2">
                     <li className="flex items-start gap-2">
                       <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                      <span>Trouver des fournisseurs fiables (Alibaba, 1688)</span>
+                      <span>Trouver des fournisseurs fiables</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
