@@ -37,8 +37,9 @@ const Formation = () => {
 
           {/* Key Features */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-20">
-            <Card>
+            <Card className="relative">
               <CardContent className="pt-6 text-center">
+                <Badge className="absolute top-2 right-2 bg-green-500 text-white">Gratuit</Badge>
                 <Clock className="w-10 h-10 text-primary mx-auto mb-3" />
                 <h3 className="font-bold mb-2">Cours privé</h3>
                 <p className="text-sm text-muted-foreground">à la demande sous 24h</p>
