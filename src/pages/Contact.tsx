@@ -1,4 +1,4 @@
-import { Mail, MessageSquare, Phone, MapPin } from "lucide-react";
+import { Mail, MessageSquare, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -130,23 +130,6 @@ const Contact = () => {
                       <a href="tel:+33123456789" className="text-primary hover:underline">
                         +33 1 23 45 67 89
                       </a>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardContent className="pt-6">
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-secondary to-primary flex items-center justify-center flex-shrink-0">
-                      <MapPin className="w-6 h-6 text-white" />
-                    </div>
-                    <div>
-                      <h3 className="font-bold text-lg mb-2">Adresse</h3>
-                      <p className="text-muted-foreground">
-                        123 Avenue de l'Innovation<br />
-                        75001 Paris, France
-                      </p>
                     </div>
                   </div>
                 </CardContent>
