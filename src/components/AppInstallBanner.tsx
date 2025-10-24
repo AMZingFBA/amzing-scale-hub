@@ -11,9 +11,19 @@ const AppInstallBanner = () => {
     const isNativePlatform = Capacitor.isNativePlatform();
     
     if (!isNativePlatform) {
-      // Check if user has previously dismissed the banner
-      const dismissed = localStorage.getItem('app-install-banner-dismissed');
-      if (!dismissed) {
+      // Check if user has dismissed the banner in the last 24 hours
+      const dismissedUntil = localStorage.getItem('app-install-banner-dismissed-until');
+      
+      if (dismissedUntil) {
+        const dismissTime = new Date(dismissedUntil).getTime();
+        const now = new Date().getTime();
+        
+        // Show banner again if 24 hours have passed
+        if (now > dismissTime) {
+          setIsVisible(true);
+        }
+      } else {
+        // First time, show the banner
         setIsVisible(true);
       }
     }
@@ -21,7 +31,11 @@ const AppInstallBanner = () => {
 
   const handleDismiss = () => {
     setIsVisible(false);
-    localStorage.setItem('app-install-banner-dismissed', 'true');
+    
+    // Set expiration to 24 hours from now
+    const tomorrow = new Date();
+    tomorrow.setHours(tomorrow.getHours() + 24);
+    localStorage.setItem('app-install-banner-dismissed-until', tomorrow.toISOString());
   };
 
   if (!isVisible) return null;
