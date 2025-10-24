@@ -301,20 +301,20 @@ const Index = () => {
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             <div className="text-center">
-              <div className="text-4xl md:text-5xl font-bold text-gradient mb-2">500+</div>
-              <div className="text-muted-foreground">Membres actifs</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl md:text-5xl font-bold text-gradient mb-2">200+</div>
+              <div className="text-4xl md:text-5xl font-bold text-gradient mb-2">1700+</div>
               <div className="text-muted-foreground">Produits sourcés</div>
             </div>
             <div className="text-center">
-              <div className="text-4xl md:text-5xl font-bold text-gradient mb-2">24h</div>
-              <div className="text-muted-foreground">Délai de préparation</div>
+              <div className="text-4xl md:text-5xl font-bold text-gradient mb-2">5,2M €</div>
+              <div className="text-muted-foreground">CA généré en 8 mois</div>
             </div>
             <div className="text-center">
-              <div className="text-4xl md:text-5xl font-bold text-gradient mb-2">95%</div>
-              <div className="text-muted-foreground">Satisfaction client</div>
+              <div className="text-4xl md:text-5xl font-bold text-gradient mb-2">24h</div>
+              <div className="text-muted-foreground">Délai d'expédition</div>
+            </div>
+            <div className="text-center">
+              <div className="text-4xl md:text-5xl font-bold text-gradient mb-2">92%</div>
+              <div className="text-muted-foreground">Taux de rétention mensuel</div>
             </div>
           </div>
         </div>
