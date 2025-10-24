@@ -72,7 +72,7 @@ const Contact = () => {
             </Card>
 
             {/* Contact Info */}
-            <div className="space-y-8">
+            <div className="space-y-6 flex flex-col justify-between h-full">
               <Card>
                 <CardContent className="pt-6">
                   <div className="flex items-start gap-4">
@@ -127,8 +127,8 @@ const Contact = () => {
                       <p className="text-muted-foreground mb-2">
                         Du lundi au vendredi, 9h-18h
                       </p>
-                      <a href="tel:+33123456789" className="text-primary hover:underline">
-                        +33 1 23 45 67 89
+                      <a href="tel:+33780930274" className="text-primary hover:underline">
+                        07 80 93 02 74
                       </a>
                     </div>
                   </div>
