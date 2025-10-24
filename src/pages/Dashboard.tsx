@@ -29,6 +29,8 @@ const Dashboard = () => {
   const daysRemaining = subscription?.expires_at 
     ? Math.ceil((new Date(subscription.expires_at).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))
     : null;
+  
+  const isTrialActive = subscription?.is_trial && daysRemaining && daysRemaining > 0;
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -41,7 +43,7 @@ const Dashboard = () => {
               <h1 className="text-4xl font-bold">Espace VIP</h1>
             </div>
 
-            {daysRemaining && daysRemaining > 0 && (
+            {isTrialActive && (
               <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 mb-6">
                 <p className="text-center">
                   🎉 Essai gratuit actif - Il vous reste <strong>{daysRemaining} jours</strong>

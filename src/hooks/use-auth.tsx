@@ -6,8 +6,9 @@ import { toast } from 'sonner';
 
 interface Subscription {
   plan_type: 'free' | 'vip';
-  status: 'active' | 'inactive' | 'cancelled';
+  status: 'active' | 'inactive' | 'cancelled' | 'expired';
   expires_at: string | null;
+  is_trial?: boolean;
 }
 
 interface AuthContextType {
@@ -37,7 +38,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       const { data, error } = await supabase
         .from('subscriptions')
-        .select('plan_type, status, expires_at')
+        .select('plan_type, status, expires_at, is_trial')
         .eq('user_id', userId)
         .single();
 
@@ -45,7 +46,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setSubscription(data as Subscription);
     } catch (error) {
       console.error('Error fetching subscription:', error);
-      setSubscription({ plan_type: 'free', status: 'active', expires_at: null });
+      setSubscription({ plan_type: 'free', status: 'active', expires_at: null, is_trial: false });
     }
   };
 

@@ -28,6 +28,7 @@ export const useTrial = () => {
           plan_type: 'vip',
           status: 'active',
           expires_at: expiresAt.toISOString(),
+          is_trial: true,
         })
         .eq('user_id', user.id);
 

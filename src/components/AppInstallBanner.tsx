@@ -2,15 +2,17 @@ import { useState, useEffect } from 'react';
 import { X, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Capacitor } from '@capacitor/core';
+import { useAuth } from '@/hooks/use-auth';
 
 const AppInstallBanner = () => {
   const [isVisible, setIsVisible] = useState(false);
+  const { isVIP } = useAuth();
 
   useEffect(() => {
-    // Only show banner on web (not in Capacitor app)
+    // Only show banner on web (not in Capacitor app) and not to VIP users
     const isNativePlatform = Capacitor.isNativePlatform();
     
-    if (!isNativePlatform) {
+    if (!isNativePlatform && !isVIP) {
       // Check if user has dismissed the banner in the last 24 hours
       const dismissedUntil = localStorage.getItem('app-install-banner-dismissed-until');
       
@@ -27,7 +29,7 @@ const AppInstallBanner = () => {
         setIsVisible(true);
       }
     }
-  }, []);
+  }, [isVIP]);
 
   const handleDismiss = () => {
     setIsVisible(false);
