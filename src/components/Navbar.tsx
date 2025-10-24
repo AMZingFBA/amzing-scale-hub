@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Menu, X, User, LogOut } from "lucide-react";
+import { Menu, X, User, LogOut, Crown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/use-auth";
@@ -64,6 +64,17 @@ const Navbar = () => {
                     )}
                   </div>
                   <DropdownMenuSeparator />
+                  {isVIP && (
+                    <>
+                      <DropdownMenuItem asChild>
+                        <Link to="/dashboard" className="cursor-pointer">
+                          <Crown className="w-4 h-4 mr-2" />
+                          Espace VIP
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                    </>
+                  )}
                   <DropdownMenuItem onClick={signOut}>
                     <LogOut className="w-4 h-4 mr-2" />
                     Se déconnecter
@@ -141,6 +152,19 @@ const Navbar = () => {
                     </Badge>
                   )}
                 </div>
+                {isVIP && (
+                  <Button
+                    variant="default"
+                    size="lg"
+                    className="w-full"
+                    asChild
+                  >
+                    <Link to="/dashboard" onClick={() => setIsOpen(false)}>
+                      <Crown className="w-4 h-4 mr-2" />
+                      Espace VIP
+                    </Link>
+                  </Button>
+                )}
                 <Button
                   variant="outline"
                   size="lg"

@@ -7,6 +7,7 @@ import ScrollToTop from "./components/ScrollToTop";
 import { AuthProvider } from "./hooks/use-auth";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
+import Dashboard from "./pages/Dashboard";
 import Services from "./pages/Services";
 import Formation from "./pages/Formation";
 import Catalogue from "./pages/Catalogue";
@@ -31,6 +32,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/services" element={<Services />} />
             <Route path="/formation" element={<Formation />} />
             <Route path="/catalogue" element={<Catalogue />} />

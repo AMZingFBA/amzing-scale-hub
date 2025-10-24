@@ -10,8 +10,11 @@ import AppInstallBanner from "@/components/AppInstallBanner";
 import heroWarehouse from "@/assets/hero-warehouse.jpg";
 import teamWorking from "@/assets/team-working.jpg";
 import logistics from "@/assets/logistics.jpg";
+import { useTrial } from "@/hooks/use-trial";
 
 const Index = () => {
+  const { startFreeTrial, isStarting } = useTrial();
+
   return (
     <div className="min-h-screen">
       <Navbar />
@@ -44,10 +47,13 @@ const Index = () => {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button variant="hero" size="xl" asChild>
-                <Link to="/tarifs">
-                  Commencer l'essai gratuit <ArrowRight className="ml-2" />
-                </Link>
+              <Button 
+                variant="hero" 
+                size="xl" 
+                onClick={startFreeTrial}
+                disabled={isStarting}
+              >
+                {isStarting ? 'Activation...' : 'Commencer l\'essai gratuit'} <ArrowRight className="ml-2" />
               </Button>
               <Button variant="outline" size="xl" asChild>
                 <Link to="/services">
@@ -352,10 +358,14 @@ const Index = () => {
             Essaie gratuitement pendant 15 jours, sans engagement
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button variant="secondary" size="xl" asChild className="bg-white text-primary hover:bg-white/90">
-              <Link to="/tarifs">
-                Commencer l'essai gratuit
-              </Link>
+            <Button 
+              variant="secondary" 
+              size="xl" 
+              className="bg-white text-primary hover:bg-white/90"
+              onClick={startFreeTrial}
+              disabled={isStarting}
+            >
+              {isStarting ? 'Activation...' : 'Commencer l\'essai gratuit'}
             </Button>
             <Button variant="outline" size="xl" className="border-white text-white hover:bg-white/10" asChild>
               <Link to="/contact">
