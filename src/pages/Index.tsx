@@ -314,7 +314,7 @@ const Index = () => {
             </div>
             <div className="text-center">
               <div className="text-4xl md:text-5xl font-bold text-gradient mb-2">92%</div>
-              <div className="text-muted-foreground">Des membres renouvellent chaque mois</div>
+              <div className="text-muted-foreground">De nos membres renouvellent chaque mois</div>
             </div>
           </div>
         </div>
