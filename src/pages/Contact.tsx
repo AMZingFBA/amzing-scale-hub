@@ -104,7 +104,7 @@ const Contact = () => {
                         Support communautaire en direct
                       </p>
                       <a 
-                        href="https://discord.com/channels/1430928328466108619/1430933836958531699" 
+                        href="https://discord.gg/tHQhCSDn" 
                         target="_blank" 
                         rel="noopener noreferrer"
                         className="text-primary hover:underline"
