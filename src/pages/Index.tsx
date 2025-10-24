@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import TestimonialsCarousel from "@/components/TestimonialsCarousel";
+import AppInstallBanner from "@/components/AppInstallBanner";
 import heroWarehouse from "@/assets/hero-warehouse.jpg";
 import teamWorking from "@/assets/team-working.jpg";
 import logistics from "@/assets/logistics.jpg";
@@ -14,6 +15,7 @@ const Index = () => {
   return (
     <div className="min-h-screen">
       <Navbar />
+      <AppInstallBanner />
       
       {/* Hero Section */}
       <section className="relative pt-32 pb-20 overflow-hidden">
