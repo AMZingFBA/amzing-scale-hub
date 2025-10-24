@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import TestimonialsCarousel from "@/components/TestimonialsCarousel";
 import heroWarehouse from "@/assets/hero-warehouse.jpg";
 import teamWorking from "@/assets/team-working.jpg";
 import logistics from "@/assets/logistics.jpg";
@@ -321,63 +322,21 @@ const Index = () => {
       </section>
 
       {/* Testimonials Section */}
-      <section className="py-20">
+      <section className="py-20 bg-muted/30">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
+            <Badge className="mb-4 bg-primary/10 text-primary border-primary/20">
+              Témoignages clients réels
+            </Badge>
             <h2 className="text-4xl md:text-5xl font-bold mb-4">
-              Ce que disent nos clients
+              Ce que disent nos membres
             </h2>
-            <p className="text-muted-foreground">
-              EXEMPLE - Témoignages à remplacer par de vrais avis clients
+            <p className="text-xl text-muted-foreground">
+              Plus de 500 membres actifs nous font confiance
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <Card>
-              <CardContent className="pt-6">
-                <div className="flex items-center mb-4">
-                  {[...Array(5)].map((_, i) => (
-                    <CheckCircle2 key={i} className="w-5 h-5 text-primary" />
-                  ))}
-                </div>
-                <p className="text-muted-foreground mb-4">
-                  "EXEMPLE - Grâce à AMZing FBA j'ai fait mes 1ères ventes en 2 semaines. Support rapide et stockage nickel."
-                </p>
-                <p className="font-semibold">— Julien, client</p>
-                <p className="text-sm text-muted-foreground">(À remplacer par témoignage réel)</p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="pt-6">
-                <div className="flex items-center mb-4">
-                  {[...Array(5)].map((_, i) => (
-                    <CheckCircle2 key={i} className="w-5 h-5 text-primary" />
-                  ))}
-                </div>
-                <p className="text-muted-foreground mb-4">
-                  "EXEMPLE - La formation est claire et actionnable. Le catalogue m'a fait gagner des mois de recherche."
-                </p>
-                <p className="font-semibold">— Sophie, vendeuse FBA</p>
-                <p className="text-sm text-muted-foreground">(À remplacer par témoignage réel)</p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="pt-6">
-                <div className="flex items-center mb-4">
-                  {[...Array(5)].map((_, i) => (
-                    <CheckCircle2 key={i} className="w-5 h-5 text-primary" />
-                  ))}
-                </div>
-                <p className="text-muted-foreground mb-4">
-                  "EXEMPLE - Le service de fulfilment m'a permis de me concentrer sur la croissance. ROI incroyable!"
-                </p>
-                <p className="font-semibold">— Marc, entrepreneur</p>
-                <p className="text-sm text-muted-foreground">(À remplacer par témoignage réel)</p>
-              </CardContent>
-            </Card>
-          </div>
+          <TestimonialsCarousel />
         </div>
       </section>
 
