@@ -260,9 +260,11 @@ const Contact = () => {
               <p className="text-muted-foreground mb-6">
                 Vous trouverez peut-être la réponse à votre question dans notre foire aux questions
               </p>
-              <Button variant="outline" size="lg">
-                Voir la FAQ
-              </Button>
+              <a href="/faq">
+                <Button variant="outline" size="lg">
+                  Voir la FAQ
+                </Button>
+              </a>
             </CardContent>
           </Card>
         </div>
