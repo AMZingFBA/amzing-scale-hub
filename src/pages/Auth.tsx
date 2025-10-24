@@ -54,7 +54,7 @@ const Auth = () => {
     <div className="min-h-screen bg-gradient-to-br from-primary/10 via-background to-secondary/10 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <Link to="/" className="flex items-center justify-center mb-8">
-          <img src={logo} alt="AMZing FBA" className="h-16" />
+          <img src={logo} alt="AMZing FBA" className="h-24" />
         </Link>
 
         <Card className="border-2">
