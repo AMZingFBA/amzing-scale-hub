@@ -1,4 +1,4 @@
-import { Check, AlertCircle, GraduationCap, Package, TrendingUp, MessageSquare, Target, DollarSign, Truck } from "lucide-react";
+import { Check, AlertCircle, GraduationCap, Package, TrendingUp, MessageSquare, Target, DollarSign, Truck, Headphones } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -275,6 +275,140 @@ const Services = () => {
               </CardContent>
             </Card>
           </div>
+
+          {/* AMZing FBA 360 Detailed Section */}
+          <Card className="border-2 border-primary/20 shadow-2xl mb-16">
+            <CardHeader className="bg-gradient-to-r from-primary/10 via-secondary/10 to-primary/10 pb-8">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="text-4xl">🚛</div>
+                <div>
+                  <CardTitle className="text-3xl mb-2">AMZing FBA 360</CardTitle>
+                  <CardDescription className="text-lg">Votre solution logistique tout-en-un</CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="p-8">
+              <div className="prose prose-lg max-w-none mb-8">
+                <p className="text-lg leading-relaxed text-muted-foreground">
+                  AMZing FBA 360 est une solution complète pensée pour les vendeurs Amazon. 
+                  Nous agissons comme votre propre centre logistique, <strong className="text-foreground">plus flexible et plus abordable que le FBA d'Amazon</strong>.
+                  Nous fournissons vos produits, les stockons dans nos entrepôts sécurisés, les emballons selon les standards Amazon, 
+                  puis les expédions sous 24h à vos clients.
+                </p>
+                <p className="text-lg leading-relaxed text-muted-foreground">
+                  Notre équipe gère également le SAV et le suivi des commandes, pour que vous n'ayez rien à faire.
+                </p>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-8 mb-8">
+                <div>
+                  <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+                    <Package className="w-6 h-6 text-primary" />
+                    Notre service complet
+                  </h3>
+                  <ul className="space-y-3">
+                    <li className="flex items-start gap-3">
+                      <Check className="w-5 h-5 text-primary flex-shrink-0 mt-1" />
+                      <div>
+                        <span className="font-semibold">Sourcing produits</span>
+                        <p className="text-sm text-muted-foreground">Nous fournissons les produits rentables</p>
+                      </div>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <Check className="w-5 h-5 text-primary flex-shrink-0 mt-1" />
+                      <div>
+                        <span className="font-semibold">Stockage sécurisé</span>
+                        <p className="text-sm text-muted-foreground">Entrepôts surveillés 24/7</p>
+                      </div>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <Check className="w-5 h-5 text-primary flex-shrink-0 mt-1" />
+                      <div>
+                        <span className="font-semibold">Emballage professionnel</span>
+                        <p className="text-sm text-muted-foreground">Standards Amazon respectés</p>
+                      </div>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <Check className="w-5 h-5 text-primary flex-shrink-0 mt-1" />
+                      <div>
+                        <span className="font-semibold">Expédition rapide</span>
+                        <p className="text-sm text-muted-foreground">Livraison sous 24h</p>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+
+                <div>
+                  <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+                    <MessageSquare className="w-6 h-6 text-primary" />
+                    Service après-vente inclus
+                  </h3>
+                  <ul className="space-y-3">
+                    <li className="flex items-start gap-3">
+                      <Check className="w-5 h-5 text-primary flex-shrink-0 mt-1" />
+                      <div>
+                        <span className="font-semibold">Gestion SAV</span>
+                        <p className="text-sm text-muted-foreground">Nous gérons les retours et réclamations</p>
+                      </div>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <Check className="w-5 h-5 text-primary flex-shrink-0 mt-1" />
+                      <div>
+                        <span className="font-semibold">Suivi commandes</span>
+                        <p className="text-sm text-muted-foreground">Tracking en temps réel</p>
+                      </div>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <Check className="w-5 h-5 text-primary flex-shrink-0 mt-1" />
+                      <div>
+                        <span className="font-semibold">Support dédié</span>
+                        <p className="text-sm text-muted-foreground">Équipe disponible pour vous</p>
+                      </div>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <Check className="w-5 h-5 text-primary flex-shrink-0 mt-1" />
+                      <div>
+                        <span className="font-semibold">Flexibilité totale</span>
+                        <p className="text-sm text-muted-foreground">Contrôle total sur vos stocks</p>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              <div className="bg-gradient-to-r from-primary/10 via-secondary/10 to-primary/10 rounded-lg p-6 mb-6">
+                <div className="flex items-start gap-4">
+                  <div className="text-3xl">💰</div>
+                  <div>
+                    <h4 className="text-xl font-bold mb-2">Économisez jusqu'à 30% vs Amazon FBA</h4>
+                    <p className="text-muted-foreground mb-4">
+                      Vous bénéficiez de frais de stockage et d'expédition jusqu'à 30 % inférieurs à ceux d'Amazon, 
+                      tout en gardant un contrôle total sur vos marges et vos stocks.
+                    </p>
+                    <div className="grid grid-cols-2 gap-4 text-sm">
+                      <div className="bg-background rounded p-3">
+                        <div className="font-semibold text-primary">Tarifs transparents</div>
+                        <div className="text-muted-foreground">Sans frais cachés</div>
+                      </div>
+                      <div className="bg-background rounded p-3">
+                        <div className="font-semibold text-primary">Flexibilité totale</div>
+                        <div className="text-muted-foreground">Aucun engagement long terme</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-muted/50 rounded-lg p-6">
+                <p className="text-center text-lg font-semibold mb-2">
+                  🎯 AMZing FBA 360 = Votre grossiste + Votre entrepôt + Votre partenaire logistique
+                </p>
+                <p className="text-center text-muted-foreground">
+                  Nous simplifions la revente sur Amazon en prenant tout en charge pour vous — du fournisseur au client final
+                </p>
+              </div>
+            </CardContent>
+          </Card>
 
           {/* CTA */}
           <Card className="bg-gradient-to-r from-primary to-secondary text-white border-none">

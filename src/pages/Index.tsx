@@ -229,6 +229,73 @@ const Index = () => {
         </div>
       </section>
 
+      {/* AMZing FBA 360 Section */}
+      <section className="py-20 bg-muted/30">
+        <div className="container mx-auto px-4">
+          <Card className="border-2 border-primary/20 shadow-2xl overflow-hidden max-w-6xl mx-auto">
+            <div className="grid md:grid-cols-2 gap-0">
+              <div className="bg-gradient-to-br from-primary/10 via-secondary/10 to-primary/5 p-12 flex flex-col justify-center">
+                <Badge className="mb-4 bg-primary/20 text-primary border-primary/30 w-fit">
+                  Service Premium Inclus
+                </Badge>
+                <h2 className="text-4xl font-bold mb-6 text-gradient">
+                  🚛 AMZing FBA 360
+                </h2>
+                <p className="text-xl font-semibold mb-4">
+                  Votre solution logistique tout-en-un
+                </p>
+                <p className="text-muted-foreground text-lg leading-relaxed mb-4">
+                  AMZing FBA 360 est une solution complète pensée pour les vendeurs Amazon.
+                </p>
+                <p className="text-muted-foreground leading-relaxed">
+                  Nous agissons comme votre propre centre logistique, <strong className="text-foreground">plus flexible et plus abordable que le FBA d'Amazon</strong>.
+                </p>
+              </div>
+              <div className="p-12 bg-background">
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="text-xl font-bold mb-3">Comment ça marche ?</h3>
+                    <ul className="space-y-3 text-muted-foreground">
+                      <li className="flex items-start gap-3">
+                        <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-1" />
+                        <span>Nous fournissons vos produits rentables</span>
+                      </li>
+                      <li className="flex items-start gap-3">
+                        <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-1" />
+                        <span>Stockage dans nos entrepôts sécurisés</span>
+                      </li>
+                      <li className="flex items-start gap-3">
+                        <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-1" />
+                        <span>Emballage aux standards Amazon</span>
+                      </li>
+                      <li className="flex items-start gap-3">
+                        <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-1" />
+                        <span>Expédition sous 24h à vos clients</span>
+                      </li>
+                      <li className="flex items-start gap-3">
+                        <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-1" />
+                        <span>Gestion du SAV et suivi des commandes</span>
+                      </li>
+                    </ul>
+                  </div>
+                  <div className="pt-4 border-t">
+                    <div className="bg-primary/10 rounded-lg p-4">
+                      <p className="font-semibold text-lg mb-2">💰 Économisez jusqu'à 30%</p>
+                      <p className="text-sm text-muted-foreground">
+                        Frais de stockage et d'expédition inférieurs à Amazon FBA, avec un contrôle total sur vos marges
+                      </p>
+                    </div>
+                  </div>
+                  <p className="text-sm text-muted-foreground italic pt-4">
+                    AMZing FBA 360 = Votre grossiste + Votre entrepôt + Votre partenaire logistique
+                  </p>
+                </div>
+              </div>
+            </div>
+          </Card>
+        </div>
+      </section>
+
       {/* Stats Section */}
       <section className="py-20 bg-gradient-to-br from-primary/10 via-background to-secondary/10">
         <div className="container mx-auto px-4">
