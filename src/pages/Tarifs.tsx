@@ -132,24 +132,11 @@ const Tarifs = () => {
             <div className="space-y-4">
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-lg">Puis-je changer de pack ?</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground">
-                    Oui, vous pouvez upgrader ou downgrader votre pack à tout moment. 
-                    Les changements prennent effet au prochain cycle de facturation.
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
                   <CardTitle className="text-lg">Y a-t-il un engagement ?</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-muted-foreground">
-                    Aucun engagement. Vous pouvez annuler votre abonnement à tout moment. 
-                    Les abonnements annuels bénéficient d'une réduction mais sont non remboursables.
+                    Aucun engagement. Vous pouvez annuler votre abonnement à tout moment sans frais.
                   </p>
                 </CardContent>
               </Card>
@@ -160,8 +147,18 @@ const Tarifs = () => {
                 </CardHeader>
                 <CardContent>
                   <p className="text-muted-foreground">
-                    Nous acceptons les cartes bancaires (Visa, Mastercard, Amex) et les virements bancaires 
-                    pour les abonnements annuels.
+                    Nous acceptons les cartes bancaires (Visa, Mastercard, Amex) via notre plateforme de paiement sécurisée.
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Que comprend la période d{"'"}essai ?</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground">
+                    Les 15 jours d{"'"}essai gratuits vous donnent accès complet à tous les services : formation, catalogue produits, outils et communauté Discord VIP.
                   </p>
                 </CardContent>
               </Card>
