@@ -145,11 +145,11 @@
 }
 
 .animate-scroll-fast {
-  animation: scroll-left 45s linear infinite;
+  animation: scroll-left 25s linear infinite;
 }
 
 .animate-scroll-reverse {
-  animation: scroll-right 45s linear infinite;
+  animation: scroll-right 25s linear infinite;
 }
 
 .animate-scroll-fast:hover,
