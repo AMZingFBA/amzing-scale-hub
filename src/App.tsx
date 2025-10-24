@@ -11,6 +11,9 @@ import Catalogue from "./pages/Catalogue";
 import Tarifs from "./pages/Tarifs";
 import Contact from "./pages/Contact";
 import FAQ from "./pages/FAQ";
+import CGV from "./pages/CGV";
+import Privacy from "./pages/Privacy";
+import Refund from "./pages/Refund";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -30,6 +33,9 @@ const App = () => (
           <Route path="/tarifs" element={<Tarifs />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/faq" element={<FAQ />} />
+          <Route path="/cgv" element={<CGV />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/refund" element={<Refund />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

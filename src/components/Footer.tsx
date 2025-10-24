@@ -74,6 +74,17 @@ const Footer = () => {
           <p className="text-muted-foreground text-sm">
             © {new Date().getFullYear()} AMZing FBA. Tous droits réservés.
           </p>
+          <div className="flex gap-6 text-sm">
+            <Link to="/cgv" className="text-muted-foreground hover:text-primary transition-colors">
+              CGV
+            </Link>
+            <Link to="/privacy" className="text-muted-foreground hover:text-primary transition-colors">
+              Confidentialité
+            </Link>
+            <Link to="/refund" className="text-muted-foreground hover:text-primary transition-colors">
+              Remboursement
+            </Link>
+          </div>
         </div>
       </div>
     </footer>
