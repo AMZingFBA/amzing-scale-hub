@@ -29,13 +29,13 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
-                <Link to="/fulfilment" className="text-muted-foreground hover:text-primary transition-colors">
+                <Link to="/services" className="text-muted-foreground hover:text-primary transition-colors">
                   Stockage & Fulfilment
                 </Link>
               </li>
               <li>
-                <Link to="/coaching" className="text-muted-foreground hover:text-primary transition-colors">
-                  Coaching Premium
+                <Link to="/tarifs" className="text-muted-foreground hover:text-primary transition-colors">
+                  Tarifs
                 </Link>
               </li>
             </ul>
@@ -46,16 +46,6 @@ const Footer = () => {
             <h3 className="font-bold text-foreground mb-4">Informations</h3>
             <ul className="space-y-2">
               <li>
-                <Link to="/about" className="text-muted-foreground hover:text-primary transition-colors">
-                  À propos
-                </Link>
-              </li>
-              <li>
-                <Link to="/case-studies" className="text-muted-foreground hover:text-primary transition-colors">
-                  Études de cas
-                </Link>
-              </li>
-              <li>
                 <Link to="/faq" className="text-muted-foreground hover:text-primary transition-colors">
                   FAQ
                 </Link>
@@ -64,6 +54,16 @@ const Footer = () => {
                 <Link to="/contact" className="text-muted-foreground hover:text-primary transition-colors">
                   Contact
                 </Link>
+              </li>
+              <li>
+                <a 
+                  href="https://discord.gg/tHQhCSDn" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-muted-foreground hover:text-primary transition-colors"
+                >
+                  Discord
+                </a>
               </li>
             </ul>
           </div>
@@ -74,17 +74,6 @@ const Footer = () => {
           <p className="text-muted-foreground text-sm">
             © {new Date().getFullYear()} AMZing FBA. Tous droits réservés.
           </p>
-          <div className="flex gap-6 text-sm">
-            <Link to="/legal/privacy" className="text-muted-foreground hover:text-primary transition-colors">
-              Politique de confidentialité
-            </Link>
-            <Link to="/legal/terms" className="text-muted-foreground hover:text-primary transition-colors">
-              CGV
-            </Link>
-            <Link to="/legal/mentions" className="text-muted-foreground hover:text-primary transition-colors">
-              Mentions légales
-            </Link>
-          </div>
         </div>
       </div>
     </footer>
