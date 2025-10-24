@@ -169,14 +169,16 @@ const Tarifs = () => {
           <Card className="mt-16 bg-gradient-to-r from-primary to-secondary text-white border-none">
             <CardContent className="p-12 text-center">
               <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                Besoin d'un Devis Personnalisé ?
+                Besoin d{"'"}un Devis Personnalisé ?
               </h2>
               <p className="text-xl mb-8 text-white/90 max-w-2xl mx-auto">
                 Contactez-nous pour discuter de vos besoins spécifiques
               </p>
-              <Button variant="secondary" size="xl" className="bg-white text-primary hover:bg-white/90">
-                Nous contacter
-              </Button>
+              <a href="/contact">
+                <Button variant="secondary" size="xl" className="bg-white text-primary hover:bg-white/90">
+                  Nous contacter
+                </Button>
+              </a>
             </CardContent>
           </Card>
         </div>
