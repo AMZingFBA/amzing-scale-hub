@@ -1,5 +1,5 @@
 import { useAuth } from '@/hooks/use-auth';
-import { Navigate } from 'react-router-dom';
+import { Navigate, Link } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -14,18 +14,27 @@ import {
 interface CategoryItemProps {
   icon: React.ElementType;
   label: string;
+  link?: string;
 }
 
-const CategoryItem = ({ icon: Icon, label }: CategoryItemProps) => (
-  <Card className="hover:bg-accent/50 transition-colors cursor-pointer">
-    <CardContent className="p-4">
-      <div className="flex items-center gap-3">
-        <Icon className="w-5 h-5 text-primary" />
-        <span className="font-medium">{label}</span>
-      </div>
-    </CardContent>
-  </Card>
-);
+const CategoryItem = ({ icon: Icon, label, link }: CategoryItemProps) => {
+  const content = (
+    <Card className="hover:bg-accent/50 transition-colors cursor-pointer">
+      <CardContent className="p-4">
+        <div className="flex items-center gap-3">
+          <Icon className="w-5 h-5 text-primary" />
+          <span className="font-medium">{label}</span>
+        </div>
+      </CardContent>
+    </Card>
+  );
+
+  if (link) {
+    return <Link to={link}>{content}</Link>;
+  }
+
+  return content;
+};
 
 const Dashboard = () => {
   const { user, isVIP, subscription, isLoading } = useAuth();
@@ -87,7 +96,7 @@ const Dashboard = () => {
                     <CategoryItem icon={Bell} label="notifications" />
                     <CategoryItem icon={BookOpen} label="règles" />
                     <CategoryItem icon={CheckCircle} label="débuter" />
-                    <CategoryItem icon={BookOpen} label="guides" />
+                    <CategoryItem icon={BookOpen} label="guides" link="/guides" />
                     <CategoryItem icon={DollarSign} label="affiliation" />
                     <CategoryItem icon={HelpCircle} label="support" />
                   </div>

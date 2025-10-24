@@ -8,6 +8,7 @@ import { AuthProvider } from "./hooks/use-auth";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
+import Guides from "./pages/Guides";
 import Services from "./pages/Services";
 import Formation from "./pages/Formation";
 import Catalogue from "./pages/Catalogue";
@@ -33,6 +34,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/guides" element={<Guides />} />
             <Route path="/services" element={<Services />} />
             <Route path="/formation" element={<Formation />} />
             <Route path="/catalogue" element={<Catalogue />} />
