@@ -46,6 +46,7 @@ export type Database = {
           created_at: string
           expires_at: string | null
           id: string
+          is_trial: boolean | null
           plan_type: string
           started_at: string
           status: string
@@ -56,6 +57,7 @@ export type Database = {
           created_at?: string
           expires_at?: string | null
           id?: string
+          is_trial?: boolean | null
           plan_type: string
           started_at?: string
           status: string
@@ -66,6 +68,7 @@ export type Database = {
           created_at?: string
           expires_at?: string | null
           id?: string
+          is_trial?: boolean | null
           plan_type?: string
           started_at?: string
           status?: string
@@ -79,7 +82,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      check_and_expire_subscriptions: { Args: never; Returns: undefined }
     }
     Enums: {
       [_ in never]: never
