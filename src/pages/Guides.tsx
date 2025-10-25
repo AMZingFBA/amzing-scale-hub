@@ -515,65 +515,226 @@ const Guides = () => {
                       <AccordionTrigger className="text-lg font-semibold hover:no-underline">
                         <div className="flex items-center gap-3">
                           <Building2 className="w-5 h-5 text-primary" />
-                          <span>Créer son entreprise facilement</span>
+                          <span>Comment créer son entreprise facilement ?</span>
                         </div>
                       </AccordionTrigger>
-                      <AccordionContent className="space-y-4 pt-4">
-                        <p>Créer une entreprise pour ton activité Amazon FBA est simple et rapide. Voici les options :</p>
-                        
-                        <div className="space-y-4">
+                      <AccordionContent className="space-y-6 pt-4">
+                        <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-4">
+                          <p className="flex items-start gap-2">
+                            <span className="text-lg">💡</span>
+                            <span className="text-sm">Dans ce guide, nous t'expliquons comment il est possible de créer ta société de la manière la plus simple et la moins chère possible.</span>
+                          </p>
+                        </div>
+
+                        <div>
+                          <h3 className="text-xl font-bold mb-4">Explication rapide</h3>
+                          <p className="mb-4">Créer sa société à partir de <strong>84,15€</strong> ici :</p>
+                          
                           <Card className="bg-primary/5">
-                            <CardHeader>
-                              <CardTitle className="text-base">🚀 Auto-entrepreneur (Micro-entreprise)</CardTitle>
-                            </CardHeader>
-                            <CardContent className="text-sm space-y-3">
-                              <div>
-                                <p className="font-semibold mb-1">Avantages :</p>
-                                <ul className="list-disc list-inside space-y-1 text-muted-foreground">
-                                  <li>Création gratuite et instantanée en ligne</li>
-                                  <li>Comptabilité ultra-simplifiée</li>
-                                  <li>Charges sociales calculées sur le CA (environ 22%)</li>
-                                  <li>Pas de TVA à gérer si CA &lt; 36 800 €</li>
-                                </ul>
-                              </div>
-                              <div>
-                                <p className="font-semibold mb-1">Inconvénients :</p>
-                                <ul className="list-disc list-inside space-y-1 text-muted-foreground">
-                                  <li>Plafond de CA : 188 700 € pour l'achat-revente</li>
-                                  <li>Difficulté à récupérer la TVA sur les achats</li>
-                                </ul>
+                            <CardContent className="pt-6">
+                              <div className="flex items-start gap-3">
+                                <div className="flex-1">
+                                  <h4 className="font-semibold mb-2">LegalPlace - Lancez votre société, on s'occupe de tout !</h4>
+                                  <p className="text-sm text-muted-foreground mb-3">
+                                    Créez votre entreprise simplement et rapidement. Gérez votre juridique et votre comptabilité ultra efficacement.
+                                  </p>
+                                  <a 
+                                    href="https://c3po.link/QPhAN9VEpB" 
+                                    target="_blank" 
+                                    rel="noopener noreferrer"
+                                    className="text-primary hover:underline text-sm font-medium"
+                                  >
+                                    🔗 https://c3po.link/QPhAN9VEpB
+                                  </a>
+                                </div>
                               </div>
                             </CardContent>
                           </Card>
+                        </div>
 
-                          <Card className="bg-primary/5">
-                            <CardHeader>
-                              <CardTitle className="text-base">🏢 SASU / EURL</CardTitle>
-                            </CardHeader>
-                            <CardContent className="text-sm space-y-3">
-                              <div>
-                                <p className="font-semibold mb-1">Avantages :</p>
-                                <ul className="list-disc list-inside space-y-1 text-muted-foreground">
-                                  <li>Pas de plafond de CA</li>
-                                  <li>Récupération de la TVA sur tous tes achats</li>
-                                  <li>Plus crédible auprès des fournisseurs et banques</li>
-                                  <li>Protection du patrimoine personnel</li>
-                                </ul>
-                              </div>
-                              <div>
-                                <p className="font-semibold mb-1">Inconvénients :</p>
-                                <ul className="list-disc list-inside space-y-1 text-muted-foreground">
-                                  <li>Création payante (frais entre 200 et 500 €)</li>
-                                  <li>Comptabilité plus complexe (besoin d'un expert-comptable)</li>
-                                  <li>Charges sociales plus élevées</li>
-                                </ul>
-                              </div>
-                            </CardContent>
-                          </Card>
+                        <div>
+                          <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+                            <span>🤔</span>
+                            <span>Comment créer une micro-entreprise ?</span>
+                          </h3>
+                          
+                          <p className="mb-4 font-semibold">Pour créer sa micro-entreprise, il existe deux moyens de le faire :</p>
 
-                          <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4">
-                            <p className="font-semibold">💡 Conseil</p>
-                            <p className="text-sm mt-2">Commence en auto-entrepreneur si tu débutes, puis passe en SASU/EURL quand ton CA dépasse 50 000 €/an.</p>
+                          <div className="space-y-6">
+                            <div>
+                              <h4 className="font-semibold mb-3">Créer sa micro-entreprise soi-même gratuitement :</h4>
+                              
+                              <p className="mb-3">
+                                - Rends-toi sur le site du ministère de l'Économie et des Finances à l'adresse suivante : 
+                                <a 
+                                  href="https://www.economie.gouv.fr" 
+                                  target="_blank" 
+                                  rel="noopener noreferrer"
+                                  className="text-primary hover:underline ml-1"
+                                >
+                                  lien
+                                </a>.
+                              </p>
+
+                              <Card className="bg-primary/5 mb-4">
+                                <CardContent className="pt-6">
+                                  <h5 className="font-semibold mb-2">Comment devenir micro-entrepreneur (auto-entrepreneur) ?</h5>
+                                  <p className="text-sm text-muted-foreground mb-3">
+                                    Le micro-entrepreneur, ou auto-entrepreneur, bénéficie d'un régime unique et simplifié, destiné à faciliter un début d'activité.
+                                  </p>
+                                  <a 
+                                    href="https://rb.gy/lqt0ge" 
+                                    target="_blank" 
+                                    rel="noopener noreferrer"
+                                    className="text-primary hover:underline text-sm font-medium inline-flex items-center gap-1"
+                                  >
+                                    🇫🇷 https://rb.gy/lqt0ge
+                                  </a>
+                                </CardContent>
+                              </Card>
+
+                              <p className="mb-3">
+                                - Crée un compte INPI Connect ou France Connect pour accéder aux prochaines étapes de création de ton entreprise.
+                              </p>
+
+                              <p className="mb-3">
+                                - Après avoir rempli les formulaires nécessaires en ligne, tu recevras ton numéro de <strong>SIREN</strong> attribué par ta préfecture dans un délai d'une à deux semaines au maximum.
+                              </p>
+
+                              <p className="text-sm text-muted-foreground">
+                                Ce numéro est indispensable lorsque tu souhaites créer un profil de vendeur sur Amazon ou pour toute autre démarche administrative liée à ton entreprise.
+                              </p>
+                            </div>
+
+                            <div>
+                              <h4 className="font-semibold mb-3 flex items-center gap-2">
+                                <span>👨‍💼</span>
+                                <span>Créer sa micro-entreprise grâce à un gestionnaire de service :</span>
+                              </h4>
+                              
+                              <p className="mb-4">
+                                Nous te recommandons vivement d'utiliser le site internet <strong>LegalPlace</strong>, reconnu dans toute la France pour la qualité de son service de création d'entreprise.
+                              </p>
+
+                              <p className="mb-4">
+                                En ce qui concerne le prix de ces services, pour une <strong>SARL</strong>, prévois entre <strong>400 et 700 euros</strong> de frais de gestionnaire de service et de frais légaux.
+                              </p>
+
+                              <p className="mb-4">
+                                Le prix va dépendre du statut que tu vas choisir ainsi que l'activité, dans notre cas, l'achat-revente en ligne de produits diverses.
+                              </p>
+
+                              <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4 mb-4">
+                                <p className="font-semibold mb-2">💬 Besoin d'aide ?</p>
+                                <p className="text-sm">
+                                  N'hésite pas à venir en discuter dans le groupe, nous sommes nombreux à avoir des entreprises et nous serons là pour t'aider si tu as des questions !
+                                </p>
+                              </div>
+
+                              <p className="mb-3">
+                                Pour justement bien choisir son statut, nous t'invitons à lire ce prochain guide :
+                              </p>
+
+                              <div className="flex items-center gap-2 text-primary font-medium">
+                                <span>🏢</span>
+                                <span>Les différences entre auto-entrepreneur / SASU</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div>
+                          <h3 className="text-xl font-bold mb-4">Pour créer sa société, il existe deux moyens de le faire :</h3>
+
+                          <div className="space-y-6">
+                            <div>
+                              <h4 className="font-semibold mb-4 flex items-center gap-2">
+                                <span>👨‍💼</span>
+                                <span>Créer son entreprise via un avocat fiscaliste :</span>
+                              </h4>
+
+                              <p className="mb-4">
+                                Créer une entreprise avec l'aide d'un avocat fiscaliste peut être une excellente décision, surtout si tu veux assurer une bonne gestion fiscale dès le départ.
+                              </p>
+
+                              <p className="mb-3 font-semibold">Voici quelques points clé à considérer :</p>
+
+                              <div className="space-y-3 mb-4">
+                                <Card>
+                                  <CardContent className="pt-6">
+                                    <h5 className="font-semibold mb-2">1. Conseils sur la structure juridique :</h5>
+                                    <p className="text-sm text-muted-foreground">
+                                      Un avocat fiscaliste peut te conseiller sur la meilleure structure juridique pour ton entreprise en fonction de tes besoins spécifiques, qu'il s'agisse d'une SARL, d'une SAS, ou autre.
+                                    </p>
+                                  </CardContent>
+                                </Card>
+
+                                <Card>
+                                  <CardContent className="pt-6">
+                                    <h5 className="font-semibold mb-2">2. Optimisation fiscale :</h5>
+                                    <p className="text-sm text-muted-foreground">
+                                      L'avocat fiscaliste peut t'aider à optimiser ta situation fiscale en te conseillant sur les différentes options fiscales disponibles et en élaborant des stratégies pour minimiser ta charge fiscale tout en respectant la législation.
+                                    </p>
+                                  </CardContent>
+                                </Card>
+
+                                <Card>
+                                  <CardContent className="pt-6">
+                                    <h5 className="font-semibold mb-2">3. Formalités administratives :</h5>
+                                    <p className="text-sm text-muted-foreground">
+                                      Ils peuvent également t'aider à remplir toutes les formalités administratives nécessaires à la création de votre entreprise, ce qui peut te faire gagner du temps et t'assurer que tout est en ordre.
+                                    </p>
+                                  </CardContent>
+                                </Card>
+                              </div>
+
+                              <p className="mb-4">
+                                En ce qui concerne les coûts, cela varie énormément des honoraires de ton avocat, de la région où tu habites ou encore même du tarif horaire ou forfaitaire de ton avocat.
+                              </p>
+
+                              <p className="mb-4">
+                                Si nous devions donner une échelle de prix, comptez entre <strong>700 et 1500€</strong>.
+                              </p>
+
+                              <p className="text-sm text-muted-foreground">
+                                Concernant le délai de création de votre entreprise, cela dépendra également de ton avocat, mais en règle générale, tu pourras t'attendre à ce que le processus prenne plusieurs semaines.
+                              </p>
+                            </div>
+
+                            <div>
+                              <h4 className="font-semibold mb-4 flex items-center gap-2">
+                                <span>👨‍💼</span>
+                                <span>Créer son entreprise grâce à un gestionnaire de service :</span>
+                              </h4>
+
+                              <p className="mb-4">
+                                Nous te recommandons vivement d'utiliser le site internet <strong>LegalPlace</strong> reconnu dans toute la France pour la qualité de son service de création d'entreprise.
+                              </p>
+
+                              <p className="mb-4">
+                                En ce qui concerne le prix de ces services, pour une <strong>SARL</strong>, prévois entre <strong>400 et 700 euros</strong> de frais de gestionnaire de service et de frais légaux.
+                              </p>
+
+                              <p className="mb-4">
+                                Le prix va dépendre du statut que tu vas choisir ainsi que l'activité, dans notre cas, l'achat-revente en ligne de produits diverses.
+                              </p>
+
+                              <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4 mb-4">
+                                <p className="font-semibold mb-2">💬 Besoin d'aide ?</p>
+                                <p className="text-sm">
+                                  N'hésite pas à venir en discuter dans le groupe, nous sommes nombreux à avoir des entreprises et nous serons là pour t'aider si tu as des questions !
+                                </p>
+                              </div>
+
+                              <p className="mb-3">
+                                Pour justement bien choisir son statut, nous t'invitons à lire ce prochain guide :
+                              </p>
+
+                              <div className="flex items-center gap-2 text-primary font-medium">
+                                <span>🏢</span>
+                                <span>Les différences entre auto-entrepreneur / SASU</span>
+                              </div>
+                            </div>
                           </div>
                         </div>
                       </AccordionContent>
