@@ -539,12 +539,12 @@ const Guides = () => {
                                     Créez votre entreprise simplement et rapidement. Gérez votre juridique et votre comptabilité ultra efficacement.
                                   </p>
                                   <a 
-                                    href="https://c3po.link/QPhAN9VEpB" 
+                                    href="https://www.legalplace.fr/creation/landing/creation-entreprise-ads?utm_source=google&utm_medium=cpc&utm_campaign=Cr%C3%A9er%20entreprise&utm_content=Cr%C3%A9ation%20Entreprise%20France&k=%2Bcreation%20%2Bsociete%20%2Bfrance&gad_source=1&gad_campaignid=1444619687&gbraid=0AAAAADkacZmzyP6m_4HfIk1osKVZ0zgZI&gclid=CjwKCAjw6vHHBhBwEiwAq4zvA8snAcyVNVTv4O5rj0W1LZeIDwjavVj8Gga-1X1LaNhu2TKKCjD2txoCzRMQAvD_BwE" 
                                     target="_blank" 
                                     rel="noopener noreferrer"
                                     className="text-primary hover:underline text-sm font-medium"
                                   >
-                                    🔗 https://c3po.link/QPhAN9VEpB
+                                    🔗 Créer mon entreprise sur LegalPlace
                                   </a>
                                 </div>
                               </div>
@@ -567,7 +567,7 @@ const Guides = () => {
                               <p className="mb-3">
                                 - Rends-toi sur le site du ministère de l'Économie et des Finances à l'adresse suivante : 
                                 <a 
-                                  href="https://www.economie.gouv.fr" 
+                                  href="https://www.economie.gouv.fr/cedef/fiches-pratiques/micro-entrepreneur-auto-entrepreneur#:~:text=D%C3%A9claration%20d'activit%C3%A9%20en%20ligne,activit%C3%A9%2C%20via%20le%20guichet%20unique." 
                                   target="_blank" 
                                   rel="noopener noreferrer"
                                   className="text-primary hover:underline ml-1"
@@ -583,12 +583,12 @@ const Guides = () => {
                                     Le micro-entrepreneur, ou auto-entrepreneur, bénéficie d'un régime unique et simplifié, destiné à faciliter un début d'activité.
                                   </p>
                                   <a 
-                                    href="https://rb.gy/lqt0ge" 
+                                    href="https://www.economie.gouv.fr/cedef/fiches-pratiques/micro-entrepreneur-auto-entrepreneur#:~:text=D%C3%A9claration%20d'activit%C3%A9%20en%20ligne,activit%C3%A9%2C%20via%20le%20guichet%20unique." 
                                     target="_blank" 
                                     rel="noopener noreferrer"
                                     className="text-primary hover:underline text-sm font-medium inline-flex items-center gap-1"
                                   >
-                                    🇫🇷 https://rb.gy/lqt0ge
+                                    🇫🇷 Ministère de l'Économie et des Finances
                                   </a>
                                 </CardContent>
                               </Card>
@@ -744,47 +744,172 @@ const Guides = () => {
                       <AccordionTrigger className="text-lg font-semibold hover:no-underline">
                         <div className="flex items-center gap-3">
                           <Target className="w-5 h-5 text-primary" />
-                          <span>Auto-entrepreneur ou SASU ?</span>
+                          <span>Les différences entre auto-entrepreneur / SASU</span>
                         </div>
                       </AccordionTrigger>
-                      <AccordionContent className="space-y-4 pt-4">
-                        <div className="overflow-x-auto">
-                          <table className="w-full text-sm border-collapse">
-                            <thead>
-                              <tr className="border-b">
-                                <th className="text-left py-3 px-4">Critère</th>
-                                <th className="text-left py-3 px-4">Auto-entrepreneur</th>
-                                <th className="text-left py-3 px-4">SASU</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              <tr className="border-b">
-                                <td className="py-3 px-4 font-medium">Création</td>
-                                <td className="py-3 px-4 text-muted-foreground">Gratuite et rapide</td>
-                                <td className="py-3 px-4 text-muted-foreground">Payante (200-500 €)</td>
-                              </tr>
-                              <tr className="border-b">
-                                <td className="py-3 px-4 font-medium">Plafond CA</td>
-                                <td className="py-3 px-4 text-muted-foreground">188 700 €</td>
-                                <td className="py-3 px-4 text-muted-foreground">Illimité</td>
-                              </tr>
-                              <tr className="border-b">
-                                <td className="py-3 px-4 font-medium">TVA</td>
-                                <td className="py-3 px-4 text-muted-foreground">Franchise si &lt; 36 800 €</td>
-                                <td className="py-3 px-4 text-muted-foreground">Obligatoire dès le début</td>
-                              </tr>
-                              <tr className="border-b">
-                                <td className="py-3 px-4 font-medium">Comptabilité</td>
-                                <td className="py-3 px-4 text-muted-foreground">Simplifiée</td>
-                                <td className="py-3 px-4 text-muted-foreground">Expert-comptable requis</td>
-                              </tr>
-                              <tr>
-                                <td className="py-3 px-4 font-medium">Idéal pour</td>
-                                <td className="py-3 px-4 text-muted-foreground">Débutants, side-business</td>
-                                <td className="py-3 px-4 text-muted-foreground">Gros volumes, professionnels</td>
-                              </tr>
-                            </tbody>
-                          </table>
+                      <AccordionContent className="space-y-6 pt-4">
+                        <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-4">
+                          <p className="text-sm">
+                            Il faut savoir que pour la plupart des statuts, tu peux toi-même créer et rédiger les statuts pour minimiser les coûts, mais si tu n'as aucune connaissance (ce qui est normal), évite absolument ! Passe plutôt par une entreprise spécialisée ou par un avocat fiscaliste.
+                          </p>
+                        </div>
+
+                        <div className="space-y-6">
+                          <Card className="bg-primary/5">
+                            <CardHeader>
+                              <CardTitle className="text-base flex items-center gap-2">
+                                <span>👨‍⚖️</span>
+                                <span>Micro Entrepreneur (Auto-entrepreneur)</span>
+                              </CardTitle>
+                            </CardHeader>
+                            <CardContent className="text-sm space-y-2">
+                              <p>Si tu veux commencer pour tester et sans investir trop d'argent dans ton entreprise, c'est un bon début !</p>
+                              <p className="font-medium text-amber-600 dark:text-amber-400">
+                                ⚠️ Cependant ce n'est pas le meilleur choix à la longue, tu vas être limité et surtout un manque à gagner important, car tu ne récupères pas la TVA !
+                              </p>
+                            </CardContent>
+                          </Card>
+
+                          <Card className="bg-primary/5">
+                            <CardHeader>
+                              <CardTitle className="text-base flex items-center gap-2">
+                                <span>🏢</span>
+                                <span>SAS (Société par Actions Simplifiée)</span>
+                              </CardTitle>
+                            </CardHeader>
+                            <CardContent className="text-sm space-y-3">
+                              <p>Une SAS est l'une des formes juridiques les plus réputées pour le commerce. Elle se caractérise essentiellement par sa souplesse de fonctionnement.</p>
+                              
+                              <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3">
+                                <p className="font-semibold mb-1">🚨 Informations importantes :</p>
+                                <p className="text-xs">Tu peux créer une SAS à partir de 2 actionnaires, tu peux choisir ton capital social, rien n'est imposé par la loi, tu peux déposer 1€ symbolique.</p>
+                              </div>
+
+                              <p>Tu peux être le seul actionnaire d'une SAS, on parle alors d'une <strong>SASU (Société par Actions Simplifiée Unipersonnelle)</strong>.</p>
+                              <p className="font-medium">(Si tu es seul à créer ton entreprise alors oui il vaut mieux privilégier une SASU).</p>
+
+                              <div className="mt-4">
+                                <p className="font-semibold mb-2">Avantages de la SAS/SASU :</p>
+                                <ul className="list-disc list-inside space-y-1 text-xs">
+                                  <li>Capital social à partir de 1€</li>
+                                  <li>De faibles obligations légales</li>
+                                  <li>Un régime fiscal avantageux (La SASU est soumise par défaut au régime fiscal de l'impôt sur les sociétés (IS). Les bénéfices sont imposés à un taux de 15% jusqu'à 42 500€, puis 25% au-delà)</li>
+                                </ul>
+                                <p className="text-xs mt-2">La SASU est souvent choisie pour sa flexibilité et son régime fiscal avantageux pour les entreprises en croissance.</p>
+                              </div>
+
+                              <div className="mt-4">
+                                <p className="font-semibold mb-2">😬 Inconvénients :</p>
+                                <ul className="list-disc list-inside space-y-1 text-xs">
+                                  <li>Frais de constitution élevés</li>
+                                  <li>Une extrême rigueur dans la rédaction des statuts (Il faut des connaissances et passer par des professionnels comme un avocat fiscaliste ou une entreprise comme LegalPlace)</li>
+                                  <li>Tu ne vas pas cotiser, alors qu'en SARL il y a un minimum obligatoire pour la cotisation</li>
+                                </ul>
+                              </div>
+                            </CardContent>
+                          </Card>
+
+                          <Card className="bg-primary/5">
+                            <CardHeader>
+                              <CardTitle className="text-base flex items-center gap-2">
+                                <span>🤔</span>
+                                <span>La différence entre SARL et EURL</span>
+                              </CardTitle>
+                            </CardHeader>
+                            <CardContent className="text-sm space-y-3">
+                              <div>
+                                <p className="font-semibold mb-1">SARL (Société à Responsabilité Limitée) :</p>
+                                <ul className="list-disc list-inside space-y-1 text-xs text-muted-foreground">
+                                  <li>Une société commerciale constituée de deux associés au minimum et de cent associés au maximum</li>
+                                  <li>La responsabilité des associés est limitée au montant de leurs apports dans la société</li>
+                                  <li>Souvent choisie pour sa simplicité de fonctionnement et son cadre juridique bien établi</li>
+                                </ul>
+                              </div>
+
+                              <div>
+                                <p className="font-semibold mb-1">EURL (Entreprise Unipersonnelle à Responsabilité Limitée) :</p>
+                                <ul className="list-disc list-inside space-y-1 text-xs text-muted-foreground">
+                                  <li>Une EURL est une SARL avec un seul associé</li>
+                                  <li>Offre une responsabilité limitée pour l'associé unique, qui n'est responsable qu'à concurrence de ses apports</li>
+                                  <li>Son fonctionnement est similaire à celui d'une SARL, avec un gérant qui peut être l'associé unique ou une autre personne</li>
+                                </ul>
+                              </div>
+
+                              <p className="mt-3 text-xs">
+                                <strong>En résumé :</strong> La principale différence réside dans le nombre d'associés et la structure de gouvernance, avec la SASU étant la plus flexible et la mieux adaptée aux entreprises individuelles, tandis que la SARL peut accueillir plusieurs associés et offre une structure plus traditionnelle.
+                              </p>
+                            </CardContent>
+                          </Card>
+
+                          <Card className="bg-primary/5">
+                            <CardHeader>
+                              <CardTitle className="text-base flex items-center gap-2">
+                                <span>🌍</span>
+                                <span>LTD (Limited Company)</span>
+                              </CardTitle>
+                            </CardHeader>
+                            <CardContent className="text-sm">
+                              <p>Une LTD est une forme juridique d'entreprise qui est intéressante à l'étranger, mais il vaut mieux commencer avec une SAS/SARL en France.</p>
+                            </CardContent>
+                          </Card>
+
+                          <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4">
+                            <p className="font-semibold mb-2">💭 Autres paramètres à considérer :</p>
+                            <ul className="list-disc list-inside space-y-1 text-sm">
+                              <li>Est-ce que tu vas vivre grâce à cette activité ?</li>
+                              <li>Les bénéfices que tu estimes atteindre</li>
+                              <li>Auras-tu qu'une seule activité professionnelle pour ta société ?</li>
+                            </ul>
+                          </div>
+
+                          <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-4">
+                            <p className="font-semibold text-green-700 dark:text-green-400 mb-2">👨‍⚖️ Recommandation</p>
+                            <p className="text-sm">
+                              Il faut bien se renseigner et poser des questions sur le groupe, mais il est préférable d'opter pour une <strong>SASU ou EURL</strong>.
+                            </p>
+                          </div>
+                        </div>
+
+                        <div>
+                          <h3 className="text-lg font-bold mb-4">📊 Tableau comparatif</h3>
+                          <div className="overflow-x-auto">
+                            <table className="w-full text-sm border-collapse border">
+                              <thead>
+                                <tr className="border-b bg-muted/50">
+                                  <th className="text-left py-3 px-4 border-r">Critère</th>
+                                  <th className="text-left py-3 px-4 border-r">Auto-entrepreneur</th>
+                                  <th className="text-left py-3 px-4">SASU</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                <tr className="border-b">
+                                  <td className="py-3 px-4 font-medium border-r">Création</td>
+                                  <td className="py-3 px-4 text-muted-foreground border-r">Gratuite et rapide</td>
+                                  <td className="py-3 px-4 text-muted-foreground">Payante (200-500 €)</td>
+                                </tr>
+                                <tr className="border-b">
+                                  <td className="py-3 px-4 font-medium border-r">Plafond CA</td>
+                                  <td className="py-3 px-4 text-muted-foreground border-r">188 700 €</td>
+                                  <td className="py-3 px-4 text-muted-foreground">Illimité</td>
+                                </tr>
+                                <tr className="border-b">
+                                  <td className="py-3 px-4 font-medium border-r">TVA</td>
+                                  <td className="py-3 px-4 text-muted-foreground border-r">Franchise si &lt; 36 800 €</td>
+                                  <td className="py-3 px-4 text-muted-foreground">Obligatoire dès le début</td>
+                                </tr>
+                                <tr className="border-b">
+                                  <td className="py-3 px-4 font-medium border-r">Comptabilité</td>
+                                  <td className="py-3 px-4 text-muted-foreground border-r">Simplifiée</td>
+                                  <td className="py-3 px-4 text-muted-foreground">Expert-comptable requis</td>
+                                </tr>
+                                <tr>
+                                  <td className="py-3 px-4 font-medium border-r">Idéal pour</td>
+                                  <td className="py-3 px-4 text-muted-foreground border-r">Débutants, side-business</td>
+                                  <td className="py-3 px-4 text-muted-foreground">Gros volumes, professionnels</td>
+                                </tr>
+                              </tbody>
+                            </table>
+                          </div>
                         </div>
                       </AccordionContent>
                     </AccordionItem>
