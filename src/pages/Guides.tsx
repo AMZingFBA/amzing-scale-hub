@@ -1,4 +1,4 @@
-import { ArrowLeft, CheckCircle2, TrendingUp, Euro, Package, Store, Shield, Clock, Target, Building2, Wrench, BookOpen, GraduationCap, Search } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, TrendingUp, Euro, Package, Store, Shield, Clock, Target, Building2, Wrench, BookOpen, GraduationCap, Search, Users, CreditCard, ShoppingCart, TrendingDown, AlertTriangle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -6,6 +6,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import processFlow from '@/assets/amazon-process-flow.png';
+import profilProfessionnel from '@/assets/profil-professionnel.jpg';
+import compteVendeurAmazon from '@/assets/compte-vendeur-amazon.jpg';
+import produitsRentablesHero from '@/assets/produits-rentables-hero.jpg';
+import fbaWarehouse from '@/assets/fba-warehouse.jpg';
+import fbmPackages from '@/assets/fbm-packages.jpg';
+import reconnaitreProduitHero from '@/assets/reconaitre-produit-hero.png';
 
 const Guides = () => {
   return (
@@ -66,7 +72,7 @@ const Guides = () => {
                       <div className="bg-background/80 rounded-lg p-6 my-6">
                         <img 
                           src={processFlow} 
-                          alt="Processus d'achat-revente sur Amazon : Tu trouves un bon produit → tu l'achètes au bon prix → tu le mets sur Amazon → tu encaisses" 
+                          alt="Processus d'achat-revente sur Amazon" 
                           className="w-full max-w-3xl mx-auto"
                         />
                       </div>
@@ -177,7 +183,7 @@ const Guides = () => {
                         <CardTitle className="text-base">📦 FBA (Fulfillment by Amazon)</CardTitle>
                       </CardHeader>
                       <CardContent className="text-sm text-muted-foreground">
-                        Service d'Amazon qui gère le stockage, l'emballage et l'expédition de tes produits. Tu envoies tes articles à un entrepôt Amazon, et ils s'occupent du reste.
+                        Service d'Amazon qui gère le stockage, l'emballage et l'expédition de tes produits.
                       </CardContent>
                     </Card>
 
@@ -186,7 +192,7 @@ const Guides = () => {
                         <CardTitle className="text-base">🚚 FBM (Fulfillment by Merchant)</CardTitle>
                       </CardHeader>
                       <CardContent className="text-sm text-muted-foreground">
-                        Tu gères toi-même le stockage et l'expédition de tes produits. Moins de frais, mais plus de travail manuel.
+                        Tu gères toi-même le stockage et l'expédition de tes produits.
                       </CardContent>
                     </Card>
 
@@ -195,7 +201,7 @@ const Guides = () => {
                         <CardTitle className="text-base">🔍 ASIN</CardTitle>
                       </CardHeader>
                       <CardContent className="text-sm text-muted-foreground">
-                        Amazon Standard Identification Number - Code unique à 10 caractères attribué par Amazon à chaque produit sur sa plateforme.
+                        Code unique à 10 caractères attribué par Amazon à chaque produit.
                       </CardContent>
                     </Card>
 
@@ -204,7 +210,7 @@ const Guides = () => {
                         <CardTitle className="text-base">📊 Buy Box</CardTitle>
                       </CardHeader>
                       <CardContent className="text-sm text-muted-foreground">
-                        L'encadré "Ajouter au panier" visible sur une page produit. C'est la position la plus convoitée car elle génère 80% des ventes.
+                        L'encadré "Ajouter au panier" qui génère 80% des ventes.
                       </CardContent>
                     </Card>
 
@@ -213,25 +219,7 @@ const Guides = () => {
                         <CardTitle className="text-base">💰 ROI (Return on Investment)</CardTitle>
                       </CardHeader>
                       <CardContent className="text-sm text-muted-foreground">
-                        Retour sur investissement. Calcul : (Bénéfice net / Coût d'achat) × 100. Un bon ROI en FBA est d'au moins 40-50%.
-                      </CardContent>
-                    </Card>
-
-                    <Card>
-                      <CardHeader>
-                        <CardTitle className="text-base">📦 SKU (Stock Keeping Unit)</CardTitle>
-                      </CardHeader>
-                      <CardContent className="text-sm text-muted-foreground">
-                        Code unique que tu crées pour identifier et suivre tes produits dans ton inventaire.
-                      </CardContent>
-                    </Card>
-
-                    <Card>
-                      <CardHeader>
-                        <CardTitle className="text-base">🏷️ EAN (European Article Number)</CardTitle>
-                      </CardHeader>
-                      <CardContent className="text-sm text-muted-foreground">
-                        Code-barres à 13 chiffres utilisé en Europe pour identifier un produit. Essentiel pour créer une fiche produit sur Amazon.
+                        Retour sur investissement. Un bon ROI en FBA est d'au moins 40-50%.
                       </CardContent>
                     </Card>
 
@@ -240,851 +228,886 @@ const Guides = () => {
                         <CardTitle className="text-base">📈 BSR (Best Seller Rank)</CardTitle>
                       </CardHeader>
                       <CardContent className="text-sm text-muted-foreground">
-                        Classement des meilleures ventes. Plus le chiffre est bas, plus le produit se vend bien. Utile pour estimer la vélocité de vente.
-                      </CardContent>
-                    </Card>
-
-                    <Card>
-                      <CardHeader>
-                        <CardTitle className="text-base">💸 Marge</CardTitle>
-                      </CardHeader>
-                      <CardContent className="text-sm text-muted-foreground">
-                        Différence entre ton prix de vente et tous tes coûts (achat, frais Amazon, expédition). C'est ton profit réel par unité.
-                      </CardContent>
-                    </Card>
-
-                    <Card>
-                      <CardHeader>
-                        <CardTitle className="text-base">🎯 PPC (Pay Per Click)</CardTitle>
-                      </CardHeader>
-                      <CardContent className="text-sm text-muted-foreground">
-                        Publicité sponsorisée sur Amazon. Tu paies uniquement quand quelqu'un clique sur ton annonce.
-                      </CardContent>
-                    </Card>
-
-                    <Card>
-                      <CardHeader>
-                        <CardTitle className="text-base">📦 Ungating</CardTitle>
-                      </CardHeader>
-                      <CardContent className="text-sm text-muted-foreground">
-                        Processus pour obtenir l'autorisation de vendre certaines marques ou catégories restreintes sur Amazon.
-                      </CardContent>
-                    </Card>
-
-                    <Card>
-                      <CardHeader>
-                        <CardTitle className="text-base">⚡ Lightning Deal</CardTitle>
-                      </CardHeader>
-                      <CardContent className="text-sm text-muted-foreground">
-                        Promotion à durée limitée (quelques heures) qui met en avant ton produit sur la page des offres Amazon.
+                        Classement des meilleures ventes. Plus le chiffre est bas, mieux ça vend.
                       </CardContent>
                     </Card>
                   </div>
-                </section>
-
-                {/* Les bases avant de vendre */}
-                <section>
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="p-3 rounded-lg bg-primary/10">
-                      <GraduationCap className="w-8 h-8 text-primary" />
-                    </div>
-                    <div>
-                      <h2 className="text-3xl font-bold">Les bases avant de vendre</h2>
-                      <p className="text-muted-foreground">Ce qu'il faut savoir avant d'ouvrir ton compte vendeur</p>
-                    </div>
-                  </div>
-
-                  <Accordion type="single" collapsible className="space-y-4">
-                    <AccordionItem value="budget" className="border rounded-lg px-6 bg-card">
-                      <AccordionTrigger className="text-lg font-semibold hover:no-underline">
-                        <div className="flex items-center gap-3">
-                          <Euro className="w-5 h-5 text-primary" />
-                          <span>Définir ton budget</span>
-                        </div>
-                      </AccordionTrigger>
-                      <AccordionContent className="space-y-4 pt-4">
-                        <div className="space-y-4">
-                          <p>Le budget recommandé varie selon tes ambitions, mais voici les fourchettes classiques :</p>
-                          
-                          <Card className="bg-primary/5">
-                            <CardHeader>
-                              <CardTitle className="text-base">💵 Budget de 300 à 500 €</CardTitle>
-                            </CardHeader>
-                            <CardContent className="text-sm space-y-2">
-                              <p><strong>Pour qui :</strong> Débutant qui veut tester le concept sans risque.</p>
-                              <p><strong>Résultat attendu :</strong> Petit stock, apprentissage rapide, mais croissance lente.</p>
-                            </CardContent>
-                          </Card>
-
-                          <Card className="bg-primary/5">
-                            <CardHeader>
-                              <CardTitle className="text-base">💶 Budget de 1000 à 2000 €</CardTitle>
-                            </CardHeader>
-                            <CardContent className="text-sm space-y-2">
-                              <p><strong>Pour qui :</strong> Quelqu'un qui veut lancer sérieusement.</p>
-                              <p><strong>Résultat attendu :</strong> Stock correct, premières ventes régulières, réinvestissements possibles.</p>
-                            </CardContent>
-                          </Card>
-
-                          <Card className="bg-primary/5">
-                            <CardHeader>
-                              <CardTitle className="text-base">💷 Budget de 3000 € et +</CardTitle>
-                            </CardHeader>
-                            <CardContent className="text-sm space-y-2">
-                              <p><strong>Pour qui :</strong> Personne ambitieuse prête à scaler rapidement.</p>
-                              <p><strong>Résultat attendu :</strong> Gros volume de ventes, potentiellement rentable dès le 1er mois.</p>
-                            </CardContent>
-                          </Card>
-
-                          <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-4 mt-4">
-                            <p className="font-semibold text-amber-700 dark:text-amber-400">⚠️ Important</p>
-                            <p className="text-sm mt-2">Ne mise jamais de l'argent dont tu as absolument besoin. Comme tout business, il y a un risque (même minime) de perte.</p>
-                          </div>
-                        </div>
-                      </AccordionContent>
-                    </AccordionItem>
-
-                    <AccordionItem value="obligations" className="border rounded-lg px-6 bg-card">
-                      <AccordionTrigger className="text-lg font-semibold hover:no-underline">
-                        <div className="flex items-center gap-3">
-                          <Shield className="w-5 h-5 text-primary" />
-                          <span>Les obligations légales</span>
-                        </div>
-                      </AccordionTrigger>
-                      <AccordionContent className="space-y-4 pt-4">
-                        <p>Pour vendre sur Amazon en toute légalité en France, tu dois :</p>
-                        
-                        <div className="space-y-3">
-                          <Card>
-                            <CardHeader className="pb-3">
-                              <CardTitle className="text-base flex items-center gap-2">
-                                <CheckCircle2 className="w-4 h-4 text-primary" />
-                                Avoir un statut juridique
-                              </CardTitle>
-                            </CardHeader>
-                            <CardContent className="text-sm text-muted-foreground">
-                              Auto-entrepreneur, SASU, EURL, etc. (voir section Entreprise)
-                            </CardContent>
-                          </Card>
-
-                          <Card>
-                            <CardHeader className="pb-3">
-                              <CardTitle className="text-base flex items-center gap-2">
-                                <CheckCircle2 className="w-4 h-4 text-primary" />
-                                Déclarer ton activité
-                              </CardTitle>
-                            </CardHeader>
-                            <CardContent className="text-sm text-muted-foreground">
-                              Immatriculer ton entreprise (URSSAF, INPI, Greffe)
-                            </CardContent>
-                          </Card>
-
-                          <Card>
-                            <CardHeader className="pb-3">
-                              <CardTitle className="text-base flex items-center gap-2">
-                                <CheckCircle2 className="w-4 h-4 text-primary" />
-                                Disposer d'un compte bancaire pro
-                              </CardTitle>
-                            </CardHeader>
-                            <CardContent className="text-sm text-muted-foreground">
-                              Obligatoire si tu dépasses 10 000 € de CA annuel (recommandé dès le début)
-                            </CardContent>
-                          </Card>
-
-                          <Card>
-                            <CardHeader className="pb-3">
-                              <CardTitle className="text-base flex items-center gap-2">
-                                <CheckCircle2 className="w-4 h-4 text-primary" />
-                                Respecter les règles fiscales
-                              </CardTitle>
-                            </CardHeader>
-                            <CardContent className="text-sm text-muted-foreground">
-                              TVA, impôts sur le revenu ou sur les sociétés
-                            </CardContent>
-                          </Card>
-                        </div>
-                      </AccordionContent>
-                    </AccordionItem>
-
-                    <AccordionItem value="temps" className="border rounded-lg px-6 bg-card">
-                      <AccordionTrigger className="text-lg font-semibold hover:no-underline">
-                        <div className="flex items-center gap-3">
-                          <Clock className="w-5 h-5 text-primary" />
-                          <span>Le temps à y consacrer</span>
-                        </div>
-                      </AccordionTrigger>
-                      <AccordionContent className="space-y-4 pt-4">
-                        <p>Le temps nécessaire dépend de ton objectif :</p>
-                        
-                        <div className="space-y-3">
-                          <Card className="bg-primary/5">
-                            <CardHeader>
-                              <CardTitle className="text-base">⏱️ Activité secondaire (5-10h/semaine)</CardTitle>
-                            </CardHeader>
-                            <CardContent className="text-sm space-y-2">
-                              <p>Tu cherches des produits pendant tes temps libres, tu gères tes stocks le soir ou le week-end.</p>
-                              <p className="text-muted-foreground">Objectif : 500 à 2000 € de bénéfices par mois.</p>
-                            </CardContent>
-                          </Card>
-
-                          <Card className="bg-primary/5">
-                            <CardHeader>
-                              <CardTitle className="text-base">⏰ Activité principale (20-40h/semaine)</CardTitle>
-                            </CardHeader>
-                            <CardContent className="text-sm space-y-2">
-                              <p>Tu te consacres pleinement à la recherche de produits, à la gestion de ton stock et à l'optimisation de tes listings.</p>
-                              <p className="text-muted-foreground">Objectif : 3000 à 10 000 € de bénéfices par mois (voire plus).</p>
-                            </CardContent>
-                          </Card>
-                        </div>
-
-                        <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4 mt-4">
-                          <p className="font-semibold">💡 Astuce</p>
-                          <p className="text-sm mt-2">Plus tu investis de temps au début, plus tu apprends vite. Une fois que tu maîtrises, tu peux automatiser une partie du processus.</p>
-                        </div>
-                      </AccordionContent>
-                    </AccordionItem>
-
-                    <AccordionItem value="roi" className="border rounded-lg px-6 bg-card">
-                      <AccordionTrigger className="text-lg font-semibold hover:no-underline">
-                        <div className="flex items-center gap-3">
-                          <Target className="w-5 h-5 text-primary" />
-                          <span>Le retour sur investissement (ROI)</span>
-                        </div>
-                      </AccordionTrigger>
-                      <AccordionContent className="space-y-4 pt-4">
-                        <p>Le ROI en FBA Amazon est généralement excellent si tu appliques les bonnes stratégies.</p>
-                        
-                        <div className="space-y-4">
-                          <div>
-                            <h4 className="font-semibold mb-2">Objectif de ROI minimum :</h4>
-                            <Card className="bg-primary/5">
-                              <CardContent className="pt-6">
-                                <p className="text-xl font-bold text-primary mb-2">40-50% de ROI minimum</p>
-                                <p className="text-sm text-muted-foreground">
-                                  Cela signifie que pour 100 € investis, tu récupères 140 à 150 € de bénéfice net (après tous les frais).
-                                </p>
-                              </CardContent>
-                            </Card>
-                          </div>
-
-                          <div>
-                            <h4 className="font-semibold mb-2">Exemples concrets :</h4>
-                            <div className="space-y-2">
-                              <Card>
-                                <CardContent className="pt-6 text-sm">
-                                  <p><strong>Produit acheté à 10 €</strong></p>
-                                  <p>Vendu à 25 € → ROI de 50% → Bénéfice net : 5 €</p>
-                                </CardContent>
-                              </Card>
-                              <Card>
-                                <CardContent className="pt-6 text-sm">
-                                  <p><strong>Produit acheté à 20 €</strong></p>
-                                  <p>Vendu à 50 € → ROI de 60% → Bénéfice net : 12 €</p>
-                                </CardContent>
-                              </Card>
-                            </div>
-                          </div>
-
-                          <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-4">
-                            <p className="font-semibold text-green-700 dark:text-green-400">✅ Bon à savoir</p>
-                            <p className="text-sm mt-2">Certains produits peuvent avoir des ROI de 100%, 200%, voire plus ! Tout dépend de ta capacité à dénicher les bonnes opportunités.</p>
-                          </div>
-                        </div>
-                      </AccordionContent>
-                    </AccordionItem>
-                  </Accordion>
                 </section>
               </TabsContent>
 
               {/* ========== ONGLET ENTREPRISE ========== */}
               <TabsContent value="entreprise" className="space-y-8">
-                <section>
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="p-3 rounded-lg bg-primary/10">
-                      <Building2 className="w-8 h-8 text-primary" />
-                    </div>
-                    <div>
-                      <h2 className="text-3xl font-bold">Créer son entreprise</h2>
-                      <p className="text-muted-foreground">Toutes les informations pour lancer ton activité légalement</p>
-                    </div>
-                  </div>
-
-                  <Accordion type="single" collapsible className="space-y-4">
-                    <AccordionItem value="creer-facilement" className="border rounded-lg px-6 bg-card">
-                      <AccordionTrigger className="text-lg font-semibold hover:no-underline">
-                        <div className="flex items-center gap-3">
-                          <Building2 className="w-5 h-5 text-primary" />
-                          <span>Comment créer son entreprise facilement ?</span>
-                        </div>
-                      </AccordionTrigger>
-                      <AccordionContent className="space-y-6 pt-4">
-                        <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-4">
-                          <p className="flex items-start gap-2">
-                            <span className="text-lg">💡</span>
-                            <span className="text-sm">Dans ce guide, nous t'expliquons comment il est possible de créer ta société de la manière la plus simple et la moins chère possible.</span>
-                          </p>
-                        </div>
-
-                        <div>
-                          <h3 className="text-xl font-bold mb-4">Explication rapide</h3>
-                          <p className="mb-4">Créer sa société à partir de <strong>84,15€</strong> ici :</p>
-                          
-                          <Card className="bg-primary/5">
-                            <CardContent className="pt-6">
-                              <div className="flex items-start gap-3">
-                                <div className="flex-1">
-                                  <h4 className="font-semibold mb-2">LegalPlace - Lancez votre société, on s'occupe de tout !</h4>
-                                  <p className="text-sm text-muted-foreground mb-3">
-                                    Créez votre entreprise simplement et rapidement. Gérez votre juridique et votre comptabilité ultra efficacement.
-                                  </p>
-                                  <a 
-                                    href="https://www.legalplace.fr/creation/landing/creation-entreprise-ads?utm_source=google&utm_medium=cpc&utm_campaign=Cr%C3%A9er%20entreprise&utm_content=Cr%C3%A9ation%20Entreprise%20France&k=%2Bcreation%20%2Bsociete%20%2Bfrance&gad_source=1&gad_campaignid=1444619687&gbraid=0AAAAADkacZmzyP6m_4HfIk1osKVZ0zgZI&gclid=CjwKCAjw6vHHBhBwEiwAq4zvA8snAcyVNVTv4O5rj0W1LZeIDwjavVj8Gga-1X1LaNhu2TKKCjD2txoCzRMQAvD_BwE" 
-                                    target="_blank" 
-                                    rel="noopener noreferrer"
-                                    className="text-primary hover:underline text-sm font-medium"
-                                  >
-                                    🔗 Créer mon entreprise sur LegalPlace
-                                  </a>
-                                </div>
-                              </div>
-                            </CardContent>
-                          </Card>
-                        </div>
-
-                        <div>
-                          <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
-                            <span>🤔</span>
-                            <span>Comment créer une micro-entreprise ?</span>
-                          </h3>
-                          
-                          <p className="mb-4 font-semibold">Pour créer sa micro-entreprise, il existe deux moyens de le faire :</p>
-
-                          <div className="space-y-6">
-                            <div>
-                              <h4 className="font-semibold mb-3">Créer sa micro-entreprise soi-même gratuitement :</h4>
-                              
-                              <p className="mb-3">
-                                - Rends-toi sur le site du ministère de l'Économie et des Finances à l'adresse suivante : 
-                                <a 
-                                  href="https://www.economie.gouv.fr/cedef/fiches-pratiques/micro-entrepreneur-auto-entrepreneur#:~:text=D%C3%A9claration%20d'activit%C3%A9%20en%20ligne,activit%C3%A9%2C%20via%20le%20guichet%20unique." 
-                                  target="_blank" 
-                                  rel="noopener noreferrer"
-                                  className="text-primary hover:underline ml-1"
-                                >
-                                  lien
-                                </a>.
-                              </p>
-
-                              <Card className="bg-primary/5 mb-4">
-                                <CardContent className="pt-6">
-                                  <h5 className="font-semibold mb-2">Comment devenir micro-entrepreneur (auto-entrepreneur) ?</h5>
-                                  <p className="text-sm text-muted-foreground mb-3">
-                                    Le micro-entrepreneur, ou auto-entrepreneur, bénéficie d'un régime unique et simplifié, destiné à faciliter un début d'activité.
-                                  </p>
-                                  <a 
-                                    href="https://www.economie.gouv.fr/cedef/fiches-pratiques/micro-entrepreneur-auto-entrepreneur#:~:text=D%C3%A9claration%20d'activit%C3%A9%20en%20ligne,activit%C3%A9%2C%20via%20le%20guichet%20unique." 
-                                    target="_blank" 
-                                    rel="noopener noreferrer"
-                                    className="text-primary hover:underline text-sm font-medium inline-flex items-center gap-1"
-                                  >
-                                    🇫🇷 Ministère de l'Économie et des Finances
-                                  </a>
-                                </CardContent>
-                              </Card>
-
-                              <p className="mb-3">
-                                - Crée un compte INPI Connect ou France Connect pour accéder aux prochaines étapes de création de ton entreprise.
-                              </p>
-
-                              <p className="mb-3">
-                                - Après avoir rempli les formulaires nécessaires en ligne, tu recevras ton numéro de <strong>SIREN</strong> attribué par ta préfecture dans un délai d'une à deux semaines au maximum.
-                              </p>
-
-                              <p className="text-sm text-muted-foreground">
-                                Ce numéro est indispensable lorsque tu souhaites créer un profil de vendeur sur Amazon ou pour toute autre démarche administrative liée à ton entreprise.
-                              </p>
-                            </div>
-
-                            <div>
-                              <h4 className="font-semibold mb-3 flex items-center gap-2">
-                                <span>👨‍💼</span>
-                                <span>Créer sa micro-entreprise grâce à un gestionnaire de service :</span>
-                              </h4>
-                              
-                              <p className="mb-4">
-                                Nous te recommandons vivement d'utiliser le site internet <strong>LegalPlace</strong>, reconnu dans toute la France pour la qualité de son service de création d'entreprise.
-                              </p>
-
-                              <p className="mb-4">
-                                En ce qui concerne le prix de ces services, pour une <strong>SARL</strong>, prévois entre <strong>400 et 700 euros</strong> de frais de gestionnaire de service et de frais légaux.
-                              </p>
-
-                              <p className="mb-4">
-                                Le prix va dépendre du statut que tu vas choisir ainsi que l'activité, dans notre cas, l'achat-revente en ligne de produits diverses.
-                              </p>
-
-                              <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4 mb-4">
-                                <p className="font-semibold mb-2">💬 Besoin d'aide ?</p>
-                                <p className="text-sm">
-                                  N'hésite pas à venir en discuter dans le groupe, nous sommes nombreux à avoir des entreprises et nous serons là pour t'aider si tu as des questions !
-                                </p>
-                              </div>
-
-                              <p className="mb-3">
-                                Pour justement bien choisir son statut, nous t'invitons à lire ce prochain guide :
-                              </p>
-
-                              <div className="flex items-center gap-2 text-primary font-medium">
-                                <span>🏢</span>
-                                <span>Les différences entre auto-entrepreneur / SASU</span>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div>
-                          <h3 className="text-xl font-bold mb-4">Pour créer sa société, il existe deux moyens de le faire :</h3>
-
-                          <div className="space-y-6">
-                            <div>
-                              <h4 className="font-semibold mb-4 flex items-center gap-2">
-                                <span>👨‍💼</span>
-                                <span>Créer son entreprise via un avocat fiscaliste :</span>
-                              </h4>
-
-                              <p className="mb-4">
-                                Créer une entreprise avec l'aide d'un avocat fiscaliste peut être une excellente décision, surtout si tu veux assurer une bonne gestion fiscale dès le départ.
-                              </p>
-
-                              <p className="mb-3 font-semibold">Voici quelques points clé à considérer :</p>
-
-                              <div className="space-y-3 mb-4">
-                                <Card>
-                                  <CardContent className="pt-6">
-                                    <h5 className="font-semibold mb-2">1. Conseils sur la structure juridique :</h5>
-                                    <p className="text-sm text-muted-foreground">
-                                      Un avocat fiscaliste peut te conseiller sur la meilleure structure juridique pour ton entreprise en fonction de tes besoins spécifiques, qu'il s'agisse d'une SARL, d'une SAS, ou autre.
-                                    </p>
-                                  </CardContent>
-                                </Card>
-
-                                <Card>
-                                  <CardContent className="pt-6">
-                                    <h5 className="font-semibold mb-2">2. Optimisation fiscale :</h5>
-                                    <p className="text-sm text-muted-foreground">
-                                      L'avocat fiscaliste peut t'aider à optimiser ta situation fiscale en te conseillant sur les différentes options fiscales disponibles et en élaborant des stratégies pour minimiser ta charge fiscale tout en respectant la législation.
-                                    </p>
-                                  </CardContent>
-                                </Card>
-
-                                <Card>
-                                  <CardContent className="pt-6">
-                                    <h5 className="font-semibold mb-2">3. Formalités administratives :</h5>
-                                    <p className="text-sm text-muted-foreground">
-                                      Ils peuvent également t'aider à remplir toutes les formalités administratives nécessaires à la création de votre entreprise, ce qui peut te faire gagner du temps et t'assurer que tout est en ordre.
-                                    </p>
-                                  </CardContent>
-                                </Card>
-                              </div>
-
-                              <p className="mb-4">
-                                En ce qui concerne les coûts, cela varie énormément des honoraires de ton avocat, de la région où tu habites ou encore même du tarif horaire ou forfaitaire de ton avocat.
-                              </p>
-
-                              <p className="mb-4">
-                                Si nous devions donner une échelle de prix, comptez entre <strong>700 et 1500€</strong>.
-                              </p>
-
-                              <p className="text-sm text-muted-foreground">
-                                Concernant le délai de création de votre entreprise, cela dépendra également de ton avocat, mais en règle générale, tu pourras t'attendre à ce que le processus prenne plusieurs semaines.
-                              </p>
-                            </div>
-
-                            <div>
-                              <h4 className="font-semibold mb-4 flex items-center gap-2">
-                                <span>👨‍💼</span>
-                                <span>Créer son entreprise grâce à un gestionnaire de service :</span>
-                              </h4>
-
-                              <p className="mb-4">
-                                Nous te recommandons vivement d'utiliser le site internet <strong>LegalPlace</strong> reconnu dans toute la France pour la qualité de son service de création d'entreprise.
-                              </p>
-
-                              <p className="mb-4">
-                                En ce qui concerne le prix de ces services, pour une <strong>SARL</strong>, prévois entre <strong>400 et 700 euros</strong> de frais de gestionnaire de service et de frais légaux.
-                              </p>
-
-                              <p className="mb-4">
-                                Le prix va dépendre du statut que tu vas choisir ainsi que l'activité, dans notre cas, l'achat-revente en ligne de produits diverses.
-                              </p>
-
-                              <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4 mb-4">
-                                <p className="font-semibold mb-2">💬 Besoin d'aide ?</p>
-                                <p className="text-sm">
-                                  N'hésite pas à venir en discuter dans le groupe, nous sommes nombreux à avoir des entreprises et nous serons là pour t'aider si tu as des questions !
-                                </p>
-                              </div>
-
-                              <p className="mb-3">
-                                Pour justement bien choisir son statut, nous t'invitons à lire ce prochain guide :
-                              </p>
-
-                              <div className="flex items-center gap-2 text-primary font-medium">
-                                <span>🏢</span>
-                                <span>Les différences entre auto-entrepreneur / SASU</span>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </AccordionContent>
-                    </AccordionItem>
-
-                    <AccordionItem value="ae-ou-sasu" className="border rounded-lg px-6 bg-card">
-                      <AccordionTrigger className="text-lg font-semibold hover:no-underline">
-                        <div className="flex items-center gap-3">
-                          <Target className="w-5 h-5 text-primary" />
-                          <span>Les différences entre auto-entrepreneur / SASU</span>
-                        </div>
-                      </AccordionTrigger>
-                      <AccordionContent className="space-y-6 pt-4">
-                        <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-4">
-                          <p className="text-sm">
-                            Il faut savoir que pour la plupart des statuts, tu peux toi-même créer et rédiger les statuts pour minimiser les coûts, mais si tu n'as aucune connaissance (ce qui est normal), évite absolument ! Passe plutôt par une entreprise spécialisée ou par un avocat fiscaliste.
-                          </p>
-                        </div>
-
-                        <div className="space-y-6">
-                          <Card className="bg-primary/5">
-                            <CardHeader>
-                              <CardTitle className="text-base flex items-center gap-2">
-                                <span>👨‍⚖️</span>
-                                <span>Micro Entrepreneur (Auto-entrepreneur)</span>
-                              </CardTitle>
-                            </CardHeader>
-                            <CardContent className="text-sm space-y-2">
-                              <p>Si tu veux commencer pour tester et sans investir trop d'argent dans ton entreprise, c'est un bon début !</p>
-                              <p className="font-medium text-amber-600 dark:text-amber-400">
-                                ⚠️ Cependant ce n'est pas le meilleur choix à la longue, tu vas être limité et surtout un manque à gagner important, car tu ne récupères pas la TVA !
-                              </p>
-                            </CardContent>
-                          </Card>
-
-                          <Card className="bg-primary/5">
-                            <CardHeader>
-                              <CardTitle className="text-base flex items-center gap-2">
-                                <span>🏢</span>
-                                <span>SAS (Société par Actions Simplifiée)</span>
-                              </CardTitle>
-                            </CardHeader>
-                            <CardContent className="text-sm space-y-3">
-                              <p>Une SAS est l'une des formes juridiques les plus réputées pour le commerce. Elle se caractérise essentiellement par sa souplesse de fonctionnement.</p>
-                              
-                              <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3">
-                                <p className="font-semibold mb-1">🚨 Informations importantes :</p>
-                                <p className="text-xs">Tu peux créer une SAS à partir de 2 actionnaires, tu peux choisir ton capital social, rien n'est imposé par la loi, tu peux déposer 1€ symbolique.</p>
-                              </div>
-
-                              <p>Tu peux être le seul actionnaire d'une SAS, on parle alors d'une <strong>SASU (Société par Actions Simplifiée Unipersonnelle)</strong>.</p>
-                              <p className="font-medium">(Si tu es seul à créer ton entreprise alors oui il vaut mieux privilégier une SASU).</p>
-
-                              <div className="mt-4">
-                                <p className="font-semibold mb-2">Avantages de la SAS/SASU :</p>
-                                <ul className="list-disc list-inside space-y-1 text-xs">
-                                  <li>Capital social à partir de 1€</li>
-                                  <li>De faibles obligations légales</li>
-                                  <li>Un régime fiscal avantageux (La SASU est soumise par défaut au régime fiscal de l'impôt sur les sociétés (IS). Les bénéfices sont imposés à un taux de 15% jusqu'à 42 500€, puis 25% au-delà)</li>
-                                </ul>
-                                <p className="text-xs mt-2">La SASU est souvent choisie pour sa flexibilité et son régime fiscal avantageux pour les entreprises en croissance.</p>
-                              </div>
-
-                              <div className="mt-4">
-                                <p className="font-semibold mb-2">😬 Inconvénients :</p>
-                                <ul className="list-disc list-inside space-y-1 text-xs">
-                                  <li>Frais de constitution élevés</li>
-                                  <li>Une extrême rigueur dans la rédaction des statuts (Il faut des connaissances et passer par des professionnels comme un avocat fiscaliste ou une entreprise comme LegalPlace)</li>
-                                  <li>Tu ne vas pas cotiser, alors qu'en SARL il y a un minimum obligatoire pour la cotisation</li>
-                                </ul>
-                              </div>
-                            </CardContent>
-                          </Card>
-
-                          <Card className="bg-primary/5">
-                            <CardHeader>
-                              <CardTitle className="text-base flex items-center gap-2">
-                                <span>🤔</span>
-                                <span>La différence entre SARL et EURL</span>
-                              </CardTitle>
-                            </CardHeader>
-                            <CardContent className="text-sm space-y-3">
-                              <div>
-                                <p className="font-semibold mb-1">SARL (Société à Responsabilité Limitée) :</p>
-                                <ul className="list-disc list-inside space-y-1 text-xs text-muted-foreground">
-                                  <li>Une société commerciale constituée de deux associés au minimum et de cent associés au maximum</li>
-                                  <li>La responsabilité des associés est limitée au montant de leurs apports dans la société</li>
-                                  <li>Souvent choisie pour sa simplicité de fonctionnement et son cadre juridique bien établi</li>
-                                </ul>
-                              </div>
-
-                              <div>
-                                <p className="font-semibold mb-1">EURL (Entreprise Unipersonnelle à Responsabilité Limitée) :</p>
-                                <ul className="list-disc list-inside space-y-1 text-xs text-muted-foreground">
-                                  <li>Une EURL est une SARL avec un seul associé</li>
-                                  <li>Offre une responsabilité limitée pour l'associé unique, qui n'est responsable qu'à concurrence de ses apports</li>
-                                  <li>Son fonctionnement est similaire à celui d'une SARL, avec un gérant qui peut être l'associé unique ou une autre personne</li>
-                                </ul>
-                              </div>
-
-                              <p className="mt-3 text-xs">
-                                <strong>En résumé :</strong> La principale différence réside dans le nombre d'associés et la structure de gouvernance, avec la SASU étant la plus flexible et la mieux adaptée aux entreprises individuelles, tandis que la SARL peut accueillir plusieurs associés et offre une structure plus traditionnelle.
-                              </p>
-                            </CardContent>
-                          </Card>
-
-                          <Card className="bg-primary/5">
-                            <CardHeader>
-                              <CardTitle className="text-base flex items-center gap-2">
-                                <span>🌍</span>
-                                <span>LTD (Limited Company)</span>
-                              </CardTitle>
-                            </CardHeader>
-                            <CardContent className="text-sm">
-                              <p>Une LTD est une forme juridique d'entreprise qui est intéressante à l'étranger, mais il vaut mieux commencer avec une SAS/SARL en France.</p>
-                            </CardContent>
-                          </Card>
-
-                          <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4">
-                            <p className="font-semibold mb-2">💭 Autres paramètres à considérer :</p>
-                            <ul className="list-disc list-inside space-y-1 text-sm">
-                              <li>Est-ce que tu vas vivre grâce à cette activité ?</li>
-                              <li>Les bénéfices que tu estimes atteindre</li>
-                              <li>Auras-tu qu'une seule activité professionnelle pour ta société ?</li>
-                            </ul>
-                          </div>
-
-                          <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-4">
-                            <p className="font-semibold text-green-700 dark:text-green-400 mb-2">👨‍⚖️ Recommandation</p>
-                            <p className="text-sm">
-                              Il faut bien se renseigner et poser des questions sur le groupe, mais il est préférable d'opter pour une <strong>SASU ou EURL</strong>.
-                            </p>
-                          </div>
-                        </div>
-
-                        <div>
-                          <h3 className="text-lg font-bold mb-4">📊 Tableau comparatif</h3>
-                          <div className="overflow-x-auto">
-                            <table className="w-full text-sm border-collapse border">
-                              <thead>
-                                <tr className="border-b bg-muted/50">
-                                  <th className="text-left py-3 px-4 border-r">Critère</th>
-                                  <th className="text-left py-3 px-4 border-r">Auto-entrepreneur</th>
-                                  <th className="text-left py-3 px-4">SASU</th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                <tr className="border-b">
-                                  <td className="py-3 px-4 font-medium border-r">Création</td>
-                                  <td className="py-3 px-4 text-muted-foreground border-r">Gratuite et rapide</td>
-                                  <td className="py-3 px-4 text-muted-foreground">Payante (200-500 €)</td>
-                                </tr>
-                                <tr className="border-b">
-                                  <td className="py-3 px-4 font-medium border-r">Plafond CA</td>
-                                  <td className="py-3 px-4 text-muted-foreground border-r">188 700 €</td>
-                                  <td className="py-3 px-4 text-muted-foreground">Illimité</td>
-                                </tr>
-                                <tr className="border-b">
-                                  <td className="py-3 px-4 font-medium border-r">TVA</td>
-                                  <td className="py-3 px-4 text-muted-foreground border-r">Franchise si &lt; 36 800 €</td>
-                                  <td className="py-3 px-4 text-muted-foreground">Obligatoire dès le début</td>
-                                </tr>
-                                <tr className="border-b">
-                                  <td className="py-3 px-4 font-medium border-r">Comptabilité</td>
-                                  <td className="py-3 px-4 text-muted-foreground border-r">Simplifiée</td>
-                                  <td className="py-3 px-4 text-muted-foreground">Expert-comptable requis</td>
-                                </tr>
-                                <tr>
-                                  <td className="py-3 px-4 font-medium border-r">Idéal pour</td>
-                                  <td className="py-3 px-4 text-muted-foreground border-r">Débutants, side-business</td>
-                                  <td className="py-3 px-4 text-muted-foreground">Gros volumes, professionnels</td>
-                                </tr>
-                              </tbody>
-                            </table>
-                          </div>
-                        </div>
-                      </AccordionContent>
-                    </AccordionItem>
-
-                    <AccordionItem value="profil-pro" className="border rounded-lg px-6 bg-card">
-                      <AccordionTrigger className="text-lg font-semibold hover:no-underline">
-                        <div className="flex items-center gap-3">
-                          <Store className="w-5 h-5 text-primary" />
-                          <span>Créer son profil professionnel</span>
-                        </div>
-                      </AccordionTrigger>
-                      <AccordionContent className="space-y-4 pt-4">
-                        <p>Une fois ton entreprise créée, tu dois professionnaliser ton image. Voici ce qu'il te faut :</p>
+                
+                <Accordion type="single" collapsible className="space-y-4">
+                  
+                  {/* Créer son entreprise facilement */}
+                  <AccordionItem value="creer-entreprise" className="border rounded-lg px-6 bg-card">
+                    <AccordionTrigger className="text-lg font-semibold hover:no-underline">
+                      <div className="flex items-center gap-3">
+                        <Building2 className="w-5 h-5 text-primary" />
+                        <span>Créer son entreprise facilement</span>
+                      </div>
+                    </AccordionTrigger>
+                    <AccordionContent className="space-y-6 pt-4">
+                      <div className="prose prose-sm max-w-none">
+                        <h3 className="text-xl font-bold mb-4">Comment démarrer simplement et à moindre coût</h3>
                         
-                        <div className="space-y-3">
-                          <Card>
-                            <CardHeader className="pb-3">
-                              <CardTitle className="text-base flex items-center gap-2">
-                                <CheckCircle2 className="w-4 h-4 text-primary" />
-                                Compte bancaire professionnel
-                              </CardTitle>
-                            </CardHeader>
-                            <CardContent className="text-sm text-muted-foreground space-y-2">
-                              <p>Obligatoire si ton CA dépasse 10 000 €/an (mais conseillé dès le début).</p>
-                              <p className="font-medium">Banques recommandées : Shine, Qonto, N26 Business</p>
-                            </CardContent>
-                          </Card>
+                        <p className="mb-4">
+                          Pour vendre sur Amazon, tu dois posséder une structure juridique (micro-entreprise, SASU, SARL, etc.). 
+                          La bonne nouvelle ? C'est aujourd'hui plus simple et abordable que jamais !
+                        </p>
 
-                          <Card>
-                            <CardHeader className="pb-3">
-                              <CardTitle className="text-base flex items-center gap-2">
-                                <CheckCircle2 className="w-4 h-4 text-primary" />
-                                Email professionnel
-                              </CardTitle>
-                            </CardHeader>
-                            <CardContent className="text-sm text-muted-foreground">
-                              <p>Utilise une adresse type contact@tonentreprise.com pour paraître plus sérieux.</p>
-                            </CardContent>
-                          </Card>
-
-                          <Card>
-                            <CardHeader className="pb-3">
-                              <CardTitle className="text-base flex items-center gap-2">
-                                <CheckCircle2 className="w-4 h-4 text-primary" />
-                                Logo et identité visuelle
-                              </CardTitle>
-                            </CardHeader>
-                            <CardContent className="text-sm text-muted-foreground">
-                              <p>Pas obligatoire pour débuter, mais crée une meilleure impression auprès d'Amazon et des clients.</p>
-                            </CardContent>
-                          </Card>
+                        <div className="bg-primary/5 border-l-4 border-primary p-4 my-6">
+                          <h4 className="font-semibold mb-2">📌 Notre recommandation : LegalPlace</h4>
+                          <p className="mb-2">
+                            Pour créer ton entreprise rapidement et sans complications, nous te conseillons d'utiliser LegalPlace.
+                          </p>
+                          <a 
+                            href="https://www.legalplace.fr/creation/landing/creation-entreprise-ads?utm_source=google&utm_medium=cpc&utm_campaign=Cr%C3%A9er%20entreprise&utm_content=Cr%C3%A9ation%20Entreprise%20France&k=%2Bcreation%20%2Bsociete%20%2Bfrance&gad_source=1&gad_campaignid=1444619687&gbraid=0AAAAADkacZmzyP6m_4HfIk1osKVZ0zgZI&gclid=CjwKCAjw6vHHBhBwEiwAq4zvA8snAcyVNVTv4O5rj0W1LZeIDwjavVj8Gga-1X1LaNhu2TKKCjD2txoCzRMQAvD_BwE" 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="text-primary hover:underline font-medium"
+                          >
+                            → Créer mon entreprise avec LegalPlace
+                          </a>
                         </div>
-                      </AccordionContent>
-                    </AccordionItem>
-                  </Accordion>
-                </section>
+
+                        <h4 className="text-lg font-semibold mt-6 mb-3">Option 1 : Créer une micro-entreprise seul (gratuit)</h4>
+                        <p className="mb-3">
+                          Si tu souhaites créer ton statut de micro-entrepreneur toi-même, c'est totalement possible et gratuit !
+                        </p>
+                        <p className="mb-2">
+                          Il suffit de te rendre sur le site officiel du gouvernement et de suivre les étapes :
+                        </p>
+                        <a 
+                          href="https://www.economie.gouv.fr/cedef/fiches-pratiques/micro-entrepreneur-auto-entrepreneur#:~:text=D%C3%A9claration%20d'activit%C3%A9%20en%20ligne,activit%C3%A9%2C%20via%20le%20guichet%20unique." 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-primary hover:underline mb-4 inline-block"
+                        >
+                          → Déclarer mon activité de micro-entrepreneur
+                        </a>
+
+                        <h4 className="text-lg font-semibold mt-6 mb-3">Option 2 : Passer par un gestionnaire de service</h4>
+                        <p className="mb-3">
+                          Si tu préfères déléguer cette tâche administrative pour gagner du temps et éviter les erreurs, tu peux utiliser 
+                          des services comme LegalPlace. Ils s'occupent de toutes les démarches pour toi moyennant des frais raisonnables.
+                        </p>
+
+                        <h4 className="text-lg font-semibold mt-6 mb-3">Option 3 : Créer une société via un expert-comptable</h4>
+                        <p className="mb-3">
+                          Pour des structures plus complexes (SASU, SARL, etc.), il peut être judicieux de faire appel à un expert-comptable 
+                          qui pourra te guider et s'assurer que tout est conforme aux réglementations en vigueur.
+                        </p>
+
+                        <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4 mt-6">
+                          <p className="text-sm">
+                            💡 <strong>Conseil :</strong> Quelle que soit l'option choisie, assure-toi d'avoir tous les documents nécessaires 
+                            (pièce d'identité, justificatif de domicile, etc.) avant de commencer les démarches.
+                          </p>
+                        </div>
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+
+                  {/* Auto-entrepreneur ou SASU */}
+                  <AccordionItem value="auto-sasu" className="border rounded-lg px-6 bg-card">
+                    <AccordionTrigger className="text-lg font-semibold hover:no-underline">
+                      <div className="flex items-center gap-3">
+                        <Target className="w-5 h-5 text-primary" />
+                        <span>Auto-entrepreneur ou SASU : Que choisir ?</span>
+                      </div>
+                    </AccordionTrigger>
+                    <AccordionContent className="space-y-6 pt-4">
+                      <div className="prose prose-sm max-w-none">
+                        <h3 className="text-xl font-bold mb-4">Les différences entre les statuts juridiques</h3>
+                        
+                        <h4 className="text-lg font-semibold mt-6 mb-3">1. Micro-entrepreneur (anciennement Auto-entrepreneur)</h4>
+                        <div className="space-y-2 mb-4">
+                          <p><strong>Avantages :</strong></p>
+                          <ul className="list-disc pl-6 space-y-1">
+                            <li>Création simple et gratuite</li>
+                            <li>Comptabilité allégée</li>
+                            <li>Pas de TVA à collecter jusqu'à un certain seuil</li>
+                            <li>Charges sociales proportionnelles au chiffre d'affaires</li>
+                          </ul>
+                          <p className="mt-3"><strong>Inconvénients :</strong></p>
+                          <ul className="list-disc pl-6 space-y-1">
+                            <li>Plafond de CA limité (188 700 € pour la vente)</li>
+                            <li>Patrimoine personnel non protégé</li>
+                            <li>Difficile de lever des fonds</li>
+                            <li>Moins crédible auprès des fournisseurs</li>
+                          </ul>
+                        </div>
+
+                        <h4 className="text-lg font-semibold mt-6 mb-3">2. SAS / SASU (Société par Actions Simplifiée)</h4>
+                        <div className="space-y-2 mb-4">
+                          <p><strong>Avantages :</strong></p>
+                          <ul className="list-disc pl-6 space-y-1">
+                            <li>Patrimoine personnel protégé</li>
+                            <li>Possibilité de s'associer facilement</li>
+                            <li>Crédibilité professionnelle accrue</li>
+                            <li>Déduction des frais réels (bureau, matériel, etc.)</li>
+                            <li>Optimisation fiscale possible</li>
+                          </ul>
+                          <p className="mt-3"><strong>Inconvénients :</strong></p>
+                          <ul className="list-disc pl-6 space-y-1">
+                            <li>Coûts de création plus élevés (environ 200-500€)</li>
+                            <li>Comptabilité obligatoire avec expert-comptable</li>
+                            <li>Charges sociales minimales même sans CA</li>
+                            <li>Formalités administratives plus lourdes</li>
+                          </ul>
+                        </div>
+
+                        <h4 className="text-lg font-semibold mt-6 mb-3">3. SARL vs EURL</h4>
+                        <p className="mb-3">
+                          Structure similaire à la SAS mais avec plus de rigidité. Convient surtout aux projets familiaux 
+                          ou entre associés de confiance. L'EURL est la version à associé unique.
+                        </p>
+
+                        <h4 className="text-lg font-semibold mt-6 mb-3">4. LTD (pour vendre à l'international)</h4>
+                        <p className="mb-3">
+                          Société britannique qui peut être intéressante pour certains vendeurs Amazon visant plusieurs marchés européens. 
+                          Nécessite des démarches spécifiques.
+                        </p>
+
+                        {/* Tableau comparatif */}
+                        <div className="my-8 overflow-x-auto">
+                          <table className="min-w-full border-collapse border border-border">
+                            <thead>
+                              <tr className="bg-muted">
+                                <th className="border border-border p-3 text-left font-semibold">Critère</th>
+                                <th className="border border-border p-3 text-left font-semibold">Auto-entrepreneur</th>
+                                <th className="border border-border p-3 text-left font-semibold">SASU</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr>
+                                <td className="border border-border p-3">Création</td>
+                                <td className="border border-border p-3">Gratuite et rapide</td>
+                                <td className="border border-border p-3">200-500€ + frais</td>
+                              </tr>
+                              <tr className="bg-muted/30">
+                                <td className="border border-border p-3">Plafond CA</td>
+                                <td className="border border-border p-3">188 700€/an</td>
+                                <td className="border border-border p-3">Illimité</td>
+                              </tr>
+                              <tr>
+                                <td className="border border-border p-3">Comptabilité</td>
+                                <td className="border border-border p-3">Simplifiée</td>
+                                <td className="border border-border p-3">Expert-comptable obligatoire</td>
+                              </tr>
+                              <tr className="bg-muted/30">
+                                <td className="border border-border p-3">Protection patrimoine</td>
+                                <td className="border border-border p-3">Non</td>
+                                <td className="border border-border p-3">Oui</td>
+                              </tr>
+                              <tr>
+                                <td className="border border-border p-3">Charges sociales</td>
+                                <td className="border border-border p-3">12,8% du CA</td>
+                                <td className="border border-border p-3">Sur salaire versé</td>
+                              </tr>
+                              <tr className="bg-muted/30">
+                                <td className="border border-border p-3">Crédibilité</td>
+                                <td className="border border-border p-3">Moyenne</td>
+                                <td className="border border-border p-3">Élevée</td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+
+                        <div className="bg-primary/5 border-l-4 border-primary p-4 mt-6">
+                          <p className="font-semibold mb-2">💡 Notre recommandation :</p>
+                          <ul className="list-disc pl-6 space-y-1 text-sm">
+                            <li><strong>Micro-entrepreneur :</strong> Si tu débutes avec moins de 1000€ de budget et veux tester</li>
+                            <li><strong>SASU :</strong> Si tu vises un CA &gt; 50k€/an ou veux protéger ton patrimoine</li>
+                          </ul>
+                        </div>
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+
+                  {/* Se créer un profil professionnel */}
+                  <AccordionItem value="profil-pro" className="border rounded-lg px-6 bg-card">
+                    <AccordionTrigger className="text-lg font-semibold hover:no-underline">
+                      <div className="flex items-center gap-3">
+                        <Users className="w-5 h-5 text-primary" />
+                        <span>Se créer un profil professionnel</span>
+                      </div>
+                    </AccordionTrigger>
+                    <AccordionContent className="space-y-6 pt-4">
+                      <img src={profilProfessionnel} alt="Profil professionnel" className="w-full rounded-lg mb-6" />
+                      
+                      <div className="prose prose-sm max-w-none">
+                        <h3 className="text-xl font-bold mb-4">Une étape cruciale pour ton succès sur Amazon</h3>
+                        
+                        <p className="mb-4">
+                          Lors de la création de ton compte vendeur Amazon, il est primordial de soigner ton identité professionnelle. 
+                          Un bon nom, une adresse email sérieuse... tout compte pour inspirer confiance !
+                        </p>
+
+                        <h4 className="text-lg font-semibold mt-6 mb-3">1. Choisir ton nom de boutique</h4>
+                        <p className="mb-3">
+                          Amazon te demandera de définir un nom de boutique. C'est ce nom qui apparaîtra sur les commandes de tes clients. 
+                          Un nom professionnel et rassurant peut vraiment faire la différence dans la décision d'achat !
+                        </p>
+
+                        <p className="mb-3">
+                          Comme tu peux le constater, avoir un nom clair et professionnel permet de vendre davantage, 
+                          car ton identité inspire confiance et donne plus envie d'acheter chez toi plutôt qu'ailleurs.
+                        </p>
+
+                        <p className="mb-3">
+                          Lorsqu'un client achète sur Amazon, la Buy Box affiche l'expédition via Amazon (FBA) et l'expédition par les vendeurs (FBM). 
+                          Amazon met naturellement plus en avant l'expédition par Amazon que celle gérée par nous, les vendeurs. 
+                          D'où l'importance d'avoir un nom vendeur percutant pour te démarquer !
+                        </p>
+
+                        <div className="bg-primary/5 rounded-lg p-4 my-6">
+                          <h4 className="font-semibold mb-3">Conseils pour choisir ton nom de vendeur :</h4>
+                          <ul className="list-disc pl-6 space-y-2">
+                            <li>Évite les noms trop longs et compliqués</li>
+                            <li>Évite les significations trop personnelles</li>
+                            <li>Privilégie un nom court : un ou deux mots maximum</li>
+                            <li>Utilise des termes qui inspirent confiance : "Conseil", "France", "Ventes", "Jouets", "Toys"...</li>
+                          </ul>
+                        </div>
+
+                        <p className="mb-4">
+                          <strong>Astuce simple :</strong> Si tu peines à trouver un nom, prends la première lettre de ton prénom et de ton nom, 
+                          puis ajoute un mot pertinent. Exemple : "LD France".
+                        </p>
+
+                        <p className="mb-4">
+                          Pour le nom de ton entreprise, c'est différent ! Il s'agit de ton statut juridique. 
+                          Là aussi, opte pour quelque chose de simple et professionnel. Voici des acronymes souvent utilisés :
+                        </p>
+                        <ul className="list-disc pl-6 space-y-1 mb-6">
+                          <li>Conseil</li>
+                          <li>Ventes / Sales</li>
+                          <li>France</li>
+                          <li>Solutions</li>
+                        </ul>
+
+                        <h4 className="text-lg font-semibold mt-6 mb-3">2. Créer un mail professionnel</h4>
+                        <p className="mb-3">
+                          Avoir une adresse email professionnelle est indispensable pour échanger avec les clients et gérer ton activité sérieusement. 
+                          Ton adresse doit être simple et inspirante de confiance.
+                        </p>
+
+                        <p className="mb-3">
+                          Tu peux facilement créer un email professionnel via Gmail avec Google Workspace :
+                        </p>
+                        <a 
+                          href="https://workspace.google.com/intl/fr/lp/gmail-for-business/" 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-primary hover:underline mb-4 inline-block"
+                        >
+                          → Créer mon email professionnel sur Google Workspace
+                        </a>
+
+                        <p className="mt-4 mb-3">
+                          Clique sur "Démarrer" et renseigne tes informations. Ensuite, choisis l'option appropriée.
+                        </p>
+
+                        <p className="mb-3">
+                          Si tu n'as pas encore de nom de domaine, clique sur "Non, j'ai besoin d'un domaine". 
+                          Recherche le nom de domaine qui te correspond et achète-le.
+                        </p>
+
+                        <p className="mb-3">
+                          Une fois ton domaine acheté, tu disposes d'un email professionnel sur Gmail ! 
+                          Tu pourras l'utiliser lors de ton inscription Amazon Seller et pour tous tes échanges professionnels futurs.
+                        </p>
+
+                        <div className="bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 rounded-lg p-4 mt-6">
+                          <p className="text-sm">
+                            ✅ <strong>En résumé :</strong> Un nom de boutique percutant + un email professionnel = une image sérieuse 
+                            qui inspire confiance et booste tes ventes !
+                          </p>
+                        </div>
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+
+                  {/* Ouvrir son compte Amazon Seller */}
+                  <AccordionItem value="compte-seller" className="border rounded-lg px-6 bg-card">
+                    <AccordionTrigger className="text-lg font-semibold hover:no-underline">
+                      <div className="flex items-center gap-3">
+                        <CreditCard className="w-5 h-5 text-primary" />
+                        <span>Ouvrir son compte Amazon Seller</span>
+                      </div>
+                    </AccordionTrigger>
+                    <AccordionContent className="space-y-6 pt-4">
+                      <img src={compteVendeurAmazon} alt="Créer compte vendeur Amazon" className="w-full rounded-lg mb-6" />
+                      
+                      <div className="prose prose-sm max-w-none">
+                        <h3 className="text-xl font-bold mb-4">La dernière étape avant de pouvoir vendre !</h3>
+                        
+                        <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4 mb-6">
+                          <h4 className="font-semibold mb-3">💰 Frais à prévoir pour créer ton compte Amazon Seller :</h4>
+                          <ul className="list-disc pl-6 space-y-1 text-sm">
+                            <li>39€ HT (46,80€ TTC) / mois</li>
+                            <li>L'application Seller AMP (environ 20$/mois)</li>
+                            <li>La livraison à ta charge</li>
+                            <li>Commissions sur tes ventes</li>
+                            <li>Les emballages</li>
+                            <li>Une imprimante thermique (obligatoire pour le FBA, mais pas nécessaire pour le FBM)</li>
+                          </ul>
+                        </div>
+
+                        <h4 className="text-lg font-semibold mt-6 mb-3">Étape 1 : Se rendre sur le site Amazon Seller</h4>
+                        <p className="mb-3">
+                          Pour démarrer, rends-toi sur :
+                        </p>
+                        <a 
+                          href="https://sell.amazon.fr/" 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-primary hover:underline mb-4 inline-block font-medium"
+                        >
+                          → https://sell.amazon.fr/
+                        </a>
+
+                        <p className="mt-4 mb-3">
+                          En haut à droite, clique sur "S'inscrire". Amazon te demandera soit de créer un nouveau compte Amazon, 
+                          soit de te connecter à un compte déjà existant.
+                        </p>
+
+                        <h4 className="text-lg font-semibold mt-6 mb-3">Étape 2 : Remplir les informations</h4>
+                        <p className="mb-3">
+                          Ensuite, c'est assez simple ! Il suffit d'indiquer quelques informations te concernant et d'attendre la validation de ton compte.
+                        </p>
+
+                        <ul className="list-disc pl-6 space-y-2 mb-4">
+                          <li>Renseigne tes informations (type d'activité, nom d'entreprise, pays...)</li>
+                          <li><strong>Nom commercial</strong> = Ton nom d'entreprise</li>
+                          <li><strong>Numéro d'enregistrement</strong> = Ton numéro SIRET</li>
+                        </ul>
+
+                        <p className="mb-4">
+                          Ensuite, de nombreuses autres informations te seront demandées, notamment tes coordonnées bancaires 
+                          (pour être payé et pour débiter ton compte lors de la création de ton compte vendeur).
+                        </p>
+
+                        <p className="mb-4">
+                          Amazon te demandera également de définir ton nom de boutique.
+                        </p>
+
+                        <h4 className="text-lg font-semibold mt-6 mb-3">Étape 3 : Vérification du compte</h4>
+                        <p className="mb-3">
+                          Dernière étape : tu devras faire vérifier ton compte. Pour cela, tu devras passer un appel avec le service d'Amazon. 
+                          Tu devras attendre d'être mis en relation avec un conseiller qui te posera quelques questions sur toi, 
+                          ce que tu comptes vendre et vérifiera ton identité.
+                        </p>
+
+                        <p className="mb-3">
+                          Une fois l'appel terminé, ton dossier sera validé en quelques jours ! 😄
+                        </p>
+
+                        <div className="bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 rounded-lg p-4 mt-6">
+                          <p className="text-sm">
+                            🎉 <strong>Félicitations !</strong> Tu vas enfin pouvoir vendre sur Amazon ! 
+                            Si tu as des questions, n'hésite pas à venir nous contacter sur le groupe Discord.
+                          </p>
+                        </div>
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+
+                </Accordion>
               </TabsContent>
 
               {/* ========== ONGLET VENDRE ========== */}
               <TabsContent value="vendre" className="space-y-8">
-                <section>
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="p-3 rounded-lg bg-primary/10">
-                      <Store className="w-8 h-8 text-primary" />
-                    </div>
-                    <div>
-                      <h2 className="text-3xl font-bold">Commencer à vendre</h2>
-                      <p className="text-muted-foreground">Guide complet pour lancer tes premières ventes sur Amazon</p>
-                    </div>
-                  </div>
-
-                  <Accordion type="single" collapsible className="space-y-4">
-                    <AccordionItem value="compte-seller" className="border rounded-lg px-6 bg-card">
-                      <AccordionTrigger className="text-lg font-semibold hover:no-underline">
-                        <div className="flex items-center gap-3">
-                          <Store className="w-5 h-5 text-primary" />
-                          <span>Ouvrir ton compte Amazon Seller</span>
+                
+                <Accordion type="single" collapsible className="space-y-4">
+                  
+                  {/* Comment trouver des produits rentables */}
+                  <AccordionItem value="produits-rentables" className="border rounded-lg px-6 bg-card">
+                    <AccordionTrigger className="text-lg font-semibold hover:no-underline">
+                      <div className="flex items-center gap-3">
+                        <Search className="w-5 h-5 text-primary" />
+                        <span>Comment trouver des produits rentables à revendre ?</span>
+                      </div>
+                    </AccordionTrigger>
+                    <AccordionContent className="space-y-6 pt-4">
+                      <img src={produitsRentablesHero} alt="Trouver des produits rentables" className="w-full rounded-lg mb-6" />
+                      
+                      <div className="prose prose-sm max-w-none">
+                        <div className="bg-primary/5 border-l-4 border-primary p-4 mb-6">
+                          <p className="mb-2">
+                            Il existe une multitude de possibilités pour dénicher des produits rentables ! 
+                            Il te suffit d'y consacrer un peu de temps et d'être débrouillard.
+                          </p>
+                          <p className="text-sm italic">
+                            Suis ces conseils, ça pourrait bien t'aider.
+                          </p>
                         </div>
-                      </AccordionTrigger>
-                      <AccordionContent className="space-y-4 pt-4">
-                        <p>Pour commencer à vendre, tu dois créer un compte vendeur Amazon. Voici les étapes :</p>
-                        
-                        <div className="space-y-4">
-                          <div>
-                            <h4 className="font-semibold mb-2">📝 Ce dont tu as besoin :</h4>
-                            <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
-                              <li>Une adresse email professionnelle</li>
-                              <li>Un numéro de téléphone valide</li>
-                              <li>Une carte bancaire internationale (Visa ou Mastercard)</li>
-                              <li>Les informations de ton entreprise (SIRET, adresse, etc.)</li>
-                              <li>Une pièce d'identité valide</li>
-                              <li>Un relevé bancaire récent (moins de 3 mois)</li>
-                            </ul>
-                          </div>
 
-                          <Card className="bg-primary/5">
+                        <p className="mb-4 font-medium">
+                          Pour commencer, il faut savoir qu'il n'existe pas de formule magique ! 
+                          Tu dois scanner tous les produits que tu croises.
+                        </p>
+
+                        <p className="mb-4">
+                          Ne te concentre pas uniquement sur une seule catégorie, sinon tu risques de passer à côté de nombreuses opportunités. 
+                          Bien sûr, certaines catégories fonctionnent mieux que d'autres, comme les jeux/jouets, l'outillage, 
+                          les articles pour enfants/bébés et le secteur pharmaceutique.
+                        </p>
+
+                        <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4 my-6">
+                          <p className="text-sm">
+                            💡 <strong>Astuce :</strong> Avant même de chercher en ligne, réfléchis à ce qui t'entoure ! 
+                            Chez toi, autour de chez toi, dans ta ville, via tes proches... 
+                            Tu as peut-être des articles qui se revendent très bien sur Amazon.
+                          </p>
+                        </div>
+
+                        <p className="mb-4">
+                          Pense aussi aux contacts que tu as. Tu connais sûrement des gens qui travaillent dans divers secteurs : 
+                          salon de coiffure, garage, etc. Ils connaissent bien les prix, les produits populaires et surtout les meilleurs fournisseurs. 
+                          En tant que professionnels, ils peuvent également commander directement auprès des grandes marques.
+                        </p>
+
+                        <h4 className="text-lg font-semibold mt-8 mb-3">1. En ligne sur les sites commerçants français</h4>
+                        <p className="mb-3">
+                          La méthode la plus populaire consiste à chercher des produits en ligne. 
+                          Quand on débute, c'est ce qui est le plus recommandé car cela permet de comprendre rapidement le business Amazon FBA. 
+                          En scannant, tu apprendras à identifier les produits rentables et les niches qui fonctionnent.
+                        </p>
+
+                        <p className="mb-3">
+                          Il existe des millions de sites ! N'hésite pas à faire tes propres recherches. 
+                          Voici quelques recommandations pour trouver d'autres sites :
+                        </p>
+                        <ul className="list-disc pl-6 space-y-2 mb-4">
+                          <li>Recherche un mot-clé comme "Jouets" sur Google et consulte la liste des différents sites</li>
+                          <li>Explore des plateformes comme Dealabs, Twitter, Les Pages Jaunes</li>
+                          <li>Utilise LinkedIn ou Facebook pour repérer des opportunités</li>
+                        </ul>
+
+                        <div className="bg-primary/5 rounded-lg p-4 my-6">
+                          <p className="text-sm">
+                            💡 Pense à créer une note regroupant tous les produits rentables que tu trouves, 
+                            ainsi que les différents sites intéressants. Cela te permettra de garder une trace de tes découvertes !
+                          </p>
+                        </div>
+
+                        <h4 className="text-lg font-semibold mt-8 mb-3">2. En magasin (commerçants, enseignes, déstockage...)</h4>
+                        <p className="mb-3">
+                          C'est un excellent moyen de trouver des produits rentables ! Dans ta ville, il y a sûrement des Carrefour, Auchan, Leclerc, 
+                          et à proximité, des enseignes comme Fnac, King Jouet, etc.
+                        </p>
+
+                        <p className="mb-3">
+                          Mais ne t'arrête pas là ! En creusant un peu plus, tu découvriras forcément des petites boutiques qui proposent 
+                          aussi des articles intéressants. Pense à leur rendre visite !
+                        </p>
+
+                        <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4 my-6">
+                          <p className="text-sm">
+                            ⚡ <strong>Important :</strong> Ne néglige aucun commerce ! Les pharmacies, les superettes... 
+                            Tous les produits peuvent être rentables.
+                          </p>
+                        </div>
+
+                        <h4 className="text-lg font-semibold mt-8 mb-3">3. Sur les plateformes entre particuliers (Vinted, LeBoncoin...)</h4>
+                        <p className="mb-3">
+                          Acheter sur des plateformes comme Vinted, Leboncoin, Ebay, Facebook Marketplace est une excellente idée ! 
+                          Tu peux trouver des articles neufs à prix réduit.
+                        </p>
+
+                        <div className="bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800 rounded-lg p-4 my-6">
+                          <p className="text-sm">
+                            ⚠️ <strong>Attention :</strong> En achetant sur ces plateformes, il ne sera pas possible de collecter la TVA sur l'achat. 
+                            Pense-y dans tes calculs de rentabilité !
+                          </p>
+                        </div>
+
+                        <h4 className="text-lg font-semibold mt-8 mb-3">4. Recherche inversée</h4>
+                        <p className="mb-3">
+                          Le principe est simple : tu analyses la boutique d'un vendeur concurrent, tu repères les produits qu'il vend, 
+                          puis tu fais des recherches pour voir si tu peux les trouver ailleurs à un prix plus bas.
+                        </p>
+
+                        <p className="mb-3">
+                          C'est une méthode très efficace ! Sur SellerAmp, rends-toi sur un produit et tout en bas, 
+                          tu auras la liste des vendeurs. Clique sur le profil du vendeur et tu verras tous ses produits en vente.
+                        </p>
+
+                        <h4 className="text-lg font-semibold mt-8 mb-3">5. Ventes aux enchères</h4>
+                        <p className="mb-3">
+                          L'avantage avec les ventes aux enchères, c'est qu'on peut collecter la TVA ! 
+                          Mais attention aux frais qui peuvent être élevés. Il est très intéressant de te créer un compte sur ces sites :
+                        </p>
+                        <ul className="list-disc pl-6 space-y-2 mb-4">
+                          <li><a href="https://www.interencheres.com/" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">InterEnchères</a></li>
+                          <li><a href="https://www.catawiki.com/" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Catawiki</a> (Frais : 9% + 3€ fixe)</li>
+                          <li><a href="https://www.moniteurdesventes.com/fr" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Moniteur des Ventes</a></li>
+                        </ul>
+
+                        <h4 className="text-lg font-semibold mt-8 mb-3">6. Acheter chez des grossistes</h4>
+                        <p className="mb-3">
+                          Avant de te présenter différents moyens, nous te recommandons vivement Qogita, 
+                          un grossiste spécialisé pour les vendeurs Amazon !
+                        </p>
+                        <a 
+                          href="https://www.qogita.com/?ref=zdc3yjk" 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-primary hover:underline mb-2 inline-block font-medium"
+                        >
+                          → Découvrir Qogita
+                        </a>
+                        <p className="text-sm mb-4">Code promo : <strong>SMILE100</strong> (-100€ sur ta première commande)</p>
+
+                        <div className="bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 rounded-lg p-4 mt-6">
+                          <p className="text-sm">
+                            ✅ <strong>En résumé :</strong> Trouver des produits rentables nécessite de combiner plusieurs méthodes 
+                            et d'éviter certains pièges (frais cachés, TVA non récupérable, contrefaçons). 
+                            En diversifiant tes sources et en utilisant les bons outils, tu peux optimiser tes marges et construire un business solide !
+                          </p>
+                        </div>
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+
+                  {/* Comment vendre en FBA */}
+                  <AccordionItem value="vendre-fba" className="border rounded-lg px-6 bg-card">
+                    <AccordionTrigger className="text-lg font-semibold hover:no-underline">
+                      <div className="flex items-center gap-3">
+                        <Package className="w-5 h-5 text-primary" />
+                        <span>Comment vendre en FBA ?</span>
+                      </div>
+                    </AccordionTrigger>
+                    <AccordionContent className="space-y-6 pt-4">
+                      <img src={fbaWarehouse} alt="Entrepôt FBA" className="w-full rounded-lg mb-6" />
+                      
+                      <div className="prose prose-sm max-w-none">
+                        <div className="bg-primary/5 border-l-4 border-primary p-4 mb-6">
+                          <p className="mb-2">
+                            <strong>Pour rappel :</strong> FBA signifie "Fulfillment by Amazon" (Expédié par Amazon en français).
+                          </p>
+                          <p className="text-sm">
+                            Le principe est simple : au lieu d'expédier ton stock chez le client (en FBM), 
+                            le FBA te permet d'envoyer ton stock dans les entrepôts d'Amazon. Ils s'occupent de tout le reste !
+                          </p>
+                        </div>
+
+                        <blockquote className="border-l-4 border-muted pl-4 italic mb-6">
+                          Ce guide t'expliquera comment expédier tes produits efficacement et quels matériaux utiliser.
+                        </blockquote>
+
+                        <h4 className="text-lg font-semibold mt-6 mb-3">Pourquoi choisir la vente en FBA ?</h4>
+                        <p className="mb-3">
+                          Le choix du FBA dépend des articles et des quantités. Nous te le recommandons vivement ! 
+                          Certains articles ont une énorme différence de bénéfice entre FBM et FBA, 
+                          tandis que pour d'autres, la différence est minime. Dans ces cas-là, privilégier le FBA devient plus intéressant.
+                        </p>
+
+                        <div className="bg-primary/5 rounded-lg p-4 my-6">
+                          <h5 className="font-semibold mb-3">Autres avantages :</h5>
+                          <ul className="list-disc pl-6 space-y-2 text-sm">
+                            <li><strong>Gagner du temps :</strong> Amazon gère l'entreposage, l'expédition et le service client</li>
+                            <li><strong>Accès au programme Prime :</strong> Tes produits deviennent éligibles pour la livraison rapide</li>
+                            <li><strong>Crédibilité accrue :</strong> Amazon garantit la qualité du service de livraison</li>
+                          </ul>
+                        </div>
+
+                        <h4 className="text-lg font-semibold mt-8 mb-3">1. Préparation de l'expédition</h4>
+                        <p className="mb-3">
+                          Avec Seller Amp, vérifie bien le poids et la taille du produit avant de l'acheter. 
+                          C'est très important car un produit lourd coûtera plus cher au moment d'envoyer ton stock à Amazon ! 
+                          Vérifie aussi que tu as l'autorisation de vendre le produit.
+                        </p>
+
+                        <h4 className="text-lg font-semibold mt-6 mb-3">2. Choisir les bons cartons</h4>
+                        <p className="mb-3">
+                          Amazon impose des exigences strictes concernant les cartons d'expédition :
+                        </p>
+                        <ul className="list-disc pl-6 space-y-2 mb-4">
+                          <li>Dimensions maximales : 63,5 cm × 48,26 cm × 73,66 cm</li>
+                          <li>Poids maximum : 22,68 kg (sauf exceptions pour produits volumineux)</li>
+                          <li>Cartons solides et neufs de préférence</li>
+                        </ul>
+
+                        <h4 className="text-lg font-semibold mt-6 mb-3">3. Matériaux recommandés</h4>
+                        <ul className="list-disc pl-6 space-y-2 mb-4">
+                          <li>Scotch résistant</li>
+                          <li>Imprimante thermique (recommandée pour les étiquettes)</li>
+                          <li>Étiquettes adhésives (format standard Amazon)</li>
+                          <li>Papier bulle (pour protéger les articles fragiles)</li>
+                        </ul>
+
+                        <h4 className="text-lg font-semibold mt-6 mb-3">4. Création de l'expédition sur Seller Central</h4>
+                        <p className="mb-3">
+                          Connecte-toi à ton compte Amazon Seller Central et suis ces étapes :
+                        </p>
+                        <ol className="list-decimal pl-6 space-y-2 mb-4">
+                          <li>Accède à "Inventaire" &gt; "Gérer les expéditions FBA"</li>
+                          <li>Crée un nouveau plan d'expédition</li>
+                          <li>Ajoute les produits à expédier avec leurs quantités</li>
+                          <li>Imprime les étiquettes FNSKU pour chaque produit</li>
+                          <li>Prépare tes cartons et imprime les étiquettes d'expédition</li>
+                        </ol>
+
+                        <h4 className="text-lg font-semibold mt-6 mb-3">5. Envoi des colis</h4>
+                        <p className="mb-3">
+                          Une fois tes cartons prêts et étiquetés, tu peux choisir entre :
+                        </p>
+                        <ul className="list-disc pl-6 space-y-2 mb-4">
+                          <li><strong>Programme de partenariat transporteur Amazon</strong> : Tarifs négociés via Amazon</li>
+                          <li><strong>Ton propre transporteur</strong> : UPS, DHL, Chronopost, etc.</li>
+                        </ul>
+
+                        <div className="bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 rounded-lg p-4 mt-6">
+                          <p className="text-sm">
+                            ✅ <strong>Astuce :</strong> Le FBA permet de gagner un temps précieux et d'accéder au badge Prime. 
+                            C'est un investissement qui vaut le coup si tu veux scaler ton business !
+                          </p>
+                        </div>
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+
+                  {/* Comment vendre en FBM */}
+                  <AccordionItem value="vendre-fbm" className="border rounded-lg px-6 bg-card">
+                    <AccordionTrigger className="text-lg font-semibold hover:no-underline">
+                      <div className="flex items-center gap-3">
+                        <ShoppingCart className="w-5 h-5 text-primary" />
+                        <span>Comment vendre en FBM ?</span>
+                      </div>
+                    </AccordionTrigger>
+                    <AccordionContent className="space-y-6 pt-4">
+                      <img src={fbmPackages} alt="Colis FBM" className="w-full rounded-lg mb-6" />
+                      
+                      <div className="prose prose-sm max-w-none">
+                        <div className="bg-primary/5 border-l-4 border-primary p-4 mb-6">
+                          <p className="mb-2">
+                            <strong>Pour rappel :</strong> FBM signifie "Fulfilled by Merchant", 
+                            ce qui veut dire que c'est le vendeur lui-même qui gère la logistique de ses commandes sur Amazon.
+                          </p>
+                          <p className="text-sm">
+                            Contrairement à FBA où Amazon s'occupe du stockage, de l'emballage et de l'expédition, 
+                            avec FBM, c'est toi (le vendeur) qui expédies directement les produits au client.
+                          </p>
+                        </div>
+
+                        <blockquote className="border-l-4 border-muted pl-4 italic mb-6">
+                          Ce guide t'expliquera comment expédier tes produits efficacement et quels matériaux utiliser.
+                        </blockquote>
+
+                        <h4 className="text-lg font-semibold mt-6 mb-3">Pourquoi choisir la vente en FBM ?</h4>
+                        <p className="mb-3">
+                          Le choix du FBM dépend des articles et des quantités. Nous te le recommandons vivement quand tu commences 
+                          avec un petit budget (moins de 500€) ou selon certains articles. 
+                          Certains produits ont une énorme différence de bénéfice entre FBM et FBA, 
+                          alors que d'autres peuvent avoir une différence de quelques euros seulement.
+                        </p>
+
+                        <h4 className="text-lg font-semibold mt-8 mb-3">1. Préparation de ton expédition</h4>
+                        <p className="mb-3">
+                          Avec Seller Amp, vérifie bien le poids et la taille du produit avant de l'acheter. 
+                          C'est très important car un produit lourd coûtera plus cher au moment d'acheter un bordereau d'expédition ! 
+                          Vérifie aussi que tu as l'autorisation de vendre le produit et les éventuelles alertes 
+                          (produit liquide, inflammable, etc.).
+                        </p>
+
+                        <h4 className="text-lg font-semibold mt-6 mb-3">1.1 Choisir les bons cartons</h4>
+                        <p className="mb-3">
+                          Quand tu expédies en FBM, pas d'inquiétude : pas besoin d'avoir une taille spécifique ! 
+                          Tu expédies dans le carton de ton choix. Fais juste en sorte que ton colis soit soigné.
+                        </p>
+                        <p className="mb-3">
+                          Tu peux acheter des cartons un peu partout. Sur le Discord, nous avons un partenaire qui vend des cartons vraiment pas cher !
+                        </p>
+
+                        <h4 className="text-lg font-semibold mt-6 mb-3">1.2 Matériaux recommandés</h4>
+                        <ul className="list-disc pl-6 space-y-2 mb-4">
+                          <li>Scotch résistant</li>
+                          <li>Imprimante thermique (recommandée, mais pas obligatoire)</li>
+                          <li>Étiquettes pour imprimante thermique (format 40mm x 30mm)</li>
+                          <li>Papier bulle (pas obligatoire mais recommandé)</li>
+                        </ul>
+
+                        <h4 className="text-lg font-semibold mt-6 mb-3">2. Création de l'expédition sur Amazon Seller Central</h4>
+                        <p className="mb-3">
+                          Tu dois te rendre sur Amazon Seller et trouver l'option "Ajouter des produits".
+                        </p>
+                        <p className="mb-3">
+                          Ensuite, tu cherches l'EAN ou l'ASIN du produit et tu cliques sur le bon produit proposé.
+                        </p>
+                        <p className="mb-3">
+                          Choisis l'état "Neuf" et clique sur "Vendre ce produit".
+                        </p>
+                        <p className="mb-3">
+                          Remplis quelques informations comme la quantité, ton prix et l'état du produit. 
+                          Le SKU du vendeur n'est pas essentiel.
+                        </p>
+                        <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4 my-4">
+                          <p className="text-sm">
+                            <strong>Important :</strong> Choisis bien "Je vais expédier cet article moi-même" pour faire du FBM !
+                          </p>
+                        </div>
+                        <p className="mb-3">
+                          Voilà ! Tu viens de créer une offre FBM. Attends environ 15 minutes avant que ton stock soit visible sur la page produit d'Amazon.
+                        </p>
+
+                        <h4 className="text-lg font-semibold mt-6 mb-3">3. Envoi des colis</h4>
+                        <p className="mb-3">
+                          Une fois ton listing validé sur Amazon Seller, tu dois maintenant attendre les ventes ! 
+                          Si tu vends un article, tu recevras une notification sur ton application Amazon Seller et un email.
+                        </p>
+                        <p className="mb-3">
+                          Pour expédier, c'est facile :
+                        </p>
+                        <ol className="list-decimal pl-6 space-y-2 mb-4">
+                          <li>Va sur l'onglet "Gérer les commandes"</li>
+                          <li>Clique sur la commande</li>
+                          <li>Va tout en bas de la commande et renseigne le numéro de suivi</li>
+                          <li>Clique sur "Confirmer l'expédition"</li>
+                        </ol>
+                        <p className="mb-3">
+                          Pour acheter un bordereau d'expédition, va sur le site d'un transporteur comme La Poste !
+                        </p>
+
+                        <h4 className="text-lg font-semibold mt-6 mb-3">3.2 Choix du transporteur</h4>
+                        <p className="mb-3">
+                          Choisis La Poste, c'est souvent le moins cher pour des envois en France. 
+                          Sinon, UPS est une bonne alternative car ils passent récupérer tes colis directement depuis chez toi.
+                        </p>
+
+                        <div className="bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 rounded-lg p-4 mt-6">
+                          <p className="text-sm">
+                            💬 Si tu as la moindre question, pense à venir nous contacter sur le Discord. On t'aidera avec plaisir !
+                          </p>
+                        </div>
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+
+                  {/* Comment reconnaître un bon d'un mauvais produit */}
+                  <AccordionItem value="reconnaitre-produit" className="border rounded-lg px-6 bg-card">
+                    <AccordionTrigger className="text-lg font-semibold hover:no-underline">
+                      <div className="flex items-center gap-3">
+                        <TrendingDown className="w-5 h-5 text-primary" />
+                        <span>Comment reconnaître un bon d'un mauvais produit ?</span>
+                      </div>
+                    </AccordionTrigger>
+                    <AccordionContent className="space-y-6 pt-4">
+                      <img src={reconnaitreProduitHero} alt="Reconnaître bon produit" className="w-full rounded-lg mb-6" />
+                      
+                      <div className="prose prose-sm max-w-none">
+                        <div className="bg-primary/5 border-l-4 border-primary p-4 mb-6">
+                          <p>
+                            Avant d'acheter n'importe quel produit sur un site, il est crucial de s'assurer que le produit est réellement profitable. 
+                            On te l'explique dans ce guide !
+                          </p>
+                        </div>
+
+                        <div className="grid md:grid-cols-2 gap-6 mb-8">
+                          <Card className="bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-800">
                             <CardHeader>
-                              <CardTitle className="text-base">💰 Coûts d'un compte vendeur</CardTitle>
+                              <CardTitle className="text-base">✅ Un "bon" produit, c'est :</CardTitle>
                             </CardHeader>
-                            <CardContent className="text-sm space-y-2">
-                              <p><strong>Abonnement mensuel :</strong> 39 € HT/mois</p>
-                              <p><strong>Frais de vente :</strong> Variable selon la catégorie (8% à 15% du prix de vente)</p>
-                              <p><strong>Frais FBA :</strong> Stockage + expédition (dépend de la taille du produit)</p>
+                            <CardContent className="text-sm">
+                              <ul className="list-disc pl-5 space-y-1">
+                                <li>Faible concurrence</li>
+                                <li>Forte demande</li>
+                                <li>Rentabilité intéressante</li>
+                              </ul>
                             </CardContent>
                           </Card>
 
-                          <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-4">
-                            <p className="font-semibold text-amber-700 dark:text-amber-400">⚠️ Important</p>
-                            <p className="text-sm mt-2">Le processus de vérification peut prendre 24 à 48h. Assure-toi d'avoir tous les documents prêts avant de commencer.</p>
-                          </div>
+                          <Card className="bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-800">
+                            <CardHeader>
+                              <CardTitle className="text-base">❌ Un "mauvais" produit, c'est :</CardTitle>
+                            </CardHeader>
+                            <CardContent className="text-sm">
+                              <ul className="list-disc pl-5 space-y-1">
+                                <li>Trop concurrentiel</li>
+                                <li>Faible volume de recherche</li>
+                                <li>Prix instable</li>
+                                <li>Faible marge de profit</li>
+                              </ul>
+                            </CardContent>
+                          </Card>
                         </div>
-                      </AccordionContent>
-                    </AccordionItem>
 
-                    <AccordionItem value="mettre-en-vente" className="border rounded-lg px-6 bg-card">
-                      <AccordionTrigger className="text-lg font-semibold hover:no-underline">
-                        <div className="flex items-center gap-3">
-                          <Package className="w-5 h-5 text-primary" />
-                          <span>Mettre en vente tes produits</span>
+                        <h4 className="text-lg font-semibold mt-8 mb-3">Les critères essentiels pour analyser un produit</h4>
+                        <p className="mb-3">
+                          Dans un premier temps, tu vas pouvoir commencer à analyser un produit à l'aide de l'application SellerAmp.
+                        </p>
+                        <p className="mb-3">
+                          Quand tu vas scanner des produits, ils peuvent être profitables à première vue. 
+                          Mais il faut vérifier quelques paramètres pour s'assurer si le produit est vraiment profitable ou non !
+                        </p>
+
+                        <h4 className="text-lg font-semibold mt-8 mb-3">Reconnaître un bon d'un mauvais graphique</h4>
+                        <p className="mb-3">
+                          L'indicateur <strong>"Est. Sales"</strong> dans SellerAmp fournit une estimation des ventes mensuelles d'un produit. 
+                          Cependant, il peut parfois afficher "Unknown" (inconnu). 
+                          Cela pose problème car sans cette donnée, il est difficile d'évaluer le potentiel de vente du produit.
+                        </p>
+
+                        <p className="mb-3">
+                          Le <strong>BSR (Best Seller Rank)</strong> indique le classement d'un produit dans sa catégorie. 
+                          Ce classement peut varier considérablement d'un pays à l'autre. 
+                          Active l'option "European Marketplaces" dans tes réglages SellerAmp pour évaluer les performances du produit 
+                          dans les différents pays européens.
+                        </p>
+
+                        <p className="mb-3">
+                          Une autre information cruciale concerne le graphique ! Plus un article grimpe dans le classement (BSR augmente), 
+                          moins il se vend généralement.
+                        </p>
+
+                        <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4 my-6">
+                          <p className="text-sm mb-2">
+                            <strong>Signification des traits dans le graphique :</strong>
+                          </p>
+                          <ul className="list-disc pl-6 space-y-1 text-sm">
+                            <li><strong>Trait jaune :</strong> Amazon vend ce produit (souvent mauvais signe)</li>
+                            <li><strong>Traits bleu et orange :</strong> Différents vendeurs FBA et FBM</li>
+                            <li><strong>Trait violet :</strong> La Buy Box (boîte d'achat). Si elle n'a jamais été là, c'est problématique</li>
+                          </ul>
                         </div>
-                      </AccordionTrigger>
-                      <AccordionContent className="space-y-4 pt-4">
-                        <p>Une fois ton compte vendeur actif, voici comment mettre tes produits en ligne :</p>
-                        
-                        <div className="space-y-4">
-                          <div>
-                            <h4 className="font-semibold mb-3">Les étapes :</h4>
-                            <div className="space-y-3">
-                              <Card>
-                                <CardHeader className="pb-3">
-                                  <CardTitle className="text-base">1️⃣ Recherche le produit sur Amazon</CardTitle>
-                                </CardHeader>
-                                <CardContent className="text-sm text-muted-foreground">
-                                  Utilise le code-barres (EAN) ou le nom du produit pour trouver la fiche existante.
-                                </CardContent>
-                              </Card>
 
-                              <Card>
-                                <CardHeader className="pb-3">
-                                  <CardTitle className="text-base">2️⃣ Crée ton offre</CardTitle>
-                                </CardHeader>
-                                <CardContent className="text-sm text-muted-foreground">
-                                  Fixe ton prix, indique la quantité disponible et choisis le mode d'expédition (FBA ou FBM).
-                                </CardContent>
-                              </Card>
+                        <h4 className="text-lg font-semibold mt-8 mb-3">Vérifie les vendeurs, leur stock et leurs prix !</h4>
+                        <p className="mb-3">
+                          Un autre critère important est de vérifier le stock et le prix des vendeurs sur la fiche produit.
+                        </p>
+                        <p className="mb-3">
+                          Parfois, dans le "Sale Price", le prix indiqué ne correspond pas toujours au prix des vendeurs actuels ! 
+                          Assure-toi donc de vérifier et de remplacer ce prix par le prix du vendeur le plus bas ou par le prix moyen 
+                          des trois derniers mois.
+                        </p>
 
-                              <Card>
-                                <CardHeader className="pb-3">
-                                  <CardTitle className="text-base">3️⃣ Envoie tes produits en FBA</CardTitle>
-                                </CardHeader>
-                                <CardContent className="text-sm text-muted-foreground">
-                                  Crée un envoi FBA, imprime les étiquettes et envoie ton stock à l'entrepôt Amazon.
-                                </CardContent>
-                              </Card>
+                        <h4 className="text-lg font-semibold mt-8 mb-3">Les caractéristiques du produit (poids, taille, réglementations)</h4>
+                        <p className="mb-3">
+                          Analyse impérativement la taille et le poids de ton produit. 
+                          Un produit lourd coûtera forcément plus cher à expédier, que ce soit en FBA ou en FBM.
+                        </p>
 
-                              <Card>
-                                <CardHeader className="pb-3">
-                                  <CardTitle className="text-base">4️⃣ Amazon gère tout</CardTitle>
-                                </CardHeader>
-                                <CardContent className="text-sm text-muted-foreground">
-                                  Une fois reçu, Amazon stocke, emballe et expédie tes produits automatiquement.
-                                </CardContent>
-                              </Card>
-                            </div>
-                          </div>
+                        <h4 className="text-lg font-semibold mt-8 mb-3">Les alertes autour du produit</h4>
+                        <p className="mb-3">
+                          Dernière chose : vérifie les alertes sur le produit ! 
+                          Très déterminant dans ton analyse, elles te permettent de suivre des indications données par SellerAmp 
+                          comme la taille/poids du produit, les variations, ou si c'est un produit dangereux à transporter, etc.
+                        </p>
 
-                          <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4">
-                            <p className="font-semibold">💡 Astuce</p>
-                            <p className="text-sm mt-2">Commence avec 3 à 5 produits pour tester le processus avant de te lancer à grande échelle.</p>
-                          </div>
+                        <div className="bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 rounded-lg p-4 mt-6">
+                          <p className="text-sm">
+                            💬 N'hésite pas à venir nous contacter sur le Discord si tu as besoin d'avis sur un produit ou si tu as besoin d'aide !
+                          </p>
                         </div>
-                      </AccordionContent>
-                    </AccordionItem>
-                  </Accordion>
-                </section>
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+
+                </Accordion>
               </TabsContent>
 
               {/* ========== ONGLET OUTILS ========== */}
@@ -1095,145 +1118,58 @@ const Guides = () => {
                       <Wrench className="w-8 h-8 text-primary" />
                     </div>
                     <div>
-                      <h2 className="text-3xl font-bold">Les outils indispensables</h2>
-                      <p className="text-muted-foreground">Les meilleurs outils pour optimiser ton activité Amazon FBA</p>
+                      <h2 className="text-3xl font-bold">Outils recommandés</h2>
+                      <p className="text-muted-foreground">Les outils essentiels pour réussir sur Amazon</p>
                     </div>
                   </div>
 
-                  <Accordion type="single" collapsible className="space-y-4">
-                    <AccordionItem value="outils-essentiels" className="border rounded-lg px-6 bg-card">
-                      <AccordionTrigger className="text-lg font-semibold hover:no-underline">
-                        <div className="flex items-center gap-3">
-                          <Wrench className="w-5 h-5 text-primary" />
-                          <span>Les outils indispensables</span>
-                        </div>
-                      </AccordionTrigger>
-                      <AccordionContent className="space-y-4 pt-4">
-                        <p>Pour réussir en FBA, tu as besoin de ces outils essentiels :</p>
-                        
-                        <div className="space-y-4">
-                          <Card className="bg-primary/5">
-                            <CardHeader>
-                              <CardTitle className="text-base">🔍 Keepa</CardTitle>
-                            </CardHeader>
-                            <CardContent className="text-sm space-y-2">
-                              <p className="font-medium">Suivi des prix et de l'historique des ventes</p>
-                              <p className="text-muted-foreground">Indispensable pour analyser si un produit se vend bien et à quel prix.</p>
-                              <p className="text-primary font-medium">Prix : ~19 €/mois</p>
-                            </CardContent>
-                          </Card>
+                  <Card className="bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
+                    <CardHeader>
+                      <CardTitle>🛠️ Outils indispensables</CardTitle>
+                      <CardDescription>
+                        Ces outils te permettront d'optimiser ton activité et de gagner du temps
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <Card>
+                          <CardHeader className="pb-3">
+                            <CardTitle className="text-base">📱 Seller AMP</CardTitle>
+                          </CardHeader>
+                          <CardContent className="text-sm text-muted-foreground">
+                            Application mobile pour scanner les produits et vérifier leur rentabilité en temps réel
+                          </CardContent>
+                        </Card>
 
-                          <Card className="bg-primary/5">
-                            <CardHeader>
-                              <CardTitle className="text-base">📱 Application Amazon Seller</CardTitle>
-                            </CardHeader>
-                            <CardContent className="text-sm space-y-2">
-                              <p className="font-medium">Scanner de codes-barres en magasin</p>
-                              <p className="text-muted-foreground">Scanne les produits en boutique pour voir s'ils sont rentables avant d'acheter.</p>
-                              <p className="text-primary font-medium">Prix : Gratuit</p>
-                            </CardContent>
-                          </Card>
+                        <Card>
+                          <CardHeader className="pb-3">
+                            <CardTitle className="text-base">📊 Keepa</CardTitle>
+                          </CardHeader>
+                          <CardContent className="text-sm text-muted-foreground">
+                            Outil de suivi des prix et des historiques de ventes Amazon
+                          </CardContent>
+                        </Card>
 
-                          <Card className="bg-primary/5">
-                            <CardHeader>
-                              <CardTitle className="text-base">💰 Calculateur de frais Amazon</CardTitle>
-                            </CardHeader>
-                            <CardContent className="text-sm space-y-2">
-                              <p className="font-medium">Estime tes marges nettes</p>
-                              <p className="text-muted-foreground">Calcule automatiquement tous les frais (FBA, commission, TVA) pour connaître ton bénéfice réel.</p>
-                              <p className="text-primary font-medium">Prix : Gratuit (intégré à Seller Central)</p>
-                            </CardContent>
-                          </Card>
+                        <Card>
+                          <CardHeader className="pb-3">
+                            <CardTitle className="text-base">🖨️ Imprimante thermique</CardTitle>
+                          </CardHeader>
+                          <CardContent className="text-sm text-muted-foreground">
+                            Pour imprimer rapidement les étiquettes FBA et FBM
+                          </CardContent>
+                        </Card>
 
-                          <Card className="bg-primary/5">
-                            <CardHeader>
-                              <CardTitle className="text-base">📊 Helium 10 / Jungle Scout</CardTitle>
-                            </CardHeader>
-                            <CardContent className="text-sm space-y-2">
-                              <p className="font-medium">Recherche avancée de produits</p>
-                              <p className="text-muted-foreground">Pour ceux qui veulent aller plus loin dans l'analyse de produits et la recherche de niches.</p>
-                              <p className="text-primary font-medium">Prix : À partir de 39 €/mois</p>
-                            </CardContent>
-                          </Card>
-
-                          <Card className="bg-primary/5">
-                            <CardHeader>
-                              <CardTitle className="text-base">🏷️ Étiqueteuse thermique</CardTitle>
-                            </CardHeader>
-                            <CardContent className="text-sm space-y-2">
-                              <p className="font-medium">Imprime tes étiquettes FBA</p>
-                              <p className="text-muted-foreground">Gain de temps énorme pour préparer tes envois Amazon.</p>
-                              <p className="text-primary font-medium">Prix : 100-200 € (Rollo, Munbyn)</p>
-                            </CardContent>
-                          </Card>
-                        </div>
-                      </AccordionContent>
-                    </AccordionItem>
-
-                    <AccordionItem value="sourcing" className="border rounded-lg px-6 bg-card">
-                      <AccordionTrigger className="text-lg font-semibold hover:no-underline">
-                        <div className="flex items-center gap-3">
-                          <Search className="w-5 h-5 text-primary" />
-                          <span>Où trouver des produits à revendre ?</span>
-                        </div>
-                      </AccordionTrigger>
-                      <AccordionContent className="space-y-4 pt-4">
-                        <p>Voici les meilleurs endroits pour sourcer tes produits :</p>
-                        
-                        <div className="space-y-3">
-                          <Card>
-                            <CardHeader className="pb-3">
-                              <CardTitle className="text-base">🏬 Grandes surfaces (Auchan, Leclerc, Carrefour)</CardTitle>
-                            </CardHeader>
-                            <CardContent className="text-sm text-muted-foreground">
-                              Promotions, déstockages, fins de série. Idéal pour les débutants.
-                            </CardContent>
-                          </Card>
-
-                          <Card>
-                            <CardHeader className="pb-3">
-                              <CardTitle className="text-base">🛍️ Magasins discount (Action, Gifi, La Foir'Fouille)</CardTitle>
-                            </CardHeader>
-                            <CardContent className="text-sm text-muted-foreground">
-                              Produits à très bas prix. Attention à la qualité.
-                            </CardContent>
-                          </Card>
-
-                          <Card>
-                            <CardHeader className="pb-3">
-                              <CardTitle className="text-base">💻 Sites e-commerce (Cdiscount, Rue du Commerce, Fnac)</CardTitle>
-                            </CardHeader>
-                            <CardContent className="text-sm text-muted-foreground">
-                              Ventes flash, codes promo. Gain de temps, pas besoin de se déplacer.
-                            </CardContent>
-                          </Card>
-
-                          <Card>
-                            <CardHeader className="pb-3">
-                              <CardTitle className="text-base">🏭 Grossistes (Alibaba, made-in-china.com)</CardTitle>
-                            </CardHeader>
-                            <CardContent className="text-sm text-muted-foreground">
-                              Pour acheter en gros volume. Réservé aux vendeurs avec un budget plus élevé.
-                            </CardContent>
-                          </Card>
-
-                          <Card>
-                            <CardHeader className="pb-3">
-                              <CardTitle className="text-base">📦 Liquidations et déstockages</CardTitle>
-                            </CardHeader>
-                            <CardContent className="text-sm text-muted-foreground">
-                              Sites comme Destockplus, B-Stock. Opportunités intéressantes mais risque plus élevé.
-                            </CardContent>
-                          </Card>
-                        </div>
-
-                        <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-4">
-                          <p className="font-semibold text-green-700 dark:text-green-400">✅ Conseil</p>
-                          <p className="text-sm mt-2">Combine plusieurs sources pour maximiser tes chances de trouver des produits rentables.</p>
-                        </div>
-                      </AccordionContent>
-                    </AccordionItem>
-                  </Accordion>
+                        <Card>
+                          <CardHeader className="pb-3">
+                            <CardTitle className="text-base">📦 Cartons et emballages</CardTitle>
+                          </CardHeader>
+                          <CardContent className="text-sm text-muted-foreground">
+                            Matériaux d'expédition de qualité pour protéger tes produits
+                          </CardContent>
+                        </Card>
+                      </div>
+                    </CardContent>
+                  </Card>
                 </section>
               </TabsContent>
             </Tabs>
