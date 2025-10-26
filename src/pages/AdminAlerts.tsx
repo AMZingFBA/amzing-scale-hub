@@ -457,7 +457,7 @@ const AdminAlerts = () => {
                                       alert.category === 'produits' ? '#047857' : '#374151'
                                   }}
                                 >
-                                  {alert.category.toUpperCase()}
+                                  {alert.category ? alert.category.toUpperCase() : 'GÉNÉRAL'}
                                 </Badge>
                                 {alert.subcategory && (
                                   <Badge variant="outline" className="text-xs">
