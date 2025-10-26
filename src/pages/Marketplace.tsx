@@ -74,6 +74,7 @@ const Marketplace = () => {
   // Marketplace conversations
   const [myConversations, setMyConversations] = useState<any[]>([]);
   const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<string>("all");
   
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -430,8 +431,11 @@ const Marketplace = () => {
       }
       await supabase.from("chat_room_members").insert(roomMembers);
 
-      toast.success("Conversation créée! Rendez-vous dans le chat.");
-      navigate("/chat");
+      // Reload conversations and switch to messages tab
+      await loadMyConversations();
+      setActiveTab("messages");
+      setSelectedConversation(room.id);
+      toast.success("Conversation créée!");
     } catch (error: any) {
       console.error("Error creating marketplace room:", error);
       toast.error("Erreur lors de la création de la conversation");
@@ -953,7 +957,7 @@ const Marketplace = () => {
 
         {/* Sell Section */}
         {activeSection === "sell" && (
-          <Tabs defaultValue="all" className="w-full">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsList className="grid w-full max-w-2xl grid-cols-3">
               <TabsTrigger value="all">Toutes les annonces</TabsTrigger>
               <TabsTrigger value="mine">Mes annonces</TabsTrigger>
