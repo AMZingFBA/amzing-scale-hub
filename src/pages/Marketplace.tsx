@@ -367,63 +367,65 @@ const Marketplace = () => {
     }
 
     try {
-      // Get seller profile info
-      const { data: sellerProfile } = await supabase
-        .from("profiles")
-        .select("email, full_name, nickname")
-        .eq("id", listing.user_id)
-        .single();
+      // Create marketplace chat room name
+      const code = listing.asin || listing.ean || "N/A";
+      const roomName = `Achat - ${listing.title} - ${code}`;
 
-      // Get buyer profile info
-      const { data: buyerProfile } = await supabase
-        .from("profiles")
-        .select("email, full_name, nickname")
-        .eq("id", user.id)
-        .single();
-
-      const sellerInfo = sellerProfile 
-        ? `${sellerProfile.nickname || sellerProfile.full_name || "Membre"} (${sellerProfile.email})`
-        : "Information non disponible";
-
-      const buyerInfo = buyerProfile
-        ? `${buyerProfile.nickname || buyerProfile.full_name || "Membre"} (${buyerProfile.email})`
-        : "Information non disponible";
-
-      // 1. Create ticket for buyer (user who clicked)
-      const { data: buyerTicket, error: buyerTicketError } = await supabase
-        .from("tickets")
+      // Create a private marketplace chat room
+      const { data: room, error: roomError } = await supabase
+        .from("chat_rooms")
         .insert({
-          user_id: user.id,
-          subject: `Marketplace - Achat: ${listing.title}`,
-          category: "marketplace",
-          status: "open",
-          priority: "normal"
+          name: roomName,
+          type: "marketplace",
+          created_by: user.id
         })
         .select()
         .single();
 
-      if (buyerTicketError) throw buyerTicketError;
+      if (roomError) throw roomError;
 
-      // 2. Create ticket for seller (owner of listing)
-      const { data: sellerTicket, error: sellerTicketError } = await supabase
-        .from("tickets")
+      // Add buyer (current user) as member
+      const { error: buyerMemberError } = await supabase
+        .from("chat_room_members")
         .insert({
-          user_id: listing.user_id,
-          subject: `Marketplace - Quelqu'un veut acheter: ${listing.title}`,
-          category: "marketplace",
-          status: "open",
-          priority: "normal"
-        })
-        .select()
+          room_id: room.id,
+          user_id: user.id
+        });
+
+      if (buyerMemberError) throw buyerMemberError;
+
+      // Add seller (listing owner) as member
+      const { error: sellerMemberError } = await supabase
+        .from("chat_room_members")
+        .insert({
+          room_id: room.id,
+          user_id: listing.user_id
+        });
+
+      if (sellerMemberError) throw sellerMemberError;
+
+      // Get admin user to add as member
+      const { data: adminRole } = await supabase
+        .from("user_roles")
+        .select("user_id")
+        .eq("role", "admin")
+        .limit(1)
         .single();
 
-      if (sellerTicketError) throw sellerTicketError;
+      if (adminRole) {
+        await supabase
+          .from("chat_room_members")
+          .insert({
+            room_id: room.id,
+            user_id: adminRole.user_id
+          });
+      }
 
-      toast.success("Demande envoyée! Le staff va vous contacter et vérifier la disponibilité.");
-      navigate("/support");
+      toast.success("Conversation créée! Rendez-vous dans le chat pour discuter.");
+      navigate("/chat");
     } catch (error: any) {
-      console.error("Error creating interest:", error);
-      toast.error("Erreur lors de l'envoi de la demande");
+      console.error("Error creating marketplace room:", error);
+      toast.error("Erreur lors de la création de la conversation");
     }
   };
 
@@ -437,60 +439,62 @@ const Marketplace = () => {
     }
 
     try {
-      // Get buyer profile info (the one who posted the buy request)
-      const { data: buyerProfile } = await supabase
-        .from("profiles")
-        .select("email, full_name, nickname")
-        .eq("id", buyRequest.user_id)
-        .single();
+      // Create marketplace chat room name
+      const code = buyRequest.asin || buyRequest.ean || "N/A";
+      const roomName = `Vente - ${buyRequest.title} - ${code}`;
 
-      // Get seller profile info (the one offering to sell)
-      const { data: sellerProfile } = await supabase
-        .from("profiles")
-        .select("email, full_name, nickname")
-        .eq("id", user.id)
-        .single();
-
-      const buyerInfo = buyerProfile 
-        ? `${buyerProfile.nickname || buyerProfile.full_name || "Membre"} (${buyerProfile.email})`
-        : "Information non disponible";
-
-      const sellerInfo = sellerProfile
-        ? `${sellerProfile.nickname || sellerProfile.full_name || "Membre"} (${sellerProfile.email})`
-        : "Information non disponible";
-
-      // 1. Create ticket for seller (user who clicked "je peux vendre")
-      const { data: sellerTicket, error: sellerTicketError } = await supabase
-        .from("tickets")
+      // Create a private marketplace chat room
+      const { data: room, error: roomError } = await supabase
+        .from("chat_rooms")
         .insert({
-          user_id: user.id,
-          subject: `Marketplace - Vente: ${buyRequest.title}`,
-          category: "marketplace",
-          status: "open",
-          priority: "normal"
+          name: roomName,
+          type: "marketplace",
+          created_by: user.id
         })
         .select()
         .single();
 
-      if (sellerTicketError) throw sellerTicketError;
+      if (roomError) throw roomError;
 
-      // 2. Create ticket for buyer (owner of buy request)
-      const { data: buyerTicket, error: buyerTicketError } = await supabase
-        .from("tickets")
+      // Add seller (current user) as member
+      const { error: sellerMemberError } = await supabase
+        .from("chat_room_members")
         .insert({
-          user_id: buyRequest.user_id,
-          subject: `Marketplace - Quelqu'un peut vendre: ${buyRequest.title}`,
-          category: "marketplace",
-          status: "open",
-          priority: "normal"
-        })
-        .select()
+          room_id: room.id,
+          user_id: user.id
+        });
+
+      if (sellerMemberError) throw sellerMemberError;
+
+      // Add buyer (buy request owner) as member
+      const { error: buyerMemberError } = await supabase
+        .from("chat_room_members")
+        .insert({
+          room_id: room.id,
+          user_id: buyRequest.user_id
+        });
+
+      if (buyerMemberError) throw buyerMemberError;
+
+      // Get admin user to add as member
+      const { data: adminRole } = await supabase
+        .from("user_roles")
+        .select("user_id")
+        .eq("role", "admin")
+        .limit(1)
         .single();
 
-      if (buyerTicketError) throw buyerTicketError;
+      if (adminRole) {
+        await supabase
+          .from("chat_room_members")
+          .insert({
+            room_id: room.id,
+            user_id: adminRole.user_id
+          });
+      }
 
-      toast.success("Proposition envoyée! Le staff va contacter l'acheteur et revenir vers vous.");
-      navigate("/support");
+      toast.success("Conversation créée! Rendez-vous dans le chat pour discuter.");
+      navigate("/chat");
     } catch (error: any) {
       console.error("Error creating proposal:", error);
       toast.error("Erreur lors de l'envoi de la proposition");
