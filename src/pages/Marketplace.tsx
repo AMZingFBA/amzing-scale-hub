@@ -1185,7 +1185,7 @@ const Marketplace = () => {
               </TabsContent>
 
               <TabsContent value="tickets" className="mt-6 animate-fade-in">
-                <div className="space-y-3">
+                <div className="space-y-6">
                   {myTickets.length === 0 ? (
                     <Card className="p-16 border-2 border-dashed border-muted-foreground/20 bg-muted/5">
                       <div className="text-center text-muted-foreground space-y-4">
@@ -1195,39 +1195,99 @@ const Marketplace = () => {
                           </div>
                         </div>
                         <p className="text-lg font-medium">Aucune demande pour le moment</p>
-                        <p className="text-sm">Lorsque vous proposerez un produit ou qu'on vous en proposera un, les tickets apparaîtront ici</p>
+                        <p className="text-sm">Lorsque vous proposerez un produit ou qu&apos;on vous en proposera un, les tickets apparaîtront ici</p>
                       </div>
                     </Card>
                   ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {myTickets.map((ticket) => (
-                        <Card
-                          key={ticket.id}
-                          className="hover:shadow-lg transition-shadow cursor-pointer"
-                          onClick={() => {
-                            navigate(`/ticket/${ticket.id}`);
-                          }}
-                        >
-                          <CardHeader className="pb-3">
-                            <div className="flex justify-between items-start gap-2">
-                              <CardTitle className="text-sm font-semibold line-clamp-2">
-                                {ticket.subject}
-                              </CardTitle>
-                              <Badge variant={ticket.status === "open" ? "default" : ticket.status === "in_progress" ? "secondary" : "outline"}>
-                                {ticket.status}
-                              </Badge>
-                            </div>
-                            <CardDescription className="text-xs">
-                              {new Date(ticket.created_at).toLocaleDateString('fr-FR', {
-                                day: 'numeric',
-                                month: 'long',
-                                year: 'numeric'
-                              })}
-                            </CardDescription>
-                          </CardHeader>
-                        </Card>
-                      ))}
-                    </div>
+                    <>
+                      {/* Demandes en cours */}
+                      {myTickets.filter(t => t.status === 'open' || t.status === 'in_progress').length > 0 && (
+                        <div className="space-y-3">
+                          <div className="flex items-center gap-2 mb-4">
+                            <div className="h-8 w-1 bg-primary rounded-full"></div>
+                            <h3 className="text-xl font-bold">Demandes en cours</h3>
+                            <Badge className="ml-2">
+                              {myTickets.filter(t => t.status === 'open' || t.status === 'in_progress').length}
+                            </Badge>
+                          </div>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {myTickets
+                              .filter(t => t.status === 'open' || t.status === 'in_progress')
+                              .map((ticket) => (
+                                <Card
+                                  key={ticket.id}
+                                  className="hover:shadow-lg transition-shadow cursor-pointer border-l-4 border-l-primary"
+                                  onClick={() => {
+                                    navigate(`/ticket/${ticket.id}`);
+                                  }}
+                                >
+                                  <CardHeader className="pb-3">
+                                    <div className="flex justify-between items-start gap-2">
+                                      <CardTitle className="text-sm font-semibold line-clamp-2">
+                                        {ticket.subject}
+                                      </CardTitle>
+                                      <Badge variant={ticket.status === "open" ? "default" : "secondary"}>
+                                        {ticket.status}
+                                      </Badge>
+                                    </div>
+                                    <CardDescription className="text-xs">
+                                      {new Date(ticket.created_at).toLocaleDateString('fr-FR', {
+                                        day: 'numeric',
+                                        month: 'long',
+                                        year: 'numeric'
+                                      })}
+                                    </CardDescription>
+                                  </CardHeader>
+                                </Card>
+                              ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Demandes closes */}
+                      {myTickets.filter(t => t.status === 'closed').length > 0 && (
+                        <div className="space-y-3">
+                          <div className="flex items-center gap-2 mb-4">
+                            <div className="h-8 w-1 bg-muted-foreground rounded-full"></div>
+                            <h3 className="text-xl font-bold text-muted-foreground">Demandes closes</h3>
+                            <Badge variant="outline" className="ml-2">
+                              {myTickets.filter(t => t.status === 'closed').length}
+                            </Badge>
+                          </div>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {myTickets
+                              .filter(t => t.status === 'closed')
+                              .map((ticket) => (
+                                <Card
+                                  key={ticket.id}
+                                  className="hover:shadow-lg transition-shadow cursor-pointer opacity-70 border-l-4 border-l-muted"
+                                  onClick={() => {
+                                    navigate(`/ticket/${ticket.id}`);
+                                  }}
+                                >
+                                  <CardHeader className="pb-3">
+                                    <div className="flex justify-between items-start gap-2">
+                                      <CardTitle className="text-sm font-semibold line-clamp-2">
+                                        {ticket.subject}
+                                      </CardTitle>
+                                      <Badge variant="outline">
+                                        closed
+                                      </Badge>
+                                    </div>
+                                    <CardDescription className="text-xs">
+                                      {new Date(ticket.created_at).toLocaleDateString('fr-FR', {
+                                        day: 'numeric',
+                                        month: 'long',
+                                        year: 'numeric'
+                                      })}
+                                    </CardDescription>
+                                  </CardHeader>
+                                </Card>
+                              ))}
+                          </div>
+                        </div>
+                      )}
+                    </>
                   )}
                 </div>
               </TabsContent>
