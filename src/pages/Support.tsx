@@ -145,6 +145,26 @@ const Support = () => {
 
     setIsCreating(true);
     try {
+      // Vérifier si l'utilisateur a déjà un ticket ouvert dans cette catégorie
+      const { data: existingTickets, error: checkError } = await supabase
+        .from('tickets')
+        .select('id')
+        .eq('user_id', user!.id)
+        .eq('category', newTicket.category)
+        .in('status', ['open', 'in_progress']);
+
+      if (checkError) throw checkError;
+
+      if (existingTickets && existingTickets.length > 0) {
+        toast({
+          title: "Ticket déjà existant",
+          description: "Vous avez déjà un ticket ouvert dans cette catégorie. Veuillez le fermer avant d'en créer un nouveau.",
+          variant: "destructive",
+        });
+        setIsCreating(false);
+        return;
+      }
+
       const { data: ticket, error: ticketError } = await supabase
         .from('tickets')
         .insert({

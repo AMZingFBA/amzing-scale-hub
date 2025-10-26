@@ -376,9 +376,9 @@ const Dashboard = () => {
                   <div className="bg-accent/50 rounded-lg p-4">
                     <p className="font-semibold mb-3">1️⃣ Créer une demande d'assistance</p>
                     <Link to="/support?category=facture_autorisation">
-                      <div className="flex items-center gap-2 text-primary hover:underline cursor-pointer">
-                        <MessageCircle className="w-4 h-4" />
-                        <span>Accéder au service support - Facture & Autorisation</span>
+                      <div className="flex items-center gap-2 p-3 rounded-md border border-primary/30 bg-primary/5 hover:bg-primary/10 hover:border-primary/50 transition-all cursor-pointer group">
+                        <MessageCircle className="w-5 h-5 text-primary group-hover:scale-110 transition-transform" />
+                        <span className="text-primary font-medium group-hover:underline">Accéder au service support - Facture & Autorisation</span>
                       </div>
                     </Link>
                   </div>
