@@ -7,7 +7,8 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, MessageSquare } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Loader2, MessageSquare, X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
@@ -114,6 +115,33 @@ const AdminTickets = () => {
     return tickets.filter(t => t.status === status);
   };
 
+  const closeTicket = async (ticketId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    try {
+      const { error } = await supabase
+        .from('tickets')
+        .update({ 
+          status: 'closed',
+          closed_at: new Date().toISOString()
+        })
+        .eq('id', ticketId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Ticket fermé",
+        description: "Le ticket a été fermé avec succès",
+      });
+    } catch (error) {
+      console.error('Error closing ticket:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de fermer le ticket",
+        variant: "destructive",
+      });
+    }
+  };
+
   if (isLoading || isAdminLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -166,16 +194,26 @@ const AdminTickets = () => {
                     onClick={() => navigate(`/ticket/${ticket.id}`)}
                   >
                     <CardHeader>
-                      <div className="flex justify-between items-start">
+                      <div className="flex justify-between items-start gap-4">
                         <div className="flex-1">
                           <CardTitle className="text-lg">{ticket.subject}</CardTitle>
                           <CardDescription>
                             De: {ticket.profiles?.full_name || ticket.profiles?.email || 'Utilisateur'}
                           </CardDescription>
                         </div>
-                        <div className="flex gap-2">
+                        <div className="flex gap-2 items-center">
                           {getPriorityBadge(ticket.priority)}
                           {getStatusBadge(ticket.status)}
+                          {ticket.status !== 'closed' && (
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={(e) => closeTicket(ticket.id, e)}
+                              title="Fermer le ticket"
+                            >
+                              <X className="w-4 h-4" />
+                            </Button>
+                          )}
                         </div>
                       </div>
                     </CardHeader>
@@ -193,16 +231,26 @@ const AdminTickets = () => {
                     onClick={() => navigate(`/ticket/${ticket.id}`)}
                   >
                     <CardHeader>
-                      <div className="flex justify-between items-start">
+                      <div className="flex justify-between items-start gap-4">
                         <div className="flex-1">
                           <CardTitle className="text-lg">{ticket.subject}</CardTitle>
                           <CardDescription>
                             De: {ticket.profiles?.full_name || ticket.profiles?.email || 'Utilisateur'}
                           </CardDescription>
                         </div>
-                        <div className="flex gap-2">
+                        <div className="flex gap-2 items-center">
                           {getPriorityBadge(ticket.priority)}
                           {getStatusBadge(ticket.status)}
+                          {ticket.status !== 'closed' && (
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={(e) => closeTicket(ticket.id, e)}
+                              title="Fermer le ticket"
+                            >
+                              <X className="w-4 h-4" />
+                            </Button>
+                          )}
                         </div>
                       </div>
                     </CardHeader>

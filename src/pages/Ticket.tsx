@@ -10,7 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
-import { Loader2, Send, ArrowLeft, Paperclip, X } from 'lucide-react';
+import { Loader2, Send, ArrowLeft, Paperclip, X, Lock } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 
@@ -62,6 +62,34 @@ const Ticket = () => {
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const closeTicket = async () => {
+    try {
+      const { error } = await supabase
+        .from('tickets')
+        .update({ 
+          status: 'closed',
+          closed_at: new Date().toISOString()
+        })
+        .eq('id', id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Ticket fermé",
+        description: "Le ticket a été fermé avec succès",
+      });
+      
+      loadTicketData();
+    } catch (error) {
+      console.error('Error closing ticket:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de fermer le ticket",
+        variant: "destructive",
+      });
+    }
   };
 
   const loadTicketData = async () => {
@@ -229,10 +257,27 @@ const Ticket = () => {
           <Card className="mb-4">
             <CardHeader>
               <div className="flex justify-between items-start">
-                <CardTitle>{ticket?.subject}</CardTitle>
-                <div className="flex gap-2">
+                <div>
+                  <CardTitle>{ticket?.subject}</CardTitle>
+                  {ticket?.status === 'closed' && (
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Ce ticket est fermé
+                    </p>
+                  )}
+                </div>
+                <div className="flex gap-2 items-center">
                   <Badge>{ticket?.priority}</Badge>
                   <Badge variant="outline">{ticket?.status}</Badge>
+                  {ticket?.status !== 'closed' && (isAdmin || ticket?.user_id === user?.id) && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={closeTicket}
+                    >
+                      <Lock className="w-4 h-4 mr-2" />
+                      Fermer
+                    </Button>
+                  )}
                 </div>
               </div>
             </CardHeader>
@@ -310,19 +355,20 @@ const Ticket = () => {
                   onChange={handleFileSelect}
                   className="hidden"
                   id="file-upload"
+                  disabled={ticket?.status === 'closed'}
                 />
                 <Button
                   variant="outline"
                   size="icon"
                   onClick={() => fileInputRef.current?.click()}
-                  disabled={isSending || isUploading}
+                  disabled={isSending || isUploading || ticket?.status === 'closed'}
                 >
                   <Paperclip className="w-4 h-4" />
                 </Button>
                 <Textarea
                   value={newMessage}
                   onChange={(e) => setNewMessage(e.target.value)}
-                  placeholder="Écrivez votre message..."
+                  placeholder={ticket?.status === 'closed' ? 'Ce ticket est fermé' : 'Écrivez votre message...'}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' && !e.shiftKey) {
                       e.preventDefault();
@@ -331,10 +377,11 @@ const Ticket = () => {
                   }}
                   rows={2}
                   className="flex-1"
+                  disabled={ticket?.status === 'closed'}
                 />
                 <Button
                   onClick={sendMessage}
-                  disabled={isSending || isUploading || (!newMessage.trim() && !selectedFile)}
+                  disabled={isSending || isUploading || (!newMessage.trim() && !selectedFile) || ticket?.status === 'closed'}
                   size="icon"
                 >
                   {(isSending || isUploading) ? (

@@ -178,6 +178,7 @@ export type Database = {
     }
     Functions: {
       check_and_expire_subscriptions: { Args: never; Returns: undefined }
+      has_open_ticket: { Args: { _user_id: string }; Returns: boolean }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
