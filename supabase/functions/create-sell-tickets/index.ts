@@ -102,7 +102,7 @@ Est-il toujours disponible svp ?`
     // Create initial message for buyer
     const buyerMessage = `Bonjour 👋
 je suis intéressé(e) pour :
-${body.listingTitle}
+- ${body.listingTitle}
 est-il toujours disponible svp ?`
 
     await supabaseAdmin.from('messages').insert({
