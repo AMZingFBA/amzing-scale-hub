@@ -29,6 +29,8 @@ const AdminAlerts = () => {
   const [linkUrl, setLinkUrl] = useState('');
   const [file, setFile] = useState<File | null>(null);
   const [filePreview, setFilePreview] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState('introduction');
+  const [selectedSubcategory, setSelectedSubcategory] = useState('');
 
   useEffect(() => {
     if (!user) {
@@ -56,7 +58,7 @@ const AdminAlerts = () => {
           {
             event: '*',
             schema: 'public',
-            table: 'product_alerts'
+            table: 'admin_alerts'
           },
           () => {
             loadAlerts();
@@ -73,7 +75,7 @@ const AdminAlerts = () => {
   const loadAlerts = async () => {
     try {
       const { data, error } = await supabase
-        .from('product_alerts')
+        .from('admin_alerts')
         .select('*')
         .order('created_at', { ascending: false });
 
@@ -89,6 +91,14 @@ const AdminAlerts = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const categories = {
+    introduction: ['notifications', 'règles', 'débuter', 'guides', 'affiliation'],
+    outils: ['création-société', 'facture-autorisation', 'cashback', 'avis', 'fiscalité-simplifiée'],
+    expedition: ['fournitures', 'cartons'],
+    informations: ['annonces', 'actualités'],
+    produits: ['produits-find', 'produits-qogita', 'produits-eany', 'grossistes', 'promotions', 'sitelist'],
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -160,7 +170,7 @@ const AdminAlerts = () => {
       }
 
       const { error } = await supabase
-        .from('product_alerts')
+        .from('admin_alerts')
         .insert({
           admin_id: user?.id,
           title: title.trim(),
@@ -169,6 +179,8 @@ const AdminAlerts = () => {
           file_url: fileUrl,
           file_type: fileType,
           file_name: fileName,
+          category: selectedCategory,
+          subcategory: selectedSubcategory || null,
         });
 
       if (error) throw error;
@@ -184,6 +196,8 @@ const AdminAlerts = () => {
       setLinkUrl('');
       setFile(null);
       setFilePreview(null);
+      setSelectedCategory('introduction');
+      setSelectedSubcategory('');
       
       // Reset file input
       const fileInput = document.getElementById('file-upload') as HTMLInputElement;
@@ -206,7 +220,7 @@ const AdminAlerts = () => {
 
     try {
       const { error } = await supabase
-        .from('product_alerts')
+        .from('admin_alerts')
         .delete()
         .eq('id', alertId);
 
@@ -248,9 +262,9 @@ const AdminAlerts = () => {
       <Navbar />
       <main className="flex-grow pt-20">
         <div className="container mx-auto px-4 py-8 max-w-6xl">
-          <h1 className="text-4xl font-bold mb-2">Alertes Produits Gagnants</h1>
+          <h1 className="text-4xl font-bold mb-2">Alertes Admin</h1>
           <p className="text-muted-foreground mb-8">
-            Publier des alertes pour les membres VIP
+            Publier des alertes dans toutes les catégories
           </p>
 
           {/* Form to create new alert */}
@@ -261,16 +275,53 @@ const AdminAlerts = () => {
                 Nouvelle Alerte
               </CardTitle>
               <CardDescription>
-                Partagez des produits gagnants avec vos membres VIP
+                Partagez des informations, produits ou actualités dans n'importe quelle catégorie
               </CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="category">Catégorie *</Label>
+                    <select
+                      id="category"
+                      value={selectedCategory}
+                      onChange={(e) => {
+                        setSelectedCategory(e.target.value);
+                        setSelectedSubcategory('');
+                      }}
+                      className="w-full px-3 py-2 border rounded-md"
+                      required
+                    >
+                      <option value="introduction">Introduction</option>
+                      <option value="outils">Outils</option>
+                      <option value="expedition">Expédition</option>
+                      <option value="informations">Informations</option>
+                      <option value="produits">Produits Gagnants</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="subcategory">Sous-catégorie (optionnel)</Label>
+                    <select
+                      id="subcategory"
+                      value={selectedSubcategory}
+                      onChange={(e) => setSelectedSubcategory(e.target.value)}
+                      className="w-full px-3 py-2 border rounded-md"
+                    >
+                      <option value="">Toutes</option>
+                      {categories[selectedCategory as keyof typeof categories]?.map((sub) => (
+                        <option key={sub} value={sub}>{sub}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
                 <div>
                   <Label htmlFor="title">Titre *</Label>
                   <Input
                     id="title"
-                    placeholder="Ex: Nouveau produit tendance..."
+                    placeholder="Ex: Nouvelle information importante..."
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     required
@@ -281,7 +332,7 @@ const AdminAlerts = () => {
                   <Label htmlFor="content">Description</Label>
                   <Textarea
                     id="content"
-                    placeholder="Détails sur le produit, stratégie, conseils..."
+                    placeholder="Détails, stratégie, conseils..."
                     value={content}
                     onChange={(e) => setContent(e.target.value)}
                     rows={4}
@@ -360,19 +411,25 @@ const AdminAlerts = () => {
               alerts.map((alert) => (
                 <Card key={alert.id}>
                   <CardHeader>
-                    <div className="flex justify-between items-start">
-                      <div className="flex-1">
-                        <CardTitle>{alert.title}</CardTitle>
-                        <CardDescription>
-                          {new Date(alert.created_at).toLocaleDateString('fr-FR', {
-                            day: 'numeric',
-                            month: 'long',
-                            year: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit'
-                          })}
-                        </CardDescription>
-                      </div>
+                      <div className="flex justify-between items-start">
+                        <div className="flex-1">
+                          <CardTitle>{alert.title}</CardTitle>
+                          <div className="flex gap-2 mt-2">
+                            <Badge variant="secondary">{alert.category}</Badge>
+                            {alert.subcategory && (
+                              <Badge variant="outline">{alert.subcategory}</Badge>
+                            )}
+                          </div>
+                          <CardDescription className="mt-2">
+                            {new Date(alert.created_at).toLocaleDateString('fr-FR', {
+                              day: 'numeric',
+                              month: 'long',
+                              year: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit'
+                            })}
+                          </CardDescription>
+                        </div>
                       <Button
                         variant="ghost"
                         size="icon"

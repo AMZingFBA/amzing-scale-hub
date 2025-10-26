@@ -43,7 +43,7 @@ const ProductAlerts = () => {
           {
             event: '*',
             schema: 'public',
-            table: 'product_alerts'
+            table: 'admin_alerts'
           },
           (payload) => {
             if (payload.eventType === 'INSERT') {
@@ -66,7 +66,7 @@ const ProductAlerts = () => {
   const loadAlerts = async () => {
     try {
       const { data, error } = await supabase
-        .from('product_alerts')
+        .from('admin_alerts')
         .select('*')
         .order('created_at', { ascending: false });
 

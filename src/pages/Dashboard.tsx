@@ -7,6 +7,7 @@ import { Navigate, Link } from 'react-router-dom';
 import { useState } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import CategoryAlerts from '@/components/CategoryAlerts';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
@@ -167,6 +168,7 @@ const Dashboard = () => {
                   </div>
                 </AccordionTrigger>
                 <AccordionContent>
+                  <CategoryAlerts category="introduction" />
                   <div className="grid gap-3 pt-2">
                     <CategoryItem icon={Bell} label="notifications" badge={unreadCounts.introduction?.subcategories?.notifications} />
                     <CategoryItem icon={BookOpen} label="règles" onClick={() => setRulesOpen(true)} badge={unreadCounts.introduction?.subcategories?.règles} />
@@ -194,6 +196,7 @@ const Dashboard = () => {
                   </div>
                 </AccordionTrigger>
                 <AccordionContent>
+                  <CategoryAlerts category="outils" />
                   <div className="grid gap-3 pt-2">
                     <CategoryItem icon={Eye} label="création-société" badge={unreadCounts.outils?.subcategories?.['création-société']} />
                     <CategoryItem icon={FileText} label="facture-autorisation" onClick={() => setInvoiceAuthOpen(true)} badge={unreadCounts.outils?.subcategories?.['facture-autorisation']} />
@@ -213,6 +216,7 @@ const Dashboard = () => {
                   </div>
                 </AccordionTrigger>
                 <AccordionContent>
+                  <CategoryAlerts category="produits" />
                   <div className="grid gap-3 pt-2">
                     <CategoryItem icon={Sparkles} label="produits-find" link="/produits-find" />
                     <CategoryItem icon={Sparkles} label="produits-qogita" />
@@ -240,6 +244,7 @@ const Dashboard = () => {
                   </div>
                 </AccordionTrigger>
                 <AccordionContent>
+                  <CategoryAlerts category="expedition" />
                   <div className="grid gap-3 pt-2">
                     <CategoryItem icon={Settings} label="fournitures" badge={unreadCounts.expedition?.subcategories?.fournitures} />
                     <CategoryItem icon={Package} label="cartons" badge={unreadCounts.expedition?.subcategories?.cartons} />
@@ -263,6 +268,7 @@ const Dashboard = () => {
                   </div>
                 </AccordionTrigger>
                 <AccordionContent>
+                  <CategoryAlerts category="informations" />
                   <div className="grid gap-3 pt-2">
                     <CategoryItem icon={Megaphone} label="annonces" badge={unreadCounts.informations?.subcategories?.annonces} />
                     <CategoryItem icon={Newspaper} label="actualités" badge={unreadCounts.informations?.subcategories?.actualités} />
