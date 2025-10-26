@@ -51,12 +51,10 @@ Deno.serve(async (req) => {
       .eq('id', body.buyRequestUserId)
       .single()
 
-    const sellerNickname = sellerProfile?.nickname || sellerProfile?.email?.split('@')[0] || 'Vendeur'
-    const buyerNickname = buyerProfile?.nickname || buyerProfile?.email?.split('@')[0] || 'Acheteur'
     const buyerEmail = buyerProfile?.email || ''
 
-    // Create ticket for seller
-    const sellerSubject = `vente - ${body.buyRequestTitle} - ${body.buyRequestCode} et ${sellerNickname}`
+    // Create ticket for seller (without exposing buyer nickname)
+    const sellerSubject = `vente - ${body.buyRequestTitle} - ${body.buyRequestCode}`
     const { data: sellerTicket, error: sellerError } = await supabaseAdmin
       .from('tickets')
       .insert({
@@ -76,7 +74,7 @@ Deno.serve(async (req) => {
 
     console.log('Seller ticket created:', sellerTicket.id)
 
-    // Create initial message for seller
+    // Create initial message for seller (without exposing buyer info)
     const sellerMessage = `Bonjour 👋,
 Je possède cet article et je souhaite le vendre.
 Voici les détails de l'annonce :
@@ -85,7 +83,7 @@ Voici les détails de l'annonce :
 - Quantité : ${body.buyRequestQuantity}
 - Code annonce : ${body.buyRequestCode}
 
-📧 Contact acheteur : ${buyerNickname} (${buyerEmail})`
+Le staff va vous mettre en contact avec l'acheteur.`
 
     await supabaseAdmin.from('messages').insert({
       ticket_id: sellerTicket.id,
@@ -93,8 +91,8 @@ Voici les détails de l'annonce :
       content: sellerMessage
     })
 
-    // Create ticket for buyer
-    const buyerSubject = `achat - ${body.buyRequestTitle} - ${body.buyRequestCode} et ${sellerNickname}`
+    // Create ticket for buyer (without exposing seller nickname)
+    const buyerSubject = `achat - ${body.buyRequestTitle} - ${body.buyRequestCode}`
     const { data: buyerTicket, error: buyerError } = await supabaseAdmin
       .from('tickets')
       .insert({
