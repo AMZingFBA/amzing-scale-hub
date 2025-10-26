@@ -126,34 +126,12 @@ const AdminTickets = () => {
       if (user) {
         const counts: Record<string, number> = {};
         for (const ticket of ticketsWithProfiles) {
-          // For admins, count messages FROM admin that users haven't read yet
-          // This shows which tickets have unanswered admin responses
-          const { data: messagesData } = await supabase
-            .from('messages')
-            .select('id, user_id')
-            .eq('ticket_id', ticket.id);
-
-          if (messagesData) {
-            let unreadCount = 0;
-            for (const message of messagesData) {
-              // Count admin messages that the ticket owner hasn't read
-              if (message.user_id === user.id) {
-                const { data: readStatus } = await supabase
-                  .from('message_read_status')
-                  .select('is_read')
-                  .eq('message_id', message.id)
-                  .eq('user_id', ticket.user_id)
-                  .single();
-
-                if (!readStatus || !readStatus.is_read) {
-                  unreadCount++;
-                }
-              }
-            }
-            counts[ticket.id] = unreadCount;
-          } else {
-            counts[ticket.id] = 0;
-          }
+          const { data: countData } = await supabase
+            .rpc('get_unread_count', { 
+              ticket_id_param: ticket.id, 
+              user_id_param: user.id 
+            });
+          counts[ticket.id] = countData || 0;
         }
         setUnreadCounts(counts);
       }
@@ -315,14 +293,6 @@ const AdminTickets = () => {
   const statusStats = getStatusStats();
   const categoryStats = getCategoryStats();
   const catalogueProStats = getCatalogueProStats();
-
-  // Debug logs
-  console.log('Catalogue Pro Debug:', {
-    totalTickets: tickets.length,
-    catalogueProTickets: tickets.filter(t => t.category === 'gestion_produit' && t.subcategory === 'catalogue_pro'),
-    unreadCounts,
-    catalogueProStats
-  });
 
   return (
     <div className="min-h-screen flex flex-col">
