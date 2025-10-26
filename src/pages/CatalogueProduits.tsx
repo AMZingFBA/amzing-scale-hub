@@ -940,14 +940,11 @@ const Marketplace = () => {
               <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
                 Catalogue Pro — Mes produits
               </h1>
-              <div className="mt-2 space-y-1">
-                <p className="text-lg font-semibold text-amber-600">🟨 Sous-titre :</p>
-                <p className="text-muted-foreground">
-                  Découvrez tous les produits disponibles à la vente pour les professionnels.
-                  <br />
-                  Chaque article est stocké, expédié et géré directement par notre équipe (SAV inclus)
-                </p>
-              </div>
+              <p className="text-muted-foreground mt-2">
+                Découvrez tous les produits disponibles à la vente pour les professionnels.
+                <br />
+                Chaque article est stocké, expédié et géré directement par notre équipe (SAV inclus)
+              </p>
             </div>
 
             {/* Create Buy Request Button - Admin Only */}
