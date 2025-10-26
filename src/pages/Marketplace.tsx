@@ -983,44 +983,7 @@ const Marketplace = () => {
                     </Button>
                   </div>
 
-                  {uploadedImages.length > 0 && (
-                    <div className="grid grid-cols-4 gap-2">
-                      {uploadedImages.map((img, idx) => (
-                        <div key={idx} className="relative group">
-                          <img src={img} alt={`Upload ${idx + 1}`} className="w-full h-24 object-cover rounded-lg" />
-                          <button
-                            onClick={() => setUploadedImages(uploadedImages.filter((_, i) => i !== idx))}
-                            className="absolute top-1 right-1 bg-destructive text-destructive-foreground p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                          >
-                            <X className="w-3 h-3" />
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-
                   <div className="space-y-4">
-                    <div>
-                      <Label>Photos du produit (optionnel)</Label>
-                      <div className="mt-2">
-                        <label className="flex items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer hover:bg-muted/50 transition-colors">
-                          <div className="text-center">
-                            <Upload className="w-8 h-8 mx-auto mb-2 text-muted-foreground" />
-                            <p className="text-sm text-muted-foreground">
-                              Cliquez pour uploader des photos
-                            </p>
-                          </div>
-                          <input
-                            type="file"
-                            multiple
-                            accept="image/*"
-                            onChange={handleFileUpload}
-                            className="hidden"
-                          />
-                        </label>
-                      </div>
-                    </div>
-
                     <div>
                       <Label>Titre du produit recherché *</Label>
                       <Input
@@ -1038,6 +1001,48 @@ const Marketplace = () => {
                         placeholder="Précisez ce que vous recherchez (état, couleur, taille, etc.)..."
                         rows={4}
                       />
+                    </div>
+
+                    <div>
+                      <Label>Photos du produit (optionnel)</Label>
+                      <p className="text-xs text-muted-foreground mb-2">Ajoutez une ou plusieurs photos pour aider les vendeurs à identifier le produit</p>
+                      <div className="mt-2">
+                        <label className="flex items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer hover:bg-muted/50 transition-colors">
+                          <div className="text-center">
+                            <Upload className="w-8 h-8 mx-auto mb-2 text-muted-foreground" />
+                            <p className="text-sm text-muted-foreground">
+                              Cliquez pour uploader des photos
+                            </p>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              PNG, JPG, WEBP acceptés
+                            </p>
+                          </div>
+                          <input
+                            type="file"
+                            multiple
+                            accept="image/*"
+                            onChange={handleFileUpload}
+                            className="hidden"
+                          />
+                        </label>
+                      </div>
+                      
+                      {uploadedImages.length > 0 && (
+                        <div className="grid grid-cols-4 gap-2 mt-3">
+                          {uploadedImages.map((img, idx) => (
+                            <div key={idx} className="relative group">
+                              <img src={img} alt={`Photo ${idx + 1}`} className="w-full h-24 object-cover rounded-lg border-2 border-muted" />
+                              <button
+                                onClick={() => setUploadedImages(uploadedImages.filter((_, i) => i !== idx))}
+                                className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
+                                type="button"
+                              >
+                                <X className="w-4 h-4" />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
