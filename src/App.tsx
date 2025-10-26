@@ -18,6 +18,9 @@ import FAQ from "./pages/FAQ";
 import CGV from "./pages/CGV";
 import Privacy from "./pages/Privacy";
 import Refund from "./pages/Refund";
+import Support from "./pages/Support";
+import Ticket from "./pages/Ticket";
+import AdminTickets from "./pages/AdminTickets";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -44,6 +47,9 @@ const App = () => (
             <Route path="/cgv" element={<CGV />} />
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/refund" element={<Refund />} />
+            <Route path="/support" element={<Support />} />
+            <Route path="/ticket/:id" element={<Ticket />} />
+            <Route path="/admin/tickets" element={<AdminTickets />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

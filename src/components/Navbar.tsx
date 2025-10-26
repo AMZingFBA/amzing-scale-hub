@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Menu, X, User, LogOut, Crown } from "lucide-react";
+import { Menu, X, User, LogOut, Crown, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/use-auth";
+import { useAdmin } from "@/hooks/use-admin";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,6 +17,7 @@ import logo from "@/assets/logo.png";
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { user, isVIP, signOut } = useAuth();
+  const { isAdmin } = useAdmin();
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
@@ -70,6 +72,17 @@ const Navbar = () => {
                         <Link to="/dashboard" className="cursor-pointer">
                           <Crown className="w-4 h-4 mr-2" />
                           Espace VIP
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                    </>
+                  )}
+                  {isAdmin && (
+                    <>
+                      <DropdownMenuItem asChild>
+                        <Link to="/admin/tickets" className="cursor-pointer">
+                          <Shield className="w-4 h-4 mr-2" />
+                          Administration
                         </Link>
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />

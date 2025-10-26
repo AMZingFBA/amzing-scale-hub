@@ -146,7 +146,7 @@ const Dashboard = () => {
                     <CategoryItem icon={CheckCircle} label="débuter" />
                     <CategoryItem icon={BookOpen} label="guides" link="/guides" />
                     <CategoryItem icon={DollarSign} label="affiliation" />
-                    <CategoryItem icon={HelpCircle} label="support" />
+                    <CategoryItem icon={HelpCircle} label="support" link="/support" />
                   </div>
                 </AccordionContent>
               </AccordionItem>
