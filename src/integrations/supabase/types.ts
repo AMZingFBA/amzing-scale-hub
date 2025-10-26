@@ -17,7 +17,7 @@ export type Database = {
       admin_alerts: {
         Row: {
           admin_id: string
-          category: string | null
+          category: string
           content: string | null
           created_at: string
           file_name: string | null
@@ -31,7 +31,7 @@ export type Database = {
         }
         Insert: {
           admin_id: string
-          category?: string | null
+          category?: string
           content?: string | null
           created_at?: string
           file_name?: string | null
@@ -45,7 +45,7 @@ export type Database = {
         }
         Update: {
           admin_id?: string
-          category?: string | null
+          category?: string
           content?: string | null
           created_at?: string
           file_name?: string | null
