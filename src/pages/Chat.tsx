@@ -290,7 +290,11 @@ const Chat = () => {
         .delete()
         .eq('id', roomToDelete);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase error:', error);
+        toast.error(`Erreur: ${error.message}`);
+        return;
+      }
 
       // Update local state immediately
       setRooms(prev => prev.filter(room => room.id !== roomToDelete));
@@ -306,7 +310,7 @@ const Chat = () => {
       setRoomToDelete(null);
     } catch (error: any) {
       console.error('Error deleting room:', error);
-      toast.error('Erreur lors de la suppression');
+      toast.error(`Erreur: ${error.message || 'Erreur lors de la suppression'}`);
     }
   };
 
