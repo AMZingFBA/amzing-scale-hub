@@ -27,6 +27,7 @@ const Ticket = () => {
   const [isSending, setIsSending] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [signedUrls, setSignedUrls] = useState<Record<string, string>>({});
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -49,7 +50,36 @@ const Ticket = () => {
           filter: `ticket_id=eq.${id}`
         },
         (payload) => {
-          setMessages((prev) => [...prev, payload.new]);
+          const newMessage = payload.new;
+          
+          // Generate signed URL if message has a file
+          if (newMessage.file_url) {
+            (async () => {
+              try {
+                const url = new URL(newMessage.file_url);
+                const pathMatch = url.pathname.match(/\/storage\/v1\/object\/public\/ticket-attachments\/(.+)$/);
+                
+                if (pathMatch) {
+                  const filePath = pathMatch[1];
+                  const { data: signedUrlData } = await supabase
+                    .storage
+                    .from('ticket-attachments')
+                    .createSignedUrl(filePath, 3600);
+                  
+                  if (signedUrlData) {
+                    setSignedUrls((prev) => ({
+                      ...prev,
+                      [newMessage.id]: signedUrlData.signedUrl
+                    }));
+                  }
+                }
+              } catch (error) {
+                console.error('Error generating signed URL:', error);
+              }
+            })();
+          }
+          
+          setMessages((prev) => [...prev, newMessage]);
           scrollToBottom();
         }
       )
@@ -124,6 +154,38 @@ const Ticket = () => {
         .order('created_at', { ascending: true });
 
       if (messagesError) throw messagesError;
+      
+      // Generate signed URLs for file attachments
+      const messagesWithFiles = messagesData?.filter(m => m.file_url) || [];
+      const newSignedUrls: Record<string, string> = {};
+      
+      for (const message of messagesWithFiles) {
+        if (message.file_url) {
+          try {
+            // Extract the file path from the URL
+            const url = new URL(message.file_url);
+            const pathMatch = url.pathname.match(/\/storage\/v1\/object\/public\/ticket-attachments\/(.+)$/);
+            
+            if (pathMatch) {
+              const filePath = pathMatch[1];
+              
+              // Generate a signed URL valid for 1 hour
+              const { data: signedUrlData, error: urlError } = await supabase
+                .storage
+                .from('ticket-attachments')
+                .createSignedUrl(filePath, 3600);
+              
+              if (!urlError && signedUrlData) {
+                newSignedUrls[message.id] = signedUrlData.signedUrl;
+              }
+            }
+          } catch (error) {
+            console.error('Error generating signed URL:', error);
+          }
+        }
+      }
+      
+      setSignedUrls(newSignedUrls);
       setMessages(messagesData || []);
       
       // Mark messages as read
@@ -317,39 +379,28 @@ const Ticket = () => {
                       }`}
                     >
                       {message.content && <p className="text-sm whitespace-pre-wrap break-words">{message.content}</p>}
-                      {message.file_url && (
+                      {message.file_url && signedUrls[message.id] && (
                         <>
                           {(message.file_type?.startsWith('image/') || 
                             message.file_name?.match(/\.(jpg|jpeg|png|gif|webp)$/i)) ? (
                             <div className="mt-2">
                               <a
-                                href={message.file_url}
+                                href={signedUrls[message.id]}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="block"
                               >
                                 <img
-                                  src={message.file_url}
+                                  src={signedUrls[message.id]}
                                   alt={message.file_name || 'Image'}
                                   className="max-w-full rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
                                   style={{ maxHeight: '300px', width: 'auto' }}
-                                  onError={(e) => {
-                                    // Fallback si l'image ne charge pas
-                                    e.currentTarget.style.display = 'none';
-                                    const parent = e.currentTarget.parentElement?.parentElement;
-                                    if (parent) {
-                                      const fallback = document.createElement('div');
-                                      fallback.className = 'text-sm underline flex items-center gap-2 mt-2';
-                                      fallback.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path></svg> ${message.file_name}`;
-                                      parent.appendChild(fallback);
-                                    }
-                                  }}
                                 />
                               </a>
                             </div>
                           ) : (
                             <a
-                              href={message.file_url}
+                              href={signedUrls[message.id]}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="text-sm underline flex items-center gap-2 mt-2 hover:opacity-80"
