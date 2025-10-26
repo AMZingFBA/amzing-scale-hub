@@ -25,6 +25,7 @@ import Chat from "./pages/Chat";
 import NotFound from "./pages/NotFound";
 import Success from "./pages/Success";
 import Sales from "./pages/Sales";
+import Suggestions from "./pages/Suggestions";
 
 const queryClient = new QueryClient();
 
@@ -56,6 +57,7 @@ const App = () => (
             <Route path="/chat" element={<Chat />} />
             <Route path="/success" element={<Success />} />
             <Route path="/sales" element={<Sales />} />
+            <Route path="/suggestions" element={<Suggestions />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
