@@ -361,11 +361,25 @@ const Marketplace = () => {
     if (!user) return;
 
     try {
+      // Get seller profile info
+      const { data: sellerProfile } = await supabase
+        .from("profiles")
+        .select("email, full_name, nickname")
+        .eq("id", listing.user_id)
+        .single();
+
+      // Get buyer profile info
+      const { data: buyerProfile } = await supabase
+        .from("profiles")
+        .select("email, full_name, nickname")
+        .eq("id", user.id)
+        .single();
+
       const { data: ticket, error: ticketError } = await supabase
         .from("tickets")
         .insert({
           user_id: user.id,
-          subject: `Achat: ${listing.title}`,
+          subject: `Marketplace - Demande d'achat: ${listing.title}`,
           category: "marketplace",
           status: "open",
           priority: "normal"
@@ -375,17 +389,25 @@ const Marketplace = () => {
 
       if (ticketError) throw ticketError;
 
+      const sellerInfo = sellerProfile 
+        ? `${sellerProfile.nickname || sellerProfile.full_name || "Membre"} (${sellerProfile.email})`
+        : "Information non disponible";
+
+      const buyerInfo = buyerProfile
+        ? `${buyerProfile.nickname || buyerProfile.full_name || "Membre"} (${buyerProfile.email})`
+        : "Information non disponible";
+
       const { error: messageError } = await supabase
         .from("messages")
         .insert({
           ticket_id: ticket.id,
           user_id: user.id,
-          content: `Je souhaite acheter ce produit:\n\nTitre: ${listing.title}\nQuantité disponible: ${listing.quantity}\nPrix: ${listing.price}€ ${listing.price_type} par unité\n\nCode produit: ${listing.asin || listing.ean || "N/A"}`
+          content: `🛒 NOUVELLE DEMANDE D'ACHAT\n\n📦 Produit: ${listing.title}\n💰 Prix: ${listing.price}€ ${listing.price_type} par unité\n📊 Quantité disponible: ${listing.quantity}\n🏷️ Code: ${listing.asin || listing.ean || "N/A"}\n\n👤 ACHETEUR:\n${buyerInfo}\n\n👤 VENDEUR:\n${sellerInfo}\n\n⚠️ Action requise: Merci de mettre en contact l'acheteur et le vendeur.`
         });
 
       if (messageError) throw messageError;
 
-      toast.success("Demande envoyée! Le staff vous mettra en contact.");
+      toast.success("Demande envoyée! Le staff vous mettra en contact avec le vendeur.");
       navigate("/support");
     } catch (error: any) {
       console.error("Error creating interest:", error);
@@ -397,11 +419,25 @@ const Marketplace = () => {
     if (!user) return;
 
     try {
+      // Get buyer profile info (the one who posted the buy request)
+      const { data: buyerProfile } = await supabase
+        .from("profiles")
+        .select("email, full_name, nickname")
+        .eq("id", buyRequest.user_id)
+        .single();
+
+      // Get seller profile info (the one offering to sell)
+      const { data: sellerProfile } = await supabase
+        .from("profiles")
+        .select("email, full_name, nickname")
+        .eq("id", user.id)
+        .single();
+
       const { data: ticket, error: ticketError } = await supabase
         .from("tickets")
         .insert({
           user_id: user.id,
-          subject: `Vente: ${buyRequest.title}`,
+          subject: `Marketplace - Proposition de vente: ${buyRequest.title}`,
           category: "marketplace",
           status: "open",
           priority: "normal"
@@ -411,17 +447,25 @@ const Marketplace = () => {
 
       if (ticketError) throw ticketError;
 
+      const buyerInfo = buyerProfile 
+        ? `${buyerProfile.nickname || buyerProfile.full_name || "Membre"} (${buyerProfile.email})`
+        : "Information non disponible";
+
+      const sellerInfo = sellerProfile
+        ? `${sellerProfile.nickname || sellerProfile.full_name || "Membre"} (${sellerProfile.email})`
+        : "Information non disponible";
+
       const { error: messageError } = await supabase
         .from("messages")
         .insert({
           ticket_id: ticket.id,
           user_id: user.id,
-          content: `Je peux fournir ce produit:\n\nTitre: ${buyRequest.title}\nQuantité recherchée: ${buyRequest.quantity}\nPrix maximum: ${buyRequest.max_price ? `${buyRequest.max_price}€ ${buyRequest.price_type} par unité` : "Non spécifié"}\n\nCode produit: ${buyRequest.asin || buyRequest.ean || "N/A"}`
+          content: `🏪 NOUVELLE PROPOSITION DE VENTE\n\n📦 Produit: ${buyRequest.title}\n💰 Prix maximum: ${buyRequest.max_price ? `${buyRequest.max_price}€ ${buyRequest.price_type} par unité` : "Non spécifié"}\n📊 Quantité recherchée: ${buyRequest.quantity}\n🏷️ Code: ${buyRequest.asin || buyRequest.ean || "N/A"}\n\n👤 ACHETEUR (Demandeur):\n${buyerInfo}\n\n👤 VENDEUR (Propose):\n${sellerInfo}\n\n⚠️ Action requise: Merci de mettre en contact l'acheteur et le vendeur.`
         });
 
       if (messageError) throw messageError;
 
-      toast.success("Proposition envoyée! Le staff vous mettra en contact.");
+      toast.success("Proposition envoyée! Le staff vous mettra en contact avec l'acheteur.");
       navigate("/support");
     } catch (error: any) {
       console.error("Error creating proposal:", error);
