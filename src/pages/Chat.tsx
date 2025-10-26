@@ -292,16 +292,18 @@ const Chat = () => {
 
       if (error) throw error;
 
+      // Update local state immediately
+      setRooms(prev => prev.filter(room => room.id !== roomToDelete));
+      
       toast.success('Salon supprimé');
       setDeleteDialogOpen(false);
-      setRoomToDelete(null);
       
       // If deleting current room, deselect it
       if (selectedRoom === roomToDelete) {
         setSelectedRoom(null);
       }
       
-      fetchRooms();
+      setRoomToDelete(null);
     } catch (error: any) {
       console.error('Error deleting room:', error);
       toast.error('Erreur lors de la suppression');
