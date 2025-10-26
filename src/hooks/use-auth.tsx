@@ -135,9 +135,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const signOut = async () => {
     try {
-      // Sign out with scope: 'local' to clear local storage
-      const { error } = await supabase.auth.signOut({ scope: 'local' });
-      if (error) throw error;
+      // Sign out and clear all sessions
+      await supabase.auth.signOut();
 
       // Clear all state
       setUser(null);
@@ -145,11 +144,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setSubscription(null);
       
       toast.success('Déconnexion réussie');
-      
-      // Force a full page reload to clear all cache
-      window.location.href = '/';
+      navigate('/auth');
     } catch (error: any) {
-      toast.error(error.message || 'Erreur lors de la déconnexion');
+      console.error('Logout error:', error);
+      toast.error('Erreur lors de la déconnexion');
     }
   };
 
