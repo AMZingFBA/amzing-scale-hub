@@ -456,13 +456,12 @@ const WantToSell = () => {
       
       <main className="container mx-auto px-4 pt-24 pb-12">
         <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold mb-4">
-              <ShoppingBag className="inline-block w-10 h-10 mr-2 mb-1" />
+          <div className="mb-8">
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
               Want to Sell - Je vends
             </h1>
-            <p className="text-muted-foreground text-lg">
-              Publiez vos produits à vendre ou parcourez les annonces des autres membres
+            <p className="text-muted-foreground mt-2">
+              Publiez vos produits à vendre ou parcourez les annonces des autres membres.
             </p>
           </div>
 
