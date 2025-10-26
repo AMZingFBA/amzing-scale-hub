@@ -28,13 +28,9 @@ const Navbar = () => {
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-20">
-          {/* Spacer for mobile */}
-          <div className="w-10 md:hidden" />
-          
-          {/* Centered Logo & Name */}
-          <Link to="/" className="absolute left-1/2 -translate-x-1/2 flex items-center gap-3 group">
+          <Link to="/" className="flex items-center gap-3 group">
             <img src={logo} alt="AMZing FBA" className="h-12 transition-transform group-hover:scale-105" />
-            <span className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent hidden sm:block">
+            <span className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
               AMZing FBA
             </span>
           </Link>
