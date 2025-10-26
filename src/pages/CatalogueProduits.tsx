@@ -45,7 +45,7 @@ interface BuyRequest {
   created_at: string;
 }
 
-const Marketplace = () => {
+const CatalogueProduits = () => {
   const { user, isVIP } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -360,7 +360,7 @@ const Marketplace = () => {
       return;
     }
 
-    if (activeSection === "sell" && !price) {
+    if (!price) {
       toast.error("Le prix est requis");
       return;
     }
@@ -368,73 +368,26 @@ const Marketplace = () => {
     setIsCreating(true);
 
     try {
-      if (editingBuyRequest) {
-        // Mise à jour d'une demande d'achat existante
-        const { error } = await supabase
-          .from("marketplace_buy_requests")
-          .update({
-            asin: searchType === "asin" ? searchCode : null,
-            ean: searchType === "ean" ? searchCode : null,
-            title,
-            description,
-            images: uploadedImages,
-            quantity,
-            max_price: price ? parseFloat(price) : null,
-            price_type: priceType,
-          })
-          .eq("id", editingBuyRequest.id);
+      // Créer un produit dans le catalogue (marketplace_listings)
+      const { error } = await supabase
+        .from("marketplace_listings")
+        .insert({
+          user_id: user.id,
+          asin: searchType === "asin" ? searchCode : null,
+          ean: searchType === "ean" ? searchCode : null,
+          title,
+          description: description || null,
+          images: uploadedImages,
+          quantity,
+          price: parseFloat(price),
+          price_type: priceType,
+          status: "active"
+        });
 
-        if (error) throw error;
-        toast.success("Demande d'achat modifiée avec succès!");
-        
-        setEditingBuyRequest(null);
-        await loadMyBuyRequests();
-      } else if (activeSection === "sell") {
-        // Créer une annonce de vente
-        const { error } = await supabase
-          .from("marketplace_listings")
-          .insert({
-            user_id: user.id,
-            asin: searchType === "asin" ? searchCode : null,
-            ean: searchType === "ean" ? searchCode : null,
-            title,
-            description,
-            images: uploadedImages,
-            quantity,
-            price: parseFloat(price),
-            price_type: priceType,
-            status: "active"
-          });
-
-        if (error) throw error;
-        toast.success("Annonce de vente créée avec succès!");
-        
-        await loadMyListings();
-        navigate("/vendre");
-      } else {
-        // Créer une demande d'achat
-        const { error } = await supabase
-          .from("marketplace_buy_requests")
-          .insert({
-            user_id: user.id,
-            asin: searchType === "asin" ? searchCode : null,
-            ean: searchType === "ean" ? searchCode : null,
-            title,
-            description,
-            images: uploadedImages,
-            quantity,
-            max_price: price ? parseFloat(price) : null,
-            price_type: priceType,
-            status: "active"
-          });
-
-        if (error) throw error;
-        toast.success("Demande d'achat créée avec succès!");
-        
-        await loadMyBuyRequests();
-        navigate("/acheter");
-      }
-
+      if (error) throw error;
+      toast.success("Produit ajouté au catalogue avec succès!");
+      
+      await loadListings();
       resetForm();
       setShowCreateDialog(false);
     } catch (error: any) {
@@ -959,13 +912,10 @@ const Marketplace = () => {
               <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                   <DialogTitle>
-                    {editingBuyRequest ? "Modifier ma recherche de produit" : "Publier une recherche de produit"}
+                    Ajouter un produit au catalogue
                   </DialogTitle>
                   <DialogDescription>
-                    {editingBuyRequest 
-                      ? "Modifiez les détails du produit que vous cherchez à acheter."
-                      : "Décrivez le produit que vous cherchez à acheter. Les membres qui le possèdent pourront vous contacter via le staff."
-                    }
+                    Ajoutez un nouveau produit au catalogue professionnel. Ce produit sera stocké, expédié et géré par notre équipe.
                   </DialogDescription>
                 </DialogHeader>
 
@@ -993,7 +943,7 @@ const Marketplace = () => {
 
                   <div className="space-y-4">
                     <div>
-                      <Label>Titre du produit recherché *</Label>
+                      <Label>Titre du produit *</Label>
                       <Input
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
@@ -1003,7 +953,7 @@ const Marketplace = () => {
 
                     <div>
                       <Label>Photos du produit (optionnel)</Label>
-                      <p className="text-xs text-muted-foreground mb-2">Ajoutez une ou plusieurs photos pour aider les vendeurs à identifier le produit</p>
+                      <p className="text-xs text-muted-foreground mb-2">Ajoutez une ou plusieurs photos du produit</p>
                       <div className="mt-2">
                         <label className="flex items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer hover:bg-muted/50 transition-colors">
                           <div className="text-center">
@@ -1054,7 +1004,7 @@ const Marketplace = () => {
                         />
                       </div>
                       <div>
-                        <Label>Prix</Label>
+                        <Label>Prix *</Label>
                         <div className="flex gap-2">
                           <Input
                             type="number"
@@ -1062,7 +1012,6 @@ const Marketplace = () => {
                             min="0"
                             value={price}
                             onChange={(e) => setPrice(e.target.value)}
-                            placeholder="Optionnel"
                           />
                           <Select value={priceType} onValueChange={(v: any) => setPriceType(v)}>
                             <SelectTrigger className="w-24">
@@ -1087,8 +1036,8 @@ const Marketplace = () => {
                     Annuler
                   </Button>
                   <Button onClick={createListing} disabled={isCreating}>
-                    {isCreating ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Search className="w-4 h-4 mr-2" />}
-                    {editingBuyRequest ? "Modifier ma recherche" : "Publier ma recherche"}
+                    {isCreating ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Package className="w-4 h-4 mr-2" />}
+                    Ajouter au catalogue
                   </Button>
                 </DialogFooter>
               </DialogContent>
@@ -1112,7 +1061,7 @@ const Marketplace = () => {
               </TabsList>
 
               <TabsContent value="all" className="mt-6 animate-fade-in">
-                {buyRequests.length === 0 ? (
+                {listings.length === 0 ? (
                   <Card className="p-16 border-2 border-dashed border-muted-foreground/20 bg-muted/5">
                     <div className="text-center text-muted-foreground space-y-4">
                       <div className="flex justify-center">
@@ -1126,7 +1075,7 @@ const Marketplace = () => {
                   </Card>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {buyRequests.map(request => renderBuyRequest(request, false))}
+                    {listings.map(listing => renderListing(listing, false))}
                   </div>
                 )}
               </TabsContent>
@@ -1622,4 +1571,4 @@ const Marketplace = () => {
   );
 };
 
-export default Marketplace;
+export default CatalogueProduits;
