@@ -13,7 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "sonner";
 import { Loader2, Package, Search, Upload, Trash2, ShoppingCart, ShoppingBag, MessageCircle, X, CheckCircle, Copy, ZoomIn, ChevronLeft, ChevronRight, Edit } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { useMarketplaceUnread } from "@/hooks/use-marketplace-unread";
+import { useMarketplaceBuyUnread } from "@/hooks/use-marketplace-buy-unread";
 
 interface Listing {
   id: string;
@@ -49,7 +49,7 @@ const Marketplace = () => {
   const { user, isVIP } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const { unreadCount } = useMarketplaceUnread();
+  const { unreadCount } = useMarketplaceBuyUnread();
   
   // Determine section based on route
   const getInitialSection = (): "buy" | "sell" | "my-buy-requests" | "my-sell-listings" => {

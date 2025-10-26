@@ -13,7 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "sonner";
 import { Loader2, Upload, Trash2, Package, MessageCircle, X, ZoomIn, ChevronLeft, ChevronRight, Edit, Search, Copy } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { useMarketplaceUnread } from "@/hooks/use-marketplace-unread";
+import { useMarketplaceSellUnread } from "@/hooks/use-marketplace-sell-unread";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
@@ -36,7 +36,7 @@ const WantToSell = () => {
   const { user, isVIP } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const { unreadCount } = useMarketplaceUnread();
+  const { unreadCount } = useMarketplaceSellUnread();
   
   const [listings, setListings] = useState<Listing[]>([]);
   const [myListings, setMyListings] = useState<Listing[]>([]);

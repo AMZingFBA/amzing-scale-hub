@@ -1,6 +1,7 @@
 import { useAuth } from '@/hooks/use-auth';
 import { useUnreadMessages } from '@/hooks/use-unread-messages';
-import { useMarketplaceUnread } from '@/hooks/use-marketplace-unread';
+import { useMarketplaceBuyUnread } from '@/hooks/use-marketplace-buy-unread';
+import { useMarketplaceSellUnread } from '@/hooks/use-marketplace-sell-unread';
 import { Navigate, Link } from 'react-router-dom';
 import { useState } from 'react';
 import Navbar from '@/components/Navbar';
@@ -54,7 +55,9 @@ const CategoryItem = ({ icon: Icon, label, link, onClick, badge }: CategoryItemP
 const Dashboard = () => {
   const { user, isVIP, subscription, isLoading } = useAuth();
   const { unreadCount } = useUnreadMessages();
-  const { unreadCount: marketplaceUnreadCount } = useMarketplaceUnread();
+  const { unreadCount: buyUnreadCount } = useMarketplaceBuyUnread();
+  const { unreadCount: sellUnreadCount } = useMarketplaceSellUnread();
+  const marketplaceUnreadCount = buyUnreadCount + sellUnreadCount;
   const [rulesOpen, setRulesOpen] = useState(false);
   const [invoiceAuthOpen, setInvoiceAuthOpen] = useState(false);
   const [reviewsOpen, setReviewsOpen] = useState(false);
@@ -272,8 +275,8 @@ const Dashboard = () => {
                 </AccordionTrigger>
                 <AccordionContent>
                   <div className="grid gap-3 pt-2">
-                    <CategoryItem icon={ShoppingCart} label="Want to Buy" link="/acheter" badge={marketplaceUnreadCount} />
-                    <CategoryItem icon={Package} label="Want to Sell" link="/vendre" />
+                    <CategoryItem icon={ShoppingCart} label="Want to Buy" link="/acheter" badge={buyUnreadCount} />
+                    <CategoryItem icon={Package} label="Want to Sell" link="/vendre" badge={sellUnreadCount} />
                   </div>
                 </AccordionContent>
               </AccordionItem>

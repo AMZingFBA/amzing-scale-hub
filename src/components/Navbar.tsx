@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/use-auth";
 import { useAdmin } from "@/hooks/use-admin";
-import { useMarketplaceUnread } from "@/hooks/use-marketplace-unread";
+import { useMarketplaceBuyUnread } from "@/hooks/use-marketplace-buy-unread";
+import { useMarketplaceSellUnread } from "@/hooks/use-marketplace-sell-unread";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,7 +20,9 @@ const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { user, isVIP, signOut } = useAuth();
   const { isAdmin } = useAdmin();
-  const { unreadCount } = useMarketplaceUnread();
+  const { unreadCount: buyUnreadCount } = useMarketplaceBuyUnread();
+  const { unreadCount: sellUnreadCount } = useMarketplaceSellUnread();
+  const totalMarketplaceUnread = buyUnreadCount + sellUnreadCount;
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
@@ -50,14 +53,19 @@ const Navbar = () => {
               <>
                 <Link to="/acheter" className="text-foreground hover:text-primary transition-colors font-medium relative">
                   Want to Buy
-                  {unreadCount > 0 && (
+                  {buyUnreadCount > 0 && (
                     <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-                      {unreadCount}
+                      {buyUnreadCount}
                     </span>
                   )}
                 </Link>
-                <Link to="/vendre" className="text-foreground hover:text-primary transition-colors font-medium">
+                <Link to="/vendre" className="text-foreground hover:text-primary transition-colors font-medium relative">
                   Want to Sell
+                  {sellUnreadCount > 0 && (
+                    <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                      {sellUnreadCount}
+                    </span>
+                  )}
                 </Link>
               </>
             )}
@@ -179,18 +187,23 @@ const Navbar = () => {
                   onClick={() => setIsOpen(false)}
                 >
                   Want to Buy
-                  {unreadCount > 0 && (
+                  {buyUnreadCount > 0 && (
                     <span className="absolute top-1 left-24 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-                      {unreadCount}
+                      {buyUnreadCount}
                     </span>
                   )}
                 </Link>
                 <Link
                   to="/vendre"
-                  className="block text-foreground hover:text-primary transition-colors font-medium py-2"
+                  className="block text-foreground hover:text-primary transition-colors font-medium py-2 relative"
                   onClick={() => setIsOpen(false)}
                 >
                   Want to Sell
+                  {sellUnreadCount > 0 && (
+                    <span className="absolute top-1 left-28 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                      {sellUnreadCount}
+                    </span>
+                  )}
                 </Link>
               </>
             )}
