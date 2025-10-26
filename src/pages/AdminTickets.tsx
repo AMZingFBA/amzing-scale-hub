@@ -279,8 +279,16 @@ const AdminTickets = () => {
                     <CardHeader>
                       <div className="flex justify-between items-start gap-4">
                         <div className="flex-1">
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2 flex-wrap">
                             <CardTitle className="text-lg">{ticket.subject}</CardTitle>
+                            {ticket.category && ticket.category !== 'general' && (
+                              <Badge variant="outline" className="text-xs">
+                                {ticket.category === 'facture_autorisation' && '📝 Facture/Auto'}
+                                {ticket.category === 'gestion_produit' && '📦 Gestion produit'}
+                                {ticket.category === 'marketplace' && '🛒 Marketplace'}
+                                {ticket.category === 'autre' && '💬 Autre'}
+                              </Badge>
+                            )}
                             {unreadCounts[ticket.id] > 0 && (
                               <Badge variant="destructive">
                                 {unreadCounts[ticket.id]}
@@ -323,8 +331,16 @@ const AdminTickets = () => {
                     <CardHeader>
                       <div className="flex justify-between items-start gap-4">
                         <div className="flex-1">
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2 flex-wrap">
                             <CardTitle className="text-lg">{ticket.subject}</CardTitle>
+                            {ticket.category && ticket.category !== 'general' && (
+                              <Badge variant="outline" className="text-xs">
+                                {ticket.category === 'facture_autorisation' && '📝 Facture/Auto'}
+                                {ticket.category === 'gestion_produit' && '📦 Gestion produit'}
+                                {ticket.category === 'marketplace' && '🛒 Marketplace'}
+                                {ticket.category === 'autre' && '💬 Autre'}
+                              </Badge>
+                            )}
                             {unreadCounts[ticket.id] > 0 && (
                               <Badge variant="destructive">
                                 {unreadCounts[ticket.id]}

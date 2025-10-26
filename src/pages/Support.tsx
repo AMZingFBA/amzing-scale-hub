@@ -42,6 +42,7 @@ const Support = () => {
   const [newTicket, setNewTicket] = useState({
     subject: '',
     priority: 'normal',
+    category: 'general',
     initialMessage: ''
   });
 
@@ -86,6 +87,16 @@ const Support = () => {
       supabase.removeChannel(channel);
     };
   }, [user, isVIP, isAdmin, isAdminLoading, navigate]);
+
+  // Handle URL params for category
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const category = params.get('category');
+    if (category) {
+      setNewTicket(prev => ({ ...prev, category }));
+      setDialogOpen(true);
+    }
+  }, []);
 
   const loadTickets = async () => {
     try {
@@ -140,6 +151,7 @@ const Support = () => {
           user_id: user!.id,
           subject: newTicket.subject,
           priority: newTicket.priority,
+          category: newTicket.category,
           status: 'open'
         })
         .select()
@@ -163,7 +175,7 @@ const Support = () => {
       });
 
       setDialogOpen(false);
-      setNewTicket({ subject: '', priority: 'normal', initialMessage: '' });
+      setNewTicket({ subject: '', priority: 'normal', category: 'general', initialMessage: '' });
       loadTickets();
       navigate(`/ticket/${ticket.id}`);
     } catch (error) {
@@ -247,6 +259,24 @@ const Support = () => {
                     />
                   </div>
                   <div>
+                    <Label htmlFor="category">Catégorie</Label>
+                    <Select
+                      value={newTicket.category}
+                      onValueChange={(value) => setNewTicket({ ...newTicket, category: value })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="general">Général</SelectItem>
+                        <SelectItem value="facture_autorisation">Facture & Autorisation</SelectItem>
+                        <SelectItem value="gestion_produit">Gestion produit</SelectItem>
+                        <SelectItem value="marketplace">Marketplace</SelectItem>
+                        <SelectItem value="autre">Autre</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
                     <Label htmlFor="priority">Priorité</Label>
                     <Select
                       value={newTicket.priority}
@@ -309,10 +339,18 @@ const Support = () => {
                 >
                   <CardHeader>
                     <div className="flex justify-between items-start">
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 flex-wrap">
                         <CardTitle className="text-lg">{ticket.subject}</CardTitle>
+                        {ticket.category && ticket.category !== 'general' && (
+                          <Badge variant="outline" className="text-xs">
+                            {ticket.category === 'facture_autorisation' && '📝 Facture/Auto'}
+                            {ticket.category === 'gestion_produit' && '📦 Gestion produit'}
+                            {ticket.category === 'marketplace' && '🛒 Marketplace'}
+                            {ticket.category === 'autre' && '💬 Autre'}
+                          </Badge>
+                        )}
                         {unreadCounts[ticket.id] > 0 && (
-                          <Badge variant="destructive" className="ml-2">
+                          <Badge variant="destructive">
                             {unreadCounts[ticket.id]}
                           </Badge>
                         )}

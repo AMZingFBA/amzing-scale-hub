@@ -339,6 +339,14 @@ const Ticket = () => {
                   )}
                 </div>
                 <div className="flex gap-2 items-center">
+                  {ticket?.category && ticket?.category !== 'general' && (
+                    <Badge variant="secondary" className="text-xs">
+                      {ticket.category === 'facture_autorisation' && '📝 Facture/Autorisation'}
+                      {ticket.category === 'gestion_produit' && '📦 Gestion produit'}
+                      {ticket.category === 'marketplace' && '🛒 Marketplace'}
+                      {ticket.category === 'autre' && '💬 Autre'}
+                    </Badge>
+                  )}
                   <Badge>{ticket?.priority}</Badge>
                   <Badge variant="outline">{ticket?.status}</Badge>
                   {ticket?.status !== 'closed' && (isAdmin || ticket?.user_id === user?.id) && (

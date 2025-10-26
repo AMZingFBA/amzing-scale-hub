@@ -152,6 +152,7 @@ export type Database = {
       }
       tickets: {
         Row: {
+          category: string | null
           closed_at: string | null
           created_at: string
           id: string
@@ -162,6 +163,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          category?: string | null
           closed_at?: string | null
           created_at?: string
           id?: string
@@ -172,6 +174,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          category?: string | null
           closed_at?: string | null
           created_at?: string
           id?: string

@@ -375,10 +375,10 @@ const Dashboard = () => {
                   
                   <div className="bg-accent/50 rounded-lg p-4">
                     <p className="font-semibold mb-3">1️⃣ Créer une demande d'assistance</p>
-                    <Link to="/support">
+                    <Link to="/support?category=facture_autorisation">
                       <div className="flex items-center gap-2 text-primary hover:underline cursor-pointer">
                         <MessageCircle className="w-4 h-4" />
-                        <span>Accéder au service support</span>
+                        <span>Accéder au service support - Facture & Autorisation</span>
                       </div>
                     </Link>
                   </div>
