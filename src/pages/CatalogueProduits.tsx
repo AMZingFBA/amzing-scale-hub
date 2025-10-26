@@ -60,6 +60,11 @@ const CatalogueProduits = () => {
   const [editingProduct, setEditingProduct] = useState<CatalogueProduct | null>(null);
   const [showEditDialog, setShowEditDialog] = useState(false);
   
+  // Quantity dialog states
+  const [showQuantityDialog, setShowQuantityDialog] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<CatalogueProduct | null>(null);
+  const [requestedQuantity, setRequestedQuantity] = useState(1);
+  
   // Image gallery states
   const [selectedImageGallery, setSelectedImageGallery] = useState<string[] | null>(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -275,14 +280,26 @@ const CatalogueProduits = () => {
     }
   };
 
-  const handleInterestInProduct = async (product: CatalogueProduct) => {
-    if (!user) return;
+  const openQuantityDialog = (product: CatalogueProduct) => {
+    setSelectedProduct(product);
+    setRequestedQuantity(1);
+    setShowQuantityDialog(true);
+  };
+
+  const handleInterestInProduct = async () => {
+    if (!user || !selectedProduct) return;
+
+    // Valider la quantité
+    if (requestedQuantity < 1 || requestedQuantity > selectedProduct.quantity) {
+      toast.error(`La quantité doit être entre 1 et ${selectedProduct.quantity}`);
+      return;
+    }
 
     try {
-      const code = product.asin || product.ean || "N/A";
+      const code = selectedProduct.asin || selectedProduct.ean || "N/A";
       
       // Créer un ticket pour catalogue pro avec l'acheteur qui contacte les admins
-      const buyerSubject = `Catalogue Pro - ${product.title}`;
+      const buyerSubject = `Catalogue Pro - ${selectedProduct.title}`;
       const { data: ticket, error: ticketError } = await supabase
         .from('tickets')
         .insert({
@@ -298,13 +315,13 @@ const CatalogueProduits = () => {
 
       if (ticketError) throw ticketError;
 
-      // Créer le message initial
+      // Créer le message initial avec la quantité demandée
       const buyerMessage = `Bonjour 👋
 Je suis intéressé(e) par ce produit du catalogue :
-- Titre : ${product.title}
+- Titre : ${selectedProduct.title}
 - Code : ${code}
-- Prix : ${product.price}€ ${product.price_type}
-- Quantité souhaitée : 1
+- Prix : ${selectedProduct.price}€ ${selectedProduct.price_type}
+- Quantité souhaitée : ${requestedQuantity}
 
 Est-il toujours disponible ?`;
 
@@ -320,6 +337,9 @@ Est-il toujours disponible ?`;
 
       toast.success("Demande d'achat envoyée! Un ticket a été créé.");
       
+      setShowQuantityDialog(false);
+      setSelectedProduct(null);
+      setRequestedQuantity(1);
       await loadMyTickets();
       navigate("/catalogue-produits?tab=tickets");
     } catch (error: any) {
@@ -510,7 +530,7 @@ Est-il toujours disponible ?`;
             <Button
               size="lg"
               className="w-full hover-scale font-semibold"
-              onClick={() => handleInterestInProduct(product)}
+              onClick={() => openQuantityDialog(product)}
             >
               <ShoppingCart className="w-5 h-5 mr-2" />
               Je veux acheter ce produit
@@ -552,6 +572,75 @@ Est-il toujours disponible ?`;
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/20 p-4 md:p-8">
       <div className="max-w-7xl mx-auto space-y-6">
+        {/* Quantity Selection Dialog */}
+        <Dialog open={showQuantityDialog} onOpenChange={setShowQuantityDialog}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>Quantité souhaitée</DialogTitle>
+              <DialogDescription>
+                {selectedProduct && (
+                  <>
+                    Combien d'unités de <strong>{selectedProduct.title}</strong> souhaitez-vous commander ?
+                    <br />
+                    <span className="text-sm text-muted-foreground mt-2 block">
+                      Quantité disponible : {selectedProduct.quantity} unité{selectedProduct.quantity > 1 ? 's' : ''}
+                    </span>
+                  </>
+                )}
+              </DialogDescription>
+            </DialogHeader>
+            
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <Label htmlFor="quantity">Quantité *</Label>
+                <Input
+                  id="quantity"
+                  type="number"
+                  min="1"
+                  max={selectedProduct?.quantity || 1}
+                  value={requestedQuantity}
+                  onChange={(e) => setRequestedQuantity(parseInt(e.target.value) || 1)}
+                  className="text-lg font-semibold"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Minimum: 1 • Maximum: {selectedProduct?.quantity || 1}
+                </p>
+              </div>
+
+              {selectedProduct && (
+                <div className="bg-muted/50 p-4 rounded-lg space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Prix unitaire</span>
+                    <span className="font-semibold">{selectedProduct.price}€ {selectedProduct.price_type}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Quantité</span>
+                    <span className="font-semibold">× {requestedQuantity}</span>
+                  </div>
+                  <div className="border-t border-border pt-2 mt-2">
+                    <div className="flex justify-between">
+                      <span className="font-medium">Total estimé</span>
+                      <span className="text-lg font-bold text-primary">
+                        {(selectedProduct.price * requestedQuantity).toFixed(2)}€ {selectedProduct.price_type}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setShowQuantityDialog(false)}>
+                Annuler
+              </Button>
+              <Button onClick={handleInterestInProduct}>
+                <ShoppingCart className="w-4 h-4 mr-2" />
+                Confirmer la demande
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
         {/* Image Gallery Dialog */}
         <Dialog open={showImageDialog} onOpenChange={setShowImageDialog}>
           <DialogContent className="max-w-4xl p-0">
