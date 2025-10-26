@@ -608,6 +608,20 @@ const Chat = () => {
                                   >
                                     <EyeOff className="h-3 w-3" />
                                   </Button>
+                                  {(room.created_by === user?.id || isAdmin) && (
+                                    <Button
+                                      size="sm"
+                                      variant="ghost"
+                                      className="h-8 w-8 p-0"
+                                      onClick={() => {
+                                        setRoomToDelete(room.id);
+                                        setDeleteDialogOpen(true);
+                                      }}
+                                      title="Supprimer"
+                                    >
+                                      <Trash2 className="h-3 w-3" />
+                                    </Button>
+                                  )}
                                 </div>
                               </div>
                             </div>
@@ -652,6 +666,20 @@ const Chat = () => {
                                   >
                                     <EyeOff className="h-3 w-3" />
                                   </Button>
+                                  {(room.created_by === user?.id || isAdmin) && (
+                                    <Button
+                                      size="sm"
+                                      variant="ghost"
+                                      className="h-8 w-8 p-0"
+                                      onClick={() => {
+                                        setRoomToDelete(room.id);
+                                        setDeleteDialogOpen(true);
+                                      }}
+                                      title="Supprimer"
+                                    >
+                                      <Trash2 className="h-3 w-3" />
+                                    </Button>
+                                  )}
                                 </div>
                               </div>
                             </div>
