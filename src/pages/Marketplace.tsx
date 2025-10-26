@@ -569,7 +569,7 @@ const Marketplace = () => {
       
       // Recharger les tickets et rediriger
       await loadMyTickets();
-      navigate("/acheter?tab=mine");
+      navigate("/acheter?tab=tickets");
     } catch (error: any) {
       console.error("Error creating tickets:", error);
       toast.error("Erreur lors de la création de la proposition");
@@ -1120,12 +1120,15 @@ const Marketplace = () => {
 
             {/* Tabs for all buy requests and my buy requests */}
             <Tabs defaultValue={new URLSearchParams(location.search).get('tab') || "all"} className="w-full">
-              <TabsList className="grid w-full max-w-md grid-cols-2 p-1 bg-muted/50 rounded-lg">
+              <TabsList className="grid w-full max-w-2xl grid-cols-3 p-1 bg-muted/50 rounded-lg">
                 <TabsTrigger value="all" className="data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all">
                   Toutes les recherches
                 </TabsTrigger>
                 <TabsTrigger value="mine" className="data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all">
                   Mes recherches
+                </TabsTrigger>
+                <TabsTrigger value="tickets" className="data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all">
+                  Mes demandes
                 </TabsTrigger>
               </TabsList>
 
@@ -1150,61 +1153,6 @@ const Marketplace = () => {
               </TabsContent>
 
               <TabsContent value="mine" className="mt-6 animate-fade-in">
-                <div className="mb-4 flex justify-end">
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <Button variant="outline" size="sm">
-                        <MessageCircle className="w-4 h-4 mr-2" />
-                        Mes demandes
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
-                      <DialogHeader>
-                        <DialogTitle>Mes demandes marketplace</DialogTitle>
-                        <DialogDescription>
-                          Liste de tous vos tickets liés à vos recherches et ventes
-                        </DialogDescription>
-                      </DialogHeader>
-                      <div className="space-y-3 mt-4">
-                        {myTickets.length === 0 ? (
-                          <div className="text-center text-muted-foreground py-8">
-                            <MessageCircle className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                            <p>Aucune demande pour le moment</p>
-                          </div>
-                        ) : (
-                          myTickets.map((ticket) => (
-                            <Card
-                              key={ticket.id}
-                              className="hover:shadow-lg transition-shadow cursor-pointer"
-                              onClick={() => {
-                                navigate(`/ticket/${ticket.id}`);
-                              }}
-                            >
-                              <CardHeader className="pb-3">
-                                <div className="flex justify-between items-start gap-2">
-                                  <CardTitle className="text-sm font-semibold line-clamp-2">
-                                    {ticket.subject}
-                                  </CardTitle>
-                                  <Badge variant={ticket.status === "open" ? "default" : ticket.status === "in_progress" ? "secondary" : "outline"}>
-                                    {ticket.status}
-                                  </Badge>
-                                </div>
-                                <CardDescription className="text-xs">
-                                  {new Date(ticket.created_at).toLocaleDateString('fr-FR', {
-                                    day: 'numeric',
-                                    month: 'long',
-                                    year: 'numeric'
-                                  })}
-                                </CardDescription>
-                              </CardHeader>
-                            </Card>
-                          ))
-                        )}
-                      </div>
-                    </DialogContent>
-                  </Dialog>
-                </div>
-
                 {myBuyRequests.filter(r => r.status === "active").length === 0 ? (
                   <Card className="p-16 border-2 border-dashed border-muted-foreground/20 bg-muted/5">
                     <div className="text-center text-muted-foreground space-y-4">
@@ -1222,6 +1170,54 @@ const Marketplace = () => {
                     {myBuyRequests.filter(r => r.status === "active").map(request => renderBuyRequest(request, true))}
                   </div>
                 )}
+              </TabsContent>
+
+              <TabsContent value="tickets" className="mt-6 animate-fade-in">
+                <div className="space-y-3">
+                  {myTickets.length === 0 ? (
+                    <Card className="p-16 border-2 border-dashed border-muted-foreground/20 bg-muted/5">
+                      <div className="text-center text-muted-foreground space-y-4">
+                        <div className="flex justify-center">
+                          <div className="p-4 rounded-full bg-muted/30">
+                            <MessageCircle className="w-12 h-12 opacity-50" />
+                          </div>
+                        </div>
+                        <p className="text-lg font-medium">Aucune demande pour le moment</p>
+                        <p className="text-sm">Lorsque vous proposerez un produit ou qu'on vous en proposera un, les tickets apparaîtront ici</p>
+                      </div>
+                    </Card>
+                  ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {myTickets.map((ticket) => (
+                        <Card
+                          key={ticket.id}
+                          className="hover:shadow-lg transition-shadow cursor-pointer"
+                          onClick={() => {
+                            navigate(`/ticket/${ticket.id}`);
+                          }}
+                        >
+                          <CardHeader className="pb-3">
+                            <div className="flex justify-between items-start gap-2">
+                              <CardTitle className="text-sm font-semibold line-clamp-2">
+                                {ticket.subject}
+                              </CardTitle>
+                              <Badge variant={ticket.status === "open" ? "default" : ticket.status === "in_progress" ? "secondary" : "outline"}>
+                                {ticket.status}
+                              </Badge>
+                            </div>
+                            <CardDescription className="text-xs">
+                              {new Date(ticket.created_at).toLocaleDateString('fr-FR', {
+                                day: 'numeric',
+                                month: 'long',
+                                year: 'numeric'
+                              })}
+                            </CardDescription>
+                          </CardHeader>
+                        </Card>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </TabsContent>
             </Tabs>
           </div>
