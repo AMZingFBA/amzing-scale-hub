@@ -12,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "sonner";
 import { Loader2, Package, Search, Upload, Trash2, ShoppingCart, MessageCircle, X, Copy, ZoomIn, ChevronLeft, ChevronRight, TriangleAlert, Pencil } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { useMarketplaceBuyUnread } from "@/hooks/use-marketplace-buy-unread";
+import { useCatalogueUnread } from "@/hooks/use-catalogue-unread";
 
 interface CatalogueProduct {
   id: string;
@@ -33,7 +33,7 @@ const CatalogueProduits = () => {
   const { user, isVIP } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const { unreadCount } = useMarketplaceBuyUnread();
+  const { unreadCount } = useCatalogueUnread();
   
   const [catalogueProducts, setCatalogueProducts] = useState<CatalogueProduct[]>([]);
   const [myTickets, setMyTickets] = useState<any[]>([]);
@@ -88,7 +88,7 @@ const CatalogueProduits = () => {
         event: "*", 
         schema: "public", 
         table: "tickets",
-        filter: `category=eq.marketplace`
+        filter: `category=eq.gestion_produit`
       }, () => {
         loadMyTickets();
       })
@@ -135,8 +135,8 @@ const CatalogueProduits = () => {
           messages(id, content, created_at, user_id, file_url, file_name)
         `)
         .eq("user_id", user.id)
-        .eq("category", "marketplace")
-        .eq("subcategory", "buy")
+        .eq("category", "gestion_produit")
+        .eq("subcategory", "catalogue_pro")
         .order("created_at", { ascending: false });
 
       if (error) throw error;
@@ -281,15 +281,15 @@ const CatalogueProduits = () => {
     try {
       const code = product.asin || product.ean || "N/A";
       
-      // Créer un ticket uniquement pour l'acheteur qui contacte les admins
+      // Créer un ticket pour catalogue pro avec l'acheteur qui contacte les admins
       const buyerSubject = `Catalogue Pro - ${product.title}`;
       const { data: ticket, error: ticketError } = await supabase
         .from('tickets')
         .insert({
           user_id: user.id,
           subject: buyerSubject,
-          category: 'marketplace',
-          subcategory: 'buy',
+          category: 'gestion_produit',
+          subcategory: 'catalogue_pro',
           status: 'open',
           priority: 'normal'
         })
@@ -944,6 +944,27 @@ Est-il toujours disponible ?`;
 
             <TabsContent value="tickets" className="mt-6 animate-fade-in">
               <div className="space-y-6">
+                {/* Notification Banner */}
+                {unreadCount > 0 && (
+                  <Card className="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent border-l-4 border-l-primary">
+                    <CardHeader className="pb-3">
+                      <div className="flex items-start gap-3">
+                        <div className="p-2 bg-primary/10 rounded-lg">
+                          <MessageCircle className="w-5 h-5 text-primary" />
+                        </div>
+                        <div className="flex-1">
+                          <CardTitle className="text-base mb-1">
+                            {unreadCount} nouveau{unreadCount > 1 ? 'x' : ''} message{unreadCount > 1 ? 's' : ''}
+                          </CardTitle>
+                          <CardDescription className="text-sm">
+                            Vous avez reçu de nouvelles réponses concernant vos demandes de produits du catalogue pro
+                          </CardDescription>
+                        </div>
+                      </div>
+                    </CardHeader>
+                  </Card>
+                )}
+
                 {myTickets.length === 0 ? (
                   <Card className="p-16 border-2 border-dashed border-muted-foreground/20 bg-muted/5">
                     <div className="text-center text-muted-foreground space-y-4">
