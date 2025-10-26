@@ -34,10 +34,12 @@ const Navbar = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
-            <Link to="/contact" className="text-foreground hover:text-primary transition-colors font-medium">
-              Contact
-            </Link>
-            {user && (
+            {!isVIP && (
+              <Link to="/contact" className="text-foreground hover:text-primary transition-colors font-medium">
+                Contact
+              </Link>
+            )}
+            {user && !isVIP && (
               <>
                 <Link to="/acheter" className="text-foreground hover:text-primary transition-colors font-medium relative">
                   Want to Buy
@@ -132,14 +134,16 @@ const Navbar = () => {
         {/* Mobile Navigation */}
         {isOpen && (
           <div className="md:hidden py-4 space-y-4">
-            <Link
-              to="/contact"
-              className="block text-foreground hover:text-primary transition-colors font-medium py-2"
-              onClick={() => setIsOpen(false)}
-            >
-              Contact
-            </Link>
-            {user && (
+            {!isVIP && (
+              <Link
+                to="/contact"
+                className="block text-foreground hover:text-primary transition-colors font-medium py-2"
+                onClick={() => setIsOpen(false)}
+              >
+                Contact
+              </Link>
+            )}
+            {user && !isVIP && (
               <>
                 <Link
                   to="/acheter"
