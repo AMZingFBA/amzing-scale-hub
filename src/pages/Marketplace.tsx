@@ -379,49 +379,28 @@ const Marketplace = () => {
 
       const isCurrentUserAdmin = adminUserId === user.id;
 
-      // 1. Create buyer + staff conversation
-      const buyerRoomName = `Achat - ${listing.title} - ${code}`;
-      const { data: buyerRoom, error: buyerRoomError } = await supabase
+      // Create buyer + staff conversation ONLY
+      const roomName = `Achat - ${listing.title} - ${code}`;
+      const { data: room, error: roomError } = await supabase
         .from("chat_rooms")
         .insert({
-          name: buyerRoomName,
+          name: roomName,
           type: "marketplace",
           created_by: user.id
         })
         .select()
         .single();
 
-      if (buyerRoomError) throw buyerRoomError;
+      if (roomError) throw roomError;
 
-      // Add buyer and admin to buyer room (avoid duplicates if user is admin)
-      const buyerRoomMembers = [{ room_id: buyerRoom.id, user_id: user.id }];
+      // Add buyer and admin to room (avoid duplicates if user is admin)
+      const roomMembers = [{ room_id: room.id, user_id: user.id }];
       if (!isCurrentUserAdmin) {
-        buyerRoomMembers.push({ room_id: buyerRoom.id, user_id: adminUserId });
+        roomMembers.push({ room_id: room.id, user_id: adminUserId });
       }
-      await supabase.from("chat_room_members").insert(buyerRoomMembers);
+      await supabase.from("chat_room_members").insert(roomMembers);
 
-      // 2. Create seller + staff conversation
-      const sellerRoomName = `Vente - ${listing.title} - ${code}`;
-      const { data: sellerRoom, error: sellerRoomError } = await supabase
-        .from("chat_rooms")
-        .insert({
-          name: sellerRoomName,
-          type: "marketplace",
-          created_by: user.id
-        })
-        .select()
-        .single();
-
-      if (sellerRoomError) throw sellerRoomError;
-
-      // Add seller and admin to seller room (avoid duplicates)
-      const sellerRoomMembers = [{ room_id: sellerRoom.id, user_id: listing.user_id }];
-      if (listing.user_id !== adminUserId) {
-        sellerRoomMembers.push({ room_id: sellerRoom.id, user_id: adminUserId });
-      }
-      await supabase.from("chat_room_members").insert(sellerRoomMembers);
-
-      toast.success("Conversations créées! Rendez-vous dans le chat.");
+      toast.success("Conversation créée! Rendez-vous dans le chat.");
       navigate("/chat");
     } catch (error: any) {
       console.error("Error creating marketplace room:", error);
