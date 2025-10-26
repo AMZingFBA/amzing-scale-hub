@@ -8,7 +8,10 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ChatRoom from '@/components/chat/ChatRoom';
+import { DirectMessageList } from '@/components/chat/DirectMessageList';
+import { DirectChatRoom } from '@/components/chat/DirectChatRoom';
 import { useAdmin } from '@/hooks/use-admin';
 
 interface Room {
@@ -26,6 +29,8 @@ const Chat = () => {
   const [searchParams] = useSearchParams();
   const [rooms, setRooms] = useState<Room[]>([]);
   const [selectedRoom, setSelectedRoom] = useState<string | null>(null);
+  const [selectedDirectConversation, setSelectedDirectConversation] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<'rooms' | 'direct'>('rooms');
   const [loading, setLoading] = useState(true);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [newRoomName, setNewRoomName] = useState('');
@@ -318,88 +323,95 @@ const Chat = () => {
       <div className="container mx-auto py-8 px-4">
         <div className="flex gap-4 h-[calc(100vh-8rem)]">
           {/* Sidebar - Room List */}
-          <div className={`${selectedRoom ? 'hidden md:flex' : 'flex'} w-full md:w-80 bg-card border rounded-lg p-4 flex-col`}>
-            <div className="space-y-4 mb-4">
-              <div className="flex items-center justify-between">
-                <h2 className="text-xl font-bold flex items-center gap-2">
-                  <Users className="h-5 w-5" />
-                  Conversations
-                </h2>
-                <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
-                  <DialogTrigger asChild>
-                    <Button size="sm" variant="outline">
-                      <Plus className="h-4 w-4" />
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>Nouvelle conversation privée</DialogTitle>
-                    </DialogHeader>
-                    <div className="space-y-4">
-                      <div>
-                        <Label htmlFor="room-name">Nom de la conversation</Label>
-                        <Input
-                          id="room-name"
-                          value={newRoomName}
-                          onChange={(e) => setNewRoomName(e.target.value)}
-                          placeholder="Ex: Discussion produits"
-                        />
-                      </div>
-                      <Button onClick={createPrivateRoom} className="w-full">
-                        Créer
+          <div className={`${(selectedRoom || selectedDirectConversation) ? 'hidden md:flex' : 'flex'} w-full md:w-80 bg-card border rounded-lg p-4 flex-col`}>
+            <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'rooms' | 'direct')} className="flex-1 flex flex-col">
+              <TabsList className="grid w-full grid-cols-2 mb-4">
+                <TabsTrigger value="rooms">Salons</TabsTrigger>
+                <TabsTrigger value="direct">Directs</TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="rooms" className="flex-1 flex flex-col">
+                <div className="space-y-4 mb-4">
+                  <div className="flex items-center justify-between">
+                    <h2 className="text-xl font-bold flex items-center gap-2">
+                      <Users className="h-5 w-5" />
+                      Conversations
+                    </h2>
+                    <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
+                      <DialogTrigger asChild>
+                        <Button size="sm" variant="outline">
+                          <Plus className="h-4 w-4" />
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>Nouvelle conversation privée</DialogTitle>
+                        </DialogHeader>
+                        <div className="space-y-4">
+                          <div>
+                            <Label htmlFor="room-name">Nom de la conversation</Label>
+                            <Input
+                              id="room-name"
+                              value={newRoomName}
+                              onChange={(e) => setNewRoomName(e.target.value)}
+                              placeholder="Ex: Discussion produits"
+                            />
+                          </div>
+                          <Button onClick={createPrivateRoom} className="w-full">
+                            Créer
+                          </Button>
+                        </div>
+                      </DialogContent>
+                    </Dialog>
+                  </div>
+
+                  {/* Search */}
+                  <Input
+                    placeholder="Rechercher une conversation..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
+
+                  {/* Filter for admins */}
+                  {isAdmin && (
+                    <div className="flex gap-2">
+                      <Button
+                        size="sm"
+                        variant={roomFilter === 'all' ? 'default' : 'outline'}
+                        onClick={() => setRoomFilter('all')}
+                        className="flex-1"
+                      >
+                        Toutes
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant={roomFilter === 'public' ? 'default' : 'outline'}
+                        onClick={() => setRoomFilter('public')}
+                        className="flex-1"
+                      >
+                        Publiques
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant={roomFilter === 'private' ? 'default' : 'outline'}
+                        onClick={() => setRoomFilter('private')}
+                        className="flex-1"
+                      >
+                        Privées
                       </Button>
                     </div>
-                  </DialogContent>
-                </Dialog>
-              </div>
-
-              {/* Search */}
-              <Input
-                placeholder="Rechercher une conversation..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-
-              {/* Filter for admins */}
-              {isAdmin && (
-                <div className="flex gap-2">
-                  <Button
-                    size="sm"
-                    variant={roomFilter === 'all' ? 'default' : 'outline'}
-                    onClick={() => setRoomFilter('all')}
-                    className="flex-1"
-                  >
-                    Toutes
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant={roomFilter === 'public' ? 'default' : 'outline'}
-                    onClick={() => setRoomFilter('public')}
-                    className="flex-1"
-                  >
-                    Publiques
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant={roomFilter === 'private' ? 'default' : 'outline'}
-                    onClick={() => setRoomFilter('private')}
-                    className="flex-1"
-                  >
-                    Privées
-                  </Button>
+                  )}
                 </div>
-              )}
-            </div>
 
-            <div className="flex-1 overflow-y-auto space-y-2">
-              {filteredRooms.length === 0 ? (
-                <p className="text-sm text-muted-foreground text-center py-4">
-                  Aucune conversation trouvée
-                </p>
-              ) : (
-                <>
-                  {/* Regular rooms */}
-                  {otherRooms.map((room) => (
+                <div className="flex-1 overflow-y-auto space-y-2">
+                  {filteredRooms.length === 0 ? (
+                    <p className="text-sm text-muted-foreground text-center py-4">
+                      Aucune conversation trouvée
+                    </p>
+                  ) : (
+                    <>
+                      {/* Regular rooms */}
+                      {otherRooms.map((room) => (
                   <div
                     key={room.id}
                     className={`rounded-lg transition-colors ${
@@ -440,7 +452,10 @@ const Chat = () => {
                     ) : (
                       <div className="flex items-center">
                         <button
-                          onClick={() => setSelectedRoom(room.id)}
+                          onClick={() => {
+                            setSelectedRoom(room.id);
+                            setSelectedDirectConversation(null);
+                          }}
                           className="flex-1 text-left p-3"
                         >
                           <div className="font-medium flex items-center gap-2">
@@ -595,21 +610,38 @@ const Chat = () => {
                 </>
               )}
             </div>
-          </div>
+          </TabsContent>
 
-          {/* Chat Area */}
-          <div className={`${selectedRoom ? 'flex' : 'hidden md:flex'} flex-1 bg-card border rounded-lg overflow-hidden`}>
-            {selectedRoom ? (
-              <ChatRoom roomId={selectedRoom} onBack={() => setSelectedRoom(null)} />
-            ) : (
-              <div className="h-full flex items-center justify-center text-muted-foreground">
-                Sélectionnez une conversation pour commencer
-              </div>
-            )}
+          <TabsContent value="direct" className="flex-1 overflow-y-auto">
+            <DirectMessageList
+              selectedConversation={selectedDirectConversation}
+              onSelectConversation={(id) => {
+                setSelectedDirectConversation(id);
+                setSelectedRoom(null);
+              }}
+            />
+          </TabsContent>
+        </Tabs>
+      </div>
+
+      {/* Chat Area */}
+      <div className={`${(selectedRoom || selectedDirectConversation) ? 'flex' : 'hidden md:flex'} flex-1 bg-card border rounded-lg overflow-hidden`}>
+        {selectedRoom ? (
+          <ChatRoom roomId={selectedRoom} onBack={() => setSelectedRoom(null)} />
+        ) : selectedDirectConversation ? (
+          <DirectChatRoom 
+            conversationId={selectedDirectConversation} 
+            onBack={() => setSelectedDirectConversation(null)} 
+          />
+        ) : (
+          <div className="h-full flex items-center justify-center text-muted-foreground">
+            Sélectionnez une conversation pour commencer
           </div>
-        </div>
+        )}
       </div>
     </div>
+  </div>
+</div>
   );
 };
 
