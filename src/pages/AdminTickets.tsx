@@ -486,12 +486,17 @@ const AdminTickets = () => {
                   filterTickets(status === 'all' ? undefined : status).map((ticket) => (
                     <Card
                       key={ticket.id}
-                      className="hover:shadow-lg transition-all cursor-pointer border-l-4"
+                      className={`hover:shadow-lg transition-all cursor-pointer border-l-4 ${
+                        unreadCounts[ticket.id] > 0 
+                          ? 'bg-red-50/50 dark:bg-red-950/10 border-red-500 shadow-md' 
+                          : ''
+                      }`}
                       style={{
-                        borderLeftColor: 
-                          ticket.priority === 'urgent' ? '#ef4444' :
-                          ticket.priority === 'high' ? '#f97316' :
-                          ticket.priority === 'normal' ? '#22c55e' : '#3b82f6'
+                        borderLeftColor: unreadCounts[ticket.id] > 0 
+                          ? '#ef4444' 
+                          : ticket.priority === 'urgent' ? '#ef4444' :
+                            ticket.priority === 'high' ? '#f97316' :
+                            ticket.priority === 'normal' ? '#22c55e' : '#3b82f6'
                       }}
                       onClick={() => navigate(`/ticket/${ticket.id}`)}
                     >
@@ -499,10 +504,15 @@ const AdminTickets = () => {
                         <div className="flex justify-between items-start gap-4">
                           <div className="flex-1">
                             <div className="flex items-center gap-2 flex-wrap mb-2">
-                              <CardTitle className="text-lg">{ticket.subject}</CardTitle>
+                              <CardTitle className="text-lg flex items-center gap-2">
+                                {ticket.subject}
+                                {unreadCounts[ticket.id] > 0 && (
+                                  <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" title="Messages non lus" />
+                                )}
+                              </CardTitle>
                               {unreadCounts[ticket.id] > 0 && (
-                                <Badge variant="destructive" className="animate-pulse">
-                                  {unreadCounts[ticket.id]} nouveau{unreadCounts[ticket.id] > 1 ? 'x' : ''}
+                                <Badge variant="destructive" className="animate-pulse font-bold">
+                                  {unreadCounts[ticket.id]} message{unreadCounts[ticket.id] > 1 ? 's' : ''} non lu{unreadCounts[ticket.id] > 1 ? 's' : ''}
                                 </Badge>
                               )}
                             </div>
