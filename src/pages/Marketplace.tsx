@@ -547,60 +547,25 @@ const Marketplace = () => {
     }
 
     try {
-      // Récupérer les profils des utilisateurs pour les pseudos
-      const { data: sellerProfile } = await supabase
-        .from("profiles")
-        .select("nickname, email")
-        .eq("id", user.id)
-        .single();
-
-      const { data: buyerProfile } = await supabase
-        .from("profiles")
-        .select("nickname, email")
-        .eq("id", buyRequest.user_id)
-        .single();
-
-      const sellerNickname = sellerProfile?.nickname || sellerProfile?.email?.split("@")[0] || "Vendeur";
-      const buyerNickname = buyerProfile?.nickname || buyerProfile?.email?.split("@")[0] || "Acheteur";
-      const buyerEmail = buyerProfile?.email || "";
-      
       const code = buyRequest.asin || buyRequest.ean || "N/A";
-      const codeType = buyRequest.asin ? "ASIN" : buyRequest.ean ? "EAN" : "Code";
       
-      // Créer un ticket pour le vendeur (celui qui a cliqué "J'ai ce produit") + staff
-      const sellerSubject = `vente - ${buyRequest.title} - ${code} et ${sellerNickname}`;
-      const { data: sellerTicket, error: sellerError } = await supabase
-        .from("tickets")
-        .insert({
-          user_id: user.id,
-          subject: sellerSubject,
-          category: "marketplace",
-          status: "open",
-          priority: "normal"
-        })
-        .select()
-        .single();
-
-      if (sellerError) throw sellerError;
-
-      // Message initial pour le vendeur avec toutes les infos
-      const sellerMessage = `Bonjour 👋,
-Je possède cet article et je souhaite le vendre.
-Voici les détails de l'annonce :
-- Titre : ${buyRequest.title}
-- Budget max : ${buyRequest.max_price ? `${buyRequest.max_price}€ ${buyRequest.price_type}` : "Non spécifié"}
-- Quantité : ${buyRequest.quantity}
-- Code annonce : ${code}
-
-📧 Contact acheteur : ${buyerNickname} (${buyerEmail})`;
-      
-      await supabase.from("messages").insert({
-        ticket_id: sellerTicket.id,
-        user_id: user.id,
-        content: sellerMessage
+      // Appeler l'edge function pour créer les deux tickets
+      const { data, error } = await supabase.functions.invoke('create-marketplace-tickets', {
+        body: {
+          buyRequestId: buyRequest.id,
+          buyRequestTitle: buyRequest.title,
+          buyRequestCode: code,
+          buyRequestQuantity: buyRequest.quantity,
+          buyRequestMaxPrice: buyRequest.max_price,
+          buyRequestPriceType: buyRequest.price_type,
+          buyRequestUserId: buyRequest.user_id,
+          sellerUserId: user.id
+        }
       });
 
-      toast.success("Proposition de vente envoyée! Un ticket a été créé.");
+      if (error) throw error;
+
+      toast.success("Proposition de vente envoyée! Les tickets ont été créés.");
       
       // Recharger les tickets et rediriger
       await loadMyTickets();
