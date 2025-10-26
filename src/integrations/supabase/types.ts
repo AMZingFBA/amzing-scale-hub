@@ -687,6 +687,15 @@ export type Database = {
         Args: { other_user_id: string }
         Returns: string
       }
+      get_public_profile: {
+        Args: { user_id_param: string }
+        Returns: {
+          avatar_url: string
+          full_name: string
+          id: string
+          nickname: string
+        }[]
+      }
       get_unread_count: {
         Args: { ticket_id_param: string; user_id_param: string }
         Returns: number
