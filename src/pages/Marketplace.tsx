@@ -11,7 +11,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Loader2, Package, Search, Upload, Trash2, ShoppingCart, ShoppingBag } from "lucide-react";
+import { Loader2, Package, Search, Upload, Trash2, ShoppingCart, ShoppingBag, Copy, Check } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 interface Listing {
@@ -89,6 +89,7 @@ const Marketplace = () => {
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [copiedCode, setCopiedCode] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) {
@@ -349,6 +350,13 @@ const Marketplace = () => {
     setProductData(null);
   };
 
+  const copyToClipboard = (text: string, type: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedCode(type);
+    toast.success(`${type} copié!`);
+    setTimeout(() => setCopiedCode(null), 2000);
+  };
+
   const handleInterestInListing = async (listing: Listing) => {
     if (!user) return;
 
@@ -372,16 +380,16 @@ const Marketplace = () => {
         .insert({
           ticket_id: ticket.id,
           user_id: user.id,
-          content: `Je souhaite acheter ce produit:\n\nTitre: ${listing.title}\nQuantité disponible: ${listing.quantity}\nPrix: ${listing.price}€ ${listing.price_type}\n\nCode produit: ${listing.asin || listing.ean || "N/A"}`
+          content: `Je souhaite acheter ce produit:\n\nTitre: ${listing.title}\nQuantité disponible: ${listing.quantity}\nPrix: ${listing.price}€ ${listing.price_type} par unité\n\nCode produit: ${listing.asin || listing.ean || "N/A"}`
         });
 
       if (messageError) throw messageError;
 
-      toast.success("Demande envoyée! Le staff vous contactera bientôt.");
-      navigate(`/ticket/${ticket.id}`);
+      toast.success("Demande envoyée! Le staff vous mettra en contact.");
+      navigate("/support");
     } catch (error: any) {
-      console.error("Error creating interest ticket:", error);
-      toast.error("Erreur lors de la création du ticket");
+      console.error("Error creating interest:", error);
+      toast.error("Erreur lors de l'envoi de la demande");
     }
   };
 
@@ -408,16 +416,16 @@ const Marketplace = () => {
         .insert({
           ticket_id: ticket.id,
           user_id: user.id,
-          content: `Je peux fournir ce produit:\n\nTitre: ${buyRequest.title}\nQuantité recherchée: ${buyRequest.quantity}\nPrix maximum: ${buyRequest.max_price ? `${buyRequest.max_price}€ ${buyRequest.price_type}` : "Non spécifié"}\n\nCode produit: ${buyRequest.asin || buyRequest.ean || "N/A"}`
+          content: `Je peux fournir ce produit:\n\nTitre: ${buyRequest.title}\nQuantité recherchée: ${buyRequest.quantity}\nPrix maximum: ${buyRequest.max_price ? `${buyRequest.max_price}€ ${buyRequest.price_type} par unité` : "Non spécifié"}\n\nCode produit: ${buyRequest.asin || buyRequest.ean || "N/A"}`
         });
 
       if (messageError) throw messageError;
 
-      toast.success("Proposition envoyée! Le staff vous contactera bientôt.");
-      navigate(`/ticket/${ticket.id}`);
+      toast.success("Proposition envoyée! Le staff vous mettra en contact.");
+      navigate("/support");
     } catch (error: any) {
-      console.error("Error creating proposal ticket:", error);
-      toast.error("Erreur lors de la création du ticket");
+      console.error("Error creating proposal:", error);
+      toast.error("Erreur lors de l'envoi de la proposition");
     }
   };
 
@@ -497,13 +505,27 @@ const Marketplace = () => {
         <div className="flex items-center justify-between text-sm">
           <span className="text-muted-foreground">Quantité: {listing.quantity}</span>
           <span className="text-xl font-bold text-primary">
-            {listing.price}€ <span className="text-sm">{listing.price_type}</span>
+            {listing.price}€ <span className="text-sm">{listing.price_type}/unité</span>
           </span>
         </div>
         {(listing.asin || listing.ean) && (
-          <p className="text-xs text-muted-foreground">
-            {listing.asin ? `ASIN: ${listing.asin}` : `EAN: ${listing.ean}`}
-          </p>
+          <div className="flex items-center gap-2">
+            <p className="text-xs text-muted-foreground flex-1">
+              {listing.asin ? `ASIN: ${listing.asin}` : `EAN: ${listing.ean}`}
+            </p>
+            <Button
+              size="sm"
+              variant="ghost"
+              className="h-6 px-2"
+              onClick={() => copyToClipboard(listing.asin || listing.ean || "", listing.asin ? "ASIN" : "EAN")}
+            >
+              {copiedCode === (listing.asin ? "ASIN" : "EAN") ? (
+                <Check className="w-3 h-3" />
+              ) : (
+                <Copy className="w-3 h-3" />
+              )}
+            </Button>
+          </div>
         )}
       </CardContent>
       <CardFooter className="flex gap-2">
@@ -561,14 +583,28 @@ const Marketplace = () => {
           <span className="text-muted-foreground">Quantité recherchée: {buyRequest.quantity}</span>
           {buyRequest.max_price && (
             <span className="text-xl font-bold text-primary">
-              Max: {buyRequest.max_price}€ <span className="text-sm">{buyRequest.price_type}</span>
+              Max: {buyRequest.max_price}€ <span className="text-sm">{buyRequest.price_type}/unité</span>
             </span>
           )}
         </div>
         {(buyRequest.asin || buyRequest.ean) && (
-          <p className="text-xs text-muted-foreground">
-            {buyRequest.asin ? `ASIN: ${buyRequest.asin}` : `EAN: ${buyRequest.ean}`}
-          </p>
+          <div className="flex items-center gap-2">
+            <p className="text-xs text-muted-foreground flex-1">
+              {buyRequest.asin ? `ASIN: ${buyRequest.asin}` : `EAN: ${buyRequest.ean}`}
+            </p>
+            <Button
+              size="sm"
+              variant="ghost"
+              className="h-6 px-2"
+              onClick={() => copyToClipboard(buyRequest.asin || buyRequest.ean || "", buyRequest.asin ? "ASIN" : "EAN")}
+            >
+              {copiedCode === (buyRequest.asin ? "ASIN" : "EAN") ? (
+                <Check className="w-3 h-3" />
+              ) : (
+                <Copy className="w-3 h-3" />
+              )}
+            </Button>
+          </div>
         )}
       </CardContent>
       <CardFooter className="flex gap-2">
@@ -737,12 +773,15 @@ const Marketplace = () => {
                         type="number"
                         min="1"
                         value={quantity}
-                        onChange={(e) => setQuantity(parseInt(e.target.value) || 1)}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          setQuantity(val === '' ? 1 : parseInt(val) || 1);
+                        }}
                       />
                     </div>
                     <div>
                       <Label>
-                        {activeSection === "sell" ? "Prix * (€)" : "Prix maximum (€)"}
+                        {activeSection === "sell" ? "Prix par unité * (€)" : "Prix max par unité (€)"}
                       </Label>
                       <div className="flex gap-2">
                         <Input
