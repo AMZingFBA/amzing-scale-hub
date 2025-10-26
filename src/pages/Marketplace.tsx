@@ -62,19 +62,6 @@ const Marketplace = () => {
   useEffect(() => {
     const newSection = getInitialSection();
     setActiveSection(newSection);
-    
-    // Check for tab parameter in URL
-    const searchParams = new URLSearchParams(location.search);
-    const tabParam = searchParams.get('tab');
-    
-    if (tabParam === 'my-requests') {
-      setActiveTab('my-requests');
-    } else if (tabParam === 'my-sales') {
-      setActiveTab('my-sales');
-    } else {
-      // Reset tab when changing section without tab parameter
-      setActiveTab("all");
-    }
   }, [location.pathname, location.search]);
   
   // Sell listings
@@ -84,8 +71,6 @@ const Marketplace = () => {
   // Buy requests
   const [buyRequests, setBuyRequests] = useState<BuyRequest[]>([]);
   const [myBuyRequests, setMyBuyRequests] = useState<BuyRequest[]>([]);
-  
-  const [activeTab, setActiveTab] = useState<string>("all");
   
   // Marketplace tickets
   const [myTickets, setMyTickets] = useState<any[]>([]);
@@ -439,9 +424,8 @@ const Marketplace = () => {
 
       toast.success("Demande d'achat envoyée au staff!");
       
-      // Reload tickets and switch to my-requests tab
+      // Reload tickets
       await loadMyTickets();
-      setActiveTab("my-requests");
       setShowCreateDialog(false);
     } catch (error: any) {
       console.error("Error creating ticket:", error);
@@ -488,10 +472,9 @@ const Marketplace = () => {
 
       toast.success("Proposition de vente envoyée au staff!");
       
-      // Reload tickets and switch to my-sales tab in sell section
+      // Reload tickets and switch to sell section
       await loadMyTickets();
       setActiveSection("sell");
-      setActiveTab("my-sales");
       setShowCreateDialog(false);
     } catch (error: any) {
       console.error("Error creating ticket:", error);
@@ -740,308 +723,232 @@ const Marketplace = () => {
       <div className="max-w-7xl mx-auto">
         {/* Buy Section */}
         {activeSection === "buy" && (
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full max-w-2xl grid-cols-3">
-              <TabsTrigger value="all">Toutes les demandes</TabsTrigger>
-              <TabsTrigger value="mine">Mes demandes</TabsTrigger>
-              <TabsTrigger value="my-requests">Mes demandes d'achat</TabsTrigger>
-            </TabsList>
+          <div className="w-full">
+            <Tabs defaultValue="ongoing" className="w-full">
+              <TabsList className="grid w-full max-w-md grid-cols-2 mb-6">
+                <TabsTrigger value="ongoing">En cours</TabsTrigger>
+                <TabsTrigger value="completed">Terminé</TabsTrigger>
+              </TabsList>
 
-            <TabsContent value="all" className="mt-6">
-              {buyRequests.length === 0 ? (
-                <Card className="p-12">
-                  <div className="text-center text-muted-foreground">
-                    <ShoppingCart className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                    <p>Aucune demande d'achat pour le moment</p>
+              <TabsContent value="ongoing" className="mt-6">
+                {selectedTicket ? (
+                  <div className="space-y-4">
+                    <Button 
+                      variant="outline" 
+                      onClick={() => setSelectedTicket(null)}
+                    >
+                      ← Retour aux demandes
+                    </Button>
+                    <iframe 
+                      src={`/ticket/${selectedTicket}`}
+                      className="w-full h-[600px] rounded-lg border"
+                      title="Ticket"
+                    />
                   </div>
-                </Card>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {buyRequests.map(request => renderBuyRequest(request, false))}
-                </div>
-              )}
-            </TabsContent>
-
-            <TabsContent value="mine" className="mt-6">
-              {myBuyRequests.length === 0 ? (
-                <Card className="p-12">
-                  <div className="text-center text-muted-foreground">
-                    <ShoppingCart className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                    <p>Vous n'avez pas encore créé de demande d'achat</p>
-                  </div>
-                </Card>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {myBuyRequests.map(request => renderBuyRequest(request, true))}
-                </div>
-              )}
-            </TabsContent>
-
-            <TabsContent value="my-requests" className="mt-6">
-              <Tabs defaultValue="ongoing" className="w-full">
-                <TabsList className="grid w-full max-w-md grid-cols-2">
-                  <TabsTrigger value="ongoing">En cours</TabsTrigger>
-                  <TabsTrigger value="completed">Terminé</TabsTrigger>
-                </TabsList>
-
-                <TabsContent value="ongoing" className="mt-6">
-                  {selectedTicket ? (
-                    <div className="space-y-4">
-                      <Button 
-                        variant="outline" 
-                        onClick={() => setSelectedTicket(null)}
-                      >
-                        ← Retour aux demandes
-                      </Button>
-                      <iframe 
-                        src={`/ticket/${selectedTicket}`}
-                        className="w-full h-[600px] rounded-lg border"
-                        title="Ticket"
-                      />
-                    </div>
-                  ) : (
-                    <>
-                      {myTickets.filter(t => t.subject.startsWith('Achat') && ['open', 'in_progress'].includes(t.status)).length === 0 ? (
-                        <Card className="p-12">
-                          <div className="text-center text-muted-foreground">
-                            <MessageCircle className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                            <p>Aucune demande d'achat en cours</p>
-                            <p className="text-sm mt-2">Cliquez sur "Je veux acheter" sur une annonce pour créer une demande</p>
-                          </div>
-                        </Card>
-                      ) : (
-                        <div className="grid grid-cols-1 gap-4">
-                          {myTickets
-                            .filter(t => t.subject.startsWith('Achat') && ['open', 'in_progress'].includes(t.status))
-                            .map((ticket) => (
-                            <Card key={ticket.id} className="hover:shadow-lg transition-shadow cursor-pointer">
-                              <CardHeader>
-                                <div className="flex items-start justify-between">
-                                  <div>
-                                    <CardTitle className="text-lg">{ticket.subject}</CardTitle>
-                                    <CardDescription className="mt-1">
-                                      Créé le {new Date(ticket.created_at).toLocaleDateString('fr-FR')}
-                                    </CardDescription>
-                                  </div>
-                                  <Badge variant={ticket.status === 'open' ? 'default' : 'secondary'}>
-                                    {ticket.status === 'open' ? 'Ouvert' : 'En cours'}
-                                  </Badge>
-                                </div>
-                              </CardHeader>
-                              <CardFooter>
-                                <Button 
-                                  className="w-full"
-                                  onClick={() => setSelectedTicket(ticket.id)}
-                                >
-                                  <MessageCircle className="w-4 h-4 mr-2" />
-                                  Voir la conversation
-                                </Button>
-                              </CardFooter>
-                            </Card>
-                          ))}
+                ) : (
+                  <>
+                    {myTickets.filter(t => t.subject.startsWith('Achat') && ['open', 'in_progress'].includes(t.status)).length === 0 ? (
+                      <Card className="p-12">
+                        <div className="text-center text-muted-foreground">
+                          <MessageCircle className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                          <p>Aucune demande d'achat en cours</p>
+                          <p className="text-sm mt-2">Cliquez sur "Je veux acheter" sur une annonce pour créer une demande</p>
                         </div>
-                      )}
-                    </>
-                  )}
-                </TabsContent>
-
-                <TabsContent value="completed" className="mt-6">
-                  {myTickets.filter(t => t.subject.startsWith('Achat') && t.status === 'closed').length === 0 ? (
-                    <Card className="p-12">
-                      <div className="text-center text-muted-foreground">
-                        <MessageCircle className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                        <p>Aucune demande d'achat terminée</p>
-                      </div>
-                    </Card>
-                  ) : (
-                    <div className="grid grid-cols-1 gap-4">
-                      {myTickets
-                        .filter(t => t.subject.startsWith('Achat') && t.status === 'closed')
-                        .map((ticket) => (
-                        <Card key={ticket.id} className="hover:shadow-lg transition-shadow cursor-pointer opacity-70">
-                          <CardHeader>
-                            <div className="flex items-start justify-between">
-                              <div>
-                                <CardTitle className="text-lg">{ticket.subject}</CardTitle>
-                                <CardDescription className="mt-1">
-                                  Créé le {new Date(ticket.created_at).toLocaleDateString('fr-FR')}
-                                  {ticket.closed_at && ` • Fermé le ${new Date(ticket.closed_at).toLocaleDateString('fr-FR')}`}
-                                </CardDescription>
+                      </Card>
+                    ) : (
+                      <div className="grid grid-cols-1 gap-4">
+                        {myTickets
+                          .filter(t => t.subject.startsWith('Achat') && ['open', 'in_progress'].includes(t.status))
+                          .map((ticket) => (
+                          <Card key={ticket.id} className="hover:shadow-lg transition-shadow cursor-pointer">
+                            <CardHeader>
+                              <div className="flex items-start justify-between">
+                                <div>
+                                  <CardTitle className="text-lg">{ticket.subject}</CardTitle>
+                                  <CardDescription className="mt-1">
+                                    Créé le {new Date(ticket.created_at).toLocaleDateString('fr-FR')}
+                                  </CardDescription>
+                                </div>
+                                <Badge variant={ticket.status === 'open' ? 'default' : 'secondary'}>
+                                  {ticket.status === 'open' ? 'Ouvert' : 'En cours'}
+                                </Badge>
                               </div>
-                              <Badge variant="outline">Fermé</Badge>
-                            </div>
-                          </CardHeader>
-                          <CardFooter>
-                            <Button 
-                              className="w-full"
-                              variant="outline"
-                              onClick={() => setSelectedTicket(ticket.id)}
-                            >
-                              <MessageCircle className="w-4 h-4 mr-2" />
-                              Voir l'historique
-                            </Button>
-                          </CardFooter>
-                        </Card>
-                      ))}
+                            </CardHeader>
+                            <CardFooter>
+                              <Button 
+                                className="w-full"
+                                onClick={() => setSelectedTicket(ticket.id)}
+                              >
+                                <MessageCircle className="w-4 h-4 mr-2" />
+                                Voir la conversation
+                              </Button>
+                            </CardFooter>
+                          </Card>
+                        ))}
+                      </div>
+                    )}
+                  </>
+                )}
+              </TabsContent>
+
+              <TabsContent value="completed" className="mt-6">
+                {myTickets.filter(t => t.subject.startsWith('Achat') && t.status === 'closed').length === 0 ? (
+                  <Card className="p-12">
+                    <div className="text-center text-muted-foreground">
+                      <MessageCircle className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                      <p>Aucune demande d'achat terminée</p>
                     </div>
-                  )}
-                </TabsContent>
-              </Tabs>
-            </TabsContent>
-          </Tabs>
+                  </Card>
+                ) : (
+                  <div className="grid grid-cols-1 gap-4">
+                    {myTickets
+                      .filter(t => t.subject.startsWith('Achat') && t.status === 'closed')
+                      .map((ticket) => (
+                      <Card key={ticket.id} className="hover:shadow-lg transition-shadow cursor-pointer opacity-70">
+                        <CardHeader>
+                          <div className="flex items-start justify-between">
+                            <div>
+                              <CardTitle className="text-lg">{ticket.subject}</CardTitle>
+                              <CardDescription className="mt-1">
+                                Créé le {new Date(ticket.created_at).toLocaleDateString('fr-FR')}
+                                {ticket.closed_at && ` • Fermé le ${new Date(ticket.closed_at).toLocaleDateString('fr-FR')}`}
+                              </CardDescription>
+                            </div>
+                            <Badge variant="outline">Fermé</Badge>
+                          </div>
+                        </CardHeader>
+                        <CardFooter>
+                          <Button 
+                            className="w-full"
+                            variant="outline"
+                            onClick={() => setSelectedTicket(ticket.id)}
+                          >
+                            <MessageCircle className="w-4 h-4 mr-2" />
+                            Voir l'historique
+                          </Button>
+                        </CardFooter>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+              </TabsContent>
+            </Tabs>
+          </div>
         )}
 
         {/* Sell Section */}
         {activeSection === "sell" && (
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full max-w-2xl grid-cols-3">
-              <TabsTrigger value="all">Toutes les annonces</TabsTrigger>
-              <TabsTrigger value="mine">Mes annonces</TabsTrigger>
-              <TabsTrigger value="my-sales">Mes demandes de vente</TabsTrigger>
-            </TabsList>
+          <div className="w-full">
+            <Tabs defaultValue="ongoing" className="w-full">
+              <TabsList className="grid w-full max-w-md grid-cols-2 mb-6">
+                <TabsTrigger value="ongoing">En cours</TabsTrigger>
+                <TabsTrigger value="completed">Terminé</TabsTrigger>
+              </TabsList>
 
-            <TabsContent value="all" className="mt-6">
-              {listings.length === 0 ? (
-                <Card className="p-12">
-                  <div className="text-center text-muted-foreground">
-                    <ShoppingBag className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                    <p>Aucune annonce de vente disponible pour le moment</p>
+              <TabsContent value="ongoing" className="mt-6">
+                {selectedTicket ? (
+                  <div className="space-y-4">
+                    <Button 
+                      variant="outline" 
+                      onClick={() => setSelectedTicket(null)}
+                    >
+                      ← Retour aux demandes
+                    </Button>
+                    <iframe 
+                      src={`/ticket/${selectedTicket}`}
+                      className="w-full h-[600px] rounded-lg border"
+                      title="Ticket"
+                    />
                   </div>
-                </Card>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {listings.map(listing => renderListing(listing, false))}
-                </div>
-              )}
-            </TabsContent>
-
-            <TabsContent value="mine" className="mt-6">
-              {myListings.length === 0 ? (
-                <Card className="p-12">
-                  <div className="text-center text-muted-foreground">
-                    <ShoppingBag className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                    <p>Vous n'avez pas encore créé d'annonce de vente</p>
-                  </div>
-                </Card>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {myListings.map(listing => renderListing(listing, true))}
-                </div>
-              )}
-            </TabsContent>
-
-            <TabsContent value="my-sales" className="mt-6">
-              <Tabs defaultValue="ongoing" className="w-full">
-                <TabsList className="grid w-full max-w-md grid-cols-2">
-                  <TabsTrigger value="ongoing">En cours</TabsTrigger>
-                  <TabsTrigger value="completed">Terminé</TabsTrigger>
-                </TabsList>
-
-                <TabsContent value="ongoing" className="mt-6">
-                  {selectedTicket ? (
-                    <div className="space-y-4">
-                      <Button 
-                        variant="outline" 
-                        onClick={() => setSelectedTicket(null)}
-                      >
-                        ← Retour aux demandes
-                      </Button>
-                      <iframe 
-                        src={`/ticket/${selectedTicket}`}
-                        className="w-full h-[600px] rounded-lg border"
-                        title="Ticket"
-                      />
-                    </div>
-                  ) : (
-                    <>
-                      {myTickets.filter(t => t.subject.startsWith('Vente') && ['open', 'in_progress'].includes(t.status)).length === 0 ? (
-                        <Card className="p-12">
-                          <div className="text-center text-muted-foreground">
-                            <MessageCircle className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                            <p>Aucune demande de vente en cours</p>
-                            <p className="text-sm mt-2">Cliquez sur "Je peux vendre" sur une demande pour créer une proposition</p>
-                          </div>
-                        </Card>
-                      ) : (
-                        <div className="grid grid-cols-1 gap-4">
-                          {myTickets
-                            .filter(t => t.subject.startsWith('Vente') && ['open', 'in_progress'].includes(t.status))
-                            .map((ticket) => (
-                            <Card key={ticket.id} className="hover:shadow-lg transition-shadow cursor-pointer">
-                              <CardHeader>
-                                <div className="flex items-start justify-between">
-                                  <div>
-                                    <CardTitle className="text-lg">{ticket.subject}</CardTitle>
-                                    <CardDescription className="mt-1">
-                                      Créé le {new Date(ticket.created_at).toLocaleDateString('fr-FR')}
-                                    </CardDescription>
-                                  </div>
-                                  <Badge variant={ticket.status === 'open' ? 'default' : 'secondary'}>
-                                    {ticket.status === 'open' ? 'Ouvert' : 'En cours'}
-                                  </Badge>
-                                </div>
-                              </CardHeader>
-                              <CardFooter>
-                                <Button 
-                                  className="w-full"
-                                  onClick={() => setSelectedTicket(ticket.id)}
-                                >
-                                  <MessageCircle className="w-4 h-4 mr-2" />
-                                  Voir la conversation
-                                </Button>
-                              </CardFooter>
-                            </Card>
-                          ))}
+                ) : (
+                  <>
+                    {myTickets.filter(t => t.subject.startsWith('Vente') && ['open', 'in_progress'].includes(t.status)).length === 0 ? (
+                      <Card className="p-12">
+                        <div className="text-center text-muted-foreground">
+                          <MessageCircle className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                          <p>Aucune demande de vente en cours</p>
+                          <p className="text-sm mt-2">Cliquez sur "Je peux vendre" sur une demande pour créer une proposition</p>
                         </div>
-                      )}
-                    </>
-                  )}
-                </TabsContent>
-
-                <TabsContent value="completed" className="mt-6">
-                  {myTickets.filter(t => t.subject.startsWith('Vente') && t.status === 'closed').length === 0 ? (
-                    <Card className="p-12">
-                      <div className="text-center text-muted-foreground">
-                        <MessageCircle className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                        <p>Aucune demande de vente terminée</p>
-                      </div>
-                    </Card>
-                  ) : (
-                    <div className="grid grid-cols-1 gap-4">
-                      {myTickets
-                        .filter(t => t.subject.startsWith('Vente') && t.status === 'closed')
-                        .map((ticket) => (
-                        <Card key={ticket.id} className="hover:shadow-lg transition-shadow cursor-pointer opacity-70">
-                          <CardHeader>
-                            <div className="flex items-start justify-between">
-                              <div>
-                                <CardTitle className="text-lg">{ticket.subject}</CardTitle>
-                                <CardDescription className="mt-1">
-                                  Créé le {new Date(ticket.created_at).toLocaleDateString('fr-FR')}
-                                  {ticket.closed_at && ` • Fermé le ${new Date(ticket.closed_at).toLocaleDateString('fr-FR')}`}
-                                </CardDescription>
+                      </Card>
+                    ) : (
+                      <div className="grid grid-cols-1 gap-4">
+                        {myTickets
+                          .filter(t => t.subject.startsWith('Vente') && ['open', 'in_progress'].includes(t.status))
+                          .map((ticket) => (
+                          <Card key={ticket.id} className="hover:shadow-lg transition-shadow cursor-pointer">
+                            <CardHeader>
+                              <div className="flex items-start justify-between">
+                                <div>
+                                  <CardTitle className="text-lg">{ticket.subject}</CardTitle>
+                                  <CardDescription className="mt-1">
+                                    Créé le {new Date(ticket.created_at).toLocaleDateString('fr-FR')}
+                                  </CardDescription>
+                                </div>
+                                <Badge variant={ticket.status === 'open' ? 'default' : 'secondary'}>
+                                  {ticket.status === 'open' ? 'Ouvert' : 'En cours'}
+                                </Badge>
                               </div>
-                              <Badge variant="outline">Fermé</Badge>
-                            </div>
-                          </CardHeader>
-                          <CardFooter>
-                            <Button 
-                              className="w-full"
-                              variant="outline"
-                              onClick={() => setSelectedTicket(ticket.id)}
-                            >
-                              <MessageCircle className="w-4 h-4 mr-2" />
-                              Voir l'historique
-                            </Button>
-                          </CardFooter>
-                        </Card>
-                      ))}
+                            </CardHeader>
+                            <CardFooter>
+                              <Button 
+                                className="w-full"
+                                onClick={() => setSelectedTicket(ticket.id)}
+                              >
+                                <MessageCircle className="w-4 h-4 mr-2" />
+                                Voir la conversation
+                              </Button>
+                            </CardFooter>
+                          </Card>
+                        ))}
+                      </div>
+                    )}
+                  </>
+                )}
+              </TabsContent>
+
+              <TabsContent value="completed" className="mt-6">
+                {myTickets.filter(t => t.subject.startsWith('Vente') && t.status === 'closed').length === 0 ? (
+                  <Card className="p-12">
+                    <div className="text-center text-muted-foreground">
+                      <MessageCircle className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                      <p>Aucune demande de vente terminée</p>
                     </div>
-                  )}
-                </TabsContent>
-              </Tabs>
-            </TabsContent>
-          </Tabs>
+                  </Card>
+                ) : (
+                  <div className="grid grid-cols-1 gap-4">
+                    {myTickets
+                      .filter(t => t.subject.startsWith('Vente') && t.status === 'closed')
+                      .map((ticket) => (
+                      <Card key={ticket.id} className="hover:shadow-lg transition-shadow cursor-pointer opacity-70">
+                        <CardHeader>
+                          <div className="flex items-start justify-between">
+                            <div>
+                              <CardTitle className="text-lg">{ticket.subject}</CardTitle>
+                              <CardDescription className="mt-1">
+                                Créé le {new Date(ticket.created_at).toLocaleDateString('fr-FR')}
+                                {ticket.closed_at && ` • Fermé le ${new Date(ticket.closed_at).toLocaleDateString('fr-FR')}`}
+                              </CardDescription>
+                            </div>
+                            <Badge variant="outline">Fermé</Badge>
+                          </div>
+                        </CardHeader>
+                        <CardFooter>
+                          <Button 
+                            className="w-full"
+                            variant="outline"
+                            onClick={() => setSelectedTicket(ticket.id)}
+                          >
+                            <MessageCircle className="w-4 h-4 mr-2" />
+                            Voir l'historique
+                          </Button>
+                        </CardFooter>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+              </TabsContent>
+            </Tabs>
+          </div>
         )}
       </div>
     </div>
