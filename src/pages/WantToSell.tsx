@@ -55,6 +55,12 @@ const WantToSell = () => {
   const [priceType, setPriceType] = useState<"TTC" | "HT">("TTC");
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [editingListing, setEditingListing] = useState<Listing | null>(null);
+  
+  // Image gallery states
+  const [showImageDialog, setShowImageDialog] = useState(false);
+  const [selectedImageGallery, setSelectedImageGallery] = useState<string[] | null>(null);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   useEffect(() => {
     if (!user) {
@@ -209,25 +215,50 @@ const WantToSell = () => {
     setIsCreating(true);
 
     try {
-      const { error } = await supabase
-        .from("marketplace_listings")
-        .insert({
-          user_id: user.id,
-          asin: searchType === "asin" ? searchCode : null,
-          ean: searchType === "ean" ? searchCode : null,
-          title,
-          description,
-          images: uploadedImages,
-          quantity,
-          price: parseFloat(price),
-          price_type: priceType,
-          status: "active"
-        });
+      if (editingListing) {
+        // Mise à jour d'une annonce existante
+        const { error } = await supabase
+          .from("marketplace_listings")
+          .update({
+            asin: searchType === "asin" ? searchCode : null,
+            ean: searchType === "ean" ? searchCode : null,
+            title,
+            description,
+            images: uploadedImages,
+            quantity,
+            price: parseFloat(price),
+            price_type: priceType,
+          })
+          .eq("id", editingListing.id);
 
-      if (error) throw error;
-      toast.success("Annonce de vente créée avec succès!");
+        if (error) throw error;
+        toast.success("Annonce modifiée avec succès!");
+        
+        setEditingListing(null);
+        await loadMyListings();
+      } else {
+        // Créer une nouvelle annonce
+        const { error } = await supabase
+          .from("marketplace_listings")
+          .insert({
+            user_id: user.id,
+            asin: searchType === "asin" ? searchCode : null,
+            ean: searchType === "ean" ? searchCode : null,
+            title,
+            description,
+            images: uploadedImages,
+            quantity,
+            price: parseFloat(price),
+            price_type: priceType,
+            status: "active"
+          });
+
+        if (error) throw error;
+        toast.success("Annonce de vente créée avec succès!");
+        
+        await loadMyListings();
+      }
       
-      await loadMyListings();
       resetForm();
       setShowCreateDialog(false);
     } catch (error: any) {
@@ -245,6 +276,56 @@ const WantToSell = () => {
     setQuantity(1);
     setPrice("");
     setUploadedImages([]);
+    setEditingListing(null);
+  };
+
+  const editListing = (listing: Listing) => {
+    setEditingListing(listing);
+    setSearchType(listing.asin ? "asin" : "ean");
+    setSearchCode(listing.asin || listing.ean || "");
+    setTitle(listing.title);
+    setDescription(listing.description || "");
+    setQuantity(listing.quantity);
+    setPrice(listing.price.toString());
+    setPriceType(listing.price_type as "TTC" | "HT");
+    setUploadedImages(listing.images || []);
+    setShowCreateDialog(true);
+  };
+
+  const handleInterestInListing = async (listing: Listing) => {
+    if (!user) return;
+
+    if (listing.user_id === user.id) {
+      toast.error("Vous ne pouvez pas acheter votre propre annonce!");
+      return;
+    }
+
+    try {
+      const code = listing.asin || listing.ean || "N/A";
+      
+      const { data, error } = await supabase.functions.invoke('create-sell-tickets', {
+        body: {
+          listingId: listing.id,
+          listingTitle: listing.title,
+          listingCode: code,
+          listingQuantity: listing.quantity,
+          listingPrice: listing.price,
+          listingPriceType: listing.price_type,
+          listingUserId: listing.user_id,
+          buyerUserId: user.id
+        }
+      });
+
+      if (error) throw error;
+
+      toast.success("Demande d'achat envoyée! Les tickets ont été créés.");
+      
+      await loadMyTickets();
+      navigate("/vendre?tab=tickets");
+    } catch (error: any) {
+      console.error("Error creating tickets:", error);
+      toast.error("Erreur lors de la création de la demande");
+    }
   };
 
   const deleteListing = async (listingId: string) => {
@@ -272,6 +353,24 @@ const WantToSell = () => {
     toast.success("Code copié!");
   };
 
+  const openImageGallery = (images: string[], index: number = 0) => {
+    setSelectedImageGallery(images);
+    setCurrentImageIndex(index);
+    setShowImageDialog(true);
+  };
+
+  const nextImage = () => {
+    if (selectedImageGallery) {
+      setCurrentImageIndex((prev) => (prev + 1) % selectedImageGallery.length);
+    }
+  };
+
+  const prevImage = () => {
+    if (selectedImageGallery) {
+      setCurrentImageIndex((prev) => (prev - 1 + selectedImageGallery.length) % selectedImageGallery.length);
+    }
+  };
+
   const renderListing = (listing: Listing, isOwn: boolean) => {
     const code = listing.asin || listing.ean || "N/A";
     const codeType = listing.asin ? "ASIN" : listing.ean ? "EAN" : "Code";
@@ -286,12 +385,22 @@ const WantToSell = () => {
       <Card key={listing.id} className="hover:shadow-xl transition-all animate-fade-in overflow-hidden">
         {hasImages && (
           <div className="p-4">
-            <div className="relative border-2 border-muted rounded-lg overflow-hidden">
+            <div 
+              className="relative cursor-pointer group/image border-2 border-muted rounded-lg overflow-hidden"
+              onClick={() => openImageGallery(listing.images, 0)}
+            >
               <img
                 src={listing.images[0]}
                 alt={listing.title}
                 className="w-full h-56 object-cover"
               />
+              <div className="absolute inset-0 bg-black/0 group-hover/image:bg-black/30 transition-all flex items-center justify-center">
+                <div className="opacity-0 group-hover/image:opacity-100 transition-opacity">
+                  <div className="bg-white rounded-full p-3">
+                    <ZoomIn className="w-6 h-6 text-primary" />
+                  </div>
+                </div>
+              </div>
               {listing.images.length > 1 && (
                 <div className="absolute bottom-3 right-3 bg-black/70 text-white px-3 py-1.5 rounded-md text-sm font-semibold">
                   +{listing.images.length - 1} photo{listing.images.length > 2 ? 's' : ''}
@@ -332,21 +441,32 @@ const WantToSell = () => {
         
         <CardFooter className="flex gap-2 p-4 pt-0">
           {isOwn ? (
-            <Button
-              variant="destructive"
-              size="lg"
-              className="w-full"
-              onClick={() => deleteListing(listing.id)}
-            >
-              <Trash2 className="w-4 h-4 mr-2" />
-              Supprimer mon annonce
-            </Button>
+            <>
+              <Button
+                variant="outline"
+                size="lg"
+                className="flex-1"
+                onClick={() => editListing(listing)}
+              >
+                <Edit className="w-4 h-4 mr-2" />
+                Modifier
+              </Button>
+              <Button
+                variant="destructive"
+                size="lg"
+                className="flex-1"
+                onClick={() => deleteListing(listing.id)}
+              >
+                <Trash2 className="w-4 h-4 mr-2" />
+                Supprimer
+              </Button>
+            </>
           ) : (
             <>
               <Button
                 size="lg"
                 className="flex-1 hover-scale font-semibold"
-                onClick={() => {/* TODO: handle interest */}}
+                onClick={() => handleInterestInListing(listing)}
               >
                 <Package className="w-5 h-5 mr-2" />
                 Je veux acheter ce produit
@@ -399,6 +519,47 @@ const WantToSell = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
       
+      {/* Image Gallery Dialog */}
+      <Dialog open={showImageDialog} onOpenChange={setShowImageDialog}>
+        <DialogContent className="max-w-4xl p-0">
+          <div className="relative">
+            {selectedImageGallery && selectedImageGallery.length > 0 && (
+              <>
+                <img
+                  src={selectedImageGallery[currentImageIndex]}
+                  alt={`Image ${currentImageIndex + 1}`}
+                  className="w-full h-auto max-h-[80vh] object-contain"
+                />
+                
+                {selectedImageGallery.length > 1 && (
+                  <>
+                    <Button
+                      variant="secondary"
+                      size="icon"
+                      className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full"
+                      onClick={prevImage}
+                    >
+                      <ChevronLeft className="w-6 h-6" />
+                    </Button>
+                    <Button
+                      variant="secondary"
+                      size="icon"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full"
+                      onClick={nextImage}
+                    >
+                      <ChevronRight className="w-6 h-6" />
+                    </Button>
+                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/70 text-white px-4 py-2 rounded-full text-sm font-semibold">
+                      {currentImageIndex + 1} / {selectedImageGallery.length}
+                    </div>
+                  </>
+                )}
+              </>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+      
       <main className="container mx-auto px-4 pt-24 pb-12">
         <div className="max-w-6xl mx-auto space-y-6">
           <div className="mb-8">
@@ -411,7 +572,10 @@ const WantToSell = () => {
           </div>
 
           {/* Create Listing Button */}
-          <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
+          <Dialog open={showCreateDialog} onOpenChange={(open) => {
+            setShowCreateDialog(open);
+            if (!open) resetForm();
+          }}>
             <DialogTrigger asChild>
               <Button size="lg" className="w-full md:w-auto hover-scale">
                 <Package className="w-5 h-5 mr-2" />
@@ -420,9 +584,9 @@ const WantToSell = () => {
             </DialogTrigger>
             <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
               <DialogHeader>
-                <DialogTitle>Publier une annonce de vente</DialogTitle>
+                <DialogTitle>{editingListing ? "Modifier l'annonce" : "Publier une annonce de vente"}</DialogTitle>
                 <DialogDescription>
-                  Décrivez le produit que vous souhaitez vendre. Les membres intéressés pourront vous contacter via le staff.
+                  {editingListing ? "Modifiez votre annonce de vente" : "Décrivez le produit que vous souhaitez vendre. Les membres intéressés pourront vous contacter via le staff."}
                 </DialogDescription>
               </DialogHeader>
 
