@@ -906,7 +906,7 @@ const Marketplace = () => {
             <TabsList className="grid w-full max-w-2xl grid-cols-3">
               <TabsTrigger value="all">Toutes les demandes</TabsTrigger>
               <TabsTrigger value="mine">Mes demandes</TabsTrigger>
-              <TabsTrigger value="my-requests">Mes achats</TabsTrigger>
+              <TabsTrigger value="my-requests">Mes demandes d'achat</TabsTrigger>
             </TabsList>
 
             <TabsContent value="all" className="mt-6">
@@ -1059,7 +1059,7 @@ const Marketplace = () => {
             <TabsList className="grid w-full max-w-2xl grid-cols-3">
               <TabsTrigger value="all">Toutes les annonces</TabsTrigger>
               <TabsTrigger value="mine">Mes annonces</TabsTrigger>
-              <TabsTrigger value="my-sales">Mes ventes</TabsTrigger>
+              <TabsTrigger value="my-sales">Mes demandes de vente</TabsTrigger>
             </TabsList>
 
             <TabsContent value="all" className="mt-6">
