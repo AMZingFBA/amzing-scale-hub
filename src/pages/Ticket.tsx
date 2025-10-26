@@ -344,6 +344,7 @@ const Ticket = () => {
                       {ticket.category === 'facture_autorisation' && '📝 Facture/Autorisation'}
                       {ticket.category === 'gestion_produit' && '📦 Gestion produit'}
                       {ticket.category === 'marketplace' && '🛒 Marketplace'}
+                      {ticket.category === 'avis' && '⭐ Avis'}
                       {ticket.category === 'autre' && '💬 Autre'}
                     </Badge>
                   )}

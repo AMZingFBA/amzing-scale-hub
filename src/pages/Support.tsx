@@ -292,6 +292,7 @@ const Support = () => {
                         <SelectItem value="facture_autorisation">Facture & Autorisation</SelectItem>
                         <SelectItem value="gestion_produit">Gestion produit</SelectItem>
                         <SelectItem value="marketplace">Marketplace</SelectItem>
+                        <SelectItem value="avis">Programme Avis</SelectItem>
                         <SelectItem value="autre">Autre</SelectItem>
                       </SelectContent>
                     </Select>
@@ -366,6 +367,7 @@ const Support = () => {
                             {ticket.category === 'facture_autorisation' && '📝 Facture/Auto'}
                             {ticket.category === 'gestion_produit' && '📦 Gestion produit'}
                             {ticket.category === 'marketplace' && '🛒 Marketplace'}
+                            {ticket.category === 'avis' && '⭐ Avis'}
                             {ticket.category === 'autre' && '💬 Autre'}
                           </Badge>
                         )}

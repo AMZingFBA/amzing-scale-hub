@@ -286,6 +286,7 @@ const AdminTickets = () => {
                                 {ticket.category === 'facture_autorisation' && '📝 Facture/Auto'}
                                 {ticket.category === 'gestion_produit' && '📦 Gestion produit'}
                                 {ticket.category === 'marketplace' && '🛒 Marketplace'}
+                                {ticket.category === 'avis' && '⭐ Avis'}
                                 {ticket.category === 'autre' && '💬 Autre'}
                               </Badge>
                             )}
@@ -338,6 +339,7 @@ const AdminTickets = () => {
                                 {ticket.category === 'facture_autorisation' && '📝 Facture/Auto'}
                                 {ticket.category === 'gestion_produit' && '📦 Gestion produit'}
                                 {ticket.category === 'marketplace' && '🛒 Marketplace'}
+                                {ticket.category === 'avis' && '⭐ Avis'}
                                 {ticket.category === 'autre' && '💬 Autre'}
                               </Badge>
                             )}

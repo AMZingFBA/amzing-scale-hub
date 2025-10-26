@@ -55,6 +55,7 @@ const Dashboard = () => {
   const { unreadCount } = useUnreadMessages();
   const [rulesOpen, setRulesOpen] = useState(false);
   const [invoiceAuthOpen, setInvoiceAuthOpen] = useState(false);
+  const [reviewsOpen, setReviewsOpen] = useState(false);
 
   const rules = [
     {
@@ -176,7 +177,7 @@ const Dashboard = () => {
                     <CategoryItem icon={Eye} label="création-société" />
                     <CategoryItem icon={FileText} label="facture-autorisation" onClick={() => setInvoiceAuthOpen(true)} />
                     <CategoryItem icon={DollarSign} label="cashback" />
-                    <CategoryItem icon={Star} label="avis" />
+                    <CategoryItem icon={Star} label="avis" onClick={() => setReviewsOpen(true)} />
                     <CategoryItem icon={Calculator} label="fiscalité-simplifiée" />
                   </div>
                 </AccordionContent>
@@ -484,6 +485,129 @@ const Dashboard = () => {
                   </p>
                   <p className="text-xs text-center text-muted-foreground mt-2">
                     Cette analyse est basée sur notre expertise terrain et nos échanges réguliers avec les équipes Amazon concernant les demandes d'autorisation de nos membres.
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+          </ScrollArea>
+        </DialogContent>
+      </Dialog>
+
+      {/* Reviews Dialog */}
+      <Dialog open={reviewsOpen} onOpenChange={setReviewsOpen}>
+        <DialogContent className="max-w-4xl max-h-[80vh]">
+          <DialogHeader>
+            <DialogTitle className="text-2xl flex items-center gap-2">
+              <Star className="w-6 h-6 text-primary" />
+              Plus d'avis, plus de ventes. On s'entraide ? ⭐
+            </DialogTitle>
+            <DialogDescription>
+              Programme d'entraide communautaire pour développer la crédibilité de votre boutique Amazon
+            </DialogDescription>
+          </DialogHeader>
+          <ScrollArea className="h-[60vh] pr-4">
+            <div className="space-y-6">
+              <Card className="border-primary/20 bg-primary/5">
+                <CardContent className="pt-6">
+                  <p className="text-base leading-relaxed">
+                    Nous encourageons l'entraide au sein de la communauté AMZing FBA afin que chaque membre puisse bénéficier d'un avantage concret. Cette fonctionnalité a pour objectif de vous accompagner dans l'augmentation des avis positifs sur votre boutique Amazon.
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-lg">
+                    <CheckCircle className="w-5 h-5 text-primary" />
+                    Comment ça fonctionne ? 🤝
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <p className="text-sm leading-relaxed">
+                    Le principe repose sur la mise en relation de deux membres du groupe via la création d'un ticket support. Chaque participant endosse alternativement le rôle de vendeur et d'acheteur.
+                  </p>
+
+                  <div className="bg-accent/50 rounded-lg p-4">
+                    <p className="font-semibold mb-3">📋 Pour participer au programme d'entraide</p>
+                    <Link to="/support?category=avis">
+                      <div className="flex items-center gap-2 p-3 rounded-md border border-primary/30 bg-primary/5 hover:bg-primary/10 hover:border-primary/50 transition-all cursor-pointer group">
+                        <MessageCircle className="w-5 h-5 text-primary group-hover:scale-110 transition-transform" />
+                        <span className="text-primary font-medium group-hover:underline">Créer une demande - Programme Avis</span>
+                      </div>
+                    </Link>
+                  </div>
+
+                  <div className="space-y-4 mt-6">
+                    <p className="font-semibold text-base">Deux options sont disponibles :</p>
+                    
+                    <Card className="border-primary/20">
+                      <CardHeader className="pb-3">
+                        <CardTitle className="text-base flex items-center gap-2">
+                          <Badge className="bg-primary">Option 1</Badge>
+                          <span>Achat avec retour</span>
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-sm text-muted-foreground">
+                          L'acheteur commande le produit du vendeur, le reçoit, effectue un retour, puis dépose un avis 5 étoiles sur la fiche produit.
+                        </p>
+                      </CardContent>
+                    </Card>
+
+                    <Card className="border-primary/20">
+                      <CardHeader className="pb-3">
+                        <CardTitle className="text-base flex items-center gap-2">
+                          <Badge className="bg-primary">Option 2</Badge>
+                          <span>Achat définitif petit prix</span>
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-sm text-muted-foreground">
+                          Le vendeur propose un article à prix réduit. L'acheteur l'acquiert définitivement et laisse un avis 5 étoiles sans nécessité de retour.
+                        </p>
+                      </CardContent>
+                    </Card>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-lg">
+                    <Trophy className="w-5 h-5 text-primary" />
+                    Pourquoi les avis sont-ils essentiels ? 📈
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div className="space-y-3">
+                    <div className="flex items-start gap-3 p-3 rounded-lg bg-accent/30">
+                      <CheckCircle className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
+                      <p className="text-sm">
+                        <strong>Crédibilité renforcée :</strong> Les avis positifs inspirent confiance aux acheteurs potentiels et augmentent significativement votre taux de conversion.
+                      </p>
+                    </div>
+                    
+                    <div className="flex items-start gap-3 p-3 rounded-lg bg-accent/30">
+                      <CheckCircle className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
+                      <p className="text-sm">
+                        <strong>Facilitation des autorisations Amazon :</strong> Un historique d'avis positifs joue un rôle déterminant dans l'obtention d'autorisations de vente pour certaines catégories de produits.
+                      </p>
+                    </div>
+                    
+                    <div className="flex items-start gap-3 p-3 rounded-lg bg-accent/30">
+                      <CheckCircle className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
+                      <p className="text-sm">
+                        <strong>Visibilité accrue :</strong> Les produits avec de nombreux avis bénéficient d'un meilleur classement dans les résultats de recherche Amazon.
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-primary/5 border-primary/20">
+                <CardContent className="pt-6 text-center">
+                  <p className="text-sm font-semibold text-foreground">
+                    Rejoignez le programme d'entraide AMZing FBA et développez votre activité ensemble ! 🚀
                   </p>
                 </CardContent>
               </Card>
