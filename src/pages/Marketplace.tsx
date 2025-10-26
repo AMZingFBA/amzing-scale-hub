@@ -1271,7 +1271,7 @@ const Marketplace = () => {
           </div>
         )}
 
-        {/* Sell Section - Want to Sell */}
+        {/* Sell Section - Want to Sell - Exact copy of Want to Buy design */}
         {activeSection === "sell" && (
           <div className="w-full space-y-6 animate-fade-in">
             <div className="mb-8">
