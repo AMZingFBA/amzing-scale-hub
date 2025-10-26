@@ -637,6 +637,7 @@ const Marketplace = () => {
 
   const renderListing = (listing: Listing, isOwn: boolean) => {
     const code = listing.asin || listing.ean || "N/A";
+    const codeType = listing.asin ? "ASIN" : listing.ean ? "EAN" : "Code";
     const hasImages = listing.images && listing.images.length > 0;
     
     return (
@@ -673,8 +674,8 @@ const Marketplace = () => {
             <CardTitle className="text-lg font-bold line-clamp-2">
               {listing.title}
             </CardTitle>
-            <Badge className="shrink-0 text-lg font-bold px-4 py-1.5 whitespace-nowrap">
-              {listing.price}€ {listing.price_type}
+            <Badge className="shrink-0 text-base font-bold px-3 py-1.5 whitespace-nowrap">
+              {listing.price}€/u {listing.price_type}
             </Badge>
           </div>
         </CardHeader>
@@ -685,7 +686,7 @@ const Marketplace = () => {
             onClick={() => copyToClipboard(code)}
           >
             <div className="flex items-center gap-2 flex-1 min-w-0">
-              <span className="text-xs font-medium text-muted-foreground shrink-0">Code:</span>
+              <span className="text-xs font-medium text-muted-foreground shrink-0">{codeType}:</span>
               <code className="font-mono font-bold text-sm truncate">{code}</code>
             </div>
             <Copy className="w-4 h-4 text-muted-foreground group-hover/code:text-primary transition-colors shrink-0" />
@@ -736,6 +737,7 @@ const Marketplace = () => {
 
   const renderBuyRequest = (request: BuyRequest, isOwn: boolean) => {
     const code = request.asin || request.ean || "N/A";
+    const codeType = request.asin ? "ASIN" : request.ean ? "EAN" : "Code";
     const hasImages = request.images && request.images.length > 0;
     
     return (
@@ -773,8 +775,8 @@ const Marketplace = () => {
               {request.title}
             </CardTitle>
             {request.max_price && (
-              <Badge variant="secondary" className="shrink-0 text-lg font-bold px-4 py-1.5 whitespace-nowrap">
-                Max {request.max_price}€ {request.price_type}
+              <Badge variant="secondary" className="shrink-0 text-base font-bold px-3 py-1.5 whitespace-nowrap">
+                Max {request.max_price}€/u {request.price_type}
               </Badge>
             )}
           </div>
@@ -786,7 +788,7 @@ const Marketplace = () => {
             onClick={() => copyToClipboard(code)}
           >
             <div className="flex items-center gap-2 flex-1 min-w-0">
-              <span className="text-xs font-medium text-muted-foreground shrink-0">Code:</span>
+              <span className="text-xs font-medium text-muted-foreground shrink-0">{codeType}:</span>
               <code className="font-mono font-bold text-sm truncate">{code}</code>
             </div>
             <Copy className="w-4 h-4 text-muted-foreground group-hover/code:text-primary transition-colors shrink-0" />

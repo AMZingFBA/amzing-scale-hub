@@ -330,22 +330,25 @@ const WantToSell = () => {
     }
   };
 
-  const renderListing = (listing: Listing, showActions: boolean = true) => (
-    <Card key={listing.id} className="overflow-hidden hover:shadow-lg transition-shadow">
-      <CardHeader className="pb-3">
-        <div className="flex justify-between items-start">
-          <div className="flex-1">
-            <CardTitle className="text-xl mb-1">{listing.title}</CardTitle>
-            <CardDescription className="text-sm">
-              {listing.asin && `ASIN: ${listing.asin}`}
-              {listing.ean && `EAN: ${listing.ean}`}
-            </CardDescription>
+  const renderListing = (listing: Listing, showActions: boolean = true) => {
+    const code = listing.asin || listing.ean || "N/A";
+    const codeType = listing.asin ? "ASIN" : listing.ean ? "EAN" : "Code";
+    
+    return (
+      <Card key={listing.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+        <CardHeader className="pb-3">
+          <div className="flex justify-between items-start">
+            <div className="flex-1">
+              <CardTitle className="text-xl mb-1">{listing.title}</CardTitle>
+              <CardDescription className="text-sm">
+                {codeType}: {code}
+              </CardDescription>
+            </div>
+            <Badge variant="secondary" className="ml-2">
+              {listing.price}€/u {listing.price_type}
+            </Badge>
           </div>
-          <Badge variant="secondary" className="ml-2">
-            {listing.price}€ {listing.price_type}
-          </Badge>
-        </div>
-      </CardHeader>
+        </CardHeader>
       
       <CardContent className="space-y-3">
         {listing.images && listing.images.length > 0 && (
@@ -392,6 +395,7 @@ const WantToSell = () => {
       )}
     </Card>
   );
+};
 
   if (loading) {
     return (
