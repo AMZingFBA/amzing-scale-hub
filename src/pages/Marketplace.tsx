@@ -744,6 +744,11 @@ const Marketplace = () => {
     const codeType = request.asin ? "ASIN" : request.ean ? "EAN" : "Code";
     const hasImages = request.images && request.images.length > 0;
     
+    // Calculer le prix affiché : -15% pour les vendeurs, prix original pour l'acheteur
+    const displayPrice = isOwn 
+      ? request.max_price 
+      : request.max_price ? (Number(request.max_price) * 0.85).toFixed(2) : null;
+    
     return (
       <Card key={request.id} className="hover:shadow-xl transition-all animate-fade-in overflow-hidden">
         {hasImages && (
@@ -778,9 +783,9 @@ const Marketplace = () => {
             <CardTitle className="text-lg font-bold line-clamp-2">
               {request.title}
             </CardTitle>
-            {request.max_price && (
+            {displayPrice && (
               <Badge variant="secondary" className="shrink-0 text-base font-bold px-3 py-1.5 whitespace-nowrap">
-                Max {request.max_price}€/u {request.price_type}
+                Max {displayPrice}€/u {request.price_type}
               </Badge>
             )}
           </div>
