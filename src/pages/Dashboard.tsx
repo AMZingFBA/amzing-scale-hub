@@ -1,5 +1,6 @@
 import { useAuth } from '@/hooks/use-auth';
 import { useUnreadMessages } from '@/hooks/use-unread-messages';
+import { useMarketplaceUnread } from '@/hooks/use-marketplace-unread';
 import { Navigate, Link } from 'react-router-dom';
 import { useState } from 'react';
 import Navbar from '@/components/Navbar';
@@ -53,6 +54,7 @@ const CategoryItem = ({ icon: Icon, label, link, onClick, badge }: CategoryItemP
 const Dashboard = () => {
   const { user, isVIP, subscription, isLoading } = useAuth();
   const { unreadCount } = useUnreadMessages();
+  const { unreadCount: marketplaceUnreadCount } = useMarketplaceUnread();
   const [rulesOpen, setRulesOpen] = useState(false);
   const [invoiceAuthOpen, setInvoiceAuthOpen] = useState(false);
   const [reviewsOpen, setReviewsOpen] = useState(false);
@@ -256,14 +258,21 @@ const Dashboard = () => {
               {/* MARKETPLACE */}
               <AccordionItem value="marketplace" className="border rounded-lg px-6 bg-card">
                 <AccordionTrigger className="hover:no-underline">
-                  <div className="flex items-center gap-3">
-                    <ShoppingCart className="w-6 h-6 text-primary" />
-                    <span className="text-xl font-bold">MARKETPLACE</span>
+                  <div className="flex items-center justify-between w-full gap-3">
+                    <div className="flex items-center gap-3">
+                      <ShoppingCart className="w-6 h-6 text-primary" />
+                      <span className="text-xl font-bold">MARKETPLACE</span>
+                    </div>
+                    {marketplaceUnreadCount > 0 && (
+                      <Badge variant="destructive" className="ml-auto">
+                        {marketplaceUnreadCount}
+                      </Badge>
+                    )}
                   </div>
                 </AccordionTrigger>
                 <AccordionContent>
                   <div className="grid gap-3 pt-2">
-                    <CategoryItem icon={ShoppingCart} label="Want to Buy" link="/acheter" />
+                    <CategoryItem icon={ShoppingCart} label="Want to Buy" link="/acheter" badge={marketplaceUnreadCount} />
                     <CategoryItem icon={Package} label="Want to Sell" link="/vendre" />
                   </div>
                 </AccordionContent>
