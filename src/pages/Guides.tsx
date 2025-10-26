@@ -6,12 +6,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import processFlow from '@/assets/amazon-process-flow.png';
-import profilProfessionnel from '@/assets/profil-professionnel.jpg';
-import compteVendeurAmazon from '@/assets/compte-vendeur-amazon.jpg';
-import produitsRentablesHero from '@/assets/produits-rentables-hero.jpg';
-import fbaWarehouse from '@/assets/fba-warehouse.jpg';
-import fbmPackages from '@/assets/fbm-packages.jpg';
-import reconnaitreProduitHero from '@/assets/reconaitre-produit-hero.png';
 
 const Guides = () => {
   return (
@@ -436,8 +430,6 @@ const Guides = () => {
                       </div>
                     </AccordionTrigger>
                     <AccordionContent className="space-y-6 pt-4">
-                      <img src={profilProfessionnel} alt="Profil professionnel" className="w-full rounded-lg mb-6" />
-                      
                       <div className="prose prose-sm max-w-none">
                         <h3 className="text-xl font-bold mb-4">Une étape cruciale pour ton succès sur Amazon</h3>
                         
@@ -540,8 +532,6 @@ const Guides = () => {
                       </div>
                     </AccordionTrigger>
                     <AccordionContent className="space-y-6 pt-4">
-                      <img src={compteVendeurAmazon} alt="Créer compte vendeur Amazon" className="w-full rounded-lg mb-6" />
-                      
                       <div className="prose prose-sm max-w-none">
                         <h3 className="text-xl font-bold mb-4">La dernière étape avant de pouvoir vendre !</h3>
                         
@@ -633,8 +623,6 @@ const Guides = () => {
                       </div>
                     </AccordionTrigger>
                     <AccordionContent className="space-y-6 pt-4">
-                      <img src={produitsRentablesHero} alt="Trouver des produits rentables" className="w-full rounded-lg mb-6" />
-                      
                       <div className="prose prose-sm max-w-none">
                         <div className="bg-primary/5 border-l-4 border-primary p-4 mb-6">
                           <p className="mb-2">
@@ -761,7 +749,6 @@ const Guides = () => {
                         >
                           → Découvrir Qogita
                         </a>
-                        <p className="text-sm mb-4">Code promo : <strong>SMILE100</strong> (-100€ sur ta première commande)</p>
 
                         <div className="bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 rounded-lg p-4 mt-6">
                           <p className="text-sm">
@@ -783,8 +770,6 @@ const Guides = () => {
                       </div>
                     </AccordionTrigger>
                     <AccordionContent className="space-y-6 pt-4">
-                      <img src={fbaWarehouse} alt="Entrepôt FBA" className="w-full rounded-lg mb-6" />
-                      
                       <div className="prose prose-sm max-w-none">
                         <div className="bg-primary/5 border-l-4 border-primary p-4 mb-6">
                           <p className="mb-2">
@@ -881,8 +866,6 @@ const Guides = () => {
                       </div>
                     </AccordionTrigger>
                     <AccordionContent className="space-y-6 pt-4">
-                      <img src={fbmPackages} alt="Colis FBM" className="w-full rounded-lg mb-6" />
-                      
                       <div className="prose prose-sm max-w-none">
                         <div className="bg-primary/5 border-l-4 border-primary p-4 mb-6">
                           <p className="mb-2">
@@ -981,7 +964,7 @@ const Guides = () => {
 
                         <div className="bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 rounded-lg p-4 mt-6">
                           <p className="text-sm">
-                            💬 Si tu as la moindre question, pense à venir nous contacter sur le Discord. On t'aidera avec plaisir !
+                            💬 Si tu as la moindre question, pense à venir nous contacter. On t'aidera avec plaisir !
                           </p>
                         </div>
                       </div>
@@ -997,8 +980,6 @@ const Guides = () => {
                       </div>
                     </AccordionTrigger>
                     <AccordionContent className="space-y-6 pt-4">
-                      <img src={reconnaitreProduitHero} alt="Reconnaître bon produit" className="w-full rounded-lg mb-6" />
-                      
                       <div className="prose prose-sm max-w-none">
                         <div className="bg-primary/5 border-l-4 border-primary p-4 mb-6">
                           <p>
@@ -1100,7 +1081,7 @@ const Guides = () => {
 
                         <div className="bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 rounded-lg p-4 mt-6">
                           <p className="text-sm">
-                            💬 N'hésite pas à venir nous contacter sur le Discord si tu as besoin d'avis sur un produit ou si tu as besoin d'aide !
+                            💬 N'hésite pas à venir nous contacter si tu as besoin d'avis sur un produit ou si tu as besoin d'aide !
                           </p>
                         </div>
                       </div>
