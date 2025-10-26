@@ -16,11 +16,12 @@ export const useUnreadMessages = () => {
 
     const loadUnreadCount = async () => {
       try {
-        // Get all user's tickets
+        // Get all user's tickets (only open and in_progress)
         const { data: tickets, error: ticketsError } = await supabase
           .from('tickets')
           .select('id')
-          .eq('user_id', user.id);
+          .eq('user_id', user.id)
+          .in('status', ['open', 'in_progress']);
 
         if (ticketsError) throw ticketsError;
 

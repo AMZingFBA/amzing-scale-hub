@@ -122,16 +122,21 @@ const AdminTickets = () => {
 
       setTickets(ticketsWithProfiles);
 
-      // Load unread counts for each ticket
+      // Load unread counts for each ticket (only for open/in_progress tickets)
       if (user) {
         const counts: Record<string, number> = {};
         for (const ticket of ticketsWithProfiles) {
-          const { data: countData } = await supabase
-            .rpc('get_unread_count', { 
-              ticket_id_param: ticket.id, 
-              user_id_param: user.id 
-            });
-          counts[ticket.id] = countData || 0;
+          // Only count unread messages for open and in_progress tickets
+          if (ticket.status === 'open' || ticket.status === 'in_progress') {
+            const { data: countData } = await supabase
+              .rpc('get_unread_count', { 
+                ticket_id_param: ticket.id, 
+                user_id_param: user.id 
+              });
+            counts[ticket.id] = countData || 0;
+          } else {
+            counts[ticket.id] = 0;
+          }
         }
         setUnreadCounts(counts);
       }
