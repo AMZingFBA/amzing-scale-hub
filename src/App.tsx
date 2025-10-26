@@ -34,6 +34,7 @@ import NotificationAlerts from "./pages/NotificationAlerts";
 import Annonces from "./pages/Annonces";
 import Actualite from "./pages/Actualite";
 import CatalogueProduits from "./pages/CatalogueProduits";
+import Questions from "./pages/Questions";
 
 const queryClient = new QueryClient();
 
@@ -72,6 +73,7 @@ const App = () => (
             <Route path="/success" element={<Success />} />
             <Route path="/sales" element={<Sales />} />
             <Route path="/suggestions" element={<Suggestions />} />
+            <Route path="/questions" element={<Questions />} />
             <Route path="/acheter" element={<Marketplace />} />
             <Route path="/vendre" element={<WantToSell />} />
             <Route path="/marketplace" element={<Marketplace />} />

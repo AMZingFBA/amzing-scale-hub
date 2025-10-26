@@ -339,7 +339,7 @@ const Dashboard = () => {
                   <div className="grid gap-3 pt-2">
                     <CategoryItem icon={Info} label="informations" onClick={() => setGestionInfoOpen(true)} />
                     <CategoryItem icon={Package} label="catalogue-produits" link="/catalogue-produits" badge={catalogueUnreadCount} />
-                    <CategoryItem icon={MessageCircle} label="questions" />
+                    <CategoryItem icon={MessageCircle} label="questions" link="/questions" />
                   </div>
                 </AccordionContent>
               </AccordionItem>
