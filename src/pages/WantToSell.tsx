@@ -11,7 +11,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Loader2, Upload, Trash2, ShoppingBag, MessageCircle, X, ZoomIn, ChevronLeft, ChevronRight } from "lucide-react";
+import { Loader2, Upload, Trash2, ShoppingBag, MessageCircle, X, ZoomIn, ChevronLeft, ChevronRight, Edit } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -52,6 +52,9 @@ const WantToSell = () => {
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
+  
+  // Edit state
+  const [editingListing, setEditingListing] = useState<Listing | null>(null);
   
   // Image gallery states
   const [selectedImageGallery, setSelectedImageGallery] = useState<string[] | null>(null);
@@ -192,23 +195,45 @@ const WantToSell = () => {
     setIsCreating(true);
 
     try {
-      const { error } = await supabase
-        .from("marketplace_listings")
-        .insert({
-          user_id: user.id,
-          asin: searchType === "asin" ? searchCode : null,
-          ean: searchType === "ean" ? searchCode : null,
-          title,
-          description,
-          images: uploadedImages,
-          quantity,
-          price: parseFloat(price),
-          price_type: priceType,
-          status: "active"
-        });
+      if (editingListing) {
+        // Mise à jour d'une annonce existante
+        const { error } = await supabase
+          .from("marketplace_listings")
+          .update({
+            asin: searchType === "asin" ? searchCode : null,
+            ean: searchType === "ean" ? searchCode : null,
+            title,
+            description,
+            images: uploadedImages,
+            quantity,
+            price: parseFloat(price),
+            price_type: priceType,
+          })
+          .eq("id", editingListing.id);
 
-      if (error) throw error;
-      toast.success("Annonce créée avec succès!");
+        if (error) throw error;
+        toast.success("Annonce modifiée avec succès!");
+        setEditingListing(null);
+      } else {
+        // Création d'une nouvelle annonce
+        const { error } = await supabase
+          .from("marketplace_listings")
+          .insert({
+            user_id: user.id,
+            asin: searchType === "asin" ? searchCode : null,
+            ean: searchType === "ean" ? searchCode : null,
+            title,
+            description,
+            images: uploadedImages,
+            quantity,
+            price: parseFloat(price),
+            price_type: priceType,
+            status: "active"
+          });
+
+        if (error) throw error;
+        toast.success("Annonce créée avec succès!");
+      }
       
       resetForm();
       setShowCreateDialog(false);
@@ -229,6 +254,20 @@ const WantToSell = () => {
     setPrice("");
     setUploadedFiles([]);
     setUploadedImages([]);
+    setEditingListing(null);
+  };
+
+  const editListing = (listing: Listing) => {
+    setEditingListing(listing);
+    setSearchType(listing.asin ? "asin" : "ean");
+    setSearchCode(listing.asin || listing.ean || "");
+    setTitle(listing.title);
+    setDescription(listing.description || "");
+    setQuantity(listing.quantity);
+    setPrice(listing.price.toString());
+    setPriceType(listing.price_type as "TTC" | "HT");
+    setUploadedImages(listing.images || []);
+    setShowCreateDialog(true);
   };
 
   const handleInterestInListing = async (listing: Listing) => {
@@ -381,10 +420,16 @@ const WantToSell = () => {
       {showActions && (
         <CardFooter className="flex gap-2">
           {listing.user_id === user?.id || isAdmin ? (
-            <Button variant="destructive" size="sm" onClick={() => deleteListing(listing.id)} className="flex-1">
-              <Trash2 className="w-4 h-4 mr-2" />
-              Supprimer
-            </Button>
+            <>
+              <Button variant="outline" size="sm" onClick={() => editListing(listing)} className="flex-1">
+                <Edit className="w-4 h-4 mr-2" />
+                Modifier
+              </Button>
+              <Button variant="destructive" size="sm" onClick={() => deleteListing(listing.id)} className="flex-1">
+                <Trash2 className="w-4 h-4 mr-2" />
+                Supprimer
+              </Button>
+            </>
           ) : (
             <Button variant="default" size="sm" onClick={() => handleInterestInListing(listing)} className="flex-1">
               <MessageCircle className="w-4 h-4 mr-2" />
@@ -437,9 +482,14 @@ const WantToSell = () => {
                 </DialogTrigger>
                 <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                   <DialogHeader>
-                    <DialogTitle>Publier un produit à vendre</DialogTitle>
+                    <DialogTitle>
+                      {editingListing ? "Modifier mon annonce" : "Publier un produit à vendre"}
+                    </DialogTitle>
                     <DialogDescription>
-                      Ajoutez les détails de votre produit avec des photos
+                      {editingListing 
+                        ? "Modifiez les détails de votre produit à vendre"
+                        : "Ajoutez les détails de votre produit avec des photos"
+                      }
                     </DialogDescription>
                   </DialogHeader>
                   
@@ -555,17 +605,20 @@ const WantToSell = () => {
                   </div>
 
                   <DialogFooter>
-                    <Button variant="outline" onClick={() => setShowCreateDialog(false)}>
+                    <Button variant="outline" onClick={() => {
+                      setShowCreateDialog(false);
+                      resetForm();
+                    }}>
                       Annuler
                     </Button>
                     <Button onClick={createListing} disabled={isCreating}>
                       {isCreating ? (
                         <>
                           <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                          Création...
+                          {editingListing ? "Modification..." : "Création..."}
                         </>
                       ) : (
-                        "Publier l'annonce"
+                        editingListing ? "Modifier l'annonce" : "Publier l'annonce"
                       )}
                     </Button>
                   </DialogFooter>

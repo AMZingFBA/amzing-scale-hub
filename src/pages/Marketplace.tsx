@@ -97,6 +97,9 @@ const Marketplace = () => {
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   
+  // Edit states
+  const [editingBuyRequest, setEditingBuyRequest] = useState<BuyRequest | null>(null);
+  
   // Image gallery states
   const [selectedImageGallery, setSelectedImageGallery] = useState<string[] | null>(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -358,7 +361,28 @@ const Marketplace = () => {
     setIsCreating(true);
 
     try {
-      if (activeSection === "sell") {
+      if (editingBuyRequest) {
+        // Mise à jour d'une demande d'achat existante
+        const { error } = await supabase
+          .from("marketplace_buy_requests")
+          .update({
+            asin: searchType === "asin" ? searchCode : null,
+            ean: searchType === "ean" ? searchCode : null,
+            title,
+            description,
+            images: uploadedImages,
+            quantity,
+            max_price: price ? parseFloat(price) : null,
+            price_type: priceType,
+          })
+          .eq("id", editingBuyRequest.id);
+
+        if (error) throw error;
+        toast.success("Demande d'achat modifiée avec succès!");
+        
+        setEditingBuyRequest(null);
+        await loadMyBuyRequests();
+      } else if (activeSection === "sell") {
         // Créer une annonce de vente
         const { error } = await supabase
           .from("marketplace_listings")
@@ -424,6 +448,20 @@ const Marketplace = () => {
     setUploadedImages([]);
     setProductFound(false);
     setProductData(null);
+    setEditingBuyRequest(null);
+  };
+
+  const editBuyRequest = (request: BuyRequest) => {
+    setEditingBuyRequest(request);
+    setSearchType(request.asin ? "asin" : "ean");
+    setSearchCode(request.asin || request.ean || "");
+    setTitle(request.title);
+    setDescription(request.description || "");
+    setQuantity(request.quantity);
+    setPrice(request.max_price?.toString() || "");
+    setPriceType(request.price_type as "TTC" | "HT");
+    setUploadedImages(request.images || []);
+    setShowCreateDialog(true);
   };
 
   const handleInterestInListing = async (listing: Listing) => {
@@ -808,15 +846,26 @@ const Marketplace = () => {
         
         <CardFooter className="flex gap-2 p-4 pt-0">
           {isOwn ? (
-            <Button
-              variant="destructive"
-              size="lg"
-              className="w-full"
-              onClick={() => deleteBuyRequest(request.id)}
-            >
-              <Trash2 className="w-4 h-4 mr-2" />
-              Supprimer ma demande
-            </Button>
+            <>
+              <Button
+                variant="outline"
+                size="lg"
+                className="flex-1"
+                onClick={() => editBuyRequest(request)}
+              >
+                <Edit className="w-4 h-4 mr-2" />
+                Modifier
+              </Button>
+              <Button
+                variant="destructive"
+                size="lg"
+                className="flex-1"
+                onClick={() => deleteBuyRequest(request.id)}
+              >
+                <Trash2 className="w-4 h-4 mr-2" />
+                Supprimer
+              </Button>
+            </>
           ) : (
             <>
               <Button
@@ -957,9 +1006,14 @@ const Marketplace = () => {
               </DialogTrigger>
               <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
-                  <DialogTitle>Publier une recherche de produit</DialogTitle>
+                  <DialogTitle>
+                    {editingBuyRequest ? "Modifier ma recherche de produit" : "Publier une recherche de produit"}
+                  </DialogTitle>
                   <DialogDescription>
-                    Décrivez le produit que vous cherchez à acheter. Les membres qui le possèdent pourront vous contacter via le staff.
+                    {editingBuyRequest 
+                      ? "Modifiez les détails du produit que vous cherchez à acheter."
+                      : "Décrivez le produit que vous cherchez à acheter. Les membres qui le possèdent pourront vous contacter via le staff."
+                    }
                   </DialogDescription>
                 </DialogHeader>
 
@@ -1092,7 +1146,7 @@ const Marketplace = () => {
                   </Button>
                   <Button onClick={createListing} disabled={isCreating}>
                     {isCreating ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Search className="w-4 h-4 mr-2" />}
-                    Publier ma recherche
+                    {editingBuyRequest ? "Modifier ma recherche" : "Publier ma recherche"}
                   </Button>
                 </DialogFooter>
               </DialogContent>
