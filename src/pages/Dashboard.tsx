@@ -221,12 +221,12 @@ const Dashboard = () => {
                 <AccordionContent>
                   <CategoryAlerts category="produits" />
                   <div className="grid gap-3 pt-2">
-                    <CategoryItem icon={Sparkles} label="produits-find" link="/produits-find" />
-                    <CategoryItem icon={Sparkles} label="produits-qogita" />
-                    <CategoryItem icon={Sparkles} label="produits-eany" />
-                    <CategoryItem icon={Package} label="grossistes" />
-                    <CategoryItem icon={DollarSign} label="promotions" />
-                    <CategoryItem icon={FileText} label="sitelist" />
+                    <CategoryItem icon={Sparkles} label="Toutes les alertes" link="/produits-find" />
+                    <CategoryItem icon={Sparkles} label="produits-qogita" link="/produits-find" />
+                    <CategoryItem icon={Sparkles} label="produits-eany" link="/produits-find" />
+                    <CategoryItem icon={Package} label="grossistes" link="/produits-find" />
+                    <CategoryItem icon={DollarSign} label="promotions" link="/produits-find" />
+                    <CategoryItem icon={FileText} label="sitelist" link="/produits-find" />
                   </div>
                 </AccordionContent>
               </AccordionItem>

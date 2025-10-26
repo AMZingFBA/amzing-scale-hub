@@ -68,6 +68,7 @@ const ProductAlerts = () => {
       const { data, error } = await supabase
         .from('admin_alerts')
         .select('*')
+        .eq('category', 'produits')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -109,9 +110,9 @@ const ProductAlerts = () => {
           <div className="flex items-center gap-3 mb-8">
             <Sparkles className="w-8 h-8 text-primary" />
             <div>
-              <h1 className="text-4xl font-bold">Produits Gagnants Find</h1>
+              <h1 className="text-4xl font-bold">Produits Gagnants</h1>
               <p className="text-muted-foreground">
-                Alertes exclusives de produits à fort potentiel
+                Toutes les alertes de produits à fort potentiel • Find • Qogita • Eany • Grossistes • Promotions • Sitelist
               </p>
             </div>
           </div>
@@ -133,6 +134,11 @@ const ProductAlerts = () => {
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex-1">
                         <CardTitle className="text-2xl mb-2">{alert.title}</CardTitle>
+                        {alert.subcategory && (
+                          <Badge variant="outline" className="mb-2">
+                            {alert.subcategory}
+                          </Badge>
+                        )}
                         <CardDescription>
                           Publié le {new Date(alert.created_at).toLocaleDateString('fr-FR', {
                             day: 'numeric',
