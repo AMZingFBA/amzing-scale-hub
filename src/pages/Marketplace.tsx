@@ -11,7 +11,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Loader2, Package, Search, Upload, Trash2, ShoppingCart, ShoppingBag, Copy, Check } from "lucide-react";
+import { Loader2, Package, Search, Upload, Trash2, ShoppingCart, ShoppingBag, Copy, Check, MessageCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 interface Listing {
@@ -70,6 +70,9 @@ const Marketplace = () => {
   const [buyRequests, setBuyRequests] = useState<BuyRequest[]>([]);
   const [myBuyRequests, setMyBuyRequests] = useState<BuyRequest[]>([]);
   
+  // Marketplace conversations
+  const [myConversations, setMyConversations] = useState<any[]>([]);
+  
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
 
@@ -102,6 +105,7 @@ const Marketplace = () => {
     loadMyListings();
     loadBuyRequests();
     loadMyBuyRequests();
+    loadMyConversations();
 
     const listingsChannel = supabase
       .channel("marketplace_listings_changes")
@@ -198,6 +202,30 @@ const Marketplace = () => {
       setMyBuyRequests(data || []);
     } catch (error: any) {
       console.error("Error loading my buy requests:", error);
+    }
+  };
+
+  const loadMyConversations = async () => {
+    if (!user) return;
+    
+    try {
+      // Get all marketplace rooms where user is a member
+      const { data: rooms, error } = await supabase
+        .from("chat_rooms")
+        .select(`
+          id,
+          name,
+          created_at,
+          chat_room_members!inner(user_id)
+        `)
+        .eq("type", "marketplace")
+        .eq("chat_room_members.user_id", user.id)
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+      setMyConversations(rooms || []);
+    } catch (error: any) {
+      console.error("Error loading conversations:", error);
     }
   };
 
@@ -924,9 +952,10 @@ const Marketplace = () => {
         {/* Sell Section */}
         {activeSection === "sell" && (
           <Tabs defaultValue="all" className="w-full">
-            <TabsList className="grid w-full max-w-md grid-cols-2">
+            <TabsList className="grid w-full max-w-2xl grid-cols-3">
               <TabsTrigger value="all">Toutes les annonces</TabsTrigger>
               <TabsTrigger value="mine">Mes annonces</TabsTrigger>
+              <TabsTrigger value="messages">Mes messages</TabsTrigger>
             </TabsList>
 
             <TabsContent value="all" className="mt-6">
@@ -955,6 +984,38 @@ const Marketplace = () => {
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {myListings.map(listing => renderListing(listing, true))}
+                </div>
+              )}
+            </TabsContent>
+
+            <TabsContent value="messages" className="mt-6">
+              {myConversations.length === 0 ? (
+                <Card className="p-12">
+                  <div className="text-center text-muted-foreground">
+                    <MessageCircle className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                    <p>Aucune conversation pour le moment</p>
+                  </div>
+                </Card>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {myConversations.map(room => (
+                    <Card key={room.id} className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate("/chat")}>
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2 text-lg">
+                          <MessageCircle className="w-5 h-5" />
+                          {room.name}
+                        </CardTitle>
+                        <CardDescription>
+                          Créé le {new Date(room.created_at).toLocaleDateString("fr-FR")}
+                        </CardDescription>
+                      </CardHeader>
+                      <CardFooter>
+                        <Button variant="outline" className="w-full" onClick={() => navigate("/chat")}>
+                          Ouvrir la conversation
+                        </Button>
+                      </CardFooter>
+                    </Card>
+                  ))}
                 </div>
               )}
             </TabsContent>
