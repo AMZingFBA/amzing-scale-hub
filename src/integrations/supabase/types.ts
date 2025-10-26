@@ -495,6 +495,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_marketplace_room_creator: {
+        Args: { _room_id: string; _user_id: string }
+        Returns: boolean
+      }
       mark_ticket_messages_as_read: {
         Args: { ticket_id_param: string }
         Returns: undefined
