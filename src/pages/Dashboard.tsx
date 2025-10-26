@@ -172,6 +172,7 @@ const Dashboard = () => {
                   <NotificationAlerts />
                   <CategoryAlerts category="introduction" />
                   <div className="grid gap-3 pt-2">
+                    <CategoryItem icon={Bell} label="notifications" badge={unreadCounts.introduction?.subcategories?.notifications} />
                     <CategoryItem icon={BookOpen} label="règles" onClick={() => setRulesOpen(true)} badge={unreadCounts.introduction?.subcategories?.règles} />
                     <CategoryItem icon={CheckCircle} label="débuter" badge={unreadCounts.introduction?.subcategories?.débuter} />
                     <CategoryItem icon={BookOpen} label="guides" link="/guides" badge={unreadCounts.introduction?.subcategories?.guides} />
