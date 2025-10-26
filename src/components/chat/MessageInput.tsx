@@ -100,24 +100,46 @@ const MessageInput = ({ roomId, replyTo, onMessageSent }: MessageInputProps) => 
   const startRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mediaRecorder = new MediaRecorder(stream);
+      
+      // Try to use a more compatible audio format
+      let mimeType = 'audio/webm';
+      const options = [
+        'audio/webm;codecs=opus',
+        'audio/webm',
+        'audio/mp4',
+        'audio/ogg;codecs=opus'
+      ];
+      
+      for (const option of options) {
+        if (MediaRecorder.isTypeSupported(option)) {
+          mimeType = option;
+          console.log('Using audio format:', mimeType);
+          break;
+        }
+      }
+      
+      const mediaRecorder = new MediaRecorder(stream, { mimeType });
       mediaRecorderRef.current = mediaRecorder;
       audioChunksRef.current = [];
 
       mediaRecorder.ondataavailable = (event) => {
-        audioChunksRef.current.push(event.data);
+        if (event.data.size > 0) {
+          audioChunksRef.current.push(event.data);
+        }
       };
 
       mediaRecorder.onstop = async () => {
-        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
-        const file = new File([audioBlob], `audio-${Date.now()}.webm`, { type: 'audio/webm' });
+        const audioBlob = new Blob(audioChunksRef.current, { type: mimeType });
+        const extension = mimeType.includes('webm') ? 'webm' : 
+                         mimeType.includes('mp4') ? 'mp4' : 'ogg';
+        const file = new File([audioBlob], `audio-${Date.now()}.${extension}`, { type: mimeType });
         await handleFileUpload(file, 'audio');
         stream.getTracks().forEach(track => track.stop());
       };
 
       mediaRecorder.start();
       setRecording(true);
-      toast.success('Enregistrement en cours...');
+      toast.success('🎤 Enregistrement en cours...');
     } catch (error) {
       console.error('Error starting recording:', error);
       toast.error('Erreur lors de l\'accès au microphone');
@@ -128,6 +150,7 @@ const MessageInput = ({ roomId, replyTo, onMessageSent }: MessageInputProps) => 
     if (mediaRecorderRef.current && recording) {
       mediaRecorderRef.current.stop();
       setRecording(false);
+      toast.success('Audio enregistré, envoi en cours...');
     }
   };
 

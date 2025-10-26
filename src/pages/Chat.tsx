@@ -212,20 +212,40 @@ const Chat = () => {
     if (!user) return;
 
     try {
-      const { error } = await supabase
+      // First check if visibility record exists
+      const { data: existing } = await supabase
         .from('chat_room_visibility')
-        .upsert({ 
-          room_id: roomId, 
-          user_id: user.id, 
-          is_hidden: true 
-        }, {
-          onConflict: 'room_id,user_id'
-        });
+        .select('id')
+        .eq('room_id', roomId)
+        .eq('user_id', user.id)
+        .single();
 
-      if (error) throw error;
+      if (existing) {
+        // Update existing record
+        const { error } = await supabase
+          .from('chat_room_visibility')
+          .update({ is_hidden: true })
+          .eq('room_id', roomId)
+          .eq('user_id', user.id);
 
+        if (error) throw error;
+      } else {
+        // Insert new record
+        const { error } = await supabase
+          .from('chat_room_visibility')
+          .insert({ 
+            room_id: roomId, 
+            user_id: user.id, 
+            is_hidden: true 
+          });
+
+        if (error) throw error;
+      }
+
+      // Update local state immediately
+      setHiddenRooms(prev => new Set([...prev, roomId]));
+      
       toast.success('Conversation masquée');
-      fetchHiddenRooms();
       
       // If hiding currently selected room, deselect it
       if (selectedRoom === roomId) {

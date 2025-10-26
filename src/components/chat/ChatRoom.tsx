@@ -188,10 +188,12 @@ const ChatRoom = ({ roomId, onBack }: ChatRoomProps) => {
               src={message.file_url || ''} 
               controls 
               className="w-full"
-              preload="metadata"
+              preload="auto"
+              controlsList="nodownload"
             >
               Votre navigateur ne supporte pas la lecture audio.
             </audio>
+            <p className="text-xs mt-1 opacity-50">🎤 Message vocal</p>
           </div>
         );
       case 'file':
