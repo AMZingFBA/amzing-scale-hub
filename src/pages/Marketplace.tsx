@@ -651,7 +651,7 @@ const Marketplace = () => {
             <CardTitle className="text-lg font-bold line-clamp-2">
               {listing.title}
             </CardTitle>
-            <Badge className="shrink-0 text-base font-bold px-3 py-1.5 whitespace-nowrap">
+            <Badge variant="secondary" className="shrink-0 text-base font-bold px-3 py-1.5 whitespace-nowrap">
               {displayPrice}€/u {listing.price_type}
             </Badge>
           </div>
@@ -1275,7 +1275,7 @@ const Marketplace = () => {
         {activeSection === "sell" && (
           <div className="w-full space-y-6 animate-fade-in">
             <div className="mb-8">
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+              <h1 className="text-4xl font-bold text-primary">
                 Want to Sell - Je vends
               </h1>
               <p className="text-muted-foreground mt-2">
