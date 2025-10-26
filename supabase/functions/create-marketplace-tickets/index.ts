@@ -81,9 +81,7 @@ Voici les détails de l'annonce :
 - Titre : ${body.buyRequestTitle}
 - Budget max : ${body.buyRequestMaxPrice ? `${body.buyRequestMaxPrice}€ ${body.buyRequestPriceType}` : 'Non spécifié'}
 - Quantité : ${body.buyRequestQuantity}
-- Code annonce : ${body.buyRequestCode}
-
-Le staff va vous mettre en contact avec l'acheteur.`
+- Code annonce : ${body.buyRequestCode}`
 
     await supabaseAdmin.from('messages').insert({
       ticket_id: sellerTicket.id,
