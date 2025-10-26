@@ -3,12 +3,22 @@ import { useAuth } from '@/hooks/use-auth';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { Loader2, Users, Plus, Edit2, Check, X, Pin, PinOff, EyeOff } from 'lucide-react';
+import { Loader2, Users, Plus, Edit2, Check, X, Pin, PinOff, EyeOff, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import ChatRoom from '@/components/chat/ChatRoom';
 import { DirectMessageList } from '@/components/chat/DirectMessageList';
 import { DirectChatRoom } from '@/components/chat/DirectChatRoom';
@@ -40,6 +50,8 @@ const Chat = () => {
   const [editingRoomName, setEditingRoomName] = useState('');
   const [pinnedRooms, setPinnedRooms] = useState<Set<string>>(new Set());
   const [hiddenRooms, setHiddenRooms] = useState<Set<string>>(new Set());
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [roomToDelete, setRoomToDelete] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) {
@@ -266,6 +278,33 @@ const Chat = () => {
     } catch (error: any) {
       console.error('Error hiding room:', error);
       toast.error('Erreur lors du masquage');
+    }
+  };
+
+  const deleteRoom = async () => {
+    if (!roomToDelete) return;
+
+    try {
+      const { error } = await supabase
+        .from('chat_rooms')
+        .delete()
+        .eq('id', roomToDelete);
+
+      if (error) throw error;
+
+      toast.success('Salon supprimé');
+      setDeleteDialogOpen(false);
+      setRoomToDelete(null);
+      
+      // If deleting current room, deselect it
+      if (selectedRoom === roomToDelete) {
+        setSelectedRoom(null);
+      }
+      
+      fetchRooms();
+    } catch (error: any) {
+      console.error('Error deleting room:', error);
+      toast.error('Erreur lors de la suppression');
     }
   };
 
@@ -502,6 +541,20 @@ const Chat = () => {
                               >
                                 <EyeOff className="h-3 w-3" />
                               </Button>
+                              {(room.created_by === user?.id || isAdmin) && (
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  className="h-8 w-8 p-0"
+                                  onClick={() => {
+                                    setRoomToDelete(room.id);
+                                    setDeleteDialogOpen(true);
+                                  }}
+                                  title="Supprimer ce salon"
+                                >
+                                  <Trash2 className="h-3 w-3" />
+                                </Button>
+                              )}
                             </>
                           )}
                         </div>
@@ -638,10 +691,27 @@ const Chat = () => {
             Sélectionnez une conversation pour commencer
           </div>
         )}
+          </div>
+        </div>
       </div>
+
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Supprimer le salon ?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Cette action est irréversible. Tous les messages de ce salon seront définitivement supprimés.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogAction onClick={deleteRoom} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Supprimer
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
-  </div>
-</div>
   );
 };
 
