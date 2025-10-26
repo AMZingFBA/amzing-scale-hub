@@ -59,6 +59,54 @@ export type Database = {
         }
         Relationships: []
       }
+      catalogue_products: {
+        Row: {
+          admin_id: string
+          asin: string | null
+          created_at: string
+          description: string | null
+          ean: string | null
+          id: string
+          images: string[] | null
+          price: number
+          price_type: string
+          quantity: number
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          admin_id: string
+          asin?: string | null
+          created_at?: string
+          description?: string | null
+          ean?: string | null
+          id?: string
+          images?: string[] | null
+          price: number
+          price_type?: string
+          quantity?: number
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          admin_id?: string
+          asin?: string | null
+          created_at?: string
+          description?: string | null
+          ean?: string | null
+          id?: string
+          images?: string[] | null
+          price?: number
+          price_type?: string
+          quantity?: number
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       chat_messages: {
         Row: {
           content: string | null
