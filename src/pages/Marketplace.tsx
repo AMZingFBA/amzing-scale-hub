@@ -646,6 +646,11 @@ const Marketplace = () => {
     const codeType = listing.asin ? "ASIN" : listing.ean ? "EAN" : "Code";
     const hasImages = listing.images && listing.images.length > 0;
     
+    // Calculer le prix affiché : +15% pour les acheteurs, prix original pour le vendeur
+    const displayPrice = isOwn 
+      ? listing.price 
+      : (Number(listing.price) * 1.15).toFixed(2);
+    
     return (
       <Card key={listing.id} className="hover:shadow-xl transition-all animate-fade-in overflow-hidden">
         {hasImages && (
@@ -681,7 +686,7 @@ const Marketplace = () => {
               {listing.title}
             </CardTitle>
             <Badge className="shrink-0 text-base font-bold px-3 py-1.5 whitespace-nowrap">
-              {listing.price}€/u {listing.price_type}
+              {displayPrice}€/u {listing.price_type}
             </Badge>
           </div>
         </CardHeader>
@@ -723,7 +728,7 @@ const Marketplace = () => {
                 onClick={() => handleInterestInListing(listing)}
               >
                 <ShoppingCart className="w-5 h-5 mr-2" />
-                Je veux vendre
+                Je veux acheter ce produit
               </Button>
               {isAdmin && (
                 <Button
