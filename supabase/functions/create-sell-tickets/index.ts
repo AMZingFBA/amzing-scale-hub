@@ -69,7 +69,7 @@ Voici les détails :
 - Quantité : ${body.listingQuantity}
 - Code annonce : ${body.listingCode}
 
-Est-il toujours disponible ?`
+Est-il toujours disponible svp ?`
 
     await supabaseAdmin.from('messages').insert({
       ticket_id: sellerTicket.id,
@@ -101,9 +101,9 @@ Est-il toujours disponible ?`
 
     // Create initial message for buyer
     const buyerMessage = `Bonjour 👋
-Je suis intéressé(e) pour :
+je suis intéressé(e) pour :
 ${body.listingTitle}
-Est-il toujours disponible ?`
+est-il toujours disponible svp ?`
 
     await supabaseAdmin.from('messages').insert({
       ticket_id: buyerTicket.id,
