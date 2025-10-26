@@ -34,18 +34,22 @@ const Navbar = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
-            <Link to="/services" className="text-foreground hover:text-primary transition-colors font-medium">
-              Services
-            </Link>
-            <Link to="/formation" className="text-foreground hover:text-primary transition-colors font-medium">
-              Formation
-            </Link>
-            <Link to="/catalogue" className="text-foreground hover:text-primary transition-colors font-medium">
-              Catalogue
-            </Link>
-            <Link to="/tarifs" className="text-foreground hover:text-primary transition-colors font-medium">
-              Tarifs
-            </Link>
+            {!isVIP && (
+              <>
+                <Link to="/services" className="text-foreground hover:text-primary transition-colors font-medium">
+                  Services
+                </Link>
+                <Link to="/formation" className="text-foreground hover:text-primary transition-colors font-medium">
+                  Formation
+                </Link>
+                <Link to="/catalogue" className="text-foreground hover:text-primary transition-colors font-medium">
+                  Catalogue
+                </Link>
+                <Link to="/tarifs" className="text-foreground hover:text-primary transition-colors font-medium">
+                  Tarifs
+                </Link>
+              </>
+            )}
             <Link to="/contact" className="text-foreground hover:text-primary transition-colors font-medium">
               Contact
             </Link>
@@ -144,34 +148,38 @@ const Navbar = () => {
         {/* Mobile Navigation */}
         {isOpen && (
           <div className="md:hidden py-4 space-y-4">
-            <Link
-              to="/services"
-              className="block text-foreground hover:text-primary transition-colors font-medium py-2"
-              onClick={() => setIsOpen(false)}
-            >
-              Services
-            </Link>
-            <Link
-              to="/formation"
-              className="block text-foreground hover:text-primary transition-colors font-medium py-2"
-              onClick={() => setIsOpen(false)}
-            >
-              Formation
-            </Link>
-            <Link
-              to="/catalogue"
-              className="block text-foreground hover:text-primary transition-colors font-medium py-2"
-              onClick={() => setIsOpen(false)}
-            >
-              Catalogue
-            </Link>
-            <Link
-              to="/tarifs"
-              className="block text-foreground hover:text-primary transition-colors font-medium py-2"
-              onClick={() => setIsOpen(false)}
-            >
-              Tarifs
-            </Link>
+            {!isVIP && (
+              <>
+                <Link
+                  to="/services"
+                  className="block text-foreground hover:text-primary transition-colors font-medium py-2"
+                  onClick={() => setIsOpen(false)}
+                >
+                  Services
+                </Link>
+                <Link
+                  to="/formation"
+                  className="block text-foreground hover:text-primary transition-colors font-medium py-2"
+                  onClick={() => setIsOpen(false)}
+                >
+                  Formation
+                </Link>
+                <Link
+                  to="/catalogue"
+                  className="block text-foreground hover:text-primary transition-colors font-medium py-2"
+                  onClick={() => setIsOpen(false)}
+                >
+                  Catalogue
+                </Link>
+                <Link
+                  to="/tarifs"
+                  className="block text-foreground hover:text-primary transition-colors font-medium py-2"
+                  onClick={() => setIsOpen(false)}
+                >
+                  Tarifs
+                </Link>
+              </>
+            )}
             <Link
               to="/contact"
               className="block text-foreground hover:text-primary transition-colors font-medium py-2"
