@@ -507,9 +507,6 @@ const Chat = () => {
                             {pinnedRooms.has(room.id) && <Pin className="h-3 w-3" />}
                             {room.name || 'Conversation'}
                           </div>
-                          <div className="text-xs opacity-70">
-                            {room.type === 'general' ? '🌍 Public' : '🔒 Privé'}
-                          </div>
                         </button>
                         <div className="flex items-center gap-1 pr-2">
                           {room.type === 'private' && (
