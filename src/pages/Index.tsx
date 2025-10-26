@@ -53,7 +53,7 @@ const Index = () => {
             </h1>
             
             <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-3xl mx-auto">
-              Rejoins le Discord VIP et accède aux moniteurs de produits rentables, 
+              Rejoins l'espace VIP et accède aux moniteurs de produits rentables, 
               guides Amazon FBA, fournisseurs privés, stock checker et bien plus.
             </p>
             

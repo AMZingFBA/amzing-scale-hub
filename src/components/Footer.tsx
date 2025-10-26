@@ -55,16 +55,6 @@ const Footer = () => {
                   Contact
                 </Link>
               </li>
-              <li>
-                <a 
-                  href="https://discord.gg/tHQhCSDn" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="text-muted-foreground hover:text-primary transition-colors"
-                >
-                  Discord
-                </a>
-              </li>
             </ul>
           </div>
         </div>

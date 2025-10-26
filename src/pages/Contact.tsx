@@ -211,30 +211,6 @@ const Contact = () => {
               <Card>
                 <CardContent className="pt-6">
                   <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-secondary to-accent flex items-center justify-center flex-shrink-0">
-                      <MessageSquare className="w-6 h-6 text-white" />
-                    </div>
-                    <div>
-                      <h3 className="font-bold text-lg mb-2">Discord</h3>
-                      <p className="text-muted-foreground mb-2">
-                        Support communautaire en direct
-                      </p>
-                      <a 
-                        href="https://discord.gg/tHQhCSDn" 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="text-primary hover:underline"
-                      >
-                        Rejoindre le serveur
-                      </a>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardContent className="pt-6">
-                  <div className="flex items-start gap-4">
                     <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center flex-shrink-0">
                       <Phone className="w-6 h-6 text-white" />
                     </div>

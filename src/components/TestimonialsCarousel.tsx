@@ -25,7 +25,7 @@ const testimonials = [
   {
     name: "Lina J.",
     rating: 5,
-    text: "Le Discord est d'une qualité rare : entraide, alertes produits, discussions sérieuses… On apprend tous les jours."
+    text: "La plateforme est d'une qualité rare : entraide, alertes produits, discussions sérieuses… On apprend tous les jours."
   },
   {
     name: "Hugo L.",
@@ -54,8 +54,8 @@ const testimonials = [
   },
   {
     name: "Mehdi Z.",
-    rating: 4,
-    text: "Sourcing et support au top, seul bémol : interface Discord parfois un peu chargée, mais le contenu vaut largement le détour."
+    rating: 5,
+    text: "Sourcing et support au top, plateforme intuitive et contenu de grande qualité."
   },
   {
     name: "Thomas G.",
@@ -80,7 +80,7 @@ const testimonials = [
   {
     name: "Kevin N.",
     rating: 5,
-    text: "Le sourcing est impressionnant. J'ai trouvé un Monopoly à 400 % de ROI grâce à une alerte Discord."
+    text: "Le sourcing est impressionnant. J'ai trouvé un Monopoly à 400 % de ROI grâce à une alerte produit."
   },
   {
     name: "Camille D.",
@@ -115,7 +115,7 @@ const testimonials = [
   {
     name: "Marion R.",
     rating: 5,
-    text: "J'ai rejoint le Discord VIP : ambiance pro, entraide réelle, et j'ai récupéré mon investissement dès le premier mois."
+    text: "J'ai rejoint la communauté VIP : ambiance pro, entraide réelle, et j'ai récupéré mon investissement dès le premier mois."
   },
   {
     name: "Thomas P.",
