@@ -325,10 +325,10 @@ const Dashboard = () => {
                     <span className="text-xl font-bold">GESTION PRODUITS</span>
                   </div>
                 </AccordionTrigger>
-                <AccordionContent>
+                <AccordionContent className="px-4 pb-4">
                   <div className="grid gap-3 pt-2">
                     <CategoryItem icon={Info} label="informations" />
-                    <CategoryItem icon={Package} label="catalogue-produits" />
+                    <CategoryItem icon={Package} label="catalogue-produits" link="/catalogue-produits" />
                     <CategoryItem icon={MessageCircle} label="questions" />
                   </div>
                 </AccordionContent>
