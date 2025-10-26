@@ -13,6 +13,7 @@ import { fr } from 'date-fns/locale';
 interface Profile {
   full_name: string;
   email: string;
+  nickname: string | null;
 }
 
 interface Message {
@@ -30,9 +31,10 @@ interface Message {
 
 interface ChatRoomProps {
   roomId: string;
+  onBack?: () => void;
 }
 
-const ChatRoom = ({ roomId }: ChatRoomProps) => {
+const ChatRoom = ({ roomId, onBack }: ChatRoomProps) => {
   const { user } = useAuth();
   const { isAdmin } = useAdmin();
   const [messages, setMessages] = useState<Message[]>([]);
@@ -63,7 +65,7 @@ const ChatRoom = ({ roomId }: ChatRoomProps) => {
       const userIds = [...new Set(messagesData?.map(m => m.user_id) || [])];
       const { data: profilesData } = await supabase
         .from('profiles')
-        .select('id, full_name, email')
+        .select('id, full_name, email, nickname')
         .in('id', userIds);
 
       const profilesMap = new Map(profilesData?.map(p => [p.id, p]) || []);
@@ -103,7 +105,7 @@ const ChatRoom = ({ roomId }: ChatRoomProps) => {
           if (messageData) {
             const { data: profileData } = await supabase
               .from('profiles')
-              .select('full_name, email')
+              .select('full_name, email, nickname')
               .eq('id', messageData.user_id)
               .single();
 
@@ -212,8 +214,77 @@ const ChatRoom = ({ roomId }: ChatRoomProps) => {
     );
   }
 
+  const createPrivateConversation = async (withUserId: string, withUserNickname: string) => {
+    try {
+      // Check if private room already exists between these users
+      const { data: existingRooms } = await supabase
+        .from('chat_rooms')
+        .select('id, created_by')
+        .eq('type', 'private');
+
+      // For each existing room, check if both users are members
+      for (const room of existingRooms || []) {
+        const { data: members } = await supabase
+          .from('chat_room_members')
+          .select('user_id')
+          .eq('room_id', room.id);
+
+        const memberIds = members?.map(m => m.user_id) || [];
+        if (memberIds.includes(user!.id) && memberIds.includes(withUserId)) {
+          // Room already exists
+          setReplyTo(null);
+          toast.success(`Conversation privée avec ${withUserNickname} déjà ouverte`);
+          return;
+        }
+      }
+
+      // Create new private room
+      const { data: newRoom, error: roomError } = await supabase
+        .from('chat_rooms')
+        .insert({
+          name: `Privé: ${withUserNickname}`,
+          type: 'private',
+          created_by: user!.id
+        })
+        .select()
+        .single();
+
+      if (roomError) throw roomError;
+
+      // Add both users as members
+      const { error: membersError } = await supabase
+        .from('chat_room_members')
+        .insert([
+          { room_id: newRoom.id, user_id: user!.id },
+          { room_id: newRoom.id, user_id: withUserId }
+        ]);
+
+      if (membersError) throw membersError;
+
+      toast.success(`Conversation privée créée avec ${withUserNickname}`);
+      setReplyTo(null);
+    } catch (error: any) {
+      console.error('Error creating private conversation:', error);
+      toast.error('Erreur lors de la création de la conversation privée');
+    }
+  };
+
   return (
     <div className="h-full flex flex-col">
+      {/* Mobile header with back button */}
+      {onBack && (
+        <div className="md:hidden flex items-center gap-2 p-4 border-b bg-card">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onBack}
+          >
+            <Reply className="h-4 w-4 rotate-180" />
+          </Button>
+          <h3 className="font-semibold">Conversation</h3>
+        </div>
+      )}
+      
       <ScrollArea className="flex-1 p-4">
         <div className="space-y-4">
           {messages.map((message) => {
@@ -236,18 +307,30 @@ const ChatRoom = ({ roomId }: ChatRoomProps) => {
                 >
                   <div className="flex items-center justify-between gap-2 mb-1">
                     <span className="text-xs font-semibold">
-                      {isOwn ? 'Vous' : message.profile?.full_name || 'Utilisateur'}
+                      {isOwn ? 'Vous' : message.profile?.nickname || message.profile?.full_name || 'Utilisateur'}
                     </span>
                     <div className="flex items-center gap-1">
                       {!isOwn && (
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          className="h-6 w-6 p-0"
-                          onClick={() => setReplyTo(message)}
-                        >
-                          <Reply className="h-3 w-3" />
-                        </Button>
+                        <>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="h-6 w-6 p-0"
+                            onClick={() => setReplyTo(message)}
+                            title="Répondre en public"
+                          >
+                            <Reply className="h-3 w-3" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="h-6 w-6 p-0"
+                            onClick={() => createPrivateConversation(message.user_id, message.profile?.nickname || message.profile?.full_name || 'Utilisateur')}
+                            title="Répondre en privé"
+                          >
+                            <AtSign className="h-3 w-3" />
+                          </Button>
+                        </>
                       )}
                       {(isOwn || isAdmin) && (
                         <Button
@@ -265,7 +348,7 @@ const ChatRoom = ({ roomId }: ChatRoomProps) => {
                   {replyToMessage && (
                     <div className="mb-2 p-2 rounded bg-black/10 text-xs opacity-70">
                       <Reply className="h-3 w-3 inline mr-1" />
-                      Réponse à {replyToMessage.profile?.full_name}
+                      Réponse à {replyToMessage.profile?.nickname || replyToMessage.profile?.full_name}
                     </div>
                   )}
 
@@ -289,7 +372,7 @@ const ChatRoom = ({ roomId }: ChatRoomProps) => {
         <div className="px-4 py-2 bg-muted border-t flex items-center justify-between">
           <div className="text-sm">
             <Reply className="h-4 w-4 inline mr-1" />
-            Réponse à {replyTo.profile?.full_name}
+            Réponse à {replyTo.profile?.nickname || replyTo.profile?.full_name}
           </div>
           <Button
             size="sm"

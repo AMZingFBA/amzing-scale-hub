@@ -110,7 +110,7 @@ const Chat = () => {
       <div className="container mx-auto py-8 px-4">
         <div className="flex gap-4 h-[calc(100vh-8rem)]">
           {/* Sidebar - Room List */}
-          <div className="w-80 bg-card border rounded-lg p-4 flex flex-col">
+          <div className={`${selectedRoom ? 'hidden md:flex' : 'flex'} w-full md:w-80 bg-card border rounded-lg p-4 flex-col`}>
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-bold flex items-center gap-2">
                 <Users className="h-5 w-5" />
@@ -167,9 +167,9 @@ const Chat = () => {
           </div>
 
           {/* Chat Area */}
-          <div className="flex-1 bg-card border rounded-lg overflow-hidden">
+          <div className={`${selectedRoom ? 'flex' : 'hidden md:flex'} flex-1 bg-card border rounded-lg overflow-hidden`}>
             {selectedRoom ? (
-              <ChatRoom roomId={selectedRoom} />
+              <ChatRoom roomId={selectedRoom} onBack={() => setSelectedRoom(null)} />
             ) : (
               <div className="h-full flex items-center justify-center text-muted-foreground">
                 Sélectionnez une conversation pour commencer

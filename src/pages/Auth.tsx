@@ -38,6 +38,7 @@ const Auth = () => {
     const email = formData.get('email') as string;
     const password = formData.get('password') as string;
     const fullName = formData.get('fullName') as string;
+    const nickname = formData.get('nickname') as string;
     const confirmPassword = formData.get('confirmPassword') as string;
 
     if (password !== confirmPassword) {
@@ -46,7 +47,7 @@ const Auth = () => {
       return;
     }
 
-    await signUp(email, password, fullName);
+    await signUp(email, password, fullName, nickname);
     setIsLoading(false);
   };
 
@@ -115,6 +116,17 @@ const Auth = () => {
                       name="fullName"
                       type="text"
                       placeholder="Jean Dupont"
+                      required
+                      disabled={isLoading}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="signup-nickname">Surnom (affiché dans les conversations)</Label>
+                    <Input
+                      id="signup-nickname"
+                      name="nickname"
+                      type="text"
+                      placeholder="JD"
                       required
                       disabled={isLoading}
                     />
