@@ -94,6 +94,18 @@ const ProductAlerts = () => {
     }
   };
 
+  const getSubcategoryLabel = (subcategory: string) => {
+    switch (subcategory) {
+      case 'produits-find': return 'Product Find';
+      case 'produits-qogita': return 'Produits rentables sur Qogita';
+      case 'produits-eany': return 'Produits rentables sur Eany';
+      case 'grossistes': return 'Liste de produits rentables de grossistes';
+      case 'promotions': return 'Promotions';
+      case 'sitelist': return 'Liste de sites internet à consulter';
+      default: return subcategory;
+    }
+  };
+
   if (isLoading || isAuthLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -112,7 +124,7 @@ const ProductAlerts = () => {
             <div>
               <h1 className="text-4xl font-bold">Produits Gagnants</h1>
               <p className="text-muted-foreground">
-                Toutes les alertes de produits à fort potentiel • Find • Qogita • Eany • Grossistes • Promotions • Sitelist
+                Product Find • Produits Qogita • Produits Eany • Grossistes • Promotions • Sitelist
               </p>
             </div>
           </div>
@@ -135,8 +147,8 @@ const ProductAlerts = () => {
                       <div className="flex-1">
                         <CardTitle className="text-2xl mb-2">{alert.title}</CardTitle>
                         {alert.subcategory && (
-                          <Badge variant="outline" className="mb-2">
-                            {alert.subcategory}
+                          <Badge variant="secondary" className="mb-2 text-sm">
+                            {getSubcategoryLabel(alert.subcategory)}
                           </Badge>
                         )}
                         <CardDescription>
