@@ -16,12 +16,13 @@ export const useMarketplaceUnread = () => {
 
     const loadUnreadCount = async () => {
       try {
-        // Get all user's marketplace tickets
+        // Get only user's open/in_progress marketplace tickets
         const { data: tickets, error: ticketsError } = await supabase
           .from('tickets')
           .select('id')
           .eq('user_id', user.id)
-          .eq('category', 'marketplace');
+          .eq('category', 'marketplace')
+          .in('status', ['open', 'in_progress']);
 
         if (ticketsError) throw ticketsError;
 
