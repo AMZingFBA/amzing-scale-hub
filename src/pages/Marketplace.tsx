@@ -53,6 +53,7 @@ const Marketplace = () => {
   
   // Determine section based on route
   const getInitialSection = (): "buy" | "sell" | "my-buy-requests" | "my-sell-listings" => {
+    console.log('🔍 Current pathname:', location.pathname);
     if (location.pathname === "/acheter") return "buy";
     if (location.pathname === "/vendre") return "sell";
     return "buy";
@@ -60,9 +61,12 @@ const Marketplace = () => {
   
   const [activeSection, setActiveSection] = useState<"buy" | "sell" | "my-buy-requests" | "my-sell-listings">(getInitialSection());
   
+  console.log('📍 Active section:', activeSection);
+  
   // Update section when route changes
   useEffect(() => {
     const newSection = getInitialSection();
+    console.log('🔄 Section changed to:', newSection);
     setActiveSection(newSection);
   }, [location.pathname, location.search]);
   
