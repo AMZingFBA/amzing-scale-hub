@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/hooks/use-auth';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { Loader2, Trash2, Reply, AtSign } from 'lucide-react';
+import { Loader2, Trash2, Reply, AtSign, Mic } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import MessageInput from './MessageInput';
@@ -182,9 +182,16 @@ const ChatRoom = ({ roomId, onBack }: ChatRoomProps) => {
         );
       case 'audio':
         return (
-          <div>
+          <div className="w-full max-w-sm">
             {message.content && <p className="mb-2">{message.content}</p>}
-            <audio src={message.file_url || ''} controls className="w-full max-w-md" />
+            <audio 
+              src={message.file_url || ''} 
+              controls 
+              className="w-full"
+              preload="metadata"
+            >
+              Votre navigateur ne supporte pas la lecture audio.
+            </audio>
           </div>
         );
       case 'file':
@@ -321,18 +328,18 @@ const ChatRoom = ({ roomId, onBack }: ChatRoomProps) => {
                             variant="ghost"
                             className="h-6 w-6 p-0"
                             onClick={() => setReplyTo(message)}
-                            title="Répondre en public"
+                            title="Répondre dans le chat"
                           >
                             <Reply className="h-3 w-3" />
                           </Button>
                           <Button
                             size="sm"
                             variant="ghost"
-                            className="h-6 w-6 p-0"
+                            className="h-6 px-2"
                             onClick={() => createPrivateConversation(message.user_id, message.profile?.nickname || message.profile?.full_name || 'Utilisateur')}
-                            title="Répondre en privé"
+                            title="Ouvrir une conversation privée"
                           >
-                            <AtSign className="h-3 w-3" />
+                            💬 Privé
                           </Button>
                         </>
                       )}
