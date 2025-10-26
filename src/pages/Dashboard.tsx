@@ -1,9 +1,11 @@
 import { useAuth } from '@/hooks/use-auth';
+import { useUnreadMessages } from '@/hooks/use-unread-messages';
 import { Navigate, Link } from 'react-router-dom';
 import { useState } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -19,15 +21,23 @@ interface CategoryItemProps {
   label: string;
   link?: string;
   onClick?: () => void;
+  badge?: number;
 }
 
-const CategoryItem = ({ icon: Icon, label, link, onClick }: CategoryItemProps) => {
+const CategoryItem = ({ icon: Icon, label, link, onClick, badge }: CategoryItemProps) => {
   const content = (
     <Card className="hover:bg-accent/50 transition-colors cursor-pointer" onClick={onClick}>
       <CardContent className="p-4">
-        <div className="flex items-center gap-3">
-          <Icon className="w-5 h-5 text-primary" />
-          <span className="font-medium">{label}</span>
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <Icon className="w-5 h-5 text-primary" />
+            <span className="font-medium">{label}</span>
+          </div>
+          {badge && badge > 0 && (
+            <Badge variant="destructive" className="ml-auto">
+              {badge}
+            </Badge>
+          )}
         </div>
       </CardContent>
     </Card>
@@ -42,6 +52,7 @@ const CategoryItem = ({ icon: Icon, label, link, onClick }: CategoryItemProps) =
 
 const Dashboard = () => {
   const { user, isVIP, subscription, isLoading } = useAuth();
+  const { unreadCount } = useUnreadMessages();
   const [rulesOpen, setRulesOpen] = useState(false);
 
   const rules = [
@@ -146,7 +157,7 @@ const Dashboard = () => {
                     <CategoryItem icon={CheckCircle} label="débuter" />
                     <CategoryItem icon={BookOpen} label="guides" link="/guides" />
                     <CategoryItem icon={DollarSign} label="affiliation" />
-                    <CategoryItem icon={HelpCircle} label="support" link="/support" />
+                    <CategoryItem icon={HelpCircle} label="support" link="/support" badge={unreadCount} />
                   </div>
                 </AccordionContent>
               </AccordionItem>
