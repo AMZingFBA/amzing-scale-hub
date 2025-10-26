@@ -477,62 +477,28 @@ const Marketplace = () => {
 
     try {
       const code = listing.asin || listing.ean || "N/A";
-      const subject = `Achat - ${listing.title} - ${code}`;
       
-      // Créer un ticket pour l'acheteur + staff
-      const { data: buyerTicket, error: buyerError } = await supabase
-        .from("tickets")
-        .insert({
-          user_id: user.id,
-          subject: subject,
-          category: "marketplace",
-          status: "open",
-          priority: "normal"
-        })
-        .select()
-        .single();
-
-      if (buyerError) throw buyerError;
-
-      // Message initial pour l'acheteur
-      const buyerMessage = `Je suis intéressé(e) par cette annonce:\n\nTitre: ${listing.title}\nCode: ${code}\nPrix: ${listing.price}€ ${listing.price_type}\nQuantité: ${listing.quantity}\n\nMerci de me contacter.`;
-      
-      await supabase.from("messages").insert({
-        ticket_id: buyerTicket.id,
-        user_id: user.id,
-        content: buyerMessage
+      // Appeler l'edge function pour créer les deux tickets
+      const { data, error } = await supabase.functions.invoke('create-sell-tickets', {
+        body: {
+          listingId: listing.id,
+          listingTitle: listing.title,
+          listingCode: code,
+          listingQuantity: listing.quantity,
+          listingPrice: listing.price,
+          listingPriceType: listing.price_type,
+          listingUserId: listing.user_id,
+          buyerUserId: user.id
+        }
       });
 
-      // Créer un ticket pour le vendeur + staff
-      const sellerSubject = `Vente - ${listing.title} - ${code}`;
-      const { data: sellerTicket, error: sellerError } = await supabase
-        .from("tickets")
-        .insert({
-          user_id: listing.user_id,
-          subject: sellerSubject,
-          category: "marketplace",
-          status: "open",
-          priority: "normal"
-        })
-        .select()
-        .single();
+      if (error) throw error;
 
-      if (sellerError) throw sellerError;
-
-      // Message initial pour le vendeur
-      const sellerMessage = `Un acheteur est intéressé par votre annonce:\n\nTitre: ${listing.title}\nCode: ${code}\nPrix: ${listing.price}€ ${listing.price_type}\nQuantité: ${listing.quantity}\n\nLe staff va vous mettre en contact.`;
+      toast.success("Demande d'achat envoyée! Les tickets ont été créés.");
       
-      await supabase.from("messages").insert({
-        ticket_id: sellerTicket.id,
-        user_id: user.id, // Message du système
-        content: sellerMessage
-      });
-
-      toast.success("Demande d'achat envoyée! Le staff va vous contacter.");
-      
-      // Recharger les tickets et rediriger
+      // Recharger les tickets et rediriger vers mes demandes
       await loadMyTickets();
-      navigate("/acheter");
+      navigate("/vendre?tab=tickets");
     } catch (error: any) {
       console.error("Error creating tickets:", error);
       toast.error("Erreur lors de la création de la demande");
@@ -1305,15 +1271,15 @@ const Marketplace = () => {
           </div>
         )}
 
-        {/* Sell Section - Mes annonces */}
+        {/* Sell Section - Want to Sell */}
         {activeSection === "sell" && (
           <div className="w-full space-y-6 animate-fade-in">
             <div className="mb-8">
               <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-                Vendre des produits
+                Want to Sell - Je vends
               </h1>
               <p className="text-muted-foreground mt-2">
-                Publiez vos produits à vendre ou répondez aux demandes des acheteurs
+                Publiez les produits que vous souhaitez vendre. Les membres intéressés pourront vous contacter.
               </p>
             </div>
 
@@ -1322,12 +1288,12 @@ const Marketplace = () => {
               <DialogTrigger asChild>
                 <Button size="lg" className="w-full md:w-auto hover-scale">
                   <Package className="w-5 h-5 mr-2" />
-                  Je vends un produit
+                  Publier mon annonce
                 </Button>
               </DialogTrigger>
               <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
-                  <DialogTitle>Je vends un produit</DialogTitle>
+                  <DialogTitle>Publier une annonce de vente</DialogTitle>
                   <DialogDescription>
                     Décrivez le produit que vous souhaitez vendre. Les acheteurs intéressés pourront vous contacter via le staff.
                   </DialogDescription>
@@ -1355,69 +1321,69 @@ const Marketplace = () => {
                     </Button>
                   </div>
 
-                  {uploadedImages.length > 0 && (
-                    <div className="grid grid-cols-4 gap-2">
-                      {uploadedImages.map((img, idx) => (
-                        <div key={idx} className="relative group">
-                          <img src={img} alt={`Upload ${idx + 1}`} className="w-full h-24 object-cover rounded-lg" />
-                          <button
-                            onClick={() => setUploadedImages(uploadedImages.filter((_, i) => i !== idx))}
-                            className="absolute top-1 right-1 bg-destructive text-destructive-foreground p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                          >
-                            <X className="w-3 h-3" />
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-
                   <div className="space-y-4">
-                    <div>
-                      <Label>Images / Fichiers</Label>
-                      <div className="mt-2">
-                        <label className="flex items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer hover:bg-muted/50 transition-colors">
-                          <div className="text-center">
-                            <Upload className="w-8 h-8 mx-auto mb-2 text-muted-foreground" />
-                            <p className="text-sm text-muted-foreground">
-                              Cliquez pour uploader (PNG, JPG, PDF)
-                            </p>
-                            <p className="text-xs text-muted-foreground mt-1">
-                              {uploadedFiles.length} fichier(s) sélectionné(s)
-                            </p>
-                          </div>
-                          <input
-                            type="file"
-                            multiple
-                            accept="image/*,.pdf"
-                            onChange={handleFileUpload}
-                            className="hidden"
-                          />
-                        </label>
-                      </div>
-                    </div>
-
                     <div>
                       <Label>Titre du produit *</Label>
                       <Input
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
-                        placeholder="Nom du produit"
+                        placeholder="Ex: iPhone 15 Pro, Nike Air Max..."
                       />
                     </div>
 
                     <div>
-                      <Label>Description</Label>
+                      <Label>Description / Précisions</Label>
                       <Textarea
                         value={description}
                         onChange={(e) => setDescription(e.target.value)}
-                        placeholder="Décrivez votre produit..."
+                        placeholder="Précisez l&apos;état, les caractéristiques, etc..."
                         rows={4}
                       />
                     </div>
 
+                    <div>
+                      <Label>Photos du produit (optionnel)</Label>
+                      <p className="text-xs text-muted-foreground mb-2">Ajoutez une ou plusieurs photos de votre produit</p>
+                      <div className="mt-2">
+                        <label className="flex items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer hover:bg-muted/50 transition-colors">
+                          <div className="text-center">
+                            <Upload className="w-8 h-8 mx-auto mb-2 text-muted-foreground" />
+                            <p className="text-sm text-muted-foreground">
+                              Cliquez pour uploader des photos
+                            </p>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              PNG, JPG, WEBP acceptés
+                            </p>
+                          </div>
+                          <input
+                            type="file"
+                            multiple
+                            accept="image/*"
+                            onChange={handleFileUpload}
+                            className="hidden"
+                          />
+                        </label>
+                      </div>
+                      {uploadedImages.length > 0 && (
+                        <div className="grid grid-cols-4 gap-2 mt-2">
+                          {uploadedImages.map((img, idx) => (
+                            <div key={idx} className="relative group">
+                              <img src={img} alt={`Upload ${idx + 1}`} className="w-full h-24 object-cover rounded-lg" />
+                              <button
+                                onClick={() => setUploadedImages(uploadedImages.filter((_, i) => i !== idx))}
+                                className="absolute top-1 right-1 bg-destructive text-destructive-foreground p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                              >
+                                <X className="w-3 h-3" />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <Label>Quantité *</Label>
+                        <Label>Quantité disponible *</Label>
                         <Input
                           type="number"
                           min="1"
@@ -1466,47 +1432,178 @@ const Marketplace = () => {
               </DialogContent>
             </Dialog>
 
-            {/* My Listings */}
-            <div>
-              <h2 className="text-2xl font-bold mb-6">Mes annonces</h2>
-              {myListings.length === 0 ? (
-                <Card className="p-16 border-2 border-dashed border-muted-foreground/20 bg-muted/5">
-                  <div className="text-center text-muted-foreground space-y-4">
-                    <div className="flex justify-center">
-                      <div className="p-4 rounded-full bg-muted/30">
-                        <ShoppingBag className="w-12 h-12 opacity-50" />
-                      </div>
-                    </div>
-                    <p className="text-lg font-medium">Vous n'avez pas encore créé d'annonce de vente</p>
-                  </div>
-                </Card>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {myListings.map(listing => renderListing(listing, true))}
-                </div>
-              )}
-            </div>
+            {/* Tabs for all listings and my listings */}
+            <Tabs defaultValue={new URLSearchParams(location.search).get('tab') || "all"} className="w-full">
+              <TabsList className="grid w-full max-w-2xl grid-cols-3 p-1 bg-muted/50 rounded-lg">
+                <TabsTrigger value="all" className="data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all">
+                  Toutes les annonces
+                </TabsTrigger>
+                <TabsTrigger value="mine" className="data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all">
+                  Mes annonces
+                </TabsTrigger>
+                <TabsTrigger value="tickets" className="data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all relative">
+                  Mes demandes
+                  {unreadCount > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                      {unreadCount}
+                    </span>
+                  )}
+                </TabsTrigger>
+              </TabsList>
 
-            {/* Buy Requests */}
-            <div className="mt-12">
-              <h2 className="text-2xl font-bold mb-6">Demandes d'achat des membres</h2>
-              {buyRequests.length === 0 ? (
-                <Card className="p-16 border-2 border-dashed border-muted-foreground/20 bg-muted/5">
-                  <div className="text-center text-muted-foreground space-y-4">
-                    <div className="flex justify-center">
-                      <div className="p-4 rounded-full bg-muted/30">
-                        <ShoppingCart className="w-12 h-12 opacity-50" />
+              <TabsContent value="all" className="mt-6 animate-fade-in">
+                {listings.filter(l => l.user_id !== user?.id).length === 0 ? (
+                  <Card className="p-16 border-2 border-dashed border-muted-foreground/20 bg-muted/5">
+                    <div className="text-center text-muted-foreground space-y-4">
+                      <div className="flex justify-center">
+                        <div className="p-4 rounded-full bg-muted/30">
+                          <Package className="w-12 h-12 opacity-50" />
+                        </div>
                       </div>
+                      <p className="text-lg font-medium">Aucune annonce de vente pour le moment</p>
+                      <p className="text-sm">Soyez le premier à publier une annonce !</p>
                     </div>
-                    <p className="text-lg font-medium">Aucune demande d'achat pour le moment</p>
+                  </Card>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {listings.filter(l => l.user_id !== user?.id).map(listing => renderListing(listing, false))}
                   </div>
-                </Card>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {buyRequests.map(request => renderBuyRequest(request, false))}
+                )}
+              </TabsContent>
+
+              <TabsContent value="mine" className="mt-6 animate-fade-in">
+                {myListings.filter(l => l.status === "active").length === 0 ? (
+                  <Card className="p-16 border-2 border-dashed border-muted-foreground/20 bg-muted/5">
+                    <div className="text-center text-muted-foreground space-y-4">
+                      <div className="flex justify-center">
+                        <div className="p-4 rounded-full bg-muted/30">
+                          <Package className="w-12 h-12 opacity-50" />
+                        </div>
+                      </div>
+                      <p className="text-lg font-medium">Vous n&apos;avez pas encore publié d&apos;annonce</p>
+                      <p className="text-sm">Cliquez sur &quot;Publier mon annonce&quot; pour commencer</p>
+                    </div>
+                  </Card>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {myListings.filter(l => l.status === "active").map(listing => renderListing(listing, true))}
+                  </div>
+                )}
+              </TabsContent>
+
+              <TabsContent value="tickets" className="mt-6 animate-fade-in">
+                <div className="space-y-6">
+                  {myTickets.length === 0 ? (
+                    <Card className="p-16 border-2 border-dashed border-muted-foreground/20 bg-muted/5">
+                      <div className="text-center text-muted-foreground space-y-4">
+                        <div className="flex justify-center">
+                          <div className="p-4 rounded-full bg-muted/30">
+                            <MessageCircle className="w-12 h-12 opacity-50" />
+                          </div>
+                        </div>
+                        <p className="text-lg font-medium">Aucune demande pour le moment</p>
+                        <p className="text-sm">Lorsque des acheteurs seront intéressés par vos annonces, les tickets apparaîtront ici</p>
+                      </div>
+                    </Card>
+                  ) : (
+                    <Tabs defaultValue="open" className="w-full">
+                      <TabsList className="grid w-full max-w-md grid-cols-2">
+                        <TabsTrigger value="open">
+                          En cours ({myTickets.filter(t => t.status === 'open' || t.status === 'in_progress').length})
+                        </TabsTrigger>
+                        <TabsTrigger value="closed">
+                          Fermés ({myTickets.filter(t => t.status === 'closed').length})
+                        </TabsTrigger>
+                      </TabsList>
+
+                      <TabsContent value="open" className="mt-4">
+                        {myTickets.filter(t => t.status === 'open' || t.status === 'in_progress').length === 0 ? (
+                          <Card className="p-12 border-2 border-dashed border-muted-foreground/20 bg-muted/5">
+                            <div className="text-center text-muted-foreground">
+                              <p className="text-sm">Aucune demande en cours</p>
+                            </div>
+                          </Card>
+                        ) : (
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {myTickets
+                              .filter(t => t.status === 'open' || t.status === 'in_progress')
+                              .map((ticket) => (
+                                <Card
+                                  key={ticket.id}
+                                  className="hover:shadow-lg transition-shadow cursor-pointer"
+                                  onClick={() => {
+                                    navigate(`/ticket/${ticket.id}`);
+                                  }}
+                                >
+                                  <CardHeader className="pb-3">
+                                    <div className="flex justify-between items-start gap-2">
+                                      <CardTitle className="text-sm font-semibold line-clamp-2">
+                                        {ticket.subject}
+                                      </CardTitle>
+                                      <Badge variant={ticket.status === "open" ? "default" : "secondary"}>
+                                        {ticket.status}
+                                      </Badge>
+                                    </div>
+                                    <CardDescription className="text-xs">
+                                      {new Date(ticket.created_at).toLocaleDateString('fr-FR', {
+                                        day: 'numeric',
+                                        month: 'long',
+                                        year: 'numeric'
+                                      })}
+                                    </CardDescription>
+                                  </CardHeader>
+                                </Card>
+                              ))}
+                          </div>
+                        )}
+                      </TabsContent>
+
+                      <TabsContent value="closed" className="mt-4">
+                        {myTickets.filter(t => t.status === 'closed').length === 0 ? (
+                          <Card className="p-12 border-2 border-dashed border-muted-foreground/20 bg-muted/5">
+                            <div className="text-center text-muted-foreground">
+                              <p className="text-sm">Aucune demande fermée</p>
+                            </div>
+                          </Card>
+                        ) : (
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {myTickets
+                              .filter(t => t.status === 'closed')
+                              .map((ticket) => (
+                                <Card
+                                  key={ticket.id}
+                                  className="hover:shadow-lg transition-shadow cursor-pointer"
+                                  onClick={() => {
+                                    navigate(`/ticket/${ticket.id}`);
+                                  }}
+                                >
+                                  <CardHeader className="pb-3">
+                                    <div className="flex justify-between items-start gap-2">
+                                      <CardTitle className="text-sm font-semibold line-clamp-2">
+                                        {ticket.subject}
+                                      </CardTitle>
+                                      <Badge variant="outline">
+                                        closed
+                                      </Badge>
+                                    </div>
+                                    <CardDescription className="text-xs">
+                                      {new Date(ticket.created_at).toLocaleDateString('fr-FR', {
+                                        day: 'numeric',
+                                        month: 'long',
+                                        year: 'numeric'
+                                      })}
+                                    </CardDescription>
+                                  </CardHeader>
+                                </Card>
+                              ))}
+                          </div>
+                        )}
+                      </TabsContent>
+                    </Tabs>
+                  )}
                 </div>
-              )}
-            </div>
+              </TabsContent>
+            </Tabs>
           </div>
         )}
       </div>
