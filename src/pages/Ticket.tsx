@@ -316,20 +316,34 @@ const Ticket = () => {
                           : 'bg-muted'
                       }`}
                     >
-                      {message.content && <p className="text-sm">{message.content}</p>}
+                      {message.content && <p className="text-sm whitespace-pre-wrap break-words">{message.content}</p>}
                       {message.file_url && (
                         <>
-                          {message.file_type?.startsWith('image/') ? (
+                          {(message.file_type?.startsWith('image/') || 
+                            message.file_name?.match(/\.(jpg|jpeg|png|gif|webp)$/i)) ? (
                             <div className="mt-2">
                               <a
                                 href={message.file_url}
                                 target="_blank"
                                 rel="noopener noreferrer"
+                                className="block"
                               >
                                 <img
                                   src={message.file_url}
                                   alt={message.file_name || 'Image'}
-                                  className="max-w-full max-h-64 rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
+                                  className="max-w-full rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
+                                  style={{ maxHeight: '300px', width: 'auto' }}
+                                  onError={(e) => {
+                                    // Fallback si l'image ne charge pas
+                                    e.currentTarget.style.display = 'none';
+                                    const parent = e.currentTarget.parentElement?.parentElement;
+                                    if (parent) {
+                                      const fallback = document.createElement('div');
+                                      fallback.className = 'text-sm underline flex items-center gap-2 mt-2';
+                                      fallback.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path></svg> ${message.file_name}`;
+                                      parent.appendChild(fallback);
+                                    }
+                                  }}
                                 />
                               </a>
                             </div>
@@ -338,7 +352,7 @@ const Ticket = () => {
                               href={message.file_url}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="text-sm underline flex items-center gap-2 mt-2"
+                              className="text-sm underline flex items-center gap-2 mt-2 hover:opacity-80"
                             >
                               <Paperclip className="w-4 h-4" />
                               {message.file_name}
