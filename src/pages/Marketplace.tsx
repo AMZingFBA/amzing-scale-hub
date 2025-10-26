@@ -633,38 +633,14 @@ const Marketplace = () => {
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/20 p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-2">Marketplace</h1>
+          <h1 className="text-4xl font-bold mb-2">
+            {activeSection === "buy" ? "Acheter" : "Vendre"}
+          </h1>
           <p className="text-muted-foreground">
-            Achetez et vendez des produits entre membres
+            {activeSection === "buy" 
+              ? "Trouvez les produits que vous recherchez" 
+              : "Mettez en vente vos produits"}
           </p>
-        </div>
-
-        {/* Section Selector */}
-        <div className="flex gap-4 mb-8">
-          <Button
-            size="lg"
-            variant={activeSection === "buy" ? "default" : "outline"}
-            onClick={() => {
-              setActiveSection("buy");
-              navigate("/acheter");
-            }}
-            className="flex-1"
-          >
-            <ShoppingCart className="w-5 h-5 mr-2" />
-            Je cherche à acheter
-          </Button>
-          <Button
-            size="lg"
-            variant={activeSection === "sell" ? "default" : "outline"}
-            onClick={() => {
-              setActiveSection("sell");
-              navigate("/vendre");
-            }}
-            className="flex-1"
-          >
-            <ShoppingBag className="w-5 h-5 mr-2" />
-            Je vends
-          </Button>
         </div>
 
         {/* Action Button */}
