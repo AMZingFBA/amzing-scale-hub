@@ -9,9 +9,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Loader2, MessageSquare, X, Search } from 'lucide-react';
+import { Loader2, MessageSquare, X, Search, ShoppingCart, BookOpen, Settings, Truck, Bell, Package, AlertCircle, Clock, CheckCircle2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const AdminTickets = () => {
   const { user } = useAuth();
@@ -22,6 +23,8 @@ const AdminTickets = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [unreadCounts, setUnreadCounts] = useState<Record<string, number>>({});
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [selectedPriority, setSelectedPriority] = useState<string>('all');
 
   useEffect(() => {
     if (!user) {
@@ -175,17 +178,71 @@ const AdminTickets = () => {
       filtered = filtered.filter(t => t.status === status);
     }
     
+    // Filter by category
+    if (selectedCategory !== 'all') {
+      filtered = filtered.filter(t => t.category === selectedCategory);
+    }
+    
+    // Filter by priority
+    if (selectedPriority !== 'all') {
+      filtered = filtered.filter(t => t.priority === selectedPriority);
+    }
+    
     // Filter by search query
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
       filtered = filtered.filter(t => 
         t.subject?.toLowerCase().includes(query) ||
         t.profiles?.full_name?.toLowerCase().includes(query) ||
-        t.profiles?.email?.toLowerCase().includes(query)
+        t.profiles?.email?.toLowerCase().includes(query) ||
+        t.subcategory?.toLowerCase().includes(query)
       );
     }
     
     return filtered;
+  };
+
+  const getCategoryStats = () => {
+    const stats: Record<string, { total: number; unread: number; icon: any }> = {
+      introduction: { total: 0, unread: 0, icon: BookOpen },
+      outils: { total: 0, unread: 0, icon: Settings },
+      expedition: { total: 0, unread: 0, icon: Truck },
+      informations: { total: 0, unread: 0, icon: Bell },
+      marketplace: { total: 0, unread: 0, icon: ShoppingCart },
+      gestion_produit: { total: 0, unread: 0, icon: Package },
+      autre: { total: 0, unread: 0, icon: MessageSquare },
+    };
+
+    tickets.forEach(ticket => {
+      const category = ticket.category || 'autre';
+      if (stats[category]) {
+        stats[category].total++;
+        if (unreadCounts[ticket.id] > 0) {
+          stats[category].unread += unreadCounts[ticket.id];
+        }
+      }
+    });
+
+    return stats;
+  };
+
+  const getStatusStats = () => {
+    const open = tickets.filter(t => t.status === 'open').length;
+    const inProgress = tickets.filter(t => t.status === 'in_progress').length;
+    const closed = tickets.filter(t => t.status === 'closed').length;
+    const totalUnread = Object.values(unreadCounts).reduce((sum, count) => sum + count, 0);
+
+    return { open, inProgress, closed, totalUnread };
+  };
+
+  const categoryLabels: Record<string, string> = {
+    introduction: 'Introduction',
+    outils: 'Outils',
+    expedition: 'Expédition',
+    informations: 'Informations',
+    marketplace: 'Marketplace',
+    gestion_produit: 'Gestion Produits',
+    autre: 'Autre',
   };
 
   const closeTicket = async (ticketId: string, e: React.MouseEvent) => {
@@ -223,154 +280,230 @@ const AdminTickets = () => {
     );
   }
 
+  const statusStats = getStatusStats();
+  const categoryStats = getCategoryStats();
+
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
       <main className="flex-grow pt-20">
-        <div className="container mx-auto px-4 py-8 max-w-6xl">
-          <h1 className="text-4xl font-bold mb-2">Administration - Tickets</h1>
-          <p className="text-muted-foreground mb-8">
-            Gérez tous les tickets de support
-          </p>
-
-          <div className="relative mb-6">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-            <Input
-              placeholder="Rechercher par sujet, nom ou email..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
-            />
+        <div className="container mx-auto px-4 py-8 max-w-7xl">
+          <div className="mb-8">
+            <h1 className="text-4xl font-bold mb-2">Panneau d'Administration</h1>
+            <p className="text-muted-foreground">Vue d'ensemble et gestion des tickets</p>
           </div>
 
-          <Tabs defaultValue="all" className="w-full">
-            <TabsList>
-              <TabsTrigger value="all">
-                Tous ({tickets.length})
-              </TabsTrigger>
+          {/* Statistiques globales */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-muted-foreground">Ouverts</p>
+                    <p className="text-3xl font-bold text-orange-500">{statusStats.open}</p>
+                  </div>
+                  <AlertCircle className="w-10 h-10 text-orange-500 opacity-20" />
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-muted-foreground">En cours</p>
+                    <p className="text-3xl font-bold text-blue-500">{statusStats.inProgress}</p>
+                  </div>
+                  <Clock className="w-10 h-10 text-blue-500 opacity-20" />
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-muted-foreground">Fermés</p>
+                    <p className="text-3xl font-bold text-green-500">{statusStats.closed}</p>
+                  </div>
+                  <CheckCircle2 className="w-10 h-10 text-green-500 opacity-20" />
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-muted-foreground">Messages non lus</p>
+                    <p className="text-3xl font-bold text-red-500">{statusStats.totalUnread}</p>
+                  </div>
+                  <MessageSquare className="w-10 h-10 text-red-500 opacity-20" />
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Statistiques par catégorie */}
+          <Card className="mb-8">
+            <CardHeader>
+              <CardTitle>Tickets par Catégorie</CardTitle>
+              <CardDescription>Répartition des tickets selon les catégories</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                {Object.entries(categoryStats).map(([key, stat]) => {
+                  const Icon = stat.icon;
+                  return (
+                    <div key={key} className="flex items-center justify-between p-4 border rounded-lg hover:bg-accent/50 transition-colors">
+                      <div className="flex items-center gap-3">
+                        <Icon className="w-5 h-5 text-primary" />
+                        <div>
+                          <p className="font-medium">{categoryLabels[key]}</p>
+                          <p className="text-sm text-muted-foreground">{stat.total} tickets</p>
+                        </div>
+                      </div>
+                      {stat.unread > 0 && (
+                        <Badge variant="destructive">{stat.unread}</Badge>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Filtres */}
+          <Card className="mb-6">
+            <CardContent className="pt-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                  <Input
+                    placeholder="Rechercher..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-10"
+                  />
+                </div>
+
+                <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Toutes les catégories" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Toutes les catégories</SelectItem>
+                    {Object.entries(categoryLabels).map(([key, label]) => (
+                      <SelectItem key={key} value={key}>{label}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                <Select value={selectedPriority} onValueChange={setSelectedPriority}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Toutes les priorités" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Toutes les priorités</SelectItem>
+                    <SelectItem value="low">Basse</SelectItem>
+                    <SelectItem value="normal">Normale</SelectItem>
+                    <SelectItem value="high">Haute</SelectItem>
+                    <SelectItem value="urgent">Urgente</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Liste des tickets avec onglets */}
+          <Tabs defaultValue="open" className="w-full">
+            <TabsList className="grid w-full grid-cols-4">
               <TabsTrigger value="open">
+                <AlertCircle className="w-4 h-4 mr-2" />
                 Ouverts ({filterTickets('open').length})
               </TabsTrigger>
               <TabsTrigger value="in_progress">
+                <Clock className="w-4 h-4 mr-2" />
                 En cours ({filterTickets('in_progress').length})
               </TabsTrigger>
               <TabsTrigger value="closed">
+                <CheckCircle2 className="w-4 h-4 mr-2" />
                 Fermés ({filterTickets('closed').length})
+              </TabsTrigger>
+              <TabsTrigger value="all">
+                Tous ({filterTickets().length})
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="all" className="space-y-4 mt-6">
-              {tickets.length === 0 ? (
-                <Card>
-                  <CardContent className="pt-6 text-center">
-                    <MessageSquare className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-                    <p className="text-muted-foreground">
-                      Aucun ticket pour le moment
-                    </p>
-                  </CardContent>
-                </Card>
-              ) : (
-                tickets.map((ticket) => (
-                  <Card
-                    key={ticket.id}
-                    className="hover:shadow-lg transition-shadow cursor-pointer"
-                    onClick={() => navigate(`/ticket/${ticket.id}`)}
-                  >
-                    <CardHeader>
-                      <div className="flex justify-between items-start gap-4">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <CardTitle className="text-lg">{ticket.subject}</CardTitle>
-                            {ticket.category && ticket.category !== 'general' && (
-                              <Badge variant="outline" className="text-xs">
-                                {ticket.category === 'facture_autorisation' && '📝 Facture/Auto'}
-                                {ticket.category === 'gestion_produit' && '📦 Gestion produit'}
-                                {ticket.category === 'marketplace' && '🛒 Marketplace'}
-                                {ticket.category === 'avis' && '⭐ Avis'}
-                                {ticket.category === 'autre' && '💬 Autre'}
+            {['open', 'in_progress', 'closed', 'all'].map((status) => (
+              <TabsContent key={status} value={status} className="space-y-3 mt-6">
+                {filterTickets(status === 'all' ? undefined : status).length === 0 ? (
+                  <Card>
+                    <CardContent className="pt-6 text-center">
+                      <MessageSquare className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+                      <p className="text-muted-foreground">Aucun ticket dans cette catégorie</p>
+                    </CardContent>
+                  </Card>
+                ) : (
+                  filterTickets(status === 'all' ? undefined : status).map((ticket) => (
+                    <Card
+                      key={ticket.id}
+                      className="hover:shadow-lg transition-all cursor-pointer border-l-4"
+                      style={{
+                        borderLeftColor: 
+                          ticket.priority === 'urgent' ? '#ef4444' :
+                          ticket.priority === 'high' ? '#f97316' :
+                          ticket.priority === 'normal' ? '#22c55e' : '#3b82f6'
+                      }}
+                      onClick={() => navigate(`/ticket/${ticket.id}`)}
+                    >
+                      <CardHeader className="pb-3">
+                        <div className="flex justify-between items-start gap-4">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 flex-wrap mb-2">
+                              <CardTitle className="text-lg">{ticket.subject}</CardTitle>
+                              {unreadCounts[ticket.id] > 0 && (
+                                <Badge variant="destructive" className="animate-pulse">
+                                  {unreadCounts[ticket.id]} nouveau{unreadCounts[ticket.id] > 1 ? 'x' : ''}
+                                </Badge>
+                              )}
+                            </div>
+                            
+                            <div className="flex items-center gap-2 flex-wrap text-sm">
+                              <Badge variant="outline">
+                                {categoryLabels[ticket.category] || 'Autre'}
                               </Badge>
-                            )}
-                            {unreadCounts[ticket.id] > 0 && (
-                              <Badge variant="destructive">
-                                {unreadCounts[ticket.id]}
-                              </Badge>
+                              {ticket.subcategory && (
+                                <Badge variant="secondary" className="text-xs">
+                                  {ticket.subcategory}
+                                </Badge>
+                              )}
+                              <span className="text-muted-foreground">
+                                • {ticket.profiles?.full_name || ticket.profiles?.email || 'Utilisateur'}
+                              </span>
+                            </div>
+                          </div>
+                          
+                          <div className="flex gap-2 items-center">
+                            {getPriorityBadge(ticket.priority)}
+                            {getStatusBadge(ticket.status)}
+                            {ticket.status !== 'closed' && (
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={(e) => closeTicket(ticket.id, e)}
+                                title="Fermer le ticket"
+                                className="hover:bg-destructive/10 hover:text-destructive"
+                              >
+                                <X className="w-4 h-4" />
+                              </Button>
                             )}
                           </div>
-                          <CardDescription>
-                            De: {ticket.profiles?.full_name || ticket.profiles?.email || 'Utilisateur'}
-                          </CardDescription>
                         </div>
-                        <div className="flex gap-2 items-center">
-                          {getPriorityBadge(ticket.priority)}
-                          {getStatusBadge(ticket.status)}
-                          {ticket.status !== 'closed' && (
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={(e) => closeTicket(ticket.id, e)}
-                              title="Fermer le ticket"
-                            >
-                              <X className="w-4 h-4" />
-                            </Button>
-                          )}
-                        </div>
-                      </div>
-                    </CardHeader>
-                  </Card>
-                ))
-              )}
-            </TabsContent>
-
-            {['open', 'in_progress', 'closed'].map((status) => (
-              <TabsContent key={status} value={status} className="space-y-4 mt-6">
-                {filterTickets(status).map((ticket) => (
-                  <Card
-                    key={ticket.id}
-                    className="hover:shadow-lg transition-shadow cursor-pointer"
-                    onClick={() => navigate(`/ticket/${ticket.id}`)}
-                  >
-                    <CardHeader>
-                      <div className="flex justify-between items-start gap-4">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <CardTitle className="text-lg">{ticket.subject}</CardTitle>
-                            {ticket.category && ticket.category !== 'general' && (
-                              <Badge variant="outline" className="text-xs">
-                                {ticket.category === 'facture_autorisation' && '📝 Facture/Auto'}
-                                {ticket.category === 'gestion_produit' && '📦 Gestion produit'}
-                                {ticket.category === 'marketplace' && '🛒 Marketplace'}
-                                {ticket.category === 'avis' && '⭐ Avis'}
-                                {ticket.category === 'autre' && '💬 Autre'}
-                              </Badge>
-                            )}
-                            {unreadCounts[ticket.id] > 0 && (
-                              <Badge variant="destructive">
-                                {unreadCounts[ticket.id]}
-                              </Badge>
-                            )}
-                          </div>
-                          <CardDescription>
-                            De: {ticket.profiles?.full_name || ticket.profiles?.email || 'Utilisateur'}
-                          </CardDescription>
-                        </div>
-                        <div className="flex gap-2 items-center">
-                          {getPriorityBadge(ticket.priority)}
-                          {getStatusBadge(ticket.status)}
-                          {ticket.status !== 'closed' && (
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={(e) => closeTicket(ticket.id, e)}
-                              title="Fermer le ticket"
-                            >
-                              <X className="w-4 h-4" />
-                            </Button>
-                          )}
-                        </div>
-                      </div>
-                    </CardHeader>
-                  </Card>
-                ))}
+                      </CardHeader>
+                    </Card>
+                  ))
+                )}
               </TabsContent>
             ))}
           </Tabs>
