@@ -54,6 +54,7 @@ const Dashboard = () => {
   const { user, isVIP, subscription, isLoading } = useAuth();
   const { unreadCount } = useUnreadMessages();
   const [rulesOpen, setRulesOpen] = useState(false);
+  const [invoiceAuthOpen, setInvoiceAuthOpen] = useState(false);
 
   const rules = [
     {
@@ -173,7 +174,7 @@ const Dashboard = () => {
                 <AccordionContent>
                   <div className="grid gap-3 pt-2">
                     <CategoryItem icon={Eye} label="création-société" />
-                    <CategoryItem icon={FileText} label="facture-autorisation" />
+                    <CategoryItem icon={FileText} label="facture-autorisation" onClick={() => setInvoiceAuthOpen(true)} />
                     <CategoryItem icon={DollarSign} label="cashback" />
                     <CategoryItem icon={Star} label="avis" />
                     <CategoryItem icon={Calculator} label="fiscalité-simplifiée" />
@@ -330,6 +331,159 @@ const Dashboard = () => {
                 <CardContent className="pt-6 text-center">
                   <p className="text-sm font-semibold text-foreground">
                     Merci de contribuer à faire d'AMZing FBA un espace professionnel, fiable et performant 💪
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+          </ScrollArea>
+        </DialogContent>
+      </Dialog>
+
+      {/* Invoice Authorization Dialog */}
+      <Dialog open={invoiceAuthOpen} onOpenChange={setInvoiceAuthOpen}>
+        <DialogContent className="max-w-4xl max-h-[80vh]">
+          <DialogHeader>
+            <DialogTitle className="text-2xl flex items-center gap-2">
+              <FileText className="w-6 h-6 text-primary" />
+              Vos autorisations de ventes assurées avec AMZing FBA ! 📝
+            </DialogTitle>
+            <DialogDescription>
+              Service professionnel d'accompagnement pour l'obtention des autorisations de marques sur Amazon
+            </DialogDescription>
+          </DialogHeader>
+          <ScrollArea className="h-[60vh] pr-4">
+            <div className="space-y-6">
+              <Card className="border-primary/20 bg-primary/5">
+                <CardContent className="pt-6">
+                  <p className="text-base leading-relaxed">
+                    Nous proposons un service d'assistance spécialisé pour faciliter l'obtention des autorisations de vente de marques sur la plateforme Amazon. Notre expertise vous permet de naviguer efficacement dans les processus de validation imposés par Amazon.
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-lg">
+                    <CheckCircle className="w-5 h-5 text-primary" />
+                    Procédure pour obtenir une autorisation
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <p className="text-sm leading-relaxed">
+                    Pour solliciter une autorisation de vente pour la marque de votre choix, veuillez suivre ces étapes :
+                  </p>
+                  
+                  <div className="bg-accent/50 rounded-lg p-4">
+                    <p className="font-semibold mb-3">1️⃣ Créer une demande d'assistance</p>
+                    <Link to="/support">
+                      <div className="flex items-center gap-2 text-primary hover:underline cursor-pointer">
+                        <MessageCircle className="w-4 h-4" />
+                        <span>Accéder au service support</span>
+                      </div>
+                    </Link>
+                  </div>
+
+                  <div className="space-y-2">
+                    <p className="font-semibold">2️⃣ Informations requises à communiquer :</p>
+                    <ul className="list-none space-y-2 ml-4">
+                      <li className="flex items-start gap-2">
+                        <span className="text-primary font-bold">•</span>
+                        <span>Adresse postale officielle de votre entreprise</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-primary font-bold">•</span>
+                        <span>Dénomination sociale complète de votre entreprise</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-primary font-bold">•</span>
+                        <span>Code EAN du produit concerné</span>
+                      </li>
+                    </ul>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-lg">
+                    <Info className="w-5 h-5 text-primary" />
+                    Contexte réglementaire Amazon
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground leading-relaxed mb-4">
+                    Amazon applique des critères d'acceptation de plus en plus stricts pour les vendeurs souhaitant commercialiser certaines marques. Cette politique vise à garantir la traçabilité et l'authenticité des produits distribués sur la plateforme.
+                  </p>
+                  
+                  <div className="space-y-4">
+                    <div className="border-l-4 border-primary/30 pl-4">
+                      <h4 className="font-semibold mb-2">Scénario 1 : Autorisation sans justificatif</h4>
+                      <p className="text-sm text-muted-foreground">
+                        Dans de rares cas, Amazon accorde l'autorisation de commercialisation sans exiger de facture d'achat.
+                      </p>
+                    </div>
+
+                    <div className="border-l-4 border-primary/30 pl-4">
+                      <h4 className="font-semibold mb-2">Scénario 2 : Validation automatisée</h4>
+                      <p className="text-sm text-muted-foreground">
+                        Amazon utilise un système automatisé d'évaluation des demandes. Les factures provenant d'enseignes reconnues (ex : grandes surfaces) sont généralement validées en quelques minutes si elles correspondent aux critères internes d'Amazon.
+                      </p>
+                    </div>
+
+                    <div className="border-l-4 border-amber-500/50 pl-4">
+                      <h4 className="font-semibold mb-2">Scénario 3 : Révision manuelle approfondie</h4>
+                      <p className="text-sm text-muted-foreground mb-3">
+                        Lorsque la validation automatique échoue, un examen manuel est déclenché. Les documents suivants peuvent être requis :
+                      </p>
+                      <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1 ml-2">
+                        <li>Facture émise par un fabricant, fournisseur ou distributeur agréé</li>
+                        <li>Lettre d'autorisation officielle de la marque</li>
+                        <li>Justificatif de traçabilité complet de la chaîne d'approvisionnement</li>
+                      </ul>
+                      <p className="text-sm text-muted-foreground mt-3 italic">
+                        Ces exigences sont particulièrement contraignantes et difficiles à obtenir pour de nombreux vendeurs.
+                      </p>
+                    </div>
+
+                    <div className="border-l-4 border-destructive/50 pl-4">
+                      <h4 className="font-semibold mb-2">Scénario 4 : Compte non éligible</h4>
+                      <p className="text-sm text-muted-foreground">
+                        Si votre demande est refusée sans justification détaillée, votre compte vendeur n'est actuellement pas éligible pour cette marque spécifique. Il est recommandé de poursuivre vos activités avec d'autres produits afin de renforcer progressivement la crédibilité de votre compte.
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-accent/30">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-lg">
+                    <LightbulbIcon className="w-5 h-5 text-primary" />
+                    Recommandations stratégiques
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <p className="text-sm leading-relaxed">
+                    Amazon évalue la fiabilité de votre compte vendeur selon plusieurs critères essentiels :
+                  </p>
+                  <ul className="list-disc list-inside text-sm space-y-2 ml-2 text-muted-foreground">
+                    <li>Historique et volume des ventes réalisées</li>
+                    <li>État de santé global du compte (taux de défauts, réclamations, retours)</li>
+                    <li>Nombre et qualité des évaluations client</li>
+                  </ul>
+                  <p className="text-sm font-semibold mt-4">
+                    Plus votre activité est régulière et conforme aux standards Amazon, plus vous obtiendrez de facilités pour les autorisations de nouvelles marques.
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card className="border-amber-500/50 bg-amber-500/5">
+                <CardContent className="pt-6">
+                  <p className="text-sm text-center font-semibold">
+                    🚨 Ces informations concernent principalement les vendeurs récents ou disposant d'un historique limité sur Amazon.
+                  </p>
+                  <p className="text-xs text-center text-muted-foreground mt-2">
+                    Cette analyse est basée sur notre expertise terrain et nos échanges réguliers avec les équipes Amazon concernant les demandes d'autorisation de nos membres.
                   </p>
                 </CardContent>
               </Card>
