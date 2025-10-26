@@ -247,7 +247,7 @@ const Dashboard = () => {
                   <div className="grid gap-3 pt-2">
                     <CategoryItem icon={MessageCircle} label="général" link="/chat" />
                     <CategoryItem icon={LightbulbIcon} label="suggestions" />
-                    <CategoryItem icon={Trophy} label="succès" />
+                    <CategoryItem icon={Trophy} label="succès" link="/success" />
                     <CategoryItem icon={DollarSign} label="ventes" />
                   </div>
                 </AccordionContent>
