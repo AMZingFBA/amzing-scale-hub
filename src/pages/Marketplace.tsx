@@ -562,6 +562,7 @@ const Marketplace = () => {
 
       const sellerNickname = sellerProfile?.nickname || sellerProfile?.email?.split("@")[0] || "Vendeur";
       const buyerNickname = buyerProfile?.nickname || buyerProfile?.email?.split("@")[0] || "Acheteur";
+      const buyerEmail = buyerProfile?.email || "";
       
       const code = buyRequest.asin || buyRequest.ean || "N/A";
       const codeType = buyRequest.asin ? "ASIN" : buyRequest.ean ? "EAN" : "Code";
@@ -582,47 +583,21 @@ const Marketplace = () => {
 
       if (sellerError) throw sellerError;
 
-      // Message initial pour le vendeur
+      // Message initial pour le vendeur avec toutes les infos
       const sellerMessage = `Bonjour 👋,
 Je possède cet article et je souhaite le vendre.
 Voici les détails de l'annonce :
 - Titre : ${buyRequest.title}
 - Budget max : ${buyRequest.max_price ? `${buyRequest.max_price}€ ${buyRequest.price_type}` : "Non spécifié"}
 - Quantité : ${buyRequest.quantity}
-- Code annonce : ${code}`;
+- Code annonce : ${code}
+
+📧 Contact acheteur : ${buyerNickname} (${buyerEmail})`;
       
       await supabase.from("messages").insert({
         ticket_id: sellerTicket.id,
         user_id: user.id,
         content: sellerMessage
-      });
-
-      // Créer un ticket miroir pour l'acheteur + staff
-      const buyerSubject = `achat - ${buyRequest.title} - ${code} et ${sellerNickname}`;
-      const { data: buyerTicket, error: buyerError } = await supabase
-        .from("tickets")
-        .insert({
-          user_id: buyRequest.user_id,
-          subject: buyerSubject,
-          category: "marketplace",
-          status: "open",
-          priority: "normal"
-        })
-        .select()
-        .single();
-
-      if (buyerError) throw buyerError;
-
-      // Message initial pour l'acheteur
-      const buyerMessage = `Bonjour 👋
-je possède l'article que vous recherchez :
-${buyRequest.title}
-Êtes-vous toujours intéressé ?`;
-      
-      await supabase.from("messages").insert({
-        ticket_id: buyerTicket.id,
-        user_id: user.id,
-        content: buyerMessage
       });
 
       toast.success("Proposition de vente envoyée! Un ticket a été créé.");
