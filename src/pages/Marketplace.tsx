@@ -367,44 +367,9 @@ const Marketplace = () => {
     }
 
     try {
-      // Create marketplace chat room name
       const code = listing.asin || listing.ean || "N/A";
-      const roomName = `Achat - ${listing.title} - ${code}`;
-
-      // Create a private marketplace chat room
-      const { data: room, error: roomError } = await supabase
-        .from("chat_rooms")
-        .insert({
-          name: roomName,
-          type: "marketplace",
-          created_by: user.id
-        })
-        .select()
-        .single();
-
-      if (roomError) throw roomError;
-
-      // Add buyer (current user) as member
-      const { error: buyerMemberError } = await supabase
-        .from("chat_room_members")
-        .insert({
-          room_id: room.id,
-          user_id: user.id
-        });
-
-      if (buyerMemberError) throw buyerMemberError;
-
-      // Add seller (listing owner) as member
-      const { error: sellerMemberError } = await supabase
-        .from("chat_room_members")
-        .insert({
-          room_id: room.id,
-          user_id: listing.user_id
-        });
-
-      if (sellerMemberError) throw sellerMemberError;
-
-      // Get admin user to add as member
+      
+      // Get admin user
       const { data: adminRole } = await supabase
         .from("user_roles")
         .select("user_id")
@@ -412,16 +377,55 @@ const Marketplace = () => {
         .limit(1)
         .single();
 
-      if (adminRole) {
-        await supabase
-          .from("chat_room_members")
-          .insert({
-            room_id: room.id,
-            user_id: adminRole.user_id
-          });
+      if (!adminRole) {
+        throw new Error("Admin non trouvé");
       }
 
-      toast.success("Conversation créée! Rendez-vous dans le chat pour discuter.");
+      // 1. Create buyer + staff conversation
+      const buyerRoomName = `Achat - ${listing.title} - ${code}`;
+      const { data: buyerRoom, error: buyerRoomError } = await supabase
+        .from("chat_rooms")
+        .insert({
+          name: buyerRoomName,
+          type: "marketplace",
+          created_by: user.id
+        })
+        .select()
+        .single();
+
+      if (buyerRoomError) throw buyerRoomError;
+
+      // Add buyer and admin to buyer room
+      await supabase
+        .from("chat_room_members")
+        .insert([
+          { room_id: buyerRoom.id, user_id: user.id },
+          { room_id: buyerRoom.id, user_id: adminRole.user_id }
+        ]);
+
+      // 2. Create seller + staff conversation
+      const sellerRoomName = `Vente - ${listing.title} - ${code}`;
+      const { data: sellerRoom, error: sellerRoomError } = await supabase
+        .from("chat_rooms")
+        .insert({
+          name: sellerRoomName,
+          type: "marketplace",
+          created_by: user.id
+        })
+        .select()
+        .single();
+
+      if (sellerRoomError) throw sellerRoomError;
+
+      // Add seller and admin to seller room
+      await supabase
+        .from("chat_room_members")
+        .insert([
+          { room_id: sellerRoom.id, user_id: listing.user_id },
+          { room_id: sellerRoom.id, user_id: adminRole.user_id }
+        ]);
+
+      toast.success("Conversations créées! Rendez-vous dans le chat.");
       navigate("/chat");
     } catch (error: any) {
       console.error("Error creating marketplace room:", error);
@@ -439,44 +443,9 @@ const Marketplace = () => {
     }
 
     try {
-      // Create marketplace chat room name
       const code = buyRequest.asin || buyRequest.ean || "N/A";
-      const roomName = `Vente - ${buyRequest.title} - ${code}`;
-
-      // Create a private marketplace chat room
-      const { data: room, error: roomError } = await supabase
-        .from("chat_rooms")
-        .insert({
-          name: roomName,
-          type: "marketplace",
-          created_by: user.id
-        })
-        .select()
-        .single();
-
-      if (roomError) throw roomError;
-
-      // Add seller (current user) as member
-      const { error: sellerMemberError } = await supabase
-        .from("chat_room_members")
-        .insert({
-          room_id: room.id,
-          user_id: user.id
-        });
-
-      if (sellerMemberError) throw sellerMemberError;
-
-      // Add buyer (buy request owner) as member
-      const { error: buyerMemberError } = await supabase
-        .from("chat_room_members")
-        .insert({
-          room_id: room.id,
-          user_id: buyRequest.user_id
-        });
-
-      if (buyerMemberError) throw buyerMemberError;
-
-      // Get admin user to add as member
+      
+      // Get admin user
       const { data: adminRole } = await supabase
         .from("user_roles")
         .select("user_id")
@@ -484,16 +453,55 @@ const Marketplace = () => {
         .limit(1)
         .single();
 
-      if (adminRole) {
-        await supabase
-          .from("chat_room_members")
-          .insert({
-            room_id: room.id,
-            user_id: adminRole.user_id
-          });
+      if (!adminRole) {
+        throw new Error("Admin non trouvé");
       }
 
-      toast.success("Conversation créée! Rendez-vous dans le chat pour discuter.");
+      // 1. Create seller + staff conversation
+      const sellerRoomName = `Vente - ${buyRequest.title} - ${code}`;
+      const { data: sellerRoom, error: sellerRoomError } = await supabase
+        .from("chat_rooms")
+        .insert({
+          name: sellerRoomName,
+          type: "marketplace",
+          created_by: user.id
+        })
+        .select()
+        .single();
+
+      if (sellerRoomError) throw sellerRoomError;
+
+      // Add seller and admin to seller room
+      await supabase
+        .from("chat_room_members")
+        .insert([
+          { room_id: sellerRoom.id, user_id: user.id },
+          { room_id: sellerRoom.id, user_id: adminRole.user_id }
+        ]);
+
+      // 2. Create buyer + staff conversation
+      const buyerRoomName = `Achat - ${buyRequest.title} - ${code}`;
+      const { data: buyerRoom, error: buyerRoomError } = await supabase
+        .from("chat_rooms")
+        .insert({
+          name: buyerRoomName,
+          type: "marketplace",
+          created_by: user.id
+        })
+        .select()
+        .single();
+
+      if (buyerRoomError) throw buyerRoomError;
+
+      // Add buyer and admin to buyer room
+      await supabase
+        .from("chat_room_members")
+        .insert([
+          { room_id: buyerRoom.id, user_id: buyRequest.user_id },
+          { room_id: buyerRoom.id, user_id: adminRole.user_id }
+        ]);
+
+      toast.success("Conversations créées! Rendez-vous dans le chat.");
       navigate("/chat");
     } catch (error: any) {
       console.error("Error creating proposal:", error);

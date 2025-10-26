@@ -289,8 +289,13 @@ const Chat = () => {
       return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
     });
 
-  // Separate marketplace rooms from other rooms
-  const marketplaceRooms = filteredRooms.filter(room => room.type === 'marketplace');
+  // Separate marketplace rooms by role (acheter vs vendre)
+  const marketplaceAcheterRooms = filteredRooms.filter(room => 
+    room.type === 'marketplace' && room.name?.startsWith('Achat')
+  );
+  const marketplaceVendreRooms = filteredRooms.filter(room => 
+    room.type === 'marketplace' && room.name?.startsWith('Vente')
+  );
   const otherRooms = filteredRooms.filter(room => room.type !== 'marketplace');
 
   if (loading) {
@@ -484,61 +489,100 @@ const Chat = () => {
                 ))
                   }
                   
-                  {/* Marketplace rooms section */}
-                  {marketplaceRooms.length > 0 && (
+                  {/* Marketplace sections */}
+                  {(marketplaceAcheterRooms.length > 0 || marketplaceVendreRooms.length > 0) && (
                     <>
                       <div className="pt-4 pb-2 px-2">
-                        <h3 className="text-sm font-semibold text-muted-foreground">🛒 Marketplace</h3>
+                        <h3 className="text-sm font-semibold text-muted-foreground uppercase">🛒 Marketplace</h3>
                       </div>
-                      {marketplaceRooms.map((room) => (
-                        <div
-                          key={room.id}
-                          className={`rounded-lg transition-colors ${
-                            selectedRoom === room.id
-                              ? 'bg-primary text-primary-foreground'
-                              : 'hover:bg-accent'
-                          }`}
-                        >
-                          <div className="flex items-center">
-                            <button
-                              onClick={() => setSelectedRoom(room.id)}
-                              className="flex-1 text-left p-3"
-                            >
-                              <div className="font-medium flex items-center gap-2">
-                                {pinnedRooms.has(room.id) && <Pin className="h-3 w-3" />}
-                                {room.name || 'Transaction'}
-                              </div>
-                              <div className="text-xs opacity-70">
-                                💬 Conversation privée
-                              </div>
-                            </button>
-                            <div className="flex items-center gap-1 pr-2">
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                className="h-8 w-8 p-0"
-                                onClick={() => togglePin(room.id)}
-                                title={pinnedRooms.has(room.id) ? 'Désépingler' : 'Épingler'}
-                              >
-                                {pinnedRooms.has(room.id) ? (
-                                  <PinOff className="h-3 w-3" />
-                                ) : (
-                                  <Pin className="h-3 w-3" />
-                                )}
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                className="h-8 w-8 p-0"
-                                onClick={() => hideRoom(room.id)}
-                                title="Masquer cette conversation"
-                              >
-                                <EyeOff className="h-3 w-3" />
-                              </Button>
-                            </div>
+                      
+                      {/* Acheter section */}
+                      {marketplaceAcheterRooms.length > 0 && (
+                        <>
+                          <div className="pt-2 pb-1 px-4">
+                            <h4 className="text-xs font-medium text-muted-foreground">🛍️ acheter</h4>
                           </div>
-                        </div>
-                      ))}
+                          {marketplaceAcheterRooms.map((room) => (
+                            <div
+                              key={room.id}
+                              className={`rounded-lg transition-colors ${
+                                selectedRoom === room.id
+                                  ? 'bg-primary text-primary-foreground'
+                                  : 'hover:bg-accent'
+                              }`}
+                            >
+                              <div className="flex items-center">
+                                <button
+                                  onClick={() => setSelectedRoom(room.id)}
+                                  className="flex-1 text-left p-3"
+                                >
+                                  <div className="font-medium text-sm">
+                                    {room.name?.replace('Achat - ', '') || 'Transaction'}
+                                  </div>
+                                  <div className="text-xs opacity-70">
+                                    💬 Vous + Staff
+                                  </div>
+                                </button>
+                                <div className="flex items-center gap-1 pr-2">
+                                  <Button
+                                    size="sm"
+                                    variant="ghost"
+                                    className="h-8 w-8 p-0"
+                                    onClick={() => hideRoom(room.id)}
+                                    title="Masquer"
+                                  >
+                                    <EyeOff className="h-3 w-3" />
+                                  </Button>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </>
+                      )}
+                      
+                      {/* Vendre section */}
+                      {marketplaceVendreRooms.length > 0 && (
+                        <>
+                          <div className="pt-2 pb-1 px-4">
+                            <h4 className="text-xs font-medium text-muted-foreground">💰 vendre</h4>
+                          </div>
+                          {marketplaceVendreRooms.map((room) => (
+                            <div
+                              key={room.id}
+                              className={`rounded-lg transition-colors ${
+                                selectedRoom === room.id
+                                  ? 'bg-primary text-primary-foreground'
+                                  : 'hover:bg-accent'
+                              }`}
+                            >
+                              <div className="flex items-center">
+                                <button
+                                  onClick={() => setSelectedRoom(room.id)}
+                                  className="flex-1 text-left p-3"
+                                >
+                                  <div className="font-medium text-sm">
+                                    {room.name?.replace('Vente - ', '') || 'Transaction'}
+                                  </div>
+                                  <div className="text-xs opacity-70">
+                                    💬 Vous + Staff
+                                  </div>
+                                </button>
+                                <div className="flex items-center gap-1 pr-2">
+                                  <Button
+                                    size="sm"
+                                    variant="ghost"
+                                    className="h-8 w-8 p-0"
+                                    onClick={() => hideRoom(room.id)}
+                                    title="Masquer"
+                                  >
+                                    <EyeOff className="h-3 w-3" />
+                                  </Button>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </>
+                      )}
                     </>
                   )}
                 </>
