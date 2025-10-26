@@ -39,7 +39,7 @@ interface Profile {
 
 interface Props {
   selectedConversation: string | null;
-  onSelectConversation: (id: string) => void;
+  onSelectConversation: (id: string | null) => void;
 }
 
 export const DirectMessageList = ({ selectedConversation, onSelectConversation }: Props) => {
@@ -199,7 +199,7 @@ export const DirectMessageList = ({ selectedConversation, onSelectConversation }
       
       // If deleting current conversation, deselect it
       if (selectedConversation === conversationToDelete) {
-        onSelectConversation('');
+        onSelectConversation(null);
       }
       
       fetchConversations();
