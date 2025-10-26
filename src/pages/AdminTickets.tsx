@@ -245,7 +245,10 @@ const AdminTickets = () => {
     const open = tickets.filter(t => t.status === 'open').length;
     const inProgress = tickets.filter(t => t.status === 'in_progress').length;
     const closed = tickets.filter(t => t.status === 'closed').length;
-    const totalUnread = Object.values(unreadCounts).reduce((sum, count) => sum + count, 0);
+    // Ne compter que les messages non lus des tickets ouverts ou en cours
+    const totalUnread = tickets
+      .filter(t => t.status === 'open' || t.status === 'in_progress')
+      .reduce((sum, ticket) => sum + (unreadCounts[ticket.id] || 0), 0);
 
     return { open, inProgress, closed, totalUnread };
   };
