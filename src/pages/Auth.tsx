@@ -39,6 +39,7 @@ const Auth = () => {
     const password = formData.get('password') as string;
     const fullName = formData.get('fullName') as string;
     const nickname = formData.get('nickname') as string;
+    const phone = formData.get('phone') as string;
     const confirmPassword = formData.get('confirmPassword') as string;
 
     if (password !== confirmPassword) {
@@ -47,7 +48,7 @@ const Auth = () => {
       return;
     }
 
-    await signUp(email, password, fullName, nickname);
+    await signUp(email, password, fullName, nickname, phone);
     setIsLoading(false);
   };
 
@@ -96,6 +97,11 @@ const Auth = () => {
                       disabled={isLoading}
                     />
                   </div>
+                  <div className="text-right">
+                    <Link to="/forgot-password" className="text-sm text-primary hover:underline">
+                      Mot de passe oublié ?
+                    </Link>
+                  </div>
                   <Button
                     type="submit"
                     variant="hero"
@@ -132,6 +138,17 @@ const Auth = () => {
                     />
                   </div>
                   <div className="space-y-2">
+                    <Label htmlFor="signup-phone">Numéro de téléphone</Label>
+                    <Input
+                      id="signup-phone"
+                      name="phone"
+                      type="tel"
+                      placeholder="+33 6 12 34 56 78"
+                      required
+                      disabled={isLoading}
+                    />
+                  </div>
+                  <div className="space-y-2">
                     <Label htmlFor="signup-email">Email</Label>
                     <Input
                       id="signup-email"
@@ -143,7 +160,7 @@ const Auth = () => {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="signup-password">Mot de passe</Label>
+                    <Label htmlFor="signup-password">Mot de passe (min. 6 caractères)</Label>
                     <Input
                       id="signup-password"
                       name="password"
@@ -174,6 +191,9 @@ const Auth = () => {
                   >
                     {isLoading ? 'Création...' : 'Créer un compte'}
                   </Button>
+                  <p className="text-xs text-muted-foreground text-center">
+                    Un email de vérification sera envoyé à votre adresse
+                  </p>
                 </form>
               </TabsContent>
             </Tabs>

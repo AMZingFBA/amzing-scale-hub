@@ -17,7 +17,7 @@ interface AuthContextType {
   subscription: Subscription | null;
   isVIP: boolean;
   isLoading: boolean;
-  signUp: (email: string, password: string, fullName: string, nickname: string) => Promise<{ error: any }>;
+  signUp: (email: string, password: string, fullName: string, nickname: string, phone: string) => Promise<{ error: any }>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
   refreshSubscription: () => Promise<void>;
@@ -89,11 +89,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return () => authSubscription.unsubscribe();
   }, []);
 
-  const signUp = async (email: string, password: string, fullName: string, nickname: string) => {
+  const signUp = async (email: string, password: string, fullName: string, nickname: string, phone: string) => {
     try {
       const redirectUrl = `${window.location.origin}/`;
       
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -101,13 +101,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           data: {
             full_name: fullName,
             nickname: nickname,
+            phone: phone,
           },
         },
       });
 
       if (error) throw error;
 
-      toast.success('Compte créé avec succès !');
+      // Update profile with phone number
+      if (data.user) {
+        await supabase
+          .from('profiles')
+          .update({ phone: phone })
+          .eq('id', data.user.id);
+      }
+
+      toast.success('Compte créé avec succès ! Veuillez vérifier votre email pour confirmer votre inscription.');
       navigate('/');
       return { error: null };
     } catch (error: any) {
