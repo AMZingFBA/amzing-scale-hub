@@ -217,7 +217,8 @@ const AdminTickets = () => {
       const category = ticket.category || 'autre';
       if (stats[category]) {
         stats[category].total++;
-        if (unreadCounts[ticket.id] > 0) {
+        // Ne compter les messages non lus QUE pour les tickets ouverts ou en cours
+        if (unreadCounts[ticket.id] > 0 && (ticket.status === 'open' || ticket.status === 'in_progress')) {
           stats[category].unread += unreadCounts[ticket.id];
         }
       }
@@ -230,9 +231,13 @@ const AdminTickets = () => {
     const catalogueProTickets = tickets.filter(t => 
       t.category === 'gestion_produit' && t.subcategory === 'catalogue_pro'
     );
-    const unreadCatalogueProCount = catalogueProTickets.reduce((sum, ticket) => 
-      sum + (unreadCounts[ticket.id] || 0), 0
-    );
+    // Ne compter les messages non lus QUE pour les tickets ouverts ou en cours
+    const unreadCatalogueProCount = catalogueProTickets.reduce((sum, ticket) => {
+      if (ticket.status === 'open' || ticket.status === 'in_progress') {
+        return sum + (unreadCounts[ticket.id] || 0);
+      }
+      return sum;
+    }, 0);
     return { total: catalogueProTickets.length, unread: unreadCatalogueProCount };
   };
 
