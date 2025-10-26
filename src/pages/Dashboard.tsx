@@ -263,7 +263,8 @@ const Dashboard = () => {
                 </AccordionTrigger>
                 <AccordionContent>
                   <div className="grid gap-3 pt-2">
-                    <CategoryItem icon={ShoppingCart} label="marketplace" link="/marketplace" />
+                    <CategoryItem icon={ShoppingCart} label="acheter" link="/acheter" />
+                    <CategoryItem icon={Package} label="vendre" link="/vendre" />
                   </div>
                 </AccordionContent>
               </AccordionItem>

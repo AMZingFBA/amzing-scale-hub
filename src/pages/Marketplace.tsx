@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/use-auth";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -46,7 +46,21 @@ interface BuyRequest {
 const Marketplace = () => {
   const { user, isVIP } = useAuth();
   const navigate = useNavigate();
-  const [activeSection, setActiveSection] = useState<"buy" | "sell">("buy");
+  const location = useLocation();
+  
+  // Determine section based on route
+  const getInitialSection = (): "buy" | "sell" => {
+    if (location.pathname === "/acheter") return "buy";
+    if (location.pathname === "/vendre") return "sell";
+    return "buy";
+  };
+  
+  const [activeSection, setActiveSection] = useState<"buy" | "sell">(getInitialSection());
+  
+  // Update section when route changes
+  useEffect(() => {
+    setActiveSection(getInitialSection());
+  }, [location.pathname]);
   
   // Sell listings
   const [listings, setListings] = useState<Listing[]>([]);
@@ -630,7 +644,10 @@ const Marketplace = () => {
           <Button
             size="lg"
             variant={activeSection === "buy" ? "default" : "outline"}
-            onClick={() => setActiveSection("buy")}
+            onClick={() => {
+              setActiveSection("buy");
+              navigate("/acheter");
+            }}
             className="flex-1"
           >
             <ShoppingCart className="w-5 h-5 mr-2" />
@@ -639,7 +656,10 @@ const Marketplace = () => {
           <Button
             size="lg"
             variant={activeSection === "sell" ? "default" : "outline"}
-            onClick={() => setActiveSection("sell")}
+            onClick={() => {
+              setActiveSection("sell");
+              navigate("/vendre");
+            }}
             className="flex-1"
           >
             <ShoppingBag className="w-5 h-5 mr-2" />
