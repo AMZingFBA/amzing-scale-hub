@@ -21,6 +21,7 @@ import Refund from "./pages/Refund";
 import Support from "./pages/Support";
 import Ticket from "./pages/Ticket";
 import AdminTickets from "./pages/AdminTickets";
+import Chat from "./pages/Chat";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -50,6 +51,7 @@ const App = () => (
             <Route path="/support" element={<Support />} />
             <Route path="/ticket/:id" element={<Ticket />} />
             <Route path="/admin/tickets" element={<AdminTickets />} />
+            <Route path="/chat" element={<Chat />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

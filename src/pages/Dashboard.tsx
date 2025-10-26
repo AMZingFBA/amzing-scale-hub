@@ -245,7 +245,7 @@ const Dashboard = () => {
                 </AccordionTrigger>
                 <AccordionContent>
                   <div className="grid gap-3 pt-2">
-                    <CategoryItem icon={MessageCircle} label="général" />
+                    <CategoryItem icon={MessageCircle} label="général" link="/chat" />
                     <CategoryItem icon={LightbulbIcon} label="suggestions" />
                     <CategoryItem icon={Trophy} label="succès" />
                     <CategoryItem icon={DollarSign} label="ventes" />
