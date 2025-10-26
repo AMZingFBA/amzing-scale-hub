@@ -60,7 +60,10 @@ const Marketplace = () => {
   
   // Update section when route changes
   useEffect(() => {
-    setActiveSection(getInitialSection());
+    const newSection = getInitialSection();
+    setActiveSection(newSection);
+    // Reset tab when changing section
+    setActiveTab("all");
   }, [location.pathname]);
   
   // Sell listings
@@ -75,6 +78,10 @@ const Marketplace = () => {
   const [myConversations, setMyConversations] = useState<any[]>([]);
   const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<string>("all");
+  
+  // Marketplace tickets
+  const [myTickets, setMyTickets] = useState<any[]>([]);
+  const [selectedTicket, setSelectedTicket] = useState<string | null>(null);
   
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -109,6 +116,7 @@ const Marketplace = () => {
     loadBuyRequests();
     loadMyBuyRequests();
     loadMyConversations();
+    loadMyTickets();
 
     const listingsChannel = supabase
       .channel("marketplace_listings_changes")
@@ -229,6 +237,27 @@ const Marketplace = () => {
       setMyConversations(rooms || []);
     } catch (error: any) {
       console.error("Error loading conversations:", error);
+    }
+  };
+
+  const loadMyTickets = async () => {
+    if (!user) return;
+    
+    try {
+      const { data, error } = await supabase
+        .from("tickets")
+        .select(`
+          *,
+          messages(id, content, created_at, user_id, file_url, file_name)
+        `)
+        .eq("user_id", user.id)
+        .eq("category", "marketplace")
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+      setMyTickets(data || []);
+    } catch (error: any) {
+      console.error("Error loading marketplace tickets:", error);
     }
   };
 
@@ -427,8 +456,10 @@ const Marketplace = () => {
 
       toast.success("Demande d'achat envoyée au staff!");
       
-      // Redirect to support page to see the ticket
-      window.location.href = "/support";
+      // Reload tickets and switch to tickets tab
+      await loadMyTickets();
+      setActiveTab("tickets");
+      setShowCreateDialog(false);
     } catch (error: any) {
       console.error("Error creating ticket:", error);
       toast.error("Erreur lors de la création de la demande");
@@ -474,8 +505,11 @@ const Marketplace = () => {
 
       toast.success("Proposition de vente envoyée au staff!");
       
-      // Redirect to support page to see the ticket
-      window.location.href = "/support";
+      // Reload tickets and switch to tickets tab (for vendre section, it needs to be in activeSection buy)
+      await loadMyTickets();
+      setActiveSection("buy");
+      setActiveTab("tickets");
+      setShowCreateDialog(false);
     } catch (error: any) {
       console.error("Error creating ticket:", error);
       toast.error("Erreur lors de la création de la proposition");
@@ -885,10 +919,11 @@ const Marketplace = () => {
 
         {/* Buy Section */}
         {activeSection === "buy" && (
-          <Tabs defaultValue="all" className="w-full">
-            <TabsList className="grid w-full max-w-md grid-cols-2">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="grid w-full max-w-2xl grid-cols-3">
               <TabsTrigger value="all">Toutes les demandes</TabsTrigger>
               <TabsTrigger value="mine">Mes demandes</TabsTrigger>
+              <TabsTrigger value="tickets">Mes demandes en cours</TabsTrigger>
             </TabsList>
 
             <TabsContent value="all" className="mt-6">
@@ -918,6 +953,71 @@ const Marketplace = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {myBuyRequests.map(request => renderBuyRequest(request, true))}
                 </div>
+              )}
+            </TabsContent>
+
+            <TabsContent value="tickets" className="mt-6">
+              {selectedTicket ? (
+                <div className="space-y-4">
+                  <Button 
+                    variant="outline" 
+                    onClick={() => setSelectedTicket(null)}
+                  >
+                    ← Retour aux demandes
+                  </Button>
+                  <iframe 
+                    src={`/ticket/${selectedTicket}`}
+                    className="w-full h-[600px] rounded-lg border"
+                    title="Ticket"
+                  />
+                </div>
+              ) : (
+                <>
+                  {myTickets.length === 0 ? (
+                    <Card className="p-12">
+                      <div className="text-center text-muted-foreground">
+                        <MessageCircle className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                        <p>Aucune demande en cours</p>
+                        <p className="text-sm mt-2">Cliquez sur "Je veux acheter" sur une annonce pour créer une demande</p>
+                      </div>
+                    </Card>
+                  ) : (
+                    <div className="grid grid-cols-1 gap-4">
+                      {myTickets.map((ticket) => (
+                        <Card key={ticket.id} className="hover:shadow-lg transition-shadow cursor-pointer">
+                          <CardHeader>
+                            <div className="flex items-start justify-between">
+                              <div>
+                                <CardTitle className="text-lg">{ticket.subject}</CardTitle>
+                                <CardDescription className="mt-1">
+                                  Créé le {new Date(ticket.created_at).toLocaleDateString('fr-FR')}
+                                </CardDescription>
+                              </div>
+                              <Badge variant={
+                                ticket.status === 'open' ? 'default' :
+                                ticket.status === 'in_progress' ? 'secondary' :
+                                'outline'
+                              }>
+                                {ticket.status === 'open' ? 'Ouvert' :
+                                 ticket.status === 'in_progress' ? 'En cours' :
+                                 'Fermé'}
+                              </Badge>
+                            </div>
+                          </CardHeader>
+                          <CardFooter>
+                            <Button 
+                              className="w-full"
+                              onClick={() => setSelectedTicket(ticket.id)}
+                            >
+                              <MessageCircle className="w-4 h-4 mr-2" />
+                              Voir la conversation
+                            </Button>
+                          </CardFooter>
+                        </Card>
+                      ))}
+                    </div>
+                  )}
+                </>
               )}
             </TabsContent>
           </Tabs>
