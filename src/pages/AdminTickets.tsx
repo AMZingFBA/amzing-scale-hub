@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Loader2, MessageSquare, X, Search, ShoppingCart, BookOpen, Settings, Truck, Bell, Package, AlertCircle, Clock, CheckCircle2 } from 'lucide-react';
+import { Loader2, MessageSquare, X, Search, ShoppingCart, BookOpen, Settings, Truck, Bell, Package, AlertCircle, Clock, CheckCircle2, Sparkles } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -288,9 +288,15 @@ const AdminTickets = () => {
       <Navbar />
       <main className="flex-grow pt-20">
         <div className="container mx-auto px-4 py-8 max-w-7xl">
-          <div className="mb-8">
-            <h1 className="text-4xl font-bold mb-2">Panneau d'Administration</h1>
-            <p className="text-muted-foreground">Vue d'ensemble et gestion des tickets</p>
+          <div className="mb-8 flex items-center justify-between">
+            <div>
+              <h1 className="text-4xl font-bold mb-2">Panneau d'Administration</h1>
+              <p className="text-muted-foreground">Vue d'ensemble et gestion des tickets</p>
+            </div>
+            <Button onClick={() => navigate('/admin/alerts')} variant="outline">
+              <Sparkles className="w-4 h-4 mr-2" />
+              Gérer les alertes produits
+            </Button>
           </div>
 
           {/* Statistiques globales */}

@@ -21,6 +21,7 @@ import Refund from "./pages/Refund";
 import Support from "./pages/Support";
 import Ticket from "./pages/Ticket";
 import AdminTickets from "./pages/AdminTickets";
+import AdminAlerts from "./pages/AdminAlerts";
 import Chat from "./pages/Chat";
 import NotFound from "./pages/NotFound";
 import Success from "./pages/Success";
@@ -28,6 +29,7 @@ import Sales from "./pages/Sales";
 import Suggestions from "./pages/Suggestions";
 import Marketplace from "./pages/Marketplace";
 import WantToSell from "./pages/WantToSell";
+import ProductAlerts from "./pages/ProductAlerts";
 
 const queryClient = new QueryClient();
 
@@ -56,6 +58,8 @@ const App = () => (
             <Route path="/support" element={<Support />} />
             <Route path="/ticket/:id" element={<Ticket />} />
             <Route path="/admin/tickets" element={<AdminTickets />} />
+            <Route path="/admin/alerts" element={<AdminAlerts />} />
+            <Route path="/produits-find" element={<ProductAlerts />} />
             <Route path="/chat" element={<Chat />} />
             <Route path="/success" element={<Success />} />
             <Route path="/sales" element={<Sales />} />

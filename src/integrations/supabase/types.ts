@@ -357,6 +357,45 @@ export type Database = {
           },
         ]
       }
+      product_alerts: {
+        Row: {
+          admin_id: string
+          content: string | null
+          created_at: string
+          file_name: string | null
+          file_type: string | null
+          file_url: string | null
+          id: string
+          link_url: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          admin_id: string
+          content?: string | null
+          created_at?: string
+          file_name?: string | null
+          file_type?: string | null
+          file_url?: string | null
+          id?: string
+          link_url?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          admin_id?: string
+          content?: string | null
+          created_at?: string
+          file_name?: string | null
+          file_type?: string | null
+          file_url?: string | null
+          id?: string
+          link_url?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
