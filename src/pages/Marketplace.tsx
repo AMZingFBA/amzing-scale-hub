@@ -874,76 +874,55 @@ const Marketplace = () => {
               </DialogContent>
             </Dialog>
 
-            {/* Tabs for all requests and my requests */}
+            {/* Tabs for listings */}
             <Tabs defaultValue="all" className="w-full">
               <TabsList className="grid w-full max-w-md grid-cols-2 p-1 bg-muted/50 rounded-lg">
                 <TabsTrigger value="all" className="data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all">
-                  Toutes les demandes
+                  Les annonces
                 </TabsTrigger>
                 <TabsTrigger value="mine" className="data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all">
-                  Mes demandes
+                  Mes annonces
                 </TabsTrigger>
               </TabsList>
 
               <TabsContent value="all" className="mt-6 animate-fade-in">
-                {buyRequests.length === 0 ? (
+                {listings.filter(l => l.user_id !== user?.id).length === 0 ? (
                   <Card className="p-16 border-2 border-dashed border-muted-foreground/20 bg-muted/5">
                     <div className="text-center text-muted-foreground space-y-4">
                       <div className="flex justify-center">
                         <div className="p-4 rounded-full bg-muted/30">
-                          <ShoppingCart className="w-12 h-12 opacity-50" />
+                          <ShoppingBag className="w-12 h-12 opacity-50" />
                         </div>
                       </div>
-                      <p className="text-lg font-medium">Aucune demande d'achat pour le moment</p>
+                      <p className="text-lg font-medium">Aucune annonce disponible pour le moment</p>
                     </div>
                   </Card>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {buyRequests.map(request => renderBuyRequest(request, false))}
+                    {listings.filter(l => l.user_id !== user?.id).map(listing => renderListing(listing, false))}
                   </div>
                 )}
               </TabsContent>
 
               <TabsContent value="mine" className="mt-6 animate-fade-in">
-                {myBuyRequests.length === 0 ? (
+                {myListings.filter(l => l.status === "active").length === 0 ? (
                   <Card className="p-16 border-2 border-dashed border-muted-foreground/20 bg-muted/5">
                     <div className="text-center text-muted-foreground space-y-4">
                       <div className="flex justify-center">
                         <div className="p-4 rounded-full bg-muted/30">
-                          <ShoppingCart className="w-12 h-12 opacity-50" />
+                          <ShoppingBag className="w-12 h-12 opacity-50" />
                         </div>
                       </div>
-                      <p className="text-lg font-medium">Vous n'avez pas encore créé de demande d'achat</p>
+                      <p className="text-lg font-medium">Vous n'avez pas encore créé d'annonce</p>
                     </div>
                   </Card>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {myBuyRequests.map(request => renderBuyRequest(request, true))}
+                    {myListings.filter(l => l.status === "active").map(listing => renderListing(listing, true))}
                   </div>
                 )}
               </TabsContent>
             </Tabs>
-
-            {/* Listings available */}
-            <div className="mt-12">
-              <h2 className="text-2xl font-bold mb-6">Annonces disponibles</h2>
-              {listings.length === 0 ? (
-                <Card className="p-16 border-2 border-dashed border-muted-foreground/20 bg-muted/5">
-                  <div className="text-center text-muted-foreground space-y-4">
-                    <div className="flex justify-center">
-                      <div className="p-4 rounded-full bg-muted/30">
-                        <ShoppingBag className="w-12 h-12 opacity-50" />
-                      </div>
-                    </div>
-                    <p className="text-lg font-medium">Aucune annonce de vente disponible pour le moment</p>
-                  </div>
-                </Card>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {listings.map(listing => renderListing(listing, false))}
-                </div>
-              )}
-            </div>
           </div>
         )}
 
