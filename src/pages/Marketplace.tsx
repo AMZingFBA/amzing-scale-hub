@@ -1271,12 +1271,12 @@ const Marketplace = () => {
           </div>
         )}
 
-        {/* Sell Section - Want to Sell - Exact copy of Want to Buy design */}
+        {/* Sell Section - Want to Sell - MISE À JOUR */}
         {activeSection === "sell" && (
           <div className="w-full space-y-6 animate-fade-in">
             <div className="mb-8">
               <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-                Want to Sell - Je vends
+                🛒 Want to Sell - Je vends
               </h1>
               <p className="text-muted-foreground mt-2">
                 Publiez vos produits à vendre ou parcourez les annonces des autres membres.
