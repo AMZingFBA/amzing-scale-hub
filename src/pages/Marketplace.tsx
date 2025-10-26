@@ -908,10 +908,10 @@ const Marketplace = () => {
           <div className="w-full space-y-6 animate-fade-in">
             <div className="mb-8">
               <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-                Rechercher des produits
+                Acheter des produits
               </h1>
               <p className="text-muted-foreground mt-2">
-                Parcourez les annonces disponibles ou dites-nous ce que vous recherchez
+                Parcourez les produits disponibles à la vente ou créez une demande de recherche
               </p>
             </div>
 
