@@ -360,6 +360,12 @@ const Marketplace = () => {
   const handleInterestInListing = async (listing: Listing) => {
     if (!user) return;
 
+    // Prevent buying your own listing
+    if (listing.user_id === user.id) {
+      toast.error("Vous ne pouvez pas acheter votre propre annonce!");
+      return;
+    }
+
     try {
       // Get seller profile info
       const { data: sellerProfile } = await supabase
@@ -423,6 +429,12 @@ const Marketplace = () => {
 
   const handleInterestInBuyRequest = async (buyRequest: BuyRequest) => {
     if (!user) return;
+
+    // Prevent selling to yourself
+    if (buyRequest.user_id === user.id) {
+      toast.error("Vous ne pouvez pas répondre à votre propre demande!");
+      return;
+    }
 
     try {
       // Get buyer profile info (the one who posted the buy request)
