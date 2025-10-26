@@ -381,6 +381,8 @@ const Marketplace = () => {
         throw new Error("Admin non trouvé");
       }
 
+      const isCurrentUserAdmin = adminRole.user_id === user.id;
+
       // 1. Create buyer + staff conversation
       const buyerRoomName = `Achat - ${listing.title} - ${code}`;
       const { data: buyerRoom, error: buyerRoomError } = await supabase
@@ -395,13 +397,12 @@ const Marketplace = () => {
 
       if (buyerRoomError) throw buyerRoomError;
 
-      // Add buyer and admin to buyer room
-      await supabase
-        .from("chat_room_members")
-        .insert([
-          { room_id: buyerRoom.id, user_id: user.id },
-          { room_id: buyerRoom.id, user_id: adminRole.user_id }
-        ]);
+      // Add buyer and admin to buyer room (avoid duplicates if user is admin)
+      const buyerRoomMembers = [{ room_id: buyerRoom.id, user_id: user.id }];
+      if (!isCurrentUserAdmin) {
+        buyerRoomMembers.push({ room_id: buyerRoom.id, user_id: adminRole.user_id });
+      }
+      await supabase.from("chat_room_members").insert(buyerRoomMembers);
 
       // 2. Create seller + staff conversation
       const sellerRoomName = `Vente - ${listing.title} - ${code}`;
@@ -417,13 +418,12 @@ const Marketplace = () => {
 
       if (sellerRoomError) throw sellerRoomError;
 
-      // Add seller and admin to seller room
-      await supabase
-        .from("chat_room_members")
-        .insert([
-          { room_id: sellerRoom.id, user_id: listing.user_id },
-          { room_id: sellerRoom.id, user_id: adminRole.user_id }
-        ]);
+      // Add seller and admin to seller room (avoid duplicates)
+      const sellerRoomMembers = [{ room_id: sellerRoom.id, user_id: listing.user_id }];
+      if (listing.user_id !== adminRole.user_id) {
+        sellerRoomMembers.push({ room_id: sellerRoom.id, user_id: adminRole.user_id });
+      }
+      await supabase.from("chat_room_members").insert(sellerRoomMembers);
 
       toast.success("Conversations créées! Rendez-vous dans le chat.");
       navigate("/chat");
@@ -457,6 +457,8 @@ const Marketplace = () => {
         throw new Error("Admin non trouvé");
       }
 
+      const isCurrentUserAdmin = adminRole.user_id === user.id;
+
       // 1. Create seller + staff conversation
       const sellerRoomName = `Vente - ${buyRequest.title} - ${code}`;
       const { data: sellerRoom, error: sellerRoomError } = await supabase
@@ -471,13 +473,12 @@ const Marketplace = () => {
 
       if (sellerRoomError) throw sellerRoomError;
 
-      // Add seller and admin to seller room
-      await supabase
-        .from("chat_room_members")
-        .insert([
-          { room_id: sellerRoom.id, user_id: user.id },
-          { room_id: sellerRoom.id, user_id: adminRole.user_id }
-        ]);
+      // Add seller and admin to seller room (avoid duplicates if user is admin)
+      const sellerRoomMembers = [{ room_id: sellerRoom.id, user_id: user.id }];
+      if (!isCurrentUserAdmin) {
+        sellerRoomMembers.push({ room_id: sellerRoom.id, user_id: adminRole.user_id });
+      }
+      await supabase.from("chat_room_members").insert(sellerRoomMembers);
 
       // 2. Create buyer + staff conversation
       const buyerRoomName = `Achat - ${buyRequest.title} - ${code}`;
@@ -493,13 +494,12 @@ const Marketplace = () => {
 
       if (buyerRoomError) throw buyerRoomError;
 
-      // Add buyer and admin to buyer room
-      await supabase
-        .from("chat_room_members")
-        .insert([
-          { room_id: buyerRoom.id, user_id: buyRequest.user_id },
-          { room_id: buyerRoom.id, user_id: adminRole.user_id }
-        ]);
+      // Add buyer and admin to buyer room (avoid duplicates)
+      const buyerRoomMembers = [{ room_id: buyerRoom.id, user_id: buyRequest.user_id }];
+      if (buyRequest.user_id !== adminRole.user_id) {
+        buyerRoomMembers.push({ room_id: buyerRoom.id, user_id: adminRole.user_id });
+      }
+      await supabase.from("chat_room_members").insert(buyerRoomMembers);
 
       toast.success("Conversations créées! Rendez-vous dans le chat.");
       navigate("/chat");
