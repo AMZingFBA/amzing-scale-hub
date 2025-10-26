@@ -1,5 +1,6 @@
 import { ArrowRight, Package, GraduationCap, Warehouse, Users, CheckCircle2, TrendingUp } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -11,9 +12,19 @@ import heroWarehouse from "@/assets/hero-warehouse.jpg";
 import teamWorking from "@/assets/team-working.jpg";
 import logistics from "@/assets/logistics.jpg";
 import { useTrial } from "@/hooks/use-trial";
+import { useAuth } from "@/hooks/use-auth";
 
 const Index = () => {
   const { startFreeTrial, isStarting } = useTrial();
+  const { isVIP, isLoading } = useAuth();
+  const navigate = useNavigate();
+
+  // Redirect VIP users to dashboard
+  useEffect(() => {
+    if (!isLoading && isVIP) {
+      navigate('/dashboard');
+    }
+  }, [isVIP, isLoading, navigate]);
 
   return (
     <div className="min-h-screen">
