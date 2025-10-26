@@ -62,9 +62,18 @@ const Marketplace = () => {
   useEffect(() => {
     const newSection = getInitialSection();
     setActiveSection(newSection);
-    // Reset tab when changing section
-    setActiveTab("all");
-  }, [location.pathname]);
+    
+    // Check for tab parameter in URL
+    const searchParams = new URLSearchParams(location.search);
+    const tabParam = searchParams.get('tab');
+    
+    if (tabParam === 'tickets') {
+      setActiveTab('tickets');
+    } else {
+      // Reset tab when changing section without tab parameter
+      setActiveTab("all");
+    }
+  }, [location.pathname, location.search]);
   
   // Sell listings
   const [listings, setListings] = useState<Listing[]>([]);
