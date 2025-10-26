@@ -723,64 +723,92 @@ const Marketplace = () => {
       <div className="max-w-7xl mx-auto">
         {/* Buy Section */}
         {activeSection === "buy" && (
-          <div className="w-full">
-            <div className="mb-6">
-              <h1 className="text-3xl font-bold">Mes demandes d'achat :</h1>
+          <div className="w-full space-y-6 animate-fade-in">
+            <div className="mb-8">
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+                Mes demandes d'achat :
+              </h1>
             </div>
             
             <Tabs defaultValue="ongoing" className="w-full">
-              <TabsList className="grid w-full max-w-md grid-cols-2 mb-6">
-                <TabsTrigger value="ongoing">En cours</TabsTrigger>
-                <TabsTrigger value="completed">Terminé</TabsTrigger>
+              <TabsList className="grid w-full max-w-md grid-cols-2 mb-8 p-1 bg-muted/50 rounded-lg">
+                <TabsTrigger 
+                  value="ongoing"
+                  className="data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all"
+                >
+                  En cours
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="completed"
+                  className="data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all"
+                >
+                  Terminé
+                </TabsTrigger>
               </TabsList>
 
-              <TabsContent value="ongoing" className="mt-6">
+              <TabsContent value="ongoing" className="mt-6 animate-fade-in">
                 {selectedTicket ? (
-                  <div className="space-y-4">
+                  <div className="space-y-4 animate-scale-in">
                     <Button 
                       variant="outline" 
                       onClick={() => setSelectedTicket(null)}
+                      className="hover-scale"
                     >
                       ← Retour aux demandes
                     </Button>
                     <iframe 
                       src={`/ticket/${selectedTicket}`}
-                      className="w-full h-[600px] rounded-lg border"
+                      className="w-full h-[600px] rounded-lg border shadow-lg"
                       title="Ticket"
                     />
                   </div>
                 ) : (
                   <>
                     {myTickets.filter(t => t.subject.startsWith('Achat') && ['open', 'in_progress'].includes(t.status)).length === 0 ? (
-                      <Card className="p-12">
-                        <div className="text-center text-muted-foreground">
-                          <MessageCircle className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                          <p>Aucune demande d'achat en cours</p>
-                          <p className="text-sm mt-2">Cliquez sur "Je veux acheter" sur une annonce pour créer une demande</p>
+                      <Card className="p-16 border-2 border-dashed border-muted-foreground/20 bg-muted/5 animate-fade-in">
+                        <div className="text-center text-muted-foreground space-y-4">
+                          <div className="flex justify-center">
+                            <div className="p-4 rounded-full bg-muted/30">
+                              <MessageCircle className="w-12 h-12 opacity-50" />
+                            </div>
+                          </div>
+                          <div className="space-y-2">
+                            <p className="text-lg font-medium">Aucune demande d'achat en cours</p>
+                            <p className="text-sm">
+                              Cliquez sur <span className="font-semibold text-primary">"Je veux acheter"</span> sur une annonce pour créer une demande
+                            </p>
+                          </div>
                         </div>
                       </Card>
                     ) : (
-                      <div className="grid grid-cols-1 gap-4">
+                      <div className="grid grid-cols-1 gap-4 animate-fade-in">
                         {myTickets
                           .filter(t => t.subject.startsWith('Achat') && ['open', 'in_progress'].includes(t.status))
                           .map((ticket) => (
-                          <Card key={ticket.id} className="hover:shadow-lg transition-shadow cursor-pointer">
+                          <Card key={ticket.id} className="hover:shadow-lg transition-all hover-scale cursor-pointer group">
                             <CardHeader>
-                              <div className="flex items-start justify-between">
-                                <div>
-                                  <CardTitle className="text-lg">{ticket.subject}</CardTitle>
-                                  <CardDescription className="mt-1">
-                                    Créé le {new Date(ticket.created_at).toLocaleDateString('fr-FR')}
+                              <div className="flex items-start justify-between gap-4">
+                                <div className="flex-1">
+                                  <CardTitle className="text-lg group-hover:text-primary transition-colors">
+                                    {ticket.subject}
+                                  </CardTitle>
+                                  <CardDescription className="mt-2 flex items-center gap-2">
+                                    <span className="text-xs">
+                                      Créé le {new Date(ticket.created_at).toLocaleDateString('fr-FR')}
+                                    </span>
                                   </CardDescription>
                                 </div>
-                                <Badge variant={ticket.status === 'open' ? 'default' : 'secondary'}>
+                                <Badge 
+                                  variant={ticket.status === 'open' ? 'default' : 'secondary'}
+                                  className="shrink-0"
+                                >
                                   {ticket.status === 'open' ? 'Ouvert' : 'En cours'}
                                 </Badge>
                               </div>
                             </CardHeader>
                             <CardFooter>
                               <Button 
-                                className="w-full"
+                                className="w-full hover-scale"
                                 onClick={() => setSelectedTicket(ticket.id)}
                               >
                                 <MessageCircle className="w-4 h-4 mr-2" />
@@ -795,30 +823,40 @@ const Marketplace = () => {
                 )}
               </TabsContent>
 
-              <TabsContent value="completed" className="mt-6">
+              <TabsContent value="completed" className="mt-6 animate-fade-in">
                 {myTickets.filter(t => t.subject.startsWith('Achat') && t.status === 'closed').length === 0 ? (
-                  <Card className="p-12">
-                    <div className="text-center text-muted-foreground">
-                      <MessageCircle className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                      <p>Aucune demande d'achat terminée</p>
+                  <Card className="p-16 border-2 border-dashed border-muted-foreground/20 bg-muted/5 animate-fade-in">
+                    <div className="text-center text-muted-foreground space-y-4">
+                      <div className="flex justify-center">
+                        <div className="p-4 rounded-full bg-muted/30">
+                          <MessageCircle className="w-12 h-12 opacity-50" />
+                        </div>
+                      </div>
+                      <p className="text-lg font-medium">Aucune demande d'achat terminée</p>
                     </div>
                   </Card>
                 ) : (
-                  <div className="grid grid-cols-1 gap-4">
+                  <div className="grid grid-cols-1 gap-4 animate-fade-in">
                     {myTickets
                       .filter(t => t.subject.startsWith('Achat') && t.status === 'closed')
                       .map((ticket) => (
-                      <Card key={ticket.id} className="hover:shadow-lg transition-shadow cursor-pointer opacity-70">
+                      <Card key={ticket.id} className="hover:shadow-lg transition-all cursor-pointer opacity-70 hover:opacity-100 group">
                         <CardHeader>
-                          <div className="flex items-start justify-between">
-                            <div>
-                              <CardTitle className="text-lg">{ticket.subject}</CardTitle>
-                              <CardDescription className="mt-1">
-                                Créé le {new Date(ticket.created_at).toLocaleDateString('fr-FR')}
-                                {ticket.closed_at && ` • Fermé le ${new Date(ticket.closed_at).toLocaleDateString('fr-FR')}`}
+                          <div className="flex items-start justify-between gap-4">
+                            <div className="flex-1">
+                              <CardTitle className="text-lg group-hover:text-primary transition-colors">
+                                {ticket.subject}
+                              </CardTitle>
+                              <CardDescription className="mt-2 text-xs space-y-1">
+                                <div>Créé le {new Date(ticket.created_at).toLocaleDateString('fr-FR')}</div>
+                                {ticket.closed_at && (
+                                  <div>Fermé le {new Date(ticket.closed_at).toLocaleDateString('fr-FR')}</div>
+                                )}
                               </CardDescription>
                             </div>
-                            <Badge variant="outline">Fermé</Badge>
+                            <Badge variant="outline" className="shrink-0">
+                              Fermé
+                            </Badge>
                           </div>
                         </CardHeader>
                         <CardFooter>
@@ -842,64 +880,92 @@ const Marketplace = () => {
 
         {/* Sell Section */}
         {activeSection === "sell" && (
-          <div className="w-full">
-            <div className="mb-6">
-              <h1 className="text-3xl font-bold">Mes demandes de vente :</h1>
+          <div className="w-full space-y-6 animate-fade-in">
+            <div className="mb-8">
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+                Mes demandes de vente :
+              </h1>
             </div>
             
             <Tabs defaultValue="ongoing" className="w-full">
-              <TabsList className="grid w-full max-w-md grid-cols-2 mb-6">
-                <TabsTrigger value="ongoing">En cours</TabsTrigger>
-                <TabsTrigger value="completed">Terminé</TabsTrigger>
+              <TabsList className="grid w-full max-w-md grid-cols-2 mb-8 p-1 bg-muted/50 rounded-lg">
+                <TabsTrigger 
+                  value="ongoing"
+                  className="data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all"
+                >
+                  En cours
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="completed"
+                  className="data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all"
+                >
+                  Terminé
+                </TabsTrigger>
               </TabsList>
 
-              <TabsContent value="ongoing" className="mt-6">
+              <TabsContent value="ongoing" className="mt-6 animate-fade-in">
                 {selectedTicket ? (
-                  <div className="space-y-4">
+                  <div className="space-y-4 animate-scale-in">
                     <Button 
                       variant="outline" 
                       onClick={() => setSelectedTicket(null)}
+                      className="hover-scale"
                     >
                       ← Retour aux demandes
                     </Button>
                     <iframe 
                       src={`/ticket/${selectedTicket}`}
-                      className="w-full h-[600px] rounded-lg border"
+                      className="w-full h-[600px] rounded-lg border shadow-lg"
                       title="Ticket"
                     />
                   </div>
                 ) : (
                   <>
                     {myTickets.filter(t => t.subject.startsWith('Vente') && ['open', 'in_progress'].includes(t.status)).length === 0 ? (
-                      <Card className="p-12">
-                        <div className="text-center text-muted-foreground">
-                          <MessageCircle className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                          <p>Aucune demande de vente en cours</p>
-                          <p className="text-sm mt-2">Cliquez sur "Je peux vendre" sur une demande pour créer une proposition</p>
+                      <Card className="p-16 border-2 border-dashed border-muted-foreground/20 bg-muted/5 animate-fade-in">
+                        <div className="text-center text-muted-foreground space-y-4">
+                          <div className="flex justify-center">
+                            <div className="p-4 rounded-full bg-muted/30">
+                              <MessageCircle className="w-12 h-12 opacity-50" />
+                            </div>
+                          </div>
+                          <div className="space-y-2">
+                            <p className="text-lg font-medium">Aucune demande de vente en cours</p>
+                            <p className="text-sm">
+                              Cliquez sur <span className="font-semibold text-primary">"Je peux vendre"</span> sur une demande pour créer une proposition
+                            </p>
+                          </div>
                         </div>
                       </Card>
                     ) : (
-                      <div className="grid grid-cols-1 gap-4">
+                      <div className="grid grid-cols-1 gap-4 animate-fade-in">
                         {myTickets
                           .filter(t => t.subject.startsWith('Vente') && ['open', 'in_progress'].includes(t.status))
                           .map((ticket) => (
-                          <Card key={ticket.id} className="hover:shadow-lg transition-shadow cursor-pointer">
+                          <Card key={ticket.id} className="hover:shadow-lg transition-all hover-scale cursor-pointer group">
                             <CardHeader>
-                              <div className="flex items-start justify-between">
-                                <div>
-                                  <CardTitle className="text-lg">{ticket.subject}</CardTitle>
-                                  <CardDescription className="mt-1">
-                                    Créé le {new Date(ticket.created_at).toLocaleDateString('fr-FR')}
+                              <div className="flex items-start justify-between gap-4">
+                                <div className="flex-1">
+                                  <CardTitle className="text-lg group-hover:text-primary transition-colors">
+                                    {ticket.subject}
+                                  </CardTitle>
+                                  <CardDescription className="mt-2 flex items-center gap-2">
+                                    <span className="text-xs">
+                                      Créé le {new Date(ticket.created_at).toLocaleDateString('fr-FR')}
+                                    </span>
                                   </CardDescription>
                                 </div>
-                                <Badge variant={ticket.status === 'open' ? 'default' : 'secondary'}>
+                                <Badge 
+                                  variant={ticket.status === 'open' ? 'default' : 'secondary'}
+                                  className="shrink-0"
+                                >
                                   {ticket.status === 'open' ? 'Ouvert' : 'En cours'}
                                 </Badge>
                               </div>
                             </CardHeader>
                             <CardFooter>
                               <Button 
-                                className="w-full"
+                                className="w-full hover-scale"
                                 onClick={() => setSelectedTicket(ticket.id)}
                               >
                                 <MessageCircle className="w-4 h-4 mr-2" />
@@ -914,30 +980,40 @@ const Marketplace = () => {
                 )}
               </TabsContent>
 
-              <TabsContent value="completed" className="mt-6">
+              <TabsContent value="completed" className="mt-6 animate-fade-in">
                 {myTickets.filter(t => t.subject.startsWith('Vente') && t.status === 'closed').length === 0 ? (
-                  <Card className="p-12">
-                    <div className="text-center text-muted-foreground">
-                      <MessageCircle className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                      <p>Aucune demande de vente terminée</p>
+                  <Card className="p-16 border-2 border-dashed border-muted-foreground/20 bg-muted/5 animate-fade-in">
+                    <div className="text-center text-muted-foreground space-y-4">
+                      <div className="flex justify-center">
+                        <div className="p-4 rounded-full bg-muted/30">
+                          <MessageCircle className="w-12 h-12 opacity-50" />
+                        </div>
+                      </div>
+                      <p className="text-lg font-medium">Aucune demande de vente terminée</p>
                     </div>
                   </Card>
                 ) : (
-                  <div className="grid grid-cols-1 gap-4">
+                  <div className="grid grid-cols-1 gap-4 animate-fade-in">
                     {myTickets
                       .filter(t => t.subject.startsWith('Vente') && t.status === 'closed')
                       .map((ticket) => (
-                      <Card key={ticket.id} className="hover:shadow-lg transition-shadow cursor-pointer opacity-70">
+                      <Card key={ticket.id} className="hover:shadow-lg transition-all cursor-pointer opacity-70 hover:opacity-100 group">
                         <CardHeader>
-                          <div className="flex items-start justify-between">
-                            <div>
-                              <CardTitle className="text-lg">{ticket.subject}</CardTitle>
-                              <CardDescription className="mt-1">
-                                Créé le {new Date(ticket.created_at).toLocaleDateString('fr-FR')}
-                                {ticket.closed_at && ` • Fermé le ${new Date(ticket.closed_at).toLocaleDateString('fr-FR')}`}
+                          <div className="flex items-start justify-between gap-4">
+                            <div className="flex-1">
+                              <CardTitle className="text-lg group-hover:text-primary transition-colors">
+                                {ticket.subject}
+                              </CardTitle>
+                              <CardDescription className="mt-2 text-xs space-y-1">
+                                <div>Créé le {new Date(ticket.created_at).toLocaleDateString('fr-FR')}</div>
+                                {ticket.closed_at && (
+                                  <div>Fermé le {new Date(ticket.closed_at).toLocaleDateString('fr-FR')}</div>
+                                )}
                               </CardDescription>
                             </div>
-                            <Badge variant="outline">Fermé</Badge>
+                            <Badge variant="outline" className="shrink-0">
+                              Fermé
+                            </Badge>
                           </div>
                         </CardHeader>
                         <CardFooter>
