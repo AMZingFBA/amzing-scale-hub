@@ -31,6 +31,8 @@ import Marketplace from "./pages/Marketplace";
 import WantToSell from "./pages/WantToSell";
 import ProductAlerts from "./pages/ProductAlerts";
 import NotificationAlerts from "./pages/NotificationAlerts";
+import Annonces from "./pages/Annonces";
+import Actualite from "./pages/Actualite";
 
 const queryClient = new QueryClient();
 
@@ -62,6 +64,8 @@ const App = () => (
             <Route path="/admin/alerts" element={<AdminAlerts />} />
             <Route path="/produits-find" element={<ProductAlerts />} />
             <Route path="/notification-alerts" element={<NotificationAlerts />} />
+            <Route path="/annonces" element={<Annonces />} />
+            <Route path="/actualite" element={<Actualite />} />
             <Route path="/chat" element={<Chat />} />
             <Route path="/success" element={<Success />} />
             <Route path="/sales" element={<Sales />} />

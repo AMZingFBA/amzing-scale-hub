@@ -267,11 +267,11 @@ const Dashboard = () => {
                     )}
                   </div>
                 </AccordionTrigger>
-                <AccordionContent>
+                <AccordionContent className="px-4 pb-4">
                   <CategoryAlerts category="informations" />
                   <div className="grid gap-3 pt-2">
-                    <CategoryItem icon={Megaphone} label="annonces" badge={unreadCounts.informations?.subcategories?.annonces} />
-                    <CategoryItem icon={Newspaper} label="actualités" badge={unreadCounts.informations?.subcategories?.actualités} />
+                    <CategoryItem icon={Megaphone} label="annonces" link="/annonces" badge={unreadCounts.informations?.subcategories?.annonces} />
+                    <CategoryItem icon={Newspaper} label="actualités" link="/actualite" badge={unreadCounts.informations?.subcategories?.actualités} />
                   </div>
                 </AccordionContent>
               </AccordionItem>
