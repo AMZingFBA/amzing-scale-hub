@@ -322,9 +322,16 @@ const Dashboard = () => {
               {/* GESTION PRODUITS */}
               <AccordionItem value="gestion" className="border rounded-lg px-6 bg-card">
                 <AccordionTrigger className="hover:no-underline">
-                  <div className="flex items-center gap-3">
-                    <Package className="w-6 h-6 text-primary" />
-                    <span className="text-xl font-bold">GESTION PRODUITS</span>
+                  <div className="flex items-center justify-between w-full gap-3">
+                    <div className="flex items-center gap-3">
+                      <Package className="w-6 h-6 text-primary" />
+                      <span className="text-xl font-bold">GESTION PRODUITS</span>
+                    </div>
+                    {catalogueUnreadCount > 0 && (
+                      <Badge variant="destructive" className="ml-auto">
+                        {catalogueUnreadCount}
+                      </Badge>
+                    )}
                   </div>
                 </AccordionTrigger>
                 <AccordionContent className="px-4 pb-4">
