@@ -215,6 +215,8 @@ const ChatRoom = ({ roomId, onBack }: ChatRoomProps) => {
   }
 
   const createPrivateConversation = async (withUserId: string, withUserNickname: string) => {
+    if (!user) return;
+
     try {
       // Check if private room already exists between these users
       const { data: existingRooms } = await supabase
@@ -230,10 +232,10 @@ const ChatRoom = ({ roomId, onBack }: ChatRoomProps) => {
           .eq('room_id', room.id);
 
         const memberIds = members?.map(m => m.user_id) || [];
-        if (memberIds.includes(user!.id) && memberIds.includes(withUserId)) {
-          // Room already exists
-          setReplyTo(null);
-          toast.success(`Conversation privée avec ${withUserNickname} déjà ouverte`);
+        if (memberIds.includes(user.id) && memberIds.includes(withUserId)) {
+          // Room already exists - redirect to it
+          toast.success(`Ouverture de la conversation avec ${withUserNickname}`);
+          window.location.href = `/chat`;
           return;
         }
       }
@@ -244,7 +246,7 @@ const ChatRoom = ({ roomId, onBack }: ChatRoomProps) => {
         .insert({
           name: `Privé: ${withUserNickname}`,
           type: 'private',
-          created_by: user!.id
+          created_by: user.id
         })
         .select()
         .single();
@@ -255,14 +257,16 @@ const ChatRoom = ({ roomId, onBack }: ChatRoomProps) => {
       const { error: membersError } = await supabase
         .from('chat_room_members')
         .insert([
-          { room_id: newRoom.id, user_id: user!.id },
+          { room_id: newRoom.id, user_id: user.id },
           { room_id: newRoom.id, user_id: withUserId }
         ]);
 
       if (membersError) throw membersError;
 
       toast.success(`Conversation privée créée avec ${withUserNickname}`);
-      setReplyTo(null);
+      
+      // Reload to show new room
+      window.location.reload();
     } catch (error: any) {
       console.error('Error creating private conversation:', error);
       toast.error('Erreur lors de la création de la conversation privée');
