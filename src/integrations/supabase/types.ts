@@ -483,6 +483,7 @@ export type Database = {
     }
     Functions: {
       check_and_expire_subscriptions: { Args: never; Returns: undefined }
+      get_admin_user_id: { Args: never; Returns: string }
       get_unread_count: {
         Args: { ticket_id_param: string; user_id_param: string }
         Returns: number

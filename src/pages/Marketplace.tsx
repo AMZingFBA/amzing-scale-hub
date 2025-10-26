@@ -369,19 +369,15 @@ const Marketplace = () => {
     try {
       const code = listing.asin || listing.ean || "N/A";
       
-      // Get admin user
-      const { data: adminRole } = await supabase
-        .from("user_roles")
-        .select("user_id")
-        .eq("role", "admin")
-        .limit(1)
-        .single();
+      // Get admin user for the conversation using security definer function
+      const { data: adminUserId, error: adminError } = await supabase
+        .rpc('get_admin_user_id');
 
-      if (!adminRole) {
+      if (adminError || !adminUserId) {
         throw new Error("Admin non trouvé");
       }
 
-      const isCurrentUserAdmin = adminRole.user_id === user.id;
+      const isCurrentUserAdmin = adminUserId === user.id;
 
       // 1. Create buyer + staff conversation
       const buyerRoomName = `Achat - ${listing.title} - ${code}`;
@@ -400,7 +396,7 @@ const Marketplace = () => {
       // Add buyer and admin to buyer room (avoid duplicates if user is admin)
       const buyerRoomMembers = [{ room_id: buyerRoom.id, user_id: user.id }];
       if (!isCurrentUserAdmin) {
-        buyerRoomMembers.push({ room_id: buyerRoom.id, user_id: adminRole.user_id });
+        buyerRoomMembers.push({ room_id: buyerRoom.id, user_id: adminUserId });
       }
       await supabase.from("chat_room_members").insert(buyerRoomMembers);
 
@@ -420,8 +416,8 @@ const Marketplace = () => {
 
       // Add seller and admin to seller room (avoid duplicates)
       const sellerRoomMembers = [{ room_id: sellerRoom.id, user_id: listing.user_id }];
-      if (listing.user_id !== adminRole.user_id) {
-        sellerRoomMembers.push({ room_id: sellerRoom.id, user_id: adminRole.user_id });
+      if (listing.user_id !== adminUserId) {
+        sellerRoomMembers.push({ room_id: sellerRoom.id, user_id: adminUserId });
       }
       await supabase.from("chat_room_members").insert(sellerRoomMembers);
 
@@ -445,19 +441,15 @@ const Marketplace = () => {
     try {
       const code = buyRequest.asin || buyRequest.ean || "N/A";
       
-      // Get admin user
-      const { data: adminRole } = await supabase
-        .from("user_roles")
-        .select("user_id")
-        .eq("role", "admin")
-        .limit(1)
-        .single();
+      // Get admin user for the conversation using security definer function
+      const { data: adminUserId, error: adminError } = await supabase
+        .rpc('get_admin_user_id');
 
-      if (!adminRole) {
+      if (adminError || !adminUserId) {
         throw new Error("Admin non trouvé");
       }
 
-      const isCurrentUserAdmin = adminRole.user_id === user.id;
+      const isCurrentUserAdmin = adminUserId === user.id;
 
       // 1. Create seller + staff conversation
       const sellerRoomName = `Vente - ${buyRequest.title} - ${code}`;
@@ -476,7 +468,7 @@ const Marketplace = () => {
       // Add seller and admin to seller room (avoid duplicates if user is admin)
       const sellerRoomMembers = [{ room_id: sellerRoom.id, user_id: user.id }];
       if (!isCurrentUserAdmin) {
-        sellerRoomMembers.push({ room_id: sellerRoom.id, user_id: adminRole.user_id });
+        sellerRoomMembers.push({ room_id: sellerRoom.id, user_id: adminUserId });
       }
       await supabase.from("chat_room_members").insert(sellerRoomMembers);
 
@@ -496,8 +488,8 @@ const Marketplace = () => {
 
       // Add buyer and admin to buyer room (avoid duplicates)
       const buyerRoomMembers = [{ room_id: buyerRoom.id, user_id: buyRequest.user_id }];
-      if (buyRequest.user_id !== adminRole.user_id) {
-        buyerRoomMembers.push({ room_id: buyerRoom.id, user_id: adminRole.user_id });
+      if (buyRequest.user_id !== adminUserId) {
+        buyerRoomMembers.push({ room_id: buyerRoom.id, user_id: adminUserId });
       }
       await supabase.from("chat_room_members").insert(buyerRoomMembers);
 
