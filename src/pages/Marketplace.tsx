@@ -1199,24 +1199,31 @@ const Marketplace = () => {
                       </div>
                     </Card>
                   ) : (
-                    <>
-                      {/* Demandes en cours */}
-                      {myTickets.filter(t => t.status === 'open' || t.status === 'in_progress').length > 0 && (
-                        <div className="space-y-3">
-                          <div className="flex items-center gap-2 mb-4">
-                            <div className="h-8 w-1 bg-primary rounded-full"></div>
-                            <h3 className="text-xl font-bold">Demandes en cours</h3>
-                            <Badge className="ml-2">
-                              {myTickets.filter(t => t.status === 'open' || t.status === 'in_progress').length}
-                            </Badge>
-                          </div>
+                    <Tabs defaultValue="open" className="w-full">
+                      <TabsList className="grid w-full max-w-md grid-cols-2">
+                        <TabsTrigger value="open">
+                          En cours ({myTickets.filter(t => t.status === 'open' || t.status === 'in_progress').length})
+                        </TabsTrigger>
+                        <TabsTrigger value="closed">
+                          Fermés ({myTickets.filter(t => t.status === 'closed').length})
+                        </TabsTrigger>
+                      </TabsList>
+
+                      <TabsContent value="open" className="mt-4">
+                        {myTickets.filter(t => t.status === 'open' || t.status === 'in_progress').length === 0 ? (
+                          <Card className="p-12 border-2 border-dashed border-muted-foreground/20 bg-muted/5">
+                            <div className="text-center text-muted-foreground">
+                              <p className="text-sm">Aucune demande en cours</p>
+                            </div>
+                          </Card>
+                        ) : (
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             {myTickets
                               .filter(t => t.status === 'open' || t.status === 'in_progress')
                               .map((ticket) => (
                                 <Card
                                   key={ticket.id}
-                                  className="hover:shadow-lg transition-shadow cursor-pointer border-l-4 border-l-primary"
+                                  className="hover:shadow-lg transition-shadow cursor-pointer"
                                   onClick={() => {
                                     navigate(`/ticket/${ticket.id}`);
                                   }}
@@ -1241,26 +1248,24 @@ const Marketplace = () => {
                                 </Card>
                               ))}
                           </div>
-                        </div>
-                      )}
+                        )}
+                      </TabsContent>
 
-                      {/* Demandes closes */}
-                      {myTickets.filter(t => t.status === 'closed').length > 0 && (
-                        <div className="space-y-3">
-                          <div className="flex items-center gap-2 mb-4">
-                            <div className="h-8 w-1 bg-muted-foreground rounded-full"></div>
-                            <h3 className="text-xl font-bold text-muted-foreground">Demandes closes</h3>
-                            <Badge variant="outline" className="ml-2">
-                              {myTickets.filter(t => t.status === 'closed').length}
-                            </Badge>
-                          </div>
+                      <TabsContent value="closed" className="mt-4">
+                        {myTickets.filter(t => t.status === 'closed').length === 0 ? (
+                          <Card className="p-12 border-2 border-dashed border-muted-foreground/20 bg-muted/5">
+                            <div className="text-center text-muted-foreground">
+                              <p className="text-sm">Aucune demande fermée</p>
+                            </div>
+                          </Card>
+                        ) : (
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             {myTickets
                               .filter(t => t.status === 'closed')
                               .map((ticket) => (
                                 <Card
                                   key={ticket.id}
-                                  className="hover:shadow-lg transition-shadow cursor-pointer opacity-70 border-l-4 border-l-muted"
+                                  className="hover:shadow-lg transition-shadow cursor-pointer"
                                   onClick={() => {
                                     navigate(`/ticket/${ticket.id}`);
                                   }}
@@ -1285,9 +1290,9 @@ const Marketplace = () => {
                                 </Card>
                               ))}
                           </div>
-                        </div>
-                      )}
-                    </>
+                        )}
+                      </TabsContent>
+                    </Tabs>
                   )}
                 </div>
               </TabsContent>
