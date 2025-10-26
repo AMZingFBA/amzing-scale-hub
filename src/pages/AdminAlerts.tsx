@@ -308,7 +308,7 @@ const AdminAlerts = () => {
     }
   };
 
-  const getAlertLocation = (category: string, subcategory?: string) => {
+  const getAlertLocation = (category: string | null, subcategory?: string | null) => {
     const categoryLabels: Record<string, string> = {
       introduction: 'Introduction',
       outils: 'Outils',
@@ -317,8 +317,17 @@ const AdminAlerts = () => {
       produits: 'Produits Gagnants',
     };
     
-    const baseLocation = categoryLabels[category] || 'Général';
-    return subcategory ? `${baseLocation} > ${subcategory}` : baseLocation;
+    if (!category) {
+      return 'Dashboard (général)';
+    }
+    
+    const baseLocation = categoryLabels[category] || category;
+    
+    if (subcategory) {
+      return `${baseLocation} › ${subcategory}`;
+    }
+    
+    return `${baseLocation} (toutes les sous-catégories)`;
   };
 
   const getFileIcon = (fileType: string) => {
@@ -520,9 +529,9 @@ const AdminAlerts = () => {
                           <div className="flex items-start justify-between gap-4">
                             <div className="flex-1 space-y-3">
                               <div className="flex items-center gap-2 flex-wrap">
-                                <MapPin className="w-4 h-4 text-muted-foreground" />
-                                <span className="text-sm text-muted-foreground font-medium">
-                                  Visible dans : {getAlertLocation(alert.category, alert.subcategory)}
+                                <MapPin className="w-3 h-3 text-primary" />
+                                <span className="text-sm font-semibold text-primary">
+                                  📍 {getAlertLocation(alert.category, alert.subcategory)}
                                 </span>
                               </div>
 
