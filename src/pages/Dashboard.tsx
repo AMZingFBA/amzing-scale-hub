@@ -164,9 +164,9 @@ const Dashboard = () => {
                       <BookOpen className="w-6 h-6 text-primary" />
                       <span className="text-xl font-bold">INTRODUCTION</span>
                     </div>
-                    {unreadCounts.introduction?.total > 0 && (
+                    {(unreadCounts.introduction?.total > 0 || unreadCount > 0) && (
                       <Badge variant="destructive" className="ml-auto">
-                        {unreadCounts.introduction.total}
+                        {(unreadCounts.introduction?.total || 0) + (unreadCount || 0)}
                       </Badge>
                     )}
                   </div>

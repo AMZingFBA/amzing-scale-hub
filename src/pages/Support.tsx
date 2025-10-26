@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Loader2, Plus, MessageSquare } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import {
   Dialog,
@@ -39,6 +40,7 @@ const Support = () => {
   const [isCreating, setIsCreating] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [unreadCounts, setUnreadCounts] = useState<Record<string, number>>({});
+  const [activeTab, setActiveTab] = useState('open');
   const [newTicket, setNewTicket] = useState({
     subject: '',
     priority: 'normal',
@@ -331,48 +333,127 @@ const Support = () => {
               </CardContent>
             </Card>
           ) : (
-            <div className="space-y-4">
-              {tickets.map((ticket) => (
-                <Card
-                  key={ticket.id}
-                  className="hover:shadow-lg transition-shadow cursor-pointer"
-                  onClick={() => navigate(`/ticket/${ticket.id}`)}
-                >
-                  <CardHeader>
-                    <div className="flex justify-between items-start">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <CardTitle className="text-lg">{ticket.subject}</CardTitle>
-                        {ticket.category && ticket.category !== 'general' && (
-                          <Badge variant="outline" className="text-xs">
-                            {ticket.category === 'facture_autorisation' && '📝 Facture/Auto'}
-                            {ticket.category === 'gestion_produit' && '📦 Gestion produit'}
-                            {ticket.category === 'marketplace' && '🛒 Marketplace'}
-                            {ticket.category === 'avis' && '⭐ Avis'}
-                            {ticket.category === 'autre' && '💬 Autre'}
-                          </Badge>
-                        )}
-                        {unreadCounts[ticket.id] > 0 && (
-                          <Badge variant="destructive">
-                            {unreadCounts[ticket.id]}
-                          </Badge>
-                        )}
-                      </div>
-                      <div className="flex gap-2">
-                        {getPriorityBadge(ticket.priority)}
-                        {getStatusBadge(ticket.status)}
-                      </div>
-                    </div>
-                    <CardDescription>
-                      Créé le {new Date(ticket.created_at).toLocaleDateString('fr-FR', {
-                        day: 'numeric',
-                        month: 'long',
-                        year: 'numeric'
-                      })}
-                    </CardDescription>
-                  </CardHeader>
-                </Card>
-              ))}
-            </div>
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="open">
+                  Tickets en cours
+                  {tickets.filter(t => t.status === 'open' || t.status === 'in_progress').length > 0 && (
+                    <Badge variant="secondary" className="ml-2">
+                      {tickets.filter(t => t.status === 'open' || t.status === 'in_progress').length}
+                    </Badge>
+                  )}
+                </TabsTrigger>
+                <TabsTrigger value="closed">
+                  Tickets clos
+                  {tickets.filter(t => t.status === 'closed').length > 0 && (
+                    <Badge variant="secondary" className="ml-2">
+                      {tickets.filter(t => t.status === 'closed').length}
+                    </Badge>
+                  )}
+                </TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="open" className="space-y-4">
+                {tickets.filter(t => t.status === 'open' || t.status === 'in_progress').length === 0 ? (
+                  <Card>
+                    <CardContent className="pt-6 text-center">
+                      <p className="text-muted-foreground">
+                        Aucun ticket en cours
+                      </p>
+                    </CardContent>
+                  </Card>
+                ) : (
+                  tickets.filter(t => t.status === 'open' || t.status === 'in_progress').map((ticket) => (
+                    <Card
+                      key={ticket.id}
+                      className="hover:shadow-lg transition-shadow cursor-pointer"
+                      onClick={() => navigate(`/ticket/${ticket.id}`)}
+                    >
+                      <CardHeader>
+                        <div className="flex justify-between items-start">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <CardTitle className="text-lg">{ticket.subject}</CardTitle>
+                            {ticket.category && ticket.category !== 'general' && (
+                              <Badge variant="outline" className="text-xs">
+                                {ticket.category === 'facture_autorisation' && '📝 Facture/Auto'}
+                                {ticket.category === 'gestion_produit' && '📦 Gestion produit'}
+                                {ticket.category === 'marketplace' && '🛒 Marketplace'}
+                                {ticket.category === 'avis' && '⭐ Avis'}
+                                {ticket.category === 'autre' && '💬 Autre'}
+                              </Badge>
+                            )}
+                            {unreadCounts[ticket.id] > 0 && (
+                              <Badge variant="destructive">
+                                {unreadCounts[ticket.id]}
+                              </Badge>
+                            )}
+                          </div>
+                          <div className="flex gap-2">
+                            {getPriorityBadge(ticket.priority)}
+                            {getStatusBadge(ticket.status)}
+                          </div>
+                        </div>
+                        <CardDescription>
+                          Créé le {new Date(ticket.created_at).toLocaleDateString('fr-FR', {
+                            day: 'numeric',
+                            month: 'long',
+                            year: 'numeric'
+                          })}
+                        </CardDescription>
+                      </CardHeader>
+                    </Card>
+                  ))
+                )}
+              </TabsContent>
+
+              <TabsContent value="closed" className="space-y-4">
+                {tickets.filter(t => t.status === 'closed').length === 0 ? (
+                  <Card>
+                    <CardContent className="pt-6 text-center">
+                      <p className="text-muted-foreground">
+                        Aucun ticket clos
+                      </p>
+                    </CardContent>
+                  </Card>
+                ) : (
+                  tickets.filter(t => t.status === 'closed').map((ticket) => (
+                    <Card
+                      key={ticket.id}
+                      className="hover:shadow-lg transition-shadow cursor-pointer"
+                      onClick={() => navigate(`/ticket/${ticket.id}`)}
+                    >
+                      <CardHeader>
+                        <div className="flex justify-between items-start">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <CardTitle className="text-lg">{ticket.subject}</CardTitle>
+                            {ticket.category && ticket.category !== 'general' && (
+                              <Badge variant="outline" className="text-xs">
+                                {ticket.category === 'facture_autorisation' && '📝 Facture/Auto'}
+                                {ticket.category === 'gestion_produit' && '📦 Gestion produit'}
+                                {ticket.category === 'marketplace' && '🛒 Marketplace'}
+                                {ticket.category === 'avis' && '⭐ Avis'}
+                                {ticket.category === 'autre' && '💬 Autre'}
+                              </Badge>
+                            )}
+                          </div>
+                          <div className="flex gap-2">
+                            {getPriorityBadge(ticket.priority)}
+                            {getStatusBadge(ticket.status)}
+                          </div>
+                        </div>
+                        <CardDescription>
+                          Créé le {new Date(ticket.created_at).toLocaleDateString('fr-FR', {
+                            day: 'numeric',
+                            month: 'long',
+                            year: 'numeric'
+                          })}
+                        </CardDescription>
+                      </CardHeader>
+                    </Card>
+                  ))
+                )}
+              </TabsContent>
+            </Tabs>
           )}
         </div>
       </main>
