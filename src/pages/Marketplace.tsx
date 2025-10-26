@@ -640,9 +640,9 @@ const Marketplace = () => {
     return (
       <Card key={listing.id} className="hover:shadow-xl transition-all animate-fade-in overflow-hidden">
         {hasImages && (
-          <div className="relative p-0">
+          <div className="p-4">
             <div 
-              className="relative cursor-pointer group/image"
+              className="relative cursor-pointer group/image border-2 border-muted rounded-lg overflow-hidden"
               onClick={() => openImageGallery(listing.images, 0)}
             >
               <img
