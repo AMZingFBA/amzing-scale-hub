@@ -32,16 +32,6 @@ const Navbar = () => {
             <img src={logo} alt="AMZing FBA" className="h-12 transition-transform group-hover:scale-105" />
           </Link>
 
-          {/* Center Section */}
-          {isVIP && (
-            <div className="hidden md:flex items-center gap-2 absolute left-1/2 -translate-x-1/2">
-              <Badge variant="outline" className="border-primary/50 bg-gradient-to-r from-primary/10 to-secondary/10 px-4 py-2">
-                <Crown className="w-4 h-4 mr-2 text-primary" />
-                <span className="font-semibold">Espace VIP</span>
-              </Badge>
-            </div>
-          )}
-
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
             {!isVIP && (
