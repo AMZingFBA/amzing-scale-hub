@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/use-auth";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,8 +11,9 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Loader2, Upload, Trash2, ShoppingBag, MessageCircle, X, ZoomIn, ChevronLeft, ChevronRight, Edit } from "lucide-react";
+import { Loader2, Upload, Trash2, Package, MessageCircle, X, ZoomIn, ChevronLeft, ChevronRight, Edit, Search, Copy } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { useMarketplaceUnread } from "@/hooks/use-marketplace-unread";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
@@ -32,11 +33,14 @@ interface Listing {
 }
 
 const WantToSell = () => {
-  const { user } = useAuth();
+  const { user, isVIP } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const { unreadCount } = useMarketplaceUnread();
   
   const [listings, setListings] = useState<Listing[]>([]);
   const [myListings, setMyListings] = useState<Listing[]>([]);
+  const [myTickets, setMyTickets] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
 
@@ -49,17 +53,8 @@ const WantToSell = () => {
   const [quantity, setQuantity] = useState(1);
   const [price, setPrice] = useState("");
   const [priceType, setPriceType] = useState<"TTC" | "HT">("TTC");
-  const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
-  
-  // Edit state
-  const [editingListing, setEditingListing] = useState<Listing | null>(null);
-  
-  // Image gallery states
-  const [selectedImageGallery, setSelectedImageGallery] = useState<string[] | null>(null);
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [showImageDialog, setShowImageDialog] = useState(false);
 
   useEffect(() => {
     if (!user) {
@@ -70,6 +65,7 @@ const WantToSell = () => {
     checkAdmin();
     loadListings();
     loadMyListings();
+    loadMyTickets();
 
     const listingsChannel = supabase
       .channel("marketplace_listings_changes")
@@ -79,8 +75,21 @@ const WantToSell = () => {
       })
       .subscribe();
 
+    const ticketsChannel = supabase
+      .channel("marketplace_tickets_changes")
+      .on("postgres_changes", { 
+        event: "*", 
+        schema: "public", 
+        table: "tickets",
+        filter: `category=eq.marketplace`
+      }, () => {
+        loadMyTickets();
+      })
+      .subscribe();
+
     return () => {
       supabase.removeChannel(listingsChannel);
+      supabase.removeChannel(ticketsChannel);
     };
   }, [user, navigate]);
 
@@ -96,7 +105,6 @@ const WantToSell = () => {
         .from("marketplace_listings")
         .select("*")
         .eq("status", "active")
-        .neq("user_id", user?.id || "")
         .order("created_at", { ascending: false });
 
       if (error) throw error;
@@ -117,7 +125,7 @@ const WantToSell = () => {
         .from("marketplace_listings")
         .select("*")
         .eq("user_id", user.id)
-        .order("created_at", { ascending: false });
+        .order("created_at", { ascending: false});
 
       if (error) throw error;
       setMyListings(data || []);
@@ -126,13 +134,32 @@ const WantToSell = () => {
     }
   };
 
+  const loadMyTickets = async () => {
+    if (!user) return;
+    
+    try {
+      const { data, error } = await supabase
+        .from("tickets")
+        .select(`
+          *,
+          messages(id, content, created_at, user_id, file_url, file_name)
+        `)
+        .eq("user_id", user.id)
+        .eq("category", "marketplace")
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+      setMyTickets(data || []);
+    } catch (error: any) {
+      console.error("Error loading marketplace tickets:", error);
+    }
+  };
+
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (!files || files.length === 0) return;
 
     const newFiles = Array.from(files);
-    setUploadedFiles([...uploadedFiles, ...newFiles]);
-
     const urls = await uploadFilesToStorage(newFiles);
     setUploadedImages([...uploadedImages, ...urls]);
   };
@@ -143,9 +170,9 @@ const WantToSell = () => {
     for (const file of files) {
       try {
         const fileExt = file.name.split('.').pop();
-        const fileName = `${user?.id}/${Date.now()}_${Math.random()}.${fileExt}`;
+        const fileName = `${user?.id}/${Math.random()}.${fileExt}`;
         
-        const { error: uploadError } = await supabase.storage
+        const { error: uploadError, data } = await supabase.storage
           .from('marketplace-images')
           .upload(fileName, file);
 
@@ -165,15 +192,6 @@ const WantToSell = () => {
     return urls;
   };
 
-  const removeImage = (index: number) => {
-    const newFiles = [...uploadedFiles];
-    const newImages = [...uploadedImages];
-    newFiles.splice(index, 1);
-    newImages.splice(index, 1);
-    setUploadedFiles(newFiles);
-    setUploadedImages(newImages);
-  };
-
   const createListing = async () => {
     if (!user) return;
     
@@ -187,57 +205,30 @@ const WantToSell = () => {
       return;
     }
 
-    if (uploadedImages.length === 0) {
-      toast.error("Au moins une photo est requise");
-      return;
-    }
-
     setIsCreating(true);
 
     try {
-      if (editingListing) {
-        // Mise à jour d'une annonce existante
-        const { error } = await supabase
-          .from("marketplace_listings")
-          .update({
-            asin: searchType === "asin" ? searchCode : null,
-            ean: searchType === "ean" ? searchCode : null,
-            title,
-            description,
-            images: uploadedImages,
-            quantity,
-            price: parseFloat(price),
-            price_type: priceType,
-          })
-          .eq("id", editingListing.id);
+      const { error } = await supabase
+        .from("marketplace_listings")
+        .insert({
+          user_id: user.id,
+          asin: searchType === "asin" ? searchCode : null,
+          ean: searchType === "ean" ? searchCode : null,
+          title,
+          description,
+          images: uploadedImages,
+          quantity,
+          price: parseFloat(price),
+          price_type: priceType,
+          status: "active"
+        });
 
-        if (error) throw error;
-        toast.success("Annonce modifiée avec succès!");
-        setEditingListing(null);
-      } else {
-        // Création d'une nouvelle annonce
-        const { error } = await supabase
-          .from("marketplace_listings")
-          .insert({
-            user_id: user.id,
-            asin: searchType === "asin" ? searchCode : null,
-            ean: searchType === "ean" ? searchCode : null,
-            title,
-            description,
-            images: uploadedImages,
-            quantity,
-            price: parseFloat(price),
-            price_type: priceType,
-            status: "active"
-          });
-
-        if (error) throw error;
-        toast.success("Annonce créée avec succès!");
-      }
+      if (error) throw error;
+      toast.success("Annonce de vente créée avec succès!");
       
+      await loadMyListings();
       resetForm();
       setShowCreateDialog(false);
-      await loadMyListings();
     } catch (error: any) {
       console.error("Error creating listing:", error);
       toast.error("Erreur lors de la création");
@@ -252,98 +243,22 @@ const WantToSell = () => {
     setDescription("");
     setQuantity(1);
     setPrice("");
-    setUploadedFiles([]);
     setUploadedImages([]);
-    setEditingListing(null);
   };
 
-  const editListing = (listing: Listing) => {
-    setEditingListing(listing);
-    setSearchType(listing.asin ? "asin" : "ean");
-    setSearchCode(listing.asin || listing.ean || "");
-    setTitle(listing.title);
-    setDescription(listing.description || "");
-    setQuantity(listing.quantity);
-    setPrice(listing.price.toString());
-    setPriceType(listing.price_type as "TTC" | "HT");
-    setUploadedImages(listing.images || []);
-    setShowCreateDialog(true);
-  };
+  const deleteListing = async (listingId: string) => {
+    if (!confirm("Êtes-vous sûr de vouloir supprimer cette annonce?")) return;
 
-  const handleInterestInListing = async (listing: Listing) => {
-    if (!user) return;
-
-    if (listing.user_id === user.id) {
-      toast.error("Vous ne pouvez pas acheter votre propre annonce!");
-      return;
-    }
-
-    try {
-      const code = listing.asin || listing.ean || "N/A";
-      const subject = `Achat - ${listing.title} - ${code}`;
-      
-      const { data: buyerTicket, error: buyerError } = await supabase
-        .from("tickets")
-        .insert({
-          user_id: user.id,
-          subject: subject,
-          category: "marketplace",
-          status: "open",
-          priority: "normal"
-        })
-        .select()
-        .single();
-
-      if (buyerError) throw buyerError;
-
-      const buyerMessage = `Je suis intéressé(e) par cette annonce:\n\nTitre: ${listing.title}\nCode: ${code}\nPrix: ${listing.price}€ ${listing.price_type}\nQuantité: ${listing.quantity}\n\nMerci de me contacter.`;
-      
-      await supabase.from("messages").insert({
-        ticket_id: buyerTicket.id,
-        user_id: user.id,
-        content: buyerMessage
-      });
-
-      const sellerSubject = `Vente - ${listing.title} - ${code}`;
-      const { data: sellerTicket, error: sellerError } = await supabase
-        .from("tickets")
-        .insert({
-          user_id: listing.user_id,
-          subject: sellerSubject,
-          category: "marketplace",
-          status: "open",
-          priority: "normal"
-        })
-        .select()
-        .single();
-
-      if (sellerError) throw sellerError;
-
-      const sellerMessage = `Un acheteur est intéressé par votre annonce:\n\nTitre: ${listing.title}\nCode: ${code}\nPrix: ${listing.price}€ ${listing.price_type}\nQuantité: ${listing.quantity}\n\nLe staff va vous mettre en contact.`;
-      
-      await supabase.from("messages").insert({
-        ticket_id: sellerTicket.id,
-        user_id: user.id,
-        content: sellerMessage
-      });
-
-      toast.success("Demande d'achat envoyée! Le staff va vous contacter.");
-      navigate("/support");
-    } catch (error: any) {
-      console.error("Error creating tickets:", error);
-      toast.error("Erreur lors de la création de la demande");
-    }
-  };
-
-  const deleteListing = async (id: string) => {
     try {
       const { error } = await supabase
         .from("marketplace_listings")
-        .update({ status: "deleted" })
-        .eq("id", id);
+        .update({ status: "removed" })
+        .eq("id", listingId);
 
       if (error) throw error;
+
       toast.success("Annonce supprimée");
+      await loadListings();
       await loadMyListings();
     } catch (error: any) {
       console.error("Error deleting listing:", error);
@@ -351,101 +266,130 @@ const WantToSell = () => {
     }
   };
 
-  const openImageGallery = (images: string[], startIndex: number = 0) => {
-    setSelectedImageGallery(images);
-    setCurrentImageIndex(startIndex);
-    setShowImageDialog(true);
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    toast.success("Code copié!");
   };
 
-  const nextImage = () => {
-    if (selectedImageGallery) {
-      setCurrentImageIndex((prev) => (prev + 1) % selectedImageGallery.length);
-    }
-  };
-
-  const previousImage = () => {
-    if (selectedImageGallery) {
-      setCurrentImageIndex((prev) => (prev - 1 + selectedImageGallery.length) % selectedImageGallery.length);
-    }
-  };
-
-  const renderListing = (listing: Listing, showActions: boolean = true) => {
+  const renderListing = (listing: Listing, isOwn: boolean) => {
     const code = listing.asin || listing.ean || "N/A";
     const codeType = listing.asin ? "ASIN" : listing.ean ? "EAN" : "Code";
+    const hasImages = listing.images && listing.images.length > 0;
+    
+    // Calculer le prix affiché : +15% pour les acheteurs, prix original pour le vendeur
+    const displayPrice = isOwn 
+      ? listing.price 
+      : (Number(listing.price) * 1.15).toFixed(2);
     
     return (
-      <Card key={listing.id} className="overflow-hidden hover:shadow-lg transition-shadow">
-        <CardHeader className="pb-3">
-          <div className="flex justify-between items-start">
-            <div className="flex-1">
-              <CardTitle className="text-xl mb-1">{listing.title}</CardTitle>
-              <CardDescription className="text-sm">
-                {codeType}: {code}
-              </CardDescription>
+      <Card key={listing.id} className="hover:shadow-xl transition-all animate-fade-in overflow-hidden">
+        {hasImages && (
+          <div className="p-4">
+            <div className="relative border-2 border-muted rounded-lg overflow-hidden">
+              <img
+                src={listing.images[0]}
+                alt={listing.title}
+                className="w-full h-56 object-cover"
+              />
+              {listing.images.length > 1 && (
+                <div className="absolute bottom-3 right-3 bg-black/70 text-white px-3 py-1.5 rounded-md text-sm font-semibold">
+                  +{listing.images.length - 1} photo{listing.images.length > 2 ? 's' : ''}
+                </div>
+              )}
             </div>
-            <Badge variant="secondary" className="ml-2">
-              {listing.price}€/u {listing.price_type}
+          </div>
+        )}
+        
+        <CardHeader className="space-y-4 pb-3">
+          <div className="flex justify-between items-start gap-3">
+            <CardTitle className="text-lg font-bold line-clamp-2">
+              {listing.title}
+            </CardTitle>
+            <Badge variant="secondary" className="shrink-0 text-base font-bold px-3 py-1.5 whitespace-nowrap">
+              {displayPrice}€/u {listing.price_type}
             </Badge>
           </div>
         </CardHeader>
-      
-      <CardContent className="space-y-3">
-        {listing.images && listing.images.length > 0 && (
-          <div className="grid grid-cols-2 gap-2">
-            {listing.images.slice(0, 4).map((img, idx) => (
-              <div key={idx} className="relative aspect-square cursor-pointer group" onClick={() => openImageGallery(listing.images, idx)}>
-                <img src={img} alt={`${listing.title} ${idx + 1}`} className="w-full h-full object-cover rounded-lg" />
-                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center">
-                  <ZoomIn className="w-6 h-6 text-white" />
-                </div>
-                {idx === 3 && listing.images.length > 4 && (
-                  <div className="absolute inset-0 bg-black/60 rounded-lg flex items-center justify-center">
-                    <span className="text-white text-lg font-semibold">+{listing.images.length - 4}</span>
-                  </div>
-                )}
-              </div>
-            ))}
+        
+        <CardContent className="space-y-3 pt-0 pb-4">
+          <div 
+            className="flex items-center justify-between gap-2 group/code cursor-pointer bg-muted/40 hover:bg-muted/60 px-3 py-2.5 rounded-lg transition-colors border border-muted"
+            onClick={() => copyToClipboard(code)}
+          >
+            <div className="flex items-center gap-2 flex-1 min-w-0">
+              <span className="text-xs font-medium text-muted-foreground shrink-0">{codeType}:</span>
+              <code className="font-mono font-bold text-sm truncate">{code}</code>
+            </div>
+            <Copy className="w-4 h-4 text-muted-foreground group-hover/code:text-primary transition-colors shrink-0" />
           </div>
-        )}
+          
+          <div className="flex items-center justify-between bg-primary/5 border border-primary/20 px-3 py-2.5 rounded-lg">
+            <span className="text-sm font-medium text-muted-foreground">Quantité disponible</span>
+            <span className="text-lg font-bold text-primary">{listing.quantity} unité{listing.quantity > 1 ? 's' : ''}</span>
+          </div>
+        </CardContent>
         
-        {listing.description && (
-          <p className="text-sm text-muted-foreground">{listing.description}</p>
-        )}
-        
-        <div className="flex items-center justify-between text-sm">
-          <span className="text-muted-foreground">Quantité: {listing.quantity}</span>
-        </div>
-      </CardContent>
-
-      {showActions && (
-        <CardFooter className="flex gap-2">
-          {listing.user_id === user?.id || isAdmin ? (
-            <>
-              <Button variant="outline" size="sm" onClick={() => editListing(listing)} className="flex-1">
-                <Edit className="w-4 h-4 mr-2" />
-                Modifier
-              </Button>
-              <Button variant="destructive" size="sm" onClick={() => deleteListing(listing.id)} className="flex-1">
-                <Trash2 className="w-4 h-4 mr-2" />
-                Supprimer
-              </Button>
-            </>
-          ) : (
-            <Button variant="default" size="sm" onClick={() => handleInterestInListing(listing)} className="flex-1">
-              <MessageCircle className="w-4 h-4 mr-2" />
-              Je veux acheter
+        <CardFooter className="flex gap-2 p-4 pt-0">
+          {isOwn ? (
+            <Button
+              variant="destructive"
+              size="lg"
+              className="w-full"
+              onClick={() => deleteListing(listing.id)}
+            >
+              <Trash2 className="w-4 h-4 mr-2" />
+              Supprimer mon annonce
             </Button>
+          ) : (
+            <>
+              <Button
+                size="lg"
+                className="flex-1 hover-scale font-semibold"
+                onClick={() => {/* TODO: handle interest */}}
+              >
+                <Package className="w-5 h-5 mr-2" />
+                Je veux acheter ce produit
+              </Button>
+              {isAdmin && (
+                <Button
+                  variant="destructive"
+                  size="lg"
+                  onClick={() => deleteListing(listing.id)}
+                >
+                  <Trash2 className="w-5 h-5" />
+                </Button>
+              )}
+            </>
           )}
         </CardFooter>
-      )}
-    </Card>
-  );
-};
+      </Card>
+    );
+  };
+
+  if (!isVIP && !isAdmin) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <Card className="max-w-md w-full">
+          <CardHeader>
+            <CardTitle>Accès VIP requis</CardTitle>
+            <CardDescription>
+              La marketplace est réservée aux membres VIP
+            </CardDescription>
+          </CardHeader>
+          <CardFooter>
+            <Button onClick={() => navigate("/tarifs")} className="w-full">
+              Voir les tarifs
+            </Button>
+          </CardFooter>
+        </Card>
+      </div>
+    );
+  }
 
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        <Loader2 className="w-8 h-8 animate-spin" />
       </div>
     );
   }
@@ -455,7 +399,7 @@ const WantToSell = () => {
       <Navbar />
       
       <main className="container mx-auto px-4 pt-24 pb-12">
-        <div className="max-w-6xl mx-auto">
+        <div className="max-w-6xl mx-auto space-y-6">
           <div className="mb-8">
             <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
               Want to Sell - Je vends
@@ -465,240 +409,328 @@ const WantToSell = () => {
             </p>
           </div>
 
-          <Tabs defaultValue="all" className="w-full">
-            <div className="flex justify-between items-center mb-6">
-              <TabsList>
-                <TabsTrigger value="all">Toutes les annonces</TabsTrigger>
-                <TabsTrigger value="my">Mes annonces</TabsTrigger>
-              </TabsList>
-              
-              <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
-                <DialogTrigger asChild>
-                  <Button variant="default" size="lg">
-                    <ShoppingBag className="w-5 h-5 mr-2" />
-                    Publier une annonce
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-                  <DialogHeader>
-                    <DialogTitle>
-                      {editingListing ? "Modifier mon annonce" : "Publier un produit à vendre"}
-                    </DialogTitle>
-                    <DialogDescription>
-                      {editingListing 
-                        ? "Modifiez les détails de votre produit à vendre"
-                        : "Ajoutez les détails de votre produit avec des photos"
-                      }
-                    </DialogDescription>
-                  </DialogHeader>
-                  
-                  <div className="space-y-4 py-4">
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label>Type de code</Label>
-                        <Select value={searchType} onValueChange={(v: "asin" | "ean") => setSearchType(v)}>
-                          <SelectTrigger>
+          {/* Create Listing Button */}
+          <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
+            <DialogTrigger asChild>
+              <Button size="lg" className="w-full md:w-auto hover-scale">
+                <Package className="w-5 h-5 mr-2" />
+                Publier une annonce
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>Publier une annonce de vente</DialogTitle>
+                <DialogDescription>
+                  Décrivez le produit que vous souhaitez vendre. Les membres intéressés pourront vous contacter via le staff.
+                </DialogDescription>
+              </DialogHeader>
+
+              <div className="space-y-4">
+                <div className="flex gap-2">
+                  <Select value={searchType} onValueChange={(v: any) => setSearchType(v)}>
+                    <SelectTrigger className="w-32">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="asin">ASIN</SelectItem>
+                      <SelectItem value="ean">EAN</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Input
+                    placeholder={searchType === "asin" ? "Ex: B08N5WRWNW" : "Ex: 1234567890123"}
+                    value={searchCode}
+                    onChange={(e) => setSearchCode(e.target.value)}
+                    className="flex-1"
+                  />
+                </div>
+
+                <div className="space-y-4">
+                  <div>
+                    <Label>Titre du produit *</Label>
+                    <Input
+                      value={title}
+                      onChange={(e) => setTitle(e.target.value)}
+                      placeholder="Ex: iPhone 15 Pro, Nike Air Max..."
+                    />
+                  </div>
+
+                  <div>
+                    <Label>Description / Précisions</Label>
+                    <Textarea
+                      value={description}
+                      onChange={(e) => setDescription(e.target.value)}
+                      placeholder="Précisez l&apos;état, les caractéristiques, etc..."
+                      rows={4}
+                    />
+                  </div>
+
+                  <div>
+                    <Label>Photos du produit (optionnel)</Label>
+                    <p className="text-xs text-muted-foreground mb-2">Ajoutez une ou plusieurs photos pour aider les acheteurs à identifier le produit</p>
+                    <div className="mt-2">
+                      <label className="flex items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer hover:bg-muted/50 transition-colors">
+                        <div className="text-center">
+                          <Upload className="w-8 h-8 mx-auto mb-2 text-muted-foreground" />
+                          <p className="text-sm text-muted-foreground">
+                            Cliquez pour uploader des photos
+                          </p>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            PNG, JPG, WEBP acceptés
+                          </p>
+                        </div>
+                        <input
+                          type="file"
+                          multiple
+                          accept="image/*"
+                          onChange={handleFileUpload}
+                          className="hidden"
+                        />
+                      </label>
+                    </div>
+                    
+                    {uploadedImages.length > 0 && (
+                      <div className="grid grid-cols-4 gap-2 mt-3">
+                        {uploadedImages.map((img, idx) => (
+                          <div key={idx} className="relative group">
+                            <img src={img} alt={`Photo ${idx + 1}`} className="w-full h-24 object-cover rounded-lg border-2 border-muted" />
+                            <button
+                              onClick={() => setUploadedImages(uploadedImages.filter((_, i) => i !== idx))}
+                              className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
+                              type="button"
+                            >
+                              <X className="w-4 h-4" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label>Quantité disponible *</Label>
+                      <Input
+                        type="number"
+                        min="1"
+                        value={quantity}
+                        onChange={(e) => setQuantity(parseInt(e.target.value) || 1)}
+                      />
+                    </div>
+                    <div>
+                      <Label>Prix par unité * (€)</Label>
+                      <div className="flex gap-2">
+                        <Input
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          value={price}
+                          onChange={(e) => setPrice(e.target.value)}
+                          placeholder="0.00"
+                        />
+                        <Select value={priceType} onValueChange={(v: any) => setPriceType(v)}>
+                          <SelectTrigger className="w-24">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="asin">ASIN</SelectItem>
-                            <SelectItem value="ean">EAN</SelectItem>
+                            <SelectItem value="TTC">TTC</SelectItem>
+                            <SelectItem value="HT">HT</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
-                      
-                      <div className="space-y-2">
-                        <Label>Code {searchType.toUpperCase()} (optionnel)</Label>
-                        <Input
-                          placeholder={`Ex: ${searchType === "asin" ? "B08XYZ1234" : "1234567890123"}`}
-                          value={searchCode}
-                          onChange={(e) => setSearchCode(e.target.value)}
-                        />
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label>Titre du produit *</Label>
-                      <Input
-                        placeholder="Ex: iPhone 15 Pro Max 256GB"
-                        value={title}
-                        onChange={(e) => setTitle(e.target.value)}
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label>Description</Label>
-                      <Textarea
-                        placeholder="Décrivez votre produit..."
-                        value={description}
-                        onChange={(e) => setDescription(e.target.value)}
-                        rows={4}
-                      />
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label>Quantité *</Label>
-                        <Input
-                          type="number"
-                          min="1"
-                          value={quantity}
-                          onChange={(e) => setQuantity(parseInt(e.target.value) || 1)}
-                        />
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label>Prix unitaire * (€)</Label>
-                        <div className="flex gap-2">
-                          <Input
-                            type="number"
-                            step="0.01"
-                            min="0"
-                            placeholder="0.00"
-                            value={price}
-                            onChange={(e) => setPrice(e.target.value)}
-                            className="flex-1"
-                          />
-                          <Select value={priceType} onValueChange={(v: "TTC" | "HT") => setPriceType(v)}>
-                            <SelectTrigger className="w-24">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="TTC">TTC</SelectItem>
-                              <SelectItem value="HT">HT</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label>Photos du produit * (minimum 1)</Label>
-                      <div className="border-2 border-dashed rounded-lg p-4">
-                        <Input
-                          type="file"
-                          accept="image/*"
-                          multiple
-                          onChange={handleFileUpload}
-                          className="mb-2"
-                        />
-                        {uploadedImages.length > 0 && (
-                          <div className="grid grid-cols-3 gap-2 mt-4">
-                            {uploadedImages.map((img, idx) => (
-                              <div key={idx} className="relative aspect-square">
-                                <img src={img} alt={`Upload ${idx + 1}`} className="w-full h-full object-cover rounded" />
-                                <Button
-                                  size="sm"
-                                  variant="destructive"
-                                  className="absolute top-1 right-1 h-6 w-6 p-0"
-                                  onClick={() => removeImage(idx)}
-                                >
-                                  <X className="w-4 h-4" />
-                                </Button>
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </div>
                     </div>
                   </div>
+                </div>
+              </div>
 
-                  <DialogFooter>
-                    <Button variant="outline" onClick={() => {
-                      setShowCreateDialog(false);
-                      resetForm();
-                    }}>
-                      Annuler
-                    </Button>
-                    <Button onClick={createListing} disabled={isCreating}>
-                      {isCreating ? (
-                        <>
-                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                          {editingListing ? "Modification..." : "Création..."}
-                        </>
-                      ) : (
-                        editingListing ? "Modifier l'annonce" : "Publier l'annonce"
-                      )}
-                    </Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
-            </div>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => {
+                  setShowCreateDialog(false);
+                  resetForm();
+                }}>
+                  Annuler
+                </Button>
+                <Button onClick={createListing} disabled={isCreating}>
+                  {isCreating ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Package className="w-4 h-4 mr-2" />}
+                  Publier une annonce
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
 
-            <TabsContent value="all" className="space-y-4">
-              {listings.length === 0 ? (
-                <Card className="p-12 text-center">
-                  <ShoppingBag className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
-                  <h3 className="text-xl font-semibold mb-2">Aucune annonce disponible</h3>
-                  <p className="text-muted-foreground">
-                    Soyez le premier à publier une annonce de vente
-                  </p>
+          {/* Tabs for all listings and my listings */}
+          <Tabs defaultValue={new URLSearchParams(location.search).get('tab') || "all"} className="w-full">
+            <TabsList className="grid w-full max-w-2xl grid-cols-3 p-1 bg-muted/50 rounded-lg">
+              <TabsTrigger value="all" className="data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all">
+                Toutes les annonces
+              </TabsTrigger>
+              <TabsTrigger value="mine" className="data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all">
+                Mes annonces
+              </TabsTrigger>
+              <TabsTrigger value="tickets" className="data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all relative">
+                Mes demandes
+                {unreadCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                    {unreadCount}
+                  </span>
+                )}
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="all" className="mt-6 animate-fade-in">
+              {listings.filter(l => l.user_id !== user?.id).length === 0 ? (
+                <Card className="p-16 border-2 border-dashed border-muted-foreground/20 bg-muted/5">
+                  <div className="text-center text-muted-foreground space-y-4">
+                    <div className="flex justify-center">
+                      <div className="p-4 rounded-full bg-muted/30">
+                        <Package className="w-12 h-12 opacity-50" />
+                      </div>
+                    </div>
+                    <p className="text-lg font-medium">Aucune annonce de vente pour le moment</p>
+                    <p className="text-sm">Soyez le premier à publier une annonce !</p>
+                  </div>
                 </Card>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {listings.map(listing => renderListing(listing, true))}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {listings.filter(l => l.user_id !== user?.id).map(listing => renderListing(listing, false))}
                 </div>
               )}
             </TabsContent>
 
-            <TabsContent value="my" className="space-y-4">
-              {myListings.length === 0 ? (
-                <Card className="p-12 text-center">
-                  <ShoppingBag className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
-                  <h3 className="text-xl font-semibold mb-2">Aucune annonce</h3>
-                  <p className="text-muted-foreground mb-4">
-                    Vous n'avez pas encore publié d'annonce de vente
-                  </p>
-                  <Button onClick={() => setShowCreateDialog(true)}>
-                    Publier ma première annonce
-                  </Button>
+            <TabsContent value="mine" className="mt-6 animate-fade-in">
+              {myListings.filter(l => l.status === "active").length === 0 ? (
+                <Card className="p-16 border-2 border-dashed border-muted-foreground/20 bg-muted/5">
+                  <div className="text-center text-muted-foreground space-y-4">
+                    <div className="flex justify-center">
+                      <div className="p-4 rounded-full bg-muted/30">
+                        <Package className="w-12 h-12 opacity-50" />
+                      </div>
+                    </div>
+                    <p className="text-lg font-medium">Vous n&apos;avez pas encore publié d&apos;annonce</p>
+                    <p className="text-sm">Cliquez sur &quot;Publier une annonce&quot; pour commencer</p>
+                  </div>
                 </Card>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {myListings.map(listing => renderListing(listing, true))}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {myListings.filter(l => l.status === "active").map(listing => renderListing(listing, true))}
                 </div>
               )}
+            </TabsContent>
+
+            <TabsContent value="tickets" className="mt-6 animate-fade-in">
+              <div className="space-y-6">
+                {myTickets.length === 0 ? (
+                  <Card className="p-16 border-2 border-dashed border-muted-foreground/20 bg-muted/5">
+                    <div className="text-center text-muted-foreground space-y-4">
+                      <div className="flex justify-center">
+                        <div className="p-4 rounded-full bg-muted/30">
+                          <MessageCircle className="w-12 h-12 opacity-50" />
+                        </div>
+                      </div>
+                      <p className="text-lg font-medium">Aucune demande pour le moment</p>
+                      <p className="text-sm">Lorsque des acheteurs seront intéressés par vos annonces, les tickets apparaîtront ici</p>
+                    </div>
+                  </Card>
+                ) : (
+                  <Tabs defaultValue="open" className="w-full">
+                    <TabsList className="grid w-full max-w-md grid-cols-2">
+                      <TabsTrigger value="open">
+                        En cours ({myTickets.filter(t => t.status === 'open' || t.status === 'in_progress').length})
+                      </TabsTrigger>
+                      <TabsTrigger value="closed">
+                        Fermés ({myTickets.filter(t => t.status === 'closed').length})
+                      </TabsTrigger>
+                    </TabsList>
+
+                    <TabsContent value="open" className="mt-4">
+                      {myTickets.filter(t => t.status === 'open' || t.status === 'in_progress').length === 0 ? (
+                        <Card className="p-12 border-2 border-dashed border-muted-foreground/20 bg-muted/5">
+                          <div className="text-center text-muted-foreground">
+                            <p className="text-sm">Aucune demande en cours</p>
+                          </div>
+                        </Card>
+                      ) : (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {myTickets
+                            .filter(t => t.status === 'open' || t.status === 'in_progress')
+                            .map((ticket) => (
+                              <Card
+                                key={ticket.id}
+                                className="hover:shadow-lg transition-shadow cursor-pointer"
+                                onClick={() => {
+                                  navigate(`/ticket/${ticket.id}`);
+                                }}
+                              >
+                                <CardHeader className="pb-3">
+                                  <div className="flex justify-between items-start gap-2">
+                                    <CardTitle className="text-sm font-semibold line-clamp-2">
+                                      {ticket.subject}
+                                    </CardTitle>
+                                    <Badge variant={ticket.status === "open" ? "default" : "secondary"}>
+                                      {ticket.status}
+                                    </Badge>
+                                  </div>
+                                  <CardDescription className="text-xs">
+                                    {new Date(ticket.created_at).toLocaleDateString('fr-FR', {
+                                      day: 'numeric',
+                                      month: 'long',
+                                      year: 'numeric'
+                                    })}
+                                  </CardDescription>
+                                </CardHeader>
+                              </Card>
+                            ))}
+                        </div>
+                      )}
+                    </TabsContent>
+
+                    <TabsContent value="closed" className="mt-4">
+                      {myTickets.filter(t => t.status === 'closed').length === 0 ? (
+                        <Card className="p-12 border-2 border-dashed border-muted-foreground/20 bg-muted/5">
+                          <div className="text-center text-muted-foreground">
+                            <p className="text-sm">Aucune demande fermée</p>
+                          </div>
+                        </Card>
+                      ) : (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {myTickets
+                            .filter(t => t.status === 'closed')
+                            .map((ticket) => (
+                              <Card
+                                key={ticket.id}
+                                className="hover:shadow-lg transition-shadow cursor-pointer"
+                                onClick={() => {
+                                  navigate(`/ticket/${ticket.id}`);
+                                }}
+                              >
+                                <CardHeader className="pb-3">
+                                  <div className="flex justify-between items-start gap-2">
+                                    <CardTitle className="text-sm font-semibold line-clamp-2">
+                                      {ticket.subject}
+                                    </CardTitle>
+                                    <Badge variant="outline">
+                                      closed
+                                    </Badge>
+                                  </div>
+                                  <CardDescription className="text-xs">
+                                    {new Date(ticket.created_at).toLocaleDateString('fr-FR', {
+                                      day: 'numeric',
+                                      month: 'long',
+                                      year: 'numeric'
+                                    })}
+                                  </CardDescription>
+                                </CardHeader>
+                              </Card>
+                            ))}
+                        </div>
+                      )}
+                    </TabsContent>
+                  </Tabs>
+                )}
+              </div>
             </TabsContent>
           </Tabs>
         </div>
       </main>
-
-      <Dialog open={showImageDialog} onOpenChange={setShowImageDialog}>
-        <DialogContent className="max-w-4xl">
-          {selectedImageGallery && (
-            <div className="relative">
-              <img 
-                src={selectedImageGallery[currentImageIndex]} 
-                alt={`Image ${currentImageIndex + 1}`}
-                className="w-full h-auto max-h-[80vh] object-contain"
-              />
-              {selectedImageGallery.length > 1 && (
-                <>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="absolute left-2 top-1/2 -translate-y-1/2"
-                    onClick={previousImage}
-                  >
-                    <ChevronLeft className="w-6 h-6" />
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="absolute right-2 top-1/2 -translate-y-1/2"
-                    onClick={nextImage}
-                  >
-                    <ChevronRight className="w-6 h-6" />
-                  </Button>
-                  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/70 text-white px-3 py-1 rounded-full text-sm">
-                    {currentImageIndex + 1} / {selectedImageGallery.length}
-                  </div>
-                </>
-              )}
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
 
       <Footer />
     </div>
