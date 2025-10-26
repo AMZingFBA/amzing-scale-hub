@@ -500,6 +500,7 @@ export type Database = {
         Args: { _room_id: string; _user_id: string }
         Returns: boolean
       }
+      is_vip_user: { Args: { _user_id: string }; Returns: boolean }
       mark_ticket_messages_as_read: {
         Args: { ticket_id_param: string }
         Returns: undefined
