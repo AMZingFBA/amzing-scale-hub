@@ -903,15 +903,15 @@ const Marketplace = () => {
             )}
           </DialogContent>
         </Dialog>
-        {/* Buy Section - Recherche de produits */}
+        {/* Buy Section - Want to Buy / Recherche de produits */}
         {activeSection === "buy" && (
           <div className="w-full space-y-6 animate-fade-in">
             <div className="mb-8">
               <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-                Acheter des produits
+                Want to Buy - Je recherche
               </h1>
               <p className="text-muted-foreground mt-2">
-                Parcourez les produits disponibles à la vente ou créez une demande de recherche
+                Publiez les produits que vous recherchez. Les membres qui les possèdent pourront vous les proposer.
               </p>
             </div>
 
@@ -920,14 +920,14 @@ const Marketplace = () => {
               <DialogTrigger asChild>
                 <Button size="lg" className="w-full md:w-auto hover-scale">
                   <Search className="w-5 h-5 mr-2" />
-                  Je recherche un produit
+                  Publier ma recherche
                 </Button>
               </DialogTrigger>
               <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
-                  <DialogTitle>Je recherche un produit</DialogTitle>
+                  <DialogTitle>Publier une recherche de produit</DialogTitle>
                   <DialogDescription>
-                    Décrivez le produit que vous souhaitez acheter. Le staff vous contactera si quelqu'un peut vous le fournir.
+                    Décrivez le produit que vous cherchez à acheter. Les membres qui le possèdent pourront vous contacter via le staff.
                   </DialogDescription>
                 </DialogHeader>
 
@@ -955,27 +955,27 @@ const Marketplace = () => {
 
                   <div className="space-y-4">
                     <div>
-                      <Label>Titre du produit *</Label>
+                      <Label>Titre du produit recherché *</Label>
                       <Input
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
-                        placeholder="Nom du produit"
+                        placeholder="Ex: iPhone 15 Pro, Nike Air Max..."
                       />
                     </div>
 
                     <div>
-                      <Label>Description</Label>
+                      <Label>Description / Précisions</Label>
                       <Textarea
                         value={description}
                         onChange={(e) => setDescription(e.target.value)}
-                        placeholder="Précisez ce que vous recherchez..."
+                        placeholder="Précisez ce que vous recherchez (état, couleur, taille, etc.)..."
                         rows={4}
                       />
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <Label>Quantité *</Label>
+                        <Label>Quantité souhaitée *</Label>
                         <Input
                           type="number"
                           min="1"
@@ -992,7 +992,7 @@ const Marketplace = () => {
                             min="0"
                             value={price}
                             onChange={(e) => setPrice(e.target.value)}
-                            placeholder="0.00"
+                            placeholder="Optionnel"
                           />
                           <Select value={priceType} onValueChange={(v: any) => setPriceType(v)}>
                             <SelectTrigger className="w-24">
@@ -1024,51 +1024,53 @@ const Marketplace = () => {
               </DialogContent>
             </Dialog>
 
-            {/* Tabs for listings */}
+            {/* Tabs for all buy requests and my buy requests */}
             <Tabs defaultValue="all" className="w-full">
               <TabsList className="grid w-full max-w-md grid-cols-2 p-1 bg-muted/50 rounded-lg">
                 <TabsTrigger value="all" className="data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all">
-                  Les annonces
+                  Toutes les recherches
                 </TabsTrigger>
                 <TabsTrigger value="mine" className="data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all">
-                  Mes annonces
+                  Mes recherches
                 </TabsTrigger>
               </TabsList>
 
               <TabsContent value="all" className="mt-6 animate-fade-in">
-                {listings.filter(l => l.user_id !== user?.id).length === 0 ? (
+                {buyRequests.filter(r => r.user_id !== user?.id).length === 0 ? (
                   <Card className="p-16 border-2 border-dashed border-muted-foreground/20 bg-muted/5">
                     <div className="text-center text-muted-foreground space-y-4">
                       <div className="flex justify-center">
                         <div className="p-4 rounded-full bg-muted/30">
-                          <ShoppingBag className="w-12 h-12 opacity-50" />
+                          <Search className="w-12 h-12 opacity-50" />
                         </div>
                       </div>
-                      <p className="text-lg font-medium">Aucune annonce disponible pour le moment</p>
+                      <p className="text-lg font-medium">Aucune recherche de produit pour le moment</p>
+                      <p className="text-sm">Soyez le premier à publier ce que vous recherchez !</p>
                     </div>
                   </Card>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {listings.filter(l => l.user_id !== user?.id).map(listing => renderListing(listing, false))}
+                    {buyRequests.filter(r => r.user_id !== user?.id).map(request => renderBuyRequest(request, false))}
                   </div>
                 )}
               </TabsContent>
 
               <TabsContent value="mine" className="mt-6 animate-fade-in">
-                {myListings.filter(l => l.status === "active").length === 0 ? (
+                {myBuyRequests.filter(r => r.status === "active").length === 0 ? (
                   <Card className="p-16 border-2 border-dashed border-muted-foreground/20 bg-muted/5">
                     <div className="text-center text-muted-foreground space-y-4">
                       <div className="flex justify-center">
                         <div className="p-4 rounded-full bg-muted/30">
-                          <ShoppingBag className="w-12 h-12 opacity-50" />
+                          <Search className="w-12 h-12 opacity-50" />
                         </div>
                       </div>
-                      <p className="text-lg font-medium">Vous n'avez pas encore créé d'annonce</p>
+                      <p className="text-lg font-medium">Vous n&apos;avez pas encore publié de recherche</p>
+                      <p className="text-sm">Cliquez sur &quot;Publier ma recherche&quot; pour commencer</p>
                     </div>
                   </Card>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {myListings.filter(l => l.status === "active").map(listing => renderListing(listing, true))}
+                    {myBuyRequests.filter(r => r.status === "active").map(request => renderBuyRequest(request, true))}
                   </div>
                 )}
               </TabsContent>
