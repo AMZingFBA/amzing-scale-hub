@@ -714,7 +714,7 @@ const Marketplace = () => {
                 onClick={() => handleInterestInListing(listing)}
               >
                 <ShoppingCart className="w-5 h-5 mr-2" />
-                Je veux acheter
+                Je veux vendre
               </Button>
               {isAdmin && (
                 <Button
