@@ -375,20 +375,6 @@ const Marketplace = () => {
         .eq("id", user.id)
         .single();
 
-      const { data: ticket, error: ticketError } = await supabase
-        .from("tickets")
-        .insert({
-          user_id: user.id,
-          subject: `Marketplace - Demande d'achat: ${listing.title}`,
-          category: "marketplace",
-          status: "open",
-          priority: "normal"
-        })
-        .select()
-        .single();
-
-      if (ticketError) throw ticketError;
-
       const sellerInfo = sellerProfile 
         ? `${sellerProfile.nickname || sellerProfile.full_name || "Membre"} (${sellerProfile.email})`
         : "Information non disponible";
@@ -397,17 +383,53 @@ const Marketplace = () => {
         ? `${buyerProfile.nickname || buyerProfile.full_name || "Membre"} (${buyerProfile.email})`
         : "Information non disponible";
 
-      const { error: messageError } = await supabase
+      // 1. Create ticket for buyer (user who clicked)
+      const { data: buyerTicket, error: buyerTicketError } = await supabase
+        .from("tickets")
+        .insert({
+          user_id: user.id,
+          subject: `Marketplace - Achat: ${listing.title}`,
+          category: "marketplace",
+          status: "open",
+          priority: "normal"
+        })
+        .select()
+        .single();
+
+      if (buyerTicketError) throw buyerTicketError;
+
+      await supabase
         .from("messages")
         .insert({
-          ticket_id: ticket.id,
+          ticket_id: buyerTicket.id,
           user_id: user.id,
-          content: `🛒 NOUVELLE DEMANDE D'ACHAT\n\n📦 Produit: ${listing.title}\n💰 Prix: ${listing.price}€ ${listing.price_type} par unité\n📊 Quantité disponible: ${listing.quantity}\n🏷️ Code: ${listing.asin || listing.ean || "N/A"}\n\n👤 ACHETEUR:\n${buyerInfo}\n\n👤 VENDEUR:\n${sellerInfo}\n\n⚠️ Action requise: Merci de mettre en contact l'acheteur et le vendeur.`
+          content: `🛒 Je suis intéressé par ce produit:\n\n📦 Produit: ${listing.title}\n💰 Prix: ${listing.price}€ ${listing.price_type} par unité\n📊 Quantité disponible: ${listing.quantity}\n🏷️ Code: ${listing.asin || listing.ean || "N/A"}\n\n👤 Vendeur: ${sellerInfo}`
         });
 
-      if (messageError) throw messageError;
+      // 2. Create ticket for seller (owner of listing)
+      const { data: sellerTicket, error: sellerTicketError } = await supabase
+        .from("tickets")
+        .insert({
+          user_id: listing.user_id,
+          subject: `Marketplace - Quelqu'un veut acheter: ${listing.title}`,
+          category: "marketplace",
+          status: "open",
+          priority: "normal"
+        })
+        .select()
+        .single();
 
-      toast.success("Demande envoyée! Le staff vous mettra en contact avec le vendeur.");
+      if (sellerTicketError) throw sellerTicketError;
+
+      await supabase
+        .from("messages")
+        .insert({
+          ticket_id: sellerTicket.id,
+          user_id: listing.user_id,
+          content: `🔔 Quelqu'un est intéressé par votre produit:\n\n📦 Produit: ${listing.title}\n💰 Prix: ${listing.price}€ ${listing.price_type} par unité\n📊 Quantité: ${listing.quantity}\n🏷️ Code: ${listing.asin || listing.ean || "N/A"}\n\n👤 Acheteur intéressé: ${buyerInfo}\n\n❓ Ce produit est-il toujours disponible ?`
+        });
+
+      toast.success("Demande envoyée! Le staff va vous contacter et vérifier la disponibilité.");
       navigate("/support");
     } catch (error: any) {
       console.error("Error creating interest:", error);
@@ -433,20 +455,6 @@ const Marketplace = () => {
         .eq("id", user.id)
         .single();
 
-      const { data: ticket, error: ticketError } = await supabase
-        .from("tickets")
-        .insert({
-          user_id: user.id,
-          subject: `Marketplace - Proposition de vente: ${buyRequest.title}`,
-          category: "marketplace",
-          status: "open",
-          priority: "normal"
-        })
-        .select()
-        .single();
-
-      if (ticketError) throw ticketError;
-
       const buyerInfo = buyerProfile 
         ? `${buyerProfile.nickname || buyerProfile.full_name || "Membre"} (${buyerProfile.email})`
         : "Information non disponible";
@@ -455,17 +463,53 @@ const Marketplace = () => {
         ? `${sellerProfile.nickname || sellerProfile.full_name || "Membre"} (${sellerProfile.email})`
         : "Information non disponible";
 
-      const { error: messageError } = await supabase
+      // 1. Create ticket for seller (user who clicked "je peux vendre")
+      const { data: sellerTicket, error: sellerTicketError } = await supabase
+        .from("tickets")
+        .insert({
+          user_id: user.id,
+          subject: `Marketplace - Vente: ${buyRequest.title}`,
+          category: "marketplace",
+          status: "open",
+          priority: "normal"
+        })
+        .select()
+        .single();
+
+      if (sellerTicketError) throw sellerTicketError;
+
+      await supabase
         .from("messages")
         .insert({
-          ticket_id: ticket.id,
+          ticket_id: sellerTicket.id,
           user_id: user.id,
-          content: `🏪 NOUVELLE PROPOSITION DE VENTE\n\n📦 Produit: ${buyRequest.title}\n💰 Prix maximum: ${buyRequest.max_price ? `${buyRequest.max_price}€ ${buyRequest.price_type} par unité` : "Non spécifié"}\n📊 Quantité recherchée: ${buyRequest.quantity}\n🏷️ Code: ${buyRequest.asin || buyRequest.ean || "N/A"}\n\n👤 ACHETEUR (Demandeur):\n${buyerInfo}\n\n👤 VENDEUR (Propose):\n${sellerInfo}\n\n⚠️ Action requise: Merci de mettre en contact l'acheteur et le vendeur.`
+          content: `🏪 Je peux fournir ce produit:\n\n📦 Produit: ${buyRequest.title}\n💰 Prix maximum: ${buyRequest.max_price ? `${buyRequest.max_price}€ ${buyRequest.price_type} par unité` : "Non spécifié"}\n📊 Quantité recherchée: ${buyRequest.quantity}\n🏷️ Code: ${buyRequest.asin || buyRequest.ean || "N/A"}\n\n👤 Acheteur: ${buyerInfo}`
         });
 
-      if (messageError) throw messageError;
+      // 2. Create ticket for buyer (owner of buy request)
+      const { data: buyerTicket, error: buyerTicketError } = await supabase
+        .from("tickets")
+        .insert({
+          user_id: buyRequest.user_id,
+          subject: `Marketplace - Quelqu'un peut vendre: ${buyRequest.title}`,
+          category: "marketplace",
+          status: "open",
+          priority: "normal"
+        })
+        .select()
+        .single();
 
-      toast.success("Proposition envoyée! Le staff vous mettra en contact avec l'acheteur.");
+      if (buyerTicketError) throw buyerTicketError;
+
+      await supabase
+        .from("messages")
+        .insert({
+          ticket_id: buyerTicket.id,
+          user_id: buyRequest.user_id,
+          content: `🔔 Quelqu'un peut fournir le produit que vous recherchez:\n\n📦 Produit: ${buyRequest.title}\n💰 Prix maximum: ${buyRequest.max_price ? `${buyRequest.max_price}€ ${buyRequest.price_type} par unité` : "Non spécifié"}\n📊 Quantité: ${buyRequest.quantity}\n🏷️ Code: ${buyRequest.asin || buyRequest.ean || "N/A"}\n\n👤 Vendeur potentiel: ${sellerInfo}\n\n❓ Êtes-vous toujours intéressé par ce produit ?`
+        });
+
+      toast.success("Proposition envoyée! Le staff va contacter l'acheteur et revenir vers vous.");
       navigate("/support");
     } catch (error: any) {
       console.error("Error creating proposal:", error);
