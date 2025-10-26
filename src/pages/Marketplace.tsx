@@ -724,6 +724,10 @@ const Marketplace = () => {
         {/* Buy Section */}
         {activeSection === "buy" && (
           <div className="w-full">
+            <div className="mb-6">
+              <h1 className="text-3xl font-bold">Mes demandes d'achat :</h1>
+            </div>
+            
             <Tabs defaultValue="ongoing" className="w-full">
               <TabsList className="grid w-full max-w-md grid-cols-2 mb-6">
                 <TabsTrigger value="ongoing">En cours</TabsTrigger>
@@ -839,6 +843,10 @@ const Marketplace = () => {
         {/* Sell Section */}
         {activeSection === "sell" && (
           <div className="w-full">
+            <div className="mb-6">
+              <h1 className="text-3xl font-bold">Mes demandes de vente :</h1>
+            </div>
+            
             <Tabs defaultValue="ongoing" className="w-full">
               <TabsList className="grid w-full max-w-md grid-cols-2 mb-6">
                 <TabsTrigger value="ongoing">En cours</TabsTrigger>
