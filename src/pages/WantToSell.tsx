@@ -146,6 +146,7 @@ const WantToSell = () => {
         `)
         .eq("user_id", user.id)
         .eq("category", "marketplace")
+        .eq("subcategory", "sell")
         .order("created_at", { ascending: false });
 
       if (error) throw error;

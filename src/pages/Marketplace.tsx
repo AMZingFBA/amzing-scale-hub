@@ -247,6 +247,7 @@ const Marketplace = () => {
         `)
         .eq("user_id", user.id)
         .eq("category", "marketplace")
+        .eq("subcategory", "buy")
         .order("created_at", { ascending: false });
 
       if (error) throw error;

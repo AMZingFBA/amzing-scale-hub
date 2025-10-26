@@ -61,6 +61,7 @@ Deno.serve(async (req) => {
         user_id: body.sellerUserId,
         subject: sellerSubject,
         category: 'marketplace',
+        subcategory: 'buy',
         status: 'open',
         priority: 'normal'
       })
@@ -97,6 +98,7 @@ Voici les détails de l'annonce :
         user_id: body.buyRequestUserId,
         subject: buyerSubject,
         category: 'marketplace',
+        subcategory: 'buy',
         status: 'open',
         priority: 'normal'
       })
