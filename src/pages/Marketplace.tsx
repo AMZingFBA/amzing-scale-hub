@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { Loader2, Package, Search, Upload, Trash2, ShoppingCart, ShoppingBag, Copy, Check, MessageCircle } from "lucide-react";
+import ChatRoom from "@/components/chat/ChatRoom";
 import { Badge } from "@/components/ui/badge";
 
 interface Listing {
@@ -72,6 +73,7 @@ const Marketplace = () => {
   
   // Marketplace conversations
   const [myConversations, setMyConversations] = useState<any[]>([]);
+  const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
   
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -989,37 +991,59 @@ const Marketplace = () => {
             </TabsContent>
 
             <TabsContent value="messages" className="mt-6">
-              {myConversations.length === 0 ? (
-                <Card className="p-12">
-                  <div className="text-center text-muted-foreground">
-                    <MessageCircle className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                    <p>Aucune conversation pour le moment</p>
-                  </div>
-                </Card>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {myConversations.map(room => (
-                    <Card key={room.id} className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate(`/chat?room=${room.id}`)}>
-                      <CardHeader>
-                        <CardTitle className="flex items-center gap-2 text-lg">
-                          <MessageCircle className="w-5 h-5" />
-                          {room.name}
-                        </CardTitle>
-                        <CardDescription>
-                          Créé le {new Date(room.created_at).toLocaleDateString("fr-FR")}
-                        </CardDescription>
-                      </CardHeader>
-                      <CardFooter>
-                        <Button variant="outline" className="w-full" onClick={(e) => {
-                          e.stopPropagation();
-                          navigate(`/chat?room=${room.id}`);
-                        }}>
-                          Ouvrir la conversation
-                        </Button>
-                      </CardFooter>
-                    </Card>
-                  ))}
+              {selectedConversation ? (
+                <div className="space-y-4">
+                  <Button 
+                    variant="outline" 
+                    onClick={() => setSelectedConversation(null)}
+                  >
+                    ← Retour aux conversations
+                  </Button>
+                  <ChatRoom roomId={selectedConversation} />
                 </div>
+              ) : (
+                <>
+                  {myConversations.length === 0 ? (
+                    <Card className="p-12">
+                      <div className="text-center text-muted-foreground">
+                        <MessageCircle className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                        <p>Aucune conversation pour le moment</p>
+                      </div>
+                    </Card>
+                  ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {myConversations.map(room => (
+                        <Card 
+                          key={room.id} 
+                          className="hover:shadow-lg transition-shadow cursor-pointer" 
+                          onClick={() => setSelectedConversation(room.id)}
+                        >
+                          <CardHeader>
+                            <CardTitle className="flex items-center gap-2 text-lg">
+                              <MessageCircle className="w-5 h-5" />
+                              {room.name}
+                            </CardTitle>
+                            <CardDescription>
+                              Créé le {new Date(room.created_at).toLocaleDateString("fr-FR")}
+                            </CardDescription>
+                          </CardHeader>
+                          <CardFooter>
+                            <Button 
+                              variant="outline" 
+                              className="w-full"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setSelectedConversation(room.id);
+                              }}
+                            >
+                              Ouvrir la conversation
+                            </Button>
+                          </CardFooter>
+                        </Card>
+                      ))}
+                    </div>
+                  )}
+                </>
               )}
             </TabsContent>
           </Tabs>
