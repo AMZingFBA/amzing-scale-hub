@@ -2,6 +2,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { useUnreadMessages } from '@/hooks/use-unread-messages';
 import { useMarketplaceBuyUnread } from '@/hooks/use-marketplace-buy-unread';
 import { useMarketplaceSellUnread } from '@/hooks/use-marketplace-sell-unread';
+import { useCategoryUnread } from '@/hooks/use-category-unread';
 import { Navigate, Link } from 'react-router-dom';
 import { useState } from 'react';
 import Navbar from '@/components/Navbar';
@@ -57,6 +58,7 @@ const Dashboard = () => {
   const { unreadCount } = useUnreadMessages();
   const { unreadCount: buyUnreadCount } = useMarketplaceBuyUnread();
   const { unreadCount: sellUnreadCount } = useMarketplaceSellUnread();
+  const { unreadCounts } = useCategoryUnread();
   const marketplaceUnreadCount = buyUnreadCount + sellUnreadCount;
   const [rulesOpen, setRulesOpen] = useState(false);
   const [invoiceAuthOpen, setInvoiceAuthOpen] = useState(false);
@@ -152,18 +154,25 @@ const Dashboard = () => {
               {/* INTRODUCTION */}
               <AccordionItem value="introduction" className="border rounded-lg px-6 bg-card">
                 <AccordionTrigger className="hover:no-underline">
-                  <div className="flex items-center gap-3">
-                    <BookOpen className="w-6 h-6 text-primary" />
-                    <span className="text-xl font-bold">INTRODUCTION</span>
+                  <div className="flex items-center justify-between w-full gap-3">
+                    <div className="flex items-center gap-3">
+                      <BookOpen className="w-6 h-6 text-primary" />
+                      <span className="text-xl font-bold">INTRODUCTION</span>
+                    </div>
+                    {unreadCounts.introduction?.total > 0 && (
+                      <Badge variant="destructive" className="ml-auto">
+                        {unreadCounts.introduction.total}
+                      </Badge>
+                    )}
                   </div>
                 </AccordionTrigger>
                 <AccordionContent>
                   <div className="grid gap-3 pt-2">
-                    <CategoryItem icon={Bell} label="notifications" />
-                    <CategoryItem icon={BookOpen} label="règles" onClick={() => setRulesOpen(true)} />
-                    <CategoryItem icon={CheckCircle} label="débuter" />
-                    <CategoryItem icon={BookOpen} label="guides" link="/guides" />
-                    <CategoryItem icon={DollarSign} label="affiliation" />
+                    <CategoryItem icon={Bell} label="notifications" badge={unreadCounts.introduction?.subcategories?.notifications} />
+                    <CategoryItem icon={BookOpen} label="règles" onClick={() => setRulesOpen(true)} badge={unreadCounts.introduction?.subcategories?.règles} />
+                    <CategoryItem icon={CheckCircle} label="débuter" badge={unreadCounts.introduction?.subcategories?.débuter} />
+                    <CategoryItem icon={BookOpen} label="guides" link="/guides" badge={unreadCounts.introduction?.subcategories?.guides} />
+                    <CategoryItem icon={DollarSign} label="affiliation" badge={unreadCounts.introduction?.subcategories?.affiliation} />
                     <CategoryItem icon={HelpCircle} label="support" link="/support" badge={unreadCount} />
                   </div>
                 </AccordionContent>
@@ -172,18 +181,25 @@ const Dashboard = () => {
               {/* OUTILS */}
               <AccordionItem value="outils" className="border rounded-lg px-6 bg-card">
                 <AccordionTrigger className="hover:no-underline">
-                  <div className="flex items-center gap-3">
-                    <Settings className="w-6 h-6 text-primary" />
-                    <span className="text-xl font-bold">OUTILS</span>
+                  <div className="flex items-center justify-between w-full gap-3">
+                    <div className="flex items-center gap-3">
+                      <Settings className="w-6 h-6 text-primary" />
+                      <span className="text-xl font-bold">OUTILS</span>
+                    </div>
+                    {unreadCounts.outils?.total > 0 && (
+                      <Badge variant="destructive" className="ml-auto">
+                        {unreadCounts.outils.total}
+                      </Badge>
+                    )}
                   </div>
                 </AccordionTrigger>
                 <AccordionContent>
                   <div className="grid gap-3 pt-2">
-                    <CategoryItem icon={Eye} label="création-société" />
-                    <CategoryItem icon={FileText} label="facture-autorisation" onClick={() => setInvoiceAuthOpen(true)} />
-                    <CategoryItem icon={DollarSign} label="cashback" />
-                    <CategoryItem icon={Star} label="avis" onClick={() => setReviewsOpen(true)} />
-                    <CategoryItem icon={Calculator} label="fiscalité-simplifiée" />
+                    <CategoryItem icon={Eye} label="création-société" badge={unreadCounts.outils?.subcategories?.['création-société']} />
+                    <CategoryItem icon={FileText} label="facture-autorisation" onClick={() => setInvoiceAuthOpen(true)} badge={unreadCounts.outils?.subcategories?.['facture-autorisation']} />
+                    <CategoryItem icon={DollarSign} label="cashback" badge={unreadCounts.outils?.subcategories?.cashback} />
+                    <CategoryItem icon={Star} label="avis" onClick={() => setReviewsOpen(true)} badge={unreadCounts.outils?.subcategories?.avis} />
+                    <CategoryItem icon={Calculator} label="fiscalité-simplifiée" badge={unreadCounts.outils?.subcategories?.['fiscalité-simplifiée']} />
                   </div>
                 </AccordionContent>
               </AccordionItem>
@@ -211,15 +227,22 @@ const Dashboard = () => {
               {/* EXPÉDITION */}
               <AccordionItem value="expedition" className="border rounded-lg px-6 bg-card">
                 <AccordionTrigger className="hover:no-underline">
-                  <div className="flex items-center gap-3">
-                    <Truck className="w-6 h-6 text-primary" />
-                    <span className="text-xl font-bold">EXPÉDITION</span>
+                  <div className="flex items-center justify-between w-full gap-3">
+                    <div className="flex items-center gap-3">
+                      <Truck className="w-6 h-6 text-primary" />
+                      <span className="text-xl font-bold">EXPÉDITION</span>
+                    </div>
+                    {unreadCounts.expedition?.total > 0 && (
+                      <Badge variant="destructive" className="ml-auto">
+                        {unreadCounts.expedition.total}
+                      </Badge>
+                    )}
                   </div>
                 </AccordionTrigger>
                 <AccordionContent>
                   <div className="grid gap-3 pt-2">
-                    <CategoryItem icon={Settings} label="fournitures" />
-                    <CategoryItem icon={Package} label="cartons" />
+                    <CategoryItem icon={Settings} label="fournitures" badge={unreadCounts.expedition?.subcategories?.fournitures} />
+                    <CategoryItem icon={Package} label="cartons" badge={unreadCounts.expedition?.subcategories?.cartons} />
                   </div>
                 </AccordionContent>
               </AccordionItem>
@@ -227,15 +250,22 @@ const Dashboard = () => {
               {/* INFORMATIONS */}
               <AccordionItem value="informations" className="border rounded-lg px-6 bg-card">
                 <AccordionTrigger className="hover:no-underline">
-                  <div className="flex items-center gap-3">
-                    <Bell className="w-6 h-6 text-primary" />
-                    <span className="text-xl font-bold">INFORMATIONS</span>
+                  <div className="flex items-center justify-between w-full gap-3">
+                    <div className="flex items-center gap-3">
+                      <Bell className="w-6 h-6 text-primary" />
+                      <span className="text-xl font-bold">INFORMATIONS</span>
+                    </div>
+                    {unreadCounts.informations?.total > 0 && (
+                      <Badge variant="destructive" className="ml-auto">
+                        {unreadCounts.informations.total}
+                      </Badge>
+                    )}
                   </div>
                 </AccordionTrigger>
                 <AccordionContent>
                   <div className="grid gap-3 pt-2">
-                    <CategoryItem icon={Megaphone} label="annonces" />
-                    <CategoryItem icon={Newspaper} label="actualités" />
+                    <CategoryItem icon={Megaphone} label="annonces" badge={unreadCounts.informations?.subcategories?.annonces} />
+                    <CategoryItem icon={Newspaper} label="actualités" badge={unreadCounts.informations?.subcategories?.actualités} />
                   </div>
                 </AccordionContent>
               </AccordionItem>
