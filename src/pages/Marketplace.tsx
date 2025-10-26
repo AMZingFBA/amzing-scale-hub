@@ -1279,7 +1279,7 @@ const Marketplace = () => {
                 Want to Sell - Je vends
               </h1>
               <p className="text-muted-foreground mt-2">
-                Publiez les produits que vous souhaitez vendre. Les membres intéressés pourront vous contacter.
+                Publiez vos produits à vendre ou parcourez les annonces des autres membres.
               </p>
             </div>
 
@@ -1288,14 +1288,14 @@ const Marketplace = () => {
               <DialogTrigger asChild>
                 <Button size="lg" className="w-full md:w-auto hover-scale">
                   <Package className="w-5 h-5 mr-2" />
-                  Publier mon annonce
+                  Publier une annonce
                 </Button>
               </DialogTrigger>
               <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                   <DialogTitle>Publier une annonce de vente</DialogTitle>
                   <DialogDescription>
-                    Décrivez le produit que vous souhaitez vendre. Les acheteurs intéressés pourront vous contacter via le staff.
+                    Décrivez le produit que vous souhaitez vendre. Les membres intéressés pourront vous contacter via le staff.
                   </DialogDescription>
                 </DialogHeader>
 
@@ -1426,7 +1426,7 @@ const Marketplace = () => {
                   </Button>
                   <Button onClick={createListing} disabled={isCreating}>
                     {isCreating ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Package className="w-4 h-4 mr-2" />}
-                    Publier mon annonce
+                    Publier l'annonce
                   </Button>
                 </DialogFooter>
               </DialogContent>
