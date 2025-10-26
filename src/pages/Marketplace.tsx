@@ -1275,10 +1275,10 @@ const Marketplace = () => {
         {activeSection === "sell" && (
           <div className="w-full space-y-6 animate-fade-in">
             <div className="mb-8">
-              <h1 className="text-4xl font-bold text-primary mb-4">
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
                 Want to Sell - Je vends
               </h1>
-              <p className="text-muted-foreground">
+              <p className="text-muted-foreground mt-2">
                 Publiez vos produits à vendre ou parcourez les annonces des autres membres.
               </p>
             </div>
@@ -1286,7 +1286,7 @@ const Marketplace = () => {
             {/* Create Listing Button */}
             <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
               <DialogTrigger asChild>
-                <Button size="lg" className="hover-scale mb-6">
+                <Button size="lg" className="w-full md:w-auto hover-scale">
                   <Package className="w-5 h-5 mr-2" />
                   Publier une annonce
                 </Button>
@@ -1343,7 +1343,7 @@ const Marketplace = () => {
 
                     <div>
                       <Label>Photos du produit (optionnel)</Label>
-                      <p className="text-xs text-muted-foreground mb-2">Ajoutez une ou plusieurs photos de votre produit</p>
+                      <p className="text-xs text-muted-foreground mb-2">Ajoutez une ou plusieurs photos pour aider les acheteurs à identifier le produit</p>
                       <div className="mt-2">
                         <label className="flex items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer hover:bg-muted/50 transition-colors">
                           <div className="text-center">
@@ -1364,16 +1364,18 @@ const Marketplace = () => {
                           />
                         </label>
                       </div>
+                      
                       {uploadedImages.length > 0 && (
-                        <div className="grid grid-cols-4 gap-2 mt-2">
+                        <div className="grid grid-cols-4 gap-2 mt-3">
                           {uploadedImages.map((img, idx) => (
                             <div key={idx} className="relative group">
-                              <img src={img} alt={`Upload ${idx + 1}`} className="w-full h-24 object-cover rounded-lg" />
+                              <img src={img} alt={`Photo ${idx + 1}`} className="w-full h-24 object-cover rounded-lg border-2 border-muted" />
                               <button
                                 onClick={() => setUploadedImages(uploadedImages.filter((_, i) => i !== idx))}
-                                className="absolute top-1 right-1 bg-destructive text-destructive-foreground p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                                className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
+                                type="button"
                               >
-                                <X className="w-3 h-3" />
+                                <X className="w-4 h-4" />
                               </button>
                             </div>
                           ))}
@@ -1426,7 +1428,7 @@ const Marketplace = () => {
                   </Button>
                   <Button onClick={createListing} disabled={isCreating}>
                     {isCreating ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Package className="w-4 h-4 mr-2" />}
-                    Publier l'annonce
+                    Publier une annonce
                   </Button>
                 </DialogFooter>
               </DialogContent>
@@ -1481,7 +1483,7 @@ const Marketplace = () => {
                         </div>
                       </div>
                       <p className="text-lg font-medium">Vous n&apos;avez pas encore publié d&apos;annonce</p>
-                      <p className="text-sm">Cliquez sur &quot;Publier mon annonce&quot; pour commencer</p>
+                      <p className="text-sm">Cliquez sur &quot;Publier une annonce&quot; pour commencer</p>
                     </div>
                   </Card>
                 ) : (
