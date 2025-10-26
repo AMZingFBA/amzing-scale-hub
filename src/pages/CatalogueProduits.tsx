@@ -938,21 +938,27 @@ const Marketplace = () => {
           <div className="w-full space-y-6 animate-fade-in">
             <div className="mb-8">
               <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-                Want to Buy - Je recherche
+                Catalogue Pro — Mes produits
               </h1>
-              <p className="text-muted-foreground mt-2">
-                Publiez les produits que vous recherchez. Les membres qui les possèdent pourront vous les proposer.
-              </p>
+              <div className="mt-2 space-y-1">
+                <p className="text-lg font-semibold text-amber-600">🟨 Sous-titre :</p>
+                <p className="text-muted-foreground">
+                  Découvrez tous les produits disponibles à la vente pour les professionnels.
+                  <br />
+                  Chaque article est stocké, expédié et géré directement par notre équipe (SAV inclus)
+                </p>
+              </div>
             </div>
 
-            {/* Create Buy Request Button */}
-            <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
-              <DialogTrigger asChild>
-                <Button size="lg" className="w-full md:w-auto hover-scale">
-                  <Search className="w-5 h-5 mr-2" />
-                  Publier ma recherche
-                </Button>
-              </DialogTrigger>
+            {/* Create Buy Request Button - Admin Only */}
+            {isAdmin && (
+              <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
+                <DialogTrigger asChild>
+                  <Button size="lg" className="w-full md:w-auto hover-scale">
+                    <Package className="w-5 h-5 mr-2" />
+                    Ajouter un produit au catalogue
+                  </Button>
+                </DialogTrigger>
               <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                   <DialogTitle>
@@ -1099,16 +1105,14 @@ const Marketplace = () => {
                   </Button>
                 </DialogFooter>
               </DialogContent>
-            </Dialog>
+              </Dialog>
+            )}
 
-            {/* Tabs for all buy requests and my buy requests */}
+            {/* Tabs for catalogue and my requests */}
             <Tabs defaultValue={new URLSearchParams(location.search).get('tab') || "all"} className="w-full">
-              <TabsList className="grid w-full max-w-2xl grid-cols-3 p-1 bg-muted/50 rounded-lg">
+              <TabsList className="grid w-full max-w-2xl grid-cols-2 p-1 bg-muted/50 rounded-lg">
                 <TabsTrigger value="all" className="data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all">
-                  Toutes les recherches
-                </TabsTrigger>
-                <TabsTrigger value="mine" className="data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all">
-                  Mes recherches
+                  Notre catalogue
                 </TabsTrigger>
                 <TabsTrigger value="tickets" className="data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all relative">
                   Mes demandes
@@ -1121,41 +1125,21 @@ const Marketplace = () => {
               </TabsList>
 
               <TabsContent value="all" className="mt-6 animate-fade-in">
-                {buyRequests.filter(r => r.user_id !== user?.id).length === 0 ? (
+                {buyRequests.length === 0 ? (
                   <Card className="p-16 border-2 border-dashed border-muted-foreground/20 bg-muted/5">
                     <div className="text-center text-muted-foreground space-y-4">
                       <div className="flex justify-center">
                         <div className="p-4 rounded-full bg-muted/30">
-                          <Search className="w-12 h-12 opacity-50" />
+                          <Package className="w-12 h-12 opacity-50" />
                         </div>
                       </div>
-                      <p className="text-lg font-medium">Aucune recherche de produit pour le moment</p>
-                      <p className="text-sm">Soyez le premier à publier ce que vous recherchez !</p>
+                      <p className="text-lg font-medium">Aucun produit disponible pour le moment</p>
+                      <p className="text-sm">Les produits seront ajoutés prochainement par notre équipe</p>
                     </div>
                   </Card>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {buyRequests.filter(r => r.user_id !== user?.id).map(request => renderBuyRequest(request, false))}
-                  </div>
-                )}
-              </TabsContent>
-
-              <TabsContent value="mine" className="mt-6 animate-fade-in">
-                {myBuyRequests.filter(r => r.status === "active").length === 0 ? (
-                  <Card className="p-16 border-2 border-dashed border-muted-foreground/20 bg-muted/5">
-                    <div className="text-center text-muted-foreground space-y-4">
-                      <div className="flex justify-center">
-                        <div className="p-4 rounded-full bg-muted/30">
-                          <Search className="w-12 h-12 opacity-50" />
-                        </div>
-                      </div>
-                      <p className="text-lg font-medium">Vous n&apos;avez pas encore publié de recherche</p>
-                      <p className="text-sm">Cliquez sur &quot;Publier ma recherche&quot; pour commencer</p>
-                    </div>
-                  </Card>
-                ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {myBuyRequests.filter(r => r.status === "active").map(request => renderBuyRequest(request, true))}
+                    {buyRequests.map(request => renderBuyRequest(request, false))}
                   </div>
                 )}
               </TabsContent>
