@@ -17,7 +17,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 const Ticket = () => {
   const { id } = useParams();
   const { user } = useAuth();
-  const { isAdmin } = useAdmin();
+  const { isAdmin, isLoading: isAdminLoading } = useAdmin();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [ticket, setTicket] = useState<any>(null);
@@ -102,14 +102,17 @@ const Ticket = () => {
 
       if (ticketError) throw ticketError;
 
-      if (!isAdmin && ticketData.user_id !== user!.id) {
-        toast({
-          title: "Accès refusé",
-          description: "Vous n'avez pas accès à ce ticket",
-          variant: "destructive",
-        });
-        navigate('/support');
-        return;
+      // Wait for admin status to be loaded before checking access
+      if (!isAdminLoading) {
+        if (!isAdmin && ticketData.user_id !== user!.id) {
+          toast({
+            title: "Accès refusé",
+            description: "Vous n'avez pas accès à ce ticket",
+            variant: "destructive",
+          });
+          navigate('/support');
+          return;
+        }
       }
 
       setTicket(ticketData);
