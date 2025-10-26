@@ -188,6 +188,54 @@ export type Database = {
         }
         Relationships: []
       }
+      marketplace_listings: {
+        Row: {
+          asin: string | null
+          created_at: string
+          description: string | null
+          ean: string | null
+          id: string
+          images: string[] | null
+          price: number
+          price_type: string
+          quantity: number
+          status: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          asin?: string | null
+          created_at?: string
+          description?: string | null
+          ean?: string | null
+          id?: string
+          images?: string[] | null
+          price: number
+          price_type?: string
+          quantity?: number
+          status?: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          asin?: string | null
+          created_at?: string
+          description?: string | null
+          ean?: string | null
+          id?: string
+          images?: string[] | null
+          price?: number
+          price_type?: string
+          quantity?: number
+          status?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       message_read_status: {
         Row: {
           created_at: string
