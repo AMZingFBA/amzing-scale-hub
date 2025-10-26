@@ -203,7 +203,6 @@ const Dashboard = () => {
                     <CategoryItem icon={FileText} label="facture-autorisation" onClick={() => setInvoiceAuthOpen(true)} badge={unreadCounts.outils?.subcategories?.['facture-autorisation']} />
                     <CategoryItem icon={DollarSign} label="cashback" badge={unreadCounts.outils?.subcategories?.cashback} />
                     <CategoryItem icon={Star} label="avis" onClick={() => setReviewsOpen(true)} badge={unreadCounts.outils?.subcategories?.avis} />
-                    <CategoryItem icon={Calculator} label="fiscalité-simplifiée" badge={unreadCounts.outils?.subcategories?.['fiscalité-simplifiée']} />
                   </div>
                 </AccordionContent>
               </AccordionItem>
