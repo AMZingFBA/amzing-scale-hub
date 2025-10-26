@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/use-auth';
+import { useAdmin } from '@/hooks/use-admin';
 import { supabase } from '@/integrations/supabase/client';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -32,6 +33,7 @@ const Support = () => {
   const { user, isVIP } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { isAdmin, isLoading: isAdminLoading } = useAdmin();
   const [tickets, setTickets] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isCreating, setIsCreating] = useState(false);
@@ -48,8 +50,14 @@ const Support = () => {
       return;
     }
 
+    // Si l'utilisateur est admin, le rediriger vers la page d'administration
+    if (!isAdminLoading && isAdmin) {
+      navigate('/support');
+      return;
+    }
+
     loadTickets();
-  }, [user, isVIP, navigate]);
+  }, [user, isVIP, isAdmin, isAdminLoading, navigate]);
 
   const loadTickets = async () => {
     try {
@@ -171,13 +179,14 @@ const Support = () => {
                 Contactez notre équipe pour obtenir de l'aide
               </p>
             </div>
-            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-              <DialogTrigger asChild>
-                <Button>
-                  <Plus className="w-4 h-4 mr-2" />
-                  Nouveau ticket
-                </Button>
-              </DialogTrigger>
+            {!isAdmin && (
+              <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button>
+                    <Plus className="w-4 h-4 mr-2" />
+                    Nouveau ticket
+                  </Button>
+                </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
                   <DialogTitle>Créer un ticket de support</DialogTitle>
@@ -232,7 +241,8 @@ const Support = () => {
                   </Button>
                 </div>
               </DialogContent>
-            </Dialog>
+              </Dialog>
+            )}
           </div>
 
           {tickets.length === 0 ? (

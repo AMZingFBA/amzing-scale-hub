@@ -8,7 +8,8 @@ import Footer from '@/components/Footer';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Loader2, MessageSquare, X } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Loader2, MessageSquare, X, Search } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
@@ -19,6 +20,7 @@ const AdminTickets = () => {
   const { toast } = useToast();
   const [tickets, setTickets] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     if (!user) {
@@ -130,8 +132,24 @@ const AdminTickets = () => {
   };
 
   const filterTickets = (status?: string) => {
-    if (!status) return tickets;
-    return tickets.filter(t => t.status === status);
+    let filtered = tickets;
+    
+    // Filter by status
+    if (status) {
+      filtered = filtered.filter(t => t.status === status);
+    }
+    
+    // Filter by search query
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(t => 
+        t.subject?.toLowerCase().includes(query) ||
+        t.profiles?.full_name?.toLowerCase().includes(query) ||
+        t.profiles?.email?.toLowerCase().includes(query)
+      );
+    }
+    
+    return filtered;
   };
 
   const closeTicket = async (ticketId: string, e: React.MouseEvent) => {
@@ -178,6 +196,16 @@ const AdminTickets = () => {
           <p className="text-muted-foreground mb-8">
             Gérez tous les tickets de support
           </p>
+
+          <div className="relative mb-6">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+            <Input
+              placeholder="Rechercher par sujet, nom ou email..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10"
+            />
+          </div>
 
           <Tabs defaultValue="all" className="w-full">
             <TabsList>
