@@ -11,7 +11,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Loader2, Package, Search, Upload, Trash2, ShoppingCart } from "lucide-react";
+import { Loader2, Package, Search, Upload, Trash2, ShoppingCart, ShoppingBag } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 interface Listing {
@@ -29,11 +29,33 @@ interface Listing {
   created_at: string;
 }
 
+interface BuyRequest {
+  id: string;
+  user_id: string;
+  asin: string | null;
+  ean: string | null;
+  title: string;
+  description: string | null;
+  quantity: number;
+  max_price: number | null;
+  price_type: string;
+  status: string;
+  created_at: string;
+}
+
 const Marketplace = () => {
   const { user, isVIP } = useAuth();
   const navigate = useNavigate();
+  const [activeSection, setActiveSection] = useState<"buy" | "sell">("buy");
+  
+  // Sell listings
   const [listings, setListings] = useState<Listing[]>([]);
   const [myListings, setMyListings] = useState<Listing[]>([]);
+  
+  // Buy requests
+  const [buyRequests, setBuyRequests] = useState<BuyRequest[]>([]);
+  const [myBuyRequests, setMyBuyRequests] = useState<BuyRequest[]>([]);
+  
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
 
@@ -63,17 +85,28 @@ const Marketplace = () => {
     checkAdmin();
     loadListings();
     loadMyListings();
+    loadBuyRequests();
+    loadMyBuyRequests();
 
-    const channel = supabase
-      .channel("marketplace_changes")
+    const listingsChannel = supabase
+      .channel("marketplace_listings_changes")
       .on("postgres_changes", { event: "*", schema: "public", table: "marketplace_listings" }, () => {
         loadListings();
         loadMyListings();
       })
       .subscribe();
 
+    const buyRequestsChannel = supabase
+      .channel("marketplace_buy_requests_changes")
+      .on("postgres_changes", { event: "*", schema: "public", table: "marketplace_buy_requests" }, () => {
+        loadBuyRequests();
+        loadMyBuyRequests();
+      })
+      .subscribe();
+
     return () => {
-      supabase.removeChannel(channel);
+      supabase.removeChannel(listingsChannel);
+      supabase.removeChannel(buyRequestsChannel);
     };
   }, [user, navigate]);
 
@@ -115,6 +148,41 @@ const Marketplace = () => {
       setMyListings(data || []);
     } catch (error: any) {
       console.error("Error loading my listings:", error);
+    }
+  };
+
+  const loadBuyRequests = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("marketplace_buy_requests")
+        .select("*")
+        .eq("status", "active")
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+      setBuyRequests(data || []);
+    } catch (error: any) {
+      console.error("Error loading buy requests:", error);
+      toast.error("Erreur lors du chargement des demandes");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadMyBuyRequests = async () => {
+    if (!user) return;
+    
+    try {
+      const { data, error } = await supabase
+        .from("marketplace_buy_requests")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+      setMyBuyRequests(data || []);
+    } catch (error: any) {
+      console.error("Error loading my buy requests:", error);
     }
   };
 
@@ -193,9 +261,11 @@ const Marketplace = () => {
       return;
     }
 
-    if (!price || parseFloat(price) <= 0) {
-      toast.error("Veuillez entrer un prix valide");
-      return;
+    if (activeSection === "sell") {
+      if (!price || parseFloat(price) <= 0) {
+        toast.error("Veuillez entrer un prix valide");
+        return;
+      }
     }
 
     if (quantity < 1) {
@@ -206,30 +276,48 @@ const Marketplace = () => {
     setIsCreating(true);
 
     try {
-      const imageUrls = await uploadFilesToStorage();
+      if (activeSection === "sell") {
+        const imageUrls = await uploadFilesToStorage();
 
-      const { error } = await supabase.from("marketplace_listings").insert({
-        user_id: user.id,
-        asin: searchType === "asin" ? searchCode : null,
-        ean: searchType === "ean" ? searchCode : null,
-        title,
-        description,
-        images: imageUrls,
-        quantity,
-        price: parseFloat(price),
-        price_type: priceType,
-        status: "active"
-      });
+        const { error } = await supabase.from("marketplace_listings").insert({
+          user_id: user.id,
+          asin: searchType === "asin" ? searchCode : null,
+          ean: searchType === "ean" ? searchCode : null,
+          title,
+          description,
+          images: imageUrls,
+          quantity,
+          price: parseFloat(price),
+          price_type: priceType,
+          status: "active"
+        });
 
-      if (error) throw error;
+        if (error) throw error;
+        toast.success("Annonce de vente créée avec succès!");
+        loadMyListings();
+      } else {
+        const { error } = await supabase.from("marketplace_buy_requests").insert({
+          user_id: user.id,
+          asin: searchType === "asin" ? searchCode : null,
+          ean: searchType === "ean" ? searchCode : null,
+          title,
+          description,
+          quantity,
+          max_price: price ? parseFloat(price) : null,
+          price_type: priceType,
+          status: "active"
+        });
 
-      toast.success("Annonce créée avec succès!");
+        if (error) throw error;
+        toast.success("Demande d'achat créée avec succès!");
+        loadMyBuyRequests();
+      }
+
       setShowCreateDialog(false);
       resetForm();
-      loadMyListings();
     } catch (error: any) {
-      console.error("Error creating listing:", error);
-      toast.error("Erreur lors de la création de l'annonce");
+      console.error("Error creating:", error);
+      toast.error("Erreur lors de la création");
     } finally {
       setIsCreating(false);
     }
@@ -247,16 +335,15 @@ const Marketplace = () => {
     setProductData(null);
   };
 
-  const handleInterest = async (listing: Listing) => {
+  const handleInterestInListing = async (listing: Listing) => {
     if (!user) return;
 
     try {
-      // Créer un ticket avec le vendeur
       const { data: ticket, error: ticketError } = await supabase
         .from("tickets")
         .insert({
           user_id: user.id,
-          subject: `Intéressé par: ${listing.title}`,
+          subject: `Achat: ${listing.title}`,
           category: "marketplace",
           status: "open",
           priority: "normal"
@@ -266,21 +353,56 @@ const Marketplace = () => {
 
       if (ticketError) throw ticketError;
 
-      // Ajouter un message initial
       const { error: messageError } = await supabase
         .from("messages")
         .insert({
           ticket_id: ticket.id,
           user_id: user.id,
-          content: `Je suis intéressé par ce produit:\n\nTitre: ${listing.title}\nQuantité: ${listing.quantity}\nPrix: ${listing.price}€ ${listing.price_type}\n\nCode produit: ${listing.asin || listing.ean || "N/A"}`
+          content: `Je souhaite acheter ce produit:\n\nTitre: ${listing.title}\nQuantité disponible: ${listing.quantity}\nPrix: ${listing.price}€ ${listing.price_type}\n\nCode produit: ${listing.asin || listing.ean || "N/A"}`
         });
 
       if (messageError) throw messageError;
 
-      toast.success("Ticket créé! Le staff vous contactera bientôt.");
+      toast.success("Demande envoyée! Le staff vous contactera bientôt.");
       navigate(`/ticket/${ticket.id}`);
     } catch (error: any) {
       console.error("Error creating interest ticket:", error);
+      toast.error("Erreur lors de la création du ticket");
+    }
+  };
+
+  const handleInterestInBuyRequest = async (buyRequest: BuyRequest) => {
+    if (!user) return;
+
+    try {
+      const { data: ticket, error: ticketError } = await supabase
+        .from("tickets")
+        .insert({
+          user_id: user.id,
+          subject: `Vente: ${buyRequest.title}`,
+          category: "marketplace",
+          status: "open",
+          priority: "normal"
+        })
+        .select()
+        .single();
+
+      if (ticketError) throw ticketError;
+
+      const { error: messageError } = await supabase
+        .from("messages")
+        .insert({
+          ticket_id: ticket.id,
+          user_id: user.id,
+          content: `Je peux fournir ce produit:\n\nTitre: ${buyRequest.title}\nQuantité recherchée: ${buyRequest.quantity}\nPrix maximum: ${buyRequest.max_price ? `${buyRequest.max_price}€ ${buyRequest.price_type}` : "Non spécifié"}\n\nCode produit: ${buyRequest.asin || buyRequest.ean || "N/A"}`
+        });
+
+      if (messageError) throw messageError;
+
+      toast.success("Proposition envoyée! Le staff vous contactera bientôt.");
+      navigate(`/ticket/${ticket.id}`);
+    } catch (error: any) {
+      console.error("Error creating proposal ticket:", error);
       toast.error("Erreur lors de la création du ticket");
     }
   };
@@ -301,6 +423,26 @@ const Marketplace = () => {
       loadMyListings();
     } catch (error: any) {
       console.error("Error deleting listing:", error);
+      toast.error("Erreur lors de la suppression");
+    }
+  };
+
+  const deleteBuyRequest = async (requestId: string) => {
+    if (!confirm("Êtes-vous sûr de vouloir supprimer cette demande?")) return;
+
+    try {
+      const { error } = await supabase
+        .from("marketplace_buy_requests")
+        .update({ status: "removed" })
+        .eq("id", requestId);
+
+      if (error) throw error;
+
+      toast.success("Demande supprimée");
+      loadBuyRequests();
+      loadMyBuyRequests();
+    } catch (error: any) {
+      console.error("Error deleting buy request:", error);
       toast.error("Erreur lors de la suppression");
     }
   };
@@ -368,11 +510,76 @@ const Marketplace = () => {
         ) : (
           user?.id !== listing.user_id && (
             <Button
-              onClick={() => handleInterest(listing)}
+              onClick={() => handleInterestInListing(listing)}
               className="flex-1"
             >
               <ShoppingCart className="w-4 h-4 mr-2" />
-              Je suis intéressé
+              Je veux acheter
+            </Button>
+          )
+        )}
+      </CardFooter>
+    </Card>
+  );
+
+  const renderBuyRequest = (buyRequest: BuyRequest, showActions: boolean = false) => (
+    <Card key={buyRequest.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+      <CardHeader className="pb-3">
+        <div className="flex justify-between items-start">
+          <div className="flex-1">
+            <CardTitle className="text-lg">{buyRequest.title}</CardTitle>
+            <CardDescription className="mt-1">
+              Demande d'achat vérifiée
+            </CardDescription>
+          </div>
+          <Badge variant={buyRequest.status === "active" ? "default" : "secondary"}>
+            {buyRequest.status}
+          </Badge>
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        {buyRequest.description && (
+          <p className="text-sm text-muted-foreground line-clamp-2">
+            {buyRequest.description}
+          </p>
+        )}
+        <div className="flex items-center justify-between text-sm">
+          <span className="text-muted-foreground">Quantité recherchée: {buyRequest.quantity}</span>
+          {buyRequest.max_price && (
+            <span className="text-xl font-bold text-primary">
+              Max: {buyRequest.max_price}€ <span className="text-sm">{buyRequest.price_type}</span>
+            </span>
+          )}
+        </div>
+        {(buyRequest.asin || buyRequest.ean) && (
+          <p className="text-xs text-muted-foreground">
+            {buyRequest.asin ? `ASIN: ${buyRequest.asin}` : `EAN: ${buyRequest.ean}`}
+          </p>
+        )}
+      </CardContent>
+      <CardFooter className="flex gap-2">
+        {showActions ? (
+          <>
+            {(user?.id === buyRequest.user_id || isAdmin) && (
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={() => deleteBuyRequest(buyRequest.id)}
+                className="flex-1"
+              >
+                <Trash2 className="w-4 h-4 mr-2" />
+                Supprimer
+              </Button>
+            )}
+          </>
+        ) : (
+          user?.id !== buyRequest.user_id && (
+            <Button
+              onClick={() => handleInterestInBuyRequest(buyRequest)}
+              className="flex-1"
+            >
+              <ShoppingBag className="w-4 h-4 mr-2" />
+              Je peux vendre
             </Button>
           )
         )}
@@ -411,25 +618,51 @@ const Marketplace = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/20 p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-4xl font-bold mb-2">Marketplace</h1>
-            <p className="text-muted-foreground">
-              Achetez et vendez des produits entre membres
-            </p>
-          </div>
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold mb-2">Marketplace</h1>
+          <p className="text-muted-foreground">
+            Achetez et vendez des produits entre membres
+          </p>
+        </div>
+
+        {/* Section Selector */}
+        <div className="flex gap-4 mb-8">
+          <Button
+            size="lg"
+            variant={activeSection === "buy" ? "default" : "outline"}
+            onClick={() => setActiveSection("buy")}
+            className="flex-1"
+          >
+            <ShoppingCart className="w-5 h-5 mr-2" />
+            Je cherche à acheter
+          </Button>
+          <Button
+            size="lg"
+            variant={activeSection === "sell" ? "default" : "outline"}
+            onClick={() => setActiveSection("sell")}
+            className="flex-1"
+          >
+            <ShoppingBag className="w-5 h-5 mr-2" />
+            Je vends
+          </Button>
+        </div>
+
+        {/* Action Button */}
+        <div className="mb-6">
           <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
             <DialogTrigger asChild>
-              <Button size="lg">
+              <Button size="lg" className="w-full md:w-auto">
                 <Package className="w-5 h-5 mr-2" />
-                Créer une annonce
+                {activeSection === "sell" ? "Créer une annonce de vente" : "Créer une demande d'achat"}
               </Button>
             </DialogTrigger>
             <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
               <DialogHeader>
-                <DialogTitle>Créer une nouvelle annonce</DialogTitle>
+                <DialogTitle>
+                  {activeSection === "sell" ? "Créer une annonce de vente" : "Créer une demande d'achat"}
+                </DialogTitle>
                 <DialogDescription>
-                  Entrez un code ASIN ou EAN pour rechercher le produit automatiquement
+                  Entrez un code ASIN ou EAN pour identifier le produit
                 </DialogDescription>
               </DialogHeader>
 
@@ -470,34 +703,36 @@ const Marketplace = () => {
                     <Textarea
                       value={description}
                       onChange={(e) => setDescription(e.target.value)}
-                      placeholder="Décrivez votre produit..."
+                      placeholder={activeSection === "sell" ? "Décrivez votre produit..." : "Précisez ce que vous recherchez..."}
                       rows={4}
                     />
                   </div>
 
-                  <div>
-                    <Label>Images / Fichiers</Label>
-                    <div className="mt-2">
-                      <label className="flex items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer hover:bg-muted/50 transition-colors">
-                        <div className="text-center">
-                          <Upload className="w-8 h-8 mx-auto mb-2 text-muted-foreground" />
-                          <p className="text-sm text-muted-foreground">
-                            Cliquez pour uploader (PNG, JPG, PDF)
-                          </p>
-                          <p className="text-xs text-muted-foreground mt-1">
-                            {uploadedFiles.length} fichier(s) sélectionné(s)
-                          </p>
-                        </div>
-                        <input
-                          type="file"
-                          multiple
-                          accept="image/*,.pdf"
-                          onChange={handleFileUpload}
-                          className="hidden"
-                        />
-                      </label>
+                  {activeSection === "sell" && (
+                    <div>
+                      <Label>Images / Fichiers</Label>
+                      <div className="mt-2">
+                        <label className="flex items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer hover:bg-muted/50 transition-colors">
+                          <div className="text-center">
+                            <Upload className="w-8 h-8 mx-auto mb-2 text-muted-foreground" />
+                            <p className="text-sm text-muted-foreground">
+                              Cliquez pour uploader (PNG, JPG, PDF)
+                            </p>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              {uploadedFiles.length} fichier(s) sélectionné(s)
+                            </p>
+                          </div>
+                          <input
+                            type="file"
+                            multiple
+                            accept="image/*,.pdf"
+                            onChange={handleFileUpload}
+                            className="hidden"
+                          />
+                        </label>
+                      </div>
                     </div>
-                  </div>
+                  )}
 
                   <div className="grid grid-cols-2 gap-4">
                     <div>
@@ -510,7 +745,9 @@ const Marketplace = () => {
                       />
                     </div>
                     <div>
-                      <Label>Prix * (€)</Label>
+                      <Label>
+                        {activeSection === "sell" ? "Prix * (€)" : "Prix maximum (€)"}
+                      </Label>
                       <div className="flex gap-2">
                         <Input
                           type="number"
@@ -551,49 +788,92 @@ const Marketplace = () => {
                   ) : (
                     <Package className="w-4 h-4 mr-2" />
                   )}
-                  Publier l'annonce
+                  Publier
                 </Button>
               </DialogFooter>
             </DialogContent>
           </Dialog>
         </div>
 
-        <Tabs defaultValue="all" className="w-full">
-          <TabsList className="grid w-full max-w-md grid-cols-2">
-            <TabsTrigger value="all">Toutes les annonces</TabsTrigger>
-            <TabsTrigger value="mine">Mes annonces</TabsTrigger>
-          </TabsList>
+        {/* Buy Section */}
+        {activeSection === "buy" && (
+          <Tabs defaultValue="all" className="w-full">
+            <TabsList className="grid w-full max-w-md grid-cols-2">
+              <TabsTrigger value="all">Toutes les demandes</TabsTrigger>
+              <TabsTrigger value="mine">Mes demandes</TabsTrigger>
+            </TabsList>
 
-          <TabsContent value="all" className="mt-6">
-            {listings.length === 0 ? (
-              <Card className="p-12">
-                <div className="text-center text-muted-foreground">
-                  <Package className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                  <p>Aucune annonce disponible pour le moment</p>
+            <TabsContent value="all" className="mt-6">
+              {buyRequests.length === 0 ? (
+                <Card className="p-12">
+                  <div className="text-center text-muted-foreground">
+                    <ShoppingCart className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                    <p>Aucune demande d'achat pour le moment</p>
+                  </div>
+                </Card>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {buyRequests.map(request => renderBuyRequest(request, false))}
                 </div>
-              </Card>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {listings.map(listing => renderListing(listing, false))}
-              </div>
-            )}
-          </TabsContent>
+              )}
+            </TabsContent>
 
-          <TabsContent value="mine" className="mt-6">
-            {myListings.length === 0 ? (
-              <Card className="p-12">
-                <div className="text-center text-muted-foreground">
-                  <Package className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                  <p>Vous n'avez pas encore créé d'annonce</p>
+            <TabsContent value="mine" className="mt-6">
+              {myBuyRequests.length === 0 ? (
+                <Card className="p-12">
+                  <div className="text-center text-muted-foreground">
+                    <ShoppingCart className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                    <p>Vous n'avez pas encore créé de demande d'achat</p>
+                  </div>
+                </Card>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {myBuyRequests.map(request => renderBuyRequest(request, true))}
                 </div>
-              </Card>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {myListings.map(listing => renderListing(listing, true))}
-              </div>
-            )}
-          </TabsContent>
-        </Tabs>
+              )}
+            </TabsContent>
+          </Tabs>
+        )}
+
+        {/* Sell Section */}
+        {activeSection === "sell" && (
+          <Tabs defaultValue="all" className="w-full">
+            <TabsList className="grid w-full max-w-md grid-cols-2">
+              <TabsTrigger value="all">Toutes les annonces</TabsTrigger>
+              <TabsTrigger value="mine">Mes annonces</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="all" className="mt-6">
+              {listings.length === 0 ? (
+                <Card className="p-12">
+                  <div className="text-center text-muted-foreground">
+                    <ShoppingBag className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                    <p>Aucune annonce de vente disponible pour le moment</p>
+                  </div>
+                </Card>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {listings.map(listing => renderListing(listing, false))}
+                </div>
+              )}
+            </TabsContent>
+
+            <TabsContent value="mine" className="mt-6">
+              {myListings.length === 0 ? (
+                <Card className="p-12">
+                  <div className="text-center text-muted-foreground">
+                    <ShoppingBag className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                    <p>Vous n'avez pas encore créé d'annonce de vente</p>
+                  </div>
+                </Card>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {myListings.map(listing => renderListing(listing, true))}
+                </div>
+              )}
+            </TabsContent>
+          </Tabs>
+        )}
       </div>
     </div>
   );

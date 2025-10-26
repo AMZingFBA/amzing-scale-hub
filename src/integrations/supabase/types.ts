@@ -188,6 +188,51 @@ export type Database = {
         }
         Relationships: []
       }
+      marketplace_buy_requests: {
+        Row: {
+          asin: string | null
+          created_at: string
+          description: string | null
+          ean: string | null
+          id: string
+          max_price: number | null
+          price_type: string
+          quantity: number
+          status: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          asin?: string | null
+          created_at?: string
+          description?: string | null
+          ean?: string | null
+          id?: string
+          max_price?: number | null
+          price_type?: string
+          quantity?: number
+          status?: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          asin?: string | null
+          created_at?: string
+          description?: string | null
+          ean?: string | null
+          id?: string
+          max_price?: number | null
+          price_type?: string
+          quantity?: number
+          status?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       marketplace_listings: {
         Row: {
           asin: string | null
