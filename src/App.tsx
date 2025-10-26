@@ -30,6 +30,7 @@ import Suggestions from "./pages/Suggestions";
 import Marketplace from "./pages/Marketplace";
 import WantToSell from "./pages/WantToSell";
 import ProductAlerts from "./pages/ProductAlerts";
+import NotificationAlerts from "./pages/NotificationAlerts";
 
 const queryClient = new QueryClient();
 
@@ -60,6 +61,7 @@ const App = () => (
             <Route path="/admin/tickets" element={<AdminTickets />} />
             <Route path="/admin/alerts" element={<AdminAlerts />} />
             <Route path="/produits-find" element={<ProductAlerts />} />
+            <Route path="/notification-alerts" element={<NotificationAlerts />} />
             <Route path="/chat" element={<Chat />} />
             <Route path="/success" element={<Success />} />
             <Route path="/sales" element={<Sales />} />
