@@ -24,6 +24,7 @@ import AdminTickets from "./pages/AdminTickets";
 import Chat from "./pages/Chat";
 import NotFound from "./pages/NotFound";
 import Success from "./pages/Success";
+import Sales from "./pages/Sales";
 
 const queryClient = new QueryClient();
 
@@ -54,6 +55,7 @@ const App = () => (
             <Route path="/admin/tickets" element={<AdminTickets />} />
             <Route path="/chat" element={<Chat />} />
             <Route path="/success" element={<Success />} />
+            <Route path="/sales" element={<Sales />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

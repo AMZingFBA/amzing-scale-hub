@@ -248,7 +248,7 @@ const Dashboard = () => {
                     <CategoryItem icon={MessageCircle} label="général" link="/chat" />
                     <CategoryItem icon={LightbulbIcon} label="suggestions" />
                     <CategoryItem icon={Trophy} label="succès" link="/success" />
-                    <CategoryItem icon={DollarSign} label="ventes" />
+                    <CategoryItem icon={ShoppingCart} label="ventes" link="/sales" />
                   </div>
                 </AccordionContent>
               </AccordionItem>
