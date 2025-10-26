@@ -13,6 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "sonner";
 import { Loader2, Package, Search, Upload, Trash2, ShoppingCart, ShoppingBag, MessageCircle, X, CheckCircle, Copy, ZoomIn, ChevronLeft, ChevronRight, Edit } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { useMarketplaceUnread } from "@/hooks/use-marketplace-unread";
 
 interface Listing {
   id: string;
@@ -48,6 +49,7 @@ const Marketplace = () => {
   const { user, isVIP } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const { unreadCount } = useMarketplaceUnread();
   
   // Determine section based on route
   const getInitialSection = (): "buy" | "sell" | "my-buy-requests" | "my-sell-listings" => {
@@ -1132,8 +1134,13 @@ const Marketplace = () => {
                 <TabsTrigger value="mine" className="data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all">
                   Mes recherches
                 </TabsTrigger>
-                <TabsTrigger value="tickets" className="data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all">
+                <TabsTrigger value="tickets" className="data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all relative">
                   Mes demandes
+                  {unreadCount > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                      {unreadCount}
+                    </span>
+                  )}
                 </TabsTrigger>
               </TabsList>
 
