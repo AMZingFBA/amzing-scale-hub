@@ -55,8 +55,13 @@ const CategoryAlerts = ({ category, subcategory }: CategoryAlertsProps) => {
         .order('created_at', { ascending: false })
         .limit(5);
 
+      // Si une sous-catégorie est spécifiée, filtrer uniquement sur cette sous-catégorie
       if (subcategory) {
         query = query.eq('subcategory', subcategory);
+      } else {
+        // Si pas de sous-catégorie spécifiée, ne montrer que les alertes sans sous-catégorie
+        // (les alertes générales de la catégorie)
+        query = query.is('subcategory', null);
       }
 
       const { data, error } = await query;
