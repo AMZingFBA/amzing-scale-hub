@@ -11,8 +11,9 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Plus, Trash2, Link2, Image, Video, Mic, FileText, AlertCircle } from 'lucide-react';
+import { Loader2, Plus, Trash2, Link2, Image, Video, Mic, FileText, AlertCircle, Edit2, MapPin } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 const AdminAlerts = () => {
   const { user } = useAuth();
@@ -31,6 +32,15 @@ const AdminAlerts = () => {
   const [filePreview, setFilePreview] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState('introduction');
   const [selectedSubcategory, setSelectedSubcategory] = useState('');
+
+  // Edit state
+  const [editingAlert, setEditingAlert] = useState<any>(null);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [editTitle, setEditTitle] = useState('');
+  const [editContent, setEditContent] = useState('');
+  const [editLinkUrl, setEditLinkUrl] = useState('');
+  const [editCategory, setEditCategory] = useState('');
+  const [editSubcategory, setEditSubcategory] = useState('');
 
   useEffect(() => {
     if (!user) {
@@ -240,6 +250,77 @@ const AdminAlerts = () => {
     }
   };
 
+  const openEditDialog = (alert: any) => {
+    setEditingAlert(alert);
+    setEditTitle(alert.title);
+    setEditContent(alert.content || '');
+    setEditLinkUrl(alert.link_url || '');
+    setEditCategory(alert.category || 'introduction');
+    setEditSubcategory(alert.subcategory || '');
+    setEditDialogOpen(true);
+  };
+
+  const handleEditSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!editTitle.trim()) {
+      toast({
+        title: "Erreur",
+        description: "Le titre est requis",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const { error } = await supabase
+        .from('admin_alerts')
+        .update({
+          title: editTitle.trim(),
+          content: editContent.trim() || null,
+          link_url: editLinkUrl.trim() || null,
+          category: editCategory,
+          subcategory: editSubcategory || null,
+        })
+        .eq('id', editingAlert.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Alerte modifiée",
+        description: "L'alerte a été modifiée avec succès",
+      });
+
+      setEditDialogOpen(false);
+      setEditingAlert(null);
+
+    } catch (error) {
+      console.error('Error updating alert:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de modifier l'alerte",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const getAlertLocation = (category: string, subcategory?: string) => {
+    const categoryLabels: Record<string, string> = {
+      introduction: 'Introduction',
+      outils: 'Outils',
+      expedition: 'Expédition',
+      informations: 'Informations',
+      produits: 'Produits Gagnants',
+    };
+    
+    const baseLocation = categoryLabels[category] || 'Général';
+    return subcategory ? `${baseLocation} > ${subcategory}` : baseLocation;
+  };
+
   const getFileIcon = (fileType: string) => {
     switch (fileType) {
       case 'image': return <Image className="w-4 h-4" />;
@@ -439,6 +520,13 @@ const AdminAlerts = () => {
                           <div className="flex items-start justify-between gap-4">
                             <div className="flex-1 space-y-3">
                               <div className="flex items-center gap-2 flex-wrap">
+                                <MapPin className="w-4 h-4 text-muted-foreground" />
+                                <span className="text-sm text-muted-foreground font-medium">
+                                  Visible dans : {getAlertLocation(alert.category, alert.subcategory)}
+                                </span>
+                              </div>
+
+                              <div className="flex items-center gap-2 flex-wrap">
                                 <Badge 
                                   variant="secondary" 
                                   className="text-xs font-medium"
@@ -477,14 +565,24 @@ const AdminAlerts = () => {
                               <CardTitle className="text-xl">{alert.title}</CardTitle>
                             </div>
                             
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => deleteAlert(alert.id)}
-                              className="hover:bg-destructive/10 hover:text-destructive flex-shrink-0"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
+                            <div className="flex gap-2 flex-shrink-0">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => openEditDialog(alert)}
+                                className="hover:bg-primary/10 hover:text-primary"
+                              >
+                                <Edit2 className="w-4 h-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => deleteAlert(alert.id)}
+                                className="hover:bg-destructive/10 hover:text-destructive"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            </div>
                           </div>
                         </CardHeader>
                         
@@ -553,6 +651,115 @@ const AdminAlerts = () => {
         </div>
       </main>
       <Footer />
+
+      {/* Edit Dialog */}
+      <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Modifier l'alerte</DialogTitle>
+            <DialogDescription>
+              Modifiez les informations de votre alerte
+            </DialogDescription>
+          </DialogHeader>
+          
+          <form onSubmit={handleEditSubmit} className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="edit-category">Catégorie *</Label>
+                <select
+                  id="edit-category"
+                  value={editCategory}
+                  onChange={(e) => {
+                    setEditCategory(e.target.value);
+                    setEditSubcategory('');
+                  }}
+                  className="w-full px-3 py-2 border rounded-md"
+                  required
+                >
+                  <option value="introduction">Introduction</option>
+                  <option value="outils">Outils</option>
+                  <option value="expedition">Expédition</option>
+                  <option value="informations">Informations</option>
+                  <option value="produits">Produits Gagnants</option>
+                </select>
+              </div>
+
+              <div>
+                <Label htmlFor="edit-subcategory">Sous-catégorie</Label>
+                <select
+                  id="edit-subcategory"
+                  value={editSubcategory}
+                  onChange={(e) => setEditSubcategory(e.target.value)}
+                  className="w-full px-3 py-2 border rounded-md"
+                >
+                  <option value="">Toutes</option>
+                  {categories[editCategory as keyof typeof categories]?.map((sub) => (
+                    <option key={sub} value={sub}>{sub}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <Label htmlFor="edit-title">Titre *</Label>
+              <Input
+                id="edit-title"
+                placeholder="Titre de l'alerte"
+                value={editTitle}
+                onChange={(e) => setEditTitle(e.target.value)}
+                required
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="edit-content">Description</Label>
+              <Textarea
+                id="edit-content"
+                placeholder="Détails..."
+                value={editContent}
+                onChange={(e) => setEditContent(e.target.value)}
+                rows={4}
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="edit-link">Lien</Label>
+              <div className="relative">
+                <Link2 className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input
+                  id="edit-link"
+                  type="url"
+                  placeholder="https://..."
+                  value={editLinkUrl}
+                  onChange={(e) => setEditLinkUrl(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+            </div>
+
+            <div className="flex gap-2 justify-end pt-4">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setEditDialogOpen(false)}
+                disabled={isSubmitting}
+              >
+                Annuler
+              </Button>
+              <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Modification...
+                  </>
+                ) : (
+                  'Enregistrer'
+                )}
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
