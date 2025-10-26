@@ -3,7 +3,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { Loader2, Users, Plus, Edit2, Check, X } from 'lucide-react';
+import { Loader2, Users, Plus, Edit2, Check, X, Pin, PinOff, EyeOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -32,6 +32,8 @@ const Chat = () => {
   const [roomFilter, setRoomFilter] = useState<'all' | 'public' | 'private'>('all');
   const [editingRoomId, setEditingRoomId] = useState<string | null>(null);
   const [editingRoomName, setEditingRoomName] = useState('');
+  const [pinnedRooms, setPinnedRooms] = useState<Set<string>>(new Set());
+  const [hiddenRooms, setHiddenRooms] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     if (!user) {
@@ -46,7 +48,40 @@ const Chat = () => {
     }
 
     fetchRooms();
+    fetchPinnedRooms();
+    fetchHiddenRooms();
   }, [user, isVIP, isAdmin, navigate]);
+
+  const fetchPinnedRooms = async () => {
+    if (!user) return;
+    try {
+      const { data, error } = await supabase
+        .from('chat_room_pins')
+        .select('room_id')
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+      setPinnedRooms(new Set(data?.map(p => p.room_id) || []));
+    } catch (error: any) {
+      console.error('Error fetching pinned rooms:', error);
+    }
+  };
+
+  const fetchHiddenRooms = async () => {
+    if (!user) return;
+    try {
+      const { data, error } = await supabase
+        .from('chat_room_visibility')
+        .select('room_id')
+        .eq('user_id', user.id)
+        .eq('is_hidden', true);
+
+      if (error) throw error;
+      setHiddenRooms(new Set(data?.map(v => v.room_id) || []));
+    } catch (error: any) {
+      console.error('Error fetching hidden rooms:', error);
+    }
+  };
 
   const fetchRooms = async () => {
     try {
@@ -59,7 +94,7 @@ const Chat = () => {
 
       setRooms(data || []);
       
-      // Auto-select general room
+      // Auto-select general room if not already selected
       const generalRoom = data?.find(r => r.type === 'general');
       if (generalRoom && !selectedRoom) {
         setSelectedRoom(generalRoom.id);
@@ -136,17 +171,103 @@ const Chat = () => {
     setEditingRoomName('');
   };
 
-  const filteredRooms = rooms.filter(room => {
-    const matchesSearch = !searchQuery || 
-      room.name?.toLowerCase().includes(searchQuery.toLowerCase());
-    
-    const matchesFilter = 
-      roomFilter === 'all' ||
-      (roomFilter === 'public' && room.type === 'general') ||
-      (roomFilter === 'private' && room.type === 'private');
+  const togglePin = async (roomId: string) => {
+    if (!user) return;
 
-    return matchesSearch && matchesFilter;
-  });
+    try {
+      if (pinnedRooms.has(roomId)) {
+        // Unpin
+        const { error } = await supabase
+          .from('chat_room_pins')
+          .delete()
+          .eq('room_id', roomId)
+          .eq('user_id', user.id);
+
+        if (error) throw error;
+        toast.success('Conversation désépinglée');
+      } else {
+        // Check if already have 3 pinned
+        if (pinnedRooms.size >= 3) {
+          toast.error('Vous pouvez épingler maximum 3 conversations');
+          return;
+        }
+
+        // Pin
+        const { error } = await supabase
+          .from('chat_room_pins')
+          .insert({ room_id: roomId, user_id: user.id });
+
+        if (error) throw error;
+        toast.success('Conversation épinglée');
+      }
+
+      fetchPinnedRooms();
+    } catch (error: any) {
+      console.error('Error toggling pin:', error);
+      toast.error('Erreur lors de l\'épinglage');
+    }
+  };
+
+  const hideRoom = async (roomId: string) => {
+    if (!user) return;
+
+    try {
+      const { error } = await supabase
+        .from('chat_room_visibility')
+        .upsert({ 
+          room_id: roomId, 
+          user_id: user.id, 
+          is_hidden: true 
+        }, {
+          onConflict: 'room_id,user_id'
+        });
+
+      if (error) throw error;
+
+      toast.success('Conversation masquée');
+      fetchHiddenRooms();
+      
+      // If hiding currently selected room, deselect it
+      if (selectedRoom === roomId) {
+        setSelectedRoom(null);
+      }
+    } catch (error: any) {
+      console.error('Error hiding room:', error);
+      toast.error('Erreur lors du masquage');
+    }
+  };
+
+  const filteredRooms = rooms
+    .filter(room => {
+      // Don't show hidden rooms for non-admins
+      if (!isAdmin && hiddenRooms.has(room.id)) {
+        return false;
+      }
+
+      const matchesSearch = !searchQuery || 
+        room.name?.toLowerCase().includes(searchQuery.toLowerCase());
+      
+      const matchesFilter = 
+        roomFilter === 'all' ||
+        (roomFilter === 'public' && room.type === 'general') ||
+        (roomFilter === 'private' && room.type === 'private');
+
+      return matchesSearch && matchesFilter;
+    })
+    .sort((a, b) => {
+      // 1. General room always on top
+      if (a.type === 'general') return -1;
+      if (b.type === 'general') return 1;
+
+      // 2. Pinned rooms next
+      const aIsPinned = pinnedRooms.has(a.id);
+      const bIsPinned = pinnedRooms.has(b.id);
+      if (aIsPinned && !bIsPinned) return -1;
+      if (!aIsPinned && bIsPinned) return 1;
+
+      // 3. Then by creation date
+      return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+    });
 
   if (loading) {
     return (
@@ -284,23 +405,53 @@ const Chat = () => {
                           onClick={() => setSelectedRoom(room.id)}
                           className="flex-1 text-left p-3"
                         >
-                          <div className="font-medium">
+                          <div className="font-medium flex items-center gap-2">
+                            {pinnedRooms.has(room.id) && <Pin className="h-3 w-3" />}
                             {room.name || 'Conversation'}
                           </div>
                           <div className="text-xs opacity-70">
                             {room.type === 'general' ? '🌍 Public' : '🔒 Privé'}
                           </div>
                         </button>
-                        {room.type === 'private' && (room.created_by === user?.id || isAdmin) && (
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            className="h-8 w-8 p-0 mr-2"
-                            onClick={() => startEditing(room)}
-                          >
-                            <Edit2 className="h-3 w-3" />
-                          </Button>
-                        )}
+                        <div className="flex items-center gap-1 pr-2">
+                          {room.type === 'private' && (
+                            <>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                className="h-8 w-8 p-0"
+                                onClick={() => togglePin(room.id)}
+                                title={pinnedRooms.has(room.id) ? 'Désépingler' : 'Épingler'}
+                              >
+                                {pinnedRooms.has(room.id) ? (
+                                  <PinOff className="h-3 w-3" />
+                                ) : (
+                                  <Pin className="h-3 w-3" />
+                                )}
+                              </Button>
+                              {(room.created_by === user?.id || isAdmin) && (
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  className="h-8 w-8 p-0"
+                                  onClick={() => startEditing(room)}
+                                  title="Renommer"
+                                >
+                                  <Edit2 className="h-3 w-3" />
+                                </Button>
+                              )}
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                className="h-8 w-8 p-0"
+                                onClick={() => hideRoom(room.id)}
+                                title="Masquer cette conversation"
+                              >
+                                <EyeOff className="h-3 w-3" />
+                              </Button>
+                            </>
+                          )}
+                        </div>
                       </div>
                     )}
                   </div>

@@ -100,6 +100,67 @@ export type Database = {
           },
         ]
       }
+      chat_room_pins: {
+        Row: {
+          id: string
+          pinned_at: string
+          room_id: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          pinned_at?: string
+          room_id: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          pinned_at?: string
+          room_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_room_pins_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "chat_rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      chat_room_visibility: {
+        Row: {
+          created_at: string
+          id: string
+          is_hidden: boolean
+          room_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_hidden?: boolean
+          room_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_hidden?: boolean
+          room_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_room_visibility_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "chat_rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       chat_rooms: {
         Row: {
           created_at: string
