@@ -64,7 +64,7 @@ const Privacy = () => {
             </CardHeader>
             <CardContent className="prose prose-lg max-w-none">
               <p>Aucune donnée n'est vendue ni cédée à des tiers.</p>
-              <p>Certaines données peuvent être transmises à des partenaires techniques (Stripe, Whop, Discord) strictement pour la gestion du service.</p>
+              <p>Certaines données peuvent être transmises à des partenaires techniques (Stripe, Whop) strictement pour la gestion du service.</p>
             </CardContent>
           </Card>
 

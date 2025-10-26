@@ -23,7 +23,7 @@ const Formation = () => {
             </h1>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8">
               Méthode éprouvée pour lancer votre business Amazon FBA. 
-              Modules vidéo, templates et accès Discord inclus.
+              Modules vidéo, templates et accès plateforme inclus.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button variant="hero" size="xl">
@@ -271,7 +271,7 @@ const Formation = () => {
                   <div className="w-16 h-16 bg-gradient-to-br from-primary to-primary-glow rounded-2xl flex items-center justify-center mx-auto mb-4">
                     <Users className="w-8 h-8 text-white" />
                   </div>
-                  <h3 className="font-bold text-xl mb-3">Accès Discord Privé</h3>
+                  <h3 className="font-bold text-xl mb-3">Accès Communauté VIP</h3>
                   <p className="text-muted-foreground">
                     Rejoignez la communauté, posez vos questions et recevez des alertes produits
                   </p>

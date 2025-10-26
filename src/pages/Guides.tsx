@@ -599,7 +599,7 @@ const Guides = () => {
                         <div className="bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 rounded-lg p-4 mt-6">
                           <p className="text-sm">
                             🎉 <strong>Félicitations !</strong> Tu vas enfin pouvoir vendre sur Amazon ! 
-                            Si tu as des questions, n'hésite pas à venir nous contacter sur le groupe Discord.
+                            Si tu as des questions, n'hésite pas à nous contacter via le support.
                           </p>
                         </div>
                       </div>
@@ -904,7 +904,7 @@ const Guides = () => {
                           Tu expédies dans le carton de ton choix. Fais juste en sorte que ton colis soit soigné.
                         </p>
                         <p className="mb-3">
-                          Tu peux acheter des cartons un peu partout. Sur le Discord, nous avons un partenaire qui vend des cartons vraiment pas cher !
+                          Tu peux acheter des cartons un peu partout. Nous avons des partenaires qui vendent des cartons à prix réduit !
                         </p>
 
                         <h4 className="text-lg font-semibold mt-6 mb-3">1.2 Matériaux recommandés</h4>

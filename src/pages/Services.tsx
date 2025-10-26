@@ -15,7 +15,7 @@ const Services = () => {
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <Badge className="mb-4 bg-primary/10 text-primary border-primary/20">
-              Tout inclus dans le Discord VIP
+              Tout inclus dans l'espace VIP
             </Badge>
             <h1 className="text-5xl md:text-6xl font-bold mb-6">
               Ce Que Tu Obtiens
@@ -44,7 +44,7 @@ const Services = () => {
                 <ul className="space-y-3">
                   <li className="flex items-start gap-2">
                     <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                    <span>Alertes temps réel sur Discord</span>
+                    <span>Alertes temps réel sur la plateforme</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
@@ -168,7 +168,7 @@ const Services = () => {
                 <ul className="space-y-3">
                   <li className="flex items-start gap-2">
                     <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                    <span>Alertes Discord instantanées</span>
+                    <span>Alertes instantanées</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
@@ -256,7 +256,7 @@ const Services = () => {
               <CardContent>
                 <p className="text-muted-foreground mb-6">
                   Confie ton stock à notre entrepôt. Nous gérons le stockage et expédions sous 24h. 
-                  Service disponible pour les membres du Discord VIP.
+                  Service disponible pour les membres VIP.
                 </p>
                 <ul className="space-y-3">
                   <li className="flex items-start gap-2">
@@ -417,7 +417,7 @@ const Services = () => {
                 Prêt à Démarrer ?
               </h2>
               <p className="text-xl mb-8 text-white/90 max-w-2xl mx-auto">
-                Rejoins le Discord VIP pour 34,99€/mois HT et accède à tout
+                Rejoins l'espace VIP pour 34,99€/mois HT et accède à tout
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button variant="secondary" size="xl" className="bg-white text-primary hover:bg-white/90" asChild>

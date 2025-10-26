@@ -47,7 +47,7 @@ const Refund = () => {
               <CardTitle>Annulation d'abonnement</CardTitle>
             </CardHeader>
             <CardContent className="prose prose-lg max-w-none">
-              <p>Tu peux annuler ton abonnement Discord VIP à tout moment via ton compte Whop ou en contactant le support.</p>
+              <p>Tu peux annuler ton abonnement VIP à tout moment via ton compte Whop ou en contactant le support.</p>
               <p>L'annulation prend effet à la prochaine échéance mensuelle.</p>
             </CardContent>
           </Card>

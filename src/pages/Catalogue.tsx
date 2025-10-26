@@ -68,7 +68,7 @@ const Catalogue = () => {
             <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-secondary/20 to-primary/20 blur-3xl -z-10" />
             <Badge className="mb-6 bg-gradient-to-r from-primary to-secondary text-white border-none px-6 py-2 text-base">
               <Crown className="w-4 h-4 inline mr-2" />
-              Communauté Discord VIP
+              Communauté VIP
             </Badge>
             <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-primary via-secondary to-primary bg-clip-text text-transparent">
               Rejoins la Communauté #1

@@ -21,7 +21,7 @@ const CGV = () => {
               <p>Les présentes conditions régissent la vente de services proposés par AMZing FBA, notamment :</p>
               <ul>
                 <li>Formations en ligne et ressources éducatives,</li>
-                <li>Accès à la communauté privée Discord,</li>
+                <li>Accès à la communauté privée VIP,</li>
                 <li>Services de sourcing, stockage, expédition et accompagnement e-commerce.</li>
               </ul>
             </CardContent>
@@ -32,7 +32,7 @@ const CGV = () => {
               <CardTitle>Article 2 — Commandes et accès</CardTitle>
             </CardHeader>
             <CardContent className="prose prose-lg max-w-none">
-              <p>L'accès aux produits et services s'effectue via le site amzingfba.com ou ses plateformes partenaires (Whop, Stripe, Discord).</p>
+              <p>L'accès aux produits et services s'effectue via le site amzingfba.com ou ses plateformes partenaires (Whop, Stripe).</p>
               <p>Toute commande validée implique l'acceptation pleine et entière des présentes conditions générales.</p>
             </CardContent>
           </Card>
@@ -63,7 +63,7 @@ const CGV = () => {
               <CardTitle>Article 5 — Abonnements</CardTitle>
             </CardHeader>
             <CardContent className="prose prose-lg max-w-none">
-              <p>Les abonnements au Discord VIP sont sans engagement et peuvent être annulés à tout moment via le compte client Whop.</p>
+              <p>Les abonnements VIP sont sans engagement et peuvent être annulés à tout moment via le compte client Whop.</p>
               <p>Toute période entamée reste due.</p>
             </CardContent>
           </Card>

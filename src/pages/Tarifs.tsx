@@ -18,7 +18,7 @@ const Tarifs = () => {
               Une seule offre, tout inclus
             </Badge>
             <h1 className="text-5xl md:text-6xl font-bold mb-6">
-              Accès Discord VIP
+              Accès VIP AMZing FBA
             </h1>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
               Tout ce dont tu as besoin pour réussir sur Amazon FBA en un seul abonnement
@@ -35,7 +35,7 @@ const Tarifs = () => {
                 </Badge>
               </div>
               <CardHeader className="text-center pb-8 pt-12">
-                <CardTitle className="text-4xl mb-4">Discord VIP AMZing FBA</CardTitle>
+                <CardTitle className="text-4xl mb-4">Espace VIP AMZing FBA</CardTitle>
                 <CardDescription className="text-lg">Accès complet à tous les outils et services</CardDescription>
                 <div className="mt-8">
                   <span className="text-6xl font-bold text-gradient">34,99€</span>

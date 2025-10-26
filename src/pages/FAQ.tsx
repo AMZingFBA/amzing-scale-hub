@@ -12,11 +12,11 @@ const FAQ = () => {
   const faqData = [
     {
       question: "🧠 Qu'est-ce qu'AMZing FBA ?",
-      answer: "AMZing FBA est une solution 360° pour les vendeurs Amazon et e-commerce. Nous proposons une formation complète, un catalogue de produits rentables, une logistique clé-en-main (stockage, emballage, expédition), ainsi qu'un accès exclusif à notre communauté Discord VIP. En clair : on t'aide à lancer, automatiser et développer ton business Amazon sans stress."
+      answer: "AMZing FBA est une solution 360° pour les vendeurs Amazon et e-commerce. Nous proposons une formation complète, un catalogue de produits rentables, une logistique clé-en-main (stockage, emballage, expédition), ainsi qu'un accès exclusif à notre communauté VIP. En clair : on t'aide à lancer, automatiser et développer ton business Amazon sans stress."
     },
     {
       question: "💰 Combien coûte le service AMZing FBA ?",
-      answer: "Nous avons plusieurs formules selon tes besoins :\n\n• Accès formation + communauté Discord VIP : abonnement mensuel (tarif sur la page \"Rejoindre\")\n• Service logistique AMZing FBA 360 : facturation à l'usage (stockage + expéditions)\n• Catalogue grossiste : prix variables selon les produits et volumes d'achat\n\nTu ne payes que ce dont tu as réellement besoin, sans engagement caché."
+      answer: "Nous avons plusieurs formules selon tes besoins :\n\n• Accès formation + communauté VIP : abonnement mensuel (tarif sur la page \"Rejoindre\")\n• Service logistique AMZing FBA 360 : facturation à l'usage (stockage + expéditions)\n• Catalogue grossiste : prix variables selon les produits et volumes d'achat\n\nTu ne payes que ce dont tu as réellement besoin, sans engagement caché."
     },
     {
       question: "📦 Comment fonctionne le service logistique AMZing FBA 360 ?",
@@ -36,11 +36,11 @@ const FAQ = () => {
     },
     {
       question: "🧾 Comment accéder au catalogue produits rentables ?",
-      answer: "Le catalogue est réservé aux membres de la communauté Discord VIP. Une fois inscrit, tu auras accès à la catégorie 🛒・catalogue-produits où sont listés tous les produits avec :\n\n• le prix d'achat\n• le prix de revente Amazon\n• le ROI moyen\n• et le nombre de ventes mensuelles estimé"
+      answer: "Le catalogue est réservé aux membres VIP. Une fois inscrit, tu auras accès à tous les produits avec :\n\n• le prix d'achat\n• le prix de revente Amazon\n• le ROI moyen\n• et le nombre de ventes mensuelles estimé"
     },
     {
-      question: "💬 Comment rejoindre la communauté Discord VIP ?",
-      answer: "Tu peux t'inscrire directement via notre page \"Rejoindre la communauté\". Une fois le paiement effectué, ton accès est automatiquement débloqué :\n\n• Accès complet au serveur Discord privé\n• Outils, guides, alertes produits et tickets support\n• Coaching et entraide entre vendeurs"
+      question: "💬 Comment rejoindre la communauté VIP ?",
+      answer: "Tu peux t'inscrire directement via notre page \"Rejoindre la communauté\". Une fois le paiement effectué, ton accès est automatiquement débloqué :\n\n• Accès complet à la plateforme VIP\n• Outils, guides, alertes produits et tickets support\n• Coaching et entraide entre vendeurs"
     },
     {
       question: "🧑‍🏫 Est-ce que la formation est adaptée aux débutants ?",
@@ -68,11 +68,11 @@ const FAQ = () => {
     },
     {
       question: "⏰ Sous combien de temps puis-je commencer ?",
-      answer: "Dès ton inscription !\n\nTu peux rejoindre le Discord, accéder au catalogue et commencer à vendre dans la même journée. Nos formations et outils sont accessibles immédiatement après ton inscription."
+      answer: "Dès ton inscription !\n\nTu peux rejoindre l'espace VIP, accéder au catalogue et commencer à vendre dans la même journée. Nos formations et outils sont accessibles immédiatement après ton inscription."
     },
     {
       question: "📩 Comment contacter l'équipe ?",
-      answer: "Directement via ton espace Discord VIP dans le salon 📥・support. Tu peux aussi nous contacter via le formulaire du site. Notre équipe est disponible 7j/7 pour les membres Premium."
+      answer: "Directement via ton espace VIP dans le support. Tu peux aussi nous contacter via le formulaire du site. Notre équipe est disponible 7j/7 pour les membres Premium."
     },
     {
       question: "📊 Quelle est la différence entre AMZing FBA et Amazon FBA ?",
