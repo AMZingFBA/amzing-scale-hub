@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Loader2, Package, Search, Upload, Trash2, ShoppingCart, MessageCircle, X, Copy, ZoomIn, ChevronLeft, ChevronRight } from "lucide-react";
+import { Loader2, Package, Search, Upload, Trash2, ShoppingCart, MessageCircle, X, Copy, ZoomIn, ChevronLeft, ChevronRight, TriangleAlert, Pencil } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useMarketplaceBuyUnread } from "@/hooks/use-marketplace-buy-unread";
 
@@ -55,6 +55,10 @@ const CatalogueProduits = () => {
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
+  
+  // Edit states
+  const [editingProduct, setEditingProduct] = useState<CatalogueProduct | null>(null);
+  const [showEditDialog, setShowEditDialog] = useState(false);
   
   // Image gallery states
   const [selectedImageGallery, setSelectedImageGallery] = useState<string[] | null>(null);
@@ -277,29 +281,108 @@ const CatalogueProduits = () => {
     try {
       const code = product.asin || product.ean || "N/A";
       
-      // Appeler l'edge function pour créer les tickets
-      const { data, error } = await supabase.functions.invoke('create-sell-tickets', {
-        body: {
-          listingId: product.id,
-          listingTitle: product.title,
-          listingCode: code,
-          listingQuantity: product.quantity,
-          listingPrice: product.price,
-          listingPriceType: product.price_type,
-          listingUserId: product.admin_id,
-          buyerUserId: user.id
-        }
-      });
+      // Créer un ticket uniquement pour l'acheteur qui contacte les admins
+      const buyerSubject = `Catalogue Pro - ${product.title}`;
+      const { data: ticket, error: ticketError } = await supabase
+        .from('tickets')
+        .insert({
+          user_id: user.id,
+          subject: buyerSubject,
+          category: 'marketplace',
+          subcategory: 'buy',
+          status: 'open',
+          priority: 'normal'
+        })
+        .select()
+        .single();
 
-      if (error) throw error;
+      if (ticketError) throw ticketError;
+
+      // Créer le message initial
+      const buyerMessage = `Bonjour 👋
+Je suis intéressé(e) par ce produit du catalogue :
+- Titre : ${product.title}
+- Code : ${code}
+- Prix : ${product.price}€ ${product.price_type}
+- Quantité souhaitée : 1
+
+Est-il toujours disponible ?`;
+
+      const { error: messageError } = await supabase
+        .from('messages')
+        .insert({
+          ticket_id: ticket.id,
+          user_id: user.id,
+          content: buyerMessage
+        });
+
+      if (messageError) throw messageError;
 
       toast.success("Demande d'achat envoyée! Un ticket a été créé.");
       
       await loadMyTickets();
       navigate("/catalogue-produits?tab=tickets");
     } catch (error: any) {
-      console.error("Error creating tickets:", error);
+      console.error("Error creating ticket:", error);
       toast.error("Erreur lors de la création de la demande");
+    }
+  };
+
+  const openEditDialog = (product: CatalogueProduct) => {
+    setEditingProduct(product);
+    setTitle(product.title);
+    setDescription(product.description || "");
+    setQuantity(product.quantity);
+    setPrice(product.price.toString());
+    setPriceType(product.price_type as "TTC" | "HT");
+    setSearchCode(product.asin || product.ean || "");
+    setSearchType(product.asin ? "asin" : "ean");
+    setUploadedImages(product.images || []);
+    setShowEditDialog(true);
+  };
+
+  const updateProduct = async () => {
+    if (!editingProduct || !user) return;
+    
+    if (!title.trim()) {
+      toast.error("Le titre du produit est requis");
+      return;
+    }
+
+    if (!price) {
+      toast.error("Le prix est requis");
+      return;
+    }
+
+    setIsCreating(true);
+
+    try {
+      const { error } = await supabase
+        .from("catalogue_products")
+        .update({
+          asin: searchType === "asin" ? searchCode : null,
+          ean: searchType === "ean" ? searchCode : null,
+          title,
+          description: description || null,
+          images: uploadedImages,
+          quantity,
+          price: parseFloat(price),
+          price_type: priceType,
+        })
+        .eq("id", editingProduct.id);
+
+      if (error) throw error;
+      toast.success("Produit modifié avec succès!");
+      
+      await loadCatalogueProducts();
+      resetForm();
+      setShowEditDialog(false);
+      setEditingProduct(null);
+    } catch (error: any) {
+      console.error("Error updating product:", error);
+      toast.error("Erreur lors de la modification");
+    } finally {
+      setIsCreating(false);
     }
   };
 
@@ -390,19 +473,39 @@ const CatalogueProduits = () => {
             <span className="text-sm font-medium text-muted-foreground">Quantité disponible</span>
             <span className="text-lg font-bold text-primary">{product.quantity} unité{product.quantity > 1 ? 's' : ''}</span>
           </div>
+
+          {!isAdmin && (
+            <div className="flex items-start gap-2 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900 px-3 py-2.5 rounded-lg">
+              <TriangleAlert className="w-5 h-5 text-amber-600 dark:text-amber-500 shrink-0 mt-0.5" />
+              <p className="text-xs text-amber-800 dark:text-amber-300 leading-relaxed">
+                Le prix comprend le produit, les frais de stockage dans nos locaux, les frais d'expédition (cartons, emballage, bordereaux) et le service après-vente.
+              </p>
+            </div>
+          )}
         </CardContent>
         
         <CardFooter className="flex gap-2 p-4 pt-0">
           {isAdmin ? (
-            <Button
-              variant="destructive"
-              size="lg"
-              className="w-full"
-              onClick={() => deleteCatalogueProduct(product.id)}
-            >
-              <Trash2 className="w-4 h-4 mr-2" />
-              Supprimer du catalogue
-            </Button>
+            <>
+              <Button
+                variant="outline"
+                size="lg"
+                className="flex-1"
+                onClick={() => openEditDialog(product)}
+              >
+                <Pencil className="w-4 h-4 mr-2" />
+                Modifier
+              </Button>
+              <Button
+                variant="destructive"
+                size="lg"
+                className="flex-1"
+                onClick={() => deleteCatalogueProduct(product.id)}
+              >
+                <Trash2 className="w-4 h-4 mr-2" />
+                Supprimer
+              </Button>
+            </>
           ) : (
             <Button
               size="lg"
@@ -524,16 +627,17 @@ const CatalogueProduits = () => {
             </p>
           </div>
 
-          {/* Create Product Button - Admin Only */}
+          {/* Create/Edit Product Dialog - Admin Only */}
           {isAdmin && (
-            <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
-              <DialogTrigger asChild>
-                <Button size="lg" className="w-full md:w-auto hover-scale">
-                  <Package className="w-5 h-5 mr-2" />
-                  Ajouter un produit au catalogue
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            <>
+              <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
+                <DialogTrigger asChild>
+                  <Button size="lg" className="w-full md:w-auto hover-scale">
+                    <Package className="w-5 h-5 mr-2" />
+                    Ajouter un produit au catalogue
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                   <DialogTitle>
                     Ajouter un produit au catalogue
@@ -666,6 +770,140 @@ const CatalogueProduits = () => {
                 </DialogFooter>
               </DialogContent>
             </Dialog>
+
+            <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
+              <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle>
+                    Modifier le produit
+                  </DialogTitle>
+                  <DialogDescription>
+                    Modifiez les informations du produit dans le catalogue professionnel.
+                  </DialogDescription>
+                </DialogHeader>
+
+                <div className="space-y-4">
+                  <div className="flex gap-2">
+                    <Select value={searchType} onValueChange={(v: any) => setSearchType(v)}>
+                      <SelectTrigger className="w-32">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="asin">ASIN</SelectItem>
+                        <SelectItem value="ean">EAN</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Input
+                      placeholder={searchType === "asin" ? "Ex: B08N5WRWNW" : "Ex: 1234567890123"}
+                      value={searchCode}
+                      onChange={(e) => setSearchCode(e.target.value)}
+                      className="flex-1"
+                    />
+                  </div>
+
+                  <div className="space-y-4">
+                    <div>
+                      <Label>Titre du produit *</Label>
+                      <Input
+                        value={title}
+                        onChange={(e) => setTitle(e.target.value)}
+                        placeholder="Ex: iPhone 15 Pro, Nike Air Max..."
+                      />
+                    </div>
+
+                    <div>
+                      <Label>Photos du produit (optionnel)</Label>
+                      <p className="text-xs text-muted-foreground mb-2">Ajoutez une ou plusieurs photos du produit</p>
+                      <div className="mt-2">
+                        <label className="flex items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer hover:bg-muted/50 transition-colors">
+                          <div className="text-center">
+                            <Upload className="w-8 h-8 mx-auto mb-2 text-muted-foreground" />
+                            <p className="text-sm text-muted-foreground">
+                              Cliquez pour uploader des photos
+                            </p>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              PNG, JPG, WEBP acceptés
+                            </p>
+                          </div>
+                          <input
+                            type="file"
+                            multiple
+                            accept="image/*"
+                            onChange={handleFileUpload}
+                            className="hidden"
+                          />
+                        </label>
+                      </div>
+                      
+                      {uploadedImages.length > 0 && (
+                        <div className="grid grid-cols-4 gap-2 mt-3">
+                          {uploadedImages.map((img, idx) => (
+                            <div key={idx} className="relative group">
+                              <img src={img} alt={`Photo ${idx + 1}`} className="w-full h-24 object-cover rounded-lg border-2 border-muted" />
+                              <button
+                                onClick={() => setUploadedImages(uploadedImages.filter((_, i) => i !== idx))}
+                                className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
+                                type="button"
+                              >
+                                <X className="w-4 h-4" />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label>Quantité *</Label>
+                        <Input
+                          type="number"
+                          min="1"
+                          value={quantity}
+                          onChange={(e) => setQuantity(parseInt(e.target.value) || 1)}
+                        />
+                      </div>
+                      <div>
+                        <Label>Prix *</Label>
+                        <div className="flex gap-2">
+                          <Input
+                            type="number"
+                            step="0.01"
+                            min="0"
+                            value={price}
+                            onChange={(e) => setPrice(e.target.value)}
+                          />
+                          <Select value={priceType} onValueChange={(v: any) => setPriceType(v)}>
+                            <SelectTrigger className="w-24">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="TTC">TTC</SelectItem>
+                              <SelectItem value="HT">HT</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <DialogFooter>
+                  <Button variant="outline" onClick={() => {
+                    setShowEditDialog(false);
+                    setEditingProduct(null);
+                    resetForm();
+                  }}>
+                    Annuler
+                  </Button>
+                  <Button onClick={updateProduct} disabled={isCreating}>
+                    {isCreating ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Pencil className="w-4 h-4 mr-2" />}
+                    Enregistrer les modifications
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          </>
           )}
 
           {/* Tabs for catalogue and my requests */}
