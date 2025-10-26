@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/use-auth';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Loader2, Users, Plus, Edit2, Check, X, Pin, PinOff, EyeOff } from 'lucide-react';
@@ -23,6 +23,7 @@ const Chat = () => {
   const { user, isVIP } = useAuth();
   const { isAdmin } = useAdmin();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [rooms, setRooms] = useState<Room[]>([]);
   const [selectedRoom, setSelectedRoom] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -50,7 +51,13 @@ const Chat = () => {
     fetchRooms();
     fetchPinnedRooms();
     fetchHiddenRooms();
-  }, [user, isVIP, isAdmin, navigate]);
+    
+    // Check if there's a room ID in the URL
+    const roomId = searchParams.get('room');
+    if (roomId) {
+      setSelectedRoom(roomId);
+    }
+  }, [user, isVIP, isAdmin, navigate, searchParams]);
 
   const fetchPinnedRooms = async () => {
     if (!user) return;

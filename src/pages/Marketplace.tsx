@@ -999,7 +999,7 @@ const Marketplace = () => {
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {myConversations.map(room => (
-                    <Card key={room.id} className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate("/chat")}>
+                    <Card key={room.id} className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate(`/chat?room=${room.id}`)}>
                       <CardHeader>
                         <CardTitle className="flex items-center gap-2 text-lg">
                           <MessageCircle className="w-5 h-5" />
@@ -1010,7 +1010,10 @@ const Marketplace = () => {
                         </CardDescription>
                       </CardHeader>
                       <CardFooter>
-                        <Button variant="outline" className="w-full" onClick={() => navigate("/chat")}>
+                        <Button variant="outline" className="w-full" onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/chat?room=${room.id}`);
+                        }}>
                           Ouvrir la conversation
                         </Button>
                       </CardFooter>
