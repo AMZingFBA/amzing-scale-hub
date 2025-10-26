@@ -1,7 +1,13 @@
 import { Link } from "react-router-dom";
 import logo from "@/assets/logo.png";
+import { useAuth } from "@/hooks/use-auth";
 
 const Footer = () => {
+  const { isVIP } = useAuth();
+  
+  // Hide footer for VIP members
+  if (isVIP) return null;
+  
   return (
     <footer className="bg-card border-t border-border mt-20">
       <div className="container mx-auto px-4 py-12">
