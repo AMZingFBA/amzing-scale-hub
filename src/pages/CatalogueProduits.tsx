@@ -1033,24 +1033,26 @@ Est-il toujours disponible ?`;
 
             <TabsContent value="tickets" className="mt-6 animate-fade-in">
               <div className="space-y-6">
-                {/* Notification Banner - ALWAYS SHOW FOR DEBUGGING */}
-                <Card className="bg-gradient-to-r from-amber-50 via-amber-50/50 to-transparent dark:from-amber-950/20 dark:via-amber-950/10 dark:to-transparent border-l-4 border-l-amber-500">
-                  <CardHeader className="pb-3">
-                    <div className="flex items-start gap-3">
-                      <div className="p-2 bg-amber-500/10 rounded-lg">
-                        <Package className="w-5 h-5 text-amber-600 dark:text-amber-500" />
+                {/* Notification Banner */}
+                {unreadCount > 0 && (
+                  <Card className="bg-gradient-to-r from-amber-50 via-amber-50/50 to-transparent dark:from-amber-950/20 dark:via-amber-950/10 dark:to-transparent border-l-4 border-l-amber-500">
+                    <CardHeader className="pb-3">
+                      <div className="flex items-start gap-3">
+                        <div className="p-2 bg-amber-500/10 rounded-lg">
+                          <Package className="w-5 h-5 text-amber-600 dark:text-amber-500" />
+                        </div>
+                        <div className="flex-1">
+                          <CardTitle className="text-base mb-1 text-amber-900 dark:text-amber-100">
+                            {unreadCount} nouveau{unreadCount > 1 ? 'x' : ''} message{unreadCount > 1 ? 's' : ''}
+                          </CardTitle>
+                          <CardDescription className="text-sm text-amber-700 dark:text-amber-300">
+                            Catégorie: Gestion Produits • Sous-catégorie: Catalogue Pro
+                          </CardDescription>
+                        </div>
                       </div>
-                      <div className="flex-1">
-                        <CardTitle className="text-base mb-1 text-amber-900 dark:text-amber-100">
-                          {unreadCount > 0 ? `${unreadCount} nouveau${unreadCount > 1 ? 'x' : ''} message${unreadCount > 1 ? 's' : ''}` : 'Aucun nouveau message'}
-                        </CardTitle>
-                        <CardDescription className="text-sm text-amber-700 dark:text-amber-300">
-                          Catégorie: Gestion Produits • Sous-catégorie: Catalogue Pro
-                        </CardDescription>
-                      </div>
-                    </div>
-                  </CardHeader>
-                </Card>
+                    </CardHeader>
+                  </Card>
+                )}
 
                 {myTickets.length === 0 ? (
                   <Card className="p-16 border-2 border-dashed border-muted-foreground/20 bg-muted/5">

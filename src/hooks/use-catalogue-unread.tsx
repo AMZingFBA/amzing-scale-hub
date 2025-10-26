@@ -27,8 +27,6 @@ export const useCatalogueUnread = () => {
 
         if (ticketsError) throw ticketsError;
 
-        console.log('Catalogue Unread Debug - Tickets:', tickets);
-
         if (!tickets || tickets.length === 0) {
           setUnreadCount(0);
           setIsLoading(false);
@@ -43,11 +41,9 @@ export const useCatalogueUnread = () => {
               ticket_id_param: ticket.id,
               user_id_param: user.id
             });
-          console.log(`Catalogue Unread for ticket ${ticket.id}:`, count);
           totalUnread += (count || 0);
         }
 
-        console.log('Catalogue Total Unread:', totalUnread);
         setUnreadCount(totalUnread);
       } catch (error) {
         console.error('Error loading catalogue unread count:', error);

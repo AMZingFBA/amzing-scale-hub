@@ -3,6 +3,7 @@ import { useUnreadMessages } from '@/hooks/use-unread-messages';
 import { useMarketplaceBuyUnread } from '@/hooks/use-marketplace-buy-unread';
 import { useMarketplaceSellUnread } from '@/hooks/use-marketplace-sell-unread';
 import { useCategoryUnread } from '@/hooks/use-category-unread';
+import { useCatalogueUnread } from '@/hooks/use-catalogue-unread';
 import { Navigate, Link } from 'react-router-dom';
 import { useState } from 'react';
 import Navbar from '@/components/Navbar';
@@ -60,6 +61,7 @@ const Dashboard = () => {
   const { unreadCount } = useUnreadMessages();
   const { unreadCount: buyUnreadCount } = useMarketplaceBuyUnread();
   const { unreadCount: sellUnreadCount } = useMarketplaceSellUnread();
+  const { unreadCount: catalogueUnreadCount } = useCatalogueUnread();
   const { unreadCounts } = useCategoryUnread();
   const marketplaceUnreadCount = buyUnreadCount + sellUnreadCount;
   const [rulesOpen, setRulesOpen] = useState(false);
@@ -328,7 +330,7 @@ const Dashboard = () => {
                 <AccordionContent className="px-4 pb-4">
                   <div className="grid gap-3 pt-2">
                     <CategoryItem icon={Info} label="informations" />
-                    <CategoryItem icon={Package} label="catalogue-produits" link="/catalogue-produits" />
+                    <CategoryItem icon={Package} label="catalogue-produits" link="/catalogue-produits" badge={catalogueUnreadCount} />
                     <CategoryItem icon={MessageCircle} label="questions" />
                   </div>
                 </AccordionContent>
