@@ -125,6 +125,14 @@ const Ticket = () => {
 
       if (messagesError) throw messagesError;
       setMessages(messagesData || []);
+      
+      // Mark messages as read
+      if (user && id) {
+        await supabase.rpc('mark_ticket_messages_as_read', {
+          ticket_id_param: id
+        });
+      }
+      
       setTimeout(scrollToBottom, 100);
     } catch (error) {
       console.error('Error loading ticket:', error);

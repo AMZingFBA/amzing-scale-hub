@@ -21,6 +21,7 @@ const AdminTickets = () => {
   const [tickets, setTickets] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [unreadCounts, setUnreadCounts] = useState<Record<string, number>>({});
 
   useEffect(() => {
     if (!user) {
@@ -41,7 +42,7 @@ const AdminTickets = () => {
     if (isAdmin) {
       loadTickets();
       
-      const channel = supabase
+      const ticketsChannel = supabase
         .channel('admin-tickets')
         .on(
           'postgres_changes',
@@ -56,8 +57,29 @@ const AdminTickets = () => {
         )
         .subscribe();
 
+      const messagesChannel = supabase
+        .channel('admin-messages')
+        .on(
+          'postgres_changes',
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'messages'
+          },
+          (payload) => {
+            // Notify admin of new user message
+            toast({
+              title: "Nouveau message",
+              description: "Un utilisateur a envoyé un message",
+            });
+            loadTickets();
+          }
+        )
+        .subscribe();
+
       return () => {
-        supabase.removeChannel(channel);
+        supabase.removeChannel(ticketsChannel);
+        supabase.removeChannel(messagesChannel);
       };
     }
   }, [user, isAdmin, isAdminLoading, navigate]);
@@ -96,6 +118,20 @@ const AdminTickets = () => {
       })) || [];
 
       setTickets(ticketsWithProfiles);
+
+      // Load unread counts for each ticket
+      if (user) {
+        const counts: Record<string, number> = {};
+        for (const ticket of ticketsWithProfiles) {
+          const { data: countData } = await supabase
+            .rpc('get_unread_count', { 
+              ticket_id_param: ticket.id, 
+              user_id_param: user.id 
+            });
+          counts[ticket.id] = countData || 0;
+        }
+        setUnreadCounts(counts);
+      }
     } catch (error) {
       console.error('Error loading tickets:', error);
       toast({
@@ -243,7 +279,14 @@ const AdminTickets = () => {
                     <CardHeader>
                       <div className="flex justify-between items-start gap-4">
                         <div className="flex-1">
-                          <CardTitle className="text-lg">{ticket.subject}</CardTitle>
+                          <div className="flex items-center gap-2">
+                            <CardTitle className="text-lg">{ticket.subject}</CardTitle>
+                            {unreadCounts[ticket.id] > 0 && (
+                              <Badge variant="destructive">
+                                {unreadCounts[ticket.id]}
+                              </Badge>
+                            )}
+                          </div>
                           <CardDescription>
                             De: {ticket.profiles?.full_name || ticket.profiles?.email || 'Utilisateur'}
                           </CardDescription>
@@ -280,7 +323,14 @@ const AdminTickets = () => {
                     <CardHeader>
                       <div className="flex justify-between items-start gap-4">
                         <div className="flex-1">
-                          <CardTitle className="text-lg">{ticket.subject}</CardTitle>
+                          <div className="flex items-center gap-2">
+                            <CardTitle className="text-lg">{ticket.subject}</CardTitle>
+                            {unreadCounts[ticket.id] > 0 && (
+                              <Badge variant="destructive">
+                                {unreadCounts[ticket.id]}
+                              </Badge>
+                            )}
+                          </div>
                           <CardDescription>
                             De: {ticket.profiles?.full_name || ticket.profiles?.email || 'Utilisateur'}
                           </CardDescription>

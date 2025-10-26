@@ -38,6 +38,7 @@ const Support = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isCreating, setIsCreating] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [unreadCounts, setUnreadCounts] = useState<Record<string, number>>({});
   const [newTicket, setNewTicket] = useState({
     subject: '',
     priority: 'normal',
@@ -57,6 +58,33 @@ const Support = () => {
     }
 
     loadTickets();
+
+    // Listen for new messages
+    const channel = supabase
+      .channel('user-tickets-messages')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'messages'
+        },
+        (payload) => {
+          // Only notify if message is from admin (not from current user)
+          if (payload.new.user_id !== user.id) {
+            toast({
+              title: "Nouveau message",
+              description: "Un admin a répondu à votre ticket",
+            });
+            loadTickets();
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [user, isVIP, isAdmin, isAdminLoading, navigate]);
 
   const loadTickets = async () => {
@@ -68,6 +96,20 @@ const Support = () => {
 
       if (error) throw error;
       setTickets(data || []);
+
+      // Load unread counts for each ticket
+      if (data && user) {
+        const counts: Record<string, number> = {};
+        for (const ticket of data) {
+          const { data: countData } = await supabase
+            .rpc('get_unread_count', { 
+              ticket_id_param: ticket.id, 
+              user_id_param: user.id 
+            });
+          counts[ticket.id] = countData || 0;
+        }
+        setUnreadCounts(counts);
+      }
     } catch (error) {
       console.error('Error loading tickets:', error);
       toast({
@@ -267,7 +309,14 @@ const Support = () => {
                 >
                   <CardHeader>
                     <div className="flex justify-between items-start">
-                      <CardTitle className="text-lg">{ticket.subject}</CardTitle>
+                      <div className="flex items-center gap-2">
+                        <CardTitle className="text-lg">{ticket.subject}</CardTitle>
+                        {unreadCounts[ticket.id] > 0 && (
+                          <Badge variant="destructive" className="ml-2">
+                            {unreadCounts[ticket.id]}
+                          </Badge>
+                        )}
+                      </div>
                       <div className="flex gap-2">
                         {getPriorityBadge(ticket.priority)}
                         {getStatusBadge(ticket.status)}

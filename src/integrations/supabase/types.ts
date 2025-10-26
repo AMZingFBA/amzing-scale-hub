@@ -14,6 +14,38 @@ export type Database = {
   }
   public: {
     Tables: {
+      message_read_status: {
+        Row: {
+          created_at: string
+          id: string
+          is_read: boolean
+          message_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          message_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          message_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "message_read_status_message_id_fkey"
+            columns: ["message_id"]
+            isOneToOne: false
+            referencedRelation: "messages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       messages: {
         Row: {
           content: string | null
@@ -178,6 +210,10 @@ export type Database = {
     }
     Functions: {
       check_and_expire_subscriptions: { Args: never; Returns: undefined }
+      get_unread_count: {
+        Args: { ticket_id_param: string; user_id_param: string }
+        Returns: number
+      }
       has_open_ticket: { Args: { _user_id: string }; Returns: boolean }
       has_role: {
         Args: {
@@ -185,6 +221,10 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      mark_ticket_messages_as_read: {
+        Args: { ticket_id_param: string }
+        Returns: undefined
       }
     }
     Enums: {
