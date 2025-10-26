@@ -11,7 +11,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Loader2, Package, Search, Upload, Trash2, ShoppingCart, ShoppingBag, MessageCircle, X, CheckCircle } from "lucide-react";
+import { Loader2, Package, Search, Upload, Trash2, ShoppingCart, ShoppingBag, MessageCircle, X, CheckCircle, Copy, ZoomIn, ChevronLeft, ChevronRight, Edit } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 interface Listing {
@@ -95,6 +95,11 @@ const Marketplace = () => {
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
+  
+  // Image gallery states
+  const [selectedImageGallery, setSelectedImageGallery] = useState<string[] | null>(null);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [showImageDialog, setShowImageDialog] = useState(false);
 
   useEffect(() => {
     if (!user) {
@@ -605,45 +610,90 @@ const Marketplace = () => {
     }
   };
 
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    toast.success("Code copié!");
+  };
+
+  const openImageGallery = (images: string[], index: number = 0) => {
+    setSelectedImageGallery(images);
+    setCurrentImageIndex(index);
+    setShowImageDialog(true);
+  };
+
+  const nextImage = () => {
+    if (selectedImageGallery) {
+      setCurrentImageIndex((prev) => (prev + 1) % selectedImageGallery.length);
+    }
+  };
+
+  const prevImage = () => {
+    if (selectedImageGallery) {
+      setCurrentImageIndex((prev) => (prev - 1 + selectedImageGallery.length) % selectedImageGallery.length);
+    }
+  };
+
   const renderListing = (listing: Listing, isOwn: boolean) => {
     const code = listing.asin || listing.ean || "N/A";
+    const hasImages = listing.images && listing.images.length > 0;
     
     return (
-      <Card key={listing.id} className="hover:shadow-xl transition-all animate-fade-in group">
-        <CardHeader>
+      <Card key={listing.id} className="hover:shadow-xl transition-all animate-fade-in overflow-hidden">
+        <CardHeader className="space-y-3">
           <div className="flex justify-between items-start gap-4">
-            <div className="flex-1">
-              <CardTitle className="text-lg group-hover:text-primary transition-colors">
-                {listing.title}
-              </CardTitle>
-              <CardDescription className="mt-2 text-xs space-y-1">
-                <div className="font-mono">{code}</div>
-                <div>{listing.quantity} unité(s) disponible(s)</div>
-              </CardDescription>
-            </div>
-            <Badge className="shrink-0">
+            <CardTitle className="text-xl font-bold text-primary">
+              {listing.title}
+            </CardTitle>
+            <Badge variant="secondary" className="shrink-0 text-base font-bold px-3 py-1">
               {listing.price}€ {listing.price_type}
             </Badge>
           </div>
+          
+          <div className="space-y-2">
+            <div 
+              className="flex items-center gap-2 group/code cursor-pointer bg-muted/30 hover:bg-muted/50 p-2 rounded-md transition-colors"
+              onClick={() => copyToClipboard(code)}
+            >
+              <span className="text-xs text-muted-foreground">Code:</span>
+              <code className="font-mono font-semibold flex-1">{code}</code>
+              <Copy className="w-4 h-4 text-muted-foreground group-hover/code:text-primary transition-colors" />
+            </div>
+            
+            <div className="text-sm text-muted-foreground">
+              <span className="font-semibold">{listing.quantity}</span> unité(s) disponible(s)
+            </div>
+          </div>
         </CardHeader>
         
-        {listing.images && listing.images.length > 0 && (
-          <CardContent>
-            <div className="grid grid-cols-2 gap-2">
-              {listing.images.slice(0, 4).map((img, idx) => (
-                <img
-                  key={idx}
-                  src={img}
-                  alt={`Image ${idx + 1}`}
-                  className="w-full h-32 object-cover rounded-lg"
-                />
-              ))}
+        {hasImages && (
+          <CardContent className="relative p-0">
+            <div 
+              className="relative cursor-pointer group/image"
+              onClick={() => openImageGallery(listing.images, 0)}
+            >
+              <img
+                src={listing.images[0]}
+                alt={listing.title}
+                className="w-full h-64 object-cover"
+              />
+              <div className="absolute inset-0 bg-black/0 group-hover/image:bg-black/30 transition-all flex items-center justify-center">
+                <div className="opacity-0 group-hover/image:opacity-100 transition-opacity">
+                  <div className="bg-white rounded-full p-3">
+                    <ZoomIn className="w-6 h-6 text-primary" />
+                  </div>
+                </div>
+              </div>
+              {listing.images.length > 1 && (
+                <div className="absolute bottom-2 right-2 bg-black/70 text-white px-2 py-1 rounded-md text-xs font-semibold">
+                  +{listing.images.length - 1} photo{listing.images.length > 2 ? 's' : ''}
+                </div>
+              )}
             </div>
           </CardContent>
         )}
         
-        <CardFooter className="flex gap-2">
-          {isOwn || isAdmin ? (
+        <CardFooter className="flex gap-2 p-4">
+          {isOwn ? (
             <Button
               variant="destructive"
               size="sm"
@@ -654,13 +704,24 @@ const Marketplace = () => {
               Supprimer
             </Button>
           ) : (
-            <Button
-              className="w-full hover-scale"
-              onClick={() => handleInterestInListing(listing)}
-            >
-              <ShoppingCart className="w-4 h-4 mr-2" />
-              Je veux acheter
-            </Button>
+            <>
+              <Button
+                className="flex-1 hover-scale"
+                onClick={() => handleInterestInListing(listing)}
+              >
+                <ShoppingCart className="w-4 h-4 mr-2" />
+                Acheter
+              </Button>
+              {isAdmin && (
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={() => deleteListing(listing.id)}
+                >
+                  <Trash2 className="w-4 h-4" />
+                </Button>
+              )}
+            </>
           )}
         </CardFooter>
       </Card>
@@ -671,34 +732,43 @@ const Marketplace = () => {
     const code = request.asin || request.ean || "N/A";
     
     return (
-      <Card key={request.id} className="hover:shadow-xl transition-all animate-fade-in group">
-        <CardHeader>
+      <Card key={request.id} className="hover:shadow-xl transition-all animate-fade-in overflow-hidden">
+        <CardHeader className="space-y-3">
           <div className="flex justify-between items-start gap-4">
-            <div className="flex-1">
-              <CardTitle className="text-lg group-hover:text-primary transition-colors">
-                {request.title}
-              </CardTitle>
-              <CardDescription className="mt-2 text-xs space-y-1">
-                <div className="font-mono">{code}</div>
-                <div>{request.quantity} unité(s) recherchée(s)</div>
-              </CardDescription>
-            </div>
+            <CardTitle className="text-xl font-bold text-primary">
+              {request.title}
+            </CardTitle>
             {request.max_price && (
-              <Badge variant="secondary" className="shrink-0">
+              <Badge variant="secondary" className="shrink-0 text-base font-bold px-3 py-1">
                 Max {request.max_price}€ {request.price_type}
               </Badge>
             )}
+          </div>
+          
+          <div className="space-y-2">
+            <div 
+              className="flex items-center gap-2 group/code cursor-pointer bg-muted/30 hover:bg-muted/50 p-2 rounded-md transition-colors"
+              onClick={() => copyToClipboard(code)}
+            >
+              <span className="text-xs text-muted-foreground">Code:</span>
+              <code className="font-mono font-semibold flex-1">{code}</code>
+              <Copy className="w-4 h-4 text-muted-foreground group-hover/code:text-primary transition-colors" />
+            </div>
+            
+            <div className="text-sm text-muted-foreground">
+              <span className="font-semibold">{request.quantity}</span> unité(s) recherchée(s)
+            </div>
           </div>
         </CardHeader>
         
         {request.description && (
           <CardContent>
-            <p className="text-sm text-muted-foreground">{request.description}</p>
+            <p className="text-sm text-muted-foreground line-clamp-3">{request.description}</p>
           </CardContent>
         )}
         
-        <CardFooter className="flex gap-2">
-          {isOwn || isAdmin ? (
+        <CardFooter className="flex gap-2 p-4">
+          {isOwn ? (
             <Button
               variant="destructive"
               size="sm"
@@ -709,13 +779,24 @@ const Marketplace = () => {
               Supprimer
             </Button>
           ) : (
-            <Button
-              className="w-full hover-scale"
-              onClick={() => handleInterestInBuyRequest(request)}
-            >
-              <ShoppingBag className="w-4 h-4 mr-2" />
-              Je peux vendre
-            </Button>
+            <>
+              <Button
+                className="flex-1 hover-scale"
+                onClick={() => handleInterestInBuyRequest(request)}
+              >
+                <ShoppingBag className="w-4 h-4 mr-2" />
+                Vendre
+              </Button>
+              {isAdmin && (
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={() => deleteBuyRequest(request.id)}
+                >
+                  <Trash2 className="w-4 h-4" />
+                </Button>
+              )}
+            </>
           )}
         </CardFooter>
       </Card>
@@ -753,6 +834,67 @@ const Marketplace = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/20 p-4 md:p-8">
       <div className="max-w-7xl mx-auto space-y-6">
+        {/* Image Gallery Dialog */}
+        <Dialog open={showImageDialog} onOpenChange={setShowImageDialog}>
+          <DialogContent className="max-w-4xl p-0">
+            <div className="relative">
+              {selectedImageGallery && selectedImageGallery.length > 0 && (
+                <>
+                  <img
+                    src={selectedImageGallery[currentImageIndex]}
+                    alt={`Image ${currentImageIndex + 1}`}
+                    className="w-full h-auto max-h-[80vh] object-contain"
+                  />
+                  
+                  {selectedImageGallery.length > 1 && (
+                    <>
+                      <Button
+                        variant="secondary"
+                        size="icon"
+                        className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full"
+                        onClick={prevImage}
+                      >
+                        <ChevronLeft className="w-6 h-6" />
+                      </Button>
+                      <Button
+                        variant="secondary"
+                        size="icon"
+                        className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full"
+                        onClick={nextImage}
+                      >
+                        <ChevronRight className="w-6 h-6" />
+                      </Button>
+                      
+                      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/70 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                        {currentImageIndex + 1} / {selectedImageGallery.length}
+                      </div>
+                    </>
+                  )}
+                </>
+              )}
+            </div>
+            
+            {selectedImageGallery && selectedImageGallery.length > 1 && (
+              <div className="p-4 bg-muted/30">
+                <div className="flex gap-2 overflow-x-auto pb-2">
+                  {selectedImageGallery.map((img, idx) => (
+                    <img
+                      key={idx}
+                      src={img}
+                      alt={`Thumbnail ${idx + 1}`}
+                      className={`w-20 h-20 object-cover rounded-lg cursor-pointer transition-all ${
+                        idx === currentImageIndex 
+                          ? 'ring-2 ring-primary scale-110' 
+                          : 'opacity-60 hover:opacity-100'
+                      }`}
+                      onClick={() => setCurrentImageIndex(idx)}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
         {/* Buy Section - Recherche de produits */}
         {activeSection === "buy" && (
           <div className="w-full space-y-6 animate-fade-in">
