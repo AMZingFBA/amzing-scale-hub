@@ -195,6 +195,7 @@ export type Database = {
           description: string | null
           ean: string | null
           id: string
+          images: string[] | null
           max_price: number | null
           price_type: string
           quantity: number
@@ -209,6 +210,7 @@ export type Database = {
           description?: string | null
           ean?: string | null
           id?: string
+          images?: string[] | null
           max_price?: number | null
           price_type?: string
           quantity?: number
@@ -223,6 +225,7 @@ export type Database = {
           description?: string | null
           ean?: string | null
           id?: string
+          images?: string[] | null
           max_price?: number | null
           price_type?: string
           quantity?: number

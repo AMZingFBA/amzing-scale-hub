@@ -36,6 +36,7 @@ interface BuyRequest {
   ean: string | null;
   title: string;
   description: string | null;
+  images: string[];
   quantity: number;
   max_price: number | null;
   price_type: string;
@@ -389,6 +390,7 @@ const Marketplace = () => {
             ean: searchType === "ean" ? searchCode : null,
             title,
             description,
+            images: uploadedImages,
             quantity,
             max_price: price ? parseFloat(price) : null,
             price_type: priceType,
@@ -734,9 +736,37 @@ const Marketplace = () => {
 
   const renderBuyRequest = (request: BuyRequest, isOwn: boolean) => {
     const code = request.asin || request.ean || "N/A";
+    const hasImages = request.images && request.images.length > 0;
     
     return (
       <Card key={request.id} className="hover:shadow-xl transition-all animate-fade-in overflow-hidden">
+        {hasImages && (
+          <div className="p-4">
+            <div 
+              className="relative cursor-pointer group/image border-2 border-muted rounded-lg overflow-hidden"
+              onClick={() => openImageGallery(request.images, 0)}
+            >
+              <img
+                src={request.images[0]}
+                alt={request.title}
+                className="w-full h-56 object-cover"
+              />
+              <div className="absolute inset-0 bg-black/0 group-hover/image:bg-black/30 transition-all flex items-center justify-center">
+                <div className="opacity-0 group-hover/image:opacity-100 transition-opacity">
+                  <div className="bg-white rounded-full p-3">
+                    <ZoomIn className="w-6 h-6 text-primary" />
+                  </div>
+                </div>
+              </div>
+              {request.images.length > 1 && (
+                <div className="absolute bottom-3 right-3 bg-black/70 text-white px-3 py-1.5 rounded-md text-sm font-semibold">
+                  +{request.images.length - 1} photo{request.images.length > 2 ? 's' : ''}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+        
         <CardHeader className="space-y-4 pb-3">
           <div className="flex justify-between items-start gap-3">
             <CardTitle className="text-lg font-bold line-clamp-2">
@@ -953,7 +983,44 @@ const Marketplace = () => {
                     </Button>
                   </div>
 
+                  {uploadedImages.length > 0 && (
+                    <div className="grid grid-cols-4 gap-2">
+                      {uploadedImages.map((img, idx) => (
+                        <div key={idx} className="relative group">
+                          <img src={img} alt={`Upload ${idx + 1}`} className="w-full h-24 object-cover rounded-lg" />
+                          <button
+                            onClick={() => setUploadedImages(uploadedImages.filter((_, i) => i !== idx))}
+                            className="absolute top-1 right-1 bg-destructive text-destructive-foreground p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
                   <div className="space-y-4">
+                    <div>
+                      <Label>Photos du produit (optionnel)</Label>
+                      <div className="mt-2">
+                        <label className="flex items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer hover:bg-muted/50 transition-colors">
+                          <div className="text-center">
+                            <Upload className="w-8 h-8 mx-auto mb-2 text-muted-foreground" />
+                            <p className="text-sm text-muted-foreground">
+                              Cliquez pour uploader des photos
+                            </p>
+                          </div>
+                          <input
+                            type="file"
+                            multiple
+                            accept="image/*"
+                            onChange={handleFileUpload}
+                            className="hidden"
+                          />
+                        </label>
+                      </div>
+                    </div>
+
                     <div>
                       <Label>Titre du produit recherché *</Label>
                       <Input

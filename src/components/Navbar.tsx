@@ -44,6 +44,16 @@ const Navbar = () => {
             <Link to="/contact" className="text-foreground hover:text-primary transition-colors font-medium">
               Contact
             </Link>
+            {user && (
+              <>
+                <Link to="/acheter" className="text-foreground hover:text-primary transition-colors font-medium">
+                  Want to Buy
+                </Link>
+                <Link to="/vendre" className="text-foreground hover:text-primary transition-colors font-medium">
+                  Want to Sell
+                </Link>
+              </>
+            )}
             
             {user ? (
               <DropdownMenu>
@@ -154,6 +164,24 @@ const Navbar = () => {
             >
               Contact
             </Link>
+            {user && (
+              <>
+                <Link
+                  to="/acheter"
+                  className="block text-foreground hover:text-primary transition-colors font-medium py-2"
+                  onClick={() => setIsOpen(false)}
+                >
+                  Want to Buy
+                </Link>
+                <Link
+                  to="/vendre"
+                  className="block text-foreground hover:text-primary transition-colors font-medium py-2"
+                  onClick={() => setIsOpen(false)}
+                >
+                  Want to Sell
+                </Link>
+              </>
+            )}
             
             {user ? (
               <div className="space-y-2 pt-2 border-t">
