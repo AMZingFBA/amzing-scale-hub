@@ -318,15 +318,33 @@ const Ticket = () => {
                     >
                       {message.content && <p className="text-sm">{message.content}</p>}
                       {message.file_url && (
-                        <a
-                          href={message.file_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-sm underline flex items-center gap-2 mt-2"
-                        >
-                          <Paperclip className="w-4 h-4" />
-                          {message.file_name}
-                        </a>
+                        <>
+                          {message.file_type?.startsWith('image/') ? (
+                            <div className="mt-2">
+                              <a
+                                href={message.file_url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                              >
+                                <img
+                                  src={message.file_url}
+                                  alt={message.file_name || 'Image'}
+                                  className="max-w-full max-h-64 rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
+                                />
+                              </a>
+                            </div>
+                          ) : (
+                            <a
+                              href={message.file_url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-sm underline flex items-center gap-2 mt-2"
+                            >
+                              <Paperclip className="w-4 h-4" />
+                              {message.file_name}
+                            </a>
+                          )}
+                        </>
                       )}
                       <p className="text-xs mt-2 opacity-70">
                         {new Date(message.created_at).toLocaleTimeString('fr-FR', {
