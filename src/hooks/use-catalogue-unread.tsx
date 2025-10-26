@@ -55,7 +55,7 @@ export const useCatalogueUnread = () => {
 
     loadUnreadCount();
 
-    // Listen for new messages
+    // Listen for new messages and ticket status changes
     const channel = supabase
       .channel('catalogue-unread-count')
       .on(
@@ -86,6 +86,17 @@ export const useCatalogueUnread = () => {
           event: 'UPDATE',
           schema: 'public',
           table: 'message_read_status'
+        },
+        () => {
+          loadUnreadCount();
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'tickets'
         },
         () => {
           loadUnreadCount();
