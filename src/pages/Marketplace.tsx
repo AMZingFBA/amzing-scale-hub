@@ -126,9 +126,22 @@ const Marketplace = () => {
       })
       .subscribe();
 
+    const ticketsChannel = supabase
+      .channel("marketplace_tickets_changes")
+      .on("postgres_changes", { 
+        event: "*", 
+        schema: "public", 
+        table: "tickets",
+        filter: `category=eq.marketplace`
+      }, () => {
+        loadMyTickets();
+      })
+      .subscribe();
+
     return () => {
       supabase.removeChannel(listingsChannel);
       supabase.removeChannel(buyRequestsChannel);
+      supabase.removeChannel(ticketsChannel);
     };
   }, [user, navigate]);
 
@@ -424,8 +437,11 @@ const Marketplace = () => {
 
       toast.success("Demande d'achat envoyée au staff!");
       
-      // Reload tickets
+      // Reload tickets and redirect to buy requests page
       await loadMyTickets();
+      
+      // Redirect to the buy requests page
+      navigate("/acheter");
       setShowCreateDialog(false);
     } catch (error: any) {
       console.error("Error creating ticket:", error);
@@ -472,9 +488,11 @@ const Marketplace = () => {
 
       toast.success("Proposition de vente envoyée au staff!");
       
-      // Reload tickets and switch to sell section
+      // Reload tickets and redirect to sell requests page
       await loadMyTickets();
-      setActiveSection("sell");
+      
+      // Redirect to the sell requests page
+      navigate("/vendre");
       setShowCreateDialog(false);
     } catch (error: any) {
       console.error("Error creating ticket:", error);
