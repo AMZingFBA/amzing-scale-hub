@@ -28,8 +28,11 @@ const Navbar = () => {
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-20">
-          <Link to="/" className="flex items-center">
-            <img src={logo} alt="AMZing FBA" className="h-12" />
+          <Link to="/" className="flex items-center gap-3 group">
+            <img src={logo} alt="AMZing FBA" className="h-12 transition-transform group-hover:scale-105" />
+            <span className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+              AMZing FBA
+            </span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -63,11 +66,15 @@ const Navbar = () => {
             {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="lg" className="gap-2">
-                    <User className="w-4 h-4" />
-                    Mon compte
+                  <Button 
+                    variant="outline" 
+                    size="lg" 
+                    className={`gap-2 transition-all ${isVIP ? 'border-primary/50 hover:border-primary bg-gradient-to-r from-primary/5 to-secondary/5' : ''}`}
+                  >
+                    <User className="w-5 h-5" />
+                    <span className="font-semibold">Mon compte</span>
                     {isVIP && (
-                      <Badge className="ml-2 bg-gradient-to-r from-primary to-secondary text-white border-0">
+                      <Badge className="ml-1 bg-gradient-to-r from-primary to-secondary text-white border-0 shadow-lg">
                         VIP
                       </Badge>
                     )}
@@ -174,10 +181,10 @@ const Navbar = () => {
             
             {user ? (
               <div className="space-y-2 pt-2 border-t">
-                <div className="px-2 py-2">
-                  <p className="text-sm font-medium">{user.email}</p>
+                <div className="px-2 py-3 bg-gradient-to-r from-primary/10 to-secondary/10 rounded-lg">
+                  <p className="text-sm font-semibold">{user.email}</p>
                   {isVIP && (
-                    <Badge className="mt-1 bg-gradient-to-r from-primary to-secondary text-white border-0">
+                    <Badge className="mt-2 bg-gradient-to-r from-primary to-secondary text-white border-0 shadow-lg">
                       Membre VIP
                     </Badge>
                   )}
