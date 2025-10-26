@@ -215,6 +215,22 @@ const Success = () => {
             />
           </div>
         );
+      case 'audio':
+        return (
+          <div className="w-full max-w-sm">
+            {message.content && <p className="mb-2">{message.content}</p>}
+            <audio 
+              src={message.file_url || ''} 
+              controls 
+              className="w-full"
+              preload="auto"
+              controlsList="nodownload"
+            >
+              Votre navigateur ne supporte pas la lecture audio.
+            </audio>
+            <p className="text-xs mt-1 opacity-50">🎤 Message vocal</p>
+          </div>
+        );
       case 'file':
         return (
           <div>
