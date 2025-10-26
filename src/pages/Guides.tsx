@@ -1093,65 +1093,404 @@ const Guides = () => {
 
               {/* ========== ONGLET OUTILS ========== */}
               <TabsContent value="outils" className="space-y-8">
-                <section>
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="p-3 rounded-lg bg-primary/10">
-                      <Wrench className="w-8 h-8 text-primary" />
-                    </div>
-                    <div>
-                      <h2 className="text-3xl font-bold">Outils recommandés</h2>
-                      <p className="text-muted-foreground">Les outils essentiels pour réussir sur Amazon</p>
-                    </div>
-                  </div>
-
-                  <Card className="bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
-                    <CardHeader>
-                      <CardTitle>🛠️ Outils indispensables</CardTitle>
-                      <CardDescription>
-                        Ces outils te permettront d'optimiser ton activité et de gagner du temps
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div className="grid md:grid-cols-2 gap-4">
-                        <Card>
-                          <CardHeader className="pb-3">
-                            <CardTitle className="text-base">📱 Seller AMP</CardTitle>
-                          </CardHeader>
-                          <CardContent className="text-sm text-muted-foreground">
-                            Application mobile pour scanner les produits et vérifier leur rentabilité en temps réel
-                          </CardContent>
-                        </Card>
-
-                        <Card>
-                          <CardHeader className="pb-3">
-                            <CardTitle className="text-base">📊 Keepa</CardTitle>
-                          </CardHeader>
-                          <CardContent className="text-sm text-muted-foreground">
-                            Outil de suivi des prix et des historiques de ventes Amazon
-                          </CardContent>
-                        </Card>
-
-                        <Card>
-                          <CardHeader className="pb-3">
-                            <CardTitle className="text-base">🖨️ Imprimante thermique</CardTitle>
-                          </CardHeader>
-                          <CardContent className="text-sm text-muted-foreground">
-                            Pour imprimer rapidement les étiquettes FBA et FBM
-                          </CardContent>
-                        </Card>
-
-                        <Card>
-                          <CardHeader className="pb-3">
-                            <CardTitle className="text-base">📦 Cartons et emballages</CardTitle>
-                          </CardHeader>
-                          <CardContent className="text-sm text-muted-foreground">
-                            Matériaux d'expédition de qualité pour protéger tes produits
-                          </CardContent>
-                        </Card>
+                
+                <Accordion type="single" collapsible className="space-y-4">
+                  
+                  {/* Seller AMP */}
+                  <AccordionItem value="seller-amp" className="border rounded-lg px-6 bg-card">
+                    <AccordionTrigger className="text-lg font-semibold hover:no-underline">
+                      <div className="flex items-center gap-3">
+                        <Search className="w-5 h-5 text-primary" />
+                        <span>Seller AMP - Scanner de produits</span>
                       </div>
-                    </CardContent>
-                  </Card>
-                </section>
+                    </AccordionTrigger>
+                    <AccordionContent className="space-y-6 pt-4">
+                      <div className="prose prose-sm max-w-none">
+                        <div className="bg-primary/5 border-l-4 border-primary p-4 mb-6">
+                          <p className="mb-2">
+                            L'application Seller Amp est remplie d'informations importantes ! 
+                            Il est essentiel de les comprendre pour bien vendre sur Amazon.
+                          </p>
+                          <a 
+                            href="https://selleramp.com/?gc_id=18474664952&utm_campaign=SEARCH%20-%20BRAND%20BROAD&utm_source=google&utm_medium=cpc&utm_content=BRAND&utm_term=seller%20amp&utm_term=seller%20amp&utm_campaign=SEARCH+-+BRAND&utm_source=adwords&utm_medium=ppc&hsa_acc=9738693668&hsa_cam=19603041783&hsa_grp=145757011659&hsa_ad=646160900057&hsa_src=g&hsa_tgt=kwd-30666654175&hsa_kw=seller%20amp&hsa_mt=e&hsa_net=adwords&hsa_ver=3&gad_source=1&gad_campaignid=19603041783&gbraid=0AAAAAoif9_eRkWO_UXNZBSdciGfz1qHQO&gclid=CjwKCAjw6vHHBhBwEiwAq4zvA50baDeM_odyrsEQ0fKNAY41Rkwlox15bxrpCPLC1YqIqUW2-w_vTxoCHzwQAvD_BwE" 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="text-primary hover:underline font-medium"
+                          >
+                            → Découvrir Seller AMP
+                          </a>
+                        </div>
+
+                        <p className="mb-4">
+                          Quand tu vas scanner un article à l'aide de Seller Amp, il y a cet espace "Alerts" qui peut paraître inutile 
+                          quand tu as déjà les informations sur le nombre de ventes par mois et le bénéfice que tu vas pouvoir réaliser. 
+                          Pourtant, l'une des informations les plus importantes reste justement cet espace "Alerts".
+                        </p>
+
+                        <p className="mb-4">
+                          Tu vas rencontrer différentes alertes et il faut les comprendre ! Nous t'expliquons tout juste en dessous.
+                        </p>
+
+                        <h4 className="text-lg font-semibold mt-8 mb-3">✅ Pas d'alerte - Tout est OK !</h4>
+                        <p className="mb-3">
+                          On commence avec un exemple où tu n'as aucun souci ! Aucune inquiétude, tu peux vendre ce produit 
+                          et il n'y a pas de privatisation ou de danger lié à cet objet (exemple : produit chimique).
+                        </p>
+                        <p className="mb-4">
+                          Quand c'est en vert, c'est qu'il n'y a pas de "souci" ! 
+                          Cependant, l'indication du carré vert avec un chiffre indique quelque chose.
+                        </p>
+
+                        <div className="bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 rounded-lg p-4 my-6">
+                          <h5 className="font-semibold mb-2">Quand on clique dessus, voici ce qui s'affiche :</h5>
+                          <ul className="list-disc pl-6 space-y-1 text-sm">
+                            <li><strong>Eligibility</strong> (Éligibilité) : Tu peux vendre ce produit</li>
+                            <li><strong>Amazon Share Buy Box</strong> : Tu auras la buy box</li>
+                            <li><strong>Private Label</strong> : Unlikely = Peu probable</li>
+                            <li><strong>Size</strong> : Standard Size = Taille standard</li>
+                            <li><strong>Meltable</strong> : Fondable (exemple : le chocolat peut fondre)</li>
+                            <li><strong>Variations</strong> : No (pas de variation de couleur/taille)</li>
+                          </ul>
+                        </div>
+
+                        <h4 className="text-lg font-semibold mt-8 mb-3">🚨 L'alerte "V" pour Variations</h4>
+                        <p className="mb-3">
+                          L'alerte V signifie variations, ce qui indique que le produit a des variations sur la page produit. 
+                          Par exemple, une variation avec une taille différente ou une autre couleur.
+                        </p>
+                        <p className="mb-4">
+                          Les variations peuvent être problématiques car tu n'as peut-être pas la meilleure ! 
+                          Certaines variations de l'article se vendent parfois mieux car le prix est plus bas 
+                          ou tout simplement c'est une couleur plus populaire. 
+                          Donc plus il y a de variations, plus c'est risqué selon le nombre de ventes par mois.
+                        </p>
+
+                        <h4 className="text-lg font-semibold mt-8 mb-3">🚨 L'alerte "M" pour Meltable</h4>
+                        <p className="mb-4">
+                          Meltable veut dire "Fondable". Certains produits peuvent fondre à cause de la chaleur, 
+                          donc fais attention ! Un produit doit toujours arriver neuf chez le client ou chez Amazon.
+                        </p>
+
+                        <h4 className="text-lg font-semibold mt-8 mb-3">🚨 L'alerte "S" pour Oversize</h4>
+                        <p className="mb-4">
+                          C'est une alerte pour prévenir que l'article est grand ! 
+                          Donc compliqué à expédier, voire cher à expédier selon le poids.
+                        </p>
+
+                        <h4 className="text-lg font-semibold mt-8 mb-3">🚨 L'alerte "PL" pour Private Label</h4>
+                        <div className="bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800 rounded-lg p-4 my-4">
+                          <p className="text-sm">
+                            <strong>⚠️ C'est sûrement l'alerte la plus importante !</strong> 
+                            Le Private Label sur un article signifie une privatisation de l'article par la marque. 
+                            Tu n'es donc PAS autorisé à vendre ce produit.
+                          </p>
+                        </div>
+
+                        <h4 className="text-lg font-semibold mt-8 mb-3">🚨 L'alerte "BB" pour Buy Box</h4>
+                        <p className="mb-4">
+                          BB signifie "Amazon Share Buy Box". SellerAmp indique qu'Amazon vend le produit 
+                          et détient souvent la Buy Box. Ce n'est pas une exclusivité cependant, 
+                          Amazon peut partager la Buy Box et donc tu peux aussi régulièrement l'avoir.
+                        </p>
+
+                        <h4 className="text-lg font-semibold mt-8 mb-3">🚨 L'alerte "DG" pour Dangerous Goods</h4>
+                        <p className="mb-3">
+                          C'est pour indiquer que le produit est fragile ou possiblement dangereux 
+                          (inflammable ou un produit avec de l'alcool par exemple).
+                        </p>
+                        <p className="mb-4">
+                          Cette alerte ne t'empêche pas de l'acheter, elle te prévient uniquement 
+                          que c'est un produit fragile ou possiblement dangereux !
+                        </p>
+
+                        <div className="bg-primary/5 rounded-lg p-4 mt-6">
+                          <p className="text-sm">
+                            💡 Il y a pleins d'autres alertes plus ou moins rares, mais nous venons de te présenter 
+                            les plus importantes et récurrentes ! Il existe par exemple des alertes sur le poids du produit, 
+                            sur la suppression du listing, ou sur le fait qu'il n'y a pas de buy box.
+                          </p>
+                        </div>
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+
+                  {/* Seller Toolkit */}
+                  <AccordionItem value="seller-toolkit" className="border rounded-lg px-6 bg-card">
+                    <AccordionTrigger className="text-lg font-semibold hover:no-underline">
+                      <div className="flex items-center gap-3">
+                        <Wrench className="w-5 h-5 text-primary" />
+                        <span>Seller Toolkit - Gestion complète</span>
+                      </div>
+                    </AccordionTrigger>
+                    <AccordionContent className="space-y-6 pt-4">
+                      <div className="prose prose-sm max-w-none">
+                        <div className="bg-primary/5 border-l-4 border-primary p-4 mb-6">
+                          <p className="mb-2">
+                            Seller Toolkit est une plateforme complète de gestion pour les vendeurs Amazon. 
+                            Elle regroupe tous les outils dont tu as besoin pour analyser, optimiser et développer ton business.
+                          </p>
+                          <a 
+                            href="https://app.sellertoolkit.co.uk/#/login" 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="text-primary hover:underline font-medium"
+                          >
+                            → Découvrir Seller Toolkit
+                          </a>
+                        </div>
+
+                        <h4 className="text-lg font-semibold mt-6 mb-3">Fonctionnalités principales :</h4>
+                        
+                        <div className="space-y-4">
+                          <Card className="bg-primary/5">
+                            <CardHeader className="pb-3">
+                              <CardTitle className="text-base">📊 Analyse des ventes</CardTitle>
+                            </CardHeader>
+                            <CardContent className="text-sm">
+                              <p className="mb-2">
+                                Suivis détaillés de tes performances avec graphiques et statistiques en temps réel. 
+                                Visualise ton chiffre d'affaires, tes marges et identifie rapidement tes produits les plus rentables.
+                              </p>
+                            </CardContent>
+                          </Card>
+
+                          <Card className="bg-primary/5">
+                            <CardHeader className="pb-3">
+                              <CardTitle className="text-base">💰 Gestion des profits</CardTitle>
+                            </CardHeader>
+                            <CardContent className="text-sm">
+                              <p className="mb-2">
+                                Calcule automatiquement tes bénéfices réels en prenant en compte tous les frais Amazon, 
+                                les coûts d'achat, les frais d'expédition et la TVA. Plus besoin de calculer manuellement !
+                              </p>
+                            </CardContent>
+                          </Card>
+
+                          <Card className="bg-primary/5">
+                            <CardHeader className="pb-3">
+                              <CardTitle className="text-base">📦 Suivi des stocks</CardTitle>
+                            </CardHeader>
+                            <CardContent className="text-sm">
+                              <p className="mb-2">
+                                Reçois des alertes quand ton stock devient faible et évite les ruptures. 
+                                Optimise ton inventaire pour ne jamais manquer une vente.
+                              </p>
+                            </CardContent>
+                          </Card>
+
+                          <Card className="bg-primary/5">
+                            <CardHeader className="pb-3">
+                              <CardTitle className="text-base">🔍 Recherche de produits</CardTitle>
+                            </CardHeader>
+                            <CardContent className="text-sm">
+                              <p className="mb-2">
+                                Utilise les filtres avancés pour trouver des produits rentables selon tes critères : 
+                                marges, volume de ventes, concurrence, etc.
+                              </p>
+                            </CardContent>
+                          </Card>
+
+                          <Card className="bg-primary/5">
+                            <CardHeader className="pb-3">
+                              <CardTitle className="text-base">📈 Surveillance des prix</CardTitle>
+                            </CardHeader>
+                            <CardContent className="text-sm">
+                              <p className="mb-2">
+                                Configure des alertes pour être notifié quand les prix de tes concurrents changent 
+                                ou quand des opportunités d'achat apparaissent.
+                              </p>
+                            </CardContent>
+                          </Card>
+                        </div>
+
+                        <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4 mt-6">
+                          <h5 className="font-semibold mb-2">💡 Pourquoi utiliser Seller Toolkit ?</h5>
+                          <ul className="list-disc pl-6 space-y-1 text-sm">
+                            <li>Gagne du temps sur la gestion administrative</li>
+                            <li>Prends des décisions basées sur des données fiables</li>
+                            <li>Évite les erreurs de calcul de rentabilité</li>
+                            <li>Reste compétitif grâce aux alertes en temps réel</li>
+                          </ul>
+                        </div>
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+
+                  {/* Imprimantes thermiques */}
+                  <AccordionItem value="imprimantes" className="border rounded-lg px-6 bg-card">
+                    <AccordionTrigger className="text-lg font-semibold hover:no-underline">
+                      <div className="flex items-center gap-3">
+                        <Package className="w-5 h-5 text-primary" />
+                        <span>Imprimantes thermiques recommandées</span>
+                      </div>
+                    </AccordionTrigger>
+                    <AccordionContent className="space-y-6 pt-4">
+                      <div className="prose prose-sm max-w-none">
+                        <p className="mb-4">
+                          Une imprimante thermique est indispensable pour imprimer rapidement tes étiquettes d'expédition 
+                          et tes codes-barres. Voici nos recommandations testées et approuvées par la communauté.
+                        </p>
+
+                        <div className="space-y-6">
+                          {/* Imprimante 1 */}
+                          <Card className="bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
+                            <CardHeader>
+                              <CardTitle className="text-base">🖨️ MUNBYN ITC 4x6 - Le meilleur rapport qualité/prix</CardTitle>
+                            </CardHeader>
+                            <CardContent className="space-y-3">
+                              <a 
+                                href="https://www.amazon.fr/MUNBYN-Thermique-Bluetooth-Compatible-Transporteur/dp/B0CTKD26XW" 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="text-primary hover:underline font-medium inline-block mb-2"
+                              >
+                                → Voir sur Amazon
+                              </a>
+                              
+                              <div className="grid md:grid-cols-2 gap-4">
+                                <div>
+                                  <h5 className="font-semibold mb-2 text-green-700 dark:text-green-400">✅ Avantages :</h5>
+                                  <ul className="list-disc pl-6 space-y-1 text-sm">
+                                    <li>Excellente qualité d'impression</li>
+                                    <li>Compatible FBA et FBM</li>
+                                    <li>Connexion USB et Bluetooth</li>
+                                    <li>Installation simple et rapide</li>
+                                    <li>Prix abordable (environ 100-130€)</li>
+                                  </ul>
+                                </div>
+                                <div>
+                                  <h5 className="font-semibold mb-2 text-red-700 dark:text-red-400">❌ Inconvénients :</h5>
+                                  <ul className="list-disc pl-6 space-y-1 text-sm">
+                                    <li>Peut être bruyante</li>
+                                    <li>Format d'étiquettes limité (4x6)</li>
+                                  </ul>
+                                </div>
+                              </div>
+                              
+                              <div className="bg-primary/10 rounded-lg p-3 mt-3">
+                                <p className="text-sm">
+                                  <strong>Idéale pour :</strong> Les débutants et vendeurs intermédiaires qui cherchent 
+                                  une solution fiable sans se ruiner.
+                                </p>
+                              </div>
+                            </CardContent>
+                          </Card>
+
+                          {/* Imprimante 2 */}
+                          <Card className="bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
+                            <CardHeader>
+                              <CardTitle className="text-base">🖨️ Rollo Label Printer - Le choix premium</CardTitle>
+                            </CardHeader>
+                            <CardContent className="space-y-3">
+                              <a 
+                                href="https://www.amazon.fr/Rollo-Thermique-%C3%89tiquettes-Commerciale-Compatible/dp/B082WZ3MPF" 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="text-primary hover:underline font-medium inline-block mb-2"
+                              >
+                                → Voir sur Amazon
+                              </a>
+                              
+                              <div className="grid md:grid-cols-2 gap-4">
+                                <div>
+                                  <h5 className="font-semibold mb-2 text-green-700 dark:text-green-400">✅ Avantages :</h5>
+                                  <ul className="list-disc pl-6 space-y-1 text-sm">
+                                    <li>Qualité professionnelle supérieure</li>
+                                    <li>Très silencieuse</li>
+                                    <li>Grande vitesse d'impression</li>
+                                    <li>Compatible multi-formats</li>
+                                    <li>Logiciel intégré performant</li>
+                                    <li>Durabilité exceptionnelle</li>
+                                  </ul>
+                                </div>
+                                <div>
+                                  <h5 className="font-semibold mb-2 text-red-700 dark:text-red-400">❌ Inconvénients :</h5>
+                                  <ul className="list-disc pl-6 space-y-1 text-sm">
+                                    <li>Prix élevé (environ 250-300€)</li>
+                                    <li>Surdimensionnée pour petits volumes</li>
+                                  </ul>
+                                </div>
+                              </div>
+                              
+                              <div className="bg-primary/10 rounded-lg p-3 mt-3">
+                                <p className="text-sm">
+                                  <strong>Idéale pour :</strong> Les vendeurs confirmés avec un gros volume d'expéditions 
+                                  qui recherchent la meilleure qualité et fiabilité.
+                                </p>
+                              </div>
+                            </CardContent>
+                          </Card>
+
+                          {/* Imprimante 3 */}
+                          <Card className="bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
+                            <CardHeader>
+                              <CardTitle className="text-base">🖨️ Phomemo M110 - La compacte</CardTitle>
+                            </CardHeader>
+                            <CardContent className="space-y-3">
+                              <a 
+                                href="https://www.amazon.fr/Phomemo-Imprimante-Thermique-Portable-Bluetooth/dp/B0BXCN4KHT" 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="text-primary hover:underline font-medium inline-block mb-2"
+                              >
+                                → Voir sur Amazon
+                              </a>
+                              
+                              <div className="grid md:grid-cols-2 gap-4">
+                                <div>
+                                  <h5 className="font-semibold mb-2 text-green-700 dark:text-green-400">✅ Avantages :</h5>
+                                  <ul className="list-disc pl-6 space-y-1 text-sm">
+                                    <li>Très compacte et portable</li>
+                                    <li>Connexion Bluetooth facile</li>
+                                    <li>Prix d'entrée de gamme (60-80€)</li>
+                                    <li>Parfaite pour débuter</li>
+                                    <li>Silencieuse</li>
+                                  </ul>
+                                </div>
+                                <div>
+                                  <h5 className="font-semibold mb-2 text-red-700 dark:text-red-400">❌ Inconvénients :</h5>
+                                  <ul className="list-disc pl-6 space-y-1 text-sm">
+                                    <li>Qualité d'impression moyenne</li>
+                                    <li>Vitesse d'impression plus lente</li>
+                                    <li>Ne convient pas aux gros volumes</li>
+                                    <li>Formats d'étiquettes limités</li>
+                                  </ul>
+                                </div>
+                              </div>
+                              
+                              <div className="bg-primary/10 rounded-lg p-3 mt-3">
+                                <p className="text-sm">
+                                  <strong>Idéale pour :</strong> Les débutants qui veulent tester le business Amazon FBM 
+                                  avec un petit budget et peu de volume.
+                                </p>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        </div>
+
+                        <div className="bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 rounded-lg p-4 mt-6">
+                          <h5 className="font-semibold mb-2">💡 Notre recommandation :</h5>
+                          <p className="text-sm mb-2">
+                            Pour 90% des vendeurs, la <strong>MUNBYN ITC 4x6</strong> est le meilleur choix. 
+                            Elle offre un excellent équilibre entre prix, qualité et fonctionnalités.
+                          </p>
+                          <p className="text-sm">
+                            Si tu fais plus de 50 expéditions par semaine, investis dans la <strong>Rollo</strong> 
+                            pour sa fiabilité et sa rapidité.
+                          </p>
+                        </div>
+
+                        <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4 mt-4">
+                          <p className="text-sm">
+                            ⚠️ <strong>Important :</strong> Pense aussi à acheter des rouleaux d'étiquettes compatibles ! 
+                            Le format standard est 4x6 pouces (10x15 cm) pour la plupart des expéditions Amazon.
+                          </p>
+                        </div>
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+
+                </Accordion>
               </TabsContent>
             </Tabs>
           </div>
