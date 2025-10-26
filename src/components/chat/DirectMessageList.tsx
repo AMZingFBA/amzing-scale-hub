@@ -5,8 +5,18 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Input } from '@/components/ui/input';
-import { Users, EyeOff, Eye, MessageCircle } from 'lucide-react';
+import { Users, Trash2, MessageCircle } from 'lucide-react';
 import { toast } from 'sonner';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 interface DirectConversation {
   id: string;
@@ -18,7 +28,6 @@ interface DirectConversation {
     email: string;
     nickname?: string;
   };
-  is_hidden: boolean;
 }
 
 interface Profile {
@@ -39,15 +48,16 @@ export const DirectMessageList = ({ selectedConversation, onSelectConversation }
   const [allUsers, setAllUsers] = useState<Profile[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
-  const [showHidden, setShowHidden] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [conversationToDelete, setConversationToDelete] = useState<string | null>(null);
 
   useEffect(() => {
     if (user) {
       fetchConversations();
       fetchAllUsers();
     }
-  }, [user, showHidden]);
+  }, [user]);
 
   const fetchConversations = async () => {
     if (!user) return;
@@ -61,18 +71,6 @@ export const DirectMessageList = ({ selectedConversation, onSelectConversation }
         .order('updated_at', { ascending: false });
 
       if (convosError) throw convosError;
-
-      // Fetch visibility settings
-      const { data: visibility, error: visError } = await supabase
-        .from('direct_conversation_visibility')
-        .select('conversation_id, is_hidden')
-        .eq('user_id', user.id);
-
-      if (visError) throw visError;
-
-      const visibilityMap = new Map(
-        visibility?.map(v => [v.conversation_id, v.is_hidden]) || []
-      );
 
       // Get other users' profiles
       const userIds = convos?.map(c => 
@@ -100,10 +98,9 @@ export const DirectMessageList = ({ selectedConversation, onSelectConversation }
             id: otherUserId,
             email: otherUser?.email || 'Utilisateur',
             nickname: otherUser?.nickname || otherUser?.full_name
-          },
-          is_hidden: visibilityMap.get(c.id) || false
+          }
         };
-      }).filter(c => showHidden || !c.is_hidden) || [];
+      }) || [];
 
       setConversations(formattedConvos);
     } catch (error: any) {
@@ -185,6 +182,33 @@ export const DirectMessageList = ({ selectedConversation, onSelectConversation }
     }
   };
 
+  const deleteConversation = async () => {
+    if (!conversationToDelete) return;
+
+    try {
+      const { error } = await supabase
+        .from('direct_conversations')
+        .delete()
+        .eq('id', conversationToDelete);
+
+      if (error) throw error;
+
+      toast.success('Conversation supprimée');
+      setDeleteDialogOpen(false);
+      setConversationToDelete(null);
+      
+      // If deleting current conversation, deselect it
+      if (selectedConversation === conversationToDelete) {
+        onSelectConversation('');
+      }
+      
+      fetchConversations();
+    } catch (error: any) {
+      console.error('Error deleting conversation:', error);
+      toast.error('Erreur lors de la suppression');
+    }
+  };
+
   const filteredUsers = allUsers.filter(u => {
     const displayName = u.nickname || u.full_name || u.email;
     return displayName.toLowerCase().includes(searchQuery.toLowerCase());
@@ -193,20 +217,10 @@ export const DirectMessageList = ({ selectedConversation, onSelectConversation }
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <h3 className="font-semibold flex items-center gap-2">
-            <MessageCircle className="h-4 w-4" />
-            Messages Directs
-          </h3>
-          <Button
-            size="sm"
-            variant="ghost"
-            onClick={() => setShowHidden(!showHidden)}
-            title={showHidden ? 'Masquer les conversations cachées' : 'Afficher tout'}
-          >
-            {showHidden ? <Eye className="h-3 w-3" /> : <EyeOff className="h-3 w-3" />}
-          </Button>
-        </div>
+        <h3 className="font-semibold flex items-center gap-2">
+          <MessageCircle className="h-4 w-4" />
+          Messages Directs
+        </h3>
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
             <Button size="sm" variant="outline">
@@ -290,10 +304,13 @@ export const DirectMessageList = ({ selectedConversation, onSelectConversation }
                     size="sm"
                     variant="ghost"
                     className="h-8 w-8 p-0"
-                    onClick={() => toggleHideConversation(convo.id, convo.is_hidden)}
-                    title={convo.is_hidden ? 'Afficher' : 'Masquer'}
+                    onClick={() => {
+                      setConversationToDelete(convo.id);
+                      setDeleteDialogOpen(true);
+                    }}
+                    title="Supprimer"
                   >
-                    <EyeOff className="h-3 w-3" />
+                    <Trash2 className="h-3 w-3" />
                   </Button>
                 </div>
               </div>
@@ -301,6 +318,23 @@ export const DirectMessageList = ({ selectedConversation, onSelectConversation }
           ))
         )}
       </div>
+
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Supprimer la conversation ?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Cette action est irréversible. Tous les messages de cette conversation seront définitivement supprimés.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogAction onClick={deleteConversation} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Supprimer
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
