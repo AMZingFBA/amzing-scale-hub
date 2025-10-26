@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Plus, Trash2, Link2, Image, Video, Mic, FileText } from 'lucide-react';
+import { Loader2, Plus, Trash2, Link2, Image, Video, Mic, FileText, AlertCircle } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
 const AdminAlerts = () => {
@@ -398,93 +398,156 @@ const AdminAlerts = () => {
           </Card>
 
           {/* List of existing alerts */}
-          <div className="space-y-4">
-            <h2 className="text-2xl font-bold">Alertes publiées ({alerts.length})</h2>
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-bold">Alertes publiées</h2>
+              <Badge variant="secondary" className="text-lg px-4 py-1">
+                {alerts.length} {alerts.length > 1 ? 'alertes' : 'alerte'}
+              </Badge>
+            </div>
             
             {alerts.length === 0 ? (
-              <Card>
-                <CardContent className="pt-6 text-center">
-                  <p className="text-muted-foreground">Aucune alerte publiée pour le moment</p>
+              <Card className="border-dashed">
+                <CardContent className="pt-12 pb-12 text-center">
+                  <AlertCircle className="w-16 h-16 mx-auto mb-4 text-muted-foreground opacity-50" />
+                  <p className="text-lg text-muted-foreground">Aucune alerte publiée</p>
+                  <p className="text-sm text-muted-foreground mt-2">
+                    Utilisez le formulaire ci-dessus pour créer votre première alerte
+                  </p>
                 </CardContent>
               </Card>
             ) : (
-              alerts.map((alert) => (
-                <Card key={alert.id}>
-                  <CardHeader>
-                      <div className="flex justify-between items-start">
-                        <div className="flex-1">
-                          <CardTitle>{alert.title}</CardTitle>
-                          <div className="flex gap-2 mt-2">
-                            <Badge variant="secondary">{alert.category}</Badge>
-                            {alert.subcategory && (
-                              <Badge variant="outline">{alert.subcategory}</Badge>
-                            )}
+              <div className="grid gap-4">
+                {alerts.map((alert) => (
+                  <Card key={alert.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+                    <div className="flex">
+                      {/* Sidebar colorée selon la catégorie */}
+                      <div 
+                        className="w-2 flex-shrink-0"
+                        style={{
+                          backgroundColor: 
+                            alert.category === 'introduction' ? '#3b82f6' :
+                            alert.category === 'outils' ? '#8b5cf6' :
+                            alert.category === 'expedition' ? '#f59e0b' :
+                            alert.category === 'informations' ? '#ef4444' :
+                            alert.category === 'produits' ? '#10b981' : '#6b7280'
+                        }}
+                      />
+                      
+                      <div className="flex-1">
+                        <CardHeader className="pb-3">
+                          <div className="flex items-start justify-between gap-4">
+                            <div className="flex-1 space-y-3">
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <Badge 
+                                  variant="secondary" 
+                                  className="text-xs font-medium"
+                                  style={{
+                                    backgroundColor: 
+                                      alert.category === 'introduction' ? '#dbeafe' :
+                                      alert.category === 'outils' ? '#ede9fe' :
+                                      alert.category === 'expedition' ? '#fef3c7' :
+                                      alert.category === 'informations' ? '#fee2e2' :
+                                      alert.category === 'produits' ? '#d1fae5' : '#f3f4f6',
+                                    color: 
+                                      alert.category === 'introduction' ? '#1e40af' :
+                                      alert.category === 'outils' ? '#6d28d9' :
+                                      alert.category === 'expedition' ? '#b45309' :
+                                      alert.category === 'informations' ? '#b91c1c' :
+                                      alert.category === 'produits' ? '#047857' : '#374151'
+                                  }}
+                                >
+                                  {alert.category.toUpperCase()}
+                                </Badge>
+                                {alert.subcategory && (
+                                  <Badge variant="outline" className="text-xs">
+                                    {alert.subcategory}
+                                  </Badge>
+                                )}
+                                <span className="text-xs text-muted-foreground">
+                                  • {new Date(alert.created_at).toLocaleDateString('fr-FR', {
+                                    day: 'numeric',
+                                    month: 'short',
+                                    hour: '2-digit',
+                                    minute: '2-digit'
+                                  })}
+                                </span>
+                              </div>
+                              
+                              <CardTitle className="text-xl">{alert.title}</CardTitle>
+                            </div>
+                            
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => deleteAlert(alert.id)}
+                              className="hover:bg-destructive/10 hover:text-destructive flex-shrink-0"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
                           </div>
-                          <CardDescription className="mt-2">
-                            {new Date(alert.created_at).toLocaleDateString('fr-FR', {
-                              day: 'numeric',
-                              month: 'long',
-                              year: 'numeric',
-                              hour: '2-digit',
-                              minute: '2-digit'
-                            })}
-                          </CardDescription>
-                        </div>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => deleteAlert(alert.id)}
-                        className="hover:bg-destructive/10 hover:text-destructive"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    {alert.content && (
-                      <p className="whitespace-pre-wrap">{alert.content}</p>
-                    )}
-                    
-                    {alert.link_url && (
-                      <a
-                        href={alert.link_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-2 text-primary hover:underline"
-                      >
-                        <Link2 className="w-4 h-4" />
-                        {alert.link_url}
-                      </a>
-                    )}
+                        </CardHeader>
+                        
+                        <CardContent className="space-y-4">
+                          {alert.content && (
+                            <div className="bg-muted/50 rounded-lg p-4">
+                              <p className="text-sm whitespace-pre-wrap leading-relaxed">
+                                {alert.content}
+                              </p>
+                            </div>
+                          )}
+                          
+                          {alert.link_url && (
+                            <div className="flex items-center gap-2 p-3 bg-primary/5 rounded-lg border border-primary/20">
+                              <Link2 className="w-4 h-4 text-primary flex-shrink-0" />
+                              <a
+                                href={alert.link_url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-sm text-primary hover:underline font-medium truncate"
+                              >
+                                {alert.link_url}
+                              </a>
+                            </div>
+                          )}
 
-                    {alert.file_url && (
-                      <div className="mt-4">
-                        {alert.file_type === 'image' && (
-                          <img
-                            src={alert.file_url}
-                            alt={alert.file_name}
-                            className="max-w-md rounded-lg"
-                          />
-                        )}
-                        {alert.file_type === 'video' && (
-                          <video
-                            src={alert.file_url}
-                            controls
-                            className="max-w-md rounded-lg"
-                          />
-                        )}
-                        {alert.file_type === 'audio' && (
-                          <audio src={alert.file_url} controls className="w-full max-w-md" />
-                        )}
-                        <Badge variant="outline" className="mt-2">
-                          {getFileIcon(alert.file_type)}
-                          <span className="ml-1">{alert.file_name}</span>
-                        </Badge>
+                          {alert.file_url && (
+                            <div className="space-y-3">
+                              {alert.file_type === 'image' && (
+                                <div className="relative rounded-lg overflow-hidden border">
+                                  <img
+                                    src={alert.file_url}
+                                    alt={alert.file_name}
+                                    className="w-full max-h-96 object-contain bg-muted"
+                                  />
+                                </div>
+                              )}
+                              {alert.file_type === 'video' && (
+                                <div className="relative rounded-lg overflow-hidden border">
+                                  <video
+                                    src={alert.file_url}
+                                    controls
+                                    className="w-full max-h-96 bg-black"
+                                  />
+                                </div>
+                              )}
+                              {alert.file_type === 'audio' && (
+                                <div className="bg-muted/50 p-4 rounded-lg border">
+                                  <audio src={alert.file_url} controls className="w-full" />
+                                </div>
+                              )}
+                              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                {getFileIcon(alert.file_type)}
+                                <span className="truncate">{alert.file_name}</span>
+                              </div>
+                            </div>
+                          )}
+                        </CardContent>
                       </div>
-                    )}
-                  </CardContent>
-                </Card>
-              ))
+                    </div>
+                  </Card>
+                ))}
+              </div>
             )}
           </div>
         </div>
