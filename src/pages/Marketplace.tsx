@@ -547,15 +547,32 @@ const Marketplace = () => {
     }
 
     try {
-      const code = buyRequest.asin || buyRequest.ean || "N/A";
-      const subject = `Vente - ${buyRequest.title} - ${code}`;
+      // Récupérer les profils des utilisateurs pour les pseudos
+      const { data: sellerProfile } = await supabase
+        .from("profiles")
+        .select("nickname, email")
+        .eq("id", user.id)
+        .single();
+
+      const { data: buyerProfile } = await supabase
+        .from("profiles")
+        .select("nickname, email")
+        .eq("id", buyRequest.user_id)
+        .single();
+
+      const sellerNickname = sellerProfile?.nickname || sellerProfile?.email?.split("@")[0] || "Vendeur";
+      const buyerNickname = buyerProfile?.nickname || buyerProfile?.email?.split("@")[0] || "Acheteur";
       
-      // Créer un ticket pour le vendeur + staff
+      const code = buyRequest.asin || buyRequest.ean || "N/A";
+      const codeType = buyRequest.asin ? "ASIN" : buyRequest.ean ? "EAN" : "Code";
+      
+      // Créer un ticket pour le vendeur (celui qui a cliqué "J'ai ce produit") + staff
+      const sellerSubject = `vente - ${buyRequest.title} - ${code} et ${sellerNickname}`;
       const { data: sellerTicket, error: sellerError } = await supabase
         .from("tickets")
         .insert({
           user_id: user.id,
-          subject: subject,
+          subject: sellerSubject,
           category: "marketplace",
           status: "open",
           priority: "normal"
@@ -566,7 +583,13 @@ const Marketplace = () => {
       if (sellerError) throw sellerError;
 
       // Message initial pour le vendeur
-      const sellerMessage = `Je peux fournir ce produit demandé:\n\nTitre: ${buyRequest.title}\nCode: ${code}\nQuantité demandée: ${buyRequest.quantity}\nPrix max: ${buyRequest.max_price}€ ${buyRequest.price_type}\n\nMerci de me contacter.`;
+      const sellerMessage = `Bonjour 👋,
+Je possède cet article et je souhaite le vendre.
+Voici les détails de l'annonce :
+- Titre : ${buyRequest.title}
+- Budget max : ${buyRequest.max_price ? `${buyRequest.max_price}€ ${buyRequest.price_type}` : "Non spécifié"}
+- Quantité : ${buyRequest.quantity}
+- Code annonce : ${code}`;
       
       await supabase.from("messages").insert({
         ticket_id: sellerTicket.id,
@@ -574,8 +597,8 @@ const Marketplace = () => {
         content: sellerMessage
       });
 
-      // Créer un ticket pour l'acheteur + staff
-      const buyerSubject = `Achat - ${buyRequest.title} - ${code}`;
+      // Créer un ticket miroir pour l'acheteur + staff
+      const buyerSubject = `achat - ${buyRequest.title} - ${code} et ${sellerNickname}`;
       const { data: buyerTicket, error: buyerError } = await supabase
         .from("tickets")
         .insert({
@@ -591,19 +614,22 @@ const Marketplace = () => {
       if (buyerError) throw buyerError;
 
       // Message initial pour l'acheteur
-      const buyerMessage = `Un vendeur peut fournir le produit que vous recherchez:\n\nTitre: ${buyRequest.title}\nCode: ${code}\nQuantité: ${buyRequest.quantity}\nPrix max: ${buyRequest.max_price}€ ${buyRequest.price_type}\n\nLe staff va vous mettre en contact.`;
+      const buyerMessage = `Bonjour 👋
+je possède l'article que vous recherchez :
+${buyRequest.title}
+Êtes-vous toujours intéressé ?`;
       
       await supabase.from("messages").insert({
         ticket_id: buyerTicket.id,
-        user_id: user.id, // Message du système
+        user_id: user.id,
         content: buyerMessage
       });
 
-      toast.success("Proposition de vente envoyée! Le staff va vous contacter.");
+      toast.success("Proposition de vente envoyée! Un ticket a été créé.");
       
       // Recharger les tickets et rediriger
       await loadMyTickets();
-      navigate("/vendre");
+      navigate("/acheter?tab=mine");
     } catch (error: any) {
       console.error("Error creating tickets:", error);
       toast.error("Erreur lors de la création de la proposition");
@@ -1153,7 +1179,7 @@ const Marketplace = () => {
             </Dialog>
 
             {/* Tabs for all buy requests and my buy requests */}
-            <Tabs defaultValue="all" className="w-full">
+            <Tabs defaultValue={new URLSearchParams(location.search).get('tab') || "all"} className="w-full">
               <TabsList className="grid w-full max-w-md grid-cols-2 p-1 bg-muted/50 rounded-lg">
                 <TabsTrigger value="all" className="data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all">
                   Toutes les recherches
@@ -1184,6 +1210,61 @@ const Marketplace = () => {
               </TabsContent>
 
               <TabsContent value="mine" className="mt-6 animate-fade-in">
+                <div className="mb-4 flex justify-end">
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button variant="outline" size="sm">
+                        <MessageCircle className="w-4 h-4 mr-2" />
+                        Mes demandes
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+                      <DialogHeader>
+                        <DialogTitle>Mes demandes marketplace</DialogTitle>
+                        <DialogDescription>
+                          Liste de tous vos tickets liés à vos recherches et ventes
+                        </DialogDescription>
+                      </DialogHeader>
+                      <div className="space-y-3 mt-4">
+                        {myTickets.length === 0 ? (
+                          <div className="text-center text-muted-foreground py-8">
+                            <MessageCircle className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                            <p>Aucune demande pour le moment</p>
+                          </div>
+                        ) : (
+                          myTickets.map((ticket) => (
+                            <Card
+                              key={ticket.id}
+                              className="hover:shadow-lg transition-shadow cursor-pointer"
+                              onClick={() => {
+                                navigate(`/ticket/${ticket.id}`);
+                              }}
+                            >
+                              <CardHeader className="pb-3">
+                                <div className="flex justify-between items-start gap-2">
+                                  <CardTitle className="text-sm font-semibold line-clamp-2">
+                                    {ticket.subject}
+                                  </CardTitle>
+                                  <Badge variant={ticket.status === "open" ? "default" : ticket.status === "in_progress" ? "secondary" : "outline"}>
+                                    {ticket.status}
+                                  </Badge>
+                                </div>
+                                <CardDescription className="text-xs">
+                                  {new Date(ticket.created_at).toLocaleDateString('fr-FR', {
+                                    day: 'numeric',
+                                    month: 'long',
+                                    year: 'numeric'
+                                  })}
+                                </CardDescription>
+                              </CardHeader>
+                            </Card>
+                          ))
+                        )}
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                </div>
+
                 {myBuyRequests.filter(r => r.status === "active").length === 0 ? (
                   <Card className="p-16 border-2 border-dashed border-muted-foreground/20 bg-muted/5">
                     <div className="text-center text-muted-foreground space-y-4">
