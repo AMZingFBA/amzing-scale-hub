@@ -1002,16 +1002,6 @@ const Marketplace = () => {
                     </div>
 
                     <div>
-                      <Label>Description / Précisions</Label>
-                      <Textarea
-                        value={description}
-                        onChange={(e) => setDescription(e.target.value)}
-                        placeholder="Précisez ce que vous recherchez (état, couleur, taille, etc.)..."
-                        rows={4}
-                      />
-                    </div>
-
-                    <div>
                       <Label>Photos du produit (optionnel)</Label>
                       <p className="text-xs text-muted-foreground mb-2">Ajoutez une ou plusieurs photos pour aider les vendeurs à identifier le produit</p>
                       <div className="mt-2">
@@ -1055,7 +1045,7 @@ const Marketplace = () => {
 
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <Label>Quantité souhaitée *</Label>
+                        <Label>Quantité *</Label>
                         <Input
                           type="number"
                           min="1"
@@ -1064,7 +1054,7 @@ const Marketplace = () => {
                         />
                       </div>
                       <div>
-                        <Label>Prix max par unité (€)</Label>
+                        <Label>Prix</Label>
                         <div className="flex gap-2">
                           <Input
                             type="number"
