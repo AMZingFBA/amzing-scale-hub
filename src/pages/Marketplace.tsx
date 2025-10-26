@@ -639,34 +639,8 @@ const Marketplace = () => {
     
     return (
       <Card key={listing.id} className="hover:shadow-xl transition-all animate-fade-in overflow-hidden">
-        <CardHeader className="space-y-3">
-          <div className="flex justify-between items-start gap-4">
-            <CardTitle className="text-xl font-bold text-primary">
-              {listing.title}
-            </CardTitle>
-            <Badge variant="secondary" className="shrink-0 text-base font-bold px-3 py-1">
-              {listing.price}€ {listing.price_type}
-            </Badge>
-          </div>
-          
-          <div className="space-y-2">
-            <div 
-              className="flex items-center gap-2 group/code cursor-pointer bg-muted/30 hover:bg-muted/50 p-2 rounded-md transition-colors"
-              onClick={() => copyToClipboard(code)}
-            >
-              <span className="text-xs text-muted-foreground">Code:</span>
-              <code className="font-mono font-semibold flex-1">{code}</code>
-              <Copy className="w-4 h-4 text-muted-foreground group-hover/code:text-primary transition-colors" />
-            </div>
-            
-            <div className="text-sm text-muted-foreground">
-              <span className="font-semibold">{listing.quantity}</span> unité(s) disponible(s)
-            </div>
-          </div>
-        </CardHeader>
-        
         {hasImages && (
-          <CardContent className="relative p-0">
+          <div className="relative p-0">
             <div 
               className="relative cursor-pointer group/image"
               onClick={() => openImageGallery(listing.images, 0)}
@@ -674,7 +648,7 @@ const Marketplace = () => {
               <img
                 src={listing.images[0]}
                 alt={listing.title}
-                className="w-full h-64 object-cover"
+                className="w-full h-56 object-cover"
               />
               <div className="absolute inset-0 bg-black/0 group-hover/image:bg-black/30 transition-all flex items-center justify-center">
                 <div className="opacity-0 group-hover/image:opacity-100 transition-opacity">
@@ -684,41 +658,71 @@ const Marketplace = () => {
                 </div>
               </div>
               {listing.images.length > 1 && (
-                <div className="absolute bottom-2 right-2 bg-black/70 text-white px-2 py-1 rounded-md text-xs font-semibold">
+                <div className="absolute bottom-3 right-3 bg-black/70 text-white px-3 py-1.5 rounded-md text-sm font-semibold">
                   +{listing.images.length - 1} photo{listing.images.length > 2 ? 's' : ''}
                 </div>
               )}
             </div>
-          </CardContent>
+          </div>
         )}
         
-        <CardFooter className="flex gap-2 p-4">
+        <CardHeader className="space-y-4 pb-3">
+          <div className="flex justify-between items-start gap-3">
+            <CardTitle className="text-lg font-bold line-clamp-2">
+              {listing.title}
+            </CardTitle>
+            <Badge className="shrink-0 text-lg font-bold px-4 py-1.5 whitespace-nowrap">
+              {listing.price}€ {listing.price_type}
+            </Badge>
+          </div>
+        </CardHeader>
+        
+        <CardContent className="space-y-3 pt-0 pb-4">
+          <div 
+            className="flex items-center justify-between gap-2 group/code cursor-pointer bg-muted/40 hover:bg-muted/60 px-3 py-2.5 rounded-lg transition-colors border border-muted"
+            onClick={() => copyToClipboard(code)}
+          >
+            <div className="flex items-center gap-2 flex-1 min-w-0">
+              <span className="text-xs font-medium text-muted-foreground shrink-0">Code:</span>
+              <code className="font-mono font-bold text-sm truncate">{code}</code>
+            </div>
+            <Copy className="w-4 h-4 text-muted-foreground group-hover/code:text-primary transition-colors shrink-0" />
+          </div>
+          
+          <div className="flex items-center justify-between bg-primary/5 border border-primary/20 px-3 py-2.5 rounded-lg">
+            <span className="text-sm font-medium text-muted-foreground">Quantité disponible</span>
+            <span className="text-lg font-bold text-primary">{listing.quantity} unité{listing.quantity > 1 ? 's' : ''}</span>
+          </div>
+        </CardContent>
+        
+        <CardFooter className="flex gap-2 p-4 pt-0">
           {isOwn ? (
             <Button
               variant="destructive"
-              size="sm"
+              size="lg"
               className="w-full"
               onClick={() => deleteListing(listing.id)}
             >
               <Trash2 className="w-4 h-4 mr-2" />
-              Supprimer
+              Supprimer mon annonce
             </Button>
           ) : (
             <>
               <Button
-                className="flex-1 hover-scale"
+                size="lg"
+                className="flex-1 hover-scale font-semibold"
                 onClick={() => handleInterestInListing(listing)}
               >
-                <ShoppingCart className="w-4 h-4 mr-2" />
-                Acheter
+                <ShoppingCart className="w-5 h-5 mr-2" />
+                Je veux acheter
               </Button>
               {isAdmin && (
                 <Button
                   variant="destructive"
-                  size="sm"
+                  size="lg"
                   onClick={() => deleteListing(listing.id)}
                 >
-                  <Trash2 className="w-4 h-4" />
+                  <Trash2 className="w-5 h-5" />
                 </Button>
               )}
             </>
@@ -733,67 +737,71 @@ const Marketplace = () => {
     
     return (
       <Card key={request.id} className="hover:shadow-xl transition-all animate-fade-in overflow-hidden">
-        <CardHeader className="space-y-3">
-          <div className="flex justify-between items-start gap-4">
-            <CardTitle className="text-xl font-bold text-primary">
+        <CardHeader className="space-y-4 pb-3">
+          <div className="flex justify-between items-start gap-3">
+            <CardTitle className="text-lg font-bold line-clamp-2">
               {request.title}
             </CardTitle>
             {request.max_price && (
-              <Badge variant="secondary" className="shrink-0 text-base font-bold px-3 py-1">
+              <Badge variant="secondary" className="shrink-0 text-lg font-bold px-4 py-1.5 whitespace-nowrap">
                 Max {request.max_price}€ {request.price_type}
               </Badge>
             )}
           </div>
-          
-          <div className="space-y-2">
-            <div 
-              className="flex items-center gap-2 group/code cursor-pointer bg-muted/30 hover:bg-muted/50 p-2 rounded-md transition-colors"
-              onClick={() => copyToClipboard(code)}
-            >
-              <span className="text-xs text-muted-foreground">Code:</span>
-              <code className="font-mono font-semibold flex-1">{code}</code>
-              <Copy className="w-4 h-4 text-muted-foreground group-hover/code:text-primary transition-colors" />
-            </div>
-            
-            <div className="text-sm text-muted-foreground">
-              <span className="font-semibold">{request.quantity}</span> unité(s) recherchée(s)
-            </div>
-          </div>
         </CardHeader>
         
-        {request.description && (
-          <CardContent>
-            <p className="text-sm text-muted-foreground line-clamp-3">{request.description}</p>
-          </CardContent>
-        )}
+        <CardContent className="space-y-3 pt-0 pb-4">
+          <div 
+            className="flex items-center justify-between gap-2 group/code cursor-pointer bg-muted/40 hover:bg-muted/60 px-3 py-2.5 rounded-lg transition-colors border border-muted"
+            onClick={() => copyToClipboard(code)}
+          >
+            <div className="flex items-center gap-2 flex-1 min-w-0">
+              <span className="text-xs font-medium text-muted-foreground shrink-0">Code:</span>
+              <code className="font-mono font-bold text-sm truncate">{code}</code>
+            </div>
+            <Copy className="w-4 h-4 text-muted-foreground group-hover/code:text-primary transition-colors shrink-0" />
+          </div>
+          
+          <div className="flex items-center justify-between bg-primary/5 border border-primary/20 px-3 py-2.5 rounded-lg">
+            <span className="text-sm font-medium text-muted-foreground">Quantité recherchée</span>
+            <span className="text-lg font-bold text-primary">{request.quantity} unité{request.quantity > 1 ? 's' : ''}</span>
+          </div>
+          
+          {request.description && (
+            <div className="bg-muted/30 px-3 py-2.5 rounded-lg">
+              <p className="text-sm text-muted-foreground line-clamp-3">{request.description}</p>
+            </div>
+          )}
+        </CardContent>
         
-        <CardFooter className="flex gap-2 p-4">
+        <CardFooter className="flex gap-2 p-4 pt-0">
           {isOwn ? (
             <Button
               variant="destructive"
-              size="sm"
+              size="lg"
               className="w-full"
               onClick={() => deleteBuyRequest(request.id)}
             >
               <Trash2 className="w-4 h-4 mr-2" />
-              Supprimer
+              Supprimer ma demande
             </Button>
           ) : (
             <>
               <Button
-                className="flex-1 hover-scale"
+                size="lg"
+                className="flex-1 hover-scale font-semibold"
                 onClick={() => handleInterestInBuyRequest(request)}
               >
-                <ShoppingBag className="w-4 h-4 mr-2" />
-                Vendre
+                <ShoppingBag className="w-5 h-5 mr-2" />
+                Je peux vendre
               </Button>
               {isAdmin && (
                 <Button
                   variant="destructive"
-                  size="sm"
+                  size="lg"
                   onClick={() => deleteBuyRequest(request.id)}
                 >
-                  <Trash2 className="w-4 h-4" />
+                  <Trash2 className="w-5 h-5" />
                 </Button>
               )}
             </>
