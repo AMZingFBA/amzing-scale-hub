@@ -399,46 +399,39 @@ const Marketplace = () => {
 
     try {
       const code = listing.asin || listing.ean || "N/A";
+      const subject = `Achat - ${listing.title} - ${code}`;
       
-      // Get admin user for the conversation using security definer function
-      const { data: adminUserId, error: adminError } = await supabase
-        .rpc('get_admin_user_id');
-
-      if (adminError || !adminUserId) {
-        throw new Error("Admin non trouvé");
-      }
-
-      const isCurrentUserAdmin = adminUserId === user.id;
-
-      // Create buyer + staff conversation ONLY
-      const roomName = `Achat - ${listing.title} - ${code}`;
-      const { data: room, error: roomError } = await supabase
-        .from("chat_rooms")
+      // Create a ticket for the purchase request
+      const { data: ticket, error: ticketError } = await supabase
+        .from("tickets")
         .insert({
-          name: roomName,
-          type: "marketplace",
-          created_by: user.id
+          user_id: user.id,
+          subject: subject,
+          category: "marketplace",
+          status: "open",
+          priority: "normal"
         })
         .select()
         .single();
 
-      if (roomError) throw roomError;
+      if (ticketError) throw ticketError;
 
-      // Add buyer and admin to room (avoid duplicates if user is admin)
-      const roomMembers = [{ room_id: room.id, user_id: user.id }];
-      if (!isCurrentUserAdmin) {
-        roomMembers.push({ room_id: room.id, user_id: adminUserId });
-      }
-      await supabase.from("chat_room_members").insert(roomMembers);
+      // Add initial message with listing details
+      const initialMessage = `Je suis intéressé(e) par cette annonce:\n\nTitre: ${listing.title}\nCode: ${code}\nPrix: ${listing.price}€ ${listing.price_type}\nQuantité: ${listing.quantity}\n\nMerci de me contacter.`;
+      
+      await supabase.from("messages").insert({
+        ticket_id: ticket.id,
+        user_id: user.id,
+        content: initialMessage
+      });
 
-      // Reload conversations and switch to messages tab
-      await loadMyConversations();
-      setActiveTab("messages");
-      setSelectedConversation(room.id);
-      toast.success("Conversation créée!");
+      toast.success("Demande d'achat envoyée au staff!");
+      
+      // Redirect to support page to see the ticket
+      window.location.href = "/support";
     } catch (error: any) {
-      console.error("Error creating marketplace room:", error);
-      toast.error("Erreur lors de la création de la conversation");
+      console.error("Error creating ticket:", error);
+      toast.error("Erreur lors de la création de la demande");
     }
   };
 
@@ -453,64 +446,39 @@ const Marketplace = () => {
 
     try {
       const code = buyRequest.asin || buyRequest.ean || "N/A";
+      const subject = `Vente - ${buyRequest.title} - ${code}`;
       
-      // Get admin user for the conversation using security definer function
-      const { data: adminUserId, error: adminError } = await supabase
-        .rpc('get_admin_user_id');
-
-      if (adminError || !adminUserId) {
-        throw new Error("Admin non trouvé");
-      }
-
-      const isCurrentUserAdmin = adminUserId === user.id;
-
-      // 1. Create seller + staff conversation
-      const sellerRoomName = `Vente - ${buyRequest.title} - ${code}`;
-      const { data: sellerRoom, error: sellerRoomError } = await supabase
-        .from("chat_rooms")
+      // Create a ticket for the sale response
+      const { data: ticket, error: ticketError } = await supabase
+        .from("tickets")
         .insert({
-          name: sellerRoomName,
-          type: "marketplace",
-          created_by: user.id
+          user_id: user.id,
+          subject: subject,
+          category: "marketplace",
+          status: "open",
+          priority: "normal"
         })
         .select()
         .single();
 
-      if (sellerRoomError) throw sellerRoomError;
+      if (ticketError) throw ticketError;
 
-      // Add seller and admin to seller room (avoid duplicates if user is admin)
-      const sellerRoomMembers = [{ room_id: sellerRoom.id, user_id: user.id }];
-      if (!isCurrentUserAdmin) {
-        sellerRoomMembers.push({ room_id: sellerRoom.id, user_id: adminUserId });
-      }
-      await supabase.from("chat_room_members").insert(sellerRoomMembers);
+      // Add initial message with buy request details
+      const initialMessage = `Je peux fournir ce produit demandé:\n\nTitre: ${buyRequest.title}\nCode: ${code}\nQuantité demandée: ${buyRequest.quantity}\nPrix max: ${buyRequest.max_price}€ ${buyRequest.price_type}\n\nMerci de me contacter.`;
+      
+      await supabase.from("messages").insert({
+        ticket_id: ticket.id,
+        user_id: user.id,
+        content: initialMessage
+      });
 
-      // 2. Create buyer + staff conversation
-      const buyerRoomName = `Achat - ${buyRequest.title} - ${code}`;
-      const { data: buyerRoom, error: buyerRoomError } = await supabase
-        .from("chat_rooms")
-        .insert({
-          name: buyerRoomName,
-          type: "marketplace",
-          created_by: user.id
-        })
-        .select()
-        .single();
-
-      if (buyerRoomError) throw buyerRoomError;
-
-      // Add buyer and admin to buyer room (avoid duplicates)
-      const buyerRoomMembers = [{ room_id: buyerRoom.id, user_id: buyRequest.user_id }];
-      if (buyRequest.user_id !== adminUserId) {
-        buyerRoomMembers.push({ room_id: buyerRoom.id, user_id: adminUserId });
-      }
-      await supabase.from("chat_room_members").insert(buyerRoomMembers);
-
-      toast.success("Conversations créées! Rendez-vous dans le chat.");
-      navigate("/chat");
+      toast.success("Proposition de vente envoyée au staff!");
+      
+      // Redirect to support page to see the ticket
+      window.location.href = "/support";
     } catch (error: any) {
-      console.error("Error creating proposal:", error);
-      toast.error("Erreur lors de l'envoi de la proposition");
+      console.error("Error creating ticket:", error);
+      toast.error("Erreur lors de la création de la proposition");
     }
   };
 
