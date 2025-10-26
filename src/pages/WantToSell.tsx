@@ -61,6 +61,9 @@ const WantToSell = () => {
   const [showImageDialog, setShowImageDialog] = useState(false);
   const [selectedImageGallery, setSelectedImageGallery] = useState<string[] | null>(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  
+  // Success banner state
+  const [showSuccessBanner, setShowSuccessBanner] = useState(false);
 
   useEffect(() => {
     if (!user) {
@@ -318,9 +321,15 @@ const WantToSell = () => {
 
       if (error) throw error;
 
-      toast.success("Demande d'achat envoyée! Les tickets ont été créés.");
+      // Show success banner
+      setShowSuccessBanner(true);
+      
+      // Hide banner after 5 seconds
+      setTimeout(() => setShowSuccessBanner(false), 5000);
       
       await loadMyTickets();
+      
+      // Redirect to tickets tab
       navigate("/vendre?tab=tickets");
     } catch (error: any) {
       console.error("Error creating tickets:", error);
@@ -570,6 +579,29 @@ const WantToSell = () => {
               Publiez vos produits à vendre ou parcourez les annonces des autres membres.
             </p>
           </div>
+
+          {/* Success Banner */}
+          {showSuccessBanner && (
+            <div className="bg-green-50 dark:bg-green-900/20 border-2 border-green-500 rounded-lg p-4 flex items-center gap-3 animate-fade-in shadow-lg">
+              <div className="bg-green-500 rounded-full p-2 shrink-0">
+                <MessageCircle className="w-5 h-5 text-white" />
+              </div>
+              <div className="flex-1">
+                <p className="font-semibold text-green-900 dark:text-green-100">
+                  ✅ Votre intérêt a été envoyé avec succès !
+                </p>
+                <p className="text-sm text-green-700 dark:text-green-300 mt-1">
+                  Un ticket a été créé. Le vendeur sera notifié et vous pourrez échanger via l'onglet "Mes demandes".
+                </p>
+              </div>
+              <button
+                onClick={() => setShowSuccessBanner(false)}
+                className="text-green-700 dark:text-green-300 hover:text-green-900 dark:hover:text-green-100 transition-colors shrink-0"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+          )}
 
           {/* Create Listing Button */}
           <Dialog open={showCreateDialog} onOpenChange={(open) => {
