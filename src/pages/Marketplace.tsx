@@ -1275,10 +1275,10 @@ const Marketplace = () => {
         {activeSection === "sell" && (
           <div className="w-full space-y-6 animate-fade-in">
             <div className="mb-8">
-              <h1 className="text-4xl font-bold text-primary">
+              <h1 className="text-4xl font-bold text-primary mb-4">
                 Want to Sell - Je vends
               </h1>
-              <p className="text-muted-foreground mt-2">
+              <p className="text-muted-foreground">
                 Publiez vos produits à vendre ou parcourez les annonces des autres membres.
               </p>
             </div>
@@ -1286,7 +1286,7 @@ const Marketplace = () => {
             {/* Create Listing Button */}
             <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
               <DialogTrigger asChild>
-                <Button size="lg" className="w-full md:w-auto hover-scale">
+                <Button size="lg" className="hover-scale mb-6">
                   <Package className="w-5 h-5 mr-2" />
                   Publier une annonce
                 </Button>
