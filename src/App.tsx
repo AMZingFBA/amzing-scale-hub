@@ -30,7 +30,6 @@ import Suggestions from "./pages/Suggestions";
 import Marketplace from "./pages/Marketplace";
 import WantToSell from "./pages/WantToSell";
 import ProductAlerts from "./pages/ProductAlerts";
-import CategoryTicket from "./pages/CategoryTicket";
 
 const queryClient = new QueryClient();
 
@@ -68,7 +67,6 @@ const App = () => (
             <Route path="/acheter" element={<Marketplace />} />
             <Route path="/vendre" element={<WantToSell />} />
             <Route path="/marketplace" element={<Marketplace />} />
-            <Route path="/category/:category/:subcategory" element={<CategoryTicket />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

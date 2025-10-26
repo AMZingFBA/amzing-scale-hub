@@ -246,8 +246,8 @@ const Dashboard = () => {
                 <AccordionContent>
                   <CategoryAlerts category="expedition" />
                   <div className="grid gap-3 pt-2">
-                    <CategoryItem icon={Settings} label="fournitures" link="/category/expedition/fournitures" badge={unreadCounts.expedition?.subcategories?.fournitures} />
-                    <CategoryItem icon={Package} label="cartons" link="/category/expedition/cartons" badge={unreadCounts.expedition?.subcategories?.cartons} />
+                    <CategoryItem icon={Settings} label="fournitures" badge={unreadCounts.expedition?.subcategories?.fournitures} />
+                    <CategoryItem icon={Package} label="cartons" badge={unreadCounts.expedition?.subcategories?.cartons} />
                   </div>
                 </AccordionContent>
               </AccordionItem>
