@@ -62,19 +62,38 @@ const AdminTickets = () => {
 
   const loadTickets = async () => {
     try {
-      const { data, error } = await supabase
+      // First get all tickets
+      const { data: ticketsData, error: ticketsError } = await supabase
         .from('tickets')
-        .select(`
-          *,
-          profiles:user_id (
-            full_name,
-            email
-          )
-        `)
+        .select('*')
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
-      setTickets(data || []);
+      if (ticketsError) throw ticketsError;
+
+      // Then get all profiles for these tickets
+      const userIds = [...new Set(ticketsData?.map(t => t.user_id) || [])];
+      
+      let profilesData: any[] = [];
+      if (userIds.length > 0) {
+        const { data, error: profilesError } = await supabase
+          .from('profiles')
+          .select('id, full_name, email')
+          .in('id', userIds);
+        
+        if (profilesError) {
+          console.error('Error loading profiles:', profilesError);
+        } else {
+          profilesData = data || [];
+        }
+      }
+
+      // Merge tickets with profiles
+      const ticketsWithProfiles = ticketsData?.map(ticket => ({
+        ...ticket,
+        profiles: profilesData.find(p => p.id === ticket.user_id) || null
+      })) || [];
+
+      setTickets(ticketsWithProfiles);
     } catch (error) {
       console.error('Error loading tickets:', error);
       toast({
