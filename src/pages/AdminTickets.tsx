@@ -292,6 +292,15 @@ const AdminTickets = () => {
 
   const statusStats = getStatusStats();
   const categoryStats = getCategoryStats();
+  const catalogueProStats = getCatalogueProStats();
+
+  // Debug logs
+  console.log('Catalogue Pro Debug:', {
+    totalTickets: tickets.length,
+    catalogueProTickets: tickets.filter(t => t.category === 'gestion_produit' && t.subcategory === 'catalogue_pro'),
+    unreadCounts,
+    catalogueProStats
+  });
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -432,7 +441,7 @@ const AdminTickets = () => {
           </Card>
 
           {/* Notification Banner for Catalogue Pro */}
-          {getCatalogueProStats().unread > 0 && (
+          {catalogueProStats.unread > 0 && (
             <Card className="mb-6 bg-gradient-to-r from-amber-50 via-amber-50/50 to-transparent dark:from-amber-950/20 dark:via-amber-950/10 dark:to-transparent border-l-4 border-l-amber-500">
               <CardHeader className="pb-3">
                 <div className="flex items-start gap-3">
@@ -441,7 +450,7 @@ const AdminTickets = () => {
                   </div>
                   <div className="flex-1">
                     <CardTitle className="text-base mb-1 text-amber-900 dark:text-amber-100">
-                      {getCatalogueProStats().unread} nouveau{getCatalogueProStats().unread > 1 ? 'x' : ''} message{getCatalogueProStats().unread > 1 ? 's' : ''} - Catalogue Pro
+                      {catalogueProStats.unread} nouveau{catalogueProStats.unread > 1 ? 'x' : ''} message{catalogueProStats.unread > 1 ? 's' : ''} - Catalogue Pro
                     </CardTitle>
                     <CardDescription className="text-sm text-amber-700 dark:text-amber-300">
                       Catégorie: Gestion Produits • Sous-catégorie: Catalogue Pro
