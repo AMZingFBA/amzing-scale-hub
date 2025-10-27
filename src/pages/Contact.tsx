@@ -130,9 +130,9 @@ const Contact = () => {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-6xl mx-auto lg:items-start">
             {/* Contact Form */}
-            <Card className="border-2 border-primary/20 shadow-elegant backdrop-blur-sm animate-fade-in hover:shadow-glow transition-all duration-300" style={{ animationDelay: "0.2s" }}>
+            <Card className="border-2 border-primary/20 shadow-elegant backdrop-blur-sm animate-fade-in hover:shadow-glow transition-all duration-300 h-full" style={{ animationDelay: "0.2s" }}>
               <CardHeader>
                 <CardTitle className="text-2xl flex items-center gap-2">
                   <MessageSquare className="w-6 h-6 text-primary" />
@@ -158,13 +158,13 @@ const Contact = () => {
                         value={formData.name}
                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                         onBlur={() => handleBlur("name")}
-                        className={`transition-all duration-200 ${
+                        className={`transition-all duration-300 hover:border-primary/50 hover:shadow-sm ${
                           errors.name && touched.name 
                             ? "border-destructive focus:ring-destructive" 
                             : touched.name && formData.name 
                             ? "border-green-500 focus:ring-green-500" 
                             : ""
-                        } focus:scale-102`}
+                        } focus:scale-102 focus:border-primary`}
                       />
                     </div>
                     {errors.name && touched.name && (
@@ -180,7 +180,7 @@ const Contact = () => {
                       )}
                     </Label>
                     <div className="relative group">
-                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-hover:text-primary group-focus-within:text-primary transition-colors" />
                       <Input 
                         id="email" 
                         type="email" 
@@ -188,13 +188,13 @@ const Contact = () => {
                         value={formData.email}
                         onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                         onBlur={() => handleBlur("email")}
-                        className={`pl-10 transition-all duration-200 ${
+                        className={`pl-10 transition-all duration-300 hover:border-primary/50 hover:shadow-sm ${
                           errors.email && touched.email 
                             ? "border-destructive focus:ring-destructive" 
                             : touched.email && formData.email 
                             ? "border-green-500 focus:ring-green-500" 
                             : ""
-                        } focus:scale-102`}
+                        } focus:scale-102 focus:border-primary`}
                       />
                     </div>
                     {errors.email && touched.email && (
@@ -205,14 +205,14 @@ const Contact = () => {
                   <div className="space-y-2">
                     <Label htmlFor="phone">Téléphone (optionnel)</Label>
                     <div className="relative group">
-                      <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                      <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-hover:text-primary group-focus-within:text-primary transition-colors" />
                       <Input 
                         id="phone" 
                         type="tel" 
                         placeholder="+33 6 12 34 56 78" 
                         value={formData.phone}
                         onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                        className="pl-10 transition-all duration-200 focus:scale-102"
+                        className="pl-10 transition-all duration-300 hover:border-primary/50 hover:shadow-sm focus:scale-102 focus:border-primary"
                       />
                     </div>
                   </div>
@@ -230,13 +230,13 @@ const Contact = () => {
                       value={formData.subject}
                       onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
                       onBlur={() => handleBlur("subject")}
-                      className={`transition-all duration-200 ${
+                      className={`transition-all duration-300 hover:border-primary/50 hover:shadow-sm ${
                         errors.subject && touched.subject 
                           ? "border-destructive focus:ring-destructive" 
                           : touched.subject && formData.subject 
                           ? "border-green-500 focus:ring-green-500" 
                           : ""
-                      } focus:scale-102`}
+                      } focus:scale-102 focus:border-primary`}
                     />
                     {errors.subject && touched.subject && (
                       <p className="text-sm text-destructive animate-fade-in">{errors.subject}</p>
@@ -257,13 +257,13 @@ const Contact = () => {
                       value={formData.message}
                       onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                       onBlur={() => handleBlur("message")}
-                      className={`transition-all duration-200 resize-none ${
+                      className={`transition-all duration-300 resize-none hover:border-primary/50 hover:shadow-sm ${
                         errors.message && touched.message 
                           ? "border-destructive focus:ring-destructive" 
                           : touched.message && formData.message 
                           ? "border-green-500 focus:ring-green-500" 
                           : ""
-                      } focus:scale-102`}
+                      } focus:scale-102 focus:border-primary`}
                     />
                     {errors.message && touched.message && (
                       <p className="text-sm text-destructive animate-fade-in">{errors.message}</p>
@@ -293,8 +293,8 @@ const Contact = () => {
             </Card>
 
             {/* Contact Info */}
-            <div className="space-y-6 flex flex-col">
-              <Card className="border-2 border-primary/20 hover:border-primary hover:shadow-glow transition-all duration-300 hover:scale-105 cursor-pointer animate-fade-in group" style={{ animationDelay: "0.3s" }}>
+            <div className="space-y-6 flex flex-col h-full">
+              <Card className="border-2 border-primary/20 hover:border-primary hover:shadow-glow transition-all duration-300 hover:scale-105 cursor-pointer animate-fade-in group flex-1" style={{ animationDelay: "0.3s" }}>
                 <CardContent className="pt-6">
                   <div className="flex items-start gap-4">
                     <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-primary-glow flex items-center justify-center flex-shrink-0 group-hover:rotate-6 transition-transform duration-300 animate-float">
@@ -316,7 +316,7 @@ const Contact = () => {
                 </CardContent>
               </Card>
 
-              <Card className="border-2 border-secondary/20 hover:border-secondary hover:shadow-blue transition-all duration-300 hover:scale-105 cursor-pointer animate-fade-in group" style={{ animationDelay: "0.4s" }}>
+              <Card className="border-2 border-secondary/20 hover:border-secondary hover:shadow-blue transition-all duration-300 hover:scale-105 cursor-pointer animate-fade-in group flex-1" style={{ animationDelay: "0.4s" }}>
                 <CardContent className="pt-6">
                   <div className="flex items-start gap-4">
                     <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center flex-shrink-0 group-hover:rotate-6 transition-transform duration-300 animate-float" style={{ animationDelay: "0.5s" }}>
@@ -339,8 +339,8 @@ const Contact = () => {
               </Card>
 
               {/* FAQ Card */}
-              <Card className="border-2 border-primary/20 bg-gradient-to-br from-primary/5 via-secondary/5 to-primary/5 hover:shadow-glow transition-all duration-300 hover:scale-105 animate-fade-in" style={{ animationDelay: "0.5s" }}>
-                <CardContent className="p-6 text-center">
+              <Card className="border-2 border-primary/20 bg-gradient-to-br from-primary/5 via-secondary/5 to-primary/5 hover:shadow-glow transition-all duration-300 hover:scale-105 animate-fade-in flex-1 flex flex-col" style={{ animationDelay: "0.5s" }}>
+                <CardContent className="p-6 text-center flex-1 flex flex-col justify-center">
                   <Sparkles className="w-8 h-8 text-primary mx-auto mb-3 animate-pulse" />
                   <h3 className="text-xl font-bold mb-2">Consultez notre FAQ</h3>
                   <p className="text-sm text-muted-foreground mb-4">
