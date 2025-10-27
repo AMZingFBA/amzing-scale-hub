@@ -9,19 +9,12 @@ import { useState } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import CategoryAlerts from '@/components/CategoryAlerts';
-
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { 
-  Crown, BookOpen, Bell, CheckCircle, DollarSign, HelpCircle, 
-  Settings, Eye, FileText, Star, Calculator, Sparkles, Package,
-  Truck, Megaphone, Newspaper, MessageCircle, LightbulbIcon, Trophy,
-  ShoppingCart, Info, Users, Lock, AlertCircle, Scale, Database, Shield
-} from 'lucide-react';
-
+import { Crown, BookOpen, Bell, CheckCircle, DollarSign, HelpCircle, Settings, Eye, FileText, Star, Calculator, Sparkles, Package, Truck, Megaphone, Newspaper, MessageCircle, LightbulbIcon, Trophy, ShoppingCart, Info, Users, Lock, AlertCircle, Scale, Database, Shield } from 'lucide-react';
 interface CategoryItemProps {
   icon: React.ElementType;
   label: string;
@@ -29,95 +22,95 @@ interface CategoryItemProps {
   onClick?: () => void;
   badge?: number;
 }
-
-const CategoryItem = ({ icon: Icon, label, link, onClick, badge }: CategoryItemProps) => {
-  const content = (
-    <Card className="hover:bg-accent/50 transition-colors cursor-pointer" onClick={onClick}>
+const CategoryItem = ({
+  icon: Icon,
+  label,
+  link,
+  onClick,
+  badge
+}: CategoryItemProps) => {
+  const content = <Card className="hover:bg-accent/50 transition-colors cursor-pointer" onClick={onClick}>
       <CardContent className="p-4">
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <Icon className="w-5 h-5 text-primary" />
             <span className="font-medium">{label}</span>
           </div>
-          {badge && badge > 0 && (
-            <Badge variant="destructive" className="ml-auto">
+          {badge && badge > 0 && <Badge variant="destructive" className="ml-auto">
               {badge}
-            </Badge>
-          )}
+            </Badge>}
         </div>
       </CardContent>
-    </Card>
-  );
-
+    </Card>;
   if (link) {
     return <Link to={link}>{content}</Link>;
   }
-
   return content;
 };
-
 const Dashboard = () => {
-  const { user, isVIP, subscription, isLoading } = useAuth();
-  const { unreadCount } = useUnreadMessages();
-  const { unreadCount: buyUnreadCount } = useMarketplaceBuyUnread();
-  const { unreadCount: sellUnreadCount } = useMarketplaceSellUnread();
-  const { unreadCount: catalogueUnreadCount } = useCatalogueUnread();
-  const { unreadCounts } = useCategoryUnread();
+  const {
+    user,
+    isVIP,
+    subscription,
+    isLoading
+  } = useAuth();
+  const {
+    unreadCount
+  } = useUnreadMessages();
+  const {
+    unreadCount: buyUnreadCount
+  } = useMarketplaceBuyUnread();
+  const {
+    unreadCount: sellUnreadCount
+  } = useMarketplaceSellUnread();
+  const {
+    unreadCount: catalogueUnreadCount
+  } = useCatalogueUnread();
+  const {
+    unreadCounts
+  } = useCategoryUnread();
   const marketplaceUnreadCount = buyUnreadCount + sellUnreadCount;
   const [rulesOpen, setRulesOpen] = useState(false);
   const [invoiceAuthOpen, setInvoiceAuthOpen] = useState(false);
   const [reviewsOpen, setReviewsOpen] = useState(false);
   const [gestionInfoOpen, setGestionInfoOpen] = useState(false);
-
-  const rules = [
-    {
-      icon: <Users className="w-5 h-5" />,
-      title: "Respect et professionnalisme",
-      content: "Chaque utilisateur s'engage à adopter une attitude respectueuse et bienveillante envers l'ensemble de la communauté. Les propos haineux, diffamatoires, discriminatoires ou irrespectueux ne sont pas tolérés. Les échanges doivent demeurer professionnels et constructifs, même en cas de désaccord."
-    },
-    {
-      icon: <AlertCircle className="w-5 h-5" />,
-      title: "Interdiction de publicité non autorisée",
-      content: "La promotion de produits, services, formations ou plateformes externes sans autorisation préalable est strictement interdite. Toute forme de spam, de sollicitation commerciale non approuvée ou de messages répétitifs entraînera une suspension immédiate du compte utilisateur."
-    },
-    {
-      icon: <Lock className="w-5 h-5" />,
-      title: "Confidentialité et propriété intellectuelle",
-      content: "L'ensemble des contenus, documents, stratégies, outils et méthodes partagés sur AMZing FBA sont strictement confidentiels et protégés. Toute reproduction, diffusion, revente ou partage en dehors de la plateforme est formellement interdite et constitue une violation de la propriété intellectuelle."
-    },
-    {
-      icon: <CheckCircle className="w-5 h-5" />,
-      title: "Utilisation appropriée de la plateforme",
-      content: "Chaque fonctionnalité de la plateforme (formations, catalogue, outils, support) est conçue pour un usage spécifique. Merci d'utiliser les sections appropriées pour vos demandes et publications. Un usage abusif ou détourné des services pourra entraîner une limitation ou suspension d'accès."
-    },
-    {
-      icon: <Scale className="w-5 h-5" />,
-      title: "Intégrité et conformité légale",
-      content: "AMZing FBA promeut un écosystème professionnel fondé sur l'intégrité et la conformité. Sont strictement interdits : les pratiques trompeuses, frauduleuses ou illégales, ainsi que le non-respect des conditions d'utilisation des marketplaces (Amazon, TikTok Shop, etc.). Tout manquement entraîne la fermeture immédiate du compte."
-    },
-    {
-      icon: <FileText className="w-5 h-5" />,
-      title: "Services logistiques et paiements",
-      content: "L'accès aux services de stockage, d'emballage et d'expédition implique l'acceptation des conditions commerciales associées (délais, tarifs, volumes). Tout abus, impayé ou non-respect des conditions contractuelles peut entraîner la suspension du service et du compte utilisateur."
-    },
-    {
-      icon: <Database className="w-5 h-5" />,
-      title: "Protection des données personnelles",
-      content: "Ne partagez jamais vos identifiants, coordonnées bancaires ou informations sensibles avec d'autres utilisateurs. En cas de doute, contactez exclusivement le support officiel AMZing FBA. La plateforme est conforme au RGPD et garantit la protection de vos données personnelles."
-    },
-    {
-      icon: <Shield className="w-5 h-5" />,
-      title: "Sanctions et modération",
-      content: "Tout manquement aux présentes règles peut entraîner un avertissement, une suspension temporaire ou une exclusion définitive de la plateforme. L'équipe AMZing FBA se réserve le droit de supprimer tout contenu ou compte ne respectant pas ces règles d'utilisation."
-    }
-  ];
-
+  const rules = [{
+    icon: <Users className="w-5 h-5" />,
+    title: "Respect et professionnalisme",
+    content: "Chaque utilisateur s'engage à adopter une attitude respectueuse et bienveillante envers l'ensemble de la communauté. Les propos haineux, diffamatoires, discriminatoires ou irrespectueux ne sont pas tolérés. Les échanges doivent demeurer professionnels et constructifs, même en cas de désaccord."
+  }, {
+    icon: <AlertCircle className="w-5 h-5" />,
+    title: "Interdiction de publicité non autorisée",
+    content: "La promotion de produits, services, formations ou plateformes externes sans autorisation préalable est strictement interdite. Toute forme de spam, de sollicitation commerciale non approuvée ou de messages répétitifs entraînera une suspension immédiate du compte utilisateur."
+  }, {
+    icon: <Lock className="w-5 h-5" />,
+    title: "Confidentialité et propriété intellectuelle",
+    content: "L'ensemble des contenus, documents, stratégies, outils et méthodes partagés sur AMZing FBA sont strictement confidentiels et protégés. Toute reproduction, diffusion, revente ou partage en dehors de la plateforme est formellement interdite et constitue une violation de la propriété intellectuelle."
+  }, {
+    icon: <CheckCircle className="w-5 h-5" />,
+    title: "Utilisation appropriée de la plateforme",
+    content: "Chaque fonctionnalité de la plateforme (formations, catalogue, outils, support) est conçue pour un usage spécifique. Merci d'utiliser les sections appropriées pour vos demandes et publications. Un usage abusif ou détourné des services pourra entraîner une limitation ou suspension d'accès."
+  }, {
+    icon: <Scale className="w-5 h-5" />,
+    title: "Intégrité et conformité légale",
+    content: "AMZing FBA promeut un écosystème professionnel fondé sur l'intégrité et la conformité. Sont strictement interdits : les pratiques trompeuses, frauduleuses ou illégales, ainsi que le non-respect des conditions d'utilisation des marketplaces (Amazon, TikTok Shop, etc.). Tout manquement entraîne la fermeture immédiate du compte."
+  }, {
+    icon: <FileText className="w-5 h-5" />,
+    title: "Services logistiques et paiements",
+    content: "L'accès aux services de stockage, d'emballage et d'expédition implique l'acceptation des conditions commerciales associées (délais, tarifs, volumes). Tout abus, impayé ou non-respect des conditions contractuelles peut entraîner la suspension du service et du compte utilisateur."
+  }, {
+    icon: <Database className="w-5 h-5" />,
+    title: "Protection des données personnelles",
+    content: "Ne partagez jamais vos identifiants, coordonnées bancaires ou informations sensibles avec d'autres utilisateurs. En cas de doute, contactez exclusivement le support officiel AMZing FBA. La plateforme est conforme au RGPD et garantit la protection de vos données personnelles."
+  }, {
+    icon: <Shield className="w-5 h-5" />,
+    title: "Sanctions et modération",
+    content: "Tout manquement aux présentes règles peut entraîner un avertissement, une suspension temporaire ou une exclusion définitive de la plateforme. L'équipe AMZing FBA se réserve le droit de supprimer tout contenu ou compte ne respectant pas ces règles d'utilisation."
+  }];
   if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
+    return <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-      </div>
-    );
+      </div>;
   }
 
   // Redirect to auth if not logged in
@@ -129,15 +122,9 @@ const Dashboard = () => {
   if (!isVIP) {
     return <Navigate to="/" replace />;
   }
-
-  const daysRemaining = subscription?.expires_at 
-    ? Math.ceil((new Date(subscription.expires_at).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))
-    : null;
-  
+  const daysRemaining = subscription?.expires_at ? Math.ceil((new Date(subscription.expires_at).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)) : null;
   const isTrialActive = subscription?.is_trial && daysRemaining && daysRemaining > 0;
-
-  return (
-    <div className="min-h-screen flex flex-col">
+  return <div className="min-h-screen flex flex-col">
       <Navbar />
       <main className="flex-grow pt-20">
         <div className="container mx-auto px-4 py-8">
@@ -147,13 +134,11 @@ const Dashboard = () => {
               <h1 className="text-4xl font-bold">Espace VIP</h1>
             </div>
 
-            {isTrialActive && (
-              <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 mb-6">
+            {isTrialActive && <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 mb-6">
                 <p className="text-center">
                   🎉 Essai gratuit actif - Il vous reste <strong>{daysRemaining} jours</strong>
                 </p>
-              </div>
-            )}
+              </div>}
 
             <Accordion type="multiple" className="space-y-4">
               {/* INTRODUCTION */}
@@ -164,11 +149,9 @@ const Dashboard = () => {
                       <BookOpen className="w-6 h-6 text-primary" />
                       <span className="text-xl font-bold">INTRODUCTION</span>
                     </div>
-                    {(unreadCounts.introduction?.total > 0 || unreadCount > 0) && (
-                      <Badge variant="destructive" className="ml-auto">
+                    {(unreadCounts.introduction?.total > 0 || unreadCount > 0) && <Badge variant="destructive" className="ml-auto">
                         {(unreadCounts.introduction?.total || 0) + (unreadCount || 0)}
-                      </Badge>
-                    )}
+                      </Badge>}
                   </div>
                 </AccordionTrigger>
                 <AccordionContent className="px-4 pb-4">
@@ -192,11 +175,9 @@ const Dashboard = () => {
                       <Settings className="w-6 h-6 text-primary" />
                       <span className="text-xl font-bold">OUTILS</span>
                     </div>
-                    {unreadCounts.outils?.total > 0 && (
-                      <Badge variant="destructive" className="ml-auto">
+                    {unreadCounts.outils?.total > 0 && <Badge variant="destructive" className="ml-auto">
                         {unreadCounts.outils.total}
-                      </Badge>
-                    )}
+                      </Badge>}
                   </div>
                 </AccordionTrigger>
                 <AccordionContent>
@@ -239,11 +220,9 @@ const Dashboard = () => {
                       <Truck className="w-6 h-6 text-primary" />
                       <span className="text-xl font-bold">EXPÉDITION</span>
                     </div>
-                    {unreadCounts.expedition?.total > 0 && (
-                      <Badge variant="destructive" className="ml-auto">
+                    {unreadCounts.expedition?.total > 0 && <Badge variant="destructive" className="ml-auto">
                         {unreadCounts.expedition.total}
-                      </Badge>
-                    )}
+                      </Badge>}
                   </div>
                 </AccordionTrigger>
                 <AccordionContent>
@@ -263,11 +242,9 @@ const Dashboard = () => {
                       <Bell className="w-6 h-6 text-primary" />
                       <span className="text-xl font-bold">INFORMATIONS</span>
                     </div>
-                    {unreadCounts.informations?.total > 0 && (
-                      <Badge variant="destructive" className="ml-auto">
+                    {unreadCounts.informations?.total > 0 && <Badge variant="destructive" className="ml-auto">
                         {unreadCounts.informations.total}
-                      </Badge>
-                    )}
+                      </Badge>}
                   </div>
                 </AccordionTrigger>
                 <AccordionContent className="px-4 pb-4">
@@ -305,11 +282,9 @@ const Dashboard = () => {
                       <ShoppingCart className="w-6 h-6 text-primary" />
                       <span className="text-xl font-bold">MARKETPLACE</span>
                     </div>
-                    {marketplaceUnreadCount > 0 && (
-                      <Badge variant="destructive" className="ml-auto">
+                    {marketplaceUnreadCount > 0 && <Badge variant="destructive" className="ml-auto">
                         {marketplaceUnreadCount}
-                      </Badge>
-                    )}
+                      </Badge>}
                   </div>
                 </AccordionTrigger>
                 <AccordionContent>
@@ -328,11 +303,9 @@ const Dashboard = () => {
                       <Package className="w-6 h-6 text-primary" />
                       <span className="text-xl font-bold">GESTION PRODUITS</span>
                     </div>
-                    {catalogueUnreadCount > 0 && (
-                      <Badge variant="destructive" className="ml-auto">
+                    {catalogueUnreadCount > 0 && <Badge variant="destructive" className="ml-auto">
                         {catalogueUnreadCount}
-                      </Badge>
-                    )}
+                      </Badge>}
                   </div>
                 </AccordionTrigger>
                 <AccordionContent className="px-4 pb-4">
@@ -368,8 +341,7 @@ const Dashboard = () => {
                 </CardContent>
               </Card>
 
-              {rules.map((rule, index) => (
-                <Card key={index}>
+              {rules.map((rule, index) => <Card key={index}>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-3 text-base">
                       <div className="p-2 rounded-lg bg-primary/10 text-primary">
@@ -383,8 +355,7 @@ const Dashboard = () => {
                       {rule.content}
                     </p>
                   </CardContent>
-                </Card>
-              ))}
+                </Card>)}
 
               <Card className="bg-primary/5 border-primary/20">
                 <CardContent className="pt-6 text-center">
@@ -854,8 +825,6 @@ const Dashboard = () => {
           </ScrollArea>
         </DialogContent>
       </Dialog>
-    </div>
-  );
+    </div>;
 };
-
 export default Dashboard;
