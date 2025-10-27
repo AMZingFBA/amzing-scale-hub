@@ -144,12 +144,16 @@ const TestimonialsCarousel = () => {
 
   return (
     <div className="relative overflow-hidden space-y-6">
+      {/* Fade masks on sides */}
+      <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none" />
+      <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none" />
+      
       {/* First row - scrolling left */}
       <div className="flex animate-scroll-fast gap-6">
         {duplicatedFirst.map((testimonial, index) => (
           <Card 
             key={index} 
-            className="flex-shrink-0 w-[380px] hover:scale-105 transition-all duration-300 hover:shadow-2xl hover:border-primary/50 bg-gradient-to-br from-background to-muted/30"
+            className="flex-shrink-0 w-[380px] hover:scale-102 transition-all duration-300 hover:shadow-2xl hover:border-primary/50 bg-gradient-to-br from-background to-muted/30"
           >
             <CardContent className="pt-6">
               <div className="flex items-center mb-3 gap-1">
@@ -165,7 +169,7 @@ const TestimonialsCarousel = () => {
                 ))}
                 <span className="ml-2 text-sm font-bold text-primary">{testimonial.rating}/5</span>
               </div>
-              <p className="text-muted-foreground mb-4 text-sm leading-relaxed min-h-[100px]">
+              <p className="text-muted-foreground mb-4 text-sm leading-relaxed">
                 "{testimonial.text}"
               </p>
               <p className="font-bold text-primary">— {testimonial.name}</p>
@@ -179,7 +183,7 @@ const TestimonialsCarousel = () => {
         {duplicatedSecond.map((testimonial, index) => (
           <Card 
             key={index} 
-            className="flex-shrink-0 w-[380px] hover:scale-105 transition-all duration-300 hover:shadow-2xl hover:border-secondary/50 bg-gradient-to-br from-background to-muted/30"
+            className="flex-shrink-0 w-[380px] hover:scale-102 transition-all duration-300 hover:shadow-2xl hover:border-secondary/50 bg-gradient-to-br from-background to-muted/30"
           >
             <CardContent className="pt-6">
               <div className="flex items-center mb-3 gap-1">
@@ -195,7 +199,7 @@ const TestimonialsCarousel = () => {
                 ))}
                 <span className="ml-2 text-sm font-bold text-secondary">{testimonial.rating}/5</span>
               </div>
-              <p className="text-muted-foreground mb-4 text-sm leading-relaxed min-h-[100px]">
+              <p className="text-muted-foreground mb-4 text-sm leading-relaxed">
                 "{testimonial.text}"
               </p>
               <p className="font-bold text-secondary">— {testimonial.name}</p>

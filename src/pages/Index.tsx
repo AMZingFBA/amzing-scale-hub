@@ -73,7 +73,7 @@ const Index = () => {
               </Button>
             </div>
             <p className="mt-6 text-muted-foreground text-lg">
-              34,99€/mois HT après l'essai gratuit
+              34,99€/mois après l'essai gratuit
             </p>
           </div>
         </div>
@@ -84,7 +84,7 @@ const Index = () => {
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold mb-4">Tout inclus dans l'abonnement</h2>
-            <p className="text-xl text-muted-foreground">34,99€/mois HT pour un accès complet</p>
+            <p className="text-xl text-muted-foreground">34,99€/mois pour un accès complet</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <Card className="border-2 hover:border-primary transition-colors">
@@ -142,10 +142,10 @@ const Index = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            <Card className="border-2 border-primary/20">
+            <Card className="border-2 border-primary/20 cursor-pointer transition-all duration-300 hover:border-primary hover:shadow-glow hover:scale-105 active:scale-95 active:border-primary">
               <CardContent className="pt-6">
                 <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-gradient-to-br from-primary to-primary-glow rounded-xl flex items-center justify-center flex-shrink-0">
+                  <div className="w-12 h-12 bg-gradient-to-br from-primary to-primary-glow rounded-xl flex items-center justify-center flex-shrink-0 transition-transform duration-200 group-hover:rotate-6">
                     <TrendingUp className="w-6 h-6 text-white" />
                   </div>
                   <div>
@@ -158,10 +158,10 @@ const Index = () => {
               </CardContent>
             </Card>
 
-            <Card className="border-2 border-primary/20">
+            <Card className="border-2 border-primary/20 cursor-pointer transition-all duration-300 hover:border-secondary hover:shadow-blue hover:scale-105 active:scale-95 active:border-secondary">
               <CardContent className="pt-6">
                 <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-gradient-to-br from-secondary to-accent rounded-xl flex items-center justify-center flex-shrink-0">
+                  <div className="w-12 h-12 bg-gradient-to-br from-secondary to-accent rounded-xl flex items-center justify-center flex-shrink-0 transition-transform duration-200 group-hover:rotate-6">
                     <GraduationCap className="w-6 h-6 text-white" />
                   </div>
                   <div>
@@ -174,10 +174,10 @@ const Index = () => {
               </CardContent>
             </Card>
 
-            <Card className="border-2 border-primary/20">
+            <Card className="border-2 border-primary/20 cursor-pointer transition-all duration-300 hover:border-primary hover:shadow-glow hover:scale-105 active:scale-95 active:border-primary">
               <CardContent className="pt-6">
                 <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center flex-shrink-0">
+                  <div className="w-12 h-12 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center flex-shrink-0 transition-transform duration-200 group-hover:rotate-6">
                     <Package className="w-6 h-6 text-white" />
                   </div>
                   <div>
@@ -190,10 +190,10 @@ const Index = () => {
               </CardContent>
             </Card>
 
-            <Card className="border-2 border-primary/20">
+            <Card className="border-2 border-primary/20 cursor-pointer transition-all duration-300 hover:border-secondary hover:shadow-blue hover:scale-105 active:scale-95 active:border-secondary">
               <CardContent className="pt-6">
                 <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-gradient-to-br from-secondary to-primary rounded-xl flex items-center justify-center flex-shrink-0">
+                  <div className="w-12 h-12 bg-gradient-to-br from-secondary to-primary rounded-xl flex items-center justify-center flex-shrink-0 transition-transform duration-200 group-hover:rotate-6">
                     <CheckCircle2 className="w-6 h-6 text-white" />
                   </div>
                   <div>
@@ -206,10 +206,10 @@ const Index = () => {
               </CardContent>
             </Card>
 
-            <Card className="border-2 border-primary/20">
+            <Card className="border-2 border-primary/20 cursor-pointer transition-all duration-300 hover:border-primary hover:shadow-glow hover:scale-105 active:scale-95 active:border-primary">
               <CardContent className="pt-6">
                 <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center flex-shrink-0">
+                  <div className="w-12 h-12 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center flex-shrink-0 transition-transform duration-200 group-hover:rotate-6">
                     <Warehouse className="w-6 h-6 text-white" />
                   </div>
                   <div>
@@ -222,10 +222,10 @@ const Index = () => {
               </CardContent>
             </Card>
 
-            <Card className="border-2 border-primary/20">
+            <Card className="border-2 border-primary/20 cursor-pointer transition-all duration-300 hover:border-secondary hover:shadow-blue hover:scale-105 active:scale-95 active:border-secondary">
               <CardContent className="pt-6">
                 <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-gradient-to-br from-secondary to-accent rounded-xl flex items-center justify-center flex-shrink-0">
+                  <div className="w-12 h-12 bg-gradient-to-br from-secondary to-accent rounded-xl flex items-center justify-center flex-shrink-0 transition-transform duration-200 group-hover:rotate-6">
                     <TrendingUp className="w-6 h-6 text-white" />
                   </div>
                   <div>
@@ -385,7 +385,7 @@ const Index = () => {
             </Button>
           </div>
           <p className="mt-6 text-white/90 text-lg">
-            34,99€/mois HT après l'essai gratuit
+            34,99€/mois après l'essai gratuit
           </p>
         </div>
       </section>

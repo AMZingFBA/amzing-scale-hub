@@ -200,3 +200,12 @@
 .shadow-elegant {
   box-shadow: 0 20px 25px -5px hsl(var(--primary) / 0.1), 0 10px 10px -5px hsl(var(--primary) / 0.04);
 }
+
+/* Scale utilities for subtle animations */
+.hover\:scale-102:hover {
+  transform: scale(1.02);
+}
+
+.active\:scale-95:active {
+  transform: scale(0.95);
+}

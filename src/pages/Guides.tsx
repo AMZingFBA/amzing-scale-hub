@@ -538,7 +538,7 @@ const Guides = () => {
                         <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4 mb-6">
                           <h4 className="font-semibold mb-3">💰 Frais à prévoir pour créer ton compte Amazon Seller :</h4>
                           <ul className="list-disc pl-6 space-y-1 text-sm">
-                            <li>39€ HT (46,80€ TTC) / mois</li>
+                            <li>46,80€ / mois</li>
                             <li>L'application Seller AMP (environ 20$/mois)</li>
                             <li>La livraison à ta charge</li>
                             <li>Commissions sur tes ventes</li>

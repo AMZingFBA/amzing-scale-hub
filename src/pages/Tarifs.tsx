@@ -39,7 +39,7 @@ const Tarifs = () => {
                 <CardDescription className="text-lg">Accès complet à tous les outils et services</CardDescription>
                 <div className="mt-8">
                   <span className="text-6xl font-bold text-gradient">34,99€</span>
-                  <span className="text-2xl text-muted-foreground">/mois HT</span>
+                  <span className="text-2xl text-muted-foreground">/mois</span>
                 </div>
               </CardHeader>
               <CardContent className="px-8">
