@@ -314,15 +314,15 @@ const Contact = () => {
                       <div className="space-y-2 text-sm text-muted-foreground">
                         <p className="flex items-center gap-2">
                           <CheckCircle className="w-4 h-4 text-green-500" />
-                          Support technique disponible
+                          Informations générales
                         </p>
                         <p className="flex items-center gap-2">
                           <CheckCircle className="w-4 h-4 text-green-500" />
-                          Questions sur les produits
+                          Questions pré-vente
                         </p>
                         <p className="flex items-center gap-2">
                           <CheckCircle className="w-4 h-4 text-green-500" />
-                          Aide à la configuration
+                          Demande de renseignements
                         </p>
                       </div>
                     </div>
@@ -350,15 +350,15 @@ const Contact = () => {
                       <div className="space-y-2 text-sm text-muted-foreground">
                         <p className="flex items-center gap-2">
                           <CheckCircle className="w-4 h-4 text-green-500" />
-                          Conseil personnalisé
+                          Découvrir nos services
                         </p>
                         <p className="flex items-center gap-2">
                           <CheckCircle className="w-4 h-4 text-green-500" />
-                          Démonstration produit
+                          Réponses à vos questions
                         </p>
                         <p className="flex items-center gap-2">
                           <CheckCircle className="w-4 h-4 text-green-500" />
-                          Support prioritaire VIP
+                          Accompagnement personnalisé
                         </p>
                       </div>
                     </div>
