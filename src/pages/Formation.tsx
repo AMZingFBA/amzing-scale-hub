@@ -270,44 +270,50 @@ const Formation = () => {
 
           {/* Bonuses */}
           <div className="mb-20">
-            <h2 className="text-4xl font-bold text-center mb-12">Bonus Inclus</h2>
+            <h2 className="text-4xl font-bold text-center mb-12 animate-fade-in">Bonus Inclus</h2>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-              <Card className="border-2 border-primary">
-                <CardContent className="pt-8 text-center">
-                  <div className="w-16 h-16 bg-gradient-to-br from-primary to-primary-glow rounded-2xl flex items-center justify-center mx-auto mb-4">
-                    <Users className="w-8 h-8 text-white" />
-                  </div>
-                  <h3 className="font-bold text-xl mb-3">Accès Communauté VIP</h3>
-                  <p className="text-muted-foreground">
-                    Rejoignez la communauté, posez vos questions et recevez des alertes produits
-                  </p>
-                </CardContent>
-              </Card>
+              <Link to="/tarifs" className="block group">
+                <Card className="border-2 border-primary h-full cursor-pointer hover:scale-105 hover:shadow-2xl hover:shadow-primary/30 transition-all duration-500 animate-fade-in hover:border-primary/60" style={{ animationDelay: '0.1s' }}>
+                  <CardContent className="pt-8 text-center">
+                    <div className="w-16 h-16 bg-gradient-to-br from-primary to-primary-glow rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 animate-float">
+                      <Users className="w-8 h-8 text-white" />
+                    </div>
+                    <h3 className="font-bold text-xl mb-3 group-hover:text-primary transition-colors">Accès Communauté VIP</h3>
+                    <p className="text-muted-foreground">
+                      Rejoignez la communauté, posez vos questions et recevez des alertes produits
+                    </p>
+                  </CardContent>
+                </Card>
+              </Link>
 
-              <Card className="border-2 border-secondary">
-                <CardContent className="pt-8 text-center">
-                  <div className="w-16 h-16 bg-gradient-to-br from-secondary to-accent rounded-2xl flex items-center justify-center mx-auto mb-4">
-                    <Download className="w-8 h-8 text-white" />
-                  </div>
-                  <h3 className="font-bold text-xl mb-3">Templates & Checklists</h3>
-                  <p className="text-muted-foreground">
-                    Excel, Google Sheets, documents prêts à l'emploi pour gagner du temps
-                  </p>
-                </CardContent>
-              </Card>
+              <Link to="/tarifs" className="block group">
+                <Card className="border-2 border-secondary h-full cursor-pointer hover:scale-105 hover:shadow-2xl hover:shadow-secondary/30 transition-all duration-500 animate-fade-in hover:border-secondary/60" style={{ animationDelay: '0.2s' }}>
+                  <CardContent className="pt-8 text-center">
+                    <div className="w-16 h-16 bg-gradient-to-br from-secondary to-accent rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 animate-float" style={{ animationDelay: '2s' }}>
+                      <Download className="w-8 h-8 text-white" />
+                    </div>
+                    <h3 className="font-bold text-xl mb-3 group-hover:text-secondary transition-colors">Templates & Checklists</h3>
+                    <p className="text-muted-foreground">
+                      Excel, Google Sheets, documents prêts à l'emploi pour gagner du temps
+                    </p>
+                  </CardContent>
+                </Card>
+              </Link>
 
-              <Card className="border-2 border-primary">
-                <CardContent className="pt-8 text-center">
-                  <div className="w-16 h-16 bg-gradient-to-br from-primary to-secondary rounded-2xl flex items-center justify-center mx-auto mb-4">
-                    <TrendingUp className="w-8 h-8 text-white" />
-                  </div>
-                  <h3 className="font-bold text-xl mb-3">Mises à Jour Gratuites</h3>
-                  <p className="text-muted-foreground">
-                    Accès à vie avec tous les nouveaux modules et contenus ajoutés
-                  </p>
-                </CardContent>
-              </Card>
+              <Link to="/tarifs" className="block group">
+                <Card className="border-2 border-primary h-full cursor-pointer hover:scale-105 hover:shadow-2xl hover:shadow-primary/30 transition-all duration-500 animate-fade-in hover:border-primary/60" style={{ animationDelay: '0.3s' }}>
+                  <CardContent className="pt-8 text-center">
+                    <div className="w-16 h-16 bg-gradient-to-br from-primary to-secondary rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 animate-float" style={{ animationDelay: '4s' }}>
+                      <TrendingUp className="w-8 h-8 text-white" />
+                    </div>
+                    <h3 className="font-bold text-xl mb-3 group-hover:text-primary transition-colors">Mises à Jour Gratuites</h3>
+                    <p className="text-muted-foreground">
+                      Accès à vie avec tous les nouveaux modules et contenus ajoutés
+                    </p>
+                  </CardContent>
+                </Card>
+              </Link>
             </div>
           </div>
 
