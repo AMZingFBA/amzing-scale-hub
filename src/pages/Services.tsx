@@ -277,18 +277,28 @@ const Services = () => {
           </div>
 
           {/* AMZing FBA 360 Detailed Section */}
-          <Card id="amzing-360" className="border-2 border-primary/20 shadow-2xl mb-16 scroll-mt-24">
-            <CardHeader className="bg-gradient-to-r from-primary/10 via-secondary/10 to-primary/10 pb-8">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="text-4xl">🚛</div>
+          <Card 
+            id="amzing-360" 
+            className="relative border-2 border-primary/20 shadow-2xl mb-16 scroll-mt-24 overflow-hidden animate-fade-in hover:shadow-[0_0_50px_rgba(255,153,0,0.3)] transition-all duration-500 group"
+          >
+            {/* Animated floating orbs background */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+              <div className="absolute top-10 left-10 w-32 h-32 bg-primary/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '0s' }}></div>
+              <div className="absolute bottom-10 right-10 w-40 h-40 bg-secondary/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }}></div>
+              <div className="absolute top-1/2 left-1/3 w-24 h-24 bg-accent/10 rounded-full blur-2xl animate-float" style={{ animationDelay: '4s' }}></div>
+            </div>
+
+            <CardHeader className="relative bg-gradient-to-r from-primary/10 via-secondary/10 to-primary/10 pb-8 animate-gradient-shift">
+              <div className="flex items-center gap-3 mb-4 animate-fade-in" style={{ animationDelay: '0.1s' }}>
+                <div className="text-4xl animate-float">🚛</div>
                 <div>
                   <CardTitle className="text-3xl mb-2">AMZing FBA 360</CardTitle>
                   <CardDescription className="text-lg">Votre solution logistique tout-en-un</CardDescription>
                 </div>
               </div>
             </CardHeader>
-            <CardContent className="p-8">
-              <div className="prose prose-lg max-w-none mb-8">
+            <CardContent className="relative p-8 z-10">
+              <div className="prose prose-lg max-w-none mb-8 animate-fade-in" style={{ animationDelay: '0.2s' }}>
                 <p className="text-lg leading-relaxed text-muted-foreground">
                   AMZing FBA 360 est une solution complète pensée pour les vendeurs Amazon. 
                   Nous agissons comme votre propre centre logistique, <strong className="text-foreground">plus flexible et plus abordable que le FBA d'Amazon</strong>.
@@ -301,35 +311,35 @@ const Services = () => {
               </div>
 
               <div className="grid md:grid-cols-2 gap-8 mb-8">
-                <div>
+                <div className="animate-fade-in" style={{ animationDelay: '0.3s' }}>
                   <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
-                    <Package className="w-6 h-6 text-primary" />
+                    <Package className="w-6 h-6 text-primary animate-pulse" />
                     Notre service complet
                   </h3>
                   <ul className="space-y-3">
-                    <li className="flex items-start gap-3">
-                      <Check className="w-5 h-5 text-primary flex-shrink-0 mt-1" />
+                    <li className="flex items-start gap-3 group/item hover:translate-x-2 transition-transform duration-300 animate-fade-in" style={{ animationDelay: '0.4s' }}>
+                      <Check className="w-5 h-5 text-primary flex-shrink-0 mt-1 group-hover/item:scale-110 transition-transform" />
                       <div>
                         <span className="font-semibold">Sourcing produits</span>
                         <p className="text-sm text-muted-foreground">Nous fournissons les produits rentables</p>
                       </div>
                     </li>
-                    <li className="flex items-start gap-3">
-                      <Check className="w-5 h-5 text-primary flex-shrink-0 mt-1" />
+                    <li className="flex items-start gap-3 group/item hover:translate-x-2 transition-transform duration-300 animate-fade-in" style={{ animationDelay: '0.5s' }}>
+                      <Check className="w-5 h-5 text-primary flex-shrink-0 mt-1 group-hover/item:scale-110 transition-transform" />
                       <div>
                         <span className="font-semibold">Stockage sécurisé</span>
                         <p className="text-sm text-muted-foreground">Entrepôts surveillés 24/7</p>
                       </div>
                     </li>
-                    <li className="flex items-start gap-3">
-                      <Check className="w-5 h-5 text-primary flex-shrink-0 mt-1" />
+                    <li className="flex items-start gap-3 group/item hover:translate-x-2 transition-transform duration-300 animate-fade-in" style={{ animationDelay: '0.6s' }}>
+                      <Check className="w-5 h-5 text-primary flex-shrink-0 mt-1 group-hover/item:scale-110 transition-transform" />
                       <div>
                         <span className="font-semibold">Emballage professionnel</span>
                         <p className="text-sm text-muted-foreground">Standards Amazon respectés</p>
                       </div>
                     </li>
-                    <li className="flex items-start gap-3">
-                      <Check className="w-5 h-5 text-primary flex-shrink-0 mt-1" />
+                    <li className="flex items-start gap-3 group/item hover:translate-x-2 transition-transform duration-300 animate-fade-in" style={{ animationDelay: '0.7s' }}>
+                      <Check className="w-5 h-5 text-primary flex-shrink-0 mt-1 group-hover/item:scale-110 transition-transform" />
                       <div>
                         <span className="font-semibold">Expédition rapide</span>
                         <p className="text-sm text-muted-foreground">Livraison sous 24h</p>
@@ -338,35 +348,35 @@ const Services = () => {
                   </ul>
                 </div>
 
-                <div>
+                <div className="animate-fade-in" style={{ animationDelay: '0.4s' }}>
                   <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
-                    <MessageSquare className="w-6 h-6 text-primary" />
+                    <MessageSquare className="w-6 h-6 text-primary animate-pulse" style={{ animationDelay: '1s' }} />
                     Service après-vente inclus
                   </h3>
                   <ul className="space-y-3">
-                    <li className="flex items-start gap-3">
-                      <Check className="w-5 h-5 text-primary flex-shrink-0 mt-1" />
+                    <li className="flex items-start gap-3 group/item hover:translate-x-2 transition-transform duration-300 animate-fade-in" style={{ animationDelay: '0.5s' }}>
+                      <Check className="w-5 h-5 text-primary flex-shrink-0 mt-1 group-hover/item:scale-110 transition-transform" />
                       <div>
                         <span className="font-semibold">Gestion SAV</span>
                         <p className="text-sm text-muted-foreground">Nous gérons les retours et réclamations</p>
                       </div>
                     </li>
-                    <li className="flex items-start gap-3">
-                      <Check className="w-5 h-5 text-primary flex-shrink-0 mt-1" />
+                    <li className="flex items-start gap-3 group/item hover:translate-x-2 transition-transform duration-300 animate-fade-in" style={{ animationDelay: '0.6s' }}>
+                      <Check className="w-5 h-5 text-primary flex-shrink-0 mt-1 group-hover/item:scale-110 transition-transform" />
                       <div>
                         <span className="font-semibold">Suivi commandes</span>
                         <p className="text-sm text-muted-foreground">Tracking en temps réel</p>
                       </div>
                     </li>
-                    <li className="flex items-start gap-3">
-                      <Check className="w-5 h-5 text-primary flex-shrink-0 mt-1" />
+                    <li className="flex items-start gap-3 group/item hover:translate-x-2 transition-transform duration-300 animate-fade-in" style={{ animationDelay: '0.7s' }}>
+                      <Check className="w-5 h-5 text-primary flex-shrink-0 mt-1 group-hover/item:scale-110 transition-transform" />
                       <div>
                         <span className="font-semibold">Support dédié</span>
                         <p className="text-sm text-muted-foreground">Équipe disponible pour vous</p>
                       </div>
                     </li>
-                    <li className="flex items-start gap-3">
-                      <Check className="w-5 h-5 text-primary flex-shrink-0 mt-1" />
+                    <li className="flex items-start gap-3 group/item hover:translate-x-2 transition-transform duration-300 animate-fade-in" style={{ animationDelay: '0.8s' }}>
+                      <Check className="w-5 h-5 text-primary flex-shrink-0 mt-1 group-hover/item:scale-110 transition-transform" />
                       <div>
                         <span className="font-semibold">Flexibilité totale</span>
                         <p className="text-sm text-muted-foreground">Contrôle total sur vos stocks</p>
