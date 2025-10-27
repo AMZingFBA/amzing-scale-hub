@@ -300,17 +300,31 @@ const Contact = () => {
                     <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-primary-glow flex items-center justify-center flex-shrink-0 group-hover:rotate-6 transition-transform duration-300 animate-float">
                       <Mail className="w-7 h-7 text-white" />
                     </div>
-                    <div>
+                    <div className="flex-1">
                       <h3 className="font-bold text-xl mb-2">Email</h3>
                       <p className="text-muted-foreground mb-3 text-sm">
                         Réponse sous 24h
                       </p>
                       <a 
                         href="mailto:contact@amzingfba.com" 
-                        className="text-primary hover:underline font-semibold text-lg hover:text-primary-glow transition-colors"
+                        className="text-primary hover:underline font-semibold text-lg hover:text-primary-glow transition-colors block mb-4"
                       >
                         contact@amzingfba.com
                       </a>
+                      <div className="space-y-2 text-sm text-muted-foreground">
+                        <p className="flex items-center gap-2">
+                          <CheckCircle className="w-4 h-4 text-green-500" />
+                          Support technique disponible
+                        </p>
+                        <p className="flex items-center gap-2">
+                          <CheckCircle className="w-4 h-4 text-green-500" />
+                          Questions sur les produits
+                        </p>
+                        <p className="flex items-center gap-2">
+                          <CheckCircle className="w-4 h-4 text-green-500" />
+                          Aide à la configuration
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </CardContent>
@@ -322,17 +336,31 @@ const Contact = () => {
                     <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center flex-shrink-0 group-hover:rotate-6 transition-transform duration-300 animate-float" style={{ animationDelay: "0.5s" }}>
                       <Phone className="w-7 h-7 text-white" />
                     </div>
-                    <div>
+                    <div className="flex-1">
                       <h3 className="font-bold text-xl mb-2">Téléphone</h3>
                       <p className="text-muted-foreground mb-3 text-sm">
                         Du lundi au vendredi, 9h-18h
                       </p>
                       <a 
                         href="tel:+33780930274" 
-                        className="text-secondary hover:underline font-semibold text-lg hover:text-secondary/80 transition-colors"
+                        className="text-secondary hover:underline font-semibold text-lg hover:text-secondary/80 transition-colors block mb-4"
                       >
                         07 80 93 02 74
                       </a>
+                      <div className="space-y-2 text-sm text-muted-foreground">
+                        <p className="flex items-center gap-2">
+                          <CheckCircle className="w-4 h-4 text-green-500" />
+                          Conseil personnalisé
+                        </p>
+                        <p className="flex items-center gap-2">
+                          <CheckCircle className="w-4 h-4 text-green-500" />
+                          Démonstration produit
+                        </p>
+                        <p className="flex items-center gap-2">
+                          <CheckCircle className="w-4 h-4 text-green-500" />
+                          Support prioritaire VIP
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </CardContent>
