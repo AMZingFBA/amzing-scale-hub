@@ -135,37 +135,37 @@ const Tarifs = () => {
 
           {/* FAQ Pricing */}
           <div className="max-w-3xl mx-auto">
-            <h2 className="text-3xl font-bold text-center mb-8">Questions Fréquentes</h2>
+            <h2 className="text-3xl font-bold text-center mb-8 animate-fade-in">Questions Fréquentes</h2>
             
             <div className="space-y-4">
-              <Card>
+              <Card className="group hover:shadow-lg hover:shadow-primary/10 hover:scale-[1.02] hover:border-primary/30 transition-all duration-300 animate-fade-in" style={{ animationDelay: '0.1s' }}>
                 <CardHeader>
-                  <CardTitle className="text-lg">Y a-t-il un engagement ?</CardTitle>
+                  <CardTitle className="text-lg group-hover:text-primary transition-colors">Y a-t-il un engagement ?</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-muted-foreground">
+                  <p className="text-muted-foreground group-hover:translate-x-1 transition-transform duration-300">
                     Aucun engagement. Vous pouvez annuler votre abonnement à tout moment sans frais.
                   </p>
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card className="group hover:shadow-lg hover:shadow-secondary/10 hover:scale-[1.02] hover:border-secondary/30 transition-all duration-300 animate-fade-in" style={{ animationDelay: '0.2s' }}>
                 <CardHeader>
-                  <CardTitle className="text-lg">Quels moyens de paiement acceptez-vous ?</CardTitle>
+                  <CardTitle className="text-lg group-hover:text-secondary transition-colors">Quels moyens de paiement acceptez-vous ?</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-muted-foreground">
+                  <p className="text-muted-foreground group-hover:translate-x-1 transition-transform duration-300">
                     Nous acceptons les cartes bancaires (Visa, Mastercard, Amex) via notre plateforme de paiement sécurisée.
                   </p>
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card className="group hover:shadow-lg hover:shadow-primary/10 hover:scale-[1.02] hover:border-primary/30 transition-all duration-300 animate-fade-in" style={{ animationDelay: '0.3s' }}>
                 <CardHeader>
-                  <CardTitle className="text-lg">Que comprend la période d{"'"}essai ?</CardTitle>
+                  <CardTitle className="text-lg group-hover:text-primary transition-colors">Que comprend la période d{"'"}essai ?</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-muted-foreground">
+                  <p className="text-muted-foreground group-hover:translate-x-1 transition-transform duration-300">
                     Les 15 jours d{"'"}essai gratuits vous donnent accès complet à tous les services : formation, catalogue produits, outils et communauté Discord VIP.
                   </p>
                 </CardContent>
