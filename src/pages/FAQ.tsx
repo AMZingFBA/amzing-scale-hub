@@ -7,6 +7,8 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Card } from "@/components/ui/card";
+import { MessageCircle } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const FAQ = () => {
   const faqData = [
@@ -89,27 +91,39 @@ const FAQ = () => {
   ];
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen relative overflow-hidden">
       <Navbar />
       
-      <div className="pt-32 pb-20">
+      {/* Animated background elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-20">
+        <div className="absolute top-20 left-10 w-64 h-64 bg-primary/30 rounded-full blur-3xl animate-float" style={{ animationDelay: '0s' }}></div>
+        <div className="absolute bottom-40 right-20 w-96 h-96 bg-secondary/30 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }}></div>
+        <div className="absolute top-1/2 left-1/3 w-48 h-48 bg-accent/20 rounded-full blur-3xl animate-float" style={{ animationDelay: '4s' }}></div>
+      </div>
+
+      <div className="pt-32 pb-20 relative z-10">
         <div className="container mx-auto px-4">
           {/* Hero */}
           <div className="text-center mb-16">
-            <h1 className="text-5xl md:text-6xl font-bold mb-6">
-              ❓ FAQ — AMZing FBA
+            <h1 className="text-5xl md:text-6xl font-bold mb-6 animate-fade-in">
+              Questions Fréquentes
             </h1>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto animate-fade-in" style={{ animationDelay: '0.1s' }}>
               Trouvez rapidement les réponses à toutes vos questions
             </p>
           </div>
 
           {/* FAQ Accordion */}
-          <Card className="max-w-4xl mx-auto p-6 md:p-8">
+          <Card className="max-w-4xl mx-auto p-6 md:p-8 shadow-xl hover:shadow-2xl transition-shadow duration-500 animate-fade-in border-2 border-primary/10" style={{ animationDelay: '0.2s' }}>
             <Accordion type="single" collapsible className="w-full">
               {faqData.map((faq, index) => (
-                <AccordionItem key={index} value={`item-${index}`}>
-                  <AccordionTrigger className="text-left text-lg">
+                <AccordionItem 
+                  key={index} 
+                  value={`item-${index}`} 
+                  className="group hover:bg-primary/5 px-4 rounded-lg transition-colors animate-fade-in"
+                  style={{ animationDelay: `${0.1 * (index + 1)}s` }}
+                >
+                  <AccordionTrigger className="text-left text-lg hover:text-primary transition-colors group-hover:translate-x-2 duration-300">
                     {faq.question}
                   </AccordionTrigger>
                   <AccordionContent className="text-muted-foreground whitespace-pre-line">
@@ -121,17 +135,20 @@ const FAQ = () => {
           </Card>
 
           {/* Contact CTA */}
-          <Card className="mt-16 max-w-4xl mx-auto bg-gradient-to-r from-primary/10 via-secondary/10 to-primary/10 border-2 border-primary/20">
+          <Card className="mt-16 max-w-4xl mx-auto bg-gradient-to-r from-primary/10 via-secondary/10 to-primary/10 border-2 border-primary/20 hover:shadow-2xl hover:shadow-primary/20 transition-all duration-500 animate-fade-in group">
             <div className="p-8 text-center">
+              <div className="inline-block p-4 bg-primary/10 rounded-full mb-4 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300">
+                <MessageCircle className="w-8 h-8 text-primary animate-pulse" />
+              </div>
               <h3 className="text-2xl font-bold mb-2">Vous n'avez pas trouvé votre réponse ?</h3>
               <p className="text-muted-foreground mb-6">
                 Notre équipe est là pour vous aider et répondre à toutes vos questions
               </p>
-              <a href="/contact" className="inline-block">
-                <button className="px-8 py-3 bg-primary text-primary-foreground rounded-lg font-semibold hover:opacity-90 transition-opacity">
+              <Link to="/contact">
+                <button className="px-8 py-3 bg-primary text-primary-foreground rounded-lg font-semibold hover:scale-105 hover:shadow-lg hover:shadow-primary/30 transition-all duration-300">
                   Nous contacter
                 </button>
-              </a>
+              </Link>
             </div>
           </Card>
         </div>

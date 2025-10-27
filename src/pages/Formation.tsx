@@ -270,7 +270,6 @@ const Formation = () => {
 
           {/* Bonuses */}
           <div className="mb-20">
-            <h2 className="text-4xl font-bold text-center mb-12 animate-fade-in">Bonus Inclus</h2>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
               <Link to="/tarifs" className="block group">
