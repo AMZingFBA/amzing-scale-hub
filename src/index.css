@@ -144,6 +144,33 @@
   }
 }
 
+@keyframes float {
+  0%, 100% { 
+    transform: translateY(0px); 
+  }
+  50% { 
+    transform: translateY(-20px); 
+  }
+}
+
+@keyframes gradient-shift {
+  0%, 100% { 
+    background-position: 0% 50%; 
+  }
+  50% { 
+    background-position: 100% 50%; 
+  }
+}
+
+@keyframes border-glow {
+  0%, 100% { 
+    box-shadow: 0 0 0 0 hsl(var(--primary) / 0); 
+  }
+  50% { 
+    box-shadow: 0 0 0 4px hsl(var(--primary) / 0.2); 
+  }
+}
+
 .animate-scroll-fast {
   animation: scroll-left 25s linear infinite;
 }
@@ -155,4 +182,21 @@
 .animate-scroll-fast:hover,
 .animate-scroll-reverse:hover {
   animation-play-state: paused;
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-gradient-shift {
+  background-size: 200% 200%;
+  animation: gradient-shift 3s ease infinite;
+}
+
+.animate-border-glow {
+  animation: border-glow 2s ease-in-out infinite;
+}
+
+.shadow-elegant {
+  box-shadow: 0 20px 25px -5px hsl(var(--primary) / 0.1), 0 10px 10px -5px hsl(var(--primary) / 0.04);
 }
