@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import logo from "@/assets/logo.png";
+import logo from "@/assets/logo-amzing.png";
 import { useAuth } from "@/hooks/use-auth";
 import { Mail } from "lucide-react";
 

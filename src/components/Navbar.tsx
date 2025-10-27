@@ -14,7 +14,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import logo from "@/assets/logo.png";
+import logo from "@/assets/logo-amzing.png";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
