@@ -4,97 +4,105 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Badge } from "@/components/ui/badge";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { Link } from "react-router-dom";
 
 const Tarifs = () => {
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen relative overflow-hidden">
       <Navbar />
       
-      <div className="pt-32 pb-20">
+      {/* Animated background elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-20">
+        <div className="absolute top-20 left-10 w-64 h-64 bg-primary/30 rounded-full blur-3xl animate-float" style={{ animationDelay: '0s' }}></div>
+        <div className="absolute bottom-40 right-20 w-96 h-96 bg-secondary/30 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }}></div>
+        <div className="absolute top-1/2 left-1/3 w-48 h-48 bg-accent/20 rounded-full blur-3xl animate-float" style={{ animationDelay: '4s' }}></div>
+      </div>
+
+      <div className="pt-32 pb-20 relative z-10">
         <div className="container mx-auto px-4">
           {/* Hero */}
           <div className="text-center mb-16">
-            <Badge className="mb-4 bg-primary/10 text-primary border-primary/20">
+            <Badge className="mb-4 bg-primary/10 text-primary border-primary/20 animate-fade-in">
               Une seule offre, tout inclus
             </Badge>
-            <h1 className="text-5xl md:text-6xl font-bold mb-6">
+            <h1 className="text-5xl md:text-6xl font-bold mb-6 animate-fade-in" style={{ animationDelay: '0.1s' }}>
               Accès VIP AMZing FBA
             </h1>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto animate-fade-in" style={{ animationDelay: '0.2s' }}>
               Tout ce dont tu as besoin pour réussir sur Amazon FBA en un seul abonnement
             </p>
           </div>
 
           {/* Single Pricing Card */}
-          <div className="max-w-2xl mx-auto mb-16">
-            <Card className="border-2 border-primary shadow-2xl relative">
-              <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                <Badge className="bg-gradient-to-r from-primary to-secondary text-white px-6 py-2 text-lg">
-                  <Star className="w-5 h-5 inline mr-2" />
+          <div className="max-w-2xl mx-auto mb-16 animate-fade-in" style={{ animationDelay: '0.3s' }}>
+            <Card className="border-2 border-primary shadow-2xl relative group hover:scale-[1.02] hover:shadow-primary/30 transition-all duration-500">
+              <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-10">
+                <Badge className="bg-gradient-to-r from-primary to-secondary text-white px-6 py-2 text-lg animate-float hover:scale-110 transition-transform cursor-pointer">
+                  <Star className="w-5 h-5 inline mr-2 animate-pulse" />
                   15 jours gratuits
                 </Badge>
               </div>
               <CardHeader className="text-center pb-8 pt-12">
-                <CardTitle className="text-4xl mb-4">Espace VIP AMZing FBA</CardTitle>
+                <CardTitle className="text-4xl mb-4 group-hover:text-primary transition-colors">Espace VIP AMZing FBA</CardTitle>
                 <CardDescription className="text-lg">Accès complet à tous les outils et services</CardDescription>
                 <div className="mt-8">
-                  <span className="text-6xl font-bold text-gradient">34,99€</span>
+                  <span className="text-6xl font-bold text-gradient animate-fade-in">34,99€</span>
                   <span className="text-2xl text-muted-foreground">/mois</span>
                 </div>
               </CardHeader>
               <CardContent className="px-8">
                 <div className="space-y-4 mb-8">
-                  <div className="flex items-start gap-3">
-                    <Check className="w-6 h-6 text-primary flex-shrink-0 mt-1" />
+                  <div className="flex items-start gap-3 group/item hover:translate-x-2 transition-transform duration-300 animate-fade-in" style={{ animationDelay: '0.4s' }}>
+                    <Check className="w-6 h-6 text-primary flex-shrink-0 mt-1 group-hover/item:scale-110 transition-transform" />
                     <div>
                       <span className="font-semibold text-lg">Moniteurs automatiques</span>
                       <p className="text-muted-foreground text-sm">Robots qui notifient dès qu'un produit rentable est détecté (Qogita, Auchan, King Jouet...)</p>
                     </div>
                   </div>
-                  <div className="flex items-start gap-3">
-                    <Check className="w-6 h-6 text-primary flex-shrink-0 mt-1" />
+                  <div className="flex items-start gap-3 group/item hover:translate-x-2 transition-transform duration-300 animate-fade-in" style={{ animationDelay: '0.5s' }}>
+                    <Check className="w-6 h-6 text-primary flex-shrink-0 mt-1 group-hover/item:scale-110 transition-transform" />
                     <div>
                       <span className="font-semibold text-lg">Guides complets Amazon FBA</span>
                       <p className="text-muted-foreground text-sm">Formation pas à pas de 0 aux premières ventes</p>
                     </div>
                   </div>
-                  <div className="flex items-start gap-3">
-                    <Check className="w-6 h-6 text-primary flex-shrink-0 mt-1" />
+                  <div className="flex items-start gap-3 group/item hover:translate-x-2 transition-transform duration-300 animate-fade-in" style={{ animationDelay: '0.6s' }}>
+                    <Check className="w-6 h-6 text-primary flex-shrink-0 mt-1 group-hover/item:scale-110 transition-transform" />
                     <div>
                       <span className="font-semibold text-lg">Fournisseurs privés</span>
                       <p className="text-muted-foreground text-sm">Listing exclusif de produits sourcés et testés</p>
                     </div>
                   </div>
-                  <div className="flex items-start gap-3">
-                    <Check className="w-6 h-6 text-primary flex-shrink-0 mt-1" />
+                  <div className="flex items-start gap-3 group/item hover:translate-x-2 transition-transform duration-300 animate-fade-in" style={{ animationDelay: '0.7s' }}>
+                    <Check className="w-6 h-6 text-primary flex-shrink-0 mt-1 group-hover/item:scale-110 transition-transform" />
                     <div>
                       <span className="font-semibold text-lg">Stock Checker</span>
                       <p className="text-muted-foreground text-sm">Vérifie le stock en magasin en temps réel</p>
                     </div>
                   </div>
-                  <div className="flex items-start gap-3">
-                    <Check className="w-6 h-6 text-primary flex-shrink-0 mt-1" />
+                  <div className="flex items-start gap-3 group/item hover:translate-x-2 transition-transform duration-300 animate-fade-in" style={{ animationDelay: '0.8s' }}>
+                    <Check className="w-6 h-6 text-primary flex-shrink-0 mt-1 group-hover/item:scale-110 transition-transform" />
                     <div>
                       <span className="font-semibold text-lg">Notifications produits</span>
                       <p className="text-muted-foreground text-sm">Alertes instore et online pour opportunités</p>
                     </div>
                   </div>
-                  <div className="flex items-start gap-3">
-                    <Check className="w-6 h-6 text-primary flex-shrink-0 mt-1" />
+                  <div className="flex items-start gap-3 group/item hover:translate-x-2 transition-transform duration-300 animate-fade-in" style={{ animationDelay: '0.9s' }}>
+                    <Check className="w-6 h-6 text-primary flex-shrink-0 mt-1 group-hover/item:scale-110 transition-transform" />
                     <div>
                       <span className="font-semibold text-lg">Conseils niches privées</span>
                       <p className="text-muted-foreground text-sm">Investissements stratégiques et opportunités exclusives</p>
                     </div>
                   </div>
-                  <div className="flex items-start gap-3">
-                    <Check className="w-6 h-6 text-primary flex-shrink-0 mt-1" />
+                  <div className="flex items-start gap-3 group/item hover:translate-x-2 transition-transform duration-300 animate-fade-in" style={{ animationDelay: '1s' }}>
+                    <Check className="w-6 h-6 text-primary flex-shrink-0 mt-1 group-hover/item:scale-110 transition-transform" />
                     <div>
                       <span className="font-semibold text-lg">Réductions exclusives</span>
                       <p className="text-muted-foreground text-sm">Tarifs préférentiels sur emballages et bordereaux</p>
                     </div>
                   </div>
-                  <div className="flex items-start gap-3">
-                    <Check className="w-6 h-6 text-primary flex-shrink-0 mt-1" />
+                  <div className="flex items-start gap-3 group/item hover:translate-x-2 transition-transform duration-300 animate-fade-in" style={{ animationDelay: '1.1s' }}>
+                    <Check className="w-6 h-6 text-primary flex-shrink-0 mt-1 group-hover/item:scale-110 transition-transform" />
                     <div>
                       <span className="font-semibold text-lg">Service logistique</span>
                       <p className="text-muted-foreground text-sm">Stockage et expédition sous 24h disponibles</p>
@@ -103,7 +111,7 @@ const Tarifs = () => {
                 </div>
               </CardContent>
               <CardFooter className="px-8 pb-8">
-                <Button variant="hero" className="w-full text-lg py-6" size="lg">
+                <Button variant="hero" className="w-full text-lg py-6 hover:scale-105 transition-transform" size="lg">
                   Commencer l'essai gratuit (15 jours)
                 </Button>
               </CardFooter>
@@ -166,19 +174,27 @@ const Tarifs = () => {
           </div>
 
           {/* CTA */}
-          <Card className="mt-16 bg-gradient-to-r from-primary to-secondary text-white border-none">
-            <CardContent className="p-12 text-center">
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                Besoin d{"'"}un Devis Personnalisé ?
-              </h2>
-              <p className="text-xl mb-8 text-white/90 max-w-2xl mx-auto">
-                Contactez-nous pour discuter de vos besoins spécifiques
-              </p>
-              <a href="/contact">
-                <Button variant="secondary" size="xl" className="bg-white text-primary hover:bg-white/90">
-                  Nous contacter
-                </Button>
-              </a>
+          <Card className="mt-16 bg-gradient-to-r from-primary to-secondary text-white border-none animate-fade-in hover:shadow-2xl hover:shadow-primary/30 transition-all duration-500 animate-gradient-shift group">
+            <CardContent className="p-12 text-center relative overflow-hidden">
+              {/* Animated floating elements inside the card */}
+              <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-20">
+                <div className="absolute top-10 left-10 w-32 h-32 bg-white/20 rounded-full blur-2xl animate-float"></div>
+                <div className="absolute bottom-10 right-10 w-40 h-40 bg-white/10 rounded-full blur-2xl animate-float" style={{ animationDelay: '2s' }}></div>
+              </div>
+              
+              <div className="relative z-10">
+                <h2 className="text-3xl md:text-4xl font-bold mb-4 animate-fade-in group-hover:scale-105 transition-transform">
+                  Besoin d{"'"}un Devis Personnalisé ?
+                </h2>
+                <p className="text-xl mb-8 text-white/90 max-w-2xl mx-auto animate-fade-in" style={{ animationDelay: '0.1s' }}>
+                  Contactez-nous pour discuter de vos besoins spécifiques
+                </p>
+                <Link to="/contact">
+                  <Button variant="secondary" size="xl" className="bg-white text-primary hover:bg-white/90 hover:scale-105 transition-all duration-300 hover:shadow-xl animate-fade-in" style={{ animationDelay: '0.2s' }}>
+                    Nous contacter
+                  </Button>
+                </Link>
+              </div>
             </CardContent>
           </Card>
         </div>
