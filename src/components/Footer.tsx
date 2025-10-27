@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import logo from "@/assets/logo.png";
 import { useAuth } from "@/hooks/use-auth";
+import { Mail, Phone, Clock } from "lucide-react";
 
 const Footer = () => {
   const { isVIP } = useAuth();
@@ -60,19 +61,45 @@ const Footer = () => {
 
           {/* Contact Info */}
           <div className="animate-fade-in" style={{ animationDelay: '0.3s' }}>
-            <h3 className="text-lg font-semibold mb-4 text-foreground">Contact</h3>
-            <ul className="space-y-2 text-muted-foreground">
-              <li className="flex items-center gap-2">
-                <span className="text-primary">📧</span>
-                <span>support@amzingfba.com</span>
+            <h3 className="text-lg font-semibold mb-4 text-foreground">Nous Contacter</h3>
+            <ul className="space-y-3">
+              <li className="flex items-start gap-3 group">
+                <div className="p-2 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                  <Mail className="w-4 h-4 text-primary" />
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground mb-1">Email</p>
+                  <a 
+                    href="mailto:support@amzingfba.com"
+                    className="text-sm text-foreground hover:text-primary transition-colors"
+                  >
+                    support@amzingfba.com
+                  </a>
+                </div>
               </li>
-              <li className="flex items-center gap-2">
-                <span className="text-primary">📞</span>
-                <span>Service client disponible</span>
+              <li className="flex items-start gap-3 group">
+                <div className="p-2 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                  <Phone className="w-4 h-4 text-primary" />
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground mb-1">Téléphone</p>
+                  <Link 
+                    to="/contact"
+                    className="text-sm text-foreground hover:text-primary transition-colors"
+                  >
+                    Nous contacter
+                  </Link>
+                </div>
               </li>
-              <li className="flex items-center gap-2">
-                <span className="text-primary">🕐</span>
-                <span>Lun-Ven: 9h-18h</span>
+              <li className="flex items-start gap-3 group">
+                <div className="p-2 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                  <Clock className="w-4 h-4 text-primary" />
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground mb-1">Horaires</p>
+                  <p className="text-sm text-foreground">Lundi - Vendredi</p>
+                  <p className="text-xs text-muted-foreground">9h00 - 18h00</p>
+                </div>
               </li>
             </ul>
           </div>
