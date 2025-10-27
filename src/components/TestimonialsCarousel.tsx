@@ -160,8 +160,8 @@ const TestimonialsCarousel = () => {
   return (
     <div className="relative overflow-hidden space-y-6 py-4">
       {/* Fade masks on sides */}
-      <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none" />
-      <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none" />
+      <div className="absolute left-0 top-0 bottom-0 w-64 bg-gradient-to-r from-background via-background/80 to-transparent z-10 pointer-events-none" />
+      <div className="absolute right-0 top-0 bottom-0 w-64 bg-gradient-to-l from-background via-background/80 to-transparent z-10 pointer-events-none" />
       
       {/* First row - scrolling left */}
       <div className="flex animate-scroll-fast gap-6">
