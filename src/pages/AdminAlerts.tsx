@@ -470,7 +470,7 @@ const AdminAlerts = () => {
                   )}
                 </div>
 
-                <Button type="submit" disabled={isSubmitting} className="w-full">
+                <Button type="submit" variant="hero" disabled={isSubmitting} className="w-full">
                   {isSubmitting ? (
                     <>
                       <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -755,7 +755,7 @@ const AdminAlerts = () => {
               >
                 Annuler
               </Button>
-              <Button type="submit" disabled={isSubmitting}>
+              <Button type="submit" variant="hero" disabled={isSubmitting}>
                 {isSubmitting ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />

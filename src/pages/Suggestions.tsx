@@ -261,7 +261,7 @@ const Suggestions = () => {
                       >
                         Annuler
                       </Button>
-                      <Button type="submit" disabled={submitting}>
+                      <Button type="submit" variant="hero" disabled={submitting}>
                         {submitting ? (
                           <>
                             <Loader2 className="h-4 w-4 animate-spin mr-2" />

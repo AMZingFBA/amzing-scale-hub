@@ -272,7 +272,8 @@ const Contact = () => {
                   
                   <Button 
                     size="lg" 
-                    className="w-full bg-gradient-to-r from-primary to-secondary hover:shadow-glow transition-all duration-300 hover:scale-105 active:scale-95 group" 
+                    variant="hero"
+                    className="w-full hover:scale-105 group" 
                     type="submit"
                     disabled={isSubmitting}
                   >

@@ -177,7 +177,8 @@ export default function Auth() {
 
                     <Button
                       type="submit"
-                      className="w-full bg-gradient-to-r from-primary to-secondary hover:shadow-glow transition-all duration-300 active:scale-[0.98]"
+                      variant="hero"
+                      className="w-full"
                       disabled={isLoading}
                     >
                       {isLoading ? "Connexion..." : "Se connecter"}
@@ -290,7 +291,8 @@ export default function Auth() {
 
                     <Button
                       type="submit"
-                      className="w-full bg-gradient-to-r from-primary to-secondary hover:shadow-glow transition-all duration-300 active:scale-[0.98]"
+                      variant="hero"
+                      className="w-full"
                       disabled={isLoading}
                     >
                       {isLoading ? "Création..." : "Créer mon compte"}
