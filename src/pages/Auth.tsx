@@ -86,10 +86,11 @@ export default function Auth() {
       {/* Left Side - Form */}
       <div className={`w-full lg:w-1/2 flex items-center justify-center p-8 relative overflow-hidden ${isNativeApp ? 'pt-16' : ''}`}>
         {/* Decorative elements */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-5">
+        <div className={`absolute inset-0 overflow-hidden pointer-events-none ${isNativeApp ? 'opacity-20' : 'opacity-5'}`}>
           <Package className="absolute top-10 right-10 h-20 w-20 text-primary animate-float" style={{ animationDelay: "0s" }} />
           <TrendingUp className="absolute bottom-20 left-10 h-16 w-16 text-secondary animate-float" style={{ animationDelay: "1s" }} />
           <BarChart3 className="absolute top-1/3 left-5 h-12 w-12 text-primary animate-float" style={{ animationDelay: "2s" }} />
+          <Package className="absolute bottom-10 right-20 h-14 w-14 text-secondary animate-float" style={{ animationDelay: "1.5s" }} />
         </div>
         
         <div className="w-full max-w-md space-y-8 relative z-10">
