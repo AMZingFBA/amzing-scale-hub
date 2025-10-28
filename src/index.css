@@ -124,6 +124,11 @@
   .shadow-blue {
     box-shadow: var(--shadow-blue);
   }
+  
+  /* Safe area support pour les apps natives iOS */
+  .pt-safe {
+    padding-top: env(safe-area-inset-top);
+  }
 }
 
 @keyframes scroll-left {

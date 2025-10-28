@@ -14,6 +14,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Capacitor } from "@capacitor/core";
 import logo from "@/assets/logo-amzing.png";
 
 const Navbar = () => {
@@ -23,9 +24,12 @@ const Navbar = () => {
   const { unreadCount: buyUnreadCount } = useMarketplaceBuyUnread();
   const { unreadCount: sellUnreadCount } = useMarketplaceSellUnread();
   const totalMarketplaceUnread = buyUnreadCount + sellUnreadCount;
+  
+  // Détection si on est dans l'app native pour ajuster le padding pour la safe area
+  const isNativeApp = Capacitor.isNativePlatform();
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
+    <nav className={`fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border ${isNativeApp ? 'pt-safe' : ''}`}>
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-20">
           <Link to="/" className="flex items-center group">
