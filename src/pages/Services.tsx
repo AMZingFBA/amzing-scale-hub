@@ -1,10 +1,10 @@
-import { Check, AlertCircle, GraduationCap, Package, TrendingUp, MessageSquare, Target, DollarSign, Truck, Headphones } from "lucide-react";
+import { Check, AlertCircle, GraduationCap, Package, TrendingUp, MessageSquare, Target, DollarSign, Truck, Headphones, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useScrollReveal } from "@/hooks/use-scroll-reveal";
 import { Capacitor } from "@capacitor/core";
 
@@ -33,10 +33,25 @@ const ServiceCard = ({ children, delay }: { children: React.ReactNode, delay: nu
 const Services = () => {
   const isNativeApp = Capacitor.isNativePlatform();
   const headerReveal = useScrollReveal({ delay: 0 });
+  const navigate = useNavigate();
   
   return (
     <div className="min-h-screen">
       <Navbar />
+      
+      {/* Back button for mobile app */}
+      {isNativeApp && (
+        <div className="fixed top-4 left-4 z-50 animate-slide-in-left">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => navigate('/')}
+            className="rounded-full shadow-lg bg-background/80 backdrop-blur-sm hover:bg-primary hover:text-white border-2 border-primary/20 hover:border-primary transition-all duration-300 hover:scale-110"
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+        </div>
+      )}
       
       <div className="pt-32 pb-20">
         <div className="container mx-auto px-4">

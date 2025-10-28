@@ -1,4 +1,4 @@
-import { Mail, MessageSquare, Phone, Send, CheckCircle, Sparkles } from "lucide-react";
+import { Mail, MessageSquare, Phone, Send, CheckCircle, Sparkles, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -10,6 +10,8 @@ import { useState } from "react";
 import { z } from "zod";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { useNavigate } from "react-router-dom";
+import { Capacitor } from "@capacitor/core";
 
 const contactSchema = z.object({
   name: z.string().trim().min(1, "Le nom est requis").max(100, "Le nom est trop long"),
@@ -21,6 +23,8 @@ const contactSchema = z.object({
 
 const Contact = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
+  const isNativeApp = Capacitor.isNativePlatform();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
@@ -106,6 +110,20 @@ const Contact = () => {
   return (
     <div className="min-h-screen">
       <Navbar />
+      
+      {/* Back button for mobile app */}
+      {isNativeApp && (
+        <div className="fixed top-4 left-4 z-50 animate-slide-in-left">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => navigate('/')}
+            className="rounded-full shadow-lg bg-background/80 backdrop-blur-sm hover:bg-primary hover:text-white border-2 border-primary/20 hover:border-primary transition-all duration-300 hover:scale-110"
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+        </div>
+      )}
       
       {/* Hero Section with animated background */}
       <section className="relative pt-32 pb-20 overflow-hidden">
