@@ -1,9 +1,8 @@
-import React from "react";
-import { Star, CheckCircle } from "lucide-react";
+import { Star, ArrowLeft } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { useScrollReveal } from "@/hooks/use-scroll-reveal";
 import { Capacitor } from "@capacitor/core";
+import { useNavigate } from "react-router-dom";
+import { useMemo } from "react";
 
 const testimonials = [
   {
@@ -143,109 +142,76 @@ const testimonials = [
   }
 ];
 
-const TestimonialCard = ({ testimonial, delay }: { testimonial: typeof testimonials[0], delay: number }) => {
-  const { ref, isVisible } = useScrollReveal({ delay });
-
-  return (
-    <div
-      ref={ref}
-      className={`transition-all duration-300 ${
-        isVisible 
-          ? "opacity-100 translate-y-0" 
-          : "opacity-0 translate-y-4"
-      }`}
-      style={{ transitionDelay: `${delay}ms` }}
-    >
-      <Card className="border border-primary/20 bg-[#FFFDF7] shadow-lg hover:shadow-xl transition-all duration-300">
-        <CardContent className="p-5">
-          {/* Stars & Rating */}
-          <div className="flex items-center gap-2 mb-3">
-            <div className="flex gap-1">
-              {[...Array(5)].map((_, i) => (
-                <Star
-                  key={i}
-                  className={`w-5 h-5 ${
-                    i < testimonial.rating
-                      ? "text-primary fill-primary"
-                      : "text-muted-foreground/30"
-                  }`}
-                />
-              ))}
-            </div>
-            <span className="text-lg font-bold text-primary">{testimonial.rating}/5</span>
-          </div>
-
-          {/* Testimonial Text */}
-          <p className="text-[#2A2A2A] text-[15px] leading-relaxed mb-4">
-            "{testimonial.text}"
-          </p>
-
-          {/* Name */}
-          <p className="font-bold text-primary text-base">
-            — {testimonial.name}
-          </p>
-        </CardContent>
-      </Card>
-    </div>
-  );
-};
-
-const TestimonialsMobile = () => {
+const Avis = () => {
+  const navigate = useNavigate();
   const isNativeApp = Capacitor.isNativePlatform();
-  
-  // Only render mobile version on native app
+
+  // Randomize testimonials order
+  const randomizedTestimonials = useMemo(() => {
+    return [...testimonials].sort(() => 0.5 - Math.random());
+  }, []);
+
+  // Redirect to home if not native app
   if (!isNativeApp) {
+    navigate('/');
     return null;
   }
 
-  // Select 2 random testimonials from the list
-  const selectedTestimonials = React.useMemo(() => {
-    const shuffled = [...testimonials].sort(() => 0.5 - Math.random());
-    return shuffled.slice(0, 2);
-  }, []);
-
-  const [showAllTestimonials, setShowAllTestimonials] = React.useState(false);
-
   return (
-    <div className="px-4 pb-4">
-      {/* Badge */}
-      <div className="flex justify-center mb-4 opacity-0 animate-in fade-in slide-in-from-top-4 duration-200">
-        <Badge className="bg-[#FFF7E6] text-primary border border-primary/30 px-4 py-2 rounded-full text-sm font-semibold flex items-center gap-2">
-          <CheckCircle className="w-4 h-4" />
-          Témoignages clients réels
-        </Badge>
+    <div className="min-h-screen bg-background">
+      {/* Header */}
+      <div className="sticky top-0 z-10 bg-background border-b border-border">
+        <div className="flex items-center gap-4 px-4 py-4">
+          <button
+            onClick={() => navigate(-1)}
+            className="p-2 hover:bg-accent rounded-lg transition-colors active:scale-95"
+          >
+            <ArrowLeft className="w-6 h-6" />
+          </button>
+          <h1 className="text-2xl font-bold">Tous les avis</h1>
+        </div>
       </div>
 
-      {/* Title */}
-      <h2 className="text-3xl md:text-4xl font-bold text-center mb-6 text-foreground opacity-0 animate-in fade-in slide-in-from-bottom-4 duration-200" style={{ animationDelay: "50ms" }}>
-        Ce que disent nos membres
-      </h2>
-
-      {/* Testimonials Stack */}
-      <div className="max-w-2xl mx-auto space-y-4">
-        {(showAllTestimonials ? testimonials : selectedTestimonials).map((testimonial, index) => (
-          <TestimonialCard
+      {/* Testimonials List - No animations */}
+      <div className="px-4 py-6 space-y-4 max-w-2xl mx-auto">
+        {randomizedTestimonials.map((testimonial, index) => (
+          <Card 
             key={index}
-            testimonial={testimonial}
-            delay={index * 50 + 100}
-          />
+            className="border border-primary/20 bg-[#FFFDF7] shadow-lg"
+          >
+            <CardContent className="p-5">
+              {/* Stars & Rating */}
+              <div className="flex items-center gap-2 mb-3">
+                <div className="flex gap-1">
+                  {[...Array(5)].map((_, i) => (
+                    <Star
+                      key={i}
+                      className={`w-5 h-5 ${
+                        i < testimonial.rating
+                          ? "text-primary fill-primary"
+                          : "text-muted-foreground/30"
+                      }`}
+                    />
+                  ))}
+                </div>
+                <span className="text-lg font-bold text-primary">{testimonial.rating}/5</span>
+              </div>
+
+              {/* Testimonial Text */}
+              <p className="text-[#2A2A2A] text-[15px] leading-relaxed mb-4">
+                "{testimonial.text}"
+              </p>
+
+              {/* Name */}
+              <p className="font-bold text-primary text-base">
+                — {testimonial.name}
+              </p>
+            </CardContent>
+          </Card>
         ))}
       </div>
-
-      {/* Show More Button */}
-      {!showAllTestimonials && (
-        <div className="flex justify-center mt-6">
-          <a href="/avis">
-            <button
-              className="px-6 py-3 bg-gradient-to-r from-primary to-secondary text-white rounded-lg font-semibold shadow-lg hover:shadow-glow transition-all duration-300 active:scale-95"
-            >
-              Voir plus d'avis ({testimonials.length - 2})
-            </button>
-          </a>
-        </div>
-      )}
     </div>
   );
 };
 
-export default TestimonialsMobile;
+export default Avis;

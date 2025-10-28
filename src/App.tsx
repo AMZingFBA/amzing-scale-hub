@@ -37,6 +37,7 @@ import Annonces from "./pages/Annonces";
 import Actualite from "./pages/Actualite";
 import CatalogueProduits from "./pages/CatalogueProduits";
 import Questions from "./pages/Questions";
+import Avis from "./pages/Avis";
 
 const queryClient = new QueryClient();
 
@@ -81,6 +82,7 @@ const App = () => (
             <Route path="/acheter" element={<Marketplace />} />
             <Route path="/vendre" element={<WantToSell />} />
             <Route path="/marketplace" element={<Marketplace />} />
+            <Route path="/avis" element={<Avis />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
