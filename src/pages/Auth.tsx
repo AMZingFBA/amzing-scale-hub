@@ -93,12 +93,12 @@ export default function Auth() {
         )}
         <div className="w-full max-w-md space-y-8">
           {/* Logo */}
-          <Link to="/" className="flex justify-center opacity-0 animate-in fade-in slide-in-from-top-4 duration-500">
+          <Link to="/" className={`flex justify-center ${isNativeApp ? '' : 'opacity-0 animate-in fade-in slide-in-from-top-4 duration-500'}`}>
             <img src={logo} alt="AMZing FBA" className="h-16 w-auto hover:scale-105 transition-transform" />
           </Link>
 
           {/* Form Card */}
-          <Card className="border-border/50 shadow-elegant backdrop-blur-sm opacity-0 animate-in fade-in slide-in-from-bottom-6 duration-500" style={{ animationDelay: "150ms" }}>
+          <Card className={`border-border/50 shadow-elegant backdrop-blur-sm ${isNativeApp ? '' : 'opacity-0 animate-in fade-in slide-in-from-bottom-6 duration-500'}`} style={!isNativeApp ? { animationDelay: "150ms" } : undefined}>
             <CardHeader className="space-y-1 text-center">
               <CardTitle className="text-2xl font-bold">
                 {activeTab === "login" ? "Bienvenue !" : "Créez votre compte"}
@@ -305,7 +305,7 @@ export default function Auth() {
             </CardContent>
           </Card>
 
-          <p className="text-center text-sm text-muted-foreground animate-fade-in" style={{ animationDelay: "0.2s" }}>
+          <p className={`text-center text-sm text-muted-foreground ${!isNativeApp ? 'animate-fade-in' : ''}`} style={!isNativeApp ? { animationDelay: "0.2s" } : undefined}>
             <Link to="/" className="text-primary hover:underline transition-all">
               Retour à l'accueil
             </Link>
