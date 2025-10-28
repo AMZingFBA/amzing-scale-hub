@@ -947,7 +947,7 @@ const Marketplace = () => {
         {/* Buy Section - Want to Buy / Recherche de produits */}
         {activeSection === "buy" && (
           <div className="w-full space-y-6 animate-fade-in">
-            <div className={`mb-8 ${isNativeApp ? 'pt-12' : ''}`}>
+            <div className={`mb-8 ${isNativeApp ? 'pt-20' : ''}`}>
               <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
                 Want to Buy - Je recherche
               </h1>

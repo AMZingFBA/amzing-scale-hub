@@ -370,7 +370,7 @@ const Chat = () => {
       {isNativeApp && (
         <button
           onClick={() => navigate('/dashboard')}
-          className="fixed top-[46px] right-[18px] z-50 bg-primary/90 backdrop-blur-sm p-2 rounded-full shadow-lg hover:bg-primary transition-all"
+          className="fixed top-[46px] left-[18px] z-50 bg-primary/90 backdrop-blur-sm p-2 rounded-full shadow-lg hover:bg-primary transition-all"
           aria-label="Retour"
         >
           <ArrowLeft className="w-5 h-5 text-primary-foreground" />
@@ -388,14 +388,14 @@ const Chat = () => {
 
               <TabsContent value="rooms" className="flex-1 flex flex-col">
                 <div className="space-y-4 mb-4">
-                  <div className="flex items-center justify-between">
+                  <div className={`flex items-center ${isNativeApp ? 'justify-center' : 'justify-between'}`}>
                     <h2 className="text-xl font-bold flex items-center gap-2">
                       <Users className="h-5 w-5" />
                       Conversations
                     </h2>
                     <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
                       <DialogTrigger asChild>
-                        <Button size="sm" variant="outline">
+                        <Button size="sm" variant="outline" className={isNativeApp ? 'absolute right-4' : ''}>
                           <Plus className="h-4 w-4" />
                         </Button>
                       </DialogTrigger>
