@@ -6,12 +6,25 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Capacitor } from "@capacitor/core";
 import { useScrollReveal } from "@/hooks/use-scroll-reveal";
+import { useState } from "react";
 
 const Catalogue = () => {
   const isNativeApp = Capacitor.isNativePlatform();
   const heroReveal = useScrollReveal({ animation: "fade-up", delay: 100 });
   const statsReveal = useScrollReveal({ animation: "scale", delay: 200 });
   const testimonialsReveal = useScrollReveal({ animation: "fade-up", delay: 100 });
+  const [clickedCard, setClickedCard] = useState<number | null>(null);
+  const [clickedTestimonial, setClickedTestimonial] = useState<number | null>(null);
+
+  const handleCardClick = (index: number) => {
+    setClickedCard(index);
+    setTimeout(() => setClickedCard(null), 600);
+  };
+
+  const handleTestimonialClick = (index: number) => {
+    setClickedTestimonial(index);
+    setTimeout(() => setClickedTestimonial(null), 600);
+  };
   
   const benefits = [
     {
@@ -121,7 +134,7 @@ const Catalogue = () => {
             <div className={`flex flex-col sm:flex-row gap-4 justify-center items-center mb-8 ${isNativeApp ? 'animate-scale-in' : ''}`} style={isNativeApp ? { animationDelay: '0.4s' } : {}}>
               <Button 
                 size="lg" 
-                className={`bg-gradient-to-r from-primary to-secondary text-white border-none hover:opacity-90 px-8 py-6 text-lg font-bold ${isNativeApp ? 'shadow-2xl shadow-primary/50 hover:shadow-primary/70 transition-all duration-300 hover:scale-105' : ''}`}
+                className={`bg-gradient-to-r from-primary to-secondary text-white border-none hover:opacity-90 px-8 py-6 text-lg font-bold ${isNativeApp ? 'shadow-2xl shadow-primary/50 hover:shadow-primary/70 transition-all duration-300 hover:scale-105 active:scale-95 active:shadow-3xl active:shadow-primary' : ''}`}
                 onClick={() => {
                   // TODO: Remplacer par le lien Whop
                   alert("Lien Whop à venir");
@@ -133,6 +146,7 @@ const Catalogue = () => {
               <Button 
                 size="lg" 
                 variant="outline"
+                className={isNativeApp ? 'hover:scale-105 active:scale-95 transition-transform duration-200' : ''}
                 onClick={() => window.location.href = "/formation"}
               >
                 En savoir plus
@@ -164,18 +178,23 @@ const Catalogue = () => {
               {benefits.map((benefit, index) => {
                 const Icon = benefit.icon;
                 const cardReveal = useScrollReveal({ animation: "fade-up", delay: index * 100 });
+                const isClicked = clickedCard === index;
                 return (
                   <Card 
                     key={index} 
                     ref={isNativeApp ? cardReveal.ref : undefined}
-                    className={`hover:shadow-xl transition-all hover:-translate-y-1 ${isNativeApp && !cardReveal.isVisible ? 'opacity-0 translate-y-10' : ''} ${isNativeApp ? 'transition-all duration-700 ease-out' : ''} ${isNativeApp ? 'border-2 border-primary/10 hover:border-primary/30' : ''}`}
+                    onClick={() => isNativeApp && handleCardClick(index)}
+                    className={`cursor-pointer hover:shadow-xl transition-all hover:-translate-y-1 ${isNativeApp && !cardReveal.isVisible ? 'opacity-0 translate-y-10' : ''} ${isNativeApp ? 'transition-all duration-700 ease-out' : ''} ${isNativeApp ? 'border-2 border-primary/10 hover:border-primary/30 active:scale-95' : ''} ${isClicked && isNativeApp ? 'scale-105 shadow-2xl shadow-primary/50 border-primary/50' : ''}`}
                   >
-                    <CardContent className="pt-6">
-                      <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center mb-4 ${isNativeApp ? 'shadow-lg shadow-primary/30 animate-pulse' : ''}`}>
-                        <Icon className="w-7 h-7 text-white" />
+                    <CardContent className="pt-6 relative overflow-hidden">
+                      {isClicked && isNativeApp && (
+                        <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-secondary/10 to-primary/10 animate-pulse" />
+                      )}
+                      <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center mb-4 relative z-10 ${isNativeApp ? 'shadow-lg shadow-primary/30' : ''} ${isClicked && isNativeApp ? 'animate-spin' : isNativeApp ? 'animate-pulse' : ''}`}>
+                        <Icon className={`w-7 h-7 text-white ${isClicked && isNativeApp ? 'scale-125' : ''} transition-transform duration-300`} />
                       </div>
-                      <h3 className="text-xl font-bold mb-3">{benefit.title}</h3>
-                      <p className="text-muted-foreground">{benefit.description}</p>
+                      <h3 className={`text-xl font-bold mb-3 relative z-10 ${isClicked && isNativeApp ? 'text-primary' : ''} transition-colors duration-300`}>{benefit.title}</h3>
+                      <p className="text-muted-foreground relative z-10">{benefit.description}</p>
                     </CardContent>
                   </Card>
                 );
@@ -226,22 +245,34 @@ const Catalogue = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {testimonials.map((testimonial, index) => {
                 const testReveal = useScrollReveal({ animation: "fade-up", delay: index * 150 });
+                const isClicked = clickedTestimonial === index;
                 return (
                   <Card 
                     key={index} 
                     ref={isNativeApp ? testReveal.ref : undefined}
-                    className={`hover:shadow-lg transition-shadow ${isNativeApp && !testReveal.isVisible ? 'opacity-0 translate-y-10' : ''} ${isNativeApp ? 'transition-all duration-700 ease-out border-2 border-primary/10 hover:border-primary/30 hover:scale-105' : ''}`}
+                    onClick={() => isNativeApp && handleTestimonialClick(index)}
+                    className={`cursor-pointer hover:shadow-lg transition-all ${isNativeApp && !testReveal.isVisible ? 'opacity-0 translate-y-10' : ''} ${isNativeApp ? 'transition-all duration-700 ease-out border-2 border-primary/10 hover:border-primary/30 hover:scale-105 active:scale-95' : ''} ${isClicked && isNativeApp ? 'scale-110 shadow-2xl shadow-secondary/50 border-secondary/50 rotate-1' : ''}`}
                   >
-                    <CardHeader>
-                      <div className="flex gap-1 mb-3">
+                    <CardHeader className="relative overflow-hidden">
+                      {isClicked && isNativeApp && (
+                        <>
+                          <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/20 via-transparent to-transparent animate-pulse" />
+                          <Sparkles className="absolute top-2 right-2 w-5 h-5 text-yellow-400 animate-bounce" />
+                        </>
+                      )}
+                      <div className="flex gap-1 mb-3 relative z-10">
                         {[...Array(testimonial.rating)].map((_, i) => (
-                          <Star key={i} className={`w-5 h-5 fill-yellow-400 text-yellow-400 ${isNativeApp ? 'animate-pulse' : ''}`} style={isNativeApp ? { animationDelay: `${i * 0.1}s` } : {}} />
+                          <Star 
+                            key={i} 
+                            className={`w-5 h-5 fill-yellow-400 text-yellow-400 transition-transform ${isNativeApp ? 'animate-pulse' : ''} ${isClicked && isNativeApp ? 'scale-125' : ''}`} 
+                            style={isNativeApp ? { animationDelay: `${i * 0.1}s` } : {}} 
+                          />
                         ))}
                       </div>
-                      <p className="text-muted-foreground italic">"{testimonial.text}"</p>
+                      <p className={`text-muted-foreground italic relative z-10 ${isClicked && isNativeApp ? 'font-semibold' : ''} transition-all duration-300`}>"{testimonial.text}"</p>
                     </CardHeader>
                     <CardContent>
-                      <p className="font-bold text-primary">{testimonial.name}</p>
+                      <p className={`font-bold text-primary ${isClicked && isNativeApp ? 'text-secondary' : ''} transition-colors duration-300`}>{testimonial.name}</p>
                       <p className="text-sm text-muted-foreground">Membre VIP</p>
                     </CardContent>
                   </Card>
@@ -294,13 +325,13 @@ const Catalogue = () => {
               </p>
               <Button 
                 size="lg" 
-                className={`bg-white text-primary hover:bg-white/90 px-10 py-6 text-lg font-bold ${isNativeApp ? 'shadow-2xl hover:shadow-white/50 transition-all duration-300 hover:scale-110 animate-pulse' : ''}`}
+                className={`bg-white text-primary hover:bg-white/90 px-10 py-6 text-lg font-bold ${isNativeApp ? 'shadow-2xl hover:shadow-white/50 transition-all duration-300 hover:scale-110 active:scale-100 active:rotate-3 animate-pulse' : ''}`}
                 onClick={() => {
                   // TODO: Remplacer par le lien Whop
                   alert("Lien Whop à venir");
                 }}
               >
-                <Target className="w-5 h-5 mr-2" />
+                <Target className={`w-5 h-5 mr-2 ${isNativeApp ? 'animate-spin-slow' : ''}`} />
                 Rejoindre la Communauté VIP
               </Button>
               <p className="mt-6 text-sm text-white/80">
