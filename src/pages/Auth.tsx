@@ -84,14 +84,25 @@ export default function Auth() {
   return (
     <div className="min-h-screen w-full flex bg-gradient-to-br from-[#FFF7E6] via-background to-background">
       {/* Left Side - Form */}
-      <div className={`w-full lg:w-1/2 flex items-center justify-center p-8 relative overflow-hidden ${isNativeApp ? 'pt-16' : ''}`}>
+      <div className={`w-full lg:w-1/2 flex items-center justify-center p-8 relative overflow-hidden ${isNativeApp ? 'pt-16 bg-gradient-to-br from-[#FFF7E6] via-background to-primary/5' : ''}`}>
         {/* Decorative elements */}
-        <div className={`absolute inset-0 overflow-hidden pointer-events-none ${isNativeApp ? 'opacity-20' : 'opacity-5'}`}>
+        <div className={`absolute inset-0 overflow-hidden pointer-events-none ${isNativeApp ? 'opacity-25' : 'opacity-5'}`}>
           <Package className="absolute top-10 right-10 h-20 w-20 text-primary animate-float" style={{ animationDelay: "0s" }} />
           <TrendingUp className="absolute bottom-20 left-10 h-16 w-16 text-secondary animate-float" style={{ animationDelay: "1s" }} />
           <BarChart3 className="absolute top-1/3 left-5 h-12 w-12 text-primary animate-float" style={{ animationDelay: "2s" }} />
           <Package className="absolute bottom-10 right-20 h-14 w-14 text-secondary animate-float" style={{ animationDelay: "1.5s" }} />
+          <TrendingUp className="absolute top-1/2 right-5 h-16 w-16 text-primary animate-float" style={{ animationDelay: "2.5s" }} />
+          <BarChart3 className="absolute bottom-1/3 right-12 h-10 w-10 text-secondary animate-float" style={{ animationDelay: "3s" }} />
         </div>
+        
+        {/* Animated circles */}
+        {isNativeApp && (
+          <>
+            <div className="absolute top-20 left-10 w-32 h-32 bg-primary/10 rounded-full blur-2xl animate-float" style={{ animationDelay: "0s" }} />
+            <div className="absolute bottom-20 right-10 w-40 h-40 bg-secondary/10 rounded-full blur-2xl animate-float" style={{ animationDelay: "1.5s" }} />
+            <div className="absolute top-1/2 right-20 w-24 h-24 bg-primary/10 rounded-full blur-2xl animate-float" style={{ animationDelay: "3s" }} />
+          </>
+        )}
         
         <div className="w-full max-w-md space-y-8 relative z-10">
           {/* Logo */}

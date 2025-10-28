@@ -93,10 +93,18 @@ export default {
         },
         "float": {
           "0%, 100%": {
-            transform: "translateY(0px)",
+            transform: "translateY(0px) scale(1)",
           },
           "50%": {
-            transform: "translateY(-20px)",
+            transform: "translateY(-20px) scale(1.05)",
+          },
+        },
+        "float-slow": {
+          "0%, 100%": {
+            transform: "translateY(0px) translateX(0px)",
+          },
+          "50%": {
+            transform: "translateY(-30px) translateX(10px)",
           },
         },
         "slide-in-left": {
@@ -133,6 +141,7 @@ export default {
         "accordion-up": "accordion-up 0.2s ease-out",
         "gradient-shift": "gradient-shift 3s ease infinite",
         "float": "float 3s ease-in-out infinite",
+        "float-slow": "float-slow 4s ease-in-out infinite",
         "slide-in-left": "slide-in-left 0.5s ease-out",
         "slide-in-up": "slide-in-up 0.4s ease-out",
         "bounce-subtle": "bounce-subtle 2s ease-in-out infinite",
