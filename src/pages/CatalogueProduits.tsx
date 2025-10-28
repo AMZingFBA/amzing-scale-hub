@@ -14,6 +14,8 @@ import { toast } from "sonner";
 import { Loader2, Package, Search, Upload, Trash2, ShoppingCart, MessageCircle, X, Copy, ZoomIn, ChevronLeft, ChevronRight, TriangleAlert, Pencil, ArrowLeft } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useCatalogueUnread } from "@/hooks/use-catalogue-unread";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 
 interface CatalogueProduct {
   id: string;
@@ -572,16 +574,18 @@ Est-il toujours disponible ?`;
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted/20 p-4 md:p-8">
+    <div className="min-h-screen flex flex-col">
+      <Navbar />
       {isNativeApp && (
         <button
           onClick={() => navigate('/dashboard')}
-          className="fixed top-[46px] left-[18px] z-50 bg-background/80 backdrop-blur-sm p-2 rounded-full shadow-lg hover:bg-background transition-colors"
+          className="fixed top-[46px] left-[18px] z-50 bg-primary/90 backdrop-blur-sm p-2 rounded-full shadow-lg hover:bg-primary transition-all animate-bounce-subtle"
           aria-label="Retour"
         >
-          <ArrowLeft className="w-5 h-5 text-foreground" />
+          <ArrowLeft className="w-5 h-5 text-primary-foreground" />
         </button>
       )}
+      <main className="flex-grow pt-20 bg-gradient-to-b from-background to-muted/20 p-4 md:p-8">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Quantity Selection Dialog */}
         <Dialog open={showQuantityDialog} onOpenChange={setShowQuantityDialog}>
@@ -1178,6 +1182,8 @@ Est-il toujours disponible ?`;
           </Tabs>
         </div>
       </div>
+      </main>
+      <Footer />
     </div>
   );
 };
