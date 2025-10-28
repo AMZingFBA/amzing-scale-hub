@@ -36,8 +36,8 @@ const Navbar = () => {
             <img src={logo} alt="AMZing FBA" className="h-12 transition-transform group-hover:scale-105" />
           </Link>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
+          {/* Desktop Navigation - Hidden on native app */}
+          <div className={`items-center space-x-8 ${isNativeApp ? 'hidden' : 'hidden md:flex'}`}>
             {!isVIP && (
               <Link to="/contact" className="text-foreground hover:text-primary transition-colors font-medium">
                 Contact
@@ -129,9 +129,100 @@ const Navbar = () => {
             )}
           </div>
 
-          {/* Mobile Menu Button */}
+          {/* Native App Menu - Compact dropdown for mobile app */}
+          {isNativeApp && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-10 w-10">
+                  <Menu className="h-5 w-5" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56 bg-background z-50">
+                {user ? (
+                  <>
+                    <div className="px-2 py-1.5">
+                      <p className="text-sm font-medium">{user.email}</p>
+                      {isVIP && (
+                        <Badge className="mt-1 bg-gradient-to-r from-primary to-secondary text-white border-0">
+                          VIP
+                        </Badge>
+                      )}
+                    </div>
+                    <DropdownMenuSeparator />
+                    {isVIP && (
+                      <DropdownMenuItem asChild>
+                        <Link to="/dashboard" className="cursor-pointer">
+                          <Crown className="w-4 h-4 mr-2" />
+                          Espace VIP
+                        </Link>
+                      </DropdownMenuItem>
+                    )}
+                    {!isVIP && (
+                      <>
+                        <DropdownMenuItem asChild>
+                          <Link to="/acheter" className="cursor-pointer relative">
+                            Want to Buy
+                            {buyUnreadCount > 0 && (
+                              <Badge variant="destructive" className="ml-auto">{buyUnreadCount}</Badge>
+                            )}
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <Link to="/vendre" className="cursor-pointer relative">
+                            Want to Sell
+                            {sellUnreadCount > 0 && (
+                              <Badge variant="destructive" className="ml-auto">{sellUnreadCount}</Badge>
+                            )}
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <Link to="/contact" className="cursor-pointer">
+                            Contact
+                          </Link>
+                        </DropdownMenuItem>
+                      </>
+                    )}
+                    {isAdmin && (
+                      <DropdownMenuItem asChild>
+                        <Link to="/admin/tickets" className="cursor-pointer">
+                          <Shield className="w-4 h-4 mr-2" />
+                          Administration
+                        </Link>
+                      </DropdownMenuItem>
+                    )}
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={signOut}>
+                      <LogOut className="w-4 h-4 mr-2" />
+                      Se déconnecter
+                    </DropdownMenuItem>
+                  </>
+                ) : (
+                  <>
+                    <DropdownMenuItem asChild>
+                      <Link to="/contact" className="cursor-pointer">
+                        Contact
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <Link to="/auth" className="cursor-pointer">
+                        Connexion
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/auth" className="cursor-pointer">
+                        Commencer
+                      </Link>
+                    </DropdownMenuItem>
+                  </>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
+
+          {/* Web Mobile Menu Button */}
           <button
-            className="md:hidden text-foreground"
+            className={`text-foreground ${isNativeApp ? 'hidden' : 'md:hidden'}`}
             onClick={() => setIsOpen(!isOpen)}
             aria-label="Toggle menu"
           >
