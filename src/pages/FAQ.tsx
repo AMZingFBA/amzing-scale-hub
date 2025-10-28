@@ -7,8 +7,10 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Card } from "@/components/ui/card";
-import { MessageCircle } from "lucide-react";
-import { Link } from "react-router-dom";
+import { MessageCircle, ArrowLeft } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Capacitor } from "@capacitor/core";
 
 const FAQ = () => {
   const faqData = [
@@ -90,9 +92,25 @@ const FAQ = () => {
     }
   ];
 
+  const navigate = useNavigate();
+  const isNativeApp = Capacitor.isNativePlatform();
+
   return (
     <div className="min-h-screen relative overflow-hidden">
       <Navbar />
+      
+      {isNativeApp && (
+        <div className="fixed top-[46px] left-[18px] z-50">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => navigate('/')}
+            className="rounded-full shadow-lg bg-background/80 backdrop-blur-sm hover:bg-primary hover:text-white border-2 border-primary/20 hover:border-primary transition-all duration-300 hover:scale-110"
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+        </div>
+      )}
       
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-20">

@@ -1,15 +1,32 @@
-import { CheckCircle2, Clock, Users, TrendingUp, Download } from "lucide-react";
+import { CheckCircle2, Clock, Users, TrendingUp, Download, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { Capacitor } from "@capacitor/core";
 
 const Formation = () => {
+  const navigate = useNavigate();
+  const isNativeApp = Capacitor.isNativePlatform();
+
   return (
     <div className="min-h-screen">
       <Navbar />
+      
+      {isNativeApp && (
+        <div className="fixed top-[46px] left-[18px] z-50">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => navigate('/')}
+            className="rounded-full shadow-lg bg-background/80 backdrop-blur-sm hover:bg-primary hover:text-white border-2 border-primary/20 hover:border-primary transition-all duration-300 hover:scale-110"
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+        </div>
+      )}
       
       <div className="pt-32 pb-20 relative overflow-hidden">
         {/* Animated background elements */}
