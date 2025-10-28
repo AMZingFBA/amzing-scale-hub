@@ -126,12 +126,9 @@
   }
   
   /* Safe area support pour les apps natives iOS */
-  .pt-safe {
+  .navbar-safe-area {
     padding-top: env(safe-area-inset-top);
-  }
-  
-  .pt-safe-navbar {
-    padding-top: max(env(safe-area-inset-top), 44px);
+    height: calc(5rem + env(safe-area-inset-top));
   }
 }
 
