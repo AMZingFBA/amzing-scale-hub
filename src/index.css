@@ -125,15 +125,7 @@
     box-shadow: var(--shadow-blue);
   }
   
-  /* Safe area support pour les apps natives iOS - valeur fixe car env() ne fonctionne pas avec Capacitor local */
-  .navbar-safe-area {
-    padding-top: 50px;
-  }
-  
-  /* Offset pour le contenu principal pour compenser la navbar en haut */
-  .main-content-ios {
-    padding-top: 130px; /* 50px safe area + 80px navbar height */
-  }
+  /* Pas besoin de padding pour le contenu iOS car le menu est flottant */
 }
 
 @keyframes scroll-left {

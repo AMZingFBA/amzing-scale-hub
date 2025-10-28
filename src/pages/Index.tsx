@@ -13,13 +13,11 @@ import teamWorking from "@/assets/team-working.jpg";
 import logistics from "@/assets/logistics.jpg";
 import { useTrial } from "@/hooks/use-trial";
 import { useAuth } from "@/hooks/use-auth";
-import { Capacitor } from "@capacitor/core";
 
 const Index = () => {
   const { startFreeTrial, isStarting } = useTrial();
   const { isVIP, isLoading } = useAuth();
   const navigate = useNavigate();
-  const isNativeApp = Capacitor.isNativePlatform();
 
   // Redirect VIP users to dashboard
   useEffect(() => {
@@ -29,7 +27,7 @@ const Index = () => {
   }, [isVIP, isLoading, navigate]);
 
   return (
-    <div className={`min-h-screen ${isNativeApp ? 'main-content-ios' : ''}`}>
+    <div className="min-h-screen">
       <Navbar />
       <AppInstallBanner />
       
