@@ -9,12 +9,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import logo from "@/assets/logo.png";
 import { Mail, Lock, User, Phone, Package, TrendingUp, BarChart3, CheckCircle2 } from "lucide-react";
+import { Capacitor } from "@capacitor/core";
 
 export default function Auth() {
   const navigate = useNavigate();
   const { user, signUp, signIn } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("login");
+  const isNativeApp = Capacitor.isNativePlatform();
 
   useEffect(() => {
     if (user) {
@@ -76,17 +78,23 @@ export default function Auth() {
   };
 
   return (
-    <div className="min-h-screen w-full flex">
+    <div className="min-h-screen w-full flex bg-gradient-to-br from-[#FFF7E6] via-background to-background">
       {/* Left Side - Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-background animate-fade-in">
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 relative overflow-hidden">
+        {/* Subtle watermark */}
+        {isNativeApp && (
+          <div className="absolute bottom-8 right-8 opacity-[0.02] pointer-events-none">
+            <img src={logo} alt="" className="h-32 w-auto blur-sm" />
+          </div>
+        )}
         <div className="w-full max-w-md space-y-8">
           {/* Logo */}
-          <Link to="/" className="flex justify-center animate-scale-in">
+          <Link to="/" className="flex justify-center opacity-0 animate-in fade-in slide-in-from-top-4 duration-500">
             <img src={logo} alt="AMZing FBA" className="h-16 w-auto hover:scale-105 transition-transform" />
           </Link>
 
           {/* Form Card */}
-          <Card className="border-border/50 shadow-elegant backdrop-blur-sm animate-fade-in" style={{ animationDelay: "0.1s" }}>
+          <Card className="border-border/50 shadow-elegant backdrop-blur-sm opacity-0 animate-in fade-in slide-in-from-bottom-6 duration-500" style={{ animationDelay: "150ms" }}>
             <CardHeader className="space-y-1 text-center">
               <CardTitle className="text-2xl font-bold">
                 {activeTab === "login" ? "Bienvenue !" : "Créez votre compte"}
@@ -98,7 +106,13 @@ export default function Auth() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+              <Tabs 
+                value={activeTab} 
+                onValueChange={(value) => {
+                  setActiveTab(value);
+                }} 
+                className="w-full"
+              >
                 <TabsList className="grid w-full grid-cols-2 mb-6">
                   <TabsTrigger 
                     value="login" 
@@ -114,7 +128,10 @@ export default function Auth() {
                   </TabsTrigger>
                 </TabsList>
 
-                <TabsContent value="login" className="space-y-4 animate-fade-in">
+                <TabsContent 
+                  value="login" 
+                  className={`space-y-4 ${activeTab === 'login' ? 'animate-in fade-in slide-in-from-right-4 duration-300' : ''}`}
+                >
                   <form onSubmit={handleSignIn} className="space-y-4">
                     <div className="space-y-2">
                       <Label htmlFor="login-email">Email</Label>
@@ -127,7 +144,7 @@ export default function Auth() {
                           placeholder="votre@email.com"
                           required
                           disabled={isLoading}
-                          className="pl-10 transition-all duration-200 focus:ring-2 focus:ring-primary/20"
+                          className="pl-10 transition-all duration-200 focus:ring-2 focus:ring-primary/20 focus:shadow-[0_0_8px_rgba(255,186,73,0.4)]"
                         />
                       </div>
                     </div>
@@ -143,7 +160,7 @@ export default function Auth() {
                           placeholder="••••••••"
                           required
                           disabled={isLoading}
-                          className="pl-10 transition-all duration-200 focus:ring-2 focus:ring-primary/20"
+                          className="pl-10 transition-all duration-200 focus:ring-2 focus:ring-primary/20 focus:shadow-[0_0_8px_rgba(255,186,73,0.4)]"
                         />
                       </div>
                     </div>
@@ -156,7 +173,7 @@ export default function Auth() {
 
                     <Button
                       type="submit"
-                      className="w-full bg-gradient-to-r from-primary to-secondary hover:shadow-glow transition-all duration-300"
+                      className="w-full bg-gradient-to-r from-primary to-secondary hover:shadow-glow transition-all duration-300 active:scale-[0.98]"
                       disabled={isLoading}
                     >
                       {isLoading ? "Connexion..." : "Se connecter"}
@@ -164,7 +181,10 @@ export default function Auth() {
                   </form>
                 </TabsContent>
 
-                <TabsContent value="signup" className="space-y-4 animate-fade-in">
+                <TabsContent 
+                  value="signup" 
+                  className={`space-y-4 ${activeTab === 'signup' ? 'animate-in fade-in slide-in-from-right-4 duration-300' : ''}`}
+                >
                   <form onSubmit={handleSignUp} className="space-y-4">
                     <div className="space-y-2">
                       <Label htmlFor="signup-fullname">Nom complet</Label>
@@ -177,7 +197,7 @@ export default function Auth() {
                           placeholder="Jean Dupont"
                           required
                           disabled={isLoading}
-                          className="pl-10 transition-all duration-200 focus:ring-2 focus:ring-primary/20"
+                          className="pl-10 transition-all duration-200 focus:ring-2 focus:ring-primary/20 focus:shadow-[0_0_8px_rgba(255,186,73,0.4)]"
                         />
                       </div>
                     </div>
@@ -193,7 +213,7 @@ export default function Auth() {
                           placeholder="JD"
                           required
                           disabled={isLoading}
-                          className="pl-10 transition-all duration-200 focus:ring-2 focus:ring-primary/20"
+                          className="pl-10 transition-all duration-200 focus:ring-2 focus:ring-primary/20 focus:shadow-[0_0_8px_rgba(255,186,73,0.4)]"
                         />
                       </div>
                     </div>
@@ -209,7 +229,7 @@ export default function Auth() {
                           placeholder="+33 6 12 34 56 78"
                           required
                           disabled={isLoading}
-                          className="pl-10 transition-all duration-200 focus:ring-2 focus:ring-primary/20"
+                          className="pl-10 transition-all duration-200 focus:ring-2 focus:ring-primary/20 focus:shadow-[0_0_8px_rgba(255,186,73,0.4)]"
                         />
                       </div>
                     </div>
@@ -225,7 +245,7 @@ export default function Auth() {
                           placeholder="votre@email.com"
                           required
                           disabled={isLoading}
-                          className="pl-10 transition-all duration-200 focus:ring-2 focus:ring-primary/20"
+                          className="pl-10 transition-all duration-200 focus:ring-2 focus:ring-primary/20 focus:shadow-[0_0_8px_rgba(255,186,73,0.4)]"
                         />
                       </div>
                     </div>
@@ -242,7 +262,7 @@ export default function Auth() {
                           required
                           minLength={6}
                           disabled={isLoading}
-                          className="pl-10 transition-all duration-200 focus:ring-2 focus:ring-primary/20"
+                          className="pl-10 transition-all duration-200 focus:ring-2 focus:ring-primary/20 focus:shadow-[0_0_8px_rgba(255,186,73,0.4)]"
                         />
                       </div>
                     </div>
@@ -259,14 +279,14 @@ export default function Auth() {
                           required
                           minLength={6}
                           disabled={isLoading}
-                          className="pl-10 transition-all duration-200 focus:ring-2 focus:ring-primary/20"
+                          className="pl-10 transition-all duration-200 focus:ring-2 focus:ring-primary/20 focus:shadow-[0_0_8px_rgba(255,186,73,0.4)]"
                         />
                       </div>
                     </div>
 
                     <Button
                       type="submit"
-                      className="w-full bg-gradient-to-r from-primary to-secondary hover:shadow-glow transition-all duration-300"
+                      className="w-full bg-gradient-to-r from-primary to-secondary hover:shadow-glow transition-all duration-300 active:scale-[0.98]"
                       disabled={isLoading}
                     >
                       {isLoading ? "Création..." : "Créer mon compte"}

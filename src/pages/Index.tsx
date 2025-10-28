@@ -7,17 +7,43 @@ import { Badge } from "@/components/ui/badge";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import TestimonialsCarousel from "@/components/TestimonialsCarousel";
+import TestimonialsMobile from "@/components/TestimonialsMobile";
 import AppInstallBanner from "@/components/AppInstallBanner";
 import heroWarehouse from "@/assets/hero-warehouse.jpg";
 import teamWorking from "@/assets/team-working.jpg";
 import logistics from "@/assets/logistics.jpg";
 import { useTrial } from "@/hooks/use-trial";
 import { useAuth } from "@/hooks/use-auth";
+import { useScrollReveal } from "@/hooks/use-scroll-reveal";
+import { Capacitor } from "@capacitor/core";
+
+const ServiceCard = ({ children, delay }: { children: React.ReactNode, delay: number }) => {
+  const { ref, isVisible } = useScrollReveal({ delay });
+  const isNativeApp = Capacitor.isNativePlatform();
+
+  if (!isNativeApp) {
+    return <>{children}</>;
+  }
+
+  return (
+    <div
+      ref={ref}
+      className={`transition-all duration-500 ${
+        isVisible 
+          ? "opacity-100 translate-y-0" 
+          : "opacity-0 translate-y-4"
+      }`}
+    >
+      {children}
+    </div>
+  );
+};
 
 const Index = () => {
   const { startFreeTrial, isStarting } = useTrial();
   const { isVIP, isLoading } = useAuth();
   const navigate = useNavigate();
+  const isNativeApp = Capacitor.isNativePlatform();
 
   // Redirect VIP users to dashboard
   useEffect(() => {
@@ -87,7 +113,8 @@ const Index = () => {
             <p className="text-xl text-muted-foreground">34,99€/mois pour un accès complet</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <Card className="border-2 hover:border-primary transition-colors">
+            <ServiceCard delay={0}>
+            <Card className={`border-2 hover:border-primary transition-colors ${isNativeApp ? 'hover:shadow-[0_0_20px_rgba(255,153,0,0.3)]' : ''}`}>
               <CardContent className="pt-8 text-center">
                 <div className="w-16 h-16 bg-gradient-to-br from-primary to-primary-glow rounded-2xl flex items-center justify-center mx-auto mb-6">
                   <TrendingUp className="w-8 h-8 text-white" />
@@ -98,8 +125,10 @@ const Index = () => {
                 </p>
               </CardContent>
             </Card>
+            </ServiceCard>
 
-            <Card className="border-2 hover:border-primary transition-colors">
+            <ServiceCard delay={80}>
+            <Card className={`border-2 hover:border-primary transition-colors ${isNativeApp ? 'hover:shadow-[0_0_20px_rgba(255,153,0,0.3)]' : ''}`}>
               <CardContent className="pt-8 text-center">
                 <div className="w-16 h-16 bg-gradient-to-br from-secondary to-accent rounded-2xl flex items-center justify-center mx-auto mb-6">
                   <GraduationCap className="w-8 h-8 text-white" />
@@ -110,8 +139,10 @@ const Index = () => {
                 </p>
               </CardContent>
             </Card>
+            </ServiceCard>
 
-            <Card className="border-2 hover:border-primary transition-colors">
+            <ServiceCard delay={160}>
+            <Card className={`border-2 hover:border-primary transition-colors ${isNativeApp ? 'hover:shadow-[0_0_20px_rgba(255,153,0,0.3)]' : ''}`}>
               <CardContent className="pt-8 text-center">
                 <div className="w-16 h-16 bg-gradient-to-br from-primary to-secondary rounded-2xl flex items-center justify-center mx-auto mb-6">
                   <Package className="w-8 h-8 text-white" />
@@ -122,6 +153,7 @@ const Index = () => {
                 </p>
               </CardContent>
             </Card>
+            </ServiceCard>
           </div>
         </div>
       </section>
@@ -142,7 +174,8 @@ const Index = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            <Card className="border-2 border-primary/20 cursor-pointer transition-all duration-300 hover:border-primary hover:shadow-glow hover:scale-105 active:scale-95 active:border-primary">
+            <ServiceCard delay={0}>
+            <Card className={`border-2 border-primary/20 cursor-pointer transition-all duration-300 ${isNativeApp ? 'hover:border-primary hover:shadow-[0_0_20px_rgba(255,153,0,0.3)]' : 'hover:border-primary hover:shadow-glow'} hover:scale-105 active:scale-95 active:border-primary`}>
               <CardContent className="pt-6">
                 <div className="flex items-start gap-4">
                   <div className="w-12 h-12 bg-gradient-to-br from-primary to-primary-glow rounded-xl flex items-center justify-center flex-shrink-0 transition-transform duration-200 group-hover:rotate-6">
@@ -157,8 +190,10 @@ const Index = () => {
                 </div>
               </CardContent>
             </Card>
+            </ServiceCard>
 
-            <Card className="border-2 border-primary/20 cursor-pointer transition-all duration-300 hover:border-secondary hover:shadow-blue hover:scale-105 active:scale-95 active:border-secondary">
+            <ServiceCard delay={80}>
+            <Card className={`border-2 border-primary/20 cursor-pointer transition-all duration-300 ${isNativeApp ? 'hover:border-secondary hover:shadow-[0_0_20px_rgba(33,150,243,0.3)]' : 'hover:border-secondary hover:shadow-blue'} hover:scale-105 active:scale-95 active:border-secondary`}>
               <CardContent className="pt-6">
                 <div className="flex items-start gap-4">
                   <div className="w-12 h-12 bg-gradient-to-br from-secondary to-accent rounded-xl flex items-center justify-center flex-shrink-0 transition-transform duration-200 group-hover:rotate-6">
@@ -173,8 +208,10 @@ const Index = () => {
                 </div>
               </CardContent>
             </Card>
+            </ServiceCard>
 
-            <Card className="border-2 border-primary/20 cursor-pointer transition-all duration-300 hover:border-primary hover:shadow-glow hover:scale-105 active:scale-95 active:border-primary">
+            <ServiceCard delay={160}>
+            <Card className={`border-2 border-primary/20 cursor-pointer transition-all duration-300 ${isNativeApp ? 'hover:border-primary hover:shadow-[0_0_20px_rgba(255,153,0,0.3)]' : 'hover:border-primary hover:shadow-glow'} hover:scale-105 active:scale-95 active:border-primary`}>
               <CardContent className="pt-6">
                 <div className="flex items-start gap-4">
                   <div className="w-12 h-12 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center flex-shrink-0 transition-transform duration-200 group-hover:rotate-6">
@@ -189,8 +226,10 @@ const Index = () => {
                 </div>
               </CardContent>
             </Card>
+            </ServiceCard>
 
-            <Card className="border-2 border-primary/20 cursor-pointer transition-all duration-300 hover:border-secondary hover:shadow-blue hover:scale-105 active:scale-95 active:border-secondary">
+            <ServiceCard delay={240}>
+            <Card className={`border-2 border-primary/20 cursor-pointer transition-all duration-300 ${isNativeApp ? 'hover:border-secondary hover:shadow-[0_0_20px_rgba(33,150,243,0.3)]' : 'hover:border-secondary hover:shadow-blue'} hover:scale-105 active:scale-95 active:border-secondary`}>
               <CardContent className="pt-6">
                 <div className="flex items-start gap-4">
                   <div className="w-12 h-12 bg-gradient-to-br from-secondary to-primary rounded-xl flex items-center justify-center flex-shrink-0 transition-transform duration-200 group-hover:rotate-6">
@@ -205,8 +244,10 @@ const Index = () => {
                 </div>
               </CardContent>
             </Card>
+            </ServiceCard>
 
-            <Card className="border-2 border-primary/20 cursor-pointer transition-all duration-300 hover:border-primary hover:shadow-glow hover:scale-105 active:scale-95 active:border-primary">
+            <ServiceCard delay={320}>
+            <Card className={`border-2 border-primary/20 cursor-pointer transition-all duration-300 ${isNativeApp ? 'hover:border-primary hover:shadow-[0_0_20px_rgba(255,153,0,0.3)]' : 'hover:border-primary hover:shadow-glow'} hover:scale-105 active:scale-95 active:border-primary`}>
               <CardContent className="pt-6">
                 <div className="flex items-start gap-4">
                   <div className="w-12 h-12 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center flex-shrink-0 transition-transform duration-200 group-hover:rotate-6">
@@ -221,8 +262,10 @@ const Index = () => {
                 </div>
               </CardContent>
             </Card>
+            </ServiceCard>
 
-            <Card className="border-2 border-primary/20 cursor-pointer transition-all duration-300 hover:border-secondary hover:shadow-blue hover:scale-105 active:scale-95 active:border-secondary">
+            <ServiceCard delay={400}>
+            <Card className={`border-2 border-primary/20 cursor-pointer transition-all duration-300 ${isNativeApp ? 'hover:border-secondary hover:shadow-[0_0_20px_rgba(33,150,243,0.3)]' : 'hover:border-secondary hover:shadow-blue'} hover:scale-105 active:scale-95 active:border-secondary`}>
               <CardContent className="pt-6">
                 <div className="flex items-start gap-4">
                   <div className="w-12 h-12 bg-gradient-to-br from-secondary to-accent rounded-xl flex items-center justify-center flex-shrink-0 transition-transform duration-200 group-hover:rotate-6">
@@ -237,6 +280,7 @@ const Index = () => {
                 </div>
               </CardContent>
             </Card>
+            </ServiceCard>
           </div>
 
           <div className="text-center mt-12">
@@ -348,21 +392,25 @@ const Index = () => {
 
       {/* Testimonials Section */}
       <section className="py-20 bg-muted/30">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <Badge className="mb-4 bg-primary/10 text-primary border-primary/20">
-              Témoignages clients réels
-            </Badge>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">
-              Ce que disent nos membres
-            </h2>
-            <p className="text-xl text-muted-foreground">
-              Plus de 500 membres actifs nous font confiance
-            </p>
-          </div>
+        {isNativeApp ? (
+          <TestimonialsMobile />
+        ) : (
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-16">
+              <Badge className="mb-4 bg-primary/10 text-primary border-primary/20">
+                Témoignages clients réels
+              </Badge>
+              <h2 className="text-4xl md:text-5xl font-bold mb-4">
+                Ce que disent nos membres
+              </h2>
+              <p className="text-xl text-muted-foreground">
+                Plus de 500 membres actifs nous font confiance
+              </p>
+            </div>
 
-          <TestimonialsCarousel />
-        </div>
+            <TestimonialsCarousel />
+          </div>
+        )}
       </section>
 
       {/* CTA Section */}

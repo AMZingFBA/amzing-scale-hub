@@ -5,15 +5,51 @@ import { Badge } from "@/components/ui/badge";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Link } from "react-router-dom";
+import { useScrollReveal } from "@/hooks/use-scroll-reveal";
+import { Capacitor } from "@capacitor/core";
+
+const ServiceCard = ({ children, delay }: { children: React.ReactNode, delay: number }) => {
+  const { ref, isVisible } = useScrollReveal({ delay });
+  const isNativeApp = Capacitor.isNativePlatform();
+
+  if (!isNativeApp) {
+    return <>{children}</>;
+  }
+
+  return (
+    <div
+      ref={ref}
+      className={`transition-all duration-500 ${
+        isVisible 
+          ? "opacity-100 translate-y-0" 
+          : "opacity-0 translate-y-4"
+      }`}
+    >
+      {children}
+    </div>
+  );
+};
 
 const Services = () => {
+  const isNativeApp = Capacitor.isNativePlatform();
+  const headerReveal = useScrollReveal({ delay: 0 });
+  
   return (
     <div className="min-h-screen">
       <Navbar />
       
       <div className="pt-32 pb-20">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
+          <div 
+            ref={isNativeApp ? headerReveal.ref : undefined}
+            className={`text-center mb-16 ${
+              isNativeApp && headerReveal.isVisible
+                ? "opacity-100 translate-y-0 transition-all duration-500"
+                : isNativeApp
+                ? "opacity-0 translate-y-4"
+                : ""
+            }`}
+          >
             <Badge className="mb-4 bg-primary/10 text-primary border-primary/20">
               Tout inclus dans l'espace VIP
             </Badge>
@@ -28,7 +64,8 @@ const Services = () => {
           {/* Services Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto mb-16">
             {/* Moniteurs */}
-            <Card className="border-2 border-primary hover:shadow-xl transition-all">
+            <ServiceCard delay={0}>
+            <Card className={`border-2 border-primary hover:shadow-xl transition-all ${isNativeApp ? 'hover:border-primary/60 hover:shadow-[0_0_20px_rgba(255,153,0,0.3)]' : ''}`}>
               <CardHeader>
                 <div className="w-16 h-16 bg-gradient-to-br from-primary to-secondary rounded-lg flex items-center justify-center mb-4">
                   <AlertCircle className="w-8 h-8 text-white" />
@@ -57,9 +94,11 @@ const Services = () => {
                 </ul>
               </CardContent>
             </Card>
+            </ServiceCard>
 
             {/* Guides FBA */}
-            <Card className="border-2 hover:border-primary transition-all">
+            <ServiceCard delay={80}>
+            <Card className={`border-2 hover:border-primary transition-all ${isNativeApp ? 'hover:shadow-[0_0_20px_rgba(255,153,0,0.3)]' : ''}`}>
               <CardHeader>
                 <div className="w-16 h-16 bg-gradient-to-br from-secondary to-primary rounded-lg flex items-center justify-center mb-4">
                   <GraduationCap className="w-8 h-8 text-white" />
@@ -88,9 +127,11 @@ const Services = () => {
                 </ul>
               </CardContent>
             </Card>
+            </ServiceCard>
 
             {/* Fournisseurs Privés */}
-            <Card className="border-2 hover:border-primary transition-all">
+            <ServiceCard delay={160}>
+            <Card className={`border-2 hover:border-primary transition-all ${isNativeApp ? 'hover:shadow-[0_0_20px_rgba(255,153,0,0.3)]' : ''}`}>
               <CardHeader>
                 <div className="w-16 h-16 bg-gradient-to-br from-primary to-secondary rounded-lg flex items-center justify-center mb-4">
                   <Package className="w-8 h-8 text-white" />
@@ -119,9 +160,11 @@ const Services = () => {
                 </ul>
               </CardContent>
             </Card>
+            </ServiceCard>
 
             {/* Stock Checker */}
-            <Card className="border-2 hover:border-primary transition-all">
+            <ServiceCard delay={240}>
+            <Card className={`border-2 hover:border-primary transition-all ${isNativeApp ? 'hover:shadow-[0_0_20px_rgba(255,153,0,0.3)]' : ''}`}>
               <CardHeader>
                 <div className="w-16 h-16 bg-gradient-to-br from-secondary to-primary rounded-lg flex items-center justify-center mb-4">
                   <TrendingUp className="w-8 h-8 text-white" />
@@ -150,9 +193,11 @@ const Services = () => {
                 </ul>
               </CardContent>
             </Card>
+            </ServiceCard>
 
             {/* Notifications */}
-            <Card className="border-2 hover:border-primary transition-all">
+            <ServiceCard delay={320}>
+            <Card className={`border-2 hover:border-primary transition-all ${isNativeApp ? 'hover:shadow-[0_0_20px_rgba(255,153,0,0.3)]' : ''}`}>
               <CardHeader>
                 <div className="w-16 h-16 bg-gradient-to-br from-primary to-secondary rounded-lg flex items-center justify-center mb-4">
                   <MessageSquare className="w-8 h-8 text-white" />
@@ -181,9 +226,11 @@ const Services = () => {
                 </ul>
               </CardContent>
             </Card>
+            </ServiceCard>
 
             {/* Conseils Niches */}
-            <Card className="border-2 hover:border-primary transition-all">
+            <ServiceCard delay={400}>
+            <Card className={`border-2 hover:border-primary transition-all ${isNativeApp ? 'hover:shadow-[0_0_20px_rgba(255,153,0,0.3)]' : ''}`}>
               <CardHeader>
                 <div className="w-16 h-16 bg-gradient-to-br from-secondary to-primary rounded-lg flex items-center justify-center mb-4">
                   <Target className="w-8 h-8 text-white" />
@@ -212,9 +259,11 @@ const Services = () => {
                 </ul>
               </CardContent>
             </Card>
+            </ServiceCard>
 
             {/* Réductions */}
-            <Card className="border-2 hover:border-primary transition-all">
+            <ServiceCard delay={480}>
+            <Card className={`border-2 hover:border-primary transition-all ${isNativeApp ? 'hover:shadow-[0_0_20px_rgba(255,153,0,0.3)]' : ''}`}>
               <CardHeader>
                 <div className="w-16 h-16 bg-gradient-to-br from-primary to-secondary rounded-lg flex items-center justify-center mb-4">
                   <DollarSign className="w-8 h-8 text-white" />
@@ -243,9 +292,11 @@ const Services = () => {
                 </ul>
               </CardContent>
             </Card>
+            </ServiceCard>
 
             {/* Service Logistique */}
-            <Card className="border-2 hover:border-primary transition-all">
+            <ServiceCard delay={560}>
+            <Card className={`border-2 hover:border-primary transition-all ${isNativeApp ? 'hover:shadow-[0_0_20px_rgba(255,153,0,0.3)]' : ''}`}>
               <CardHeader>
                 <div className="w-16 h-16 bg-gradient-to-br from-secondary to-primary rounded-lg flex items-center justify-center mb-4">
                   <Truck className="w-8 h-8 text-white" />
@@ -274,6 +325,7 @@ const Services = () => {
                 </ul>
               </CardContent>
             </Card>
+            </ServiceCard>
           </div>
 
           {/* AMZing FBA 360 Detailed Section */}
