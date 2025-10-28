@@ -87,18 +87,18 @@ export default function Auth() {
       <div className={`w-full lg:w-1/2 flex items-center justify-center p-8 relative overflow-hidden ${isNativeApp ? 'pt-16' : ''}`}>
         {/* Subtle watermark */}
         {isNativeApp && (
-          <div className="absolute bottom-8 right-8 opacity-[0.02] pointer-events-none">
+          <div className="absolute bottom-8 right-8 opacity-[0.02] pointer-events-none animate-float">
             <img src={logo} alt="" className="h-32 w-auto blur-sm" />
           </div>
         )}
         <div className="w-full max-w-md space-y-8">
           {/* Logo */}
-          <Link to="/" className={`flex justify-center ${isNativeApp ? '' : 'opacity-0 animate-in fade-in slide-in-from-top-4 duration-500'}`}>
-            <img src={logo} alt="AMZing FBA" className="h-16 w-auto hover:scale-105 transition-transform" />
+          <Link to="/" className="flex justify-center animate-slide-in-up" style={{ animationDelay: "0ms" }}>
+            <img src={logo} alt="AMZing FBA" className="h-16 w-auto hover:scale-110 transition-all duration-300 animate-bounce-subtle" />
           </Link>
 
           {/* Form Card */}
-          <Card className={`border-border/50 shadow-elegant backdrop-blur-sm ${isNativeApp ? '' : 'opacity-0 animate-in fade-in slide-in-from-bottom-6 duration-500'}`} style={!isNativeApp ? { animationDelay: "150ms" } : undefined}>
+          <Card className="border-border/50 shadow-elegant backdrop-blur-sm animate-slide-in-up" style={{ animationDelay: "100ms" }}>
             <CardHeader className="space-y-1 text-center">
               <CardTitle className="text-2xl font-bold">
                 {activeTab === "login" ? "Bienvenue !" : "Créez votre compte"}
@@ -137,10 +137,10 @@ export default function Auth() {
                   className={`space-y-4 ${activeTab === 'login' ? 'animate-in fade-in slide-in-from-right-4 duration-300' : ''}`}
                 >
                   <form onSubmit={handleSignIn} className="space-y-4">
-                    <div className="space-y-2">
+                    <div className="space-y-2 animate-slide-in-up" style={{ animationDelay: "50ms" }}>
                       <Label htmlFor="login-email">Email</Label>
                       <div className="relative group">
-                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-all duration-300 group-focus-within:scale-110" />
                         <Input
                           id="login-email"
                           name="email"
@@ -148,15 +148,15 @@ export default function Auth() {
                           placeholder="votre@email.com"
                           required
                           disabled={isLoading}
-                          className="pl-10 transition-all duration-200 focus:ring-2 focus:ring-primary/20 focus:shadow-[0_0_8px_rgba(255,186,73,0.4)]"
+                          className="pl-10 transition-all duration-300 focus:ring-2 focus:ring-primary/20 focus:shadow-[0_0_12px_rgba(255,186,73,0.5)] hover:border-primary/50"
                         />
                       </div>
                     </div>
 
-                    <div className="space-y-2">
+                    <div className="space-y-2 animate-slide-in-up" style={{ animationDelay: "100ms" }}>
                       <Label htmlFor="login-password">Mot de passe</Label>
                       <div className="relative group">
-                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-all duration-300 group-focus-within:scale-110" />
                         <Input
                           id="login-password"
                           name="password"
@@ -164,25 +164,27 @@ export default function Auth() {
                           placeholder="••••••••"
                           required
                           disabled={isLoading}
-                          className="pl-10 transition-all duration-200 focus:ring-2 focus:ring-primary/20 focus:shadow-[0_0_8px_rgba(255,186,73,0.4)]"
+                          className="pl-10 transition-all duration-300 focus:ring-2 focus:ring-primary/20 focus:shadow-[0_0_12px_rgba(255,186,73,0.5)] hover:border-primary/50"
                         />
                       </div>
                     </div>
 
-                    <div className="text-right">
-                      <Link to="/forgot-password" className="text-sm text-primary hover:underline transition-all">
+                    <div className="text-right animate-slide-in-up" style={{ animationDelay: "150ms" }}>
+                      <Link to="/forgot-password" className="text-sm text-primary hover:underline transition-all hover:translate-x-1">
                         Mot de passe oublié ?
                       </Link>
                     </div>
 
-                    <Button
-                      type="submit"
-                      variant="hero"
-                      className="w-full"
-                      disabled={isLoading}
-                    >
-                      {isLoading ? "Connexion..." : "Se connecter"}
-                    </Button>
+                    <div className="animate-slide-in-up" style={{ animationDelay: "200ms" }}>
+                      <Button
+                        type="submit"
+                        variant="hero"
+                        className="w-full"
+                        disabled={isLoading}
+                      >
+                        {isLoading ? "Connexion..." : "Se connecter"}
+                      </Button>
+                    </div>
                   </form>
                 </TabsContent>
 
@@ -191,10 +193,10 @@ export default function Auth() {
                   className={`space-y-4 ${activeTab === 'signup' ? 'animate-in fade-in slide-in-from-right-4 duration-300' : ''}`}
                 >
                   <form onSubmit={handleSignUp} className="space-y-4">
-                    <div className="space-y-2">
+                    <div className="space-y-2 animate-slide-in-up" style={{ animationDelay: "50ms" }}>
                       <Label htmlFor="signup-fullname">Nom complet</Label>
                       <div className="relative group">
-                        <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                        <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-all duration-300 group-focus-within:scale-110" />
                         <Input
                           id="signup-fullname"
                           name="fullName"
@@ -202,15 +204,15 @@ export default function Auth() {
                           placeholder="Jean Dupont"
                           required
                           disabled={isLoading}
-                          className="pl-10 transition-all duration-200 focus:ring-2 focus:ring-primary/20 focus:shadow-[0_0_8px_rgba(255,186,73,0.4)]"
+                          className="pl-10 transition-all duration-300 focus:ring-2 focus:ring-primary/20 focus:shadow-[0_0_12px_rgba(255,186,73,0.5)] hover:border-primary/50"
                         />
                       </div>
                     </div>
 
-                    <div className="space-y-2">
+                    <div className="space-y-2 animate-slide-in-up" style={{ animationDelay: "100ms" }}>
                       <Label htmlFor="signup-nickname">Surnom (affiché dans les conversations)</Label>
                       <div className="relative group">
-                        <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                        <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-all duration-300 group-focus-within:scale-110" />
                         <Input
                           id="signup-nickname"
                           name="nickname"
@@ -218,15 +220,15 @@ export default function Auth() {
                           placeholder="JD"
                           required
                           disabled={isLoading}
-                          className="pl-10 transition-all duration-200 focus:ring-2 focus:ring-primary/20 focus:shadow-[0_0_8px_rgba(255,186,73,0.4)]"
+                          className="pl-10 transition-all duration-300 focus:ring-2 focus:ring-primary/20 focus:shadow-[0_0_12px_rgba(255,186,73,0.5)] hover:border-primary/50"
                         />
                       </div>
                     </div>
 
-                    <div className="space-y-2">
+                    <div className="space-y-2 animate-slide-in-up" style={{ animationDelay: "150ms" }}>
                       <Label htmlFor="signup-phone">Numéro de téléphone</Label>
                       <div className="relative group">
-                        <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                        <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-all duration-300 group-focus-within:scale-110" />
                         <Input
                           id="signup-phone"
                           name="phone"
@@ -234,15 +236,15 @@ export default function Auth() {
                           placeholder="+33 6 12 34 56 78"
                           required
                           disabled={isLoading}
-                          className="pl-10 transition-all duration-200 focus:ring-2 focus:ring-primary/20 focus:shadow-[0_0_8px_rgba(255,186,73,0.4)]"
+                          className="pl-10 transition-all duration-300 focus:ring-2 focus:ring-primary/20 focus:shadow-[0_0_12px_rgba(255,186,73,0.5)] hover:border-primary/50"
                         />
                       </div>
                     </div>
 
-                    <div className="space-y-2">
+                    <div className="space-y-2 animate-slide-in-up" style={{ animationDelay: "200ms" }}>
                       <Label htmlFor="signup-email">Email</Label>
                       <div className="relative group">
-                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-all duration-300 group-focus-within:scale-110" />
                         <Input
                           id="signup-email"
                           name="email"
@@ -250,15 +252,15 @@ export default function Auth() {
                           placeholder="votre@email.com"
                           required
                           disabled={isLoading}
-                          className="pl-10 transition-all duration-200 focus:ring-2 focus:ring-primary/20 focus:shadow-[0_0_8px_rgba(255,186,73,0.4)]"
+                          className="pl-10 transition-all duration-300 focus:ring-2 focus:ring-primary/20 focus:shadow-[0_0_12px_rgba(255,186,73,0.5)] hover:border-primary/50"
                         />
                       </div>
                     </div>
 
-                    <div className="space-y-2">
+                    <div className="space-y-2 animate-slide-in-up" style={{ animationDelay: "250ms" }}>
                       <Label htmlFor="signup-password">Mot de passe (min. 6 caractères)</Label>
                       <div className="relative group">
-                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-all duration-300 group-focus-within:scale-110" />
                         <Input
                           id="signup-password"
                           name="password"
@@ -267,15 +269,15 @@ export default function Auth() {
                           required
                           minLength={6}
                           disabled={isLoading}
-                          className="pl-10 transition-all duration-200 focus:ring-2 focus:ring-primary/20 focus:shadow-[0_0_8px_rgba(255,186,73,0.4)]"
+                          className="pl-10 transition-all duration-300 focus:ring-2 focus:ring-primary/20 focus:shadow-[0_0_12px_rgba(255,186,73,0.5)] hover:border-primary/50"
                         />
                       </div>
                     </div>
 
-                    <div className="space-y-2">
+                    <div className="space-y-2 animate-slide-in-up" style={{ animationDelay: "300ms" }}>
                       <Label htmlFor="signup-confirm-password">Confirmer le mot de passe</Label>
                       <div className="relative group">
-                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-all duration-300 group-focus-within:scale-110" />
                         <Input
                           id="signup-confirm-password"
                           name="confirmPassword"
@@ -284,19 +286,21 @@ export default function Auth() {
                           required
                           minLength={6}
                           disabled={isLoading}
-                          className="pl-10 transition-all duration-200 focus:ring-2 focus:ring-primary/20 focus:shadow-[0_0_8px_rgba(255,186,73,0.4)]"
+                          className="pl-10 transition-all duration-300 focus:ring-2 focus:ring-primary/20 focus:shadow-[0_0_12px_rgba(255,186,73,0.5)] hover:border-primary/50"
                         />
                       </div>
                     </div>
 
-                    <Button
-                      type="submit"
-                      variant="hero"
-                      className="w-full"
-                      disabled={isLoading}
-                    >
-                      {isLoading ? "Création..." : "Créer mon compte"}
-                    </Button>
+                    <div className="animate-slide-in-up" style={{ animationDelay: "350ms" }}>
+                      <Button
+                        type="submit"
+                        variant="hero"
+                        className="w-full"
+                        disabled={isLoading}
+                      >
+                        {isLoading ? "Création..." : "Créer mon compte"}
+                      </Button>
+                    </div>
                     
                     <p className="text-xs text-muted-foreground text-center">
                       Un email de vérification sera envoyé à votre adresse
@@ -307,8 +311,8 @@ export default function Auth() {
             </CardContent>
           </Card>
 
-          <p className={`text-center text-sm text-muted-foreground ${!isNativeApp ? 'animate-fade-in' : ''}`} style={!isNativeApp ? { animationDelay: "0.2s" } : undefined}>
-            <Link to="/" className="text-primary hover:underline transition-all">
+          <p className="text-center text-sm text-muted-foreground animate-slide-in-up" style={{ animationDelay: "400ms" }}>
+            <Link to="/" className="text-primary hover:underline transition-all hover:translate-x-1 inline-block">
               Retour à l'accueil
             </Link>
           </p>
