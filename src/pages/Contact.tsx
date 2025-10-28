@@ -113,14 +113,14 @@ const Contact = () => {
       
       {/* Back button for mobile app */}
       {isNativeApp && (
-        <div className="fixed top-4 left-4 z-50 animate-slide-in-left">
+        <div className="fixed top-[46px] left-[18px] z-50 animate-slide-in-left">
           <Button
             variant="outline"
             size="icon"
             onClick={() => navigate('/')}
-            className="rounded-full shadow-lg bg-background/80 backdrop-blur-sm hover:bg-primary hover:text-white border-2 border-primary/20 hover:border-primary transition-all duration-300 hover:scale-110"
+            className="h-14 w-14 border-2 border-primary bg-primary/10 hover:bg-primary/20 hover:scale-110 active:scale-95 transition-all duration-300 rounded-lg shadow-glow backdrop-blur-sm"
           >
-            <ArrowLeft className="h-5 w-5" />
+            <ArrowLeft className="h-7 w-7 text-primary" />
           </Button>
         </div>
       )}
