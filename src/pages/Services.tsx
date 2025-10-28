@@ -46,9 +46,9 @@ const Services = () => {
             variant="outline"
             size="icon"
             onClick={() => navigate('/')}
-            className="h-14 w-14 border-2 border-primary bg-primary/10 hover:bg-primary/20 hover:scale-110 active:scale-95 transition-all duration-300 rounded-lg shadow-glow backdrop-blur-sm"
+            className="rounded-full shadow-lg bg-background/80 backdrop-blur-sm hover:bg-primary hover:text-white border-2 border-primary/20 hover:border-primary transition-all duration-300 hover:scale-110"
           >
-            <ArrowLeft className="h-7 w-7 text-primary" />
+            <ArrowLeft className="h-5 w-5" />
           </Button>
         </div>
       )}
