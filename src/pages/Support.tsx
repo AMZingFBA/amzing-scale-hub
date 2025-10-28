@@ -228,15 +228,6 @@ const Support = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-      {isNativeApp && (
-        <button
-          onClick={() => navigate('/dashboard')}
-          className="fixed top-[46px] left-[18px] z-50 bg-background/80 backdrop-blur-sm p-2 rounded-full shadow-lg hover:bg-background transition-colors"
-          aria-label="Retour"
-        >
-          <ArrowLeft className="w-5 h-5 text-foreground" />
-        </button>
-      )}
       <main className="flex-grow pt-20">
         <div className="container mx-auto px-4 py-8 max-w-4xl">
           <div className="flex justify-between items-center mb-8">
