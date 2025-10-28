@@ -286,12 +286,11 @@ const ChatRoom = ({ roomId, onBack }: ChatRoomProps) => {
     <div className="h-full flex flex-col">
       {/* Mobile header with back button */}
       {onBack && (
-        <div className="md:hidden flex items-center justify-center gap-2 p-4 border-b bg-card relative">
+        <div className="md:hidden flex items-center justify-center gap-2 p-4 border-b bg-card">
           <Button
             variant="ghost"
             size="icon"
             onClick={onBack}
-            className="absolute left-4"
           >
             <Reply className="h-4 w-4 rotate-180" />
           </Button>
