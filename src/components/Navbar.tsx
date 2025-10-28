@@ -133,49 +133,49 @@ const Navbar = () => {
           {isNativeApp && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-10 w-10">
-                  <Menu className="h-5 w-5" />
+                <Button variant="ghost" size="icon" className="h-12 w-12 hover:bg-primary/10 transition-all">
+                  <Menu className="h-6 w-6" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56 bg-background z-50">
+              <DropdownMenuContent align="end" className="w-72 bg-background/98 backdrop-blur-lg z-50 animate-scale-in shadow-elegant border-2 border-primary/20">
                 {user ? (
                   <>
-                    <div className="px-2 py-1.5">
-                      <p className="text-sm font-medium">{user.email}</p>
+                    <div className="px-4 py-3 bg-gradient-to-r from-primary/10 to-secondary/10 rounded-lg m-2">
+                      <p className="text-base font-semibold">{user.email}</p>
                       {isVIP && (
-                        <Badge className="mt-1 bg-gradient-to-r from-primary to-secondary text-white border-0">
+                        <Badge className="mt-2 bg-gradient-to-r from-primary to-secondary text-white border-0 shadow-glow">
                           VIP
                         </Badge>
                       )}
                     </div>
-                    <DropdownMenuSeparator />
+                    <DropdownMenuSeparator className="my-2" />
                     {isVIP && (
-                      <DropdownMenuItem asChild>
+                      <DropdownMenuItem asChild className="py-3 text-base">
                         <Link to="/dashboard" className="cursor-pointer">
-                          <Crown className="w-4 h-4 mr-2" />
+                          <Crown className="w-5 h-5 mr-3" />
                           Espace VIP
                         </Link>
                       </DropdownMenuItem>
                     )}
                     {!isVIP && (
                       <>
-                        <DropdownMenuItem asChild>
+                        <DropdownMenuItem asChild className="py-3 text-base">
                           <Link to="/acheter" className="cursor-pointer relative">
                             Want to Buy
                             {buyUnreadCount > 0 && (
-                              <Badge variant="destructive" className="ml-auto">{buyUnreadCount}</Badge>
+                              <Badge variant="destructive" className="ml-auto animate-pulse">{buyUnreadCount}</Badge>
                             )}
                           </Link>
                         </DropdownMenuItem>
-                        <DropdownMenuItem asChild>
+                        <DropdownMenuItem asChild className="py-3 text-base">
                           <Link to="/vendre" className="cursor-pointer relative">
                             Want to Sell
                             {sellUnreadCount > 0 && (
-                              <Badge variant="destructive" className="ml-auto">{sellUnreadCount}</Badge>
+                              <Badge variant="destructive" className="ml-auto animate-pulse">{sellUnreadCount}</Badge>
                             )}
                           </Link>
                         </DropdownMenuItem>
-                        <DropdownMenuItem asChild>
+                        <DropdownMenuItem asChild className="py-3 text-base">
                           <Link to="/contact" className="cursor-pointer">
                             Contact
                           </Link>
@@ -183,34 +183,34 @@ const Navbar = () => {
                       </>
                     )}
                     {isAdmin && (
-                      <DropdownMenuItem asChild>
+                      <DropdownMenuItem asChild className="py-3 text-base">
                         <Link to="/admin/tickets" className="cursor-pointer">
-                          <Shield className="w-4 h-4 mr-2" />
+                          <Shield className="w-5 h-5 mr-3" />
                           Administration
                         </Link>
                       </DropdownMenuItem>
                     )}
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={signOut}>
-                      <LogOut className="w-4 h-4 mr-2" />
+                    <DropdownMenuSeparator className="my-2" />
+                    <DropdownMenuItem onClick={signOut} className="py-3 text-base text-destructive focus:text-destructive">
+                      <LogOut className="w-5 h-5 mr-3" />
                       Se déconnecter
                     </DropdownMenuItem>
                   </>
                 ) : (
                   <>
-                    <DropdownMenuItem asChild>
+                    <DropdownMenuItem asChild className="py-3 text-base">
                       <Link to="/contact" className="cursor-pointer">
                         Contact
                       </Link>
                     </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem asChild>
+                    <DropdownMenuSeparator className="my-2" />
+                    <DropdownMenuItem asChild className="py-3 text-base">
                       <Link to="/auth" className="cursor-pointer">
                         Connexion
                       </Link>
                     </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link to="/auth" className="cursor-pointer">
+                    <DropdownMenuItem asChild className="py-3 text-base bg-gradient-to-r from-primary/10 to-secondary/10">
+                      <Link to="/auth" className="cursor-pointer font-semibold">
                         Commencer
                       </Link>
                     </DropdownMenuItem>

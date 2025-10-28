@@ -129,6 +129,11 @@
   .navbar-safe-area {
     padding-top: 50px;
   }
+  
+  /* Offset pour le contenu principal pour compenser la navbar en haut */
+  .main-content-ios {
+    padding-top: 130px; /* 50px safe area + 80px navbar height */
+  }
 }
 
 @keyframes scroll-left {
