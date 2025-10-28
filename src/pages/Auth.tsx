@@ -85,16 +85,17 @@ export default function Auth() {
     <div className="min-h-screen w-full flex bg-gradient-to-br from-[#FFF7E6] via-background to-background">
       {/* Left Side - Form */}
       <div className={`w-full lg:w-1/2 flex items-center justify-center p-8 relative overflow-hidden ${isNativeApp ? 'pt-16' : ''}`}>
-        {/* Subtle watermark */}
-        {isNativeApp && (
-          <div className="absolute bottom-8 right-8 opacity-[0.02] pointer-events-none animate-float">
-            <img src={logo} alt="" className="h-32 w-auto blur-sm" />
-          </div>
-        )}
-        <div className="w-full max-w-md space-y-8">
+        {/* Decorative elements */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-5">
+          <Package className="absolute top-10 right-10 h-20 w-20 text-primary animate-float" style={{ animationDelay: "0s" }} />
+          <TrendingUp className="absolute bottom-20 left-10 h-16 w-16 text-secondary animate-float" style={{ animationDelay: "1s" }} />
+          <BarChart3 className="absolute top-1/3 left-5 h-12 w-12 text-primary animate-float" style={{ animationDelay: "2s" }} />
+        </div>
+        
+        <div className="w-full max-w-md space-y-8 relative z-10">
           {/* Logo */}
           <Link to="/" className="flex justify-center animate-slide-in-up" style={{ animationDelay: "0ms" }}>
-            <img src={logo} alt="AMZing FBA" className="h-16 w-auto hover:scale-110 transition-all duration-300 animate-bounce-subtle" />
+            <img src={logo} alt="AMZing FBA" className="h-16 w-auto hover:scale-110 transition-all duration-300" />
           </Link>
 
           {/* Form Card */}
