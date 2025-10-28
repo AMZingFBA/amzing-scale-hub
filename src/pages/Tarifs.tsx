@@ -190,7 +190,7 @@ const Tarifs = () => {
                   Contactez-nous pour discuter de vos besoins spécifiques
                 </p>
                 <Link to="/contact">
-                  <Button variant="secondary" size="xl" className="bg-white text-primary hover:bg-white/90 hover:scale-105 transition-all duration-300 hover:shadow-xl animate-fade-in" style={{ animationDelay: '0.2s' }}>
+                  <Button variant="hero" size="xl" className="hover:scale-105 transition-all duration-300 animate-fade-in" style={{ animationDelay: '0.2s' }}>
                     Nous contacter
                   </Button>
                 </Link>
