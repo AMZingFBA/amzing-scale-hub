@@ -198,10 +198,19 @@ const TestimonialsMobile = () => {
     return null;
   }
 
-  // Select 2 random testimonials from the list
+  // Select 2 random testimonials with at least one 5-star review
   const selectedTestimonials = React.useMemo(() => {
-    const shuffled = [...testimonials].sort(() => 0.5 - Math.random());
-    return shuffled.slice(0, 2);
+    const fiveStars = testimonials.filter(t => t.rating === 5);
+    const others = testimonials.filter(t => t.rating !== 5);
+    
+    // Always pick one 5-star review
+    const selected = [fiveStars[Math.floor(Math.random() * fiveStars.length)]];
+    
+    // Add one more random testimonial (could be 5-star or other)
+    const remaining = [...testimonials].filter(t => t !== selected[0]);
+    selected.push(remaining[Math.floor(Math.random() * remaining.length)]);
+    
+    return selected;
   }, []);
 
   const [showAllTestimonials, setShowAllTestimonials] = React.useState(false);
@@ -209,7 +218,7 @@ const TestimonialsMobile = () => {
   return (
     <div className="px-4">
       {/* Badge */}
-      <div className="flex justify-center mb-4 opacity-0 animate-in fade-in slide-in-from-top-4 duration-200">
+      <div className="flex justify-center mb-4">
         <Badge className="bg-[#FFF7E6] text-primary border border-primary/30 px-4 py-2 rounded-full text-sm font-semibold flex items-center gap-2">
           <CheckCircle className="w-4 h-4" />
           Témoignages clients réels
@@ -217,7 +226,7 @@ const TestimonialsMobile = () => {
       </div>
 
       {/* Title */}
-      <h2 className="text-3xl md:text-4xl font-bold text-center mb-6 text-foreground opacity-0 animate-in fade-in slide-in-from-bottom-4 duration-200" style={{ animationDelay: "50ms" }}>
+      <h2 className="text-3xl md:text-4xl font-bold text-center mb-6 text-foreground">
         Ce que disent nos membres
       </h2>
 
