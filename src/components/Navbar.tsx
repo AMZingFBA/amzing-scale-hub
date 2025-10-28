@@ -35,14 +35,14 @@ const Navbar = () => {
         <DropdownMenuTrigger asChild>
           <Button 
             variant="outline" 
-            className="fixed top-5 right-4 z-[100] h-14 w-14 border-2 border-primary bg-primary/10 hover:bg-primary/20 hover:scale-110 active:scale-95 transition-all duration-300 rounded-lg animate-border-glow font-bold shadow-glow backdrop-blur-sm"
+            className="fixed top-[46px] right-[18px] z-[100] h-14 w-14 border-2 border-primary bg-primary/10 hover:bg-primary/20 hover:scale-110 active:scale-95 transition-all duration-300 rounded-lg animate-border-glow font-bold shadow-glow backdrop-blur-sm"
           >
             <Menu className="h-7 w-7 text-primary" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent 
           align="end" 
-          className="w-72 bg-background/95 backdrop-blur-xl z-50 shadow-elegant border-2 border-primary/20 mr-4 mt-2 animate-in slide-in-from-top-2 fade-in duration-300"
+          className="w-72 bg-background/98 backdrop-blur-lg z-50 shadow-elegant border-2 border-primary/20 mr-4 mt-2 animate-in slide-in-from-top-4 fade-in duration-300"
         >
           {user ? (
             <>
@@ -116,7 +116,7 @@ const Navbar = () => {
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild className="py-3 text-base bg-gradient-to-r from-primary/10 to-secondary/10">
-                <Link to="/auth" className="cursor-pointer font-semibold">
+                <Link to="/auth?tab=signup" className="cursor-pointer font-semibold">
                   Inscription
                 </Link>
               </DropdownMenuItem>

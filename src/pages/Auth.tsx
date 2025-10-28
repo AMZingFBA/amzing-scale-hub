@@ -15,8 +15,12 @@ export default function Auth() {
   const navigate = useNavigate();
   const { user, signUp, signIn } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState("login");
   const isNativeApp = Capacitor.isNativePlatform();
+  
+  // Check URL params for default tab
+  const searchParams = new URLSearchParams(window.location.search);
+  const defaultTab = searchParams.get("tab") === "signup" ? "signup" : "login";
+  const [activeTab, setActiveTab] = useState(defaultTab);
 
   useEffect(() => {
     if (user) {
@@ -78,7 +82,7 @@ export default function Auth() {
   };
 
   return (
-    <div className="min-h-screen w-full flex bg-gradient-to-br from-[#FFF7E6] via-background to-background">
+    <div className={`min-h-screen w-full flex bg-gradient-to-br from-[#FFF7E6] via-background to-background ${isNativeApp ? 'pt-20' : ''}`}>
       {/* Left Side - Form */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8 relative overflow-hidden">
         {/* Subtle watermark */}

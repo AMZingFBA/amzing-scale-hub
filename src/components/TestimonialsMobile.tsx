@@ -1,3 +1,4 @@
+import React from "react";
 import { Star, CheckCircle } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -115,10 +116,16 @@ const TestimonialsMobile = () => {
     return null;
   }
 
+  // Select 4 random testimonials from the list
+  const selectedTestimonials = React.useMemo(() => {
+    const shuffled = [...testimonials].sort(() => 0.5 - Math.random());
+    return shuffled.slice(0, 4);
+  }, []);
+
   return (
     <div className="py-12 px-4">
       {/* Badge */}
-      <div className="flex justify-center mb-4">
+      <div className="flex justify-center mb-4 opacity-0 animate-in fade-in slide-in-from-top-4 duration-300">
         <Badge className="bg-[#FFF7E6] text-primary border border-primary/30 px-4 py-2 rounded-full text-sm font-semibold flex items-center gap-2">
           <CheckCircle className="w-4 h-4" />
           Témoignages clients réels
@@ -126,17 +133,17 @@ const TestimonialsMobile = () => {
       </div>
 
       {/* Title */}
-      <h2 className="text-3xl md:text-4xl font-bold text-center mb-8 text-foreground">
+      <h2 className="text-3xl md:text-4xl font-bold text-center mb-8 text-foreground opacity-0 animate-in fade-in slide-in-from-bottom-4 duration-300" style={{ animationDelay: "80ms" }}>
         Ce que disent nos membres
       </h2>
 
       {/* Testimonials Stack */}
       <div className="max-w-2xl mx-auto space-y-4">
-        {testimonials.map((testimonial, index) => (
+        {selectedTestimonials.map((testimonial, index) => (
           <TestimonialCard
             key={index}
             testimonial={testimonial}
-            delay={index * 80}
+            delay={index * 80 + 160}
           />
         ))}
       </div>
