@@ -113,7 +113,7 @@ const Contact = () => {
       
       {/* Back button for mobile app */}
       {isNativeApp && (
-        <div className="fixed top-4 left-4 z-50 animate-slide-in-left">
+        <div className="fixed top-20 left-4 z-50 animate-slide-in-left">
           <Button
             variant="outline"
             size="icon"
