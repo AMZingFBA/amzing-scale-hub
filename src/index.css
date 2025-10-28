@@ -129,6 +129,10 @@
   .pt-safe {
     padding-top: env(safe-area-inset-top);
   }
+  
+  .pt-safe-navbar {
+    padding-top: calc(env(safe-area-inset-top) + 0.5rem);
+  }
 }
 
 @keyframes scroll-left {
