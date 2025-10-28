@@ -32,9 +32,11 @@ const Navbar = () => {
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
       <div className={`container mx-auto px-4 ${isNativeApp ? 'navbar-safe-area' : ''}`}>
         <div className="flex items-center justify-between h-20">
-          <Link to="/" className="flex items-center group">
-            <img src={logo} alt="AMZing FBA" className="h-12 transition-transform group-hover:scale-105" />
-          </Link>
+          {!isNativeApp && (
+            <Link to="/" className="flex items-center group">
+              <img src={logo} alt="AMZing FBA" className="h-12 transition-transform group-hover:scale-105" />
+            </Link>
+          )}
 
           {/* Desktop Navigation - Hidden on native app */}
           <div className={`items-center space-x-8 ${isNativeApp ? 'hidden' : 'hidden md:flex'}`}>
@@ -133,8 +135,11 @@ const Navbar = () => {
           {isNativeApp && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-12 w-12 hover:bg-primary/10 transition-all">
-                  <Menu className="h-6 w-6" />
+                <Button 
+                  variant="outline" 
+                  className="h-14 w-14 border-2 border-primary bg-primary/10 hover:bg-primary/20 hover:scale-110 transition-all duration-300 rounded-lg animate-border-glow font-bold shadow-glow"
+                >
+                  <Menu className="h-7 w-7 text-primary" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-72 bg-background/98 backdrop-blur-lg z-50 animate-scale-in shadow-elegant border-2 border-primary/20">
