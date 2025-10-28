@@ -17,22 +17,49 @@ import { useAuth } from "@/hooks/use-auth";
 import { useScrollReveal } from "@/hooks/use-scroll-reveal";
 import { Capacitor } from "@capacitor/core";
 
-const ServiceCard = ({ children, delay }: { children: React.ReactNode, delay: number }) => {
-  const { ref, isVisible } = useScrollReveal({ delay });
+const ServiceCard = ({ 
+  children, 
+  delay, 
+  animation = "fade-up" 
+}: { 
+  children: React.ReactNode; 
+  delay: number;
+  animation?: "fade-up" | "fade-left" | "fade-right" | "scale" | "rotate" | "slide-rotate";
+}) => {
+  const { ref, isVisible } = useScrollReveal({ delay, animation });
   const isNativeApp = Capacitor.isNativePlatform();
 
   if (!isNativeApp) {
     return <>{children}</>;
   }
 
+  const getAnimationClasses = () => {
+    const base = "transition-all duration-500";
+    
+    if (!isVisible) {
+      switch (animation) {
+        case "fade-left":
+          return `${base} opacity-0 -translate-x-8`;
+        case "fade-right":
+          return `${base} opacity-0 translate-x-8`;
+        case "scale":
+          return `${base} opacity-0 scale-90`;
+        case "rotate":
+          return `${base} opacity-0 rotate-[-3deg] translate-y-4`;
+        case "slide-rotate":
+          return `${base} opacity-0 translate-y-4 rotate-[2deg] scale-95`;
+        default: // fade-up
+          return `${base} opacity-0 translate-y-4`;
+      }
+    }
+    
+    return `${base} opacity-100 translate-y-0 translate-x-0 scale-100 rotate-0`;
+  };
+
   return (
     <div
       ref={ref}
-      className={`transition-all duration-500 ${
-        isVisible 
-          ? "opacity-100 translate-y-0" 
-          : "opacity-0 translate-y-4"
-      }`}
+      className={getAnimationClasses()}
     >
       {children}
     </div>
@@ -113,7 +140,7 @@ const Index = () => {
             <p className="text-xl text-muted-foreground">34,99€/mois pour un accès complet</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <ServiceCard delay={0}>
+            <ServiceCard delay={0} animation="scale">
             <Card className={`border-2 hover:border-primary transition-colors ${isNativeApp ? 'hover:shadow-[0_0_20px_rgba(255,153,0,0.3)]' : ''}`}>
               <CardContent className="pt-8 text-center">
                 <div className="w-16 h-16 bg-gradient-to-br from-primary to-primary-glow rounded-2xl flex items-center justify-center mx-auto mb-6">
@@ -127,7 +154,7 @@ const Index = () => {
             </Card>
             </ServiceCard>
 
-            <ServiceCard delay={80}>
+            <ServiceCard delay={100} animation="fade-up">
             <Card className={`border-2 hover:border-primary transition-colors ${isNativeApp ? 'hover:shadow-[0_0_20px_rgba(255,153,0,0.3)]' : ''}`}>
               <CardContent className="pt-8 text-center">
                 <div className="w-16 h-16 bg-gradient-to-br from-secondary to-accent rounded-2xl flex items-center justify-center mx-auto mb-6">
@@ -141,7 +168,7 @@ const Index = () => {
             </Card>
             </ServiceCard>
 
-            <ServiceCard delay={160}>
+            <ServiceCard delay={200} animation="rotate">
             <Card className={`border-2 hover:border-primary transition-colors ${isNativeApp ? 'hover:shadow-[0_0_20px_rgba(255,153,0,0.3)]' : ''}`}>
               <CardContent className="pt-8 text-center">
                 <div className="w-16 h-16 bg-gradient-to-br from-primary to-secondary rounded-2xl flex items-center justify-center mx-auto mb-6">
@@ -174,7 +201,7 @@ const Index = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            <ServiceCard delay={0}>
+            <ServiceCard delay={0} animation="fade-left">
             <Card className={`border-2 border-primary/20 cursor-pointer transition-all duration-300 ${isNativeApp ? 'hover:border-primary hover:shadow-[0_0_20px_rgba(255,153,0,0.3)]' : 'hover:border-primary hover:shadow-glow'} hover:scale-105 active:scale-95 active:border-primary`}>
               <CardContent className="pt-6">
                 <div className="flex items-start gap-4">
@@ -192,7 +219,7 @@ const Index = () => {
             </Card>
             </ServiceCard>
 
-            <ServiceCard delay={80}>
+            <ServiceCard delay={80} animation="fade-right">
             <Card className={`border-2 border-primary/20 cursor-pointer transition-all duration-300 ${isNativeApp ? 'hover:border-secondary hover:shadow-[0_0_20px_rgba(33,150,243,0.3)]' : 'hover:border-secondary hover:shadow-blue'} hover:scale-105 active:scale-95 active:border-secondary`}>
               <CardContent className="pt-6">
                 <div className="flex items-start gap-4">
@@ -210,7 +237,7 @@ const Index = () => {
             </Card>
             </ServiceCard>
 
-            <ServiceCard delay={160}>
+            <ServiceCard delay={160} animation="scale">
             <Card className={`border-2 border-primary/20 cursor-pointer transition-all duration-300 ${isNativeApp ? 'hover:border-primary hover:shadow-[0_0_20px_rgba(255,153,0,0.3)]' : 'hover:border-primary hover:shadow-glow'} hover:scale-105 active:scale-95 active:border-primary`}>
               <CardContent className="pt-6">
                 <div className="flex items-start gap-4">
@@ -228,7 +255,7 @@ const Index = () => {
             </Card>
             </ServiceCard>
 
-            <ServiceCard delay={240}>
+            <ServiceCard delay={240} animation="rotate">
             <Card className={`border-2 border-primary/20 cursor-pointer transition-all duration-300 ${isNativeApp ? 'hover:border-secondary hover:shadow-[0_0_20px_rgba(33,150,243,0.3)]' : 'hover:border-secondary hover:shadow-blue'} hover:scale-105 active:scale-95 active:border-secondary`}>
               <CardContent className="pt-6">
                 <div className="flex items-start gap-4">
@@ -246,7 +273,7 @@ const Index = () => {
             </Card>
             </ServiceCard>
 
-            <ServiceCard delay={320}>
+            <ServiceCard delay={320} animation="slide-rotate">
             <Card className={`border-2 border-primary/20 cursor-pointer transition-all duration-300 ${isNativeApp ? 'hover:border-primary hover:shadow-[0_0_20px_rgba(255,153,0,0.3)]' : 'hover:border-primary hover:shadow-glow'} hover:scale-105 active:scale-95 active:border-primary`}>
               <CardContent className="pt-6">
                 <div className="flex items-start gap-4">
@@ -264,7 +291,7 @@ const Index = () => {
             </Card>
             </ServiceCard>
 
-            <ServiceCard delay={400}>
+            <ServiceCard delay={400} animation="fade-up">
             <Card className={`border-2 border-primary/20 cursor-pointer transition-all duration-300 ${isNativeApp ? 'hover:border-secondary hover:shadow-[0_0_20px_rgba(33,150,243,0.3)]' : 'hover:border-secondary hover:shadow-blue'} hover:scale-105 active:scale-95 active:border-secondary`}>
               <CardContent className="pt-6">
                 <div className="flex items-start gap-4">

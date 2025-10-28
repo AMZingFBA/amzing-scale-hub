@@ -116,11 +116,13 @@ const TestimonialsMobile = () => {
     return null;
   }
 
-  // Select 4 random testimonials from the list
+  // Select 2 random testimonials from the list
   const selectedTestimonials = React.useMemo(() => {
     const shuffled = [...testimonials].sort(() => 0.5 - Math.random());
-    return shuffled.slice(0, 4);
+    return shuffled.slice(0, 2);
   }, []);
+
+  const [showAllTestimonials, setShowAllTestimonials] = React.useState(false);
 
   return (
     <div className="py-12 px-4">
@@ -139,7 +141,7 @@ const TestimonialsMobile = () => {
 
       {/* Testimonials Stack */}
       <div className="max-w-2xl mx-auto space-y-4">
-        {selectedTestimonials.map((testimonial, index) => (
+        {(showAllTestimonials ? testimonials : selectedTestimonials).map((testimonial, index) => (
           <TestimonialCard
             key={index}
             testimonial={testimonial}
@@ -147,6 +149,18 @@ const TestimonialsMobile = () => {
           />
         ))}
       </div>
+
+      {/* Show More Button */}
+      {!showAllTestimonials && (
+        <div className="flex justify-center mt-6">
+          <button
+            onClick={() => setShowAllTestimonials(true)}
+            className="px-6 py-3 bg-gradient-to-r from-primary to-secondary text-white rounded-lg font-semibold shadow-lg hover:shadow-glow transition-all duration-300 active:scale-95"
+          >
+            Voir plus d'avis ({testimonials.length - 2})
+          </button>
+        </div>
+      )}
     </div>
   );
 };

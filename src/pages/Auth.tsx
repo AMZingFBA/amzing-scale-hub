@@ -82,9 +82,9 @@ export default function Auth() {
   };
 
   return (
-    <div className={`min-h-screen w-full flex bg-gradient-to-br from-[#FFF7E6] via-background to-background ${isNativeApp ? 'pt-20' : ''}`}>
+    <div className="min-h-screen w-full flex bg-gradient-to-br from-[#FFF7E6] via-background to-background">
       {/* Left Side - Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 relative overflow-hidden">
+      <div className={`w-full lg:w-1/2 flex items-center justify-center p-8 relative overflow-hidden ${isNativeApp ? 'pt-16' : ''}`}>
         {/* Subtle watermark */}
         {isNativeApp && (
           <div className="absolute bottom-8 right-8 opacity-[0.02] pointer-events-none">
