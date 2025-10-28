@@ -207,7 +207,7 @@ const TestimonialsMobile = () => {
   const [showAllTestimonials, setShowAllTestimonials] = React.useState(false);
 
   return (
-    <div className="px-4 pb-4">
+    <div className="px-4">
       {/* Badge */}
       <div className="flex justify-center mb-4 opacity-0 animate-in fade-in slide-in-from-top-4 duration-200">
         <Badge className="bg-[#FFF7E6] text-primary border border-primary/30 px-4 py-2 rounded-full text-sm font-semibold flex items-center gap-2">

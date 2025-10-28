@@ -1,8 +1,18 @@
-import { Star, ArrowLeft } from "lucide-react";
+import { Star, ArrowLeft, Filter } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Capacitor } from "@capacitor/core";
 import { useNavigate } from "react-router-dom";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
 
 const testimonials = [
   {
@@ -145,11 +155,18 @@ const testimonials = [
 const Avis = () => {
   const navigate = useNavigate();
   const isNativeApp = Capacitor.isNativePlatform();
+  const [filterRating, setFilterRating] = useState<string>("all");
 
   // Randomize testimonials order
   const randomizedTestimonials = useMemo(() => {
     return [...testimonials].sort(() => 0.5 - Math.random());
   }, []);
+
+  // Filter testimonials by rating
+  const filteredTestimonials = useMemo(() => {
+    if (filterRating === "all") return randomizedTestimonials;
+    return randomizedTestimonials.filter(t => t.rating.toString() === filterRating);
+  }, [randomizedTestimonials, filterRating]);
 
   // Redirect to home if not native app
   if (!isNativeApp) {
@@ -159,22 +176,43 @@ const Avis = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <div className="sticky top-0 z-10 bg-background border-b border-border">
-        <div className="flex items-center gap-4 px-4 py-4">
-          <button
-            onClick={() => navigate(-1)}
-            className="p-2 hover:bg-accent rounded-lg transition-colors active:scale-95"
-          >
-            <ArrowLeft className="w-6 h-6" />
-          </button>
-          <h1 className="text-2xl font-bold">Tous les avis</h1>
+      {/* Header with iOS safe area */}
+      <div className="sticky top-0 z-10 bg-background border-b border-border pt-safe">
+        <div className="flex items-center justify-between gap-4 px-4 py-4">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => navigate(-1)}
+              className="p-2 hover:bg-accent rounded-lg transition-colors active:scale-95"
+            >
+              <ArrowLeft className="w-6 h-6" />
+            </button>
+            <h1 className="text-2xl font-bold">Tous les avis</h1>
+          </div>
+          
+          {/* Filter Dropdown */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="icon">
+                <Filter className="w-5 h-5" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuLabel>Filtrer par note</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuRadioGroup value={filterRating} onValueChange={setFilterRating}>
+                <DropdownMenuRadioItem value="all">Tous les avis</DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="5">⭐⭐⭐⭐⭐ (5/5)</DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="4">⭐⭐⭐⭐ (4/5)</DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="3">⭐⭐⭐ (3/5)</DropdownMenuRadioItem>
+              </DropdownMenuRadioGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
 
       {/* Testimonials List - No animations */}
       <div className="px-4 py-6 space-y-4 max-w-2xl mx-auto">
-        {randomizedTestimonials.map((testimonial, index) => (
+        {filteredTestimonials.map((testimonial, index) => (
           <Card 
             key={index}
             className="border border-primary/20 bg-[#FFFDF7] shadow-lg"
