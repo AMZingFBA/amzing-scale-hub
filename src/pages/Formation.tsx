@@ -16,16 +16,13 @@ const Formation = () => {
       <Navbar />
       
       {isNativeApp && (
-        <div className="fixed top-[46px] left-[18px] z-50">
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => navigate('/')}
-            className="rounded-full shadow-lg bg-background/80 backdrop-blur-sm hover:bg-primary hover:text-white border-2 border-primary/20 hover:border-primary transition-all duration-300 hover:scale-110"
-          >
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-        </div>
+        <button
+          onClick={() => navigate('/dashboard')}
+          className="fixed top-[46px] left-[18px] z-50 bg-background/80 backdrop-blur-sm p-2 rounded-full shadow-lg hover:bg-background transition-colors"
+          aria-label="Retour"
+        >
+          <ArrowLeft className="h-5 w-5 text-foreground" />
+        </button>
       )}
       
       <div className="pt-32 pb-20 relative overflow-hidden">
