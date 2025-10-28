@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { Capacitor } from "@capacitor/core";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,7 +11,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Loader2, Package, Search, Upload, Trash2, ShoppingCart, MessageCircle, X, Copy, ZoomIn, ChevronLeft, ChevronRight, TriangleAlert, Pencil } from "lucide-react";
+import { Loader2, Package, Search, Upload, Trash2, ShoppingCart, MessageCircle, X, Copy, ZoomIn, ChevronLeft, ChevronRight, TriangleAlert, Pencil, ArrowLeft } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useCatalogueUnread } from "@/hooks/use-catalogue-unread";
 
@@ -34,6 +35,7 @@ const CatalogueProduits = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { unreadCount } = useCatalogueUnread();
+  const isNativeApp = Capacitor.isNativePlatform();
   
   const [catalogueProducts, setCatalogueProducts] = useState<CatalogueProduct[]>([]);
   const [myTickets, setMyTickets] = useState<any[]>([]);
@@ -571,6 +573,15 @@ Est-il toujours disponible ?`;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/20 p-4 md:p-8">
+      {isNativeApp && (
+        <button
+          onClick={() => navigate('/dashboard')}
+          className="fixed top-[46px] left-[18px] z-50 bg-background/80 backdrop-blur-sm p-2 rounded-full shadow-lg hover:bg-background transition-colors"
+          aria-label="Retour"
+        >
+          <ArrowLeft className="w-5 h-5 text-foreground" />
+        </button>
+      )}
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Quantity Selection Dialog */}
         <Dialog open={showQuantityDialog} onOpenChange={setShowQuantityDialog}>

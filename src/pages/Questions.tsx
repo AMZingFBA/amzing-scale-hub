@@ -2,8 +2,9 @@ import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/hooks/use-auth';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+import { Capacitor } from '@capacitor/core';
 import { toast } from 'sonner';
-import { Loader2, MessageCircle, Trash2 } from 'lucide-react';
+import { Loader2, MessageCircle, Trash2, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import MessageInput from '@/components/chat/MessageInput';
@@ -38,6 +39,7 @@ const Questions = () => {
   const [loading, setLoading] = useState(true);
   const [roomId, setRoomId] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const isNativeApp = Capacitor.isNativePlatform();
 
   useEffect(() => {
     if (!user) {
@@ -261,6 +263,15 @@ const Questions = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
+      {isNativeApp && (
+        <button
+          onClick={() => navigate('/dashboard')}
+          className="fixed top-[46px] left-[18px] z-50 bg-background/80 backdrop-blur-sm p-2 rounded-full shadow-lg hover:bg-background transition-colors"
+          aria-label="Retour"
+        >
+          <ArrowLeft className="w-5 h-5 text-foreground" />
+        </button>
+      )}
       <main className="flex-grow pt-20">
         <div className="container mx-auto px-4 py-8 max-w-5xl">
           <div className="bg-card border rounded-lg overflow-hidden h-[calc(100vh-12rem)] flex flex-col">

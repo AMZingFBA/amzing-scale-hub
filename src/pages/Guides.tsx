@@ -1,5 +1,6 @@
 import { ArrowLeft, CheckCircle2, TrendingUp, Euro, Package, Store, Shield, Clock, Target, Building2, Wrench, BookOpen, GraduationCap, Search, Users, CreditCard, ShoppingCart, TrendingDown, AlertTriangle } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { Capacitor } from '@capacitor/core';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -8,19 +9,33 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import processFlow from '@/assets/amazon-process-flow.png';
 
 const Guides = () => {
+  const navigate = useNavigate();
+  const isNativeApp = Capacitor.isNativePlatform();
+
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
+      {isNativeApp && (
+        <button
+          onClick={() => navigate('/dashboard')}
+          className="fixed top-[46px] left-[18px] z-50 bg-background/80 backdrop-blur-sm p-2 rounded-full shadow-lg hover:bg-background transition-colors"
+          aria-label="Retour"
+        >
+          <ArrowLeft className="w-5 h-5 text-foreground" />
+        </button>
+      )}
       <main className="flex-grow pt-20">
         <div className="container mx-auto px-4 py-8">
           <div className="max-w-6xl mx-auto">
-            <Link 
-              to="/dashboard" 
-              className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary mb-6 transition-colors"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              Retour à l'Espace VIP
-            </Link>
+            {!isNativeApp && (
+              <Link 
+                to="/dashboard" 
+                className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary mb-6 transition-colors"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                Retour à l'Espace VIP
+              </Link>
+            )}
 
             <div className="mb-8">
               <h1 className="text-4xl font-bold mb-3">📘 Guides AMZing FBA</h1>

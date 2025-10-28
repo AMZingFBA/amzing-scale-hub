@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/use-auth';
 import { supabase } from '@/integrations/supabase/client';
+import { Capacitor } from '@capacitor/core';
+import { ArrowLeft } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -15,6 +17,7 @@ const Actualite = () => {
   const { toast } = useToast();
   const [alerts, setAlerts] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const isNativeApp = Capacitor.isNativePlatform();
 
   useEffect(() => {
     if (!user && !isAuthLoading) {
@@ -106,6 +109,15 @@ const Actualite = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
+      {isNativeApp && (
+        <button
+          onClick={() => navigate('/dashboard')}
+          className="fixed top-[46px] left-[18px] z-50 bg-background/80 backdrop-blur-sm p-2 rounded-full shadow-lg hover:bg-background transition-colors"
+          aria-label="Retour"
+        >
+          <ArrowLeft className="w-5 h-5 text-foreground" />
+        </button>
+      )}
       <main className="flex-grow pt-20">
         <div className="container mx-auto px-4 py-8 max-w-4xl">
           <div className="flex items-center gap-3 mb-8">
