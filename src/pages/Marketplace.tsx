@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { Capacitor } from "@capacitor/core";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -11,7 +12,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Loader2, Package, Search, Upload, Trash2, ShoppingCart, ShoppingBag, MessageCircle, X, CheckCircle, Copy, ZoomIn, ChevronLeft, ChevronRight, Edit } from "lucide-react";
+import { Loader2, Package, Search, Upload, Trash2, ShoppingCart, ShoppingBag, MessageCircle, X, CheckCircle, Copy, ZoomIn, ChevronLeft, ChevronRight, Edit, ArrowLeft } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useMarketplaceBuyUnread } from "@/hooks/use-marketplace-buy-unread";
 
@@ -50,6 +51,7 @@ const Marketplace = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { unreadCount } = useMarketplaceBuyUnread();
+  const isNativeApp = Capacitor.isNativePlatform();
   
   // Determine section based on route
   const getInitialSection = (): "buy" | "sell" | "my-buy-requests" | "my-sell-listings" => {
@@ -871,6 +873,15 @@ const Marketplace = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/20 p-4 md:p-8">
+      {isNativeApp && (
+        <button
+          onClick={() => navigate('/dashboard')}
+          className="fixed top-[46px] left-[18px] z-50 bg-primary/90 backdrop-blur-sm p-2 rounded-full shadow-lg hover:bg-primary transition-all animate-bounce-subtle"
+          aria-label="Retour"
+        >
+          <ArrowLeft className="w-5 h-5 text-primary-foreground" />
+        </button>
+      )}
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Image Gallery Dialog */}
         <Dialog open={showImageDialog} onOpenChange={setShowImageDialog}>

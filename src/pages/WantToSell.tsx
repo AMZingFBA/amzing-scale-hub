@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { Capacitor } from "@capacitor/core";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -11,7 +12,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Loader2, Upload, Trash2, Package, MessageCircle, X, ZoomIn, ChevronLeft, ChevronRight, Edit, Search, Copy } from "lucide-react";
+import { Loader2, Upload, Trash2, Package, MessageCircle, X, ZoomIn, ChevronLeft, ChevronRight, Edit, Search, Copy, ArrowLeft } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useMarketplaceSellUnread } from "@/hooks/use-marketplace-sell-unread";
 import Navbar from "@/components/Navbar";
@@ -37,6 +38,7 @@ const WantToSell = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { unreadCount } = useMarketplaceSellUnread();
+  const isNativeApp = Capacitor.isNativePlatform();
   
   const [listings, setListings] = useState<Listing[]>([]);
   const [myListings, setMyListings] = useState<Listing[]>([]);
@@ -527,6 +529,15 @@ const WantToSell = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
+      {isNativeApp && (
+        <button
+          onClick={() => navigate('/dashboard')}
+          className="fixed top-[46px] left-[18px] z-50 bg-primary/90 backdrop-blur-sm p-2 rounded-full shadow-lg hover:bg-primary transition-all animate-bounce-subtle"
+          aria-label="Retour"
+        >
+          <ArrowLeft className="w-5 h-5 text-primary-foreground" />
+        </button>
+      )}
       
       {/* Image Gallery Dialog */}
       <Dialog open={showImageDialog} onOpenChange={setShowImageDialog}>

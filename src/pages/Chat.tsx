@@ -2,8 +2,9 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/use-auth';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+import { Capacitor } from '@capacitor/core';
 import { toast } from 'sonner';
-import { Loader2, Users, Plus, Edit2, Check, X, Pin, PinOff, EyeOff, Trash2 } from 'lucide-react';
+import { Loader2, Users, Plus, Edit2, Check, X, Pin, PinOff, EyeOff, Trash2, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -37,6 +38,7 @@ const Chat = () => {
   const { isAdmin } = useAdmin();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const isNativeApp = Capacitor.isNativePlatform();
   const [rooms, setRooms] = useState<Room[]>([]);
   const [selectedRoom, setSelectedRoom] = useState<string | null>(null);
   const [selectedDirectConversation, setSelectedDirectConversation] = useState<string | null>(null);
@@ -365,6 +367,15 @@ const Chat = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      {isNativeApp && (
+        <button
+          onClick={() => navigate('/dashboard')}
+          className="fixed top-[46px] left-[18px] z-50 bg-primary/90 backdrop-blur-sm p-2 rounded-full shadow-lg hover:bg-primary transition-all animate-bounce-subtle"
+          aria-label="Retour"
+        >
+          <ArrowLeft className="w-5 h-5 text-primary-foreground" />
+        </button>
+      )}
       <div className="container mx-auto py-8 px-4">
         <div className="flex gap-4 h-[calc(100vh-8rem)]">
           {/* Sidebar - Room List */}
