@@ -28,12 +28,18 @@ const CategoryItem = ({
   onClick,
   badge
 }: CategoryItemProps) => {
-  const content = <Card className="hover:bg-accent/50 transition-colors cursor-pointer relative" onClick={onClick}>
-      <NotificationBadge count={badge} />
+  const content = <Card className="hover:bg-accent/50 transition-colors cursor-pointer" onClick={onClick}>
       <CardContent className="p-4">
-        <div className="flex items-center gap-3">
-          <Icon className="w-5 h-5 text-primary" />
-          <span className="font-medium">{label}</span>
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <Icon className="w-5 h-5 text-primary" />
+            <span className="font-medium">{label}</span>
+          </div>
+          {badge && badge > 0 && (
+            <div className="flex items-center">
+              <NotificationBadge count={badge} className="relative" />
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>;
