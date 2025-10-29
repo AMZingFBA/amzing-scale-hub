@@ -576,9 +576,9 @@ Est-il toujours disponible ?`;
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-      <main className="flex-grow pt-24 bg-gradient-to-b from-background to-muted/20 p-4 md:p-8">
-      <div className="max-w-7xl mx-auto space-y-6">
-        {/* Quantity Selection Dialog */}
+      <main className="flex-grow pt-20 bg-gradient-to-b from-background to-muted/20 p-4 md:p-8">
+        <div className="max-w-7xl mx-auto">
+          {/* Quantity Selection Dialog */}
         <Dialog open={showQuantityDialog} onOpenChange={setShowQuantityDialog}>
           <DialogContent className="max-w-md">
             <DialogHeader>
@@ -709,9 +709,9 @@ Est-il toujours disponible ?`;
           </DialogContent>
         </Dialog>
 
-        {/* Catalogue Section */}
-        <div className="w-full space-y-6 animate-fade-in">
-          <div className="mb-8 flex items-start gap-3">
+          {/* Catalogue Section */}
+          <div className="w-full space-y-6 animate-fade-in mt-6">
+            <div className="mb-6 flex items-start gap-3">
             <button
               onClick={() => navigate('/dashboard')}
               className="bg-primary/90 backdrop-blur-sm p-2 rounded-full shadow-lg hover:bg-primary transition-all shrink-0 mt-1"
