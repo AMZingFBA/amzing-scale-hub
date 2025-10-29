@@ -385,7 +385,7 @@ const Chat = () => {
           {/* Sidebar - Room List */}
           <div className={`${(selectedRoom || selectedDirectConversation) ? 'hidden md:flex' : 'flex'} w-full md:w-80 bg-card border rounded-lg p-4 flex-col`}>
             <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'rooms' | 'direct')} className="flex-1 flex flex-col">
-              <TabsList className="grid w-full grid-cols-2 mb-4">
+              <TabsList className="grid w-full grid-cols-2 mb-4 mt-16 md:mt-0">
                 <TabsTrigger value="rooms">Salons</TabsTrigger>
                 <TabsTrigger value="direct">Directs</TabsTrigger>
               </TabsList>
