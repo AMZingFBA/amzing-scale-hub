@@ -151,6 +151,12 @@ export const useNotifications = () => {
 
     fetchNotifications();
 
+    // Listen for manual refresh events
+    const handleRefresh = () => {
+      fetchNotifications();
+    };
+    window.addEventListener('refreshNotifications', handleRefresh);
+
     // Subscribe to changes
     const channel = supabase
       .channel('notifications-changes')
@@ -187,6 +193,7 @@ export const useNotifications = () => {
       .subscribe();
 
     return () => {
+      window.removeEventListener('refreshNotifications', handleRefresh);
       supabase.removeChannel(channel);
     };
   }, [user]);
