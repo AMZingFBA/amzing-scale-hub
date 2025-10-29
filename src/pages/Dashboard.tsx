@@ -254,7 +254,6 @@ const Dashboard = () => {
                   <div className="grid gap-3 pt-2">
                     <CategoryItem icon={Megaphone} label="annonces" link="/annonces" badge={unreadCounts.informations?.subcategories?.annonces} />
                     <CategoryItem icon={Newspaper} label="actualités" link="/actualite" badge={unreadCounts.informations?.subcategories?.actualités} />
-                    <CategoryItem icon={Settings} label="mon profil" link="/profile" />
                   </div>
                 </AccordionContent>
               </AccordionItem>
