@@ -1,15 +1,13 @@
 import { useAuth } from '@/hooks/use-auth';
 import { useAdmin } from '@/hooks/use-admin';
-import { useUnreadMessages } from '@/hooks/use-unread-messages';
-import { useMarketplaceBuyUnread } from '@/hooks/use-marketplace-buy-unread';
-import { useMarketplaceSellUnread } from '@/hooks/use-marketplace-sell-unread';
-import { useCategoryUnread } from '@/hooks/use-category-unread';
-import { useCatalogueUnread } from '@/hooks/use-catalogue-unread';
+import { useNotifications } from '@/hooks/use-notifications';
 import { Navigate, Link } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import CategoryAlerts from '@/components/CategoryAlerts';
+import { RecentUpdates } from '@/components/RecentUpdates';
+import { NotificationBadge } from '@/components/NotificationBadge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
@@ -30,16 +28,14 @@ const CategoryItem = ({
   onClick,
   badge
 }: CategoryItemProps) => {
-  const content = <Card className="hover:bg-accent/50 transition-colors cursor-pointer" onClick={onClick}>
+  const content = <Card className="hover:bg-accent/50 transition-colors cursor-pointer relative" onClick={onClick}>
       <CardContent className="p-4">
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <Icon className="w-5 h-5 text-primary" />
             <span className="font-medium">{label}</span>
           </div>
-          {badge && badge > 0 && <Badge variant="destructive" className="ml-auto">
-              {badge}
-            </Badge>}
+          <NotificationBadge count={badge} />
         </div>
       </CardContent>
     </Card>;
@@ -56,22 +52,7 @@ const Dashboard = () => {
     isLoading
   } = useAuth();
   const { isAdmin } = useAdmin();
-  const {
-    unreadCount
-  } = useUnreadMessages();
-  const {
-    unreadCount: buyUnreadCount
-  } = useMarketplaceBuyUnread();
-  const {
-    unreadCount: sellUnreadCount
-  } = useMarketplaceSellUnread();
-  const {
-    unreadCount: catalogueUnreadCount
-  } = useCatalogueUnread();
-  const {
-    unreadCounts
-  } = useCategoryUnread();
-  const marketplaceUnreadCount = buyUnreadCount + sellUnreadCount;
+  const { notifications, markAsRead } = useNotifications();
   const [rulesOpen, setRulesOpen] = useState(false);
   const [invoiceAuthOpen, setInvoiceAuthOpen] = useState(false);
   const [reviewsOpen, setReviewsOpen] = useState(false);
@@ -142,29 +123,29 @@ const Dashboard = () => {
                 </p>
               </div>}
 
+            <RecentUpdates />
+
             <Accordion type="multiple" className="space-y-4">
               {/* INTRODUCTION */}
               <AccordionItem value="introduction" className="border rounded-lg px-6 bg-card">
                 <AccordionTrigger className="hover:no-underline">
                   <div className="flex items-center justify-between w-full gap-3">
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3 relative">
                       <BookOpen className="w-6 h-6 text-primary" />
                       <span className="text-xl font-bold">INTRODUCTION</span>
+                      <NotificationBadge count={notifications.introduction?.total} className="relative top-0 right-0" />
                     </div>
-                    {(unreadCounts.introduction?.total > 0 || unreadCount > 0) && <Badge variant="destructive" className="ml-auto">
-                        {(unreadCounts.introduction?.total || 0) + (unreadCount || 0)}
-                      </Badge>}
                   </div>
                 </AccordionTrigger>
                 <AccordionContent className="px-4 pb-4">
                   <CategoryAlerts category="introduction" />
                   <div className="grid gap-3 pt-2">
-                    <CategoryItem icon={Bell} label="notifications" link="/notification-alerts" badge={unreadCounts.introduction?.subcategories?.notifications} />
-                    <CategoryItem icon={BookOpen} label="règles" onClick={() => setRulesOpen(true)} badge={unreadCounts.introduction?.subcategories?.règles} />
-                    <CategoryItem icon={CheckCircle} label="débuter" badge={unreadCounts.introduction?.subcategories?.débuter} />
-                    <CategoryItem icon={BookOpen} label="guides" link="/guides" badge={unreadCounts.introduction?.subcategories?.guides} />
-                    <CategoryItem icon={DollarSign} label="affiliation" badge={unreadCounts.introduction?.subcategories?.affiliation} />
-                    <CategoryItem icon={HelpCircle} label="support" link="/support" badge={unreadCount} />
+                    <CategoryItem icon={Bell} label="notifications" link="/notification-alerts" badge={notifications.introduction?.subcategories?.notifications} />
+                    <CategoryItem icon={BookOpen} label="règles" onClick={() => setRulesOpen(true)} badge={notifications.introduction?.subcategories?.règles} />
+                    <CategoryItem icon={CheckCircle} label="débuter" badge={notifications.introduction?.subcategories?.débuter} />
+                    <CategoryItem icon={BookOpen} label="guides" link="/guides" badge={notifications.introduction?.subcategories?.guides} />
+                    <CategoryItem icon={DollarSign} label="affiliation" badge={notifications.introduction?.subcategories?.affiliation} />
+                    <CategoryItem icon={HelpCircle} label="support" link="/support" badge={notifications.introduction?.subcategories?.support} />
                   </div>
                 </AccordionContent>
               </AccordionItem>
@@ -173,43 +154,41 @@ const Dashboard = () => {
               <AccordionItem value="outils" className="border rounded-lg px-6 bg-card">
                 <AccordionTrigger className="hover:no-underline">
                   <div className="flex items-center justify-between w-full gap-3">
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3 relative">
                       <Settings className="w-6 h-6 text-primary" />
                       <span className="text-xl font-bold">OUTILS</span>
+                      <NotificationBadge count={notifications.outils?.total} className="relative top-0 right-0" />
                     </div>
-                    {unreadCounts.outils?.total > 0 && <Badge variant="destructive" className="ml-auto">
-                        {unreadCounts.outils.total}
-                      </Badge>}
                   </div>
                 </AccordionTrigger>
                 <AccordionContent>
                   <CategoryAlerts category="outils" />
                   <div className="grid gap-3 pt-2">
-                    <CategoryItem icon={Eye} label="création-société" badge={unreadCounts.outils?.subcategories?.['création-société']} />
-                    <CategoryItem icon={FileText} label="facture-autorisation" onClick={() => setInvoiceAuthOpen(true)} badge={unreadCounts.outils?.subcategories?.['facture-autorisation']} />
-                    <CategoryItem icon={DollarSign} label="cashback" badge={unreadCounts.outils?.subcategories?.cashback} />
-                    <CategoryItem icon={Star} label="avis" onClick={() => setReviewsOpen(true)} badge={unreadCounts.outils?.subcategories?.avis} />
+                    <CategoryItem icon={Eye} label="création-société" badge={notifications.outils?.subcategories?.['création-société']} />
+                    <CategoryItem icon={FileText} label="facture-autorisation" onClick={() => setInvoiceAuthOpen(true)} badge={notifications.outils?.subcategories?.['facture-autorisation']} />
+                    <CategoryItem icon={DollarSign} label="cashback" badge={notifications.outils?.subcategories?.cashback} />
+                    <CategoryItem icon={Star} label="avis" onClick={() => setReviewsOpen(true)} badge={notifications.outils?.subcategories?.avis} />
                   </div>
                 </AccordionContent>
               </AccordionItem>
 
-              {/* PRODUITS GAGNANTS */}
               <AccordionItem value="produits" className="border rounded-lg px-6 bg-card">
                 <AccordionTrigger className="hover:no-underline">
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3 relative">
                     <Sparkles className="w-6 h-6 text-primary" />
                     <span className="text-xl font-bold">PRODUITS GAGNANTS</span>
+                    <NotificationBadge count={notifications.produits?.total} className="relative top-0 right-0" />
                   </div>
                 </AccordionTrigger>
                 <AccordionContent>
                   <CategoryAlerts category="produits" />
                   <div className="grid gap-3 pt-2">
-                    <CategoryItem icon={Sparkles} label="product find" link="/produits-find" />
-                    <CategoryItem icon={Sparkles} label="produits qogita" link="/produits-qogita" />
-                    <CategoryItem icon={Sparkles} label="produits eany" link="/produits-eany" />
-                    <CategoryItem icon={Package} label="grossistes" link="/grossistes" />
-                    <CategoryItem icon={DollarSign} label="promotions" link="/promotions" />
-                    <CategoryItem icon={FileText} label="sitelist" link="/sitelist" />
+                    <CategoryItem icon={Sparkles} label="product find" link="/produits-find" badge={notifications.produits?.subcategories?.['product find']} />
+                    <CategoryItem icon={Sparkles} label="produits qogita" link="/produits-qogita" badge={notifications.produits?.subcategories?.['produits qogita']} />
+                    <CategoryItem icon={Sparkles} label="produits eany" link="/produits-eany" badge={notifications.produits?.subcategories?.['produits eany']} />
+                    <CategoryItem icon={Package} label="grossistes" link="/grossistes" badge={notifications.produits?.subcategories?.grossistes} />
+                    <CategoryItem icon={DollarSign} label="promotions" link="/promotions" badge={notifications.produits?.subcategories?.promotions} />
+                    <CategoryItem icon={FileText} label="sitelist" link="/sitelist" badge={notifications.produits?.subcategories?.sitelist} />
                   </div>
                 </AccordionContent>
               </AccordionItem>
@@ -218,20 +197,18 @@ const Dashboard = () => {
               <AccordionItem value="expedition" className="border rounded-lg px-6 bg-card">
                 <AccordionTrigger className="hover:no-underline">
                   <div className="flex items-center justify-between w-full gap-3">
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3 relative">
                       <Truck className="w-6 h-6 text-primary" />
                       <span className="text-xl font-bold">EXPÉDITION</span>
+                      <NotificationBadge count={notifications.expedition?.total} className="relative top-0 right-0" />
                     </div>
-                    {unreadCounts.expedition?.total > 0 && <Badge variant="destructive" className="ml-auto">
-                        {unreadCounts.expedition.total}
-                      </Badge>}
                   </div>
                 </AccordionTrigger>
                 <AccordionContent>
                   <CategoryAlerts category="expedition" />
                   <div className="grid gap-3 pt-2">
-                    <CategoryItem icon={Settings} label="fournitures" badge={unreadCounts.expedition?.subcategories?.fournitures} />
-                    <CategoryItem icon={Package} label="cartons" badge={unreadCounts.expedition?.subcategories?.cartons} />
+                    <CategoryItem icon={Settings} label="fournitures" badge={notifications.expedition?.subcategories?.fournitures} />
+                    <CategoryItem icon={Package} label="cartons" badge={notifications.expedition?.subcategories?.cartons} />
                   </div>
                 </AccordionContent>
               </AccordionItem>
@@ -240,38 +217,36 @@ const Dashboard = () => {
               <AccordionItem value="informations" className="border rounded-lg px-6 bg-card">
                 <AccordionTrigger className="hover:no-underline">
                   <div className="flex items-center justify-between w-full gap-3">
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3 relative">
                       <Bell className="w-6 h-6 text-primary" />
                       <span className="text-xl font-bold">INFORMATIONS</span>
+                      <NotificationBadge count={notifications.informations?.total} className="relative top-0 right-0" />
                     </div>
-                    {unreadCounts.informations?.total > 0 && <Badge variant="destructive" className="ml-auto">
-                        {unreadCounts.informations.total}
-                      </Badge>}
                   </div>
                 </AccordionTrigger>
                 <AccordionContent className="px-4 pb-4">
                   <CategoryAlerts category="informations" />
                   <div className="grid gap-3 pt-2">
-                    <CategoryItem icon={Megaphone} label="annonces" link="/annonces" badge={unreadCounts.informations?.subcategories?.annonces} />
-                    <CategoryItem icon={Newspaper} label="actualités" link="/actualite" badge={unreadCounts.informations?.subcategories?.actualités} />
+                    <CategoryItem icon={Megaphone} label="annonces" link="/annonces" badge={notifications.informations?.subcategories?.annonces} />
+                    <CategoryItem icon={Newspaper} label="actualités" link="/actualite" badge={notifications.informations?.subcategories?.actualités} />
                   </div>
                 </AccordionContent>
               </AccordionItem>
 
-              {/* COMMUNAUTÉ */}
               <AccordionItem value="communaute" className="border rounded-lg px-6 bg-card">
                 <AccordionTrigger className="hover:no-underline">
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3 relative">
                     <MessageCircle className="w-6 h-6 text-primary" />
                     <span className="text-xl font-bold">COMMUNAUTÉ</span>
+                    <NotificationBadge count={notifications.communaute?.total} className="relative top-0 right-0" />
                   </div>
                 </AccordionTrigger>
                 <AccordionContent>
                   <div className="grid gap-3 pt-2">
-                    <CategoryItem icon={MessageCircle} label="général" link="/chat" />
-                    <CategoryItem icon={LightbulbIcon} label="suggestions" link="/suggestions" />
-                    <CategoryItem icon={Trophy} label="succès" link="/success" />
-                    <CategoryItem icon={ShoppingCart} label="ventes" link="/sales" />
+                    <CategoryItem icon={MessageCircle} label="général" link="/chat" badge={notifications.communaute?.subcategories?.général} />
+                    <CategoryItem icon={LightbulbIcon} label="suggestions" link="/suggestions" badge={notifications.communaute?.subcategories?.suggestions} />
+                    <CategoryItem icon={Trophy} label="succès" link="/success" badge={notifications.communaute?.subcategories?.succès} />
+                    <CategoryItem icon={ShoppingCart} label="ventes" link="/sales" badge={notifications.communaute?.subcategories?.ventes} />
                   </div>
                 </AccordionContent>
               </AccordionItem>
@@ -280,19 +255,17 @@ const Dashboard = () => {
               <AccordionItem value="marketplace" className="border rounded-lg px-6 bg-card">
                 <AccordionTrigger className="hover:no-underline">
                   <div className="flex items-center justify-between w-full gap-3">
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3 relative">
                       <ShoppingCart className="w-6 h-6 text-primary" />
                       <span className="text-xl font-bold">MARKETPLACE</span>
+                      <NotificationBadge count={notifications.marketplace?.total} className="relative top-0 right-0" />
                     </div>
-                    {marketplaceUnreadCount > 0 && <Badge variant="destructive" className="ml-auto">
-                        {marketplaceUnreadCount}
-                      </Badge>}
                   </div>
                 </AccordionTrigger>
                 <AccordionContent>
                   <div className="grid gap-3 pt-2">
-                    <CategoryItem icon={ShoppingCart} label="Want to Buy" link="/acheter" badge={buyUnreadCount} />
-                    <CategoryItem icon={Package} label="Want to Sell" link="/vendre" badge={sellUnreadCount} />
+                    <CategoryItem icon={ShoppingCart} label="Want to Buy" link="/acheter" badge={notifications.marketplace?.subcategories?.['Want to Buy']} />
+                    <CategoryItem icon={Package} label="Want to Sell" link="/vendre" badge={notifications.marketplace?.subcategories?.['Want to Sell']} />
                   </div>
                 </AccordionContent>
               </AccordionItem>
@@ -301,20 +274,18 @@ const Dashboard = () => {
               <AccordionItem value="gestion" className="border rounded-lg px-6 bg-card">
                 <AccordionTrigger className="hover:no-underline">
                   <div className="flex items-center justify-between w-full gap-3">
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3 relative">
                       <Package className="w-6 h-6 text-primary" />
                       <span className="text-xl font-bold">GESTION PRODUITS</span>
+                      <NotificationBadge count={notifications.gestion_produit?.total} className="relative top-0 right-0" />
                     </div>
-                    {catalogueUnreadCount > 0 && <Badge variant="destructive" className="ml-auto">
-                        {catalogueUnreadCount}
-                      </Badge>}
                   </div>
                 </AccordionTrigger>
                 <AccordionContent className="px-4 pb-4">
                   <div className="grid gap-3 pt-2">
-                    <CategoryItem icon={Info} label="informations" onClick={() => setGestionInfoOpen(true)} />
-                    <CategoryItem icon={Package} label="catalogue-produits" link="/catalogue-produits" badge={catalogueUnreadCount} />
-                    <CategoryItem icon={MessageCircle} label="questions" link="/questions" />
+                    <CategoryItem icon={Info} label="informations" onClick={() => setGestionInfoOpen(true)} badge={notifications.gestion_produit?.subcategories?.informations} />
+                    <CategoryItem icon={Package} label="catalogue-produits" link="/catalogue-produits" badge={notifications.gestion_produit?.subcategories?.['catalogue-produits']} />
+                    <CategoryItem icon={MessageCircle} label="questions" link="/questions" badge={notifications.gestion_produit?.subcategories?.questions} />
                   </div>
                 </AccordionContent>
               </AccordionItem>

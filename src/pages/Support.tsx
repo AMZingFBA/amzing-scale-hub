@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/use-auth';
 import { useAdmin } from '@/hooks/use-admin';
+import { useMarkAsRead } from '@/hooks/use-mark-as-read';
 import { supabase } from '@/integrations/supabase/client';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -48,6 +49,9 @@ const Support = () => {
     category: 'general',
     initialMessage: ''
   });
+
+  // Mark alerts as read when visiting this page
+  useMarkAsRead({ category: 'introduction', subcategory: 'support' });
   const isNativeApp = Capacitor.isNativePlatform();
 
   useEffect(() => {
