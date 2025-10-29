@@ -45,23 +45,9 @@ const RulesAlerts = () => {
 
       if (error) throw error;
       
-      // Filter to only show unread alerts
+      // Show all alerts
       if (data) {
-        const unreadAlerts = [];
-        for (const alert of data) {
-          const { data: readStatus } = await supabase
-            .from('alert_read_status')
-            .select('is_read')
-            .eq('alert_id', alert.id)
-            .eq('user_id', user.id)
-            .eq('is_read', true)
-            .maybeSingle();
-          
-          if (!readStatus) {
-            unreadAlerts.push(alert);
-          }
-        }
-        setAlerts(unreadAlerts);
+        setAlerts(data);
       }
     } catch (error) {
       console.error('Error loading alerts:', error);
@@ -70,26 +56,40 @@ const RulesAlerts = () => {
     }
   };
 
-  // Mark alerts as read when component mounts (user visits the page)
-  useEffect(() => {
-    const timer = setTimeout(async () => {
-      await markAsReadAlerts();
-      // Reload alerts after marking as read to update the count
-      await loadAlerts();
-    }, 1000);
-    return () => clearTimeout(timer);
-  }, [user]);
-
-  // Additional mark as read when switching to updates tab
+  // Mark alerts as read only when user views the updates tab for 5 seconds
   useEffect(() => {
     if (activeTab === 'updates') {
       const timer = setTimeout(async () => {
         await markAsReadAlerts();
-        await loadAlerts();
-      }, 500);
+      }, 5000); // 5 seconds delay to ensure user sees the alerts
       return () => clearTimeout(timer);
     }
   }, [activeTab, user]);
+
+  // Real-time subscription for new alerts
+  useEffect(() => {
+    if (!user) return;
+
+    const channel = supabase
+      .channel('rules-alerts-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'admin_alerts',
+          filter: `category=eq.introduction,subcategory=eq.règles`
+        },
+        () => {
+          loadAlerts();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user]);
 
   const rules = [
     {
