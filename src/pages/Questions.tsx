@@ -39,6 +39,7 @@ const Questions = () => {
   const [loading, setLoading] = useState(true);
   const [roomId, setRoomId] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const isInitialLoad = useRef(true);
   const isNativeApp = Capacitor.isNativePlatform();
 
   useEffect(() => {
@@ -64,7 +65,12 @@ const Questions = () => {
   }, [roomId]);
 
   useEffect(() => {
-    scrollToBottom();
+    if (!isInitialLoad.current && messages.length > 0) {
+      scrollToBottom();
+    }
+    if (isInitialLoad.current && messages.length > 0) {
+      isInitialLoad.current = false;
+    }
   }, [messages]);
 
   const fetchQuestionsRoom = async () => {
