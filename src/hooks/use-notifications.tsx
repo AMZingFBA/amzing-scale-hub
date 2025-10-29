@@ -23,6 +23,8 @@ export const useNotifications = () => {
   const fetchNotifications = async () => {
     if (!user) return;
 
+    console.log('🔍 Fetching notifications for user:', user.id);
+
     try {
       // Fetch all tickets with unread messages
       const { data: tickets } = await supabase
@@ -102,6 +104,7 @@ export const useNotifications = () => {
       }
 
       setNotifications(counts);
+      console.log('📊 Notifications updated:', counts);
     } catch (error) {
       console.error('Error fetching notifications:', error);
     } finally {
@@ -153,6 +156,7 @@ export const useNotifications = () => {
 
     // Listen for manual refresh events
     const handleRefresh = () => {
+      console.log('🔄 Received refreshNotifications event, fetching...');
       fetchNotifications();
     };
     window.addEventListener('refreshNotifications', handleRefresh);

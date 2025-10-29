@@ -60,9 +60,12 @@ const RulesAlerts = () => {
   useEffect(() => {
     if (activeTab === 'updates' && alerts.length > 0) {
       const markAndRefresh = async () => {
+        console.log('🔴 Marking alerts as read...');
         await markAsReadAlerts();
+        console.log('✅ Alerts marked as read, waiting 1s before refresh...');
         // Wait for DB sync before refreshing notifications
         setTimeout(() => {
+          console.log('📢 Dispatching refreshNotifications event');
           window.dispatchEvent(new CustomEvent('refreshNotifications'));
         }, 1000);
       };
