@@ -154,6 +154,18 @@ const AdminAlerts = () => {
     return data.publicUrl;
   };
 
+  const getChatRoomName = (subcategory: string) => {
+    switch (subcategory) {
+      case 'produits-find': return 'Product Find';
+      case 'produits-qogita': return 'Produits Qogita';
+      case 'produits-eany': return 'Produits Eany';
+      case 'grossistes': return 'Grossistes';
+      case 'promotions': return 'Promotions';
+      case 'sitelist': return 'Sitelist';
+      default: return null;
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -194,6 +206,50 @@ const AdminAlerts = () => {
         });
 
       if (error) throw error;
+
+      // Si c'est une alerte produits avec une sous-catégorie, poster dans le chat room correspondant
+      if (selectedCategory === 'produits' && selectedSubcategory) {
+        const roomName = getChatRoomName(selectedSubcategory);
+        if (roomName) {
+          try {
+            // Trouver le chat room correspondant
+            const { data: roomData, error: roomError } = await supabase
+              .from('chat_rooms')
+              .select('id')
+              .eq('name', roomName)
+              .eq('type', 'products')
+              .single();
+
+            if (!roomError && roomData) {
+              // Créer un message dans ce chat room
+              let messageContent = `📢 **${title.trim()}**\n\n`;
+              if (content.trim()) {
+                messageContent += `${content.trim()}\n\n`;
+              }
+              if (linkUrl.trim()) {
+                messageContent += `🔗 ${linkUrl.trim()}`;
+              }
+
+              const { error: messageError } = await supabase
+                .from('chat_messages')
+                .insert({
+                  room_id: roomData.id,
+                  user_id: user?.id,
+                  content: messageContent,
+                  file_url: fileUrl,
+                  file_name: fileName,
+                  message_type: fileType || 'text',
+                });
+
+              if (messageError) {
+                console.error('Error posting to chat:', messageError);
+              }
+            }
+          } catch (chatError) {
+            console.error('Error finding chat room:', chatError);
+          }
+        }
+      }
 
       toast({
         title: "Alerte publiée",
