@@ -710,15 +710,16 @@ Est-il toujours disponible ?`;
         </Dialog>
 
         {/* Catalogue Section */}
-        <div className="w-full space-y-6 animate-fade-in">
-          <div className="mb-8 relative pl-12">
-            <button
-              onClick={() => navigate('/dashboard')}
-              className="absolute left-0 top-0 bg-primary/90 backdrop-blur-sm p-2 rounded-full shadow-lg hover:bg-primary transition-all z-10"
-              aria-label="Retour"
-            >
-              <ArrowLeft className="w-5 h-5 text-primary-foreground" />
-            </button>
+        <div className="w-full space-y-6 animate-fade-in relative">
+          <button
+            onClick={() => navigate('/dashboard')}
+            className="absolute -left-2 top-0 bg-primary/90 backdrop-blur-sm p-2 rounded-full shadow-lg hover:bg-primary transition-all z-10"
+            aria-label="Retour"
+          >
+            <ArrowLeft className="w-5 h-5 text-primary-foreground" />
+          </button>
+          
+          <div className="mb-8 pl-14">
             <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
               Catalogue Pro — Mes produits
             </h1>
