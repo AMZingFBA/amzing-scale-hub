@@ -17,6 +17,7 @@ import { Badge } from "@/components/ui/badge";
 import { useMarketplaceSellUnread } from "@/hooks/use-marketplace-sell-unread";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import ScrollToTop from "@/components/ScrollToTop";
 
 interface Listing {
   id: string;
@@ -528,6 +529,7 @@ const WantToSell = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <ScrollToTop />
       <Navbar />
       
       {/* Image Gallery Dialog */}
@@ -573,20 +575,23 @@ const WantToSell = () => {
       
       <main className="container mx-auto px-4 pt-24 pb-12">
         <div className="max-w-6xl mx-auto space-y-6">
-          <div className="mb-8 relative">
+          <div className="mb-8 flex items-start gap-3">
             <button
               onClick={() => navigate('/dashboard')}
-              className="absolute -left-12 top-0 bg-primary/90 backdrop-blur-sm p-2 rounded-full shadow-lg hover:bg-primary transition-all"
+              className="bg-[#FF9900] hover:bg-[#FF9900]/90 p-2 rounded-full shadow-lg transition-all shrink-0 mt-1"
               aria-label="Retour"
             >
-              <ArrowLeft className="w-5 h-5 text-primary-foreground" />
+              <ArrowLeft className="w-5 h-5 text-white" />
             </button>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-              Want to Sell - Je vends
-            </h1>
-            <p className="text-muted-foreground mt-2">
-              Publiez vos produits à vendre ou parcourez les annonces des autres membres.
-            </p>
+            
+            <div className="flex-1">
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent mb-2">
+                Want to Sell - Je vends
+              </h1>
+              <p className="text-muted-foreground">
+                Publiez vos produits à vendre ou parcourez les annonces des autres membres.
+              </p>
+            </div>
           </div>
 
           {/* Success Banner */}
