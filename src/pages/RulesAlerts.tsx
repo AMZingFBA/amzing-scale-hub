@@ -62,12 +62,12 @@ const RulesAlerts = () => {
       const markAndRefresh = async () => {
         console.log('🔴 Marking alerts as read...');
         await markAsReadAlerts();
-        console.log('✅ Alerts marked as read, waiting 1s before refresh...');
+        console.log('✅ Alerts marked as read, waiting 2s before refresh...');
         // Wait for DB sync before refreshing notifications
         setTimeout(() => {
           console.log('📢 Dispatching refreshNotifications event');
           window.dispatchEvent(new CustomEvent('refreshNotifications'));
-        }, 1000);
+        }, 2000); // Increased to 2 seconds for better DB sync
       };
       markAndRefresh();
     }
