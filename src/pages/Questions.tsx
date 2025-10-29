@@ -271,22 +271,35 @@ const Questions = () => {
       <Navbar />
       <main className="flex-grow pt-20">
         <div className="container mx-auto px-4 py-8 max-w-5xl">
-          <div className="bg-card border rounded-lg overflow-hidden h-[calc(100vh-12rem)] flex flex-col">
+          {/* Header avec flèche retour */}
+          <div className="mb-6 flex items-start gap-3">
+            <button
+              onClick={() => navigate('/dashboard')}
+              className="bg-[#FF9900] hover:bg-[#FF9900]/90 p-2 rounded-full shadow-lg transition-all shrink-0 mt-1"
+              aria-label="Retour"
+            >
+              <ArrowLeft className="w-5 h-5 text-white" />
+            </button>
+            
+            <div className="flex-1">
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent mb-2">
+                Questions & Entraide
+              </h1>
+              <p className="text-muted-foreground">
+                Posez vos questions produits et partagez vos conseils avec la communauté 💡
+              </p>
+            </div>
+          </div>
+
+          <div className="bg-card border rounded-lg overflow-hidden h-[calc(100vh-16rem)] flex flex-col">
             {/* Header */}
             <div className="p-4 border-b bg-primary/5">
-              <div className="flex items-center gap-3 relative">
-                <button
-                  onClick={() => navigate('/dashboard')}
-                  className="absolute -left-12 bg-[#FF9900] hover:bg-[#FF9900]/90 p-2 rounded-full shadow-lg transition-all"
-                  aria-label="Retour"
-                >
-                  <ArrowLeft className="w-5 h-5 text-white" />
-                </button>
+              <div className="flex items-center gap-3">
                 <MessageCircle className="h-6 w-6 text-primary" />
                 <div>
-                  <h1 className="text-2xl font-bold">Questions & Entraide</h1>
+                  <h2 className="text-xl font-bold">Salon de discussion</h2>
                   <p className="text-sm text-muted-foreground">
-                    Posez vos questions produits et partagez vos conseils avec la communauté 💡
+                    Échangez en temps réel avec la communauté
                   </p>
                 </div>
               </div>
