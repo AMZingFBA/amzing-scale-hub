@@ -6,21 +6,79 @@ import { supabase } from '@/integrations/supabase/client';
 import { Capacitor } from '@capacitor/core';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { BookOpen, Link2, Image, Video, Mic, FileText, ArrowLeft } from 'lucide-react';
+import { BookOpen, Link2, Image, Video, Mic, FileText, ArrowLeft, Shield, Users, AlertCircle, Scale, Database, UserCog, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const RulesAlerts = () => {
   const { user, isLoading: isAuthLoading } = useAuth();
   const navigate = useNavigate();
   const [alerts, setAlerts] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState('base');
   const isNativeApp = Capacitor.isNativePlatform();
 
-  // Mark alerts as read when visiting this page
-  useMarkAsRead({ category: 'introduction', subcategory: 'règles' });
+  // Mark alerts as read when visiting the updates tab
+  useEffect(() => {
+    if (activeTab === 'updates') {
+      const timer = setTimeout(() => {
+        markAsReadAlerts();
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [activeTab]);
+
+  const markAsReadAlerts = async () => {
+    try {
+      await supabase.rpc('mark_alerts_as_read', {
+        category_param: 'introduction',
+        subcategory_param: 'règles'
+      });
+    } catch (error) {
+      console.error('Error marking alerts as read:', error);
+    }
+  };
+
+  const rules = [
+    {
+      icon: <Shield className="w-5 h-5" />,
+      title: "Respect et professionnalisme",
+      content: "Tous les échanges doivent rester courtois et constructifs. Les insultes, propos haineux, discriminatoires ou inappropriés sont strictement interdits et peuvent entraîner une suspension immédiate du compte."
+    },
+    {
+      icon: <Users className="w-5 h-5" />,
+      title: "Confidentialité et sécurité",
+      content: "Il est interdit de partager des informations personnelles sensibles (coordonnées bancaires, mots de passe, etc.). Respectez la confidentialité des autres membres et ne divulguez aucune donnée privée."
+    },
+    {
+      icon: <AlertCircle className="w-5 h-5" />,
+      title: "Contenu interdit",
+      content: "La publication de contenu illégal, frauduleux, pornographique ou incitant à la violence est strictement interdite. Tout manquement entraînera une exclusion définitive de la plateforme."
+    },
+    {
+      icon: <Scale className="w-5 h-5" />,
+      title: "Transactions équitables",
+      content: "Les transactions sur la marketplace doivent être honnêtes et conformes. Toute tentative de fraude, d'arnaque ou de manipulation des prix sera sanctionnée."
+    },
+    {
+      icon: <Database className="w-5 h-5" />,
+      title: "Propriété intellectuelle",
+      content: "Ne partagez pas de contenus protégés par des droits d'auteur sans autorisation. Respectez la propriété intellectuelle d'autrui et n'utilisez les ressources partagées que dans le cadre légal."
+    },
+    {
+      icon: <UserCog className="w-5 h-5" />,
+      title: "Utilisation responsable",
+      content: "N'utilisez pas la plateforme pour du spam, de la publicité non sollicitée ou des activités nuisibles. Gardez vos échanges pertinents et en lien avec l'activité e-commerce."
+    },
+    {
+      icon: <Lock className="w-5 h-5" />,
+      title: "Sécurité du compte",
+      content: "Vous êtes responsable de la sécurité de votre compte. N'utilisez pas de comptes multiples et ne partagez jamais vos identifiants. Toute activité suspecte doit être signalée immédiatement."
+    }
+  ];
 
   useEffect(() => {
     if (!user && !isAuthLoading) {
@@ -95,79 +153,134 @@ const RulesAlerts = () => {
 
           <div className="flex items-center gap-3 mb-8">
             <BookOpen className="w-8 h-8 text-primary" />
-            <h1 className="text-3xl font-bold">Alertes - Règles</h1>
+            <h1 className="text-3xl font-bold">Règles d'utilisation</h1>
           </div>
 
-          {alerts.length === 0 ? (
-            <Card>
-              <CardContent className="p-8 text-center">
-                <p className="text-muted-foreground">Aucune alerte pour le moment</p>
-              </CardContent>
-            </Card>
-          ) : (
-            <div className="space-y-4">
-              {alerts.map((alert) => (
-                <Card key={alert.id} className="border-l-4 border-l-primary">
-                  <CardContent className="p-6 space-y-4">
-                    <div className="flex items-start justify-between gap-4">
-                      <h2 className="text-xl font-semibold">{alert.title}</h2>
-                      <Badge variant="secondary" className="text-xs shrink-0">
-                        {new Date(alert.created_at).toLocaleDateString('fr-FR', {
-                          day: 'numeric',
-                          month: 'short',
-                          year: 'numeric'
-                        })}
-                      </Badge>
-                    </div>
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="grid w-full grid-cols-2 mb-6">
+              <TabsTrigger value="base">Règles de base</TabsTrigger>
+              <TabsTrigger value="updates" className="relative">
+                Mises à jour
+                {alerts.length > 0 && (
+                  <Badge variant="destructive" className="ml-2 h-5 px-1.5 text-xs">
+                    {alerts.length}
+                  </Badge>
+                )}
+              </TabsTrigger>
+            </TabsList>
 
-                    {alert.content && (
-                      <p className="text-muted-foreground whitespace-pre-wrap leading-relaxed">
-                        {alert.content}
-                      </p>
-                    )}
+            <TabsContent value="base" className="space-y-4">
+              <Card className="border-primary/20">
+                <CardContent className="pt-6">
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    Afin de garantir un environnement sûr, professionnel et collaboratif, chaque membre s'engage à respecter les règles d'utilisation ci-dessous. En accédant à AMZing FBA, vous confirmez avoir lu, compris et accepté l'ensemble de ces conditions.
+                  </p>
+                </CardContent>
+              </Card>
 
-                    {alert.link_url && (
-                      <a
-                        href={alert.link_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-2 text-primary hover:underline font-medium"
-                      >
-                        <Link2 className="w-4 h-4" />
-                        Voir le lien
-                      </a>
-                    )}
-
-                    {alert.file_url && (
-                      <div className="space-y-3">
-                        {alert.file_type === 'image' && (
-                          <img
-                            src={alert.file_url}
-                            alt={alert.file_name}
-                            className="w-full rounded-lg border"
-                          />
-                        )}
-                        {alert.file_type === 'video' && (
-                          <video
-                            src={alert.file_url}
-                            controls
-                            className="w-full rounded-lg border"
-                          />
-                        )}
-                        {alert.file_type === 'audio' && (
-                          <audio src={alert.file_url} controls className="w-full" />
-                        )}
-                        <Badge variant="outline" className="text-xs">
-                          {getFileIcon(alert.file_type)}
-                          <span className="ml-2">{alert.file_name}</span>
-                        </Badge>
+              {rules.map((rule, index) => (
+                <Card key={index}>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-3 text-base">
+                      <div className="p-2 rounded-lg bg-primary/10 text-primary">
+                        {rule.icon}
                       </div>
-                    )}
+                      <span>{index + 1}. {rule.title}</span>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm text-muted-foreground leading-relaxed">
+                      {rule.content}
+                    </p>
                   </CardContent>
                 </Card>
               ))}
-            </div>
-          )}
+
+              <Card className="bg-primary/5 border-primary/20">
+                <CardContent className="pt-6 text-center">
+                  <p className="text-sm font-semibold text-foreground">
+                    Merci de contribuer à faire d'AMZing FBA un espace professionnel, fiable et performant 💪
+                  </p>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="updates" className="space-y-4">
+              {isLoading ? (
+                <div className="space-y-4">
+                  <Skeleton className="h-32 w-full" />
+                  <Skeleton className="h-32 w-full" />
+                </div>
+              ) : alerts.length === 0 ? (
+                <Card>
+                  <CardContent className="p-8 text-center">
+                    <p className="text-muted-foreground">Aucune mise à jour pour le moment</p>
+                  </CardContent>
+                </Card>
+              ) : (
+                alerts.map((alert) => (
+                  <Card key={alert.id} className="border-l-4 border-l-primary">
+                    <CardContent className="p-6 space-y-4">
+                      <div className="flex items-start justify-between gap-4">
+                        <h2 className="text-xl font-semibold">{alert.title}</h2>
+                        <Badge variant="secondary" className="text-xs shrink-0">
+                          {new Date(alert.created_at).toLocaleDateString('fr-FR', {
+                            day: 'numeric',
+                            month: 'short',
+                            year: 'numeric'
+                          })}
+                        </Badge>
+                      </div>
+
+                      {alert.content && (
+                        <p className="text-muted-foreground whitespace-pre-wrap leading-relaxed">
+                          {alert.content}
+                        </p>
+                      )}
+
+                      {alert.link_url && (
+                        <a
+                          href={alert.link_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-2 text-primary hover:underline font-medium"
+                        >
+                          <Link2 className="w-4 h-4" />
+                          Voir le lien
+                        </a>
+                      )}
+
+                      {alert.file_url && (
+                        <div className="space-y-3">
+                          {alert.file_type === 'image' && (
+                            <img
+                              src={alert.file_url}
+                              alt={alert.file_name}
+                              className="w-full rounded-lg border"
+                            />
+                          )}
+                          {alert.file_type === 'video' && (
+                            <video
+                              src={alert.file_url}
+                              controls
+                              className="w-full rounded-lg border"
+                            />
+                          )}
+                          {alert.file_type === 'audio' && (
+                            <audio src={alert.file_url} controls className="w-full" />
+                          )}
+                          <Badge variant="outline" className="text-xs">
+                            {getFileIcon(alert.file_type)}
+                            <span className="ml-2">{alert.file_name}</span>
+                          </Badge>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                ))
+              )}
+            </TabsContent>
+          </Tabs>
         </div>
       </main>
       {!isNativeApp && <Footer />}
