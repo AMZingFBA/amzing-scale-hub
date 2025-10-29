@@ -113,6 +113,16 @@ const Catalogue = () => {
       
       <div className="pt-32 pb-20 relative">
         <div className="container mx-auto px-4">
+          {/* Bouton retour mobile */}
+          <div className="flex justify-center mb-6 md:hidden">
+            <button
+              onClick={() => navigate('/dashboard')}
+              className="bg-[#FF9900] hover:bg-[#FF9900]/90 p-3 rounded-full shadow-lg transition-all"
+              aria-label="Retour au dashboard"
+            >
+              <ArrowLeft className="w-6 h-6 text-white" />
+            </button>
+          </div>
           {/* Hero Section */}
           <div 
             ref={isNativeApp ? heroReveal.ref : undefined}
@@ -120,10 +130,10 @@ const Catalogue = () => {
           >
             <button
               onClick={() => navigate('/dashboard')}
-              className="absolute -left-12 top-0 bg-primary/90 backdrop-blur-sm p-2 rounded-full shadow-lg hover:bg-primary transition-all"
-              aria-label="Retour"
+              className="hidden md:block absolute -left-12 top-0 bg-[#FF9900] hover:bg-[#FF9900]/90 p-2 rounded-full shadow-lg transition-all"
+              aria-label="Retour au dashboard"
             >
-              <ArrowLeft className="w-5 h-5 text-primary-foreground" />
+              <ArrowLeft className="w-5 h-5 text-white" />
             </button>
             <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-secondary/20 to-primary/20 blur-3xl -z-10" />
             <Badge className={`mb-6 bg-gradient-to-r from-primary to-secondary text-white border-none px-6 py-2 text-base ${isNativeApp ? 'animate-pulse shadow-lg shadow-primary/50' : ''}`}>

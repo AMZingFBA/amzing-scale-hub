@@ -118,20 +118,20 @@ const NotificationAlerts = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-      <main className="flex-grow pt-20">
+      <main className="flex-grow pt-24 md:pt-20">
         <div className="container mx-auto px-4 py-8 max-w-4xl">
-          <div className="flex items-center gap-3 mb-8 relative">
+          <div className="flex items-center gap-3 mb-8">
             <button
               onClick={() => navigate('/dashboard')}
-              className="absolute -left-12 top-0 bg-primary/90 backdrop-blur-sm p-2 rounded-full shadow-lg hover:bg-primary transition-all"
-              aria-label="Retour"
+              className="bg-[#FF9900] hover:bg-[#FF9900]/90 p-3 md:p-2 rounded-full shadow-lg transition-all shrink-0"
+              aria-label="Retour au dashboard"
             >
-              <ArrowLeft className="w-5 h-5 text-primary-foreground" />
+              <ArrowLeft className="w-6 h-6 md:w-5 md:h-5 text-white" />
             </button>
             <Bell className="w-8 h-8 text-destructive" />
             <div>
-              <h1 className="text-4xl font-bold">Notifications Importantes</h1>
-              <p className="text-muted-foreground">
+              <h1 className="text-3xl md:text-4xl font-bold">Notifications Importantes</h1>
+              <p className="text-sm md:text-base text-muted-foreground">
                 Nouveaux guides, produits gagnants et informations importantes
               </p>
             </div>
