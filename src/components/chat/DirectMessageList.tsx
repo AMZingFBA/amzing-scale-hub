@@ -250,9 +250,6 @@ export const DirectMessageList = ({ selectedConversation, onSelectConversation }
                         <div className="font-medium">
                           {user.nickname || user.full_name || 'Utilisateur'}
                         </div>
-                        <div className="text-xs text-muted-foreground">
-                          {user.email}
-                        </div>
                       </div>
                     </Button>
                   ))}
@@ -294,9 +291,6 @@ export const DirectMessageList = ({ selectedConversation, onSelectConversation }
                 >
                   <div className="font-medium">
                     {convo.other_user.nickname || 'Utilisateur'}
-                  </div>
-                  <div className="text-xs opacity-70">
-                    {convo.other_user.email}
                   </div>
                 </button>
                 <div className="flex items-center gap-1 pr-2">
