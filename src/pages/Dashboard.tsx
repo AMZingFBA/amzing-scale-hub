@@ -29,13 +29,11 @@ const CategoryItem = ({
   badge
 }: CategoryItemProps) => {
   const content = <Card className="hover:bg-accent/50 transition-colors cursor-pointer relative" onClick={onClick}>
+      <NotificationBadge count={badge} />
       <CardContent className="p-4">
-        <div className="flex items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <Icon className="w-5 h-5 text-primary" />
-            <span className="font-medium">{label}</span>
-          </div>
-          <NotificationBadge count={badge} />
+        <div className="flex items-center gap-3">
+          <Icon className="w-5 h-5 text-primary" />
+          <span className="font-medium">{label}</span>
         </div>
       </CardContent>
     </Card>;
@@ -129,12 +127,10 @@ const Dashboard = () => {
               {/* INTRODUCTION */}
               <AccordionItem value="introduction" className="border rounded-lg px-6 bg-card">
                 <AccordionTrigger className="hover:no-underline">
-                  <div className="flex items-center justify-between w-full gap-3">
-                    <div className="flex items-center gap-3 relative">
-                      <BookOpen className="w-6 h-6 text-primary" />
-                      <span className="text-xl font-bold">INTRODUCTION</span>
-                      <NotificationBadge count={notifications.introduction?.total} className="relative top-0 right-0" />
-                    </div>
+                  <div className="flex items-center gap-3 relative w-full">
+                    <BookOpen className="w-6 h-6 text-primary" />
+                    <span className="text-xl font-bold">INTRODUCTION</span>
+                    <NotificationBadge count={notifications.introduction?.total} />
                   </div>
                 </AccordionTrigger>
                 <AccordionContent className="px-4 pb-4">
@@ -153,12 +149,10 @@ const Dashboard = () => {
               {/* OUTILS */}
               <AccordionItem value="outils" className="border rounded-lg px-6 bg-card">
                 <AccordionTrigger className="hover:no-underline">
-                  <div className="flex items-center justify-between w-full gap-3">
-                    <div className="flex items-center gap-3 relative">
-                      <Settings className="w-6 h-6 text-primary" />
-                      <span className="text-xl font-bold">OUTILS</span>
-                      <NotificationBadge count={notifications.outils?.total} className="relative top-0 right-0" />
-                    </div>
+                  <div className="flex items-center gap-3 relative w-full">
+                    <Settings className="w-6 h-6 text-primary" />
+                    <span className="text-xl font-bold">OUTILS</span>
+                    <NotificationBadge count={notifications.outils?.total} />
                   </div>
                 </AccordionTrigger>
                 <AccordionContent>
@@ -174,10 +168,10 @@ const Dashboard = () => {
 
               <AccordionItem value="produits" className="border rounded-lg px-6 bg-card">
                 <AccordionTrigger className="hover:no-underline">
-                  <div className="flex items-center gap-3 relative">
+                  <div className="flex items-center gap-3 relative w-full">
                     <Sparkles className="w-6 h-6 text-primary" />
                     <span className="text-xl font-bold">PRODUITS GAGNANTS</span>
-                    <NotificationBadge count={notifications.produits?.total} className="relative top-0 right-0" />
+                    <NotificationBadge count={notifications.produits?.total} />
                   </div>
                 </AccordionTrigger>
                 <AccordionContent>
@@ -196,12 +190,10 @@ const Dashboard = () => {
               {/* EXPÉDITION */}
               <AccordionItem value="expedition" className="border rounded-lg px-6 bg-card">
                 <AccordionTrigger className="hover:no-underline">
-                  <div className="flex items-center justify-between w-full gap-3">
-                    <div className="flex items-center gap-3 relative">
-                      <Truck className="w-6 h-6 text-primary" />
-                      <span className="text-xl font-bold">EXPÉDITION</span>
-                      <NotificationBadge count={notifications.expedition?.total} className="relative top-0 right-0" />
-                    </div>
+                  <div className="flex items-center gap-3 relative w-full">
+                    <Truck className="w-6 h-6 text-primary" />
+                    <span className="text-xl font-bold">EXPÉDITION</span>
+                    <NotificationBadge count={notifications.expedition?.total} />
                   </div>
                 </AccordionTrigger>
                 <AccordionContent>
@@ -216,12 +208,10 @@ const Dashboard = () => {
               {/* INFORMATIONS */}
               <AccordionItem value="informations" className="border rounded-lg px-6 bg-card">
                 <AccordionTrigger className="hover:no-underline">
-                  <div className="flex items-center justify-between w-full gap-3">
-                    <div className="flex items-center gap-3 relative">
-                      <Bell className="w-6 h-6 text-primary" />
-                      <span className="text-xl font-bold">INFORMATIONS</span>
-                      <NotificationBadge count={notifications.informations?.total} className="relative top-0 right-0" />
-                    </div>
+                  <div className="flex items-center gap-3 relative w-full">
+                    <Bell className="w-6 h-6 text-primary" />
+                    <span className="text-xl font-bold">INFORMATIONS</span>
+                    <NotificationBadge count={notifications.informations?.total} />
                   </div>
                 </AccordionTrigger>
                 <AccordionContent className="px-4 pb-4">
@@ -235,10 +225,10 @@ const Dashboard = () => {
 
               <AccordionItem value="communaute" className="border rounded-lg px-6 bg-card">
                 <AccordionTrigger className="hover:no-underline">
-                  <div className="flex items-center gap-3 relative">
+                  <div className="flex items-center gap-3 relative w-full">
                     <MessageCircle className="w-6 h-6 text-primary" />
                     <span className="text-xl font-bold">COMMUNAUTÉ</span>
-                    <NotificationBadge count={notifications.communaute?.total} className="relative top-0 right-0" />
+                    <NotificationBadge count={notifications.communaute?.total} />
                   </div>
                 </AccordionTrigger>
                 <AccordionContent>
@@ -254,12 +244,10 @@ const Dashboard = () => {
               {/* MARKETPLACE */}
               <AccordionItem value="marketplace" className="border rounded-lg px-6 bg-card">
                 <AccordionTrigger className="hover:no-underline">
-                  <div className="flex items-center justify-between w-full gap-3">
-                    <div className="flex items-center gap-3 relative">
-                      <ShoppingCart className="w-6 h-6 text-primary" />
-                      <span className="text-xl font-bold">MARKETPLACE</span>
-                      <NotificationBadge count={notifications.marketplace?.total} className="relative top-0 right-0" />
-                    </div>
+                  <div className="flex items-center gap-3 relative w-full">
+                    <ShoppingCart className="w-6 h-6 text-primary" />
+                    <span className="text-xl font-bold">MARKETPLACE</span>
+                    <NotificationBadge count={notifications.marketplace?.total} />
                   </div>
                 </AccordionTrigger>
                 <AccordionContent>
@@ -273,12 +261,10 @@ const Dashboard = () => {
               {/* GESTION PRODUITS */}
               <AccordionItem value="gestion" className="border rounded-lg px-6 bg-card">
                 <AccordionTrigger className="hover:no-underline">
-                  <div className="flex items-center justify-between w-full gap-3">
-                    <div className="flex items-center gap-3 relative">
-                      <Package className="w-6 h-6 text-primary" />
-                      <span className="text-xl font-bold">GESTION PRODUITS</span>
-                      <NotificationBadge count={notifications.gestion_produit?.total} className="relative top-0 right-0" />
-                    </div>
+                  <div className="flex items-center gap-3 relative w-full">
+                    <Package className="w-6 h-6 text-primary" />
+                    <span className="text-xl font-bold">GESTION PRODUITS</span>
+                    <NotificationBadge count={notifications.gestion_produit?.total} />
                   </div>
                 </AccordionTrigger>
                 <AccordionContent className="px-4 pb-4">
