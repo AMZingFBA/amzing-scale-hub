@@ -23,6 +23,7 @@ import {
 import ChatRoom from '@/components/chat/ChatRoom';
 import { DirectMessageList } from '@/components/chat/DirectMessageList';
 import { DirectChatRoom } from '@/components/chat/DirectChatRoom';
+import { GroupDialog } from '@/components/chat/GroupDialog';
 import { useAdmin } from '@/hooks/use-admin';
 
 interface Room {
@@ -356,8 +357,9 @@ const Chat = () => {
     room.type === 'marketplace' && room.name?.startsWith('Vente')
   );
   const productRooms = filteredRooms.filter(room => room.type === 'products');
+  const groupRooms = filteredRooms.filter(room => room.type === 'group');
   const otherRooms = filteredRooms.filter(room => 
-    room.type !== 'marketplace' && room.type !== 'products'
+    room.type !== 'marketplace' && room.type !== 'products' && room.type !== 'group'
   );
 
   if (loading) {
@@ -396,32 +398,35 @@ const Chat = () => {
                       <Users className="h-5 w-5" />
                       Conversations
                     </h2>
-                    <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
-                      <DialogTrigger asChild>
-                        <Button size="sm" variant="outline" className={isNativeApp ? 'absolute right-4' : ''}>
-                          <Plus className="h-4 w-4" />
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent>
-                        <DialogHeader>
-                          <DialogTitle>Nouvelle conversation privée</DialogTitle>
-                        </DialogHeader>
-                        <div className="space-y-4">
-                          <div>
-                            <Label htmlFor="room-name">Nom de la conversation</Label>
-                            <Input
-                              id="room-name"
-                              value={newRoomName}
-                              onChange={(e) => setNewRoomName(e.target.value)}
-                              placeholder="Ex: Discussion produits"
-                            />
-                          </div>
-                          <Button onClick={createPrivateRoom} className="w-full">
-                            Créer
+                    <div className={`flex gap-2 ${isNativeApp ? 'absolute right-4' : ''}`}>
+                      <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
+                        <DialogTrigger asChild>
+                          <Button size="sm" variant="outline">
+                            <Plus className="h-4 w-4" />
                           </Button>
-                        </div>
-                      </DialogContent>
-                    </Dialog>
+                        </DialogTrigger>
+                        <DialogContent>
+                          <DialogHeader>
+                            <DialogTitle>Nouvelle conversation privée</DialogTitle>
+                          </DialogHeader>
+                          <div className="space-y-4">
+                            <div>
+                              <Label htmlFor="room-name">Nom de la conversation</Label>
+                              <Input
+                                id="room-name"
+                                value={newRoomName}
+                                onChange={(e) => setNewRoomName(e.target.value)}
+                                placeholder="Ex: Discussion produits"
+                              />
+                            </div>
+                            <Button onClick={createPrivateRoom} className="w-full">
+                              Créer
+                            </Button>
+                          </div>
+                        </DialogContent>
+                      </Dialog>
+                      <GroupDialog onGroupCreated={fetchRooms} />
+                    </div>
                   </div>
 
                   {/* Search */}
@@ -736,6 +741,120 @@ const Chat = () => {
                           ))}
                         </>
                       )}
+                    </>
+                  )}
+                  
+                  {/* Groups section */}
+                  {groupRooms.length > 0 && (
+                    <>
+                      <div className="pt-4 pb-2 px-2">
+                        <h3 className="text-sm font-semibold text-muted-foreground uppercase">👥 Groupes</h3>
+                      </div>
+                      {groupRooms.map((room) => (
+                        <div
+                          key={room.id}
+                          className={`rounded-lg transition-colors ${
+                            selectedRoom === room.id
+                              ? 'bg-primary text-primary-foreground'
+                              : 'hover:bg-accent'
+                          }`}
+                        >
+                          {editingRoomId === room.id ? (
+                            <div className="p-3 flex items-center gap-2">
+                              <Input
+                                value={editingRoomName}
+                                onChange={(e) => setEditingRoomName(e.target.value)}
+                                className="flex-1 h-8"
+                                onKeyPress={(e) => {
+                                  if (e.key === 'Enter') {
+                                    renameRoom(room.id, editingRoomName);
+                                  }
+                                }}
+                              />
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                className="h-8 w-8 p-0"
+                                onClick={() => renameRoom(room.id, editingRoomName)}
+                              >
+                                <Check className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                className="h-8 w-8 p-0"
+                                onClick={cancelEditing}
+                              >
+                                <X className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          ) : (
+                            <div className="flex items-center">
+                              <button
+                                onClick={() => {
+                                  setSelectedRoom(room.id);
+                                  setSelectedDirectConversation(null);
+                                }}
+                                className="flex-1 text-left p-3"
+                              >
+                                <div className="font-medium flex items-center gap-2">
+                                  {pinnedRooms.has(room.id) && <Pin className="h-3 w-3" />}
+                                  {room.name || 'Groupe'}
+                                </div>
+                              </button>
+                              <div className="flex items-center gap-1 pr-2">
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  className="h-8 w-8 p-0"
+                                  onClick={() => togglePin(room.id)}
+                                  title={pinnedRooms.has(room.id) ? 'Désépingler' : 'Épingler'}
+                                >
+                                  {pinnedRooms.has(room.id) ? (
+                                    <PinOff className="h-3 w-3" />
+                                  ) : (
+                                    <Pin className="h-3 w-3" />
+                                  )}
+                                </Button>
+                                {(room.created_by === user?.id || isAdmin) && (
+                                  <Button
+                                    size="sm"
+                                    variant="ghost"
+                                    className="h-8 w-8 p-0"
+                                    onClick={() => startEditing(room)}
+                                    title="Renommer"
+                                  >
+                                    <Edit2 className="h-3 w-3" />
+                                  </Button>
+                                )}
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  className="h-8 w-8 p-0"
+                                  onClick={() => hideRoom(room.id)}
+                                  title="Masquer"
+                                >
+                                  <EyeOff className="h-3 w-3" />
+                                </Button>
+                                {(room.created_by === user?.id || isAdmin) && (
+                                  <Button
+                                    size="sm"
+                                    variant="ghost"
+                                    className="h-8 w-8 p-0"
+                                    onClick={() => {
+                                      setRoomToDelete(room.id);
+                                      setDeleteDialogOpen(true);
+                                    }}
+                                    title="Supprimer"
+                                  >
+                                    <Trash2 className="h-3 w-3" />
+                                  </Button>
+                                )}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      ))}
                     </>
                   )}
                 </>
