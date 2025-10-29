@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/use-auth';
 import { supabase } from '@/integrations/supabase/client';
 import { Capacitor } from '@capacitor/core';
@@ -7,17 +7,31 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Loader2, AlertCircle, Link2, Image, Video, Mic, FileText, Sparkles, ArrowLeft, MessageCircle } from 'lucide-react';
+import { Loader2, AlertCircle, Link2, Image, Video, Mic, FileText, Sparkles, ArrowLeft } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 const ProductAlerts = () => {
   const { user, isVIP, isLoading: isAuthLoading } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const { toast } = useToast();
   const [alerts, setAlerts] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const isNativeApp = Capacitor.isNativePlatform();
+
+  // Déterminer la sous-catégorie basée sur l'URL
+  const getSubcategoryFromPath = () => {
+    const path = location.pathname;
+    if (path.includes('produits-find')) return 'produits-find';
+    if (path.includes('produits-qogita')) return 'produits-qogita';
+    if (path.includes('produits-eany')) return 'produits-eany';
+    if (path.includes('grossistes')) return 'grossistes';
+    if (path.includes('promotions')) return 'promotions';
+    if (path.includes('sitelist')) return 'sitelist';
+    return null;
+  };
+
+  const currentSubcategory = getSubcategoryFromPath();
 
   useEffect(() => {
     if (!user && !isAuthLoading) {
@@ -68,11 +82,17 @@ const ProductAlerts = () => {
 
   const loadAlerts = async () => {
     try {
-      const { data, error } = await supabase
+      let query = supabase
         .from('admin_alerts')
         .select('*')
-        .eq('category', 'produits')
-        .order('created_at', { ascending: false });
+        .eq('category', 'produits');
+
+      // Filtrer par sous-catégorie si définie
+      if (currentSubcategory) {
+        query = query.eq('subcategory', currentSubcategory);
+      }
+
+      const { data, error } = await query.order('created_at', { ascending: false });
 
       if (error) throw error;
       setAlerts(data || []);
@@ -97,6 +117,18 @@ const ProductAlerts = () => {
     }
   };
 
+  const getPageTitle = () => {
+    switch (currentSubcategory) {
+      case 'produits-find': return 'Product Find';
+      case 'produits-qogita': return 'Produits Qogita';
+      case 'produits-eany': return 'Produits Eany';
+      case 'grossistes': return 'Grossistes';
+      case 'promotions': return 'Promotions';
+      case 'sitelist': return 'Sitelist';
+      default: return 'Produits Gagnants';
+    }
+  };
+
   const getSubcategoryLabel = (subcategory: string) => {
     switch (subcategory) {
       case 'produits-find': return 'Product Find';
@@ -106,44 +138,6 @@ const ProductAlerts = () => {
       case 'promotions': return 'Promotions';
       case 'sitelist': return 'Liste de sites internet à consulter';
       default: return subcategory;
-    }
-  };
-
-  const getChatRoomName = (subcategory: string) => {
-    switch (subcategory) {
-      case 'produits-find': return 'Product Find';
-      case 'produits-qogita': return 'Produits Qogita';
-      case 'produits-eany': return 'Produits Eany';
-      case 'grossistes': return 'Grossistes';
-      case 'promotions': return 'Promotions';
-      case 'sitelist': return 'Sitelist';
-      default: return null;
-    }
-  };
-
-  const goToChatRoom = async (subcategory: string) => {
-    const roomName = getChatRoomName(subcategory);
-    if (!roomName) return;
-
-    try {
-      const { data, error } = await supabase
-        .from('chat_rooms')
-        .select('id')
-        .eq('name', roomName)
-        .eq('type', 'products')
-        .single();
-
-      if (error) throw error;
-      if (data) {
-        navigate(`/chat?room=${data.id}`);
-      }
-    } catch (error) {
-      console.error('Error finding chat room:', error);
-      toast({
-        title: "Erreur",
-        description: "Impossible de trouver le salon de discussion",
-        variant: "destructive",
-      });
     }
   };
 
@@ -172,9 +166,9 @@ const ProductAlerts = () => {
           <div className="flex items-center gap-3 mb-8">
             <Sparkles className="w-8 h-8 text-primary" />
             <div>
-              <h1 className="text-4xl font-bold">Produits Gagnants</h1>
+              <h1 className="text-4xl font-bold">{getPageTitle()}</h1>
               <p className="text-muted-foreground">
-                Product Find • Produits Qogita • Produits Eany • Grossistes • Promotions • Sitelist
+                Produits gagnants sélectionnés pour vous
               </p>
             </div>
           </div>
@@ -196,24 +190,11 @@ const ProductAlerts = () => {
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex-1">
                         <CardTitle className="text-2xl mb-2">{alert.title}</CardTitle>
-                        <div className="flex items-center gap-2 mb-2">
-                          {alert.subcategory && (
-                            <Badge variant="secondary" className="text-sm">
-                              {getSubcategoryLabel(alert.subcategory)}
-                            </Badge>
-                          )}
-                          {alert.subcategory && (
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => goToChatRoom(alert.subcategory)}
-                              className="gap-2 text-primary border-primary/20 hover:bg-primary/10"
-                            >
-                              <MessageCircle className="w-4 h-4" />
-                              Discuter
-                            </Button>
-                          )}
-                        </div>
+                        {alert.subcategory && (
+                          <Badge variant="secondary" className="text-sm mb-2">
+                            {getSubcategoryLabel(alert.subcategory)}
+                          </Badge>
+                        )}
                         <CardDescription>
                           Publié le {new Date(alert.created_at).toLocaleDateString('fr-FR', {
                             day: 'numeric',
