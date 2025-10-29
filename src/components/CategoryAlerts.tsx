@@ -4,6 +4,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { AlertCircle, Link2, Image, Video, Mic, FileText } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { useNotifications } from '@/hooks/use-notifications';
 
 interface CategoryAlertsProps {
   category: string;
@@ -13,7 +15,15 @@ interface CategoryAlertsProps {
 const CategoryAlerts = ({ category, subcategory }: CategoryAlertsProps) => {
   const [alerts, setAlerts] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedAlert, setSelectedAlert] = useState<any>(null);
   const { toast } = useToast();
+  const { markAsRead } = useNotifications();
+
+  const handleAlertClick = (alert: any) => {
+    setSelectedAlert(alert);
+    // Mark as read when opening the alert
+    markAsRead(category, subcategory);
+  };
 
   useEffect(() => {
     loadAlerts();
@@ -93,76 +103,152 @@ const CategoryAlerts = ({ category, subcategory }: CategoryAlertsProps) => {
   }
 
   return (
-    <div className="mb-6 space-y-3">
-      <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-        <AlertCircle className="w-4 h-4" />
-        <span>Alertes récentes</span>
-      </div>
-      
-      {alerts.map((alert) => (
-        <Card key={alert.id} className="border-l-4 border-l-primary bg-primary/5">
-          <CardContent className="pt-4 space-y-3">
-            <div className="flex items-start justify-between gap-2">
-              <h4 className="font-semibold text-sm">{alert.title}</h4>
-              <Badge variant="destructive" className="text-xs">Nouveau</Badge>
-            </div>
+    <>
+      <div className="mb-6 space-y-3">
+        <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+          <AlertCircle className="w-4 h-4" />
+          <span>Alertes récentes</span>
+        </div>
+        
+        {alerts.map((alert) => (
+          <Card 
+            key={alert.id} 
+            className="border-l-4 border-l-primary bg-primary/5 cursor-pointer hover:bg-primary/10 transition-colors"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleAlertClick(alert);
+            }}
+          >
+            <CardContent className="pt-4 space-y-3">
+              <div className="flex items-start justify-between gap-2">
+                <h4 className="font-semibold text-sm">{alert.title}</h4>
+                <Badge variant="destructive" className="text-xs">Nouveau</Badge>
+              </div>
 
-            {alert.content && (
-              <p className="text-sm text-muted-foreground whitespace-pre-wrap line-clamp-3">
-                {alert.content}
+              {alert.content && (
+                <p className="text-sm text-muted-foreground whitespace-pre-wrap line-clamp-3">
+                  {alert.content}
+                </p>
+              )}
+              
+              {alert.link_url && (
+                <a
+                  href={alert.link_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 text-primary hover:underline text-sm font-medium"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <Link2 className="w-3 h-3" />
+                  Voir le lien
+                </a>
+              )}
+
+              {alert.file_url && (
+                <div className="space-y-2">
+                  {alert.file_type === 'image' && (
+                    <img
+                      src={alert.file_url}
+                      alt={alert.file_name}
+                      className="w-full max-h-48 object-cover rounded-lg"
+                    />
+                  )}
+                  {alert.file_type === 'video' && (
+                    <video
+                      src={alert.file_url}
+                      controls
+                      className="w-full max-h-48 rounded-lg"
+                    />
+                  )}
+                  {alert.file_type === 'audio' && (
+                    <audio src={alert.file_url} controls className="w-full" />
+                  )}
+                  <Badge variant="outline" className="text-xs">
+                    {getFileIcon(alert.file_type)}
+                    <span className="ml-1">{alert.file_name}</span>
+                  </Badge>
+                </div>
+              )}
+
+              <p className="text-xs text-muted-foreground">
+                {new Date(alert.created_at).toLocaleDateString('fr-FR', {
+                  day: 'numeric',
+                  month: 'long',
+                  hour: '2-digit',
+                  minute: '2-digit'
+                })}
+              </p>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      {/* Alert Detail Dialog */}
+      <Dialog open={!!selectedAlert} onOpenChange={() => setSelectedAlert(null)}>
+        <DialogContent className="max-w-3xl max-h-[80vh]" onClick={(e) => e.stopPropagation()}>
+          <DialogHeader>
+            <DialogTitle>{selectedAlert?.title}</DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4 overflow-y-auto max-h-[60vh]">
+            {selectedAlert?.content && (
+              <p className="text-sm text-muted-foreground whitespace-pre-wrap">
+                {selectedAlert.content}
               </p>
             )}
-            
-            {alert.link_url && (
+
+            {selectedAlert?.link_url && (
               <a
-                href={alert.link_url}
+                href={selectedAlert.link_url}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 text-primary hover:underline text-sm font-medium"
+                onClick={(e) => e.stopPropagation()}
               >
-                <Link2 className="w-3 h-3" />
+                <Link2 className="w-4 h-4" />
                 Voir le lien
               </a>
             )}
 
-            {alert.file_url && (
+            {selectedAlert?.file_url && (
               <div className="space-y-2">
-                {alert.file_type === 'image' && (
+                {selectedAlert.file_type === 'image' && (
                   <img
-                    src={alert.file_url}
-                    alt={alert.file_name}
-                    className="w-full max-h-48 object-cover rounded-lg"
+                    src={selectedAlert.file_url}
+                    alt={selectedAlert.file_name}
+                    className="w-full rounded-lg"
                   />
                 )}
-                {alert.file_type === 'video' && (
+                {selectedAlert.file_type === 'video' && (
                   <video
-                    src={alert.file_url}
+                    src={selectedAlert.file_url}
                     controls
-                    className="w-full max-h-48 rounded-lg"
+                    className="w-full rounded-lg"
                   />
                 )}
-                {alert.file_type === 'audio' && (
-                  <audio src={alert.file_url} controls className="w-full" />
+                {selectedAlert.file_type === 'audio' && (
+                  <audio src={selectedAlert.file_url} controls className="w-full" />
                 )}
                 <Badge variant="outline" className="text-xs">
-                  {getFileIcon(alert.file_type)}
-                  <span className="ml-1">{alert.file_name}</span>
+                  {getFileIcon(selectedAlert?.file_type)}
+                  <span className="ml-1">{selectedAlert?.file_name}</span>
                 </Badge>
               </div>
             )}
 
-            <p className="text-xs text-muted-foreground">
-              {new Date(alert.created_at).toLocaleDateString('fr-FR', {
+            <p className="text-xs text-muted-foreground pt-2 border-t">
+              Publié le {selectedAlert && new Date(selectedAlert.created_at).toLocaleDateString('fr-FR', {
                 day: 'numeric',
                 month: 'long',
+                year: 'numeric',
                 hour: '2-digit',
                 minute: '2-digit'
               })}
             </p>
-          </CardContent>
-        </Card>
-      ))}
-    </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
 
