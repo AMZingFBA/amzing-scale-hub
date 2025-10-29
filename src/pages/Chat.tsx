@@ -319,6 +319,11 @@ const Chat = () => {
 
   const filteredRooms = rooms
     .filter(room => {
+      // Only show general room
+      if (room.type !== 'general') {
+        return false;
+      }
+
       // Don't show hidden rooms for non-admins
       if (!isAdmin && hiddenRooms.has(room.id)) {
         return false;
@@ -327,12 +332,7 @@ const Chat = () => {
       const matchesSearch = !searchQuery || 
         room.name?.toLowerCase().includes(searchQuery.toLowerCase());
       
-      const matchesFilter = 
-        roomFilter === 'all' ||
-        (roomFilter === 'public' && room.type === 'general') ||
-        (roomFilter === 'private' && (room.type === 'private' || room.type === 'marketplace'));
-
-      return matchesSearch && matchesFilter;
+      return matchesSearch;
     })
     .sort((a, b) => {
       // 1. General room always on top
