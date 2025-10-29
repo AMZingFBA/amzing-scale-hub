@@ -33,6 +33,7 @@ import Marketplace from "./pages/Marketplace";
 import WantToSell from "./pages/WantToSell";
 import ProductAlerts from "./pages/ProductAlerts";
 import NotificationAlerts from "./pages/NotificationAlerts";
+import RulesAlerts from "./pages/RulesAlerts";
 import Annonces from "./pages/Annonces";
 import Actualite from "./pages/Actualite";
 import CatalogueProduits from "./pages/CatalogueProduits";
@@ -77,6 +78,7 @@ const App = () => (
             <Route path="/promotions" element={<ProductAlerts />} />
             <Route path="/sitelist" element={<ProductAlerts />} />
             <Route path="/notification-alerts" element={<NotificationAlerts />} />
+            <Route path="/rules-alerts" element={<RulesAlerts />} />
             <Route path="/annonces" element={<Annonces />} />
             <Route path="/actualite" element={<Actualite />} />
             <Route path="/catalogue-produits" element={<CatalogueProduits />} />
