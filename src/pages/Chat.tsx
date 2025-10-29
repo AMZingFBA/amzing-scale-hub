@@ -449,7 +449,9 @@ const Chat = () => {
                   <div
                     key={room.id}
                     className={`rounded-lg transition-colors ${
-                      selectedRoom === room.id
+                      room.type === 'general' 
+                        ? 'bg-primary text-primary-foreground' 
+                        : selectedRoom === room.id
                         ? 'bg-primary text-primary-foreground'
                         : 'hover:bg-accent'
                     }`}
