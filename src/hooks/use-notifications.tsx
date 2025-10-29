@@ -65,25 +65,37 @@ export const useNotifications = () => {
         }
       }
 
-      // Count all alerts for each category with subcategory details (not just unread)
+      // Count unread alerts for each category with subcategory details
       for (const category of categories) {
         // Get all alerts for this category with their subcategories
-        const { data: allAlerts } = await supabase
+        const { data: unreadAlerts } = await supabase
           .from('admin_alerts')
           .select('id, subcategory')
           .eq('category', category);
 
-        if (allAlerts && allAlerts.length > 0) {
-          for (const alert of allAlerts) {
-            if (!counts[category]) {
-              counts[category] = { total: 0, subcategories: {} };
-            }
-            
-            counts[category].total += 1;
-            
-            if (alert.subcategory) {
-              counts[category].subcategories[alert.subcategory] = 
-                (counts[category].subcategories[alert.subcategory] || 0) + 1;
+        if (unreadAlerts && unreadAlerts.length > 0) {
+          for (const alert of unreadAlerts) {
+            // Check if this specific alert is unread for this user
+            const { data: isRead } = await supabase
+              .from('alert_read_status')
+              .select('is_read')
+              .eq('alert_id', alert.id)
+              .eq('user_id', user.id)
+              .eq('is_read', true)
+              .maybeSingle();
+
+            // If not marked as read, count it
+            if (!isRead) {
+              if (!counts[category]) {
+                counts[category] = { total: 0, subcategories: {} };
+              }
+              
+              counts[category].total += 1;
+              
+              if (alert.subcategory) {
+                counts[category].subcategories[alert.subcategory] = 
+                  (counts[category].subcategories[alert.subcategory] || 0) + 1;
+              }
             }
           }
         }
