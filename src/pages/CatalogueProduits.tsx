@@ -713,7 +713,7 @@ Est-il toujours disponible ?`;
         <div className="w-full space-y-6 animate-fade-in relative">
           <button
             onClick={() => navigate('/dashboard')}
-            className="absolute -left-2 top-0 bg-primary/90 backdrop-blur-sm p-2 rounded-full shadow-lg hover:bg-primary transition-all z-10"
+            className="absolute -left-16 top-0 bg-primary/90 backdrop-blur-sm p-2 rounded-full shadow-lg hover:bg-primary transition-all z-10"
             aria-label="Retour"
           >
             <ArrowLeft className="w-5 h-5 text-primary-foreground" />
