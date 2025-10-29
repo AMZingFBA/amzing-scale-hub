@@ -46,13 +46,16 @@ const RulesAlerts = () => {
     }
   };
 
-  // Mark alerts as read when switching to updates tab
+  // Mark alerts as read when user visits the page
   useEffect(() => {
-    if (activeTab === 'updates' && alerts.length > 0) {
-      console.log('🔴 Marking alerts as read for introduction/règles');
-      markAsRead('introduction', 'règles');
+    if (user) {
+      const timer = setTimeout(() => {
+        console.log('🔴 Marking alerts as read on page visit');
+        markAsRead('introduction', 'règles');
+      }, 1000); // Small delay to ensure user actually views the page
+      return () => clearTimeout(timer);
     }
-  }, [activeTab, alerts.length, markAsRead]);
+  }, [user, markAsRead]);
 
   // Real-time subscription for new alerts
   useEffect(() => {
