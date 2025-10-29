@@ -183,12 +183,12 @@ const Dashboard = () => {
                 <AccordionContent>
                   <CategoryAlerts category="produits" />
                   <div className="grid gap-3 pt-2">
-                    <CategoryItem icon={Sparkles} label="product find" link="/produits-find" badge={notifications.produits?.subcategories?.['product find']} />
-                    <CategoryItem icon={Sparkles} label="produits qogita" link="/produits-qogita" badge={notifications.produits?.subcategories?.['produits qogita']} />
-                    <CategoryItem icon={Sparkles} label="produits eany" link="/produits-eany" badge={notifications.produits?.subcategories?.['produits eany']} />
-                    <CategoryItem icon={Package} label="grossistes" link="/grossistes" badge={notifications.produits?.subcategories?.grossistes} />
-                    <CategoryItem icon={DollarSign} label="promotions" link="/promotions" badge={notifications.produits?.subcategories?.promotions} />
-                    <CategoryItem icon={FileText} label="sitelist" link="/sitelist" badge={notifications.produits?.subcategories?.sitelist} />
+                    <CategoryItem icon={Sparkles} label="product find" link="/produits-find" badge={notifications.produits?.subcategories?.['produits-find']} />
+                    <CategoryItem icon={Sparkles} label="produits qogita" link="/produits-qogita" badge={notifications.produits?.subcategories?.['produits-qogita']} />
+                    <CategoryItem icon={Sparkles} label="produits eany" link="/produits-eany" badge={notifications.produits?.subcategories?.['produits-eany']} />
+                    <CategoryItem icon={Package} label="grossistes" link="/grossistes" badge={notifications.produits?.subcategories?.['grossistes']} />
+                    <CategoryItem icon={DollarSign} label="promotions" link="/promotions" badge={notifications.produits?.subcategories?.['promotions']} />
+                    <CategoryItem icon={FileText} label="sitelist" link="/sitelist" badge={notifications.produits?.subcategories?.['sitelist']} />
                   </div>
                 </AccordionContent>
               </AccordionItem>
