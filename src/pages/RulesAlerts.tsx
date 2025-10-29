@@ -8,7 +8,7 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { BookOpen, Link2, Image, Video, Mic, FileText, ArrowLeft, Shield, Users, AlertCircle, Scale, Database, UserCog, Lock } from 'lucide-react';
+import { BookOpen, Link2, Image, Video, Mic, FileText, ArrowLeft, Shield, Users, AlertCircle, Scale, Database, UserCog, Lock, ChevronLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -21,13 +21,18 @@ const RulesAlerts = () => {
   const [activeTab, setActiveTab] = useState('base');
   const isNativeApp = Capacitor.isNativePlatform();
 
-  // Mark alerts as read when visiting the updates tab
+  // Mark alerts as read when component mounts (user visits the page)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      markAsReadAlerts();
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Additional mark as read when switching to updates tab
   useEffect(() => {
     if (activeTab === 'updates') {
-      const timer = setTimeout(() => {
-        markAsReadAlerts();
-      }, 1000);
-      return () => clearTimeout(timer);
+      markAsReadAlerts();
     }
   }, [activeTab]);
 
@@ -145,10 +150,10 @@ const RulesAlerts = () => {
           <Button
             variant="ghost"
             onClick={() => navigate('/dashboard')}
-            className="mb-6"
+            className="mb-6 group"
           >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Retour au Dashboard
+            <ChevronLeft className="w-5 h-5 mr-2 text-yellow-500 group-hover:text-yellow-600 transition-colors" />
+            <span>Retour au Dashboard</span>
           </Button>
 
           <div className="flex items-center gap-3 mb-8">
