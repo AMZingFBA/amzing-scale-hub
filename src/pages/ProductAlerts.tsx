@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/use-auth';
+import { useMarkAsRead } from '@/hooks/use-mark-as-read';
 import { supabase } from '@/integrations/supabase/client';
 import { Capacitor } from '@capacitor/core';
 import Navbar from '@/components/Navbar';
@@ -32,6 +33,9 @@ const ProductAlerts = () => {
   };
 
   const currentSubcategory = getSubcategoryFromPath();
+
+  // Mark alerts as read when visiting this page
+  useMarkAsRead({ category: 'produits', subcategory: currentSubcategory || undefined });
 
   useEffect(() => {
     if (!user && !isAuthLoading) {

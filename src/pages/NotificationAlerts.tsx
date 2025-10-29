@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/use-auth';
+import { useMarkAsRead } from '@/hooks/use-mark-as-read';
 import { supabase } from '@/integrations/supabase/client';
 import { Capacitor } from '@capacitor/core';
 import Navbar from '@/components/Navbar';
@@ -17,6 +18,9 @@ const NotificationAlerts = () => {
   const [alerts, setAlerts] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const isNativeApp = Capacitor.isNativePlatform();
+
+  // Mark notifications as read when visiting this page
+  useMarkAsRead({ category: 'informations', subcategory: 'notifications' });
 
   useEffect(() => {
     if (!user && !isAuthLoading) {
