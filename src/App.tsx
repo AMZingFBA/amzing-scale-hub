@@ -38,6 +38,8 @@ import Actualite from "./pages/Actualite";
 import CatalogueProduits from "./pages/CatalogueProduits";
 import Questions from "./pages/Questions";
 import Avis from "./pages/Avis";
+import Profile from "./pages/Profile";
+import AdminProfiles from "./pages/AdminProfiles";
 
 const queryClient = new QueryClient();
 
@@ -88,6 +90,8 @@ const App = () => (
             <Route path="/vendre" element={<WantToSell />} />
             <Route path="/marketplace" element={<Marketplace />} />
             <Route path="/avis" element={<Avis />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/admin/profiles" element={<AdminProfiles />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

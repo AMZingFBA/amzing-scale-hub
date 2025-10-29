@@ -1,4 +1,5 @@
 import { useAuth } from '@/hooks/use-auth';
+import { useAdmin } from '@/hooks/use-admin';
 import { useUnreadMessages } from '@/hooks/use-unread-messages';
 import { useMarketplaceBuyUnread } from '@/hooks/use-marketplace-buy-unread';
 import { useMarketplaceSellUnread } from '@/hooks/use-marketplace-sell-unread';
@@ -14,7 +15,7 @@ import { Badge } from '@/components/ui/badge';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Crown, BookOpen, Bell, CheckCircle, DollarSign, HelpCircle, Settings, Eye, FileText, Star, Calculator, Sparkles, Package, Truck, Megaphone, Newspaper, MessageCircle, LightbulbIcon, Trophy, ShoppingCart, Info, Users, Lock, AlertCircle, Scale, Database, Shield } from 'lucide-react';
+import { Crown, BookOpen, Bell, CheckCircle, DollarSign, HelpCircle, Settings, Eye, FileText, Star, Calculator, Sparkles, Package, Truck, Megaphone, Newspaper, MessageCircle, LightbulbIcon, Trophy, ShoppingCart, Info, Users, Lock, AlertCircle, Scale, Database, Shield, UserCog } from 'lucide-react';
 interface CategoryItemProps {
   icon: React.ElementType;
   label: string;
@@ -54,6 +55,7 @@ const Dashboard = () => {
     subscription,
     isLoading
   } = useAuth();
+  const { isAdmin } = useAdmin();
   const {
     unreadCount
   } = useUnreadMessages();
@@ -252,6 +254,7 @@ const Dashboard = () => {
                   <div className="grid gap-3 pt-2">
                     <CategoryItem icon={Megaphone} label="annonces" link="/annonces" badge={unreadCounts.informations?.subcategories?.annonces} />
                     <CategoryItem icon={Newspaper} label="actualités" link="/actualite" badge={unreadCounts.informations?.subcategories?.actualités} />
+                    <CategoryItem icon={Settings} label="mon profil" link="/profile" />
                   </div>
                 </AccordionContent>
               </AccordionItem>
@@ -316,6 +319,25 @@ const Dashboard = () => {
                   </div>
                 </AccordionContent>
               </AccordionItem>
+
+              {/* ADMINISTRATION - Visible uniquement pour les admins */}
+              {isAdmin && (
+                <AccordionItem value="administration" className="border rounded-lg px-6 bg-card border-primary/30">
+                  <AccordionTrigger className="hover:no-underline">
+                    <div className="flex items-center gap-3">
+                      <Shield className="w-6 h-6 text-primary" />
+                      <span className="text-xl font-bold">ADMINISTRATION</span>
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <div className="grid gap-3 pt-2">
+                      <CategoryItem icon={Users} label="gestion des profils" link="/admin/profiles" />
+                      <CategoryItem icon={Eye} label="gestion des tickets" link="/admin/tickets" />
+                      <CategoryItem icon={Bell} label="gestion des alertes" link="/admin/alerts" />
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              )}
             </Accordion>
           </div>
         </div>
