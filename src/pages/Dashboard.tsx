@@ -647,7 +647,7 @@ const Dashboard = () => {
 
       {/* Dialog Gestion Produits - Informations */}
       <Dialog open={gestionInfoOpen} onOpenChange={setGestionInfoOpen}>
-        <DialogContent className="max-w-4xl">
+        <DialogContent className="max-w-4xl mt-24 md:mt-0">
           <DialogHeader>
             <DialogTitle className="text-2xl flex items-center gap-3">
               <Package className="w-7 h-7 text-primary" />
