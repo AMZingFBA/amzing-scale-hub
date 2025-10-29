@@ -65,41 +65,36 @@ export const useNotifications = () => {
         }
       }
 
-      // Count unread alerts for each category
+      // Count unread alerts for each category with subcategory details
       for (const category of categories) {
-        const { data: alertCount } = await supabase
-          .rpc('get_unread_alerts_count', {
-            user_id_param: user.id,
-            category_param: category,
-            subcategory_param: null
-          });
+        // Get all unread alerts for this category with their subcategories
+        const { data: unreadAlerts } = await supabase
+          .from('admin_alerts')
+          .select('id, subcategory')
+          .eq('category', category);
 
-        if (alertCount && alertCount > 0) {
-          if (!counts[category]) {
-            counts[category] = { total: 0, subcategories: {} };
-          }
-          counts[category].total += alertCount;
+        if (unreadAlerts && unreadAlerts.length > 0) {
+          for (const alert of unreadAlerts) {
+            // Check if this specific alert is unread for this user
+            const { data: isRead } = await supabase
+              .from('alert_read_status')
+              .select('is_read')
+              .eq('alert_id', alert.id)
+              .eq('user_id', user.id)
+              .eq('is_read', true)
+              .maybeSingle();
 
-          // Get subcategory-specific counts
-          const { data: alerts } = await supabase
-            .from('admin_alerts')
-            .select('subcategory')
-            .eq('category', category);
-
-          if (alerts) {
-            const subcategories = [...new Set(alerts.map(a => a.subcategory).filter(Boolean))];
-            
-            for (const subcategory of subcategories) {
-              const { data: subCount } = await supabase
-                .rpc('get_unread_alerts_count', {
-                  user_id_param: user.id,
-                  category_param: category,
-                  subcategory_param: subcategory
-                });
-
-              if (subCount && subCount > 0) {
-                counts[category].subcategories[subcategory as string] = 
-                  (counts[category].subcategories[subcategory as string] || 0) + subCount;
+            // If not marked as read, count it
+            if (!isRead) {
+              if (!counts[category]) {
+                counts[category] = { total: 0, subcategories: {} };
+              }
+              
+              counts[category].total += 1;
+              
+              if (alert.subcategory) {
+                counts[category].subcategories[alert.subcategory] = 
+                  (counts[category].subcategories[alert.subcategory] || 0) + 1;
               }
             }
           }
