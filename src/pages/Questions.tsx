@@ -277,10 +277,10 @@ const Questions = () => {
               <div className="flex items-center gap-3 relative">
                 <button
                   onClick={() => navigate('/dashboard')}
-                  className="absolute -left-12 bg-primary/90 backdrop-blur-sm p-2 rounded-full shadow-lg hover:bg-primary transition-all"
+                  className="absolute -left-12 bg-[#FF9900] hover:bg-[#FF9900]/90 p-2 rounded-full shadow-lg transition-all"
                   aria-label="Retour"
                 >
-                  <ArrowLeft className="w-5 h-5 text-primary-foreground" />
+                  <ArrowLeft className="w-5 h-5 text-white" />
                 </button>
                 <MessageCircle className="h-6 w-6 text-primary" />
                 <div>
