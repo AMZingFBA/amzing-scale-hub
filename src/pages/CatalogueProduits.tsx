@@ -709,28 +709,27 @@ Est-il toujours disponible ?`;
           </DialogContent>
         </Dialog>
 
-          {/* Header with Back Button */}
-          <div className="mb-6">
-            <button
-              onClick={() => navigate('/dashboard')}
-              className="bg-[#FF9900] hover:bg-[#FF9900]/90 p-2 rounded-full shadow-lg transition-all mb-4"
-              aria-label="Retour"
-            >
-              <ArrowLeft className="w-5 h-5 text-white" />
-            </button>
-          </div>
-
           {/* Catalogue Section */}
           <div className="w-full space-y-6 animate-fade-in">
-            <div className="mb-6 pt-2">
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent mb-4 leading-tight">
-                Catalogue Pro — Mes produits
-              </h1>
-              <p className="text-muted-foreground">
-                Découvrez tous les produits disponibles à la vente pour les professionnels.
-                <br />
-                Chaque article est stocké, expédié et géré directement par notre équipe (SAV inclus)
-              </p>
+            <div className="mb-6 flex items-start gap-3">
+              <button
+                onClick={() => navigate('/dashboard')}
+                className="bg-[#FF9900] hover:bg-[#FF9900]/90 p-2 rounded-full shadow-lg transition-all shrink-0 mt-1"
+                aria-label="Retour"
+              >
+                <ArrowLeft className="w-5 h-5 text-white" />
+              </button>
+              
+              <div className="flex-1">
+                <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent mb-4 leading-tight">
+                  Catalogue Pro — Mes produits
+                </h1>
+                <p className="text-muted-foreground">
+                  Découvrez tous les produits disponibles à la vente pour les professionnels.
+                  <br />
+                  Chaque article est stocké, expédié et géré directement par notre équipe (SAV inclus)
+                </p>
+              </div>
             </div>
 
           {/* Create/Edit Product Dialog - Admin Only */}
