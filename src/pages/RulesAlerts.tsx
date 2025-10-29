@@ -56,17 +56,19 @@ const RulesAlerts = () => {
     }
   };
 
-  // Mark alerts as read only when user views the updates tab for 5 seconds
+  // Mark alerts as read when switching to updates tab
   useEffect(() => {
     if (activeTab === 'updates' && alerts.length > 0) {
-      const timer = setTimeout(async () => {
+      const markAndRefresh = async () => {
         await markAsReadAlerts();
-        // Force a refresh of global notifications by triggering an event
-        window.dispatchEvent(new CustomEvent('refreshNotifications'));
-      }, 5000); // 5 seconds delay to ensure user sees the alerts
-      return () => clearTimeout(timer);
+        // Wait for DB sync before refreshing notifications
+        setTimeout(() => {
+          window.dispatchEvent(new CustomEvent('refreshNotifications'));
+        }, 1000);
+      };
+      markAndRefresh();
     }
-  }, [activeTab, user, alerts.length]);
+  }, [activeTab, alerts.length]);
 
   // Real-time subscription for new alerts
   useEffect(() => {
