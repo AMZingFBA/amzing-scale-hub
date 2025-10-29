@@ -709,18 +709,20 @@ Est-il toujours disponible ?`;
           </DialogContent>
         </Dialog>
 
-          {/* Catalogue Section */}
-          <div className="w-full space-y-6 animate-fade-in mt-6">
-            <div className="mb-6 flex items-start gap-3">
+          {/* Header with Back Button */}
+          <div className="mb-6">
             <button
               onClick={() => navigate('/dashboard')}
-              className="bg-primary/90 backdrop-blur-sm p-2 rounded-full shadow-lg hover:bg-primary transition-all shrink-0 mt-1"
+              className="bg-primary/90 backdrop-blur-sm p-2 rounded-full shadow-lg hover:bg-primary transition-all mb-4"
               aria-label="Retour"
             >
               <ArrowLeft className="w-5 h-5 text-primary-foreground" />
             </button>
-            
-            <div className="flex-1">
+          </div>
+
+          {/* Catalogue Section */}
+          <div className="w-full space-y-6 animate-fade-in">
+            <div className="mb-6">
               <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
                 Catalogue Pro — Mes produits
               </h1>
@@ -730,7 +732,6 @@ Est-il toujours disponible ?`;
                 Chaque article est stocké, expédié et géré directement par notre équipe (SAV inclus)
               </p>
             </div>
-          </div>
 
           {/* Create/Edit Product Dialog - Admin Only */}
           {isAdmin && (
