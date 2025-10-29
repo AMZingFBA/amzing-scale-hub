@@ -42,11 +42,11 @@ const Services = () => {
       {/* Back button for mobile app */}
       {isNativeApp && (
         <button
-          onClick={() => navigate('/dashboard')}
-          className="fixed top-[46px] left-[18px] z-50 bg-background/80 backdrop-blur-sm p-2 rounded-full shadow-lg hover:bg-background transition-colors"
+          onClick={() => navigate(-1)}
+          className="fixed top-[46px] left-[18px] z-50 bg-primary/10 backdrop-blur-sm p-2 rounded-full shadow-lg hover:bg-primary/20 transition-colors border border-primary/20"
           aria-label="Retour"
         >
-          <ArrowLeft className="h-5 w-5 text-foreground" />
+          <ArrowLeft className="h-5 w-5 text-primary" />
         </button>
       )}
       
