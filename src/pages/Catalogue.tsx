@@ -1,4 +1,4 @@
-import { Users, Crown, Zap, BookOpen, TrendingUp, MessageSquare, Gift, Target, CheckCircle2, Star, Sparkles } from "lucide-react";
+import { Users, Crown, Zap, BookOpen, TrendingUp, MessageSquare, Gift, Target, CheckCircle2, Star, Sparkles, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -7,6 +7,7 @@ import Footer from "@/components/Footer";
 import { Capacitor } from "@capacitor/core";
 import { useScrollReveal } from "@/hooks/use-scroll-reveal";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Catalogue = () => {
   const isNativeApp = Capacitor.isNativePlatform();
@@ -77,9 +78,20 @@ const Catalogue = () => {
     },
   ];
 
+  const navigate = useNavigate();
+  
   return (
     <div className="min-h-screen relative overflow-hidden">
       <Navbar />
+      {isNativeApp && (
+        <button
+          onClick={() => navigate('/dashboard')}
+          className="fixed top-[46px] left-[18px] z-50 bg-primary/90 backdrop-blur-sm p-2 rounded-full shadow-lg hover:bg-primary transition-all"
+          aria-label="Retour"
+        >
+          <ArrowLeft className="w-5 h-5 text-primary-foreground" />
+        </button>
+      )}
       
       {/* Animated background - Only for native app */}
       {isNativeApp && (
