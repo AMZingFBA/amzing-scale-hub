@@ -577,7 +577,7 @@ Est-il toujours disponible ?`;
     <div className="min-h-screen flex flex-col">
       <Navbar />
       <main className="flex-grow pt-20 bg-gradient-to-b from-background to-muted/20 p-4 md:p-8">
-      <div className="max-w-7xl mx-auto space-y-6">
+      <div className="max-w-7xl mx-auto space-y-6 relative">
         {/* Quantity Selection Dialog */}
         <Dialog open={showQuantityDialog} onOpenChange={setShowQuantityDialog}>
           <DialogContent className="max-w-md">
@@ -709,16 +709,17 @@ Est-il toujours disponible ?`;
           </DialogContent>
         </Dialog>
 
+        <button
+          onClick={() => navigate('/dashboard')}
+          className="fixed top-20 left-4 md:left-8 z-50 bg-primary/90 backdrop-blur-sm p-2 rounded-full shadow-lg hover:bg-primary transition-all"
+          aria-label="Retour"
+        >
+          <ArrowLeft className="w-5 h-5 text-primary-foreground" />
+        </button>
+
         {/* Catalogue Section */}
         <div className="w-full space-y-6 animate-fade-in">
-          <div className="mb-8 relative">
-            <button
-              onClick={() => navigate('/dashboard')}
-              className="absolute -left-12 top-0 bg-primary/90 backdrop-blur-sm p-2 rounded-full shadow-lg hover:bg-primary transition-all"
-              aria-label="Retour"
-            >
-              <ArrowLeft className="w-5 h-5 text-primary-foreground" />
-            </button>
+          <div className="mb-8">
             <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
               Catalogue Pro — Mes produits
             </h1>
