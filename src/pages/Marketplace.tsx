@@ -938,20 +938,24 @@ const Marketplace = () => {
         {/* Buy Section - Want to Buy / Recherche de produits */}
         {activeSection === "buy" && (
           <div className="w-full space-y-6 animate-fade-in">
-            <div className={`mb-8 ${isNativeApp ? 'pt-20' : ''} relative`}>
-              <button
-                onClick={() => navigate('/dashboard')}
-                className="absolute -left-12 top-0 bg-primary/90 backdrop-blur-sm p-2 rounded-full shadow-lg hover:bg-primary transition-all"
-                aria-label="Retour"
-              >
-                <ArrowLeft className="w-5 h-5 text-primary-foreground" />
-              </button>
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-                Want to Buy - Je recherche
-              </h1>
-              <p className="text-muted-foreground mt-2">
-                Publiez les produits que vous recherchez. Les membres qui les possèdent pourront vous les proposer.
-              </p>
+            <div className={`mb-8 ${isNativeApp ? 'pt-20' : ''}`}>
+              <div className="flex items-start gap-3 mb-4">
+                <button
+                  onClick={() => navigate('/dashboard')}
+                  className="bg-[#FF9900] hover:bg-[#FF9900]/90 p-3 md:p-2 rounded-full shadow-lg transition-all shrink-0"
+                  aria-label="Retour au dashboard"
+                >
+                  <ArrowLeft className="w-6 h-6 md:w-5 md:h-5 text-white" />
+                </button>
+                <div>
+                  <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+                    Want to Buy - Je recherche
+                  </h1>
+                  <p className="text-sm md:text-base text-muted-foreground mt-2">
+                    Publiez les produits que vous recherchez. Les membres qui les possèdent pourront vous les proposer.
+                  </p>
+                </div>
+              </div>
             </div>
 
             {/* Create Buy Request Button */}
@@ -1288,20 +1292,24 @@ const Marketplace = () => {
         {/* Sell Section - Want to Sell - MISE À JOUR */}
         {activeSection === "sell" && (
           <div className="w-full space-y-6 animate-fade-in">
-            <div className="mb-8 relative">
-              <button
-                onClick={() => navigate('/dashboard')}
-                className="absolute -left-12 top-0 bg-primary/90 backdrop-blur-sm p-2 rounded-full shadow-lg hover:bg-primary transition-all"
-                aria-label="Retour"
-              >
-                <ArrowLeft className="w-5 h-5 text-primary-foreground" />
-              </button>
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-                🛒 Want to Sell - Je vends
-              </h1>
-              <p className="text-muted-foreground mt-2">
-                Publiez vos produits à vendre ou parcourez les annonces des autres membres.
-              </p>
+            <div className="mb-8">
+              <div className="flex items-start gap-3 mb-4">
+                <button
+                  onClick={() => navigate('/dashboard')}
+                  className="bg-[#FF9900] hover:bg-[#FF9900]/90 p-3 md:p-2 rounded-full shadow-lg transition-all shrink-0"
+                  aria-label="Retour au dashboard"
+                >
+                  <ArrowLeft className="w-6 h-6 md:w-5 md:h-5 text-white" />
+                </button>
+                <div>
+                  <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+                    🛒 Want to Sell - Je vends
+                  </h1>
+                  <p className="text-sm md:text-base text-muted-foreground mt-2">
+                    Publiez vos produits à vendre ou parcourez les annonces des autres membres.
+                  </p>
+                </div>
+              </div>
             </div>
 
             {/* Create Listing Button */}

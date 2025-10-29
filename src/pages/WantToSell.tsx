@@ -573,22 +573,22 @@ const WantToSell = () => {
         </DialogContent>
       </Dialog>
       
-      <main className="container mx-auto px-4 pt-24 pb-12">
+      <main className="container mx-auto px-4 pt-28 md:pt-24 pb-12">
         <div className="max-w-6xl mx-auto space-y-6">
           <div className="mb-8 flex items-start gap-3">
             <button
               onClick={() => navigate('/dashboard')}
-              className="bg-[#FF9900] hover:bg-[#FF9900]/90 p-2 rounded-full shadow-lg transition-all shrink-0 mt-1"
-              aria-label="Retour"
+              className="bg-[#FF9900] hover:bg-[#FF9900]/90 p-3 md:p-2 rounded-full shadow-lg transition-all shrink-0 mt-1"
+              aria-label="Retour au dashboard"
             >
-              <ArrowLeft className="w-5 h-5 text-white" />
+              <ArrowLeft className="w-6 h-6 md:w-5 md:h-5 text-white" />
             </button>
             
             <div className="flex-1">
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent mb-2">
+              <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent mb-2">
                 Want to Sell - Je vends
               </h1>
-              <p className="text-muted-foreground">
+              <p className="text-sm md:text-base text-muted-foreground">
                 Publiez vos produits à vendre ou parcourez les annonces des autres membres.
               </p>
             </div>

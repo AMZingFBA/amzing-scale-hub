@@ -28,18 +28,22 @@ const Guides = () => {
               </Link>
             )}
 
-            <div className="mb-8 relative">
-              <button
-                onClick={() => navigate('/dashboard')}
-                className="absolute -left-12 top-0 bg-primary/90 backdrop-blur-sm p-2 rounded-full shadow-lg hover:bg-primary transition-all"
-                aria-label="Retour"
-              >
-                <ArrowLeft className="w-5 h-5 text-primary-foreground" />
-              </button>
-              <h1 className="text-4xl font-bold mb-3">📘 Guides AMZing FBA</h1>
-              <p className="text-xl text-muted-foreground">
-                Tout ce que tu dois savoir pour réussir dans l'achat-revente sur Amazon.
-              </p>
+            <div className="mb-8">
+              <div className="flex items-center gap-3 mb-4">
+                <button
+                  onClick={() => navigate('/dashboard')}
+                  className="bg-[#FF9900] hover:bg-[#FF9900]/90 p-3 md:p-2 rounded-full shadow-lg transition-all shrink-0"
+                  aria-label="Retour au dashboard"
+                >
+                  <ArrowLeft className="w-6 h-6 md:w-5 md:h-5 text-white" />
+                </button>
+                <div>
+                  <h1 className="text-3xl md:text-4xl font-bold mb-3">📘 Guides AMZing FBA</h1>
+                  <p className="text-lg md:text-xl text-muted-foreground">
+                    Tout ce que tu dois savoir pour réussir dans l'achat-revente sur Amazon.
+                  </p>
+                </div>
+              </div>
             </div>
 
             <Tabs defaultValue="debuter" className="w-full">

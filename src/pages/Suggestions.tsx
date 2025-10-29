@@ -199,29 +199,31 @@ const Suggestions = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-      <main className="flex-grow pt-20">
+      <main className="flex-grow pt-24 md:pt-20">
         <div className="container mx-auto px-4 py-8 max-w-5xl">
           <div className="mb-8">
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center gap-3 relative">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+              <div className="flex items-start gap-3">
                 <button
                   onClick={() => navigate('/dashboard')}
-                  className="absolute -left-12 top-0 bg-primary/90 backdrop-blur-sm p-2 rounded-full shadow-lg hover:bg-primary transition-all"
-                  aria-label="Retour"
+                  className="bg-[#FF9900] hover:bg-[#FF9900]/90 p-3 md:p-2 rounded-full shadow-lg transition-all shrink-0 mt-1"
+                  aria-label="Retour au dashboard"
                 >
-                  <ArrowLeft className="w-5 h-5 text-primary-foreground" />
+                  <ArrowLeft className="w-6 h-6 md:w-5 md:h-5 text-white" />
                 </button>
-                <div className="bg-primary/10 p-3 rounded-lg">
-                  <Lightbulb className="h-8 w-8 text-primary" />
-                </div>
-                <div>
-                  <h1 className="text-3xl font-bold">Mes Suggestions</h1>
-                  <p className="text-muted-foreground">Partagez vos idées avec notre équipe</p>
+                <div className="flex items-center gap-3">
+                  <div className="bg-primary/10 p-3 rounded-lg">
+                    <Lightbulb className="h-6 w-6 md:h-8 md:w-8 text-primary" />
+                  </div>
+                  <div>
+                    <h1 className="text-2xl md:text-3xl font-bold">Mes Suggestions</h1>
+                    <p className="text-sm md:text-base text-muted-foreground">Partagez vos idées avec notre équipe</p>
+                  </div>
                 </div>
               </div>
               <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
                 <DialogTrigger asChild>
-                  <Button size="lg" className="gap-2">
+                  <Button size="lg" className="gap-2 w-full md:w-auto">
                     <Plus className="h-5 w-5" />
                     Nouvelle suggestion
                   </Button>
