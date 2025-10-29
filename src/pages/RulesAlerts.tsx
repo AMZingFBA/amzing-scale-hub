@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/use-auth';
-import { useMarkAsRead } from '@/hooks/use-mark-as-read';
+import { useNotifications } from '@/hooks/use-notifications';
 import { supabase } from '@/integrations/supabase/client';
 import { Capacitor } from '@capacitor/core';
 import Navbar from '@/components/Navbar';
@@ -15,22 +15,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const RulesAlerts = () => {
   const { user, isLoading: isAuthLoading } = useAuth();
+  const { markAsRead } = useNotifications();
   const navigate = useNavigate();
   const [alerts, setAlerts] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('base');
   const isNativeApp = Capacitor.isNativePlatform();
-
-  const markAsReadAlerts = async () => {
-    try {
-      await supabase.rpc('mark_alerts_as_read', {
-        category_param: 'introduction',
-        subcategory_param: 'règles'
-      });
-    } catch (error) {
-      console.error('Error marking alerts as read:', error);
-    }
-  };
 
   const loadAlerts = async () => {
     if (!user) return;
@@ -59,19 +49,10 @@ const RulesAlerts = () => {
   // Mark alerts as read when switching to updates tab
   useEffect(() => {
     if (activeTab === 'updates' && alerts.length > 0) {
-      const markAndRefresh = async () => {
-        console.log('🔴 Marking alerts as read...');
-        await markAsReadAlerts();
-        console.log('✅ Alerts marked as read, waiting 2s before refresh...');
-        // Wait for DB sync before refreshing notifications
-        setTimeout(() => {
-          console.log('📢 Dispatching refreshNotifications event');
-          window.dispatchEvent(new CustomEvent('refreshNotifications'));
-        }, 2000); // Increased to 2 seconds for better DB sync
-      };
-      markAndRefresh();
+      console.log('🔴 Marking alerts as read for introduction/règles');
+      markAsRead('introduction', 'règles');
     }
-  }, [activeTab, alerts.length]);
+  }, [activeTab, alerts.length, markAsRead]);
 
   // Real-time subscription for new alerts
   useEffect(() => {
