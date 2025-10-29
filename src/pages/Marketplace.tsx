@@ -938,7 +938,7 @@ const Marketplace = () => {
         {/* Buy Section - Want to Buy / Recherche de produits */}
         {activeSection === "buy" && (
           <div className="w-full space-y-6 animate-fade-in">
-            <div className={`mb-8 ${isNativeApp ? 'pt-20' : ''}`}>
+            <div className="mb-8 pt-4">
               <div className="flex items-start gap-3 mb-4">
                 <button
                   onClick={() => navigate('/dashboard')}
@@ -1292,7 +1292,7 @@ const Marketplace = () => {
         {/* Sell Section - Want to Sell - MISE À JOUR */}
         {activeSection === "sell" && (
           <div className="w-full space-y-6 animate-fade-in">
-            <div className="mb-8">
+            <div className="mb-8 pt-4">
               <div className="flex items-start gap-3 mb-4">
                 <button
                   onClick={() => navigate('/dashboard')}

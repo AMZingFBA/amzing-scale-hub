@@ -15,19 +15,9 @@ const Guides = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-      <main className="flex-grow pt-20">
+      <main className="flex-grow pt-24 md:pt-20">
         <div className="container mx-auto px-4 py-8">
           <div className="max-w-6xl mx-auto">
-            {!isNativeApp && (
-              <Link 
-                to="/dashboard" 
-                className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary mb-6 transition-colors"
-              >
-                <ArrowLeft className="w-4 h-4" />
-                Retour à l'Espace VIP
-              </Link>
-            )}
-
             <div className="mb-8">
               <div className="flex items-center gap-3 mb-4">
                 <button

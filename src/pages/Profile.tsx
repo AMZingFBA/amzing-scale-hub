@@ -118,7 +118,7 @@ const Profile = () => {
     <div className="min-h-screen flex flex-col">
       <ScrollToTop />
       <Navbar />
-      <main className="flex-grow pt-20 bg-gradient-to-b from-background to-muted/20 p-4 md:p-8">
+      <main className="flex-grow pt-24 md:pt-20 bg-gradient-to-b from-background to-muted/20 p-4 md:p-8">
         <div className="max-w-3xl mx-auto">
           {/* Header avec flèche retour - plus visible sur mobile */}
           <div className="mb-6 flex items-start gap-3">
