@@ -21,21 +21,6 @@ const RulesAlerts = () => {
   const [activeTab, setActiveTab] = useState('base');
   const isNativeApp = Capacitor.isNativePlatform();
 
-  // Mark alerts as read when component mounts (user visits the page)
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      markAsReadAlerts();
-    }, 1000);
-    return () => clearTimeout(timer);
-  }, []);
-
-  // Additional mark as read when switching to updates tab
-  useEffect(() => {
-    if (activeTab === 'updates') {
-      markAsReadAlerts();
-    }
-  }, [activeTab]);
-
   const markAsReadAlerts = async () => {
     try {
       await supabase.rpc('mark_alerts_as_read', {
@@ -46,6 +31,65 @@ const RulesAlerts = () => {
       console.error('Error marking alerts as read:', error);
     }
   };
+
+  const loadAlerts = async () => {
+    if (!user) return;
+    
+    try {
+      const { data, error } = await supabase
+        .from('admin_alerts')
+        .select('*')
+        .eq('category', 'introduction')
+        .eq('subcategory', 'règles')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      
+      // Filter to only show unread alerts
+      if (data) {
+        const unreadAlerts = [];
+        for (const alert of data) {
+          const { data: readStatus } = await supabase
+            .from('alert_read_status')
+            .select('is_read')
+            .eq('alert_id', alert.id)
+            .eq('user_id', user.id)
+            .eq('is_read', true)
+            .maybeSingle();
+          
+          if (!readStatus) {
+            unreadAlerts.push(alert);
+          }
+        }
+        setAlerts(unreadAlerts);
+      }
+    } catch (error) {
+      console.error('Error loading alerts:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Mark alerts as read when component mounts (user visits the page)
+  useEffect(() => {
+    const timer = setTimeout(async () => {
+      await markAsReadAlerts();
+      // Reload alerts after marking as read to update the count
+      await loadAlerts();
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, [user]);
+
+  // Additional mark as read when switching to updates tab
+  useEffect(() => {
+    if (activeTab === 'updates') {
+      const timer = setTimeout(async () => {
+        await markAsReadAlerts();
+        await loadAlerts();
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [activeTab, user]);
 
   const rules = [
     {
@@ -95,24 +139,6 @@ const RulesAlerts = () => {
       loadAlerts();
     }
   }, [user, isAuthLoading, navigate]);
-
-  const loadAlerts = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('admin_alerts')
-        .select('*')
-        .eq('category', 'introduction')
-        .eq('subcategory', 'règles')
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      setAlerts(data || []);
-    } catch (error) {
-      console.error('Error loading alerts:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const getFileIcon = (fileType: string) => {
     switch (fileType) {
