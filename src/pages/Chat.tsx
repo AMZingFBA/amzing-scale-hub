@@ -319,8 +319,8 @@ const Chat = () => {
 
   const filteredRooms = rooms
     .filter(room => {
-      // Only show general room
-      if (room.type !== 'general') {
+      // Show general and group rooms
+      if (room.type !== 'general' && room.type !== 'group') {
         return false;
       }
 
