@@ -529,15 +529,13 @@ const WantToSell = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      {isNativeApp && (
-        <button
-          onClick={() => navigate('/dashboard')}
-          className="fixed top-[46px] left-[18px] z-50 bg-primary/90 backdrop-blur-sm p-2 rounded-full shadow-lg hover:bg-primary transition-all"
-          aria-label="Retour"
-        >
-          <ArrowLeft className="w-5 h-5 text-primary-foreground" />
-        </button>
-      )}
+      <button
+        onClick={() => navigate('/dashboard')}
+        className="fixed top-[46px] left-[18px] z-50 bg-primary/90 backdrop-blur-sm p-2 rounded-full shadow-lg hover:bg-primary transition-all"
+        aria-label="Retour"
+      >
+        <ArrowLeft className="w-5 h-5 text-primary-foreground" />
+      </button>
       
       {/* Image Gallery Dialog */}
       <Dialog open={showImageDialog} onOpenChange={setShowImageDialog}>
