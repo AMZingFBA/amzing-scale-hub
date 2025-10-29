@@ -177,9 +177,6 @@ export const GroupDialog = ({ onGroupCreated }: Props) => {
                     <div className="font-medium text-sm">
                       {user.nickname || user.full_name || 'Utilisateur'}
                     </div>
-                    <div className="text-xs text-muted-foreground">
-                      {user.email}
-                    </div>
                   </div>
                 </div>
               ))}
