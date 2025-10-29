@@ -88,6 +88,7 @@ export const useNotifications = () => {
 
             // If not marked as read, count it
             if (!isRead) {
+              console.log(`Alert ${alert.id} (${alert.subcategory}) is UNREAD for user`);
               if (!counts[category]) {
                 counts[category] = { total: 0, subcategories: {} };
               }
@@ -98,6 +99,8 @@ export const useNotifications = () => {
                 counts[category].subcategories[alert.subcategory] = 
                   (counts[category].subcategories[alert.subcategory] || 0) + 1;
               }
+            } else {
+              console.log(`Alert ${alert.id} (${alert.subcategory}) is READ for user`);
             }
           }
         }
@@ -115,12 +118,21 @@ export const useNotifications = () => {
   const markAsRead = async (category: string, subcategory?: string) => {
     if (!user) return;
 
+    console.log(`🔄 markAsRead called for category: ${category}, subcategory: ${subcategory}`);
+
     try {
       // Mark alerts as read
-      await supabase.rpc('mark_alerts_as_read', {
+      const { error: alertError } = await supabase.rpc('mark_alerts_as_read', {
         category_param: category,
         subcategory_param: subcategory || null
       });
+
+      if (alertError) {
+        console.error('❌ Error in mark_alerts_as_read RPC:', alertError);
+        throw alertError;
+      }
+      
+      console.log('✅ Alerts marked as read successfully');
 
       // Mark ticket messages as read if there are any
       const { data: tickets } = await supabase
@@ -139,7 +151,10 @@ export const useNotifications = () => {
         }
       }
 
-      // Refresh notifications
+      // Refresh notifications after a small delay to ensure DB sync
+      console.log('⏳ Waiting 500ms before refreshing...');
+      await new Promise(resolve => setTimeout(resolve, 500));
+      console.log('🔄 Refreshing notifications now...');
       await fetchNotifications();
     } catch (error) {
       console.error('Error marking as read:', error);
