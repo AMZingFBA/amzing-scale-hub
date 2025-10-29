@@ -577,7 +577,7 @@ Est-il toujours disponible ?`;
     <div className="min-h-screen flex flex-col">
       <Navbar />
       <main className="flex-grow pt-20 bg-gradient-to-b from-background to-muted/20 p-4 md:p-8">
-        <div className="max-w-7xl mx-auto pt-4">
+        <div className="max-w-7xl mx-auto pt-8">
           {/* Quantity Selection Dialog */}
         <Dialog open={showQuantityDialog} onOpenChange={setShowQuantityDialog}>
           <DialogContent className="max-w-md">
