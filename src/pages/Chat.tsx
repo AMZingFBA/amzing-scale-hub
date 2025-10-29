@@ -392,41 +392,12 @@ const Chat = () => {
 
               <TabsContent value="rooms" className="flex-1 flex flex-col">
                 <div className="space-y-4 mb-4">
-                  <div className={`flex items-center ${isNativeApp ? 'justify-center' : 'justify-between'}`}>
-                    <h2 className="text-xl font-bold flex items-center gap-2">
-                      <Users className="h-5 w-5" />
-                      Conversations
-                    </h2>
-                    <div className={`flex gap-2 ${isNativeApp ? 'absolute right-4' : ''}`}>
-                      <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
-                        <DialogTrigger asChild>
-                          <Button size="sm" variant="outline">
-                            <Plus className="h-4 w-4" />
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent>
-                          <DialogHeader>
-                            <DialogTitle>Nouvelle conversation privée</DialogTitle>
-                          </DialogHeader>
-                          <div className="space-y-4">
-                            <div>
-                              <Label htmlFor="room-name">Nom de la conversation</Label>
-                              <Input
-                                id="room-name"
-                                value={newRoomName}
-                                onChange={(e) => setNewRoomName(e.target.value)}
-                                placeholder="Ex: Discussion produits"
-                              />
-                            </div>
-                            <Button onClick={createPrivateRoom} className="w-full">
-                              Créer
-                            </Button>
-                          </div>
-                        </DialogContent>
-                      </Dialog>
-                      <GroupDialog onGroupCreated={fetchRooms} />
-                    </div>
-                  </div>
+                  <h2 className="text-xl font-bold flex items-center gap-2">
+                    <Users className="h-5 w-5" />
+                    Conversations
+                  </h2>
+                  
+                  <GroupDialog onGroupCreated={fetchRooms} />
 
                   {/* Search */}
                   <Input
