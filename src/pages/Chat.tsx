@@ -524,15 +524,6 @@ const Chat = () => {
                                   <Edit2 className="h-3 w-3" />
                                 </Button>
                               )}
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                className="h-8 w-8 p-0"
-                                onClick={() => hideRoom(room.id)}
-                                title="Masquer cette conversation"
-                              >
-                                <EyeOff className="h-3 w-3" />
-                              </Button>
                               {(room.created_by === user?.id || isAdmin) && (
                                 <Button
                                   size="sm"
@@ -591,15 +582,6 @@ const Chat = () => {
                                   </div>
                                 </button>
                                 <div className="flex items-center gap-1 pr-2">
-                                  <Button
-                                    size="sm"
-                                    variant="ghost"
-                                    className="h-8 w-8 p-0"
-                                    onClick={() => hideRoom(room.id)}
-                                    title="Masquer"
-                                  >
-                                    <EyeOff className="h-3 w-3" />
-                                  </Button>
                                   {(room.created_by === user?.id || isAdmin) && (
                                     <Button
                                       size="sm"
@@ -649,15 +631,6 @@ const Chat = () => {
                                   </div>
                                 </button>
                                 <div className="flex items-center gap-1 pr-2">
-                                  <Button
-                                    size="sm"
-                                    variant="ghost"
-                                    className="h-8 w-8 p-0"
-                                    onClick={() => hideRoom(room.id)}
-                                    title="Masquer"
-                                  >
-                                    <EyeOff className="h-3 w-3" />
-                                  </Button>
                                   {(room.created_by === user?.id || isAdmin) && (
                                     <Button
                                       size="sm"
@@ -764,15 +737,6 @@ const Chat = () => {
                                     <Edit2 className="h-3 w-3" />
                                   </Button>
                                 )}
-                                <Button
-                                  size="sm"
-                                  variant="ghost"
-                                  className="h-8 w-8 p-0"
-                                  onClick={() => hideRoom(room.id)}
-                                  title="Masquer"
-                                >
-                                  <EyeOff className="h-3 w-3" />
-                                </Button>
                                 {(room.created_by === user?.id || isAdmin) && (
                                   <Button
                                     size="sm"
