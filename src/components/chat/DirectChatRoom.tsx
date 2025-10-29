@@ -2,10 +2,10 @@ import { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { ArrowLeft, Send, Loader2, Paperclip } from 'lucide-react';
+import { ArrowLeft, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
+import DirectMessageInput from './DirectMessageInput';
 
 interface DirectMessage {
   id: string;
@@ -34,9 +34,7 @@ export const DirectChatRoom = ({ conversationId, onBack }: Props) => {
   const { user } = useAuth();
   const [messages, setMessages] = useState<DirectMessage[]>([]);
   const [otherUser, setOtherUser] = useState<Profile | null>(null);
-  const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(true);
-  const [sending, setSending] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -125,30 +123,6 @@ export const DirectChatRoom = ({ conversationId, onBack }: Props) => {
     };
   };
 
-  const sendMessage = async () => {
-    if (!user || !newMessage.trim()) return;
-
-    setSending(true);
-    try {
-      const { error } = await supabase
-        .from('direct_messages')
-        .insert({
-          conversation_id: conversationId,
-          sender_id: user.id,
-          content: newMessage.trim()
-        });
-
-      if (error) throw error;
-
-      setNewMessage('');
-    } catch (error: any) {
-      console.error('Error sending message:', error);
-      toast.error('Erreur lors de l\'envoi du message');
-    } finally {
-      setSending(false);
-    }
-  };
-
   if (loading) {
     return (
       <div className="h-full flex items-center justify-center">
@@ -173,9 +147,6 @@ export const DirectChatRoom = ({ conversationId, onBack }: Props) => {
           <h3 className="font-semibold">
             {otherUser?.nickname || otherUser?.full_name || 'Utilisateur'}
           </h3>
-          <p className="text-xs text-muted-foreground">
-            {otherUser?.email}
-          </p>
         </div>
       </div>
 
@@ -243,34 +214,7 @@ export const DirectChatRoom = ({ conversationId, onBack }: Props) => {
 
       {/* Input */}
       <div className="border-t p-4">
-        <div className="flex gap-2">
-          <Textarea
-            value={newMessage}
-            onChange={(e) => setNewMessage(e.target.value)}
-            placeholder="Écrivez votre message..."
-            className="resize-none"
-            rows={3}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                sendMessage();
-              }
-            }}
-            disabled={sending}
-          />
-          <Button
-            onClick={sendMessage}
-            disabled={!newMessage.trim() || sending}
-            size="icon"
-            className="h-auto"
-          >
-            {sending ? (
-              <Loader2 className="w-5 h-5 animate-spin" />
-            ) : (
-              <Send className="w-5 h-5" />
-            )}
-          </Button>
-        </div>
+        <DirectMessageInput conversationId={conversationId} />
       </div>
     </div>
   );

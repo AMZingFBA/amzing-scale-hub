@@ -8,7 +8,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Users, UserPlus } from 'lucide-react';
 import { toast } from 'sonner';
-import { Checkbox } from '@/components/ui/checkbox';
 
 interface Profile {
   id: string;
@@ -166,13 +165,18 @@ export const GroupDialog = ({ onGroupCreated }: Props) => {
               {filteredUsers.map(user => (
                 <div
                   key={user.id}
-                  className="flex items-center space-x-2 p-2 rounded-md hover:bg-accent cursor-pointer"
+                  className="flex items-center space-x-3 p-2 rounded-md hover:bg-accent cursor-pointer"
                   onClick={() => toggleUserSelection(user.id)}
                 >
-                  <Checkbox
-                    checked={selectedUsers.has(user.id)}
-                    onCheckedChange={() => toggleUserSelection(user.id)}
-                  />
+                  <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${
+                    selectedUsers.has(user.id) 
+                      ? 'bg-green-500 border-green-500' 
+                      : 'border-muted-foreground'
+                  }`}>
+                    {selectedUsers.has(user.id) && (
+                      <div className="w-2 h-2 bg-white rounded-full" />
+                    )}
+                  </div>
                   <div className="flex-1">
                     <div className="font-medium text-sm">
                       {user.nickname || user.full_name || 'Utilisateur'}
