@@ -58,6 +58,13 @@ const Dashboard = () => {
   const { isAdmin } = useAdmin();
   const { notifications, markAsRead } = useNotifications();
   const [rulesOpen, setRulesOpen] = useState(false);
+  
+  // Mark rules alerts as read when dialog opens
+  useEffect(() => {
+    if (rulesOpen) {
+      markAsRead('introduction', 'règles');
+    }
+  }, [rulesOpen, markAsRead]);
   const [invoiceAuthOpen, setInvoiceAuthOpen] = useState(false);
   const [reviewsOpen, setReviewsOpen] = useState(false);
   const [gestionInfoOpen, setGestionInfoOpen] = useState(false);
@@ -317,6 +324,7 @@ const Dashboard = () => {
           </DialogHeader>
           <ScrollArea className="h-[60vh] pr-4">
             <div className="space-y-4">
+              <CategoryAlerts category="introduction" subcategory="règles" />
               <Card className="border-primary/20">
                 <CardContent className="pt-6">
                   <p className="text-sm text-muted-foreground leading-relaxed">
