@@ -723,10 +723,10 @@ Est-il toujours disponible ?`;
           {/* Catalogue Section */}
           <div className="w-full space-y-6 animate-fade-in">
             <div className="mb-6">
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent mb-4">
                 Catalogue Pro — Mes produits
               </h1>
-              <p className="text-muted-foreground mt-2">
+              <p className="text-muted-foreground">
                 Découvrez tous les produits disponibles à la vente pour les professionnels.
                 <br />
                 Chaque article est stocké, expédié et géré directement par notre équipe (SAV inclus)
