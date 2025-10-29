@@ -47,7 +47,7 @@ const Profile = () => {
         .from('profiles')
         .select('full_name, email, phone, nickname')
         .eq('id', user.id)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
       
@@ -57,6 +57,14 @@ const Profile = () => {
           email: data.email || '',
           phone: data.phone || '',
           nickname: data.nickname || ''
+        });
+      } else {
+        // Si aucun profil n'existe, utiliser l'email de l'utilisateur
+        setProfile({
+          full_name: '',
+          email: user.email || '',
+          phone: '',
+          nickname: ''
         });
       }
     } catch (error: any) {
