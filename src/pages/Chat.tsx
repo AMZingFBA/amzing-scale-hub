@@ -357,7 +357,7 @@ const Chat = () => {
     room.type === 'marketplace' && room.name?.startsWith('Vente')
   );
   const otherRooms = filteredRooms.filter(room => 
-    room.type !== 'marketplace'
+    room.type === 'general'
   );
   const groupRooms = filteredRooms.filter(room => room.type === 'group');
 
