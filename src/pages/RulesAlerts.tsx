@@ -18,6 +18,7 @@ const RulesAlerts = () => {
   const { markAsRead } = useNotifications();
   const navigate = useNavigate();
   const [alerts, setAlerts] = useState<any[]>([]);
+  const [unreadCount, setUnreadCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('base');
   const isNativeApp = Capacitor.isNativePlatform();
@@ -38,6 +39,23 @@ const RulesAlerts = () => {
       // Show all alerts
       if (data) {
         setAlerts(data);
+        
+        // Count unread alerts
+        let unread = 0;
+        for (const alert of data) {
+          const { data: readStatus } = await supabase
+            .from('alert_read_status')
+            .select('is_read')
+            .eq('alert_id', alert.id)
+            .eq('user_id', user.id)
+            .eq('is_read', true)
+            .maybeSingle();
+          
+          if (!readStatus) {
+            unread++;
+          }
+        }
+        setUnreadCount(unread);
       }
     } catch (error) {
       console.error('Error loading alerts:', error);
@@ -52,6 +70,10 @@ const RulesAlerts = () => {
       const timer = setTimeout(() => {
         console.log('🔴 Marking alerts as read on page visit');
         markAsRead('introduction', 'règles');
+        // Update unread count after marking as read
+        setTimeout(() => {
+          setUnreadCount(0);
+        }, 1000);
       }, 1000); // Small delay to ensure user actually views the page
       return () => clearTimeout(timer);
     }
@@ -183,9 +205,9 @@ const RulesAlerts = () => {
               <TabsTrigger value="base">Règles de base</TabsTrigger>
               <TabsTrigger value="updates" className="relative">
                 Mises à jour
-                {alerts.length > 0 && (
+                {unreadCount > 0 && (
                   <Badge variant="destructive" className="ml-2 h-5 px-1.5 text-xs">
-                    {alerts.length}
+                    {unreadCount}
                   </Badge>
                 )}
               </TabsTrigger>
