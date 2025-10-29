@@ -356,11 +356,10 @@ const Chat = () => {
   const marketplaceVendreRooms = filteredRooms.filter(room => 
     room.type === 'marketplace' && room.name?.startsWith('Vente')
   );
-  const productRooms = filteredRooms.filter(room => room.type === 'products');
-  const groupRooms = filteredRooms.filter(room => room.type === 'group');
   const otherRooms = filteredRooms.filter(room => 
-    room.type !== 'marketplace' && room.type !== 'products' && room.type !== 'group'
+    room.type !== 'marketplace'
   );
+  const groupRooms = filteredRooms.filter(room => room.type === 'group');
 
   if (loading) {
     return (
@@ -585,39 +584,6 @@ const Chat = () => {
                   </div>
                   ))
                   }
-                  
-                  {/* Products section */}
-                  {productRooms.length > 0 && (
-                    <>
-                      <div className="pt-4 pb-2 px-2">
-                        <h3 className="text-sm font-semibold text-muted-foreground uppercase">✨ Produits Gagnants</h3>
-                      </div>
-                      {productRooms.map((room) => (
-                        <div
-                          key={room.id}
-                          className={`rounded-lg transition-colors ${
-                            selectedRoom === room.id
-                              ? 'bg-primary text-primary-foreground'
-                              : 'hover:bg-accent'
-                          }`}
-                        >
-                          <div className="flex items-center">
-                            <button
-                              onClick={() => {
-                                setSelectedRoom(room.id);
-                                setSelectedDirectConversation(null);
-                              }}
-                              className="flex-1 text-left p-3"
-                            >
-                              <div className="font-medium text-sm">
-                                {room.name || 'Produit'}
-                              </div>
-                            </button>
-                          </div>
-                        </div>
-                      ))}
-                    </>
-                  )}
                   
                   {/* Marketplace sections */}
                   {(marketplaceAcheterRooms.length > 0 || marketplaceVendreRooms.length > 0) && (
