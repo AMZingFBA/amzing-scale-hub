@@ -171,7 +171,17 @@ export const useNotifications = () => {
       )
       .on(
         'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'alert_read_status' },
+        () => fetchNotifications()
+      )
+      .on(
+        'postgres_changes',
         { event: 'UPDATE', schema: 'public', table: 'message_read_status' },
+        () => fetchNotifications()
+      )
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'message_read_status' },
         () => fetchNotifications()
       )
       .subscribe();
