@@ -577,7 +577,7 @@ Est-il toujours disponible ?`;
     <div className="min-h-screen flex flex-col">
       <Navbar />
       <main className="flex-grow pt-20 bg-gradient-to-b from-background to-muted/20 p-4 md:p-8">
-        <div className="max-w-7xl mx-auto pt-8">
+        <div className="max-w-7xl mx-auto pt-12">
           {/* Quantity Selection Dialog */}
         <Dialog open={showQuantityDialog} onOpenChange={setShowQuantityDialog}>
           <DialogContent className="max-w-md">
@@ -711,17 +711,17 @@ Est-il toujours disponible ?`;
 
           {/* Catalogue Section */}
           <div className="w-full space-y-6 animate-fade-in">
-            <div className="mb-6 flex items-start gap-3 pt-2">
+            <div className="mb-6 flex items-start gap-3 pt-4">
               <button
                 onClick={() => navigate('/dashboard')}
-                className="bg-[#FF9900] hover:bg-[#FF9900]/90 p-2 rounded-full shadow-lg transition-all shrink-0 mt-1"
+                className="bg-[#FF9900] hover:bg-[#FF9900]/90 p-2 rounded-full shadow-lg transition-all shrink-0 mt-2"
                 aria-label="Retour"
               >
                 <ArrowLeft className="w-5 h-5 text-white" />
               </button>
               
-              <div className="flex-1">
-                <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent mb-4" style={{ lineHeight: '1.3' }}>
+              <div className="flex-1 pt-1">
+                <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent mb-5 pb-1" style={{ lineHeight: '1.4' }}>
                   Catalogue Pro — Mes produits
                 </h1>
                 <p className="text-muted-foreground">
