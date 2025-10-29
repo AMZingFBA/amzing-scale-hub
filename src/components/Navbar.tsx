@@ -55,6 +55,12 @@ const Navbar = () => {
                 )}
               </div>
               <DropdownMenuSeparator className="my-2" />
+              <DropdownMenuItem asChild className="py-3 text-base">
+                <Link to="/profile" className="cursor-pointer">
+                  <User className="w-5 h-5 mr-3" />
+                  Profil
+                </Link>
+              </DropdownMenuItem>
               {isVIP && (
                 <DropdownMenuItem asChild className="py-3 text-base">
                   <Link to="/dashboard" className="cursor-pointer">
@@ -189,6 +195,12 @@ const Navbar = () => {
                     )}
                   </div>
                   <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link to="/profile" className="cursor-pointer">
+                      <User className="w-4 h-4 mr-2" />
+                      Profil
+                    </Link>
+                  </DropdownMenuItem>
                   {isVIP && (
                     <>
                       <DropdownMenuItem asChild>
@@ -290,6 +302,17 @@ const Navbar = () => {
                     </Badge>
                   )}
                 </div>
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="w-full"
+                  asChild
+                >
+                  <Link to="/profile" onClick={() => setIsOpen(false)}>
+                    <User className="w-4 h-4 mr-2" />
+                    Profil
+                  </Link>
+                </Button>
                 {isVIP && (
                   <Button
                     variant="default"
