@@ -7,7 +7,8 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, AlertCircle, Link2, Image, Video, Mic, FileText, Sparkles, ArrowLeft } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Loader2, AlertCircle, Link2, Image, Video, Mic, FileText, Sparkles, ArrowLeft, MessageCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 const ProductAlerts = () => {
@@ -108,6 +109,44 @@ const ProductAlerts = () => {
     }
   };
 
+  const getChatRoomName = (subcategory: string) => {
+    switch (subcategory) {
+      case 'produits-find': return 'Product Find';
+      case 'produits-qogita': return 'Produits Qogita';
+      case 'produits-eany': return 'Produits Eany';
+      case 'grossistes': return 'Grossistes';
+      case 'promotions': return 'Promotions';
+      case 'sitelist': return 'Sitelist';
+      default: return null;
+    }
+  };
+
+  const goToChatRoom = async (subcategory: string) => {
+    const roomName = getChatRoomName(subcategory);
+    if (!roomName) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('chat_rooms')
+        .select('id')
+        .eq('name', roomName)
+        .eq('type', 'products')
+        .single();
+
+      if (error) throw error;
+      if (data) {
+        navigate(`/chat?room=${data.id}`);
+      }
+    } catch (error) {
+      console.error('Error finding chat room:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de trouver le salon de discussion",
+        variant: "destructive",
+      });
+    }
+  };
+
   if (isLoading || isAuthLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -157,11 +196,24 @@ const ProductAlerts = () => {
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex-1">
                         <CardTitle className="text-2xl mb-2">{alert.title}</CardTitle>
-                        {alert.subcategory && (
-                          <Badge variant="secondary" className="mb-2 text-sm">
-                            {getSubcategoryLabel(alert.subcategory)}
-                          </Badge>
-                        )}
+                        <div className="flex items-center gap-2 mb-2">
+                          {alert.subcategory && (
+                            <Badge variant="secondary" className="text-sm">
+                              {getSubcategoryLabel(alert.subcategory)}
+                            </Badge>
+                          )}
+                          {alert.subcategory && (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => goToChatRoom(alert.subcategory)}
+                              className="gap-2 text-primary border-primary/20 hover:bg-primary/10"
+                            >
+                              <MessageCircle className="w-4 h-4" />
+                              Discuter
+                            </Button>
+                          )}
+                        </div>
                         <CardDescription>
                           Publié le {new Date(alert.created_at).toLocaleDateString('fr-FR', {
                             day: 'numeric',
