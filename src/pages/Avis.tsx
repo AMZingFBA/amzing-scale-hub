@@ -177,14 +177,14 @@ const Avis = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Header with iOS safe area */}
-      <div className="sticky top-0 z-10 bg-background border-b border-border pt-safe">
+      <div className="sticky top-0 z-10 bg-background border-b border-border pt-16">
         <div className="flex items-center justify-between gap-4 px-4 py-4">
           <div className="flex items-center gap-4">
             <button
               onClick={() => navigate(-1)}
-              className="p-2 hover:bg-accent rounded-lg transition-colors active:scale-95"
+              className="p-2 bg-primary/10 hover:bg-primary/20 rounded-lg transition-colors active:scale-95 border border-primary/20"
             >
-              <ArrowLeft className="w-6 h-6" />
+              <ArrowLeft className="w-6 h-6 text-primary" />
             </button>
             <h1 className="text-2xl font-bold">Tous les avis</h1>
           </div>
