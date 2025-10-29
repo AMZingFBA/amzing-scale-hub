@@ -83,13 +83,6 @@ const Catalogue = () => {
   return (
     <div className="min-h-screen relative overflow-hidden">
       <Navbar />
-      <button
-        onClick={() => navigate('/dashboard')}
-        className="fixed top-[46px] left-[18px] z-50 bg-primary/90 backdrop-blur-sm p-2 rounded-full shadow-lg hover:bg-primary transition-all"
-        aria-label="Retour"
-      >
-        <ArrowLeft className="w-5 h-5 text-primary-foreground" />
-      </button>
       
       {/* Animated background - Only for native app */}
       {isNativeApp && (
@@ -125,6 +118,13 @@ const Catalogue = () => {
             ref={isNativeApp ? heroReveal.ref : undefined}
             className={`text-center mb-20 relative ${isNativeApp && !heroReveal.isVisible ? 'opacity-0 translate-y-10' : ''} ${isNativeApp ? 'transition-all duration-1000 ease-out' : ''}`}
           >
+            <button
+              onClick={() => navigate('/dashboard')}
+              className="absolute -left-12 top-0 bg-primary/90 backdrop-blur-sm p-2 rounded-full shadow-lg hover:bg-primary transition-all"
+              aria-label="Retour"
+            >
+              <ArrowLeft className="w-5 h-5 text-primary-foreground" />
+            </button>
             <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-secondary/20 to-primary/20 blur-3xl -z-10" />
             <Badge className={`mb-6 bg-gradient-to-r from-primary to-secondary text-white border-none px-6 py-2 text-base ${isNativeApp ? 'animate-pulse shadow-lg shadow-primary/50' : ''}`}>
               <Crown className="w-4 h-4 inline mr-2" />

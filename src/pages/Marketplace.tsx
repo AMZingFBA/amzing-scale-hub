@@ -945,7 +945,14 @@ const Marketplace = () => {
         {/* Buy Section - Want to Buy / Recherche de produits */}
         {activeSection === "buy" && (
           <div className="w-full space-y-6 animate-fade-in">
-            <div className={`mb-8 ${isNativeApp ? 'pt-20' : ''}`}>
+            <div className={`mb-8 ${isNativeApp ? 'pt-20' : ''} relative`}>
+              <button
+                onClick={() => navigate('/dashboard')}
+                className="absolute -left-12 top-0 bg-primary/90 backdrop-blur-sm p-2 rounded-full shadow-lg hover:bg-primary transition-all"
+                aria-label="Retour"
+              >
+                <ArrowLeft className="w-5 h-5 text-primary-foreground" />
+              </button>
               <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
                 Want to Buy - Je recherche
               </h1>
@@ -1288,7 +1295,14 @@ const Marketplace = () => {
         {/* Sell Section - Want to Sell - MISE À JOUR */}
         {activeSection === "sell" && (
           <div className="w-full space-y-6 animate-fade-in">
-            <div className="mb-8">
+            <div className="mb-8 relative">
+              <button
+                onClick={() => navigate('/dashboard')}
+                className="absolute -left-12 top-0 bg-primary/90 backdrop-blur-sm p-2 rounded-full shadow-lg hover:bg-primary transition-all"
+                aria-label="Retour"
+              >
+                <ArrowLeft className="w-5 h-5 text-primary-foreground" />
+              </button>
               <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
                 🛒 Want to Sell - Je vends
               </h1>

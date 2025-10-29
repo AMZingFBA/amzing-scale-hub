@@ -199,18 +199,18 @@ const Suggestions = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-      <button
-        onClick={() => navigate('/dashboard')}
-        className="fixed top-[46px] left-[18px] z-50 bg-primary/90 backdrop-blur-sm p-2 rounded-full shadow-lg hover:bg-primary transition-all"
-        aria-label="Retour"
-      >
-        <ArrowLeft className="w-5 h-5 text-primary-foreground" />
-      </button>
       <main className="flex-grow pt-20">
         <div className="container mx-auto px-4 py-8 max-w-5xl">
           <div className="mb-8">
             <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 relative">
+                <button
+                  onClick={() => navigate('/dashboard')}
+                  className="absolute -left-12 top-0 bg-primary/90 backdrop-blur-sm p-2 rounded-full shadow-lg hover:bg-primary transition-all"
+                  aria-label="Retour"
+                >
+                  <ArrowLeft className="w-5 h-5 text-primary-foreground" />
+                </button>
                 <div className="bg-primary/10 p-3 rounded-lg">
                   <Lightbulb className="h-8 w-8 text-primary" />
                 </div>

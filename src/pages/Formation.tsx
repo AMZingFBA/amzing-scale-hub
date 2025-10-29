@@ -15,14 +15,6 @@ const Formation = () => {
     <div className="min-h-screen">
       <Navbar />
       
-      <button
-        onClick={() => navigate('/dashboard')}
-        className="fixed top-[46px] left-[18px] z-50 bg-primary/90 backdrop-blur-sm p-2 rounded-full shadow-lg hover:bg-primary transition-all"
-        aria-label="Retour"
-      >
-        <ArrowLeft className="h-5 w-5 text-primary-foreground" />
-      </button>
-      
       <div className="pt-32 pb-20 relative overflow-hidden">
         {/* Animated background elements */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-20">
@@ -33,7 +25,14 @@ const Formation = () => {
 
         <div className="container mx-auto px-4 relative z-10">
           {/* Hero */}
-          <div className="text-center mb-16 animate-fade-in">
+          <div className="text-center mb-16 animate-fade-in relative">
+            <button
+              onClick={() => navigate('/dashboard')}
+              className="absolute -left-12 top-0 bg-primary/90 backdrop-blur-sm p-2 rounded-full shadow-lg hover:bg-primary transition-all"
+              aria-label="Retour"
+            >
+              <ArrowLeft className="h-5 w-5 text-primary-foreground" />
+            </button>
             <Badge className="mb-4 bg-primary/10 text-primary border-primary/20 animate-fade-in" style={{ animationDelay: '0.1s' }}>
               Formation complète Amazon FBA
             </Badge>
