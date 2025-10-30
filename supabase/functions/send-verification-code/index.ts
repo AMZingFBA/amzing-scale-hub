@@ -8,7 +8,7 @@ const corsHeaders = {
 };
 
 interface VerificationRequest {
-  type: 'email_change' | 'password_change';
+  type: 'email_change' | 'password_change' | 'phone_change';
   newValue?: string;
 }
 
@@ -78,6 +78,8 @@ const handler = async (req: Request): Promise<Response> => {
     // Send email with Resend
     const emailSubject = type === 'email_change' 
       ? 'Code de vérification - Changement d\'email' 
+      : type === 'phone_change'
+      ? 'Code de vérification - Changement de téléphone'
       : 'Code de vérification - Changement de mot de passe';
 
     const emailHtml = `
@@ -101,7 +103,11 @@ const handler = async (req: Request): Promise<Response> => {
             </div>
             <div class="content">
               <p>Bonjour,</p>
-              <p>Voici votre code de vérification pour ${type === 'email_change' ? 'changer votre email' : 'changer votre mot de passe'} :</p>
+              <p>Voici votre code de vérification pour ${
+                type === 'email_change' ? 'changer votre email' : 
+                type === 'phone_change' ? 'changer votre numéro de téléphone' :
+                'changer votre mot de passe'
+              } :</p>
               <div class="code">${code}</div>
               <p>Ce code est valide pendant 10 minutes.</p>
               <p>Si vous n'avez pas demandé ce code, ignorez cet email.</p>

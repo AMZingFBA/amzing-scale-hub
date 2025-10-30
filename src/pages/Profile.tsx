@@ -30,8 +30,10 @@ const Profile = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [showEmailDialog, setShowEmailDialog] = useState(false);
   const [showPasswordDialog, setShowPasswordDialog] = useState(false);
+  const [showPhoneDialog, setShowPhoneDialog] = useState(false);
   const [newEmail, setNewEmail] = useState('');
   const [newPassword, setNewPassword] = useState('');
+  const [newPhone, setNewPhone] = useState('');
   const [verificationCode, setVerificationCode] = useState('');
   const [codeSent, setCodeSent] = useState(false);
   const [isSendingCode, setIsSendingCode] = useState(false);
@@ -44,6 +46,14 @@ const Profile = () => {
     email: '',
   });
   const isNativeApp = Capacitor.isNativePlatform();
+
+  // Reset code state when dialogs are opened
+  useEffect(() => {
+    if (showEmailDialog || showPasswordDialog || showPhoneDialog) {
+      setCodeSent(false);
+      setVerificationCode('');
+    }
+  }, [showEmailDialog, showPasswordDialog, showPhoneDialog]);
 
   useEffect(() => {
     if (!user && !isAuthLoading) {
@@ -386,6 +396,114 @@ const Profile = () => {
     }
   };
 
+  const handleSendPhoneCode = async () => {
+    if (!newPhone || newPhone.length < 10) {
+      toast({
+        title: "Erreur",
+        description: "Veuillez entrer un numéro de téléphone valide",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSendingCode(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        throw new Error("Session expirée. Veuillez vous reconnecter.");
+      }
+
+      const { data, error } = await supabase.functions.invoke('send-verification-code', {
+        body: { type: 'phone_change', newValue: newPhone },
+        headers: {
+          Authorization: `Bearer ${session.access_token}`
+        }
+      });
+
+      if (error) throw error;
+
+      setCodeSent(true);
+      toast({
+        title: "Code envoyé",
+      });
+    } catch (error: any) {
+      console.error('Error sending code:', error);
+      toast({
+        title: "Erreur",
+        description: error.message || "Impossible d'envoyer le code",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSendingCode(false);
+    }
+  };
+
+  const handleVerifyPhoneCode = async () => {
+    if (!verificationCode || verificationCode.length !== 6) {
+      toast({
+        title: "Erreur",
+        description: "Veuillez entrer un code à 6 chiffres",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsVerifying(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        throw new Error("Session expirée. Veuillez vous reconnecter.");
+      }
+
+      const response = await supabase.functions.invoke('verify-and-update', {
+        body: { code: verificationCode, type: 'phone_change' },
+        headers: {
+          Authorization: `Bearer ${session.access_token}`
+        }
+      });
+
+      if (response.error) {
+        const errorMessage = response.data?.error || "Code invalide ou expiré";
+        throw new Error(errorMessage);
+      }
+
+      if (response.data?.error) {
+        throw new Error(response.data.error);
+      }
+
+      toast({
+        title: "Téléphone modifié",
+        description: "Votre numéro de téléphone a été mis à jour avec succès",
+      });
+
+      setShowPhoneDialog(false);
+      setNewPhone('');
+      setVerificationCode('');
+      setCodeSent(false);
+      
+      // Reload profile
+      await loadProfile();
+    } catch (error: any) {
+      console.error('Error verifying code:', error);
+      
+      let errorMessage = "Code invalide ou expiré";
+      if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      toast({
+        title: "Code incorrect",
+        description: errorMessage,
+        variant: "destructive",
+        duration: 7000,
+      });
+    } finally {
+      setIsVerifying(false);
+    }
+  };
+
   if (isLoading || isAuthLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -498,18 +616,22 @@ const Profile = () => {
                   <Phone className="w-4 h-4 inline mr-2" />
                   Téléphone
                 </Label>
-                <Input
-                  id="phone"
-                  type="tel"
-                  placeholder="+33 6 12 34 56 78"
-                  value={profileData.phone || ''}
-                  onChange={(e) =>
-                    setProfileData({ ...profileData, phone: e.target.value })
-                  }
-                />
-                <p className="text-xs text-muted-foreground">
-                  Requis pour modifier votre email
-                </p>
+                <div className="flex gap-2">
+                  <Input
+                    id="phone"
+                    type="tel"
+                    placeholder="+33 6 12 34 56 78"
+                    value={profileData.phone || ''}
+                    readOnly
+                    className="flex-1"
+                  />
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowPhoneDialog(true)}
+                  >
+                    <Edit2 className="w-4 h-4" />
+                  </Button>
+                </div>
               </div>
 
               <div className="space-y-2">
@@ -702,6 +824,94 @@ const Profile = () => {
                       </Button>
                       <Button
                         onClick={handleVerifyPasswordCode}
+                        disabled={isVerifying}
+                        className="flex-1"
+                      >
+                        {isVerifying ? (
+                          <>
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            Vérification...
+                          </>
+                        ) : (
+                          'Vérifier'
+                        )}
+                      </Button>
+                    </div>
+                  </>
+                )}
+              </div>
+            </DialogContent>
+          </Dialog>
+
+          {/* Phone Change Dialog */}
+          <Dialog open={showPhoneDialog} onOpenChange={setShowPhoneDialog}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Modifier le téléphone</DialogTitle>
+                <DialogDescription>
+                  Un code de vérification sera envoyé à votre email
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4">
+                {!codeSent ? (
+                  <>
+                    <div className="space-y-2">
+                      <Label htmlFor="new_phone">Nouveau numéro de téléphone</Label>
+                      <Input
+                        id="new_phone"
+                        type="tel"
+                        placeholder="+33 6 12 34 56 78"
+                        value={newPhone}
+                        onChange={(e) => setNewPhone(e.target.value)}
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Format: +33 6 12 34 56 78
+                      </p>
+                    </div>
+                    <Button
+                      onClick={handleSendPhoneCode}
+                      disabled={isSendingCode}
+                      className="w-full"
+                    >
+                      {isSendingCode ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Envoi...
+                        </>
+                      ) : (
+                        'Envoyer le code'
+                      )}
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <div className="space-y-2">
+                      <Label htmlFor="phone_code">Code de vérification</Label>
+                      <Input
+                        id="phone_code"
+                        type="text"
+                        placeholder="123456"
+                        maxLength={6}
+                        value={verificationCode}
+                        onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, ''))}
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Le code a été envoyé à votre email
+                      </p>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        onClick={() => {
+                          setCodeSent(false);
+                          setVerificationCode('');
+                        }}
+                        className="flex-1"
+                      >
+                        Renvoyer
+                      </Button>
+                      <Button
+                        onClick={handleVerifyPhoneCode}
                         disabled={isVerifying}
                         className="flex-1"
                       >

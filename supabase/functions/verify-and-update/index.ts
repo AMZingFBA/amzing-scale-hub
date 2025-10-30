@@ -8,7 +8,7 @@ const corsHeaders = {
 
 interface VerifyRequest {
   code: string;
-  type: 'email_change' | 'password_change';
+  type: 'email_change' | 'password_change' | 'phone_change';
   newPassword?: string;
 }
 
@@ -125,6 +125,21 @@ const handler = async (req: Request): Promise<Response> => {
         .from("profiles")
         .update({ email: verificationData.new_value })
         .eq("id", user.id);
+    } else if (type === 'phone_change') {
+      if (!verificationData.new_value) {
+        throw new Error("Nouveau téléphone requis");
+      }
+
+      // Update profile phone
+      const { error: updateError } = await supabaseAdmin
+        .from("profiles")
+        .update({ phone: verificationData.new_value })
+        .eq("id", user.id);
+
+      if (updateError) {
+        console.error("Error updating phone:", updateError);
+        throw new Error("Impossible de mettre à jour le téléphone");
+      }
     }
 
     // Mark code as used
