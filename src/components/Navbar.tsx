@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Menu, X, User, LogOut, Crown, Shield } from "lucide-react";
+import { Menu, X, User, LogOut, Crown, Shield, LayoutDashboard, MessageSquare, ShoppingBag, Store } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/use-auth";
@@ -61,16 +61,60 @@ const Navbar = () => {
                   Profil
                 </Link>
               </DropdownMenuItem>
-              {isVIP && (
-                <DropdownMenuItem asChild className="py-3 text-base">
-                  <Link to="/dashboard" className="cursor-pointer">
-                    <Crown className="w-5 h-5 mr-3" />
-                    Espace VIP
-                  </Link>
-                </DropdownMenuItem>
-              )}
-              {!isVIP && (
+              {isVIP ? (
+                // Menu VIP
                 <>
+                  <DropdownMenuItem asChild className="py-3 text-base">
+                    <Link to="/dashboard" className="cursor-pointer">
+                      <LayoutDashboard className="w-5 h-5 mr-3" />
+                      Dashboard
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild className="py-3 text-base">
+                    <Link to="/chat" className="cursor-pointer">
+                      <MessageSquare className="w-5 h-5 mr-3" />
+                      Chat
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild className="py-3 text-base">
+                    <Link to="/catalogue-produits" className="cursor-pointer">
+                      <ShoppingBag className="w-5 h-5 mr-3" />
+                      Catalogue
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild className="py-3 text-base">
+                    <Link to="/marketplace" className="cursor-pointer relative">
+                      <Store className="w-5 h-5 mr-3" />
+                      Marketplace
+                      {totalMarketplaceUnread > 0 && (
+                        <Badge variant="destructive" className="ml-auto animate-pulse">{totalMarketplaceUnread}</Badge>
+                      )}
+                    </Link>
+                  </DropdownMenuItem>
+                </>
+              ) : (
+                // Menu utilisateurs gratuits
+                <>
+                  <DropdownMenuItem asChild className="py-3 text-base">
+                    <Link to="/services" className="cursor-pointer">
+                      Nos Services
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild className="py-3 text-base">
+                    <Link to="/tarifs" className="cursor-pointer">
+                      Tarifs
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild className="py-3 text-base">
+                    <Link to="/formation" className="cursor-pointer">
+                      Formation
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild className="py-3 text-base">
+                    <Link to="/faq" className="cursor-pointer">
+                      FAQ
+                    </Link>
+                  </DropdownMenuItem>
                   <DropdownMenuItem asChild className="py-3 text-base">
                     <Link to="/acheter" className="cursor-pointer relative">
                       Want to Buy
@@ -85,11 +129,6 @@ const Navbar = () => {
                       {sellUnreadCount > 0 && (
                         <Badge variant="destructive" className="ml-auto animate-pulse">{sellUnreadCount}</Badge>
                       )}
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild className="py-3 text-base">
-                    <Link to="/contact" className="cursor-pointer">
-                      Contact
                     </Link>
                   </DropdownMenuItem>
                 </>
@@ -144,29 +183,66 @@ const Navbar = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
-            {!isVIP && (
-              <Link to="/contact" className="text-foreground hover:text-primary transition-colors font-medium">
-                Contact
-              </Link>
-            )}
-            {user && !isVIP && (
+            {isVIP ? (
+              // Navigation pour les utilisateurs VIP
               <>
-                <Link to="/acheter" className="text-foreground hover:text-primary transition-colors font-medium relative">
-                  Want to Buy
-                  {buyUnreadCount > 0 && (
+                <Link to="/dashboard" className="text-foreground hover:text-primary transition-colors font-medium flex items-center gap-2">
+                  <LayoutDashboard className="w-4 h-4" />
+                  Dashboard
+                </Link>
+                <Link to="/chat" className="text-foreground hover:text-primary transition-colors font-medium flex items-center gap-2">
+                  <MessageSquare className="w-4 h-4" />
+                  Chat
+                </Link>
+                <Link to="/catalogue-produits" className="text-foreground hover:text-primary transition-colors font-medium flex items-center gap-2">
+                  <ShoppingBag className="w-4 h-4" />
+                  Catalogue
+                </Link>
+                <Link to="/marketplace" className="text-foreground hover:text-primary transition-colors font-medium flex items-center gap-2 relative">
+                  <Store className="w-4 h-4" />
+                  Marketplace
+                  {totalMarketplaceUnread > 0 && (
                     <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-                      {buyUnreadCount}
+                      {totalMarketplaceUnread}
                     </span>
                   )}
                 </Link>
-                <Link to="/vendre" className="text-foreground hover:text-primary transition-colors font-medium relative">
-                  Want to Sell
-                  {sellUnreadCount > 0 && (
-                    <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-                      {sellUnreadCount}
-                    </span>
-                  )}
+              </>
+            ) : (
+              // Navigation pour les utilisateurs gratuits
+              <>
+                <Link to="/services" className="text-foreground hover:text-primary transition-colors font-medium">
+                  Nos Services
                 </Link>
+                <Link to="/tarifs" className="text-foreground hover:text-primary transition-colors font-medium">
+                  Tarifs
+                </Link>
+                <Link to="/formation" className="text-foreground hover:text-primary transition-colors font-medium">
+                  Formation
+                </Link>
+                <Link to="/faq" className="text-foreground hover:text-primary transition-colors font-medium">
+                  FAQ
+                </Link>
+                {user && (
+                  <>
+                    <Link to="/acheter" className="text-foreground hover:text-primary transition-colors font-medium relative">
+                      Want to Buy
+                      {buyUnreadCount > 0 && (
+                        <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                          {buyUnreadCount}
+                        </span>
+                      )}
+                    </Link>
+                    <Link to="/vendre" className="text-foreground hover:text-primary transition-colors font-medium relative">
+                      Want to Sell
+                      {sellUnreadCount > 0 && (
+                        <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                          {sellUnreadCount}
+                        </span>
+                      )}
+                    </Link>
+                  </>
+                )}
               </>
             )}
             
@@ -254,41 +330,106 @@ const Navbar = () => {
         {/* Mobile Navigation */}
         {isOpen && (
           <div className="md:hidden py-4 space-y-4">
-            {!isVIP && (
-              <Link
-                to="/contact"
-                className="block text-foreground hover:text-primary transition-colors font-medium py-2"
-                onClick={() => setIsOpen(false)}
-              >
-                Contact
-              </Link>
-            )}
-            {user && !isVIP && (
+            {isVIP ? (
+              // Navigation mobile pour les utilisateurs VIP
               <>
                 <Link
-                  to="/acheter"
-                  className="block text-foreground hover:text-primary transition-colors font-medium py-2 relative"
+                  to="/dashboard"
+                  className="block text-foreground hover:text-primary transition-colors font-medium py-2 flex items-center gap-2"
                   onClick={() => setIsOpen(false)}
                 >
-                  Want to Buy
-                  {buyUnreadCount > 0 && (
-                    <span className="absolute top-1 left-24 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-                      {buyUnreadCount}
-                    </span>
-                  )}
+                  <LayoutDashboard className="w-4 h-4" />
+                  Dashboard
                 </Link>
                 <Link
-                  to="/vendre"
-                  className="block text-foreground hover:text-primary transition-colors font-medium py-2 relative"
+                  to="/chat"
+                  className="block text-foreground hover:text-primary transition-colors font-medium py-2 flex items-center gap-2"
                   onClick={() => setIsOpen(false)}
                 >
-                  Want to Sell
-                  {sellUnreadCount > 0 && (
-                    <span className="absolute top-1 left-28 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-                      {sellUnreadCount}
+                  <MessageSquare className="w-4 h-4" />
+                  Chat
+                </Link>
+                <Link
+                  to="/catalogue-produits"
+                  className="block text-foreground hover:text-primary transition-colors font-medium py-2 flex items-center gap-2"
+                  onClick={() => setIsOpen(false)}
+                >
+                  <ShoppingBag className="w-4 h-4" />
+                  Catalogue
+                </Link>
+                <Link
+                  to="/marketplace"
+                  className="block text-foreground hover:text-primary transition-colors font-medium py-2 flex items-center gap-2 relative"
+                  onClick={() => setIsOpen(false)}
+                >
+                  <Store className="w-4 h-4" />
+                  Marketplace
+                  {totalMarketplaceUnread > 0 && (
+                    <span className="ml-2 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                      {totalMarketplaceUnread}
                     </span>
                   )}
                 </Link>
+              </>
+            ) : (
+              // Navigation mobile pour les utilisateurs gratuits
+              <>
+                <Link
+                  to="/services"
+                  className="block text-foreground hover:text-primary transition-colors font-medium py-2"
+                  onClick={() => setIsOpen(false)}
+                >
+                  Nos Services
+                </Link>
+                <Link
+                  to="/tarifs"
+                  className="block text-foreground hover:text-primary transition-colors font-medium py-2"
+                  onClick={() => setIsOpen(false)}
+                >
+                  Tarifs
+                </Link>
+                <Link
+                  to="/formation"
+                  className="block text-foreground hover:text-primary transition-colors font-medium py-2"
+                  onClick={() => setIsOpen(false)}
+                >
+                  Formation
+                </Link>
+                <Link
+                  to="/faq"
+                  className="block text-foreground hover:text-primary transition-colors font-medium py-2"
+                  onClick={() => setIsOpen(false)}
+                >
+                  FAQ
+                </Link>
+                {user && (
+                  <>
+                    <Link
+                      to="/acheter"
+                      className="block text-foreground hover:text-primary transition-colors font-medium py-2 relative"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      Want to Buy
+                      {buyUnreadCount > 0 && (
+                        <span className="absolute top-1 left-24 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                          {buyUnreadCount}
+                        </span>
+                      )}
+                    </Link>
+                    <Link
+                      to="/vendre"
+                      className="block text-foreground hover:text-primary transition-colors font-medium py-2 relative"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      Want to Sell
+                      {sellUnreadCount > 0 && (
+                        <span className="absolute top-1 left-28 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                          {sellUnreadCount}
+                        </span>
+                      )}
+                    </Link>
+                  </>
+                )}
               </>
             )}
             
