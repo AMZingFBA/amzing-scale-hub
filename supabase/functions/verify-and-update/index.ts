@@ -42,6 +42,11 @@ const handler = async (req: Request): Promise<Response> => {
 
     const { code, type, newPassword }: VerifyRequest = await req.json();
 
+    console.log("=== VERIFICATION REQUEST ===");
+    console.log("User ID:", user.id);
+    console.log("Code reçu:", code);
+    console.log("Type:", type);
+
     // Use service role key for all database operations
     const supabaseAdmin = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
@@ -61,12 +66,27 @@ const handler = async (req: Request): Promise<Response> => {
       .limit(1)
       .maybeSingle();
 
+    console.log("Résultat de la requête:", { verificationData, verifyError });
+    console.log("Date actuelle:", new Date().toISOString());
+
     if (verifyError) {
       console.error("Error verifying code:", verifyError);
       throw verifyError;
     }
 
     if (!verificationData) {
+      // Check if code exists but is expired or used
+      const { data: allCodes } = await supabaseAdmin
+        .from("verification_codes")
+        .select("*")
+        .eq("user_id", user.id)
+        .eq("code", code)
+        .eq("type", type)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      
+      console.log("Code trouvé dans la DB:", allCodes);
       throw new Error("Code invalide ou expiré");
     }
 
