@@ -16,7 +16,7 @@ const Footer = () => {
 
       <div className="container mx-auto px-4 py-12 relative z-10">
         {/* Main Footer Content - Always visible */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+        <div className={`grid gap-8 mb-12 ${isVIP ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1 md:grid-cols-3'}`}>
           {/* Logo & Description - Enhanced */}
           <div className="group animate-fade-in" style={{ animationDelay: '0.1s' }}>
             <div className="relative inline-block mb-4">
@@ -62,7 +62,7 @@ const Footer = () => {
           )}
 
           {/* Contact CTA */}
-          <div className="animate-fade-in" style={{ animationDelay: '0.3s' }}>
+          <div className={`animate-fade-in ${isVIP ? 'md:ml-auto md:text-right' : ''}`} style={{ animationDelay: '0.3s' }}>
             <h3 className="text-lg font-semibold mb-4 text-foreground">Besoin d'aide ?</h3>
             <p className="text-muted-foreground mb-4 text-sm">
               Notre équipe est là pour répondre à toutes vos questions
