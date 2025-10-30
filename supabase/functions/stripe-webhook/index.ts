@@ -99,6 +99,7 @@ serve(async (req) => {
           plan_type: "vip",
           status: "active",
           is_trial: true,
+          trial_used: true,
           expires_at: expiresAt.toISOString(),
         })
         .eq("user_id", profile.id);

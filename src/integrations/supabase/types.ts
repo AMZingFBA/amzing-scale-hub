@@ -651,6 +651,7 @@ export type Database = {
           plan_type: string
           started_at: string
           status: string
+          trial_used: boolean
           updated_at: string
           user_id: string
         }
@@ -662,6 +663,7 @@ export type Database = {
           plan_type: string
           started_at?: string
           status: string
+          trial_used?: boolean
           updated_at?: string
           user_id: string
         }
@@ -673,6 +675,7 @@ export type Database = {
           plan_type?: string
           started_at?: string
           status?: string
+          trial_used?: boolean
           updated_at?: string
           user_id?: string
         }
@@ -747,7 +750,7 @@ export type Database = {
           new_value: string | null
           type: string
           used: boolean
-          user_id: string
+          user_id: string | null
         }
         Insert: {
           code: string
@@ -757,7 +760,7 @@ export type Database = {
           new_value?: string | null
           type: string
           used?: boolean
-          user_id: string
+          user_id?: string | null
         }
         Update: {
           code?: string
@@ -767,7 +770,7 @@ export type Database = {
           new_value?: string | null
           type?: string
           used?: boolean
-          user_id?: string
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -811,6 +814,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      has_used_trial: { Args: { _user_id: string }; Returns: boolean }
       is_marketplace_room: { Args: { _room_id: string }; Returns: boolean }
       is_marketplace_room_creator: {
         Args: { _room_id: string; _user_id: string }

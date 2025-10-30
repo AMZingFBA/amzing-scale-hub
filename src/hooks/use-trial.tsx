@@ -26,6 +26,19 @@ export const useTrial = () => {
 
     setIsStarting(true);
     try {
+      // Check if user has already used their trial
+      const { data: subscription } = await supabase
+        .from('subscriptions')
+        .select('trial_used')
+        .eq('user_id', user.id)
+        .single();
+
+      if (subscription?.trial_used) {
+        toast.error('Vous avez déjà utilisé votre période d\'essai gratuite');
+        setIsStarting(false);
+        return;
+      }
+
       // Si c'est l'app mobile, afficher un message pour utiliser Apple Pay
       if (isNativePlatform()) {
         toast.info('Veuillez utiliser l\'option de paiement Apple Pay dans l\'application mobile');

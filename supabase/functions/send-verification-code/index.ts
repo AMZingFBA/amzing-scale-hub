@@ -8,9 +8,9 @@ const corsHeaders = {
 };
 
 interface VerificationRequest {
-  type: 'email_change' | 'password_change' | 'phone_change' | 'password_reset';
+  type: 'email_change' | 'password_change' | 'phone_change' | 'password_reset' | 'email_signup';
   newValue?: string;
-  email?: string; // For password_reset when user is not authenticated
+  email?: string; // For password_reset/email_signup when user is not authenticated
 }
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
@@ -26,10 +26,10 @@ const handler = async (req: Request): Promise<Response> => {
     let user: { id: string; email: string };
     let userEmail: string;
 
-    // For password_reset, we don't need authentication
-    if (type === 'password_reset') {
+    // For password_reset and email_signup, we don't need authentication
+    if (type === 'password_reset' || type === 'email_signup') {
       if (!requestEmail || !requestEmail.includes('@')) {
-        throw new Error("Email is required for password reset");
+        throw new Error(`Email is required for ${type}`);
       }
       
       // Get user by email using admin client
@@ -47,23 +47,34 @@ const handler = async (req: Request): Promise<Response> => {
 
       const foundUser = users.users.find(u => u.email === requestEmail);
       
-      if (!foundUser || !foundUser.email) {
-        // Don't reveal if email exists or not for security
-        console.log("User not found but returning success for security");
-        return new Response(
-          JSON.stringify({ 
-            success: true, 
-            message: "Code envoyé avec succès par email !" 
-          }),
-          {
-            status: 200,
-            headers: { "Content-Type": "application/json", ...corsHeaders },
-          }
-        );
-      }
+      // For email_signup, we want to verify the email doesn't exist
+      if (type === 'email_signup') {
+        if (foundUser) {
+          throw new Error("Un compte existe déjà avec cet email");
+        }
+        // For signup, we don't have a user yet, so use a temporary ID
+        user = { id: 'pending', email: requestEmail };
+        userEmail = requestEmail;
+      } else {
+        // For password_reset
+        if (!foundUser || !foundUser.email) {
+          // Don't reveal if email exists or not for security
+          console.log("User not found but returning success for security");
+          return new Response(
+            JSON.stringify({ 
+              success: true, 
+              message: "Code envoyé avec succès par email !" 
+            }),
+            {
+              status: 200,
+              headers: { "Content-Type": "application/json", ...corsHeaders },
+            }
+          );
+        }
 
-      user = { id: foundUser.id, email: foundUser.email };
-      userEmail = foundUser.email;
+        user = { id: foundUser.id, email: foundUser.email };
+        userEmail = foundUser.email;
+      }
     } else {
       // For other types, require authentication
       const authHeader = req.headers.get("Authorization");
@@ -108,14 +119,20 @@ const handler = async (req: Request): Promise<Response> => {
     );
 
     // Save code to database
+    const insertData: any = {
+      code,
+      type,
+      new_value: type === 'email_signup' ? userEmail : (newValue || null),
+    };
+    
+    // Only add user_id if it's not a signup
+    if (type !== 'email_signup') {
+      insertData.user_id = user.id;
+    }
+    
     const { error: insertError } = await supabaseAdmin
       .from("verification_codes")
-      .insert({
-        user_id: user.id,
-        code,
-        type,
-        new_value: newValue || null,
-      });
+      .insert(insertData);
 
     if (insertError) {
       console.error("Error inserting verification code:", insertError);
@@ -129,6 +146,8 @@ const handler = async (req: Request): Promise<Response> => {
       ? 'Code de vérification - Changement de téléphone'
       : type === 'password_reset'
       ? 'Code de vérification - Réinitialisation du mot de passe'
+      : type === 'email_signup'
+      ? 'Code de vérification - Inscription'
       : 'Code de vérification - Changement de mot de passe';
 
     const emailHtml = `
@@ -156,6 +175,7 @@ const handler = async (req: Request): Promise<Response> => {
                 type === 'email_change' ? 'changer votre email' : 
                 type === 'phone_change' ? 'changer votre numéro de téléphone' :
                 type === 'password_reset' ? 'réinitialiser votre mot de passe' :
+                type === 'email_signup' ? 'créer votre compte' :
                 'changer votre mot de passe'
               } :</p>
               <div class="code">${code}</div>

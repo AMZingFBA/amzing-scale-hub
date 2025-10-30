@@ -13,8 +13,17 @@ import { Capacitor } from "@capacitor/core";
 
 export default function Auth() {
   const navigate = useNavigate();
-  const { user, signUp, signIn } = useAuth();
+  const { user, signIn } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
+  const [verificationStep, setVerificationStep] = useState<'form' | 'verify'>('form');
+  const [signupData, setSignupData] = useState({
+    email: '',
+    password: '',
+    fullName: '',
+    nickname: '',
+    phone: '',
+  });
+  const [verificationCode, setVerificationCode] = useState('');
   const isNativeApp = Capacitor.isNativePlatform();
   
   // Check URL params for default tab
@@ -50,7 +59,7 @@ export default function Auth() {
     setIsLoading(false);
   };
 
-  const handleSignUp = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSendVerificationCode = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
 
@@ -68,46 +77,99 @@ export default function Auth() {
       return;
     }
 
-    const { error } = await signUp(email, password, fullName, nickname, phone);
+    // Save signup data
+    setSignupData({ email, password, fullName, nickname, phone });
 
-    if (error) {
-      toast.error("Erreur d'inscription", {
-        description: error.message,
+    try {
+      const { supabase } = await import("@/integrations/supabase/client");
+      const { data, error } = await supabase.functions.invoke('send-verification-code', {
+        body: {
+          type: 'email_signup',
+          email: email.toLowerCase(),
+        },
       });
-      setIsLoading(false);
-      return;
-    }
 
-    toast.success("Inscription réussie! Redirection vers le paiement...");
-
-    // Sur le site web (pas l'app native), rediriger vers Stripe après inscription
-    if (!isNativeApp) {
-      try {
-        const { supabase } = await import("@/integrations/supabase/client");
-        const { data, error: checkoutError } = await supabase.functions.invoke('create-checkout', {
-          headers: {
-            Authorization: `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
-          },
-        });
-
-        if (checkoutError) {
-          console.error('Error creating checkout:', checkoutError);
-          toast.error('Erreur lors de la redirection vers le paiement');
-          setIsLoading(false);
-          return;
-        }
-
-        if (data?.url) {
-          // Ouvrir Stripe Checkout dans un nouvel onglet
-          window.open(data.url, '_blank');
-        }
-      } catch (error: any) {
-        console.error('Error starting checkout:', error);
-        toast.error('Erreur lors de la redirection vers le paiement');
+      if (error) {
+        throw error;
       }
-    }
 
-    setIsLoading(false);
+      toast.success("Code de vérification envoyé par email");
+      setVerificationStep('verify');
+    } catch (error: any) {
+      console.error('Error sending verification code:', error);
+      toast.error(error.message || "Erreur lors de l'envoi du code");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleVerifyAndSignUp = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    try {
+      const { supabase } = await import("@/integrations/supabase/client");
+      
+      // Verify code and create account
+      const { data, error } = await supabase.functions.invoke('verify-and-signup', {
+        body: {
+          code: verificationCode,
+          email: signupData.email.toLowerCase(),
+          password: signupData.password,
+          fullName: signupData.fullName,
+          nickname: signupData.nickname,
+          phone: signupData.phone,
+        },
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      toast.success("Compte créé avec succès! Connexion...");
+
+      // Sign in the user
+      const { error: signInError } = await signIn(signupData.email, signupData.password);
+
+      if (signInError) {
+        toast.error("Erreur lors de la connexion", {
+          description: signInError.message,
+        });
+        setIsLoading(false);
+        return;
+      }
+
+      // Sur le site web, rediriger vers Stripe après inscription
+      if (!isNativeApp) {
+        try {
+          const { data: checkoutData, error: checkoutError } = await supabase.functions.invoke('create-checkout', {
+            headers: {
+              Authorization: `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
+            },
+          });
+
+          if (checkoutError) {
+            console.error('Error creating checkout:', checkoutError);
+            toast.error('Erreur lors de la redirection vers le paiement');
+            setIsLoading(false);
+            return;
+          }
+
+          if (checkoutData?.url) {
+            window.open(checkoutData.url, '_blank');
+            toast.success("Redirection vers le paiement sécurisé...");
+          }
+        } catch (error: any) {
+          console.error('Error starting checkout:', error);
+          toast.error('Erreur lors de la redirection vers le paiement');
+        }
+      }
+    } catch (error: any) {
+      console.error('Error verifying and signing up:', error);
+      toast.error(error.message || "Code invalide ou expiré");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -234,7 +296,8 @@ export default function Auth() {
                   value="signup" 
                   className={`space-y-4 ${activeTab === 'signup' ? 'animate-in fade-in slide-in-from-right-4 duration-300' : ''}`}
                 >
-                  <form onSubmit={handleSignUp} className="space-y-4">
+                  {verificationStep === 'form' ? (
+                    <form onSubmit={handleSendVerificationCode} className="space-y-4">
                     <div className="space-y-2 animate-slide-in-up" style={{ animationDelay: "50ms" }}>
                       <Label htmlFor="signup-fullname">Nom complet</Label>
                       <div className="relative group">
@@ -340,14 +403,60 @@ export default function Auth() {
                         className="w-full"
                         disabled={isLoading}
                       >
-                        {isLoading ? "Création..." : "Créer mon compte"}
+                        {isLoading ? "Envoi du code..." : "Continuer"}
                       </Button>
                     </div>
                     
                     <p className="text-xs text-muted-foreground text-center">
-                      Un email de vérification sera envoyé à votre adresse
+                      Un code de vérification sera envoyé à votre email
                     </p>
                   </form>
+                  ) : (
+                    <form onSubmit={handleVerifyAndSignUp} className="space-y-4">
+                      <div className="text-center space-y-2 mb-6">
+                        <CheckCircle2 className="h-12 w-12 text-primary mx-auto" />
+                        <h3 className="font-semibold">Code envoyé !</h3>
+                        <p className="text-sm text-muted-foreground">
+                          Vérifiez votre email {signupData.email}
+                        </p>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="verification-code">Code de vérification (6 chiffres)</Label>
+                        <Input
+                          id="verification-code"
+                          type="text"
+                          placeholder="123456"
+                          required
+                          maxLength={6}
+                          pattern="[0-9]{6}"
+                          value={verificationCode}
+                          onChange={(e) => setVerificationCode(e.target.value)}
+                          disabled={isLoading}
+                          className="text-center text-2xl tracking-widest"
+                        />
+                      </div>
+
+                      <Button
+                        type="submit"
+                        variant="hero"
+                        className="w-full"
+                        disabled={isLoading || verificationCode.length !== 6}
+                      >
+                        {isLoading ? "Vérification..." : "Créer mon compte"}
+                      </Button>
+
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        className="w-full"
+                        onClick={() => setVerificationStep('form')}
+                        disabled={isLoading}
+                      >
+                        Modifier mes informations
+                      </Button>
+                    </form>
+                  )}
                 </TabsContent>
               </Tabs>
             </CardContent>
