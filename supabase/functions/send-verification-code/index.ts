@@ -26,18 +26,19 @@ const handler = async (req: Request): Promise<Response> => {
       throw new Error("No authorization header");
     }
 
-    // Extract JWT token from "Bearer <token>"
-    const token = authHeader.replace("Bearer ", "");
-
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
-      Deno.env.get("SUPABASE_ANON_KEY") ?? ""
+      Deno.env.get("SUPABASE_ANON_KEY") ?? "",
+      {
+        global: { headers: { Authorization: authHeader } },
+        auth: { persistSession: false }
+      }
     );
 
     const {
       data: { user },
       error: userError,
-    } = await supabase.auth.getUser(token);
+    } = await supabase.auth.getUser();
 
     if (userError || !user) {
       throw new Error("Unauthorized");
