@@ -54,8 +54,7 @@ const NOTIFICATION_CATEGORIES = [
     { key: 'création-société', label: 'Création Société' },
     { key: 'facture-autorisation', label: 'Facture/Autorisation' },
     { key: 'cashback', label: 'Cashback' },
-    { key: 'avis', label: 'Avis' },
-    { key: 'fiscalité-simplifiée', label: 'Fiscalité Simplifiée' }
+    { key: 'avis', label: 'Avis' }
   ]}
 ];
 
