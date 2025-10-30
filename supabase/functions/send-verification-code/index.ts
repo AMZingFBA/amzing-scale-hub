@@ -56,8 +56,14 @@ const handler = async (req: Request): Promise<Response> => {
     // Generate 6-digit code
     const code = Math.floor(100000 + Math.random() * 900000).toString();
 
+    // Create admin client with service role to bypass RLS
+    const supabaseAdmin = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
+    );
+
     // Save code to database
-    const { error: insertError } = await supabase
+    const { error: insertError } = await supabaseAdmin
       .from("verification_codes")
       .insert({
         user_id: user.id,

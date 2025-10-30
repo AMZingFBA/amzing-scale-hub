@@ -23,25 +23,18 @@ const handler = async (req: Request): Promise<Response> => {
       throw new Error("No authorization header");
     }
 
+    // Extract JWT token from "Bearer <token>"
+    const token = authHeader.replace("Bearer ", "");
+
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
-      Deno.env.get("SUPABASE_ANON_KEY") ?? "",
-      {
-        auth: {
-          persistSession: false,
-        },
-        global: {
-          headers: {
-            Authorization: authHeader,
-          },
-        },
-      }
+      Deno.env.get("SUPABASE_ANON_KEY") ?? ""
     );
 
     const {
       data: { user },
       error: userError,
-    } = await supabase.auth.getUser();
+    } = await supabase.auth.getUser(token);
 
     if (userError || !user) {
       throw new Error("Unauthorized");
@@ -49,8 +42,14 @@ const handler = async (req: Request): Promise<Response> => {
 
     const { code, type, newPassword }: VerifyRequest = await req.json();
 
+    // Use service role key for all database operations
+    const supabaseAdmin = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
+    );
+
     // Verify code
-    const { data: verificationData, error: verifyError } = await supabase
+    const { data: verificationData, error: verifyError } = await supabaseAdmin
       .from("verification_codes")
       .select("*")
       .eq("user_id", user.id)
@@ -70,18 +69,6 @@ const handler = async (req: Request): Promise<Response> => {
     if (!verificationData) {
       throw new Error("Code invalide ou expiré");
     }
-
-    // Use service role key for admin operations
-    const supabaseAdmin = createClient(
-      Deno.env.get("SUPABASE_URL") ?? "",
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
-      {
-        auth: {
-          autoRefreshToken: false,
-          persistSession: false,
-        },
-      }
-    );
 
     // Update based on type
     if (type === 'password_change') {
@@ -114,14 +101,14 @@ const handler = async (req: Request): Promise<Response> => {
       }
 
       // Update profile email
-      await supabase
+      await supabaseAdmin
         .from("profiles")
         .update({ email: verificationData.new_value })
         .eq("id", user.id);
     }
 
     // Mark code as used
-    await supabase
+    await supabaseAdmin
       .from("verification_codes")
       .update({ used: true })
       .eq("id", verificationData.id);
