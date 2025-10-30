@@ -75,7 +75,6 @@ serve(async (req) => {
           message: "Bienvenue dans la communauté AMZing FBA ! Vous allez recevoir un email de confirmation.",
         },
       },
-      // Logo et branding personnalisé
       custom_fields: [
         {
           key: "trial_info",
