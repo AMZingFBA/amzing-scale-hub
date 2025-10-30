@@ -4,6 +4,8 @@ import { Card } from '@/components/ui/card';
 import { Bell, ExternalLink } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/use-auth';
+import { format } from 'date-fns';
+import { fr } from 'date-fns/locale';
 
 interface RecentUpdate {
   id: string;
@@ -164,6 +166,14 @@ export const RecentUpdates = () => {
               </p>
               <p className="text-xs text-muted-foreground">
                 {update.subcategory || update.category}
+              </p>
+            </div>
+            <div className="flex-shrink-0 text-right">
+              <p className="text-xs text-muted-foreground whitespace-nowrap">
+                {format(new Date(update.created_at), 'dd/MM/yyyy', { locale: fr })}
+              </p>
+              <p className="text-xs text-muted-foreground whitespace-nowrap">
+                {format(new Date(update.created_at), 'HH:mm')}
               </p>
             </div>
           </Link>
