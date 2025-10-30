@@ -13,27 +13,73 @@ interface NotificationPreference {
 }
 
 const NOTIFICATION_CATEGORIES = [
-  { category: 'introduction', label: 'Introduction', subcategories: [] },
-  { category: 'outils', label: 'Outils', subcategories: [] },
-  { category: 'produits', label: 'Produits', subcategories: [] },
-  { category: 'expedition', label: 'Expédition', subcategories: [] },
-  { category: 'informations', label: 'Informations', subcategories: [] },
-  { category: 'communaute', label: 'Communauté', subcategories: [] },
-  { category: 'marketplace', label: 'Marketplace', subcategories: [
-    { key: 'sell', label: 'Vendre' },
-    { key: 'buy', label: 'Acheter' }
+  // Introduction
+  { category: 'introduction', label: '📚 Introduction', subcategories: [
+    { key: 'règles', label: 'Règles' },
+    { key: 'support', label: 'Support' }
   ]},
-  { category: 'gestion_produit', label: 'Gestion de Produits', subcategories: [] },
-  { category: 'sell', label: 'Vendre sur Amazon', subcategories: [
+  
+  // Informations
+  { category: 'informations', label: '📰 Informations', subcategories: [
+    { key: 'actualité', label: 'Actualité' },
+    { key: 'annonces', label: 'Annonces' },
+    { key: 'notifications', label: 'Notifications' }
+  ]},
+  
+  // Produits
+  { category: 'produits', label: '📦 Produits', subcategories: [
+    { key: 'produits-find', label: 'Product Find' },
+    { key: 'produits-qogita', label: 'Qogita' },
+    { key: 'produits-eany', label: 'Eany' },
+    { key: 'promotions', label: 'Promotions' },
+    { key: 'sitelist', label: 'Sitelist' }
+  ]},
+  
+  // Gestion de Produits
+  { category: 'gestion_produit', label: '🗂️ Gestion de Produits', subcategories: [
+    { key: 'catalogue_pro', label: 'Catalogue Pro' }
+  ]},
+  
+  // Vendre sur Amazon
+  { category: 'sell', label: '💰 Vendre sur Amazon', subcategories: [
     { key: 'rules', label: 'Règles et Conformité' },
     { key: 'products', label: 'Identifier et Sourcer des Produits' },
     { key: 'fba', label: 'Expédier et Gérer' }
   ]},
-  { category: 'buy', label: 'Acheter sur Amazon', subcategories: [
+  
+  // Acheter sur Amazon
+  { category: 'buy', label: '🛍️ Acheter sur Amazon', subcategories: [
     { key: 'seller-account', label: 'Créer un Compte Vendeur' },
     { key: 'profitable-products', label: 'Trouver des Produits Rentables' },
     { key: 'recognize-products', label: 'Reconnaître les Bons Produits' }
-  ]}
+  ]},
+  
+  // Marketplace
+  { category: 'marketplace', label: '🏪 Marketplace', subcategories: [
+    { key: 'sell', label: 'Vendre' },
+    { key: 'buy', label: 'Acheter' }
+  ]},
+  
+  // Communauté (Chat Rooms)
+  { category: 'communaute', label: '💬 Communauté', subcategories: [
+    { key: 'general', label: 'Général' },
+    { key: 'products', label: 'Produits' },
+    { key: 'sales', label: 'Ventes' },
+    { key: 'success', label: 'Success Stories' },
+    { key: 'questions', label: 'Questions' }
+  ]},
+  
+  // Outils
+  { category: 'outils', label: '🔧 Outils', subcategories: [] },
+  
+  // Expédition
+  { category: 'expedition', label: '📮 Expédition', subcategories: [] },
+  
+  // Suggestions
+  { category: 'suggestion', label: '💡 Suggestions', subcategories: [] },
+  
+  // Support général
+  { category: 'general', label: '🎯 Support Général', subcategories: [] }
 ];
 
 export const NotificationSettings = () => {
