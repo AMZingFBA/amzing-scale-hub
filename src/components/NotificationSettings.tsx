@@ -13,74 +13,41 @@ interface NotificationPreference {
 }
 
 const NOTIFICATION_CATEGORIES = [
-  // Introduction
-  { category: 'introduction', label: '📚 Introduction', subcategories: [
-    { key: 'notifications', label: 'Notifications' },
-    { key: 'règles', label: 'Règles' },
-    { key: 'débuter', label: 'Débuter' },
-    { key: 'guides', label: 'Guides' },
-    { key: 'affiliation', label: 'Affiliation' },
-    { key: 'support', label: 'Support' }
-  ]},
-  
-  // Outils
-  { category: 'outils', label: '🔧 Outils', subcategories: [
-    { key: 'création-société', label: 'Création Société' },
-    { key: 'facture-autorisation', label: 'Facture/Autorisation' },
-    { key: 'cashback', label: 'Cashback' },
-    { key: 'avis', label: 'Avis' },
-    { key: 'fiscalité-simplifiée', label: 'Fiscalité Simplifiée' }
-  ]},
-  
-  // Expédition
-  { category: 'expedition', label: '📮 Expédition', subcategories: [
-    { key: 'fournitures', label: 'Fournitures' },
-    { key: 'cartons', label: 'Cartons' }
-  ]},
-  
-  // Informations
-  { category: 'informations', label: '📰 Informations', subcategories: [
-    { key: 'annonces', label: 'Annonces' },
-    { key: 'actualités', label: 'Actualités' }
-  ]},
-  
-  // Produits
-  { category: 'produits', label: '📦 Produits', subcategories: [
+  // 1️⃣ PRODUITS GAGNANTS
+  { category: 'produits', label: '1️⃣ PRODUITS GAGNANTS', subcategories: [
     { key: 'produits-find', label: 'Product Find' },
-    { key: 'produits-qogita', label: 'Qogita' },
-    { key: 'produits-eany', label: 'Eany' },
+    { key: 'produits-qogita', label: 'Produits Qogita' },
+    { key: 'produits-eany', label: 'Produits Eany' },
     { key: 'grossistes', label: 'Grossistes' },
     { key: 'promotions', label: 'Promotions' },
     { key: 'sitelist', label: 'Sitelist' }
   ]},
   
-  // Gestion de Produits
-  { category: 'gestion_produit', label: '🗂️ Gestion de Produits', subcategories: [
-    { key: 'catalogue_pro', label: 'Catalogue Pro' },
-    { key: 'information', label: 'Information' },
-    { key: 'question', label: 'Question' }
+  // 2️⃣ EXPÉDITION
+  { category: 'expedition', label: '2️⃣ EXPÉDITION', subcategories: [
+    { key: 'fournitures', label: 'Fournitures' },
+    { key: 'cartons', label: 'Cartons' }
   ]},
   
-  // Marketplace
-  { category: 'marketplace', label: '🏪 Marketplace', subcategories: [
-    { key: 'sell', label: 'Vendre' },
-    { key: 'buy', label: 'Acheter' }
+  // 3️⃣ INFORMATIONS
+  { category: 'informations', label: '3️⃣ INFORMATIONS', subcategories: [
+    { key: 'annonces', label: 'Annonces' },
+    { key: 'actualités', label: 'Actualités' }
   ]},
   
-  // Communauté (Chat Rooms)
-  { category: 'communaute', label: '💬 Communauté', subcategories: [
+  // 4️⃣ COMMUNAUTÉ
+  { category: 'communaute', label: '4️⃣ COMMUNAUTÉ', subcategories: [
     { key: 'general', label: 'Général' },
-    { key: 'products', label: 'Produits' },
-    { key: 'sales', label: 'Ventes' },
-    { key: 'success', label: 'Success Stories' },
-    { key: 'questions', label: 'Questions' }
+    { key: 'suggestions', label: 'Suggestions' },
+    { key: 'succès', label: 'Succès' },
+    { key: 'ventes', label: 'Ventes' }
   ]},
   
-  // Suggestions
-  { category: 'suggestion', label: '💡 Suggestions', subcategories: [] },
-  
-  // Support général
-  { category: 'general', label: '🎯 Support Général', subcategories: [] }
+  // 5️⃣ MARKETPLACE
+  { category: 'marketplace', label: '5️⃣ MARKETPLACE', subcategories: [
+    { key: 'want-to-buy', label: 'Want to Buy' },
+    { key: 'want-to-sell', label: 'Want to Sell' }
+  ]}
 ];
 
 export const NotificationSettings = () => {
