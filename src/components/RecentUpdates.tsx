@@ -34,12 +34,12 @@ const getCategoryRoute = (category: string, subcategory: string | null) => {
   
   if (category === 'produits') {
     const productRoutes: Record<string, string> = {
-      'produits-find': '/product-alerts/produits-find',
-      'produits-qogita': '/product-alerts/produits-qogita',
-      'produits-eany': '/product-alerts/produits-eany',
-      'grossistes': '/product-alerts/grossistes',
-      'promotions': '/product-alerts/promotions',
-      'sitelist': '/product-alerts/sitelist',
+      'produits-find': '/produits-find',
+      'produits-qogita': '/produits-qogita',
+      'produits-eany': '/produits-eany',
+      'grossistes': '/grossistes',
+      'promotions': '/promotions',
+      'sitelist': '/sitelist',
     };
     return productRoutes[subcategory || ''] || '/dashboard';
   }
