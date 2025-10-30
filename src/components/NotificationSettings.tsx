@@ -37,7 +37,9 @@ const NOTIFICATION_CATEGORIES = [
   
   // Gestion de Produits
   { category: 'gestion_produit', label: '🗂️ Gestion de Produits', subcategories: [
-    { key: 'catalogue_pro', label: 'Catalogue Pro' }
+    { key: 'catalogue_pro', label: 'Catalogue Pro' },
+    { key: 'information', label: 'Information' },
+    { key: 'question', label: 'Question' }
   ]},
   
   // Vendre sur Amazon
