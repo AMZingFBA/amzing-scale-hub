@@ -40,6 +40,7 @@ import CatalogueProduits from "./pages/CatalogueProduits";
 import Questions from "./pages/Questions";
 import Avis from "./pages/Avis";
 import AdminProfiles from "./pages/AdminProfiles";
+import Profile from "./pages/Profile";
 
 const queryClient = new QueryClient();
 
@@ -92,6 +93,7 @@ const App = () => (
             <Route path="/marketplace" element={<Marketplace />} />
             <Route path="/avis" element={<Avis />} />
             <Route path="/admin/profiles" element={<AdminProfiles />} />
+            <Route path="/profile" element={<Profile />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
