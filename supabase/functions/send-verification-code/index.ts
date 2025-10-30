@@ -81,7 +81,7 @@ const handler = async (req: Request): Promise<Response> => {
     if (type === 'password_change') {
       // Send code to email
       const { error: emailError } = await resend.emails.send({
-        from: "AMZing FBA <onboarding@resend.dev>",
+        from: "AMZing FBA <contact@amzingfba.com>",
         to: [user.email!],
         subject: "Code de vérification - Changement de mot de passe",
         html: `
@@ -121,7 +121,7 @@ const handler = async (req: Request): Promise<Response> => {
       
       // Send to email as backup/demo
       const { error: emailError } = await resend.emails.send({
-        from: "AMZing FBA <onboarding@resend.dev>",
+        from: "AMZing FBA <contact@amzingfba.com>",
         to: [user.email!],
         subject: "Code de vérification - Changement d'email",
         html: `
