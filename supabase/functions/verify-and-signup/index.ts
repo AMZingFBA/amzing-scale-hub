@@ -116,10 +116,16 @@ const handler = async (req: Request): Promise<Response> => {
     );
   } catch (error: any) {
     console.error("Error in verify-and-signup:", error);
+    
+    // Determine if this is a user error (400) or server error (500)
+    const isUserError = error.message?.includes("Code invalide") ||
+                        error.message?.includes("existe déjà") ||
+                        error.message?.includes("déjà utilisé");
+    
     return new Response(
       JSON.stringify({ error: error.message }),
       {
-        status: 500,
+        status: isUserError ? 400 : 500,
         headers: { "Content-Type": "application/json", ...corsHeaders },
       }
     );

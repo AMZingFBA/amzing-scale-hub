@@ -126,6 +126,11 @@ export default function Auth() {
         throw error;
       }
 
+      // Check for error in the response data
+      if (data?.error) {
+        throw new Error(data.error);
+      }
+
       toast.success("Compte créé avec succès! Connexion...");
 
       // Sign in the user
