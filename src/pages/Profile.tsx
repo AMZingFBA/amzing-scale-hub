@@ -280,7 +280,13 @@ const Profile = () => {
         }
       });
 
-      if (error) throw error;
+      if (error) {
+        throw new Error(error.message || "Une erreur est survenue");
+      }
+
+      if (data?.error) {
+        throw new Error(data.error);
+      }
 
       toast({
         title: "Email modifié",
@@ -300,9 +306,15 @@ const Profile = () => {
       navigate('/auth');
     } catch (error: any) {
       console.error('Error verifying code:', error);
+      
+      let errorMessage = "Code invalide ou expiré";
+      if (error.message) {
+        errorMessage = error.message;
+      }
+      
       toast({
-        title: "Erreur",
-        description: error.message || "Code invalide ou expiré",
+        title: "Code incorrect",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
@@ -335,7 +347,13 @@ const Profile = () => {
         }
       });
 
-      if (error) throw error;
+      if (error) {
+        throw new Error(error.message || "Une erreur est survenue");
+      }
+
+      if (data?.error) {
+        throw new Error(data.error);
+      }
 
       toast({
         title: "Mot de passe modifié",
@@ -348,9 +366,15 @@ const Profile = () => {
       setCodeSent(false);
     } catch (error: any) {
       console.error('Error verifying code:', error);
+      
+      let errorMessage = "Code invalide ou expiré";
+      if (error.message) {
+        errorMessage = error.message;
+      }
+      
       toast({
-        title: "Erreur",
-        description: error.message || "Code invalide ou expiré",
+        title: "Code incorrect",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
