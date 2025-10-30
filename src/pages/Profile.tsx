@@ -197,7 +197,10 @@ const Profile = () => {
   };
 
   const handleSendPasswordCode = async () => {
+    console.log('handleSendPasswordCode called, newPassword length:', newPassword?.length);
+    
     if (!newPassword || newPassword.length < 6) {
+      console.log('Password validation failed');
       toast({
         title: "Erreur",
         description: "Le mot de passe doit contenir au moins 6 caractères",
@@ -206,11 +209,14 @@ const Profile = () => {
       return;
     }
 
+    console.log('About to call send-verification-code edge function');
     setIsSendingCode(true);
     try {
       const { data, error } = await supabase.functions.invoke('send-verification-code', {
         body: { type: 'password_change' },
       });
+
+      console.log('Edge function response:', { data, error });
 
       if (error) throw error;
 
