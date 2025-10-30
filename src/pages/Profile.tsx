@@ -13,6 +13,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { ArrowLeft, User, Mail, Phone, Edit2, Save, Loader2, Lock, Shield } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { NotificationSettings } from '@/components/NotificationSettings';
 
 interface ProfileData {
   full_name: string | null;
@@ -930,6 +931,8 @@ const Profile = () => {
               </div>
             </DialogContent>
           </Dialog>
+
+          <NotificationSettings />
         </div>
       </main>
       {!isNativeApp && <Footer />}

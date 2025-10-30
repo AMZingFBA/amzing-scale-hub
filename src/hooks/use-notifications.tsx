@@ -26,6 +26,18 @@ export const useNotifications = () => {
     console.log('🔍 Fetching notifications for user:', user.id);
 
     try {
+      // Load user notification preferences
+      const { data: preferencesData } = await supabase
+        .from('notification_preferences')
+        .select('*')
+        .eq('user_id', user.id);
+
+      const prefsMap = new Map(
+        preferencesData?.map(pref => [
+          `${pref.category}${pref.subcategory ? `-${pref.subcategory}` : ''}`,
+          pref.enabled
+        ]) || []
+      );
       // Fetch all tickets with unread messages
       const { data: tickets } = await supabase
         .from('tickets')
@@ -77,6 +89,15 @@ export const useNotifications = () => {
 
         if (unreadAlerts && unreadAlerts.length > 0) {
           for (const alert of unreadAlerts) {
+            // Check user preferences for this alert
+            const prefKey = `${category}${alert.subcategory ? `-${alert.subcategory}` : ''}`;
+            const isEnabled = prefsMap.get(prefKey) !== false; // Default to enabled if no preference
+            
+            if (!isEnabled) {
+              console.log(`Alert ${alert.id} (${category}/${alert.subcategory}) is DISABLED by user preferences`);
+              continue; // Skip this alert
+            }
+
             // Check if this specific alert is unread for this user
             const { data: isRead } = await supabase
               .from('alert_read_status')
