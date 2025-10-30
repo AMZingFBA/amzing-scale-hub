@@ -67,9 +67,6 @@ serve(async (req) => {
       },
       success_url: `${origin}/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/#tarifs`,
-      custom_images: {
-        icon: `${origin}/amzing-logo-checkout.png`,
-      },
       custom_text: {
         submit: {
           message: "Commencez votre essai gratuit de 7 jours - Aucun paiement aujourd'hui !",
