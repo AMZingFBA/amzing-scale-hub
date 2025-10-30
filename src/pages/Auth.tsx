@@ -113,57 +113,42 @@ export default function Auth() {
     try {
       const { supabase } = await import("@/integrations/supabase/client");
       
-      console.log('Attempting to verify code:', verificationCode);
+      // Get the session for authorization
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData.session?.access_token;
       
-      // Verify code and create account
-      const response = await supabase.functions.invoke('verify-and-signup', {
-        body: {
-          code: verificationCode,
-          email: signupData.email.toLowerCase(),
-          password: signupData.password,
-          fullName: signupData.fullName,
-          nickname: signupData.nickname,
-          phone: signupData.phone,
-        },
-      });
-
-      console.log('Response from verify-and-signup:', response);
-
-      // When there's a 400 error, the error message is in response.data.error
-      if (response.data?.error) {
-        console.log('Error from response.data:', response.data.error);
-        setError(response.data.error);
-        setIsLoading(false);
-        return;
-      }
-
-      // Also check response.error (HTTP errors)
-      if (response.error) {
-        console.log('HTTP error:', response.error);
-        // Try to extract the actual error message from the error object
-        let errorMessage = "Une erreur est survenue";
-        
-        try {
-          // The error might contain the response data
-          if (response.error.message) {
-            errorMessage = response.error.message;
-          }
-        } catch (e) {
-          console.error('Could not extract error message:', e);
+      // Make direct fetch call to get proper error messages
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/verify-and-signup`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token || import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+            'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY,
+          },
+          body: JSON.stringify({
+            code: verificationCode,
+            email: signupData.email.toLowerCase(),
+            password: signupData.password,
+            fullName: signupData.fullName,
+            nickname: signupData.nickname,
+            phone: signupData.phone,
+          }),
         }
-        
+      );
+
+      const data = await response.json();
+
+      // Check if there's an error
+      if (!response.ok || data.error) {
+        const errorMessage = data.error || 'Une erreur est survenue';
         setError(errorMessage);
         setIsLoading(false);
         return;
       }
 
-      // If we get here, signup was successful
-      if (!response.data?.success) {
-        setError("Une erreur inattendue est survenue");
-        setIsLoading(false);
-        return;
-      }
-
+      // Success
       toast.success("Compte créé avec succès! Connexion...");
 
       // Sign in the user
