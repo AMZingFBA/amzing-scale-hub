@@ -173,8 +173,17 @@ const Profile = () => {
 
     setIsSendingCode(true);
     try {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        throw new Error("Session expirée. Veuillez vous reconnecter.");
+      }
+
       const { data, error } = await supabase.functions.invoke('send-verification-code', {
         body: { type: 'email_change', newValue: newEmail },
+        headers: {
+          Authorization: `Bearer ${session.access_token}`
+        }
       });
 
       if (error) throw error;
@@ -212,8 +221,17 @@ const Profile = () => {
     console.log('About to call send-verification-code edge function');
     setIsSendingCode(true);
     try {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        throw new Error("Session expirée. Veuillez vous reconnecter.");
+      }
+
       const { data, error } = await supabase.functions.invoke('send-verification-code', {
         body: { type: 'password_change' },
+        headers: {
+          Authorization: `Bearer ${session.access_token}`
+        }
       });
 
       console.log('Edge function response:', { data, error });
@@ -249,8 +267,17 @@ const Profile = () => {
 
     setIsVerifying(true);
     try {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        throw new Error("Session expirée. Veuillez vous reconnecter.");
+      }
+
       const { data, error } = await supabase.functions.invoke('verify-and-update', {
         body: { code: verificationCode, type: 'email_change' },
+        headers: {
+          Authorization: `Bearer ${session.access_token}`
+        }
       });
 
       if (error) throw error;
@@ -295,8 +322,17 @@ const Profile = () => {
 
     setIsVerifying(true);
     try {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        throw new Error("Session expirée. Veuillez vous reconnecter.");
+      }
+
       const { data, error } = await supabase.functions.invoke('verify-and-update', {
         body: { code: verificationCode, type: 'password_change', newPassword },
+        headers: {
+          Authorization: `Bearer ${session.access_token}`
+        }
       });
 
       if (error) throw error;
