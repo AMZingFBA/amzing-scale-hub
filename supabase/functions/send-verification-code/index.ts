@@ -8,8 +8,9 @@ const corsHeaders = {
 };
 
 interface VerificationRequest {
-  type: 'email_change' | 'password_change' | 'phone_change';
+  type: 'email_change' | 'password_change' | 'phone_change' | 'password_reset';
   newValue?: string;
+  email?: string; // For password_reset when user is not authenticated
 }
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
@@ -20,41 +21,83 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const authHeader = req.headers.get("Authorization");
-    
-    if (!authHeader) {
-      throw new Error("No authorization header");
+    const { type, newValue, email: requestEmail }: VerificationRequest = await req.json();
+
+    let user: { id: string; email: string };
+    let userEmail: string;
+
+    // For password_reset, we don't need authentication
+    if (type === 'password_reset') {
+      if (!requestEmail || !requestEmail.includes('@')) {
+        throw new Error("Email is required for password reset");
+      }
+      
+      // Get user by email using admin client
+      const supabaseAdmin = createClient(
+        Deno.env.get("SUPABASE_URL") ?? "",
+        Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
+      );
+
+      const { data: users, error: userError } = await supabaseAdmin.auth.admin.listUsers();
+      
+      if (userError) {
+        console.error("Error listing users:", userError);
+        throw new Error("Unable to find user");
+      }
+
+      const foundUser = users.users.find(u => u.email === requestEmail);
+      
+      if (!foundUser || !foundUser.email) {
+        // Don't reveal if email exists or not for security
+        console.log("User not found but returning success for security");
+        return new Response(
+          JSON.stringify({ 
+            success: true, 
+            message: "Code envoyé avec succès par email !" 
+          }),
+          {
+            status: 200,
+            headers: { "Content-Type": "application/json", ...corsHeaders },
+          }
+        );
+      }
+
+      user = { id: foundUser.id, email: foundUser.email };
+      userEmail = foundUser.email;
+    } else {
+      // For other types, require authentication
+      const authHeader = req.headers.get("Authorization");
+      
+      if (!authHeader) {
+        throw new Error("No authorization header");
+      }
+
+      const token = authHeader.replace("Bearer ", "");
+
+      const supabase = createClient(
+        Deno.env.get("SUPABASE_URL") ?? "",
+        Deno.env.get("SUPABASE_ANON_KEY") ?? ""
+      );
+
+      const {
+        data: { user: authUser },
+        error: userError,
+      } = await supabase.auth.getUser(token);
+
+      if (userError || !authUser || !authUser.email) {
+        throw new Error("Unauthorized");
+      }
+
+      user = { id: authUser.id, email: authUser.email };
+      userEmail = authUser.email;
     }
-
-    // Extract JWT token from "Bearer <token>"
-    const token = authHeader.replace("Bearer ", "");
-
-    const supabase = createClient(
-      Deno.env.get("SUPABASE_URL") ?? "",
-      Deno.env.get("SUPABASE_ANON_KEY") ?? ""
-    );
-
-    const {
-      data: { user },
-      error: userError,
-    } = await supabase.auth.getUser(token);
-
-    if (userError || !user) {
-      throw new Error("Unauthorized");
-    }
-
-    if (!user.email) {
-      throw new Error("User email is required");
-    }
-
-    const { type, newValue }: VerificationRequest = await req.json();
 
     // Generate 6-digit code
     const code = Math.floor(100000 + Math.random() * 900000).toString();
 
     console.log("======================");
     console.log("CODE DE VÉRIFICATION:", code);
-    console.log("Pour l'utilisateur:", user.email);
+    console.log("Pour l'utilisateur:", userEmail);
     console.log("Type:", type);
     console.log("======================");
 
@@ -84,6 +127,8 @@ const handler = async (req: Request): Promise<Response> => {
       ? 'Code de vérification - Changement d\'email' 
       : type === 'phone_change'
       ? 'Code de vérification - Changement de téléphone'
+      : type === 'password_reset'
+      ? 'Code de vérification - Réinitialisation du mot de passe'
       : 'Code de vérification - Changement de mot de passe';
 
     const emailHtml = `
@@ -110,6 +155,7 @@ const handler = async (req: Request): Promise<Response> => {
               <p>Voici votre code de vérification pour ${
                 type === 'email_change' ? 'changer votre email' : 
                 type === 'phone_change' ? 'changer votre numéro de téléphone' :
+                type === 'password_reset' ? 'réinitialiser votre mot de passe' :
                 'changer votre mot de passe'
               } :</p>
               <div class="code">${code}</div>
@@ -127,7 +173,7 @@ const handler = async (req: Request): Promise<Response> => {
     try {
       const { data: emailData, error: emailError } = await resend.emails.send({
         from: 'Amzing FBA <noreply@amzingfba.com>',
-        to: [user.email],
+        to: [userEmail],
         subject: emailSubject,
         html: emailHtml,
       });

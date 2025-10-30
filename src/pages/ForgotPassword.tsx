@@ -3,34 +3,84 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import logo from '@/assets/logo.png';
 
 const ForgotPassword = () => {
+  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
-  const [emailSent, setEmailSent] = useState(false);
+  const [codeSent, setCodeSent] = useState(false);
+  const [email, setEmail] = useState('');
+  const [verificationCode, setVerificationCode] = useState('');
+  const [newPassword, setNewPassword] = useState('');
 
-  const handleResetPassword = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSendCode = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    
+    if (!email || !email.includes('@')) {
+      toast.error('Veuillez entrer une adresse email valide');
+      return;
+    }
+
     setIsLoading(true);
-
-    const formData = new FormData(e.currentTarget);
-    const email = formData.get('email') as string;
-
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/reset-password`,
+      const { data, error } = await supabase.functions.invoke('send-verification-code', {
+        body: { type: 'password_reset', email: email }
       });
 
       if (error) throw error;
 
-      setEmailSent(true);
-      toast.success('Email de réinitialisation envoyé !');
+      setCodeSent(true);
+      toast.success('Code envoyé');
     } catch (error: any) {
-      toast.error(error.message || 'Erreur lors de l\'envoi de l\'email');
+      console.error('Error sending code:', error);
+      toast.error(error.message || 'Impossible d\'envoyer le code');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleVerifyAndReset = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (!verificationCode || verificationCode.length !== 6) {
+      toast.error('Veuillez entrer un code à 6 chiffres');
+      return;
+    }
+
+    if (!newPassword || newPassword.length < 6) {
+      toast.error('Le mot de passe doit contenir au moins 6 caractères');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const response = await supabase.functions.invoke('verify-and-update', {
+        body: { 
+          code: verificationCode, 
+          type: 'password_reset',
+          newPassword: newPassword,
+          email: email
+        }
+      });
+
+      if (response.error) {
+        const errorMessage = response.data?.error || 'Code invalide ou expiré';
+        throw new Error(errorMessage);
+      }
+
+      if (response.data?.error) {
+        throw new Error(response.data.error);
+      }
+
+      toast.success('Mot de passe réinitialisé avec succès !');
+      setTimeout(() => navigate('/auth'), 2000);
+    } catch (error: any) {
+      console.error('Error verifying code:', error);
+      toast.error(error.message || 'Code invalide ou expiré');
     } finally {
       setIsLoading(false);
     }
@@ -47,21 +97,22 @@ const ForgotPassword = () => {
           <CardHeader className="space-y-1">
             <CardTitle className="text-2xl text-center">Mot de passe oublié</CardTitle>
             <CardDescription className="text-center">
-              {emailSent
-                ? 'Consultez votre email pour réinitialiser votre mot de passe'
-                : 'Entrez votre email pour recevoir un lien de réinitialisation'}
+              {codeSent
+                ? 'Entrez le code reçu par email et votre nouveau mot de passe'
+                : 'Entrez votre email pour recevoir un code de vérification'}
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {!emailSent ? (
-              <form onSubmit={handleResetPassword} className="space-y-4">
+            {!codeSent ? (
+              <form onSubmit={handleSendCode} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="email">Email</Label>
                   <Input
                     id="email"
-                    name="email"
                     type="email"
                     placeholder="votre@email.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     required
                     disabled={isLoading}
                   />
@@ -72,22 +123,61 @@ const ForgotPassword = () => {
                   className="w-full"
                   disabled={isLoading}
                 >
-                  {isLoading ? 'Envoi...' : 'Envoyer le lien'}
+                  {isLoading ? 'Envoi...' : 'Envoyer le code'}
                 </Button>
               </form>
             ) : (
-              <div className="space-y-4">
-                <p className="text-sm text-muted-foreground text-center">
-                  Un email contenant les instructions de réinitialisation a été envoyé à votre adresse email.
-                </p>
-                <Button
-                  variant="outline"
-                  className="w-full"
-                  onClick={() => setEmailSent(false)}
-                >
-                  Renvoyer l'email
-                </Button>
-              </div>
+              <form onSubmit={handleVerifyAndReset} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="code">Code de vérification</Label>
+                  <Input
+                    id="code"
+                    type="text"
+                    placeholder="123456"
+                    maxLength={6}
+                    value={verificationCode}
+                    onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, ''))}
+                    required
+                    disabled={isLoading}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="newPassword">Nouveau mot de passe</Label>
+                  <Input
+                    id="newPassword"
+                    type="password"
+                    placeholder="Minimum 6 caractères"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    required
+                    disabled={isLoading}
+                    minLength={6}
+                  />
+                </div>
+                <div className="flex gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="flex-1"
+                    onClick={() => {
+                      setCodeSent(false);
+                      setVerificationCode('');
+                      setNewPassword('');
+                    }}
+                    disabled={isLoading}
+                  >
+                    Retour
+                  </Button>
+                  <Button
+                    type="submit"
+                    variant="hero"
+                    className="flex-1"
+                    disabled={isLoading}
+                  >
+                    {isLoading ? 'Vérification...' : 'Réinitialiser'}
+                  </Button>
+                </div>
+              </form>
             )}
 
             <div className="mt-6 text-center">

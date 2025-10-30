@@ -8,8 +8,9 @@ const corsHeaders = {
 
 interface VerifyRequest {
   code: string;
-  type: 'email_change' | 'password_change' | 'phone_change';
+  type: 'email_change' | 'password_change' | 'phone_change' | 'password_reset';
   newPassword?: string;
+  email?: string; // For password_reset when user is not authenticated
 }
 
 const handler = async (req: Request): Promise<Response> => {
@@ -18,32 +19,9 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const authHeader = req.headers.get("Authorization");
-    if (!authHeader) {
-      throw new Error("No authorization header");
-    }
-
-    // Extract JWT token from "Bearer <token>"
-    const token = authHeader.replace("Bearer ", "");
-
-    const supabase = createClient(
-      Deno.env.get("SUPABASE_URL") ?? "",
-      Deno.env.get("SUPABASE_ANON_KEY") ?? ""
-    );
-
-    const {
-      data: { user },
-      error: userError,
-    } = await supabase.auth.getUser(token);
-
-    if (userError || !user) {
-      throw new Error("Unauthorized");
-    }
-
-    const { code, type, newPassword }: VerifyRequest = await req.json();
+    const { code, type, newPassword, email }: VerifyRequest = await req.json();
 
     console.log("=== VERIFICATION REQUEST ===");
-    console.log("User ID:", user.id);
     console.log("Code reçu:", code);
     console.log("Type:", type);
 
@@ -53,11 +31,60 @@ const handler = async (req: Request): Promise<Response> => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
     );
 
+    let userId: string;
+
+    // For password_reset, get user by email instead of from auth token
+    if (type === 'password_reset') {
+      if (!email) {
+        throw new Error("Email requis pour la réinitialisation");
+      }
+
+      const { data: users, error: userError } = await supabaseAdmin.auth.admin.listUsers();
+      
+      if (userError) {
+        throw new Error("Unable to find user");
+      }
+
+      const foundUser = users.users.find(u => u.email === email);
+      
+      if (!foundUser) {
+        throw new Error("Code invalide ou expiré");
+      }
+
+      userId = foundUser.id;
+      console.log("User ID (from email):", userId);
+    } else {
+      // For other types, require authentication
+      const authHeader = req.headers.get("Authorization");
+      if (!authHeader) {
+        throw new Error("No authorization header");
+      }
+
+      const token = authHeader.replace("Bearer ", "");
+
+      const supabase = createClient(
+        Deno.env.get("SUPABASE_URL") ?? "",
+        Deno.env.get("SUPABASE_ANON_KEY") ?? ""
+      );
+
+      const {
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser(token);
+
+      if (userError || !user) {
+        throw new Error("Unauthorized");
+      }
+
+      userId = user.id;
+      console.log("User ID (from auth):", userId);
+    }
+
     // Verify code
     const { data: verificationData, error: verifyError } = await supabaseAdmin
       .from("verification_codes")
       .select("*")
-      .eq("user_id", user.id)
+      .eq("user_id", userId)
       .eq("code", code)
       .eq("type", type)
       .eq("used", false)
@@ -79,7 +106,7 @@ const handler = async (req: Request): Promise<Response> => {
       const { data: allCodes } = await supabaseAdmin
         .from("verification_codes")
         .select("*")
-        .eq("user_id", user.id)
+        .eq("user_id", userId)
         .eq("code", code)
         .eq("type", type)
         .order("created_at", { ascending: false })
@@ -91,13 +118,13 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     // Update based on type
-    if (type === 'password_change') {
+    if (type === 'password_change' || type === 'password_reset') {
       if (!newPassword) {
         throw new Error("Nouveau mot de passe requis");
       }
 
       const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(
-        user.id,
+        userId,
         { password: newPassword }
       );
 
@@ -111,7 +138,7 @@ const handler = async (req: Request): Promise<Response> => {
       }
 
       const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(
-        user.id,
+        userId,
         { email: verificationData.new_value }
       );
 
@@ -124,7 +151,7 @@ const handler = async (req: Request): Promise<Response> => {
       await supabaseAdmin
         .from("profiles")
         .update({ email: verificationData.new_value })
-        .eq("id", user.id);
+        .eq("id", userId);
     } else if (type === 'phone_change') {
       if (!verificationData.new_value) {
         throw new Error("Nouveau téléphone requis");
@@ -134,7 +161,7 @@ const handler = async (req: Request): Promise<Response> => {
       const { error: updateError } = await supabaseAdmin
         .from("profiles")
         .update({ phone: verificationData.new_value })
-        .eq("id", user.id);
+        .eq("id", userId);
 
       if (updateError) {
         console.error("Error updating phone:", updateError);
