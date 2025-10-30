@@ -47,6 +47,15 @@ const NOTIFICATION_CATEGORIES = [
   { category: 'marketplace', label: '5️⃣ MARKETPLACE', subcategories: [
     { key: 'want-to-buy', label: 'Want to Buy' },
     { key: 'want-to-sell', label: 'Want to Sell' }
+  ]},
+  
+  // 🔧 OUTILS
+  { category: 'outils', label: '🔧 OUTILS', subcategories: [
+    { key: 'création-société', label: 'Création Société' },
+    { key: 'facture-autorisation', label: 'Facture/Autorisation' },
+    { key: 'cashback', label: 'Cashback' },
+    { key: 'avis', label: 'Avis' },
+    { key: 'fiscalité-simplifiée', label: 'Fiscalité Simplifiée' }
   ]}
 ];
 
