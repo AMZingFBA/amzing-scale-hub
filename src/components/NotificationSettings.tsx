@@ -15,15 +15,33 @@ interface NotificationPreference {
 const NOTIFICATION_CATEGORIES = [
   // Introduction
   { category: 'introduction', label: '📚 Introduction', subcategories: [
+    { key: 'notifications', label: 'Notifications' },
     { key: 'règles', label: 'Règles' },
+    { key: 'débuter', label: 'Débuter' },
+    { key: 'guides', label: 'Guides' },
+    { key: 'affiliation', label: 'Affiliation' },
     { key: 'support', label: 'Support' }
+  ]},
+  
+  // Outils
+  { category: 'outils', label: '🔧 Outils', subcategories: [
+    { key: 'création-société', label: 'Création Société' },
+    { key: 'facture-autorisation', label: 'Facture/Autorisation' },
+    { key: 'cashback', label: 'Cashback' },
+    { key: 'avis', label: 'Avis' },
+    { key: 'fiscalité-simplifiée', label: 'Fiscalité Simplifiée' }
+  ]},
+  
+  // Expédition
+  { category: 'expedition', label: '📮 Expédition', subcategories: [
+    { key: 'fournitures', label: 'Fournitures' },
+    { key: 'cartons', label: 'Cartons' }
   ]},
   
   // Informations
   { category: 'informations', label: '📰 Informations', subcategories: [
-    { key: 'actualité', label: 'Actualité' },
     { key: 'annonces', label: 'Annonces' },
-    { key: 'notifications', label: 'Notifications' }
+    { key: 'actualités', label: 'Actualités' }
   ]},
   
   // Produits
@@ -31,6 +49,7 @@ const NOTIFICATION_CATEGORIES = [
     { key: 'produits-find', label: 'Product Find' },
     { key: 'produits-qogita', label: 'Qogita' },
     { key: 'produits-eany', label: 'Eany' },
+    { key: 'grossistes', label: 'Grossistes' },
     { key: 'promotions', label: 'Promotions' },
     { key: 'sitelist', label: 'Sitelist' }
   ]},
@@ -40,20 +59,6 @@ const NOTIFICATION_CATEGORIES = [
     { key: 'catalogue_pro', label: 'Catalogue Pro' },
     { key: 'information', label: 'Information' },
     { key: 'question', label: 'Question' }
-  ]},
-  
-  // Vendre sur Amazon
-  { category: 'sell', label: '💰 Vendre sur Amazon', subcategories: [
-    { key: 'rules', label: 'Règles et Conformité' },
-    { key: 'products', label: 'Identifier et Sourcer des Produits' },
-    { key: 'fba', label: 'Expédier et Gérer' }
-  ]},
-  
-  // Acheter sur Amazon
-  { category: 'buy', label: '🛍️ Acheter sur Amazon', subcategories: [
-    { key: 'seller-account', label: 'Créer un Compte Vendeur' },
-    { key: 'profitable-products', label: 'Trouver des Produits Rentables' },
-    { key: 'recognize-products', label: 'Reconnaître les Bons Produits' }
   ]},
   
   // Marketplace
@@ -70,12 +75,6 @@ const NOTIFICATION_CATEGORIES = [
     { key: 'success', label: 'Success Stories' },
     { key: 'questions', label: 'Questions' }
   ]},
-  
-  // Outils
-  { category: 'outils', label: '🔧 Outils', subcategories: [] },
-  
-  // Expédition
-  { category: 'expedition', label: '📮 Expédition', subcategories: [] },
   
   // Suggestions
   { category: 'suggestion', label: '💡 Suggestions', subcategories: [] },

@@ -49,7 +49,7 @@ export const useNotifications = () => {
       const categories = [
         'introduction', 'outils', 'produits', 'expedition', 
         'informations', 'communaute', 'marketplace', 'gestion_produit',
-        'sell', 'buy', 'suggestion', 'general'
+        'suggestion', 'general'
       ];
 
       const counts: NotificationCounts = {};
