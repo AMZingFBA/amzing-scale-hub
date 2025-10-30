@@ -74,8 +74,37 @@ export default function Auth() {
       toast.error("Erreur d'inscription", {
         description: error.message,
       });
-    } else {
-      toast.success("Inscription réussie! Vous pouvez maintenant vous connecter.");
+      setIsLoading(false);
+      return;
+    }
+
+    toast.success("Inscription réussie! Redirection vers le paiement...");
+
+    // Sur le site web (pas l'app native), rediriger vers Stripe après inscription
+    if (!isNativeApp) {
+      try {
+        const { supabase } = await import("@/integrations/supabase/client");
+        const { data, error: checkoutError } = await supabase.functions.invoke('create-checkout', {
+          headers: {
+            Authorization: `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
+          },
+        });
+
+        if (checkoutError) {
+          console.error('Error creating checkout:', checkoutError);
+          toast.error('Erreur lors de la redirection vers le paiement');
+          setIsLoading(false);
+          return;
+        }
+
+        if (data?.url) {
+          // Ouvrir Stripe Checkout dans un nouvel onglet
+          window.open(data.url, '_blank');
+        }
+      } catch (error: any) {
+        console.error('Error starting checkout:', error);
+        toast.error('Erreur lors de la redirection vers le paiement');
+      }
     }
 
     setIsLoading(false);
