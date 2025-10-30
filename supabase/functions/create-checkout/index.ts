@@ -50,7 +50,7 @@ serve(async (req) => {
       logStep("No existing customer found");
     }
 
-    // Create checkout session with 15-day trial
+    // Create checkout session with 7-day trial
     const origin = req.headers.get("origin") || "https://6c002a1c-db75-4b68-b43b-8e5c9b112692.lovableproject.com";
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
@@ -63,10 +63,33 @@ serve(async (req) => {
       ],
       mode: "subscription",
       subscription_data: {
-        trial_period_days: 15,
+        trial_period_days: 7,
       },
       success_url: `${origin}/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/#tarifs`,
+      custom_text: {
+        submit: {
+          message: "Commencez votre essai gratuit de 7 jours - Aucun paiement aujourd'hui !",
+        },
+        after_submit: {
+          message: "Bienvenue dans la communauté AMZing FBA ! Vous allez recevoir un email de confirmation.",
+        },
+      },
+      // Logo et branding personnalisé
+      custom_fields: [
+        {
+          key: "trial_info",
+          label: {
+            type: "custom",
+            custom: "🎉 Profitez de 7 jours d'accès complet gratuit",
+          },
+          type: "text",
+          text: {
+            default_value: "Tous les outils, formations et salons privés inclus",
+          },
+          optional: true,
+        },
+      ],
     });
 
     logStep("Checkout session created", { sessionId: session.id });
