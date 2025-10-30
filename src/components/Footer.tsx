@@ -62,7 +62,7 @@ const Footer = () => {
           )}
 
           {/* Contact CTA */}
-          <div className={`animate-fade-in ${isVIP ? 'md:ml-auto md:text-right' : ''}`} style={{ animationDelay: '0.3s' }}>
+          <div className={`animate-fade-in ${isVIP ? 'md:col-start-2' : ''}`} style={{ animationDelay: '0.3s' }}>
             <h3 className="text-lg font-semibold mb-4 text-foreground">Besoin d'aide ?</h3>
             <p className="text-muted-foreground mb-4 text-sm">
               Notre équipe est là pour répondre à toutes vos questions
