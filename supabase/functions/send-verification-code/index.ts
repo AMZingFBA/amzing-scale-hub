@@ -32,9 +32,6 @@ const handler = async (req: Request): Promise<Response> => {
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_ANON_KEY") ?? "",
       {
-        auth: {
-          persistSession: false,
-        },
         global: {
           headers: {
             Authorization: authHeader,
