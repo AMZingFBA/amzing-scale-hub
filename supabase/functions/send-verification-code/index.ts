@@ -21,7 +21,10 @@ const handler = async (req: Request): Promise<Response> => {
 
   try {
     const authHeader = req.headers.get("Authorization");
+    console.log("Auth header received:", authHeader ? "Present" : "Missing");
+    
     if (!authHeader) {
+      console.error("No authorization header found");
       throw new Error("No authorization header");
     }
 
@@ -45,9 +48,14 @@ const handler = async (req: Request): Promise<Response> => {
       error: userError,
     } = await supabase.auth.getUser();
 
+    console.log("User lookup result:", { hasUser: !!user, error: userError?.message });
+
     if (userError || !user) {
+      console.error("User authentication failed:", userError?.message);
       throw new Error("Unauthorized");
     }
+    
+    console.log("User authenticated successfully:", user.email);
 
     const { type, newValue }: VerificationRequest = await req.json();
 
