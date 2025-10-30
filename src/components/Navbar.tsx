@@ -5,8 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/use-auth";
 import { useAdmin } from "@/hooks/use-admin";
-import { useMarketplaceBuyUnread } from "@/hooks/use-marketplace-buy-unread";
-import { useMarketplaceSellUnread } from "@/hooks/use-marketplace-sell-unread";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -21,9 +19,6 @@ const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { user, isVIP, signOut } = useAuth();
   const { isAdmin } = useAdmin();
-  const { unreadCount: buyUnreadCount } = useMarketplaceBuyUnread();
-  const { unreadCount: sellUnreadCount } = useMarketplaceSellUnread();
-  const totalMarketplaceUnread = buyUnreadCount + sellUnreadCount;
   
   // Détection si on est dans l'app native pour ajuster le padding pour la safe area
   const isNativeApp = Capacitor.isNativePlatform();
@@ -61,7 +56,7 @@ const Navbar = () => {
                   Profil
                 </Link>
               </DropdownMenuItem>
-              {isVIP ? (
+              {isVIP && (
                 // Menu VIP
                 <>
                   <DropdownMenuItem asChild className="py-3 text-base">
@@ -83,47 +78,9 @@ const Navbar = () => {
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild className="py-3 text-base">
-                    <Link to="/marketplace" className="cursor-pointer relative">
+                    <Link to="/marketplace" className="cursor-pointer">
                       <Store className="w-5 h-5 mr-3" />
                       Marketplace
-                      {totalMarketplaceUnread > 0 && (
-                        <Badge variant="destructive" className="ml-auto animate-pulse">{totalMarketplaceUnread}</Badge>
-                      )}
-                    </Link>
-                  </DropdownMenuItem>
-                </>
-              ) : (
-                // Menu utilisateurs gratuits
-                <>
-                  <DropdownMenuItem asChild className="py-3 text-base">
-                    <Link to="/tarifs" className="cursor-pointer">
-                      Tarifs
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild className="py-3 text-base">
-                    <Link to="/formation" className="cursor-pointer">
-                      Formation
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild className="py-3 text-base">
-                    <Link to="/faq" className="cursor-pointer">
-                      FAQ
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild className="py-3 text-base">
-                    <Link to="/acheter" className="cursor-pointer relative">
-                      Want to Buy
-                      {buyUnreadCount > 0 && (
-                        <Badge variant="destructive" className="ml-auto animate-pulse">{buyUnreadCount}</Badge>
-                      )}
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild className="py-3 text-base">
-                    <Link to="/vendre" className="cursor-pointer relative">
-                      Want to Sell
-                      {sellUnreadCount > 0 && (
-                        <Badge variant="destructive" className="ml-auto animate-pulse">{sellUnreadCount}</Badge>
-                      )}
                     </Link>
                   </DropdownMenuItem>
                 </>
@@ -178,41 +135,6 @@ const Navbar = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
-            {!isVIP && (
-              // Navigation pour les utilisateurs gratuits uniquement
-              <>
-                <Link to="/tarifs" className="text-foreground hover:text-primary transition-colors font-medium">
-                  Tarifs
-                </Link>
-                <Link to="/formation" className="text-foreground hover:text-primary transition-colors font-medium">
-                  Formation
-                </Link>
-                <Link to="/faq" className="text-foreground hover:text-primary transition-colors font-medium">
-                  FAQ
-                </Link>
-                {user && (
-                  <>
-                    <Link to="/acheter" className="text-foreground hover:text-primary transition-colors font-medium relative">
-                      Want to Buy
-                      {buyUnreadCount > 0 && (
-                        <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-                          {buyUnreadCount}
-                        </span>
-                      )}
-                    </Link>
-                    <Link to="/vendre" className="text-foreground hover:text-primary transition-colors font-medium relative">
-                      Want to Sell
-                      {sellUnreadCount > 0 && (
-                        <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-                          {sellUnreadCount}
-                        </span>
-                      )}
-                    </Link>
-                  </>
-                )}
-              </>
-            )}
-            
             {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -297,61 +219,6 @@ const Navbar = () => {
         {/* Mobile Navigation */}
         {isOpen && (
           <div className="md:hidden py-4 space-y-4">
-            {!isVIP && (
-              // Navigation mobile pour les utilisateurs gratuits uniquement
-              <>
-                <Link
-                  to="/tarifs"
-                  className="block text-foreground hover:text-primary transition-colors font-medium py-2"
-                  onClick={() => setIsOpen(false)}
-                >
-                  Tarifs
-                </Link>
-                <Link
-                  to="/formation"
-                  className="block text-foreground hover:text-primary transition-colors font-medium py-2"
-                  onClick={() => setIsOpen(false)}
-                >
-                  Formation
-                </Link>
-                <Link
-                  to="/faq"
-                  className="block text-foreground hover:text-primary transition-colors font-medium py-2"
-                  onClick={() => setIsOpen(false)}
-                >
-                  FAQ
-                </Link>
-                {user && (
-                  <>
-                    <Link
-                      to="/acheter"
-                      className="block text-foreground hover:text-primary transition-colors font-medium py-2 relative"
-                      onClick={() => setIsOpen(false)}
-                    >
-                      Want to Buy
-                      {buyUnreadCount > 0 && (
-                        <span className="absolute top-1 left-24 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-                          {buyUnreadCount}
-                        </span>
-                      )}
-                    </Link>
-                    <Link
-                      to="/vendre"
-                      className="block text-foreground hover:text-primary transition-colors font-medium py-2 relative"
-                      onClick={() => setIsOpen(false)}
-                    >
-                      Want to Sell
-                      {sellUnreadCount > 0 && (
-                        <span className="absolute top-1 left-28 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-                          {sellUnreadCount}
-                        </span>
-                      )}
-                    </Link>
-                  </>
-                )}
-              </>
-            )}
-            
             {user ? (
               <div className="space-y-2 pt-2 border-t">
                 <div className="px-2 py-3 bg-gradient-to-r from-primary/10 to-secondary/10 rounded-lg">
