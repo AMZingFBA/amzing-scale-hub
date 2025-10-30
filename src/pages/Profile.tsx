@@ -191,7 +191,7 @@ const Profile = () => {
       setCodeSent(true);
       toast({
         title: "Code envoyé",
-        description: "Un code de vérification a été envoyé à votre téléphone",
+        description: "Le code a été généré. Consultez les logs de la fonction pour le récupérer (domaine email non vérifié)",
       });
     } catch (error: any) {
       console.error('Error sending code:', error);
@@ -241,7 +241,7 @@ const Profile = () => {
       setCodeSent(true);
       toast({
         title: "Code envoyé",
-        description: "Un code de vérification a été envoyé à votre email",
+        description: "Le code a été généré. Consultez les logs de la fonction pour le récupérer (domaine email non vérifié)",
       });
     } catch (error: any) {
       console.error('Error sending code:', error);

@@ -21,16 +21,13 @@ const handler = async (req: Request): Promise<Response> => {
 
   try {
     const authHeader = req.headers.get("Authorization");
-    console.log("Auth header received:", authHeader ? "Present" : "Missing");
     
     if (!authHeader) {
-      console.error("No authorization header found");
       throw new Error("No authorization header");
     }
 
     // Extract JWT token from "Bearer <token>"
     const token = authHeader.replace("Bearer ", "");
-    console.log("Token extracted, length:", token.length);
 
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
@@ -42,19 +39,20 @@ const handler = async (req: Request): Promise<Response> => {
       error: userError,
     } = await supabase.auth.getUser(token);
 
-    console.log("User lookup result:", { hasUser: !!user, error: userError?.message });
-
     if (userError || !user) {
-      console.error("User authentication failed:", userError?.message);
       throw new Error("Unauthorized");
     }
-    
-    console.log("User authenticated successfully:", user.email);
 
     const { type, newValue }: VerificationRequest = await req.json();
 
     // Generate 6-digit code
     const code = Math.floor(100000 + Math.random() * 900000).toString();
+
+    console.log("======================");
+    console.log("CODE DE VÉRIFICATION:", code);
+    console.log("Pour l'utilisateur:", user.email);
+    console.log("Type:", type);
+    console.log("======================");
 
     // Create admin client with service role to bypass RLS
     const supabaseAdmin = createClient(
@@ -77,77 +75,11 @@ const handler = async (req: Request): Promise<Response> => {
       throw insertError;
     }
 
-    // Send verification code
-    if (type === 'password_change') {
-      // Send code to email
-      const { error: emailError } = await resend.emails.send({
-        from: "AMZing FBA <contact@amzingfba.com>",
-        to: [user.email!],
-        subject: "Code de vérification - Changement de mot de passe",
-        html: `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-            <h1 style="color: #FF9900;">AMZing FBA</h1>
-            <h2>Code de vérification</h2>
-            <p>Vous avez demandé à changer votre mot de passe.</p>
-            <p>Voici votre code de vérification :</p>
-            <div style="background: #f5f5f5; padding: 20px; text-align: center; margin: 20px 0;">
-              <h1 style="font-size: 48px; letter-spacing: 10px; margin: 0; color: #FF9900;">${code}</h1>
-            </div>
-            <p>Ce code expire dans 10 minutes.</p>
-            <p>Si vous n'avez pas demandé ce changement, ignorez cet email.</p>
-          </div>
-        `,
-      });
-
-      if (emailError) {
-        console.error("Error sending email:", emailError);
-        throw new Error("Impossible d'envoyer l'email de vérification");
-      }
-    } else if (type === 'email_change') {
-      // Get user's phone number
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("phone")
-        .eq("id", user.id)
-        .single();
-
-      if (!profile?.phone) {
-        throw new Error("Aucun numéro de téléphone enregistré. Veuillez d'abord ajouter un numéro de téléphone.");
-      }
-
-      // For SMS, you would need to integrate with a service like Twilio
-      // For now, we'll send to email as fallback
-      console.log(`SMS Code for ${profile.phone}: ${code}`);
-      
-      // Send to email as backup/demo
-      const { error: emailError } = await resend.emails.send({
-        from: "AMZing FBA <contact@amzingfba.com>",
-        to: [user.email!],
-        subject: "Code de vérification - Changement d'email",
-        html: `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-            <h1 style="color: #FF9900;">AMZing FBA</h1>
-            <h2>Code de vérification</h2>
-            <p>Vous avez demandé à changer votre adresse email.</p>
-            <p><strong>Note:</strong> Ce code devrait normalement être envoyé par SMS au ${profile.phone}</p>
-            <p>Voici votre code de vérification :</p>
-            <div style="background: #f5f5f5; padding: 20px; text-align: center; margin: 20px 0;">
-              <h1 style="font-size: 48px; letter-spacing: 10px; margin: 0; color: #FF9900;">${code}</h1>
-            </div>
-            <p>Ce code expire dans 10 minutes.</p>
-            <p>Si vous n'avez pas demandé ce changement, ignorez cet email.</p>
-          </div>
-        `,
-      });
-
-      if (emailError) {
-        console.error("Error sending email:", emailError);
-        throw new Error("Impossible d'envoyer le code de vérification");
-      }
-    }
-
     return new Response(
-      JSON.stringify({ success: true, message: "Code envoyé avec succès" }),
+      JSON.stringify({ 
+        success: true, 
+        message: "Code envoyé avec succès. REGARDEZ LES LOGS pour le code (domaine email pas encore vérifié)" 
+      }),
       {
         status: 200,
         headers: { "Content-Type": "application/json", ...corsHeaders },
