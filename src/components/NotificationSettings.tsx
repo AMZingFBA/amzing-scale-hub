@@ -14,6 +14,16 @@ interface NotificationPreference {
 
 const NOTIFICATION_CATEGORIES = [
   { category: 'introduction', label: 'Introduction', subcategories: [] },
+  { category: 'outils', label: 'Outils', subcategories: [] },
+  { category: 'produits', label: 'Produits', subcategories: [] },
+  { category: 'expedition', label: 'Expédition', subcategories: [] },
+  { category: 'informations', label: 'Informations', subcategories: [] },
+  { category: 'communaute', label: 'Communauté', subcategories: [] },
+  { category: 'marketplace', label: 'Marketplace', subcategories: [
+    { key: 'sell', label: 'Vendre' },
+    { key: 'buy', label: 'Acheter' }
+  ]},
+  { category: 'gestion_produit', label: 'Gestion de Produits', subcategories: [] },
   { category: 'sell', label: 'Vendre sur Amazon', subcategories: [
     { key: 'rules', label: 'Règles et Conformité' },
     { key: 'products', label: 'Identifier et Sourcer des Produits' },
@@ -23,12 +33,7 @@ const NOTIFICATION_CATEGORIES = [
     { key: 'seller-account', label: 'Créer un Compte Vendeur' },
     { key: 'profitable-products', label: 'Trouver des Produits Rentables' },
     { key: 'recognize-products', label: 'Reconnaître les Bons Produits' }
-  ]},
-  { category: 'marketplace', label: 'Marketplace', subcategories: [
-    { key: 'sell', label: 'Vendre' },
-    { key: 'buy', label: 'Acheter' }
-  ]},
-  { category: 'catalogue', label: 'Catalogue de Produits', subcategories: [] }
+  ]}
 ];
 
 export const NotificationSettings = () => {
