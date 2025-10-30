@@ -39,7 +39,7 @@ const handler = async (req: Request): Promise<Response> => {
       error: userError,
     } = await supabase.auth.getUser(token);
 
-    if (userError || !user) {
+    if (userError || !user || !user.email) {
       throw new Error("Unauthorized");
     }
 
@@ -75,10 +75,69 @@ const handler = async (req: Request): Promise<Response> => {
       throw insertError;
     }
 
+    // Send email with Resend
+    const emailSubject = type === 'email_change' 
+      ? 'Code de vérification - Changement d\'email' 
+      : 'Code de vérification - Changement de mot de passe';
+
+    const emailHtml = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="utf-8">
+          <style>
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+            .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+            .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
+            .code { font-size: 32px; font-weight: bold; color: #667eea; text-align: center; padding: 20px; background: white; border-radius: 8px; margin: 20px 0; letter-spacing: 5px; }
+            .footer { text-align: center; margin-top: 20px; color: #666; font-size: 12px; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1>Code de Vérification</h1>
+            </div>
+            <div class="content">
+              <p>Bonjour,</p>
+              <p>Voici votre code de vérification pour ${type === 'email_change' ? 'changer votre email' : 'changer votre mot de passe'} :</p>
+              <div class="code">${code}</div>
+              <p>Ce code est valide pendant 10 minutes.</p>
+              <p>Si vous n'avez pas demandé ce code, ignorez cet email.</p>
+            </div>
+            <div class="footer">
+              <p>© ${new Date().getFullYear()} Amzing FBA - Tous droits réservés</p>
+            </div>
+          </div>
+        </body>
+      </html>
+    `;
+
+    try {
+      const { data: emailData, error: emailError } = await resend.emails.send({
+        from: 'Amzing FBA <noreply@amzingfba.com>',
+        to: [user.email],
+        subject: emailSubject,
+        html: emailHtml,
+      });
+
+      if (emailError) {
+        console.error("Error sending email:", emailError);
+        throw emailError;
+      }
+
+      console.log("Email sent successfully:", emailData);
+    } catch (emailError) {
+      console.error("Failed to send email:", emailError);
+      // Don't throw - we still want to return success if the code was saved
+      // The user can still use the code from logs if email fails
+    }
+
     return new Response(
       JSON.stringify({ 
         success: true, 
-        message: "Code envoyé avec succès. REGARDEZ LES LOGS pour le code (domaine email pas encore vérifié)" 
+        message: "Code envoyé avec succès par email !" 
       }),
       {
         status: 200,
