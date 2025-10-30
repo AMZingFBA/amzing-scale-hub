@@ -14,7 +14,7 @@ interface NotificationPreference {
 
 const NOTIFICATION_CATEGORIES = [
   // 📚 INTRODUCTION
-  { category: 'introduction', label: '📚 INTRODUCTION', subcategories: [
+  { category: 'introduction', label: '📚 Introduction', subcategories: [
     { key: 'notifications', label: 'Notifications' },
     { key: 'règles', label: 'Règles' },
     { key: 'débuter', label: 'Débuter' },
@@ -23,15 +23,15 @@ const NOTIFICATION_CATEGORIES = [
   ]},
   
   // 🔧 OUTILS
-  { category: 'outils', label: '🔧 OUTILS', subcategories: [
+  { category: 'outils', label: '🔧 Outils', subcategories: [
     { key: 'création-société', label: 'Création Société' },
     { key: 'facture-autorisation', label: 'Facture/Autorisation' },
     { key: 'cashback', label: 'Cashback' },
     { key: 'avis', label: 'Avis' }
   ]},
   
-  // 1️⃣ PRODUITS GAGNANTS
-  { category: 'produits', label: '1️⃣ PRODUITS GAGNANTS', subcategories: [
+  // 📦 PRODUITS GAGNANTS
+  { category: 'produits', label: '📦 Produits Gagnants', subcategories: [
     { key: 'produits-find', label: 'Product Find' },
     { key: 'produits-qogita', label: 'Produits Qogita' },
     { key: 'produits-eany', label: 'Produits Eany' },
@@ -40,34 +40,34 @@ const NOTIFICATION_CATEGORIES = [
     { key: 'sitelist', label: 'Sitelist' }
   ]},
   
-  // 2️⃣ EXPÉDITION
-  { category: 'expedition', label: '2️⃣ EXPÉDITION', subcategories: [
+  // 🚚 EXPÉDITION
+  { category: 'expedition', label: '🚚 Expédition', subcategories: [
     { key: 'fournitures', label: 'Fournitures' },
     { key: 'cartons', label: 'Cartons' }
   ]},
   
-  // 3️⃣ INFORMATIONS
-  { category: 'informations', label: '3️⃣ INFORMATIONS', subcategories: [
+  // 📰 INFORMATIONS
+  { category: 'informations', label: '📰 Informations', subcategories: [
     { key: 'annonces', label: 'Annonces' },
     { key: 'actualités', label: 'Actualités' }
   ]},
   
-  // 4️⃣ COMMUNAUTÉ
-  { category: 'communaute', label: '4️⃣ COMMUNAUTÉ', subcategories: [
+  // 💬 COMMUNAUTÉ
+  { category: 'communaute', label: '💬 Communauté', subcategories: [
     { key: 'general', label: 'Général' },
     { key: 'suggestions', label: 'Suggestions' },
     { key: 'succès', label: 'Succès' },
     { key: 'ventes', label: 'Ventes' }
   ]},
   
-  // 5️⃣ MARKETPLACE
-  { category: 'marketplace', label: '5️⃣ MARKETPLACE', subcategories: [
+  // 🛒 MARKETPLACE
+  { category: 'marketplace', label: '🛒 Marketplace', subcategories: [
     { key: 'want-to-buy', label: 'Want to Buy' },
     { key: 'want-to-sell', label: 'Want to Sell' }
   ]},
   
   // 🗂️ GESTION PRODUIT
-  { category: 'gestion_produit', label: '🗂️ GESTION PRODUIT', subcategories: [
+  { category: 'gestion_produit', label: '🗂️ Gestion Produit', subcategories: [
     { key: 'catalogue_pro', label: 'Catalogue Pro' },
     { key: 'information', label: 'Information' },
     { key: 'question', label: 'Question' }
