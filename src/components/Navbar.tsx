@@ -183,33 +183,8 @@ const Navbar = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
-            {isVIP ? (
-              // Navigation pour les utilisateurs VIP
-              <>
-                <Link to="/dashboard" className="text-foreground hover:text-primary transition-colors font-medium flex items-center gap-2">
-                  <LayoutDashboard className="w-4 h-4" />
-                  Dashboard
-                </Link>
-                <Link to="/chat" className="text-foreground hover:text-primary transition-colors font-medium flex items-center gap-2">
-                  <MessageSquare className="w-4 h-4" />
-                  Chat
-                </Link>
-                <Link to="/catalogue-produits" className="text-foreground hover:text-primary transition-colors font-medium flex items-center gap-2">
-                  <ShoppingBag className="w-4 h-4" />
-                  Catalogue
-                </Link>
-                <Link to="/marketplace" className="text-foreground hover:text-primary transition-colors font-medium flex items-center gap-2 relative">
-                  <Store className="w-4 h-4" />
-                  Marketplace
-                  {totalMarketplaceUnread > 0 && (
-                    <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-                      {totalMarketplaceUnread}
-                    </span>
-                  )}
-                </Link>
-              </>
-            ) : (
-              // Navigation pour les utilisateurs gratuits
+            {!isVIP && (
+              // Navigation pour les utilisateurs gratuits uniquement
               <>
                 <Link to="/services" className="text-foreground hover:text-primary transition-colors font-medium">
                   Nos Services
@@ -330,49 +305,8 @@ const Navbar = () => {
         {/* Mobile Navigation */}
         {isOpen && (
           <div className="md:hidden py-4 space-y-4">
-            {isVIP ? (
-              // Navigation mobile pour les utilisateurs VIP
-              <>
-                <Link
-                  to="/dashboard"
-                  className="block text-foreground hover:text-primary transition-colors font-medium py-2 flex items-center gap-2"
-                  onClick={() => setIsOpen(false)}
-                >
-                  <LayoutDashboard className="w-4 h-4" />
-                  Dashboard
-                </Link>
-                <Link
-                  to="/chat"
-                  className="block text-foreground hover:text-primary transition-colors font-medium py-2 flex items-center gap-2"
-                  onClick={() => setIsOpen(false)}
-                >
-                  <MessageSquare className="w-4 h-4" />
-                  Chat
-                </Link>
-                <Link
-                  to="/catalogue-produits"
-                  className="block text-foreground hover:text-primary transition-colors font-medium py-2 flex items-center gap-2"
-                  onClick={() => setIsOpen(false)}
-                >
-                  <ShoppingBag className="w-4 h-4" />
-                  Catalogue
-                </Link>
-                <Link
-                  to="/marketplace"
-                  className="block text-foreground hover:text-primary transition-colors font-medium py-2 flex items-center gap-2 relative"
-                  onClick={() => setIsOpen(false)}
-                >
-                  <Store className="w-4 h-4" />
-                  Marketplace
-                  {totalMarketplaceUnread > 0 && (
-                    <span className="ml-2 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-                      {totalMarketplaceUnread}
-                    </span>
-                  )}
-                </Link>
-              </>
-            ) : (
-              // Navigation mobile pour les utilisateurs gratuits
+            {!isVIP && (
+              // Navigation mobile pour les utilisateurs gratuits uniquement
               <>
                 <Link
                   to="/services"
