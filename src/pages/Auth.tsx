@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import logo from "@/assets/logo.png";
 import { Mail, Lock, User, Phone, Package, TrendingUp, BarChart3, CheckCircle2 } from "lucide-react";
 import { Capacitor } from "@capacitor/core";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 export default function Auth() {
   const navigate = useNavigate();
@@ -112,6 +113,8 @@ export default function Auth() {
     try {
       const { supabase } = await import("@/integrations/supabase/client");
       
+      console.log('Attempting to verify code:', verificationCode);
+      
       // Verify code and create account
       const response = await supabase.functions.invoke('verify-and-signup', {
         body: {
@@ -124,17 +127,39 @@ export default function Auth() {
         },
       });
 
-      // Check for error in the response data first
+      console.log('Response from verify-and-signup:', response);
+
+      // When there's a 400 error, the error message is in response.data.error
       if (response.data?.error) {
+        console.log('Error from response.data:', response.data.error);
         setError(response.data.error);
         setIsLoading(false);
         return;
       }
 
-      // Check for invoke error
+      // Also check response.error (HTTP errors)
       if (response.error) {
-        const errorMessage = response.error.message || "Une erreur est survenue";
+        console.log('HTTP error:', response.error);
+        // Try to extract the actual error message from the error object
+        let errorMessage = "Une erreur est survenue";
+        
+        try {
+          // The error might contain the response data
+          if (response.error.message) {
+            errorMessage = response.error.message;
+          }
+        } catch (e) {
+          console.error('Could not extract error message:', e);
+        }
+        
         setError(errorMessage);
+        setIsLoading(false);
+        return;
+      }
+
+      // If we get here, signup was successful
+      if (!response.data?.success) {
+        setError("Une erreur inattendue est survenue");
         setIsLoading(false);
         return;
       }
@@ -178,8 +203,8 @@ export default function Auth() {
         }
       }
     } catch (error: any) {
+      console.error('Caught error in handleVerifyAndSignUp:', error);
       const errorMessage = error.message || "Une erreur est survenue";
-      console.error('Error verifying and signing up:', error);
       setError(errorMessage);
     } finally {
       setIsLoading(false);
@@ -187,7 +212,8 @@ export default function Auth() {
   };
 
   return (
-    <div className="min-h-screen w-full flex bg-gradient-to-br from-[#FFF7E6] via-background to-background">
+    <ErrorBoundary>
+      <div className="min-h-screen w-full flex bg-gradient-to-br from-[#FFF7E6] via-background to-background">
       {/* Left Side - Form */}
       <div className={`w-full lg:w-1/2 flex items-center justify-center p-8 relative overflow-hidden ${isNativeApp ? 'pt-16 bg-gradient-to-br from-[#FFF7E6] via-background to-primary/5' : ''}`}>
         {/* Decorative elements */}
@@ -549,6 +575,7 @@ export default function Auth() {
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </ErrorBoundary>
   );
 }
