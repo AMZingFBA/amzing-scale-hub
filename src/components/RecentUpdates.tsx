@@ -15,16 +15,50 @@ interface RecentUpdate {
 }
 
 const getCategoryRoute = (category: string, subcategory: string | null) => {
-  const routes: Record<string, string> = {
-    'introduction': '/reglement',
+  // Map categories with subcategories
+  if (category === 'introduction') {
+    if (subcategory === 'règles') return '/rules-alerts';
+    return '/dashboard';
+  }
+  
+  if (category === 'guides') {
+    const guideRoutes: Record<string, string> = {
+      'vendre': '/guides/vendre',
+      'trouver': '/guides/trouver',
+      'fba': '/guides/fba',
+      'fbm': '/guides/fbm',
+      'compte': '/guides/compte',
+    };
+    return guideRoutes[subcategory || ''] || '/guides';
+  }
+  
+  if (category === 'produits') {
+    const productRoutes: Record<string, string> = {
+      'produits-find': '/product-alerts/produits-find',
+      'produits-qogita': '/product-alerts/produits-qogita',
+      'produits-eany': '/product-alerts/produits-eany',
+      'grossistes': '/product-alerts/grossistes',
+      'promotions': '/product-alerts/promotions',
+      'sitelist': '/product-alerts/sitelist',
+    };
+    return productRoutes[subcategory || ''] || '/dashboard';
+  }
+  
+  if (category === 'informations') {
+    if (subcategory === 'annonces') return '/annonces';
+    if (subcategory === 'notifications') return '/notification-alerts';
+    return '/actualite';
+  }
+  
+  // Default routes for other categories
+  const defaultRoutes: Record<string, string> = {
     'outils': '/facture',
-    'informations': subcategory === 'annonces' ? '/annonces' : '/actualite',
     'gestion_produit': '/catalogue-produits',
     'communaute': '/chat',
     'marketplace': '/marketplace',
   };
 
-  return routes[category] || '/dashboard';
+  return defaultRoutes[category] || '/dashboard';
 };
 
 export const RecentUpdates = () => {
