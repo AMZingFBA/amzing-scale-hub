@@ -10,7 +10,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { ArrowLeft, User, Mail, Phone, Edit2, Save, Loader2 } from 'lucide-react';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { ArrowLeft, User, Mail, Phone, Edit2, Save, Loader2, Lock, Shield } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface ProfileData {
@@ -27,6 +28,14 @@ const Profile = () => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [showEmailDialog, setShowEmailDialog] = useState(false);
+  const [showPasswordDialog, setShowPasswordDialog] = useState(false);
+  const [newEmail, setNewEmail] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [verificationCode, setVerificationCode] = useState('');
+  const [codeSent, setCodeSent] = useState(false);
+  const [isSendingCode, setIsSendingCode] = useState(false);
+  const [isVerifying, setIsVerifying] = useState(false);
   const [profileData, setProfileData] = useState<ProfileData>({
     full_name: '',
     nickname: '',
@@ -143,6 +152,170 @@ const Profile = () => {
     return profileData.email.slice(0, 2).toUpperCase();
   };
 
+  const handleSendEmailCode = async () => {
+    if (!newEmail || !newEmail.includes('@')) {
+      toast({
+        title: "Erreur",
+        description: "Veuillez entrer un email valide",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!profileData.phone) {
+      toast({
+        title: "Téléphone requis",
+        description: "Veuillez d'abord ajouter un numéro de téléphone à votre profil",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSendingCode(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('send-verification-code', {
+        body: { type: 'email_change', newValue: newEmail },
+      });
+
+      if (error) throw error;
+
+      setCodeSent(true);
+      toast({
+        title: "Code envoyé",
+        description: "Un code de vérification a été envoyé à votre téléphone",
+      });
+    } catch (error: any) {
+      console.error('Error sending code:', error);
+      toast({
+        title: "Erreur",
+        description: error.message || "Impossible d'envoyer le code",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSendingCode(false);
+    }
+  };
+
+  const handleSendPasswordCode = async () => {
+    if (!newPassword || newPassword.length < 6) {
+      toast({
+        title: "Erreur",
+        description: "Le mot de passe doit contenir au moins 6 caractères",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSendingCode(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('send-verification-code', {
+        body: { type: 'password_change' },
+      });
+
+      if (error) throw error;
+
+      setCodeSent(true);
+      toast({
+        title: "Code envoyé",
+        description: "Un code de vérification a été envoyé à votre email",
+      });
+    } catch (error: any) {
+      console.error('Error sending code:', error);
+      toast({
+        title: "Erreur",
+        description: error.message || "Impossible d'envoyer le code",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSendingCode(false);
+    }
+  };
+
+  const handleVerifyEmailCode = async () => {
+    if (!verificationCode || verificationCode.length !== 6) {
+      toast({
+        title: "Erreur",
+        description: "Veuillez entrer un code à 6 chiffres",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsVerifying(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('verify-and-update', {
+        body: { code: verificationCode, type: 'email_change' },
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Email modifié",
+        description: "Votre adresse email a été mise à jour avec succès",
+      });
+
+      setShowEmailDialog(false);
+      setNewEmail('');
+      setVerificationCode('');
+      setCodeSent(false);
+      
+      // Refresh profile
+      await loadProfile();
+      
+      // Sign out user to re-authenticate with new email
+      await supabase.auth.signOut();
+      navigate('/auth');
+    } catch (error: any) {
+      console.error('Error verifying code:', error);
+      toast({
+        title: "Erreur",
+        description: error.message || "Code invalide ou expiré",
+        variant: "destructive",
+      });
+    } finally {
+      setIsVerifying(false);
+    }
+  };
+
+  const handleVerifyPasswordCode = async () => {
+    if (!verificationCode || verificationCode.length !== 6) {
+      toast({
+        title: "Erreur",
+        description: "Veuillez entrer un code à 6 chiffres",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsVerifying(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('verify-and-update', {
+        body: { code: verificationCode, type: 'password_change', newPassword },
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Mot de passe modifié",
+        description: "Votre mot de passe a été mis à jour avec succès",
+      });
+
+      setShowPasswordDialog(false);
+      setNewPassword('');
+      setVerificationCode('');
+      setCodeSent(false);
+    } catch (error: any) {
+      console.error('Error verifying code:', error);
+      toast({
+        title: "Erreur",
+        description: error.message || "Code invalide ou expiré",
+        variant: "destructive",
+      });
+    } finally {
+      setIsVerifying(false);
+    }
+  };
+
   if (isLoading || isAuthLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -197,15 +370,24 @@ const Profile = () => {
                   <Mail className="w-4 h-4 inline mr-2" />
                   Email
                 </Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={profileData.email}
-                  disabled
-                  className="bg-muted"
-                />
+                <div className="flex gap-2">
+                  <Input
+                    id="email"
+                    type="email"
+                    value={profileData.email}
+                    disabled
+                    className="bg-muted flex-1"
+                  />
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => setShowEmailDialog(true)}
+                  >
+                    <Edit2 className="w-4 h-4" />
+                  </Button>
+                </div>
                 <p className="text-xs text-muted-foreground">
-                  L'email ne peut pas être modifié
+                  Cliquez sur le bouton pour modifier votre email
                 </p>
               </div>
 
@@ -255,6 +437,24 @@ const Profile = () => {
                     setProfileData({ ...profileData, phone: e.target.value })
                   }
                 />
+                <p className="text-xs text-muted-foreground">
+                  Requis pour modifier votre email
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label>
+                  <Lock className="w-4 h-4 inline mr-2" />
+                  Mot de passe
+                </Label>
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => setShowPasswordDialog(true)}
+                >
+                  <Shield className="w-4 h-4 mr-2" />
+                  Modifier le mot de passe
+                </Button>
               </div>
 
               <Button
@@ -277,6 +477,179 @@ const Profile = () => {
               </Button>
             </CardContent>
           </Card>
+
+          {/* Email Change Dialog */}
+          <Dialog open={showEmailDialog} onOpenChange={setShowEmailDialog}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Modifier l'email</DialogTitle>
+                <DialogDescription>
+                  Un code de vérification sera envoyé à votre téléphone
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4">
+                {!codeSent ? (
+                  <>
+                    <div className="space-y-2">
+                      <Label htmlFor="new_email">Nouvel email</Label>
+                      <Input
+                        id="new_email"
+                        type="email"
+                        placeholder="nouveau@email.com"
+                        value={newEmail}
+                        onChange={(e) => setNewEmail(e.target.value)}
+                      />
+                    </div>
+                    <Button
+                      onClick={handleSendEmailCode}
+                      disabled={isSendingCode}
+                      className="w-full"
+                    >
+                      {isSendingCode ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Envoi...
+                        </>
+                      ) : (
+                        'Envoyer le code'
+                      )}
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <div className="space-y-2">
+                      <Label htmlFor="code">Code de vérification</Label>
+                      <Input
+                        id="code"
+                        type="text"
+                        placeholder="123456"
+                        maxLength={6}
+                        value={verificationCode}
+                        onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, ''))}
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Le code a été envoyé à votre téléphone
+                      </p>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        onClick={() => {
+                          setCodeSent(false);
+                          setVerificationCode('');
+                        }}
+                        className="flex-1"
+                      >
+                        Renvoyer
+                      </Button>
+                      <Button
+                        onClick={handleVerifyEmailCode}
+                        disabled={isVerifying}
+                        className="flex-1"
+                      >
+                        {isVerifying ? (
+                          <>
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            Vérification...
+                          </>
+                        ) : (
+                          'Vérifier'
+                        )}
+                      </Button>
+                    </div>
+                  </>
+                )}
+              </div>
+            </DialogContent>
+          </Dialog>
+
+          {/* Password Change Dialog */}
+          <Dialog open={showPasswordDialog} onOpenChange={setShowPasswordDialog}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Modifier le mot de passe</DialogTitle>
+                <DialogDescription>
+                  Un code de vérification sera envoyé à votre email
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4">
+                {!codeSent ? (
+                  <>
+                    <div className="space-y-2">
+                      <Label htmlFor="new_password">Nouveau mot de passe</Label>
+                      <Input
+                        id="new_password"
+                        type="password"
+                        placeholder="••••••••"
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Minimum 6 caractères
+                      </p>
+                    </div>
+                    <Button
+                      onClick={handleSendPasswordCode}
+                      disabled={isSendingCode}
+                      className="w-full"
+                    >
+                      {isSendingCode ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Envoi...
+                        </>
+                      ) : (
+                        'Envoyer le code'
+                      )}
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <div className="space-y-2">
+                      <Label htmlFor="password_code">Code de vérification</Label>
+                      <Input
+                        id="password_code"
+                        type="text"
+                        placeholder="123456"
+                        maxLength={6}
+                        value={verificationCode}
+                        onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, ''))}
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Le code a été envoyé à votre email
+                      </p>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        onClick={() => {
+                          setCodeSent(false);
+                          setVerificationCode('');
+                        }}
+                        className="flex-1"
+                      >
+                        Renvoyer
+                      </Button>
+                      <Button
+                        onClick={handleVerifyPasswordCode}
+                        disabled={isVerifying}
+                        className="flex-1"
+                      >
+                        {isVerifying ? (
+                          <>
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            Vérification...
+                          </>
+                        ) : (
+                          'Vérifier'
+                        )}
+                      </Button>
+                    </div>
+                  </>
+                )}
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
       </main>
       {!isNativeApp && <Footer />}
