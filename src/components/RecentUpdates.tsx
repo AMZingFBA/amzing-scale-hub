@@ -15,12 +15,16 @@ interface RecentUpdate {
 }
 
 const getCategoryRoute = (category: string, subcategory: string | null) => {
-  // Map categories with subcategories
+  // Introduction
   if (category === 'introduction') {
-    if (subcategory === 'règles') return '/rules-alerts?tab=updates';
+    if (subcategory === 'notifications') return '/notification-alerts';
+    if (subcategory === 'règles') return '/rules-alerts';
+    if (subcategory === 'support') return '/support';
+    if (subcategory === 'guides') return '/guides';
     return '/dashboard';
   }
   
+  // Guides
   if (category === 'guides') {
     const guideRoutes: Record<string, string> = {
       'vendre': '/guides/vendre',
@@ -32,6 +36,7 @@ const getCategoryRoute = (category: string, subcategory: string | null) => {
     return guideRoutes[subcategory || ''] || '/guides';
   }
   
+  // Produits
   if (category === 'produits') {
     const productRoutes: Record<string, string> = {
       'produits-find': '/produits-find',
@@ -44,21 +49,47 @@ const getCategoryRoute = (category: string, subcategory: string | null) => {
     return productRoutes[subcategory || ''] || '/dashboard';
   }
   
+  // Informations
   if (category === 'informations') {
     if (subcategory === 'annonces') return '/annonces';
-    if (subcategory === 'notifications') return '/notification-alerts';
-    return '/actualite';
+    if (subcategory === 'actualités') return '/actualite';
+    return '/dashboard';
   }
   
-  // Default routes for other categories
-  const defaultRoutes: Record<string, string> = {
-    'outils': '/facture',
-    'gestion_produit': '/catalogue-produits',
-    'communaute': '/chat',
-    'marketplace': '/marketplace',
-  };
+  // Communauté
+  if (category === 'communaute') {
+    if (subcategory === 'général') return '/chat';
+    if (subcategory === 'suggestions') return '/suggestions';
+    if (subcategory === 'succès') return '/success';
+    if (subcategory === 'ventes') return '/sales';
+    return '/chat';
+  }
+  
+  // Marketplace
+  if (category === 'marketplace') {
+    if (subcategory === 'Want to Buy') return '/acheter';
+    if (subcategory === 'Want to Sell') return '/vendre';
+    return '/marketplace';
+  }
+  
+  // Gestion produits
+  if (category === 'gestion_produit') {
+    if (subcategory === 'catalogue-produits') return '/catalogue-produits';
+    if (subcategory === 'questions') return '/questions';
+    return '/catalogue-produits';
+  }
+  
+  // Outils - Return to dashboard for modal-based items
+  if (category === 'outils') {
+    return '/dashboard';
+  }
+  
+  // Expédition
+  if (category === 'expedition') {
+    return '/dashboard';
+  }
 
-  return defaultRoutes[category] || '/dashboard';
+  return '/dashboard';
 };
 
 export const RecentUpdates = () => {
