@@ -442,10 +442,19 @@ export default function Auth() {
                           maxLength={6}
                           pattern="[0-9]{6}"
                           value={verificationCode}
-                          onChange={(e) => setVerificationCode(e.target.value)}
+                          onChange={(e) => {
+                            setVerificationCode(e.target.value);
+                            setError(null); // Clear error when user types
+                          }}
                           disabled={isLoading}
-                          className="text-center text-2xl tracking-widest"
+                          className={`text-center text-2xl tracking-widest ${error ? 'border-destructive' : ''}`}
                         />
+                        {error && (
+                          <p className="text-sm text-destructive flex items-center gap-2 animate-in fade-in slide-in-from-top-1">
+                            <span className="inline-block w-1.5 h-1.5 rounded-full bg-destructive"></span>
+                            {error}
+                          </p>
+                        )}
                       </div>
 
                       <Button
