@@ -13,6 +13,23 @@ interface NotificationPreference {
 }
 
 const NOTIFICATION_CATEGORIES = [
+  // 📚 INTRODUCTION
+  { category: 'introduction', label: '📚 INTRODUCTION', subcategories: [
+    { key: 'notifications', label: 'Notifications' },
+    { key: 'règles', label: 'Règles' },
+    { key: 'débuter', label: 'Débuter' },
+    { key: 'guides', label: 'Guides' },
+    { key: 'affiliation', label: 'Affiliation' }
+  ]},
+  
+  // 🔧 OUTILS
+  { category: 'outils', label: '🔧 OUTILS', subcategories: [
+    { key: 'création-société', label: 'Création Société' },
+    { key: 'facture-autorisation', label: 'Facture/Autorisation' },
+    { key: 'cashback', label: 'Cashback' },
+    { key: 'avis', label: 'Avis' }
+  ]},
+  
   // 1️⃣ PRODUITS GAGNANTS
   { category: 'produits', label: '1️⃣ PRODUITS GAGNANTS', subcategories: [
     { key: 'produits-find', label: 'Product Find' },
@@ -54,14 +71,6 @@ const NOTIFICATION_CATEGORIES = [
     { key: 'catalogue_pro', label: 'Catalogue Pro' },
     { key: 'information', label: 'Information' },
     { key: 'question', label: 'Question' }
-  ]},
-  
-  // 🔧 OUTILS
-  { category: 'outils', label: '🔧 OUTILS', subcategories: [
-    { key: 'création-société', label: 'Création Société' },
-    { key: 'facture-autorisation', label: 'Facture/Autorisation' },
-    { key: 'cashback', label: 'Cashback' },
-    { key: 'avis', label: 'Avis' }
   ]}
 ];
 
