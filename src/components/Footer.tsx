@@ -32,61 +32,34 @@ const Footer = () => {
             </p>
           </div>
 
-          {/* Quick Links */}
-          <div className="animate-fade-in" style={{ animationDelay: '0.2s' }}>
-            <h3 className="text-lg font-semibold mb-4 text-foreground">Navigation</h3>
-            <ul className="space-y-2">
-              {isVIP ? (
-                // Liens pour utilisateurs VIP
-                <>
-                  <li>
-                    <Link to="/dashboard" className="text-muted-foreground hover:text-primary transition-all duration-300 hover:translate-x-1 inline-block">
-                      Dashboard
-                    </Link>
-                  </li>
-                  <li>
-                    <Link to="/chat" className="text-muted-foreground hover:text-primary transition-all duration-300 hover:translate-x-1 inline-block">
-                      Chat
-                    </Link>
-                  </li>
-                  <li>
-                    <Link to="/catalogue-produits" className="text-muted-foreground hover:text-primary transition-all duration-300 hover:translate-x-1 inline-block">
-                      Catalogue
-                    </Link>
-                  </li>
-                  <li>
-                    <Link to="/marketplace" className="text-muted-foreground hover:text-primary transition-all duration-300 hover:translate-x-1 inline-block">
-                      Marketplace
-                    </Link>
-                  </li>
-                </>
-              ) : (
-                // Liens pour utilisateurs gratuits
-                <>
-                  <li>
-                    <Link to="/services" className="text-muted-foreground hover:text-primary transition-all duration-300 hover:translate-x-1 inline-block">
-                      Nos Services
-                    </Link>
-                  </li>
-                  <li>
-                    <Link to="/tarifs" className="text-muted-foreground hover:text-primary transition-all duration-300 hover:translate-x-1 inline-block">
-                      Tarifs
-                    </Link>
-                  </li>
-                  <li>
-                    <Link to="/formation" className="text-muted-foreground hover:text-primary transition-all duration-300 hover:translate-x-1 inline-block">
-                      Formation
-                    </Link>
-                  </li>
-                  <li>
-                    <Link to="/faq" className="text-muted-foreground hover:text-primary transition-all duration-300 hover:translate-x-1 inline-block">
-                      FAQ
-                    </Link>
-                  </li>
-                </>
-              )}
-            </ul>
-          </div>
+          {/* Quick Links - Only for non-VIP users */}
+          {!isVIP && (
+            <div className="animate-fade-in" style={{ animationDelay: '0.2s' }}>
+              <h3 className="text-lg font-semibold mb-4 text-foreground">Navigation</h3>
+              <ul className="space-y-2">
+                <li>
+                  <Link to="/services" className="text-muted-foreground hover:text-primary transition-all duration-300 hover:translate-x-1 inline-block">
+                    Nos Services
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/tarifs" className="text-muted-foreground hover:text-primary transition-all duration-300 hover:translate-x-1 inline-block">
+                    Tarifs
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/formation" className="text-muted-foreground hover:text-primary transition-all duration-300 hover:translate-x-1 inline-block">
+                    Formation
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/faq" className="text-muted-foreground hover:text-primary transition-all duration-300 hover:translate-x-1 inline-block">
+                    FAQ
+                  </Link>
+                </li>
+              </ul>
+            </div>
+          )}
 
           {/* Contact CTA */}
           <div className="animate-fade-in" style={{ animationDelay: '0.3s' }}>
