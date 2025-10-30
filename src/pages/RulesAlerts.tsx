@@ -8,7 +8,7 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { BookOpen, Link2, Image, Video, Mic, FileText, ArrowLeft, Shield, Users, AlertCircle, Scale, Database, UserCog, Lock, ChevronLeft } from 'lucide-react';
+import { BookOpen, Link2, Image, Video, Mic, FileText, ArrowLeft, Shield, Users, AlertCircle, Scale, Database, UserCog, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -186,14 +186,13 @@ const RulesAlerts = () => {
       <Navbar />
       <main className="flex-grow pt-20">
         <div className="container mx-auto px-4 py-8">
-          <Button
-            variant="ghost"
+          <button
             onClick={() => navigate('/dashboard')}
-            className="mb-6 p-2 hover:bg-transparent"
-            size="icon"
+            className="bg-[#FF9900] hover:bg-[#FF9900]/90 p-3 md:p-2 rounded-full shadow-lg transition-all shrink-0 mb-6"
+            aria-label="Retour au dashboard"
           >
-            <ChevronLeft className="w-6 h-6 text-yellow-500 hover:text-yellow-600 transition-colors" />
-          </Button>
+            <ArrowLeft className="w-6 h-6 md:w-5 md:h-5 text-white" />
+          </button>
 
           <div className="flex items-center gap-3 mb-8">
             <BookOpen className="w-8 h-8 text-primary" />
