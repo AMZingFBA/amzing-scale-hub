@@ -96,11 +96,6 @@ const Navbar = () => {
                 // Menu utilisateurs gratuits
                 <>
                   <DropdownMenuItem asChild className="py-3 text-base">
-                    <Link to="/services" className="cursor-pointer">
-                      Nos Services
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild className="py-3 text-base">
                     <Link to="/tarifs" className="cursor-pointer">
                       Tarifs
                     </Link>
@@ -186,9 +181,6 @@ const Navbar = () => {
             {!isVIP && (
               // Navigation pour les utilisateurs gratuits uniquement
               <>
-                <Link to="/services" className="text-foreground hover:text-primary transition-colors font-medium">
-                  Nos Services
-                </Link>
                 <Link to="/tarifs" className="text-foreground hover:text-primary transition-colors font-medium">
                   Tarifs
                 </Link>
@@ -308,13 +300,6 @@ const Navbar = () => {
             {!isVIP && (
               // Navigation mobile pour les utilisateurs gratuits uniquement
               <>
-                <Link
-                  to="/services"
-                  className="block text-foreground hover:text-primary transition-colors font-medium py-2"
-                  onClick={() => setIsOpen(false)}
-                >
-                  Nos Services
-                </Link>
                 <Link
                   to="/tarifs"
                   className="block text-foreground hover:text-primary transition-colors font-medium py-2"
