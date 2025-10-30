@@ -39,8 +39,17 @@ const handler = async (req: Request): Promise<Response> => {
       error: userError,
     } = await supabase.auth.getUser(token);
 
-    if (userError || !user || !user.email) {
+    console.log("User data:", user);
+    console.log("User error:", userError);
+
+    if (userError || !user) {
+      console.error("Authentication failed:", { userError, user });
       throw new Error("Unauthorized");
+    }
+
+    if (!user.email) {
+      console.error("User email is missing");
+      throw new Error("User email is required");
     }
 
     const { type, newValue }: VerificationRequest = await req.json();
