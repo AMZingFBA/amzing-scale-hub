@@ -113,7 +113,7 @@ export default function Auth() {
       const { supabase } = await import("@/integrations/supabase/client");
       
       // Verify code and create account
-      const { data, error: invokeError } = await supabase.functions.invoke('verify-and-signup', {
+      const response = await supabase.functions.invoke('verify-and-signup', {
         body: {
           code: verificationCode,
           email: signupData.email.toLowerCase(),
@@ -125,15 +125,17 @@ export default function Auth() {
       });
 
       // Check for error in the response data first
-      if (data?.error) {
-        setError(data.error);
-        toast.error(data.error);
+      if (response.data?.error) {
+        setError(response.data.error);
+        setIsLoading(false);
         return;
       }
 
-      if (invokeError) {
-        setError(invokeError.message || "Une erreur est survenue");
-        toast.error(invokeError.message || "Une erreur est survenue");
+      // Check for invoke error
+      if (response.error) {
+        const errorMessage = response.error.message || "Une erreur est survenue";
+        setError(errorMessage);
+        setIsLoading(false);
         return;
       }
 
@@ -146,6 +148,7 @@ export default function Auth() {
         toast.error("Erreur lors de la connexion", {
           description: signInError.message,
         });
+        setIsLoading(false);
         return;
       }
 
@@ -161,6 +164,7 @@ export default function Auth() {
           if (checkoutError) {
             console.error('Error creating checkout:', checkoutError);
             toast.error('Erreur lors de la redirection vers le paiement');
+            setIsLoading(false);
             return;
           }
 
@@ -177,7 +181,6 @@ export default function Auth() {
       const errorMessage = error.message || "Une erreur est survenue";
       console.error('Error verifying and signing up:', error);
       setError(errorMessage);
-      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
