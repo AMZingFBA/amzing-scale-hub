@@ -24,6 +24,7 @@ export default function Auth() {
     phone: '',
   });
   const [verificationCode, setVerificationCode] = useState('');
+  const [error, setError] = useState<string | null>(null);
   const isNativeApp = Capacitor.isNativePlatform();
   
   // Check URL params for default tab
@@ -106,12 +107,13 @@ export default function Auth() {
   const handleVerifyAndSignUp = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
+    setError(null);
 
     try {
       const { supabase } = await import("@/integrations/supabase/client");
       
       // Verify code and create account
-      const { data, error } = await supabase.functions.invoke('verify-and-signup', {
+      const { data, error: invokeError } = await supabase.functions.invoke('verify-and-signup', {
         body: {
           code: verificationCode,
           email: signupData.email.toLowerCase(),
@@ -124,14 +126,14 @@ export default function Auth() {
 
       // Check for error in the response data first
       if (data?.error) {
+        setError(data.error);
         toast.error(data.error);
-        setIsLoading(false);
         return;
       }
 
-      if (error) {
-        toast.error(error.message || "Une erreur est survenue");
-        setIsLoading(false);
+      if (invokeError) {
+        setError(invokeError.message || "Une erreur est survenue");
+        toast.error(invokeError.message || "Une erreur est survenue");
         return;
       }
 
@@ -144,7 +146,6 @@ export default function Auth() {
         toast.error("Erreur lors de la connexion", {
           description: signInError.message,
         });
-        setIsLoading(false);
         return;
       }
 
@@ -160,7 +161,6 @@ export default function Auth() {
           if (checkoutError) {
             console.error('Error creating checkout:', checkoutError);
             toast.error('Erreur lors de la redirection vers le paiement');
-            setIsLoading(false);
             return;
           }
 
@@ -174,8 +174,11 @@ export default function Auth() {
         }
       }
     } catch (error: any) {
+      const errorMessage = error.message || "Une erreur est survenue";
       console.error('Error verifying and signing up:', error);
-      toast.error(error.message || "Une erreur est survenue");
+      setError(errorMessage);
+      toast.error(errorMessage);
+    } finally {
       setIsLoading(false);
     }
   };
