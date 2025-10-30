@@ -65,8 +65,11 @@ serve(async (req) => {
       subscription_data: {
         trial_period_days: 7,
       },
-      success_url: `${origin}/success?session_id={CHECKOUT_SESSION_ID}`,
+      success_url: `${origin}/dashboard?payment=success`,
       cancel_url: `${origin}/#tarifs`,
+      metadata: {
+        user_id: user.id,
+      },
       custom_text: {
         submit: {
           message: "Commencez votre essai gratuit de 7 jours - Aucun paiement aujourd'hui !",
