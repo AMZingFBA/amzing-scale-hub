@@ -47,7 +47,7 @@ export const useNotifications = () => {
 
       // Fetch all unread alerts counts by category
       const categories = [
-        'produits', 'expedition', 'informations', 'communaute', 'marketplace', 'outils'
+        'produits', 'expedition', 'informations', 'communaute', 'marketplace', 'gestion_produit', 'outils'
       ];
 
       const counts: NotificationCounts = {};

@@ -49,6 +49,13 @@ const NOTIFICATION_CATEGORIES = [
     { key: 'want-to-sell', label: 'Want to Sell' }
   ]},
   
+  // 🗂️ GESTION PRODUIT
+  { category: 'gestion_produit', label: '🗂️ GESTION PRODUIT', subcategories: [
+    { key: 'catalogue_pro', label: 'Catalogue Pro' },
+    { key: 'information', label: 'Information' },
+    { key: 'question', label: 'Question' }
+  ]},
+  
   // 🔧 OUTILS
   { category: 'outils', label: '🔧 OUTILS', subcategories: [
     { key: 'création-société', label: 'Création Société' },
