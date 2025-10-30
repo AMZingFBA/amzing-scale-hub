@@ -318,6 +318,7 @@ const Profile = () => {
         title: "Code incorrect",
         description: errorMessage,
         variant: "destructive",
+        duration: 7000,
       });
     } finally {
       setIsVerifying(false);
@@ -380,6 +381,7 @@ const Profile = () => {
         title: "Code incorrect",
         description: errorMessage,
         variant: "destructive",
+        duration: 7000,
       });
     } finally {
       setIsVerifying(false);
