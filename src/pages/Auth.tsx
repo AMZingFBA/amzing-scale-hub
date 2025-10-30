@@ -122,13 +122,17 @@ export default function Auth() {
         },
       });
 
-      if (error) {
-        throw error;
+      // Check for error in the response data first
+      if (data?.error) {
+        toast.error(data.error);
+        setIsLoading(false);
+        return;
       }
 
-      // Check for error in the response data
-      if (data?.error) {
-        throw new Error(data.error);
+      if (error) {
+        toast.error(error.message || "Une erreur est survenue");
+        setIsLoading(false);
+        return;
       }
 
       toast.success("Compte créé avec succès! Connexion...");
@@ -171,8 +175,7 @@ export default function Auth() {
       }
     } catch (error: any) {
       console.error('Error verifying and signing up:', error);
-      toast.error(error.message || "Code invalide ou expiré");
-    } finally {
+      toast.error(error.message || "Une erreur est survenue");
       setIsLoading(false);
     }
   };
