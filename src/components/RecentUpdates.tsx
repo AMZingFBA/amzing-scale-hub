@@ -17,7 +17,7 @@ interface RecentUpdate {
 const getCategoryRoute = (category: string, subcategory: string | null) => {
   // Map categories with subcategories
   if (category === 'introduction') {
-    if (subcategory === 'règles') return '/rules-alerts';
+    if (subcategory === 'règles') return '/rules-alerts?tab=updates';
     return '/dashboard';
   }
   

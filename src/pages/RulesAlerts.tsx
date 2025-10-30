@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/hooks/use-auth';
 import { useNotifications } from '@/hooks/use-notifications';
 import { supabase } from '@/integrations/supabase/client';
@@ -17,10 +17,11 @@ const RulesAlerts = () => {
   const { user, isLoading: isAuthLoading } = useAuth();
   const { markAsRead } = useNotifications();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [alerts, setAlerts] = useState<any[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('base');
+  const [activeTab, setActiveTab] = useState(searchParams.get('tab') === 'updates' ? 'updates' : 'base');
   const isNativeApp = Capacitor.isNativePlatform();
 
   const loadAlerts = async () => {
