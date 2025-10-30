@@ -273,19 +273,21 @@ const Profile = () => {
         throw new Error("Session expirée. Veuillez vous reconnecter.");
       }
 
-      const { data, error } = await supabase.functions.invoke('verify-and-update', {
+      const response = await supabase.functions.invoke('verify-and-update', {
         body: { code: verificationCode, type: 'email_change' },
         headers: {
           Authorization: `Bearer ${session.access_token}`
         }
       });
 
-      if (error) {
-        throw new Error(error.message || "Une erreur est survenue");
+      if (response.error) {
+        // Try to get error message from response data
+        const errorMessage = response.data?.error || "Code invalide ou expiré";
+        throw new Error(errorMessage);
       }
 
-      if (data?.error) {
-        throw new Error(data.error);
+      if (response.data?.error) {
+        throw new Error(response.data.error);
       }
 
       toast({
@@ -340,19 +342,21 @@ const Profile = () => {
         throw new Error("Session expirée. Veuillez vous reconnecter.");
       }
 
-      const { data, error } = await supabase.functions.invoke('verify-and-update', {
+      const response = await supabase.functions.invoke('verify-and-update', {
         body: { code: verificationCode, type: 'password_change', newPassword },
         headers: {
           Authorization: `Bearer ${session.access_token}`
         }
       });
 
-      if (error) {
-        throw new Error(error.message || "Une erreur est survenue");
+      if (response.error) {
+        // Try to get error message from response data
+        const errorMessage = response.data?.error || "Code invalide ou expiré";
+        throw new Error(errorMessage);
       }
 
-      if (data?.error) {
-        throw new Error(data.error);
+      if (response.data?.error) {
+        throw new Error(response.data.error);
       }
 
       toast({
