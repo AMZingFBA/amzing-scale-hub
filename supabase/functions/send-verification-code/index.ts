@@ -156,22 +156,28 @@ const handler = async (req: Request): Promise<Response> => {
         <head>
           <meta charset="utf-8">
           <style>
-            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; background-color: #f4f4f4; margin: 0; padding: 0; }
             .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-            .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
-            .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
-            .code { font-size: 32px; font-weight: bold; color: #667eea; text-align: center; padding: 20px; background: white; border-radius: 8px; margin: 20px 0; letter-spacing: 5px; }
+            .logo { text-align: center; padding: 20px 0; }
+            .logo img { max-width: 200px; height: auto; }
+            .header { background: linear-gradient(135deg, #FF8A00 0%, #FF6B00 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+            .content { background: white; padding: 30px; border-radius: 0 0 10px 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+            .code { font-size: 32px; font-weight: bold; color: #FF8A00; text-align: center; padding: 20px; background: #FFF7E6; border: 2px dashed #FF8A00; border-radius: 8px; margin: 20px 0; letter-spacing: 8px; }
             .footer { text-align: center; margin-top: 20px; color: #666; font-size: 12px; }
+            .info-box { background: #f0f8ff; border-left: 4px solid #FF8A00; padding: 15px; margin: 20px 0; border-radius: 4px; }
           </style>
         </head>
         <body>
           <div class="container">
+            <div class="logo">
+              <img src="https://amzing-scale-hub.lovable.app/amzing-logo-checkout.png" alt="AMZing FBA Logo" />
+            </div>
             <div class="header">
-              <h1>Code de Vérification</h1>
+              <h1 style="margin: 0; font-size: 24px;">🔐 Code de Vérification</h1>
             </div>
             <div class="content">
-              <p>Bonjour,</p>
-              <p>Voici votre code de vérification pour ${
+              <p style="font-size: 16px; color: #333;">Bonjour,</p>
+              <p style="font-size: 14px; color: #666;">Voici votre code de vérification pour ${
                 type === 'email_change' ? 'changer votre email' : 
                 type === 'phone_change' ? 'changer votre numéro de téléphone' :
                 type === 'password_reset' ? 'réinitialiser votre mot de passe' :
@@ -179,11 +185,19 @@ const handler = async (req: Request): Promise<Response> => {
                 'changer votre mot de passe'
               } :</p>
               <div class="code">${code}</div>
-              <p>Ce code est valide pendant 10 minutes.</p>
-              <p>Si vous n'avez pas demandé ce code, ignorez cet email.</p>
+              <div class="info-box">
+                <p style="margin: 0; font-size: 13px; color: #555;">
+                  ⏱️ Ce code est valide pendant <strong>10 minutes</strong>.<br>
+                  🔒 Ne partagez jamais ce code avec qui que ce soit.
+                </p>
+              </div>
+              <p style="font-size: 13px; color: #999; margin-top: 20px;">
+                Si vous n'avez pas demandé ce code, ignorez cet email en toute sécurité.
+              </p>
             </div>
             <div class="footer">
-              <p>© ${new Date().getFullYear()} Amzing FBA - Tous droits réservés</p>
+              <p style="margin: 5px 0;">© ${new Date().getFullYear()} <strong>AMZing FBA</strong> - Votre partenaire Amazon FBA</p>
+              <p style="margin: 5px 0; color: #999;">Tous droits réservés</p>
             </div>
           </div>
         </body>
