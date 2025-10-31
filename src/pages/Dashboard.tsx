@@ -87,12 +87,6 @@ const Dashboard = () => {
               <h1 className="text-4xl font-bold">Espace VIP</h1>
             </div>
 
-            {isTrialActive && <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 mb-6">
-                <p className="text-center">
-                  🎉 Essai gratuit actif - Il vous reste <strong>{daysRemaining} jours</strong>
-                </p>
-              </div>}
-
             <RecentUpdates />
 
             <Accordion type="multiple" className="space-y-4">
