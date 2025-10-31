@@ -75,8 +75,74 @@ const Services = () => {
 
           {/* Services Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto mb-16">
-            {/* Moniteurs */}
+            {/* Notifications */}
             <ServiceCard delay={0}>
+            <Card className={`border-2 hover:border-primary transition-all ${isNativeApp ? 'hover:shadow-[0_0_20px_rgba(255,153,0,0.3)]' : ''}`}>
+              <CardHeader>
+                <div className="w-16 h-16 bg-gradient-to-br from-primary to-secondary rounded-lg flex items-center justify-center mb-4">
+                  <MessageSquare className="w-8 h-8 text-white" />
+                </div>
+                <CardTitle className="text-3xl">Notifications Produits</CardTitle>
+                <CardDescription className="text-lg">Instore & Online</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground mb-6">
+                  Reçois des alertes pour les opportunités de sourcing en magasin et en ligne. 
+                  Ne rate plus jamais une bonne affaire.
+                </p>
+                <ul className="space-y-3">
+                  <li className="flex items-start gap-2">
+                    <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                    <span>Alertes instantanées</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                    <span>Deals online et en magasin</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                    <span>Filtrage par niche</span>
+                  </li>
+                </ul>
+              </CardContent>
+            </Card>
+            </ServiceCard>
+
+            {/* Fournisseurs Privés */}
+            <ServiceCard delay={80}>
+            <Card className={`border-2 hover:border-primary transition-all ${isNativeApp ? 'hover:shadow-[0_0_20px_rgba(255,153,0,0.3)]' : ''}`}>
+              <CardHeader>
+                <div className="w-16 h-16 bg-gradient-to-br from-primary to-secondary rounded-lg flex items-center justify-center mb-4">
+                  <Package className="w-8 h-8 text-white" />
+                </div>
+                <CardTitle className="text-3xl">Fournisseurs Privés</CardTitle>
+                <CardDescription className="text-lg">Listing exclusif</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground mb-6">
+                  Accède à notre réseau de fournisseurs testés et vérifiés. Produits sourcés avec marges 
+                  analysées et potentiel de vente confirmé.
+                </p>
+                <ul className="space-y-3">
+                  <li className="flex items-start gap-2">
+                    <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                    <span>Fournisseurs vérifiés en France et Europe</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                    <span>Produits à fort ROI</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                    <span>Mises à jour régulières</span>
+                  </li>
+                </ul>
+              </CardContent>
+            </Card>
+            </ServiceCard>
+
+            {/* Moniteurs */}
+            <ServiceCard delay={160}>
             <Card className={`border-2 border-primary hover:shadow-xl transition-all ${isNativeApp ? 'hover:border-primary/60 hover:shadow-[0_0_20px_rgba(255,153,0,0.3)]' : ''}`}>
               <CardHeader>
                 <div className="w-16 h-16 bg-gradient-to-br from-primary to-secondary rounded-lg flex items-center justify-center mb-4">
@@ -109,7 +175,7 @@ const Services = () => {
             </ServiceCard>
 
             {/* Guides FBA */}
-            <ServiceCard delay={80}>
+            <ServiceCard delay={240}>
             <Card className={`border-2 hover:border-primary transition-all ${isNativeApp ? 'hover:shadow-[0_0_20px_rgba(255,153,0,0.3)]' : ''}`}>
               <CardHeader>
                 <div className="w-16 h-16 bg-gradient-to-br from-secondary to-primary rounded-lg flex items-center justify-center mb-4">
@@ -141,41 +207,8 @@ const Services = () => {
             </Card>
             </ServiceCard>
 
-            {/* Fournisseurs Privés */}
-            <ServiceCard delay={160}>
-            <Card className={`border-2 hover:border-primary transition-all ${isNativeApp ? 'hover:shadow-[0_0_20px_rgba(255,153,0,0.3)]' : ''}`}>
-              <CardHeader>
-                <div className="w-16 h-16 bg-gradient-to-br from-primary to-secondary rounded-lg flex items-center justify-center mb-4">
-                  <Package className="w-8 h-8 text-white" />
-                </div>
-                <CardTitle className="text-3xl">Fournisseurs Privés</CardTitle>
-                <CardDescription className="text-lg">Listing exclusif</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground mb-6">
-                  Accède à notre réseau de fournisseurs testés et vérifiés. Produits sourcés avec marges 
-                  analysées et potentiel de vente confirmé.
-                </p>
-                <ul className="space-y-3">
-                  <li className="flex items-start gap-2">
-                    <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                    <span>Fournisseurs vérifiés en France et Europe</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                    <span>Produits à fort ROI</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                    <span>Mises à jour régulières</span>
-                  </li>
-                </ul>
-              </CardContent>
-            </Card>
-            </ServiceCard>
-
             {/* Stock Checker */}
-            <ServiceCard delay={240}>
+            <ServiceCard delay={320}>
             <Card className={`border-2 hover:border-primary transition-all ${isNativeApp ? 'hover:shadow-[0_0_20px_rgba(255,153,0,0.3)]' : ''}`}>
               <CardHeader>
                 <div className="w-16 h-16 bg-gradient-to-br from-secondary to-primary rounded-lg flex items-center justify-center mb-4">
@@ -201,39 +234,6 @@ const Services = () => {
                   <li className="flex items-start gap-2">
                     <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                     <span>Interface simple et rapide</span>
-                  </li>
-                </ul>
-              </CardContent>
-            </Card>
-            </ServiceCard>
-
-            {/* Notifications */}
-            <ServiceCard delay={320}>
-            <Card className={`border-2 hover:border-primary transition-all ${isNativeApp ? 'hover:shadow-[0_0_20px_rgba(255,153,0,0.3)]' : ''}`}>
-              <CardHeader>
-                <div className="w-16 h-16 bg-gradient-to-br from-primary to-secondary rounded-lg flex items-center justify-center mb-4">
-                  <MessageSquare className="w-8 h-8 text-white" />
-                </div>
-                <CardTitle className="text-3xl">Notifications Produits</CardTitle>
-                <CardDescription className="text-lg">Instore & Online</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground mb-6">
-                  Reçois des alertes pour les opportunités de sourcing en magasin et en ligne. 
-                  Ne rate plus jamais une bonne affaire.
-                </p>
-                <ul className="space-y-3">
-                  <li className="flex items-start gap-2">
-                    <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                    <span>Alertes instantanées</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                    <span>Deals online et en magasin</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                    <span>Filtrage par niche</span>
                   </li>
                 </ul>
               </CardContent>
