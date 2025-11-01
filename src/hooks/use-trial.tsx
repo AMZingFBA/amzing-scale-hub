@@ -82,7 +82,7 @@ export const useTrial = () => {
       
       // Initialiser RevenueCat avec votre API key iOS
       await Purchases.configure({
-        apiKey: 'appl_IHPMbFPbhkfYbUSWznkpYTfqBxE',
+        apiKey: 'appl_UkTXpjsXWtjIplSVBRXeCXGdALQ',
       });
 
       // Identifier l'utilisateur
@@ -112,7 +112,7 @@ export const useTrial = () => {
       console.log('Purchase successful:', purchaseResult);
 
       // Vérifier que l'achat est actif
-      if (purchaseResult.customerInfo.entitlements.active['vip']) {
+      if (purchaseResult.customerInfo.entitlements.active['AMZing FBA VIP']) {
         // Mettre à jour la base de données - Abonnement mensuel direct (pas d'essai gratuit)
         const expiresAt = new Date();
         expiresAt.setMonth(expiresAt.getMonth() + 1); // 1 mois d'abonnement payant
