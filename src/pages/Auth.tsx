@@ -162,8 +162,9 @@ export default function Auth() {
         return;
       }
 
-      // Sur le site web, rediriger vers Stripe après inscription
+      // Rediriger vers le paiement selon la plateforme
       if (!isNativeApp) {
+        // Sur le site web, rediriger vers Stripe
         try {
           const { data: checkoutData, error: checkoutError } = await supabase.functions.invoke('create-checkout', {
             headers: {
@@ -185,6 +186,16 @@ export default function Auth() {
         } catch (error: any) {
           console.error('Error starting checkout:', error);
           toast.error('Erreur lors de la redirection vers le paiement');
+        }
+      } else {
+        // Sur l'app native iOS, lancer le processus d'achat Apple
+        try {
+          toast.info('Préparation du paiement Apple...');
+          // Rediriger vers la page d'abonnement pour gérer le paiement Apple
+          navigate('/tarifs');
+        } catch (error: any) {
+          console.error('Error starting Apple IAP:', error);
+          toast.error('Erreur lors de la préparation du paiement');
         }
       }
     } catch (error: any) {
