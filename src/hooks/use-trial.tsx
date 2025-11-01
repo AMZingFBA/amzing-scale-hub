@@ -3,15 +3,18 @@ import { useAuth } from './use-auth';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
+import { Purchases } from '@revenuecat/purchases-capacitor';
 
 // Fonction pour détecter si on est sur une app mobile Capacitor
 const isNativePlatform = () => {
-  // Vérifier si Capacitor existe et si on est sur une plateforme native
   if (typeof window !== 'undefined' && (window as any).Capacitor) {
     return (window as any).Capacitor.isNativePlatform();
   }
   return false;
 };
+
+// ID du produit IAP (à configurer dans App Store Connect)
+const APPLE_SUBSCRIPTION_ID = 'com.amzing.vip.monthly';
 
 export const useTrial = () => {
   const [isStarting, setIsStarting] = useState(false);
@@ -39,10 +42,9 @@ export const useTrial = () => {
         return;
       }
 
-      // Si c'est l'app mobile, afficher un message pour utiliser Apple Pay
+      // Si c'est l'app mobile, utiliser Apple IAP
       if (isNativePlatform()) {
-        toast.info('Veuillez utiliser l\'option de paiement Apple Pay dans l\'application mobile');
-        setIsStarting(false);
+        await handleAppleIAP();
         return;
       }
 
@@ -61,7 +63,6 @@ export const useTrial = () => {
 
       if (data?.url) {
         console.log('Redirecting to Stripe checkout:', data.url);
-        // Ouvrir Stripe Checkout dans un nouvel onglet
         window.open(data.url, '_blank');
         toast.success('Redirection vers le paiement sécurisé Stripe...');
       } else {
@@ -70,6 +71,86 @@ export const useTrial = () => {
     } catch (error: any) {
       console.error('Error starting trial:', error);
       toast.error('Erreur lors de la redirection vers le paiement');
+    } finally {
+      setIsStarting(false);
+    }
+  };
+
+  const handleAppleIAP = async () => {
+    try {
+      console.log('Initializing Apple IAP with RevenueCat...');
+      
+      // Initialiser RevenueCat avec votre API key
+      // Note: La clé API doit être configurée dans l'app
+      await Purchases.configure({
+        apiKey: 'VOTRE_REVENUECAT_API_KEY_IOS', // À remplacer
+      });
+
+      // Identifier l'utilisateur
+      if (user?.id) {
+        await Purchases.logIn({ appUserID: user.id });
+      }
+
+      toast.info('Chargement des produits...');
+
+      // Récupérer les offres disponibles
+      const offerings = await Purchases.getOfferings();
+      
+      if (!offerings.current?.availablePackages || offerings.current.availablePackages.length === 0) {
+        throw new Error('Aucun produit d\'abonnement disponible');
+      }
+
+      const package_to_purchase = offerings.current.availablePackages[0];
+      console.log('Package found:', package_to_purchase);
+      
+      toast.info('Ouverture du paiement Apple...');
+
+      // Effectuer l'achat
+      const purchaseResult = await Purchases.purchasePackage({ 
+        aPackage: package_to_purchase 
+      });
+
+      console.log('Purchase successful:', purchaseResult);
+
+      // Vérifier que l'achat est actif
+      if (purchaseResult.customerInfo.entitlements.active['vip']) {
+        // Mettre à jour la base de données
+        const expiresAt = new Date();
+        expiresAt.setDate(expiresAt.getDate() + 7); // 7 jours gratuits
+        expiresAt.setMonth(expiresAt.getMonth() + 1); // + 1 mois
+
+        const { error: updateError } = await supabase
+          .from('subscriptions')
+          .update({
+            plan_type: 'vip',
+            status: 'active',
+            expires_at: expiresAt.toISOString(),
+            trial_used: true,
+            updated_at: new Date().toISOString()
+          })
+          .eq('user_id', user.id);
+
+        if (updateError) {
+          console.error('Error updating subscription:', updateError);
+          toast.error('Erreur lors de la mise à jour de l\'abonnement');
+          return;
+        }
+
+        toast.success('Abonnement activé avec succès ! 🎉');
+        navigate('/dashboard');
+      } else {
+        throw new Error('L\'abonnement n\'est pas actif après l\'achat');
+      }
+
+    } catch (error: any) {
+      console.error('Apple IAP Error:', error);
+      
+      // Gérer les erreurs spécifiques
+      if (error.code === '1') {
+        toast.error('Achat annulé');
+      } else {
+        toast.error('Erreur lors du paiement: ' + error.message);
+      }
     } finally {
       setIsStarting(false);
     }
