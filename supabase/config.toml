@@ -1,5 +1,8 @@
 project_id = "wvmfzlogijvqcsgablrb"
 
+[auth.external.hibp]
+enabled = true
+
 [functions.send-contact-email]
 verify_jwt = false
 
