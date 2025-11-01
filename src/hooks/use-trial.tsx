@@ -37,7 +37,7 @@ export const useTrial = () => {
         .single();
 
       if (subscription?.trial_used) {
-        toast.error('Vous avez déjà utilisé votre période d\'essai gratuite');
+        toast.error('Vous avez déjà un abonnement actif');
         setIsStarting(false);
         return;
       }
@@ -80,10 +80,9 @@ export const useTrial = () => {
     try {
       console.log('Initializing Apple IAP with RevenueCat...');
       
-      // Initialiser RevenueCat avec votre API key
-      // Note: La clé API doit être configurée dans l'app
+      // Initialiser RevenueCat avec votre API key iOS
       await Purchases.configure({
-        apiKey: 'VOTRE_REVENUECAT_API_KEY_IOS', // À remplacer
+        apiKey: 'appl_IHPMbFPbhkfYbUSWznkpYTfqBxE',
       });
 
       // Identifier l'utilisateur
@@ -114,10 +113,9 @@ export const useTrial = () => {
 
       // Vérifier que l'achat est actif
       if (purchaseResult.customerInfo.entitlements.active['vip']) {
-        // Mettre à jour la base de données
+        // Mettre à jour la base de données - Abonnement mensuel direct (pas d'essai gratuit)
         const expiresAt = new Date();
-        expiresAt.setDate(expiresAt.getDate() + 7); // 7 jours gratuits
-        expiresAt.setMonth(expiresAt.getMonth() + 1); // + 1 mois
+        expiresAt.setMonth(expiresAt.getMonth() + 1); // 1 mois d'abonnement payant
 
         const { error: updateError } = await supabase
           .from('subscriptions')
@@ -125,6 +123,7 @@ export const useTrial = () => {
             plan_type: 'vip',
             status: 'active',
             expires_at: expiresAt.toISOString(),
+            is_trial: false,
             trial_used: true,
             updated_at: new Date().toISOString()
           })
@@ -136,7 +135,7 @@ export const useTrial = () => {
           return;
         }
 
-        toast.success('Abonnement activé avec succès ! 🎉');
+        toast.success('Abonnement VIP activé avec succès ! 🎉');
         navigate('/dashboard');
       } else {
         throw new Error('L\'abonnement n\'est pas actif après l\'achat');
