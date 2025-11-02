@@ -113,41 +113,59 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log(`Found ${tokens.length} push tokens to send to`);
 
-    // 4. Envoyer les notifications via Firebase Cloud Messaging (FCM)
-    const fcmServerKey = Deno.env.get("FCM_SERVER_KEY");
+    // 4. Générer un access token OAuth2 pour FCM v1 API
+    const serviceAccountJson = Deno.env.get("FIREBASE_SERVICE_ACCOUNT_JSON");
     
-    if (!fcmServerKey) {
-      console.error('FCM_SERVER_KEY not configured');
+    if (!serviceAccountJson) {
+      console.error('FIREBASE_SERVICE_ACCOUNT_JSON not configured');
       return new Response(
         JSON.stringify({ error: 'FCM not configured' }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    // Envoyer les notifications par batch
+    const serviceAccount = JSON.parse(serviceAccountJson);
+    const accessToken = await getAccessToken(serviceAccount);
+
+    // 5. Envoyer les notifications par batch via FCM v1 API
     const notificationPromises = tokens.map(async ({ token, platform }) => {
       try {
-        const response = await fetch('https://fcm.googleapis.com/fcm/send', {
+        const fcmUrl = `https://fcm.googleapis.com/v1/projects/${serviceAccount.project_id}/messages:send`;
+        
+        const response = await fetch(fcmUrl, {
           method: 'POST',
           headers: {
-            'Authorization': `key=${fcmServerKey}`,
+            'Authorization': `Bearer ${accessToken}`,
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            to: token,
-            notification: {
-              title: '🔔 Nouvelle alerte AMZing FBA',
-              body: title,
-              sound: 'default',
-              badge: '1',
+            message: {
+              token: token,
+              notification: {
+                title: '🔔 Nouvelle alerte AMZing FBA',
+                body: title,
+              },
+              data: {
+                alert_id,
+                category,
+                subcategory: subcategory || '',
+                type: 'admin_alert',
+              },
+              android: {
+                priority: 'high',
+                notification: {
+                  sound: 'default',
+                },
+              },
+              apns: {
+                payload: {
+                  aps: {
+                    sound: 'default',
+                    badge: 1,
+                  },
+                },
+              },
             },
-            data: {
-              alert_id,
-              category,
-              subcategory: subcategory || '',
-              type: 'admin_alert',
-            },
-            priority: 'high',
           }),
         });
 
@@ -157,7 +175,8 @@ const handler = async (req: Request): Promise<Response> => {
           console.error(`Failed to send to ${platform} token:`, result);
           
           // Si le token est invalide, le supprimer
-          if (result.error === 'InvalidRegistration' || result.error === 'NotRegistered') {
+          if (result.error?.details?.[0]?.errorCode === 'UNREGISTERED' || 
+              result.error?.details?.[0]?.errorCode === 'INVALID_ARGUMENT') {
             await supabaseAdmin
               .from('push_notification_tokens')
               .delete()
@@ -202,5 +221,94 @@ const handler = async (req: Request): Promise<Response> => {
     );
   }
 };
+
+// Fonction pour générer un access token OAuth2 à partir du service account
+async function getAccessToken(serviceAccount: any): Promise<string> {
+  const now = Math.floor(Date.now() / 1000);
+  
+  const header = { alg: "RS256", typ: "JWT" };
+  const payload = {
+    iss: serviceAccount.client_email,
+    scope: 'https://www.googleapis.com/auth/firebase.messaging',
+    aud: 'https://oauth2.googleapis.com/token',
+    iat: now,
+    exp: now + 3600,
+  };
+
+  // Créer le JWT manuellement
+  const encodedHeader = base64UrlEncode(JSON.stringify(header));
+  const encodedPayload = base64UrlEncode(JSON.stringify(payload));
+  const unsignedToken = `${encodedHeader}.${encodedPayload}`;
+
+  // Signer avec la clé privée
+  const privateKey = await crypto.subtle.importKey(
+    "pkcs8",
+    pemToArrayBuffer(serviceAccount.private_key),
+    { name: "RSASSA-PKCS1-v1_5", hash: "SHA-256" },
+    false,
+    ["sign"]
+  );
+
+  const encoder = new TextEncoder();
+  const signature = await crypto.subtle.sign(
+    "RSASSA-PKCS1-v1_5",
+    privateKey,
+    encoder.encode(unsignedToken)
+  );
+
+  const encodedSignature = base64UrlEncode(signature);
+  const jwt = `${unsignedToken}.${encodedSignature}`;
+
+  // Échanger le JWT contre un access token
+  const response = await fetch('https://oauth2.googleapis.com/token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({
+      grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+      assertion: jwt,
+    }),
+  });
+
+  const data = await response.json();
+  return data.access_token;
+}
+
+// Encoder en base64url
+function base64UrlEncode(data: string | ArrayBuffer): string {
+  let base64: string;
+  
+  if (typeof data === 'string') {
+    base64 = btoa(data);
+  } else {
+    const bytes = new Uint8Array(data);
+    let binary = '';
+    for (let i = 0; i < bytes.length; i++) {
+      binary += String.fromCharCode(bytes[i]);
+    }
+    base64 = btoa(binary);
+  }
+  
+  return base64
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=/g, '');
+}
+
+// Convertir PEM en ArrayBuffer
+function pemToArrayBuffer(pem: string): ArrayBuffer {
+  const pemContents = pem
+    .replace('-----BEGIN PRIVATE KEY-----', '')
+    .replace('-----END PRIVATE KEY-----', '')
+    .replace(/\s/g, '');
+  
+  const binaryString = atob(pemContents);
+  const bytes = new Uint8Array(binaryString.length);
+  
+  for (let i = 0; i < binaryString.length; i++) {
+    bytes[i] = binaryString.charCodeAt(i);
+  }
+  
+  return bytes.buffer;
+}
 
 serve(handler);
