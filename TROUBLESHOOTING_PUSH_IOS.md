@@ -101,12 +101,13 @@ extension AppDelegate: MessagingDelegate {
 // Extension pour gérer les notifications
 extension AppDelegate: UNUserNotificationCenterDelegate {
     func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+        // Afficher la notification même quand l'app est au premier plan
         completionHandler([.banner, .sound, .badge])
     }
     
     func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
-        let userInfo = response.notification.request.content.userInfo
-        NotificationCenter.default.post(name: .capacitorDidReceiveNotificationResponse, object: response)
+        // Gérer l'action de l'utilisateur sur la notification
+        // Capacitor gère automatiquement ces notifications
         completionHandler()
     }
 }

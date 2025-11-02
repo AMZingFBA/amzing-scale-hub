@@ -98,8 +98,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
     
     func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
         // Gérer l'action de l'utilisateur sur la notification
-        let userInfo = response.notification.request.content.userInfo
-        NotificationCenter.default.post(name: .capacitorDidReceiveNotificationResponse, object: response)
+        // Capacitor gère automatiquement ces notifications
         completionHandler()
     }
 }
