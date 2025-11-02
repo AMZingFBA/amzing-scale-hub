@@ -25,10 +25,13 @@ export const usePushNotifications = () => {
         console.log('Initializing push notifications...');
 
         // Demander la permission
+        console.log('🔐 Requesting push notification permissions...');
         const permStatus = await PushNotifications.requestPermissions();
+        console.log('📋 Permission status received:', JSON.stringify(permStatus));
+        console.log('📋 Receive permission:', permStatus.receive);
         
-        if (permStatus.receive === 'granted') {
-          console.log('Push notification permission granted');
+        if (permStatus.receive === 'granted' || permStatus.receive === 'prompt-with-rationale') {
+          console.log('✅ Push notification permission granted');
 
           // Enregistrer pour recevoir des notifications
           await PushNotifications.register();
