@@ -191,7 +191,7 @@ const AdminAlerts = () => {
         fileName = file.name;
       }
 
-      const { error } = await supabase
+      const { data: newAlert, error } = await supabase
         .from('admin_alerts')
         .insert({
           admin_id: user?.id,
@@ -203,9 +203,40 @@ const AdminAlerts = () => {
           file_name: fileName,
           category: selectedCategory,
           subcategory: selectedSubcategory || null,
-        });
+        })
+        .select()
+        .single();
 
       if (error) throw error;
+
+      // Envoyer les notifications push
+      if (newAlert) {
+        try {
+          console.log('📤 Calling send-push-notifications...', {
+            alert_id: newAlert.id,
+            title: newAlert.title,
+            category: newAlert.category,
+            subcategory: newAlert.subcategory
+          });
+
+          const { data: pushData, error: pushError } = await supabase.functions.invoke('send-push-notifications', {
+            body: {
+              alert_id: newAlert.id,
+              title: newAlert.title,
+              category: newAlert.category,
+              subcategory: newAlert.subcategory
+            }
+          });
+
+          if (pushError) {
+            console.error('❌ Error sending push notifications:', pushError);
+          } else {
+            console.log('✅ Push notifications sent successfully:', pushData);
+          }
+        } catch (pushError) {
+          console.error('❌ Exception sending push notifications:', pushError);
+        }
+      }
 
       // Si c'est une alerte produits avec une sous-catégorie, poster dans le chat room correspondant
       if (selectedCategory === 'produits' && selectedSubcategory) {
