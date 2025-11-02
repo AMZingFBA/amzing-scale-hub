@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { PushNotifications, Token, ActionPerformed } from '@capacitor/push-notifications';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './use-auth';
-import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 
 const isNativePlatform = () => {
@@ -79,12 +78,9 @@ export const usePushNotifications = () => {
 
           // Écouter les notifications reçues
           await PushNotifications.addListener('pushNotificationReceived', (notification) => {
-            console.log('Push notification received:', notification);
-            
-            // Afficher un toast quand l'app est ouverte
-            toast.info(notification.title || 'Nouvelle notification', {
-              description: notification.body,
-            });
+            console.log('📬 Push notification received:', notification);
+            console.log('📬 Title:', notification.title);
+            console.log('📬 Body:', notification.body);
           });
 
           // Écouter les actions sur les notifications
