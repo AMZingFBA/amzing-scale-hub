@@ -35,14 +35,19 @@ export const usePushNotifications = () => {
 
           // Écouter l'enregistrement réussi
           await PushNotifications.addListener('registration', async (token: Token) => {
-            console.log('Push registration success, token:', token.value);
+            console.log('🔔 Push registration success!');
+            console.log('📱 Token:', token.value);
+            console.log('👤 User ID:', user.id);
             
             // Déterminer la plateforme
             const platform = (window as any).Capacitor.getPlatform();
+            console.log('🖥️ Platform:', platform);
             
             // Sauvegarder le token dans la base de données
             try {
-              const { error } = await supabase
+              console.log('💾 Attempting to save token to database...');
+              
+              const { data, error } = await supabase
                 .from('push_notification_tokens')
                 .upsert({
                   user_id: user.id,
@@ -51,21 +56,26 @@ export const usePushNotifications = () => {
                   updated_at: new Date().toISOString()
                 }, {
                   onConflict: 'user_id,token'
-                });
+                })
+                .select();
 
               if (error) {
-                console.error('Error saving push token:', error);
+                console.error('❌ Error saving push token:', error);
+                toast.error('Erreur lors de l\'enregistrement du token de notification');
               } else {
-                console.log('Push token saved successfully');
+                console.log('✅ Push token saved successfully!', data);
+                toast.success('Notifications activées avec succès!');
               }
             } catch (error) {
-              console.error('Error saving push token:', error);
+              console.error('❌ Exception saving push token:', error);
+              toast.error('Erreur lors de l\'enregistrement du token');
             }
           });
 
           // Écouter les erreurs d'enregistrement
           await PushNotifications.addListener('registrationError', (error: any) => {
-            console.error('Error on registration:', error);
+            console.error('❌ Push registration error:', error);
+            toast.error('Erreur lors de l\'enregistrement des notifications: ' + error.message);
           });
 
           // Écouter les notifications reçues
