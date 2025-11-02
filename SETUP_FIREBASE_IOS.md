@@ -47,45 +47,109 @@ npm install
 npx cap sync ios
 ```
 
-## Étape 5: Configuration Xcode
+## Étape 5: Installer Firebase SDK
 
 1. Ouvrez le projet dans Xcode:
 ```bash
 npx cap open ios
 ```
 
-2. **Ajouter GoogleService-Info.plist**:
+2. **Installer Firebase via CocoaPods**:
+   - Fermez Xcode
+   - Dans le terminal, allez dans le dossier ios/App:
+   ```bash
+   cd ios/App
+   ```
+   - Ouvrez le Podfile et ajoutez Firebase:
+   ```bash
+   pod 'Firebase/Messaging'
+   ```
+   - Installez les pods:
+   ```bash
+   pod install
+   ```
+   - Retournez à la racine du projet:
+   ```bash
+   cd ../..
+   ```
+
+3. **Rouvrir avec le workspace**:
+   ```bash
+   open ios/App/App.xcworkspace
+   ```
+   ⚠️ **IMPORTANT**: Utilisez toujours le fichier `.xcworkspace`, PAS le `.xcodeproj`
+
+## Étape 6: Configuration Xcode
+
+1. **Ajouter GoogleService-Info.plist**:
    - Dans Xcode, faites un clic droit sur "App" folder
    - Sélectionnez "Add Files to 'App'..."
    - Choisissez le fichier `GoogleService-Info.plist` téléchargé à l'étape 2
    - **IMPORTANT**: Cochez "Copy items if needed"
    - **IMPORTANT**: Cochez "Add to targets: App"
 
-3. **Activer Push Notifications**:
+2. **Activer Push Notifications**:
    - Sélectionnez le projet "App" dans la barre latérale
    - Allez dans l'onglet "Signing & Capabilities"
    - Cliquez sur "+ Capability"
    - Ajoutez "Push Notifications"
    - Ajoutez "Background Modes" et cochez "Remote notifications"
 
-4. **Vérifier le Bundle ID**:
+3. **Vérifier le Bundle ID**:
    - Dans "General" tab
    - Vérifiez que le Bundle Identifier est: `app.lovable.6c002a1cdb754b68b43b8e5c9b112692`
 
-## Étape 6: Tester
+4. **Initialiser Firebase dans AppDelegate.swift**:
+   - Ouvrez le fichier `ios/App/App/AppDelegate.swift`
+   - Ajoutez en haut du fichier:
+   ```swift
+   import Firebase
+   ```
+   - Dans la fonction `application(_ application: UIApplication, didFinishLaunchingWithOptions...)`, ajoutez AVANT le `return true`:
+   ```swift
+   FirebaseApp.configure()
+   ```
+   
+   Le fichier complet devrait ressembler à:
+   ```swift
+   import UIKit
+   import Capacitor
+   import Firebase
 
-1. Lancez l'app sur un **appareil physique** (les notifications push ne fonctionnent pas sur simulateur):
-```bash
-npx cap run ios --target <DEVICE_NAME>
-```
+   @UIApplicationMain
+   class AppDelegate: UIResponder, UIApplicationDelegate {
+       var window: UIWindow?
 
-2. Acceptez les notifications quand demandé
+       func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+           // Override point for customization after application launch.
+           FirebaseApp.configure()
+           return true
+       }
+       // ... reste du code
+   }
+   ```
 
-3. Vérifiez dans les logs que le token est généré:
+## Étape 7: Tester
+
+1. **Nettoyez et rebuild le projet**:
+   ```bash
+   npx cap sync ios
+   ```
+
+2. Lancez l'app sur un **appareil physique** (les notifications push ne fonctionnent pas sur simulateur):
+   ```bash
+   npx cap run ios --target <DEVICE_NAME>
+   ```
+   Ou lancez depuis Xcode en cliquant sur le bouton Play
+
+3. Acceptez les notifications quand demandé
+
+4. Vérifiez dans les logs que le token est généré:
    - Vous devriez voir: "🔔 Push registration success!"
+   - Le token devrait être affiché dans les logs
    - Le token devrait être sauvegardé dans la base de données
 
-## Étape 7: Obtenir votre Server Key FCM
+## Étape 8: Obtenir votre Server Key FCM
 
 1. Dans Firebase Console → Project Settings → Cloud Messaging
 2. Dans l'onglet "Cloud Messaging API (Legacy)"
@@ -106,7 +170,12 @@ Pour vérifier que tout fonctionne:
 ### Le token ne se génère pas
 - Vérifiez que GoogleService-Info.plist est bien ajouté au projet
 - Vérifiez que Push Notifications est activé dans Capabilities
+- **CRITIQUE**: Vérifiez que `FirebaseApp.configure()` est bien appelé dans AppDelegate.swift
+- **CRITIQUE**: Vérifiez que vous avez installé les pods Firebase (`pod 'Firebase/Messaging'`)
+- Vérifiez que vous ouvrez le `.xcworkspace` et non le `.xcodeproj`
 - Testez sur un appareil physique, pas un simulateur
+- Vérifiez que le Bundle ID dans GoogleService-Info.plist correspond à celui de votre app
+- Nettoyez le projet: Product > Clean Build Folder dans Xcode
 
 ### Notifications non reçues
 - Vérifiez que le certificat APNs est correctement configuré dans Firebase
