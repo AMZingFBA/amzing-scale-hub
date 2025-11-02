@@ -64,21 +64,17 @@ export const usePushNotifications = () => {
 
               if (error) {
                 console.error('❌ Error saving push token:', error);
-                toast.error('Erreur lors de l\'enregistrement du token de notification');
               } else {
                 console.log('✅ Push token saved successfully!', data);
-                toast.success('Notifications activées avec succès!');
               }
             } catch (error) {
               console.error('❌ Exception saving push token:', error);
-              toast.error('Erreur lors de l\'enregistrement du token');
             }
           });
 
           // Écouter les erreurs d'enregistrement
           await PushNotifications.addListener('registrationError', (error: any) => {
             console.error('❌ Push registration error:', error);
-            toast.error('Erreur lors de l\'enregistrement des notifications: ' + error.message);
           });
 
           // Écouter les notifications reçues
@@ -113,7 +109,6 @@ export const usePushNotifications = () => {
           console.log('Push notifications initialized successfully');
         } else {
           console.log('Push notification permission denied');
-          toast.error('Les notifications sont désactivées. Vous pouvez les activer dans les paramètres de votre téléphone.');
         }
       } catch (error) {
         console.error('Error initializing push notifications:', error);
