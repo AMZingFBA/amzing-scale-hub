@@ -54,12 +54,20 @@ const handler = async (req: Request): Promise<Response> => {
     const userIds = vipUsers.map(u => u.user_id);
     
     // Récupérer les préférences de notification
-    const { data: preferences, error: prefError } = await supabaseAdmin
+    let preferencesQuery = supabaseAdmin
       .from('notification_preferences')
       .select('user_id, enabled')
       .in('user_id', userIds)
-      .eq('category', category)
-      .eq('subcategory', subcategory || null);
+      .eq('category', category);
+    
+    // Ajouter le filtre subcategory seulement si elle est définie
+    if (subcategory) {
+      preferencesQuery = preferencesQuery.eq('subcategory', subcategory);
+    } else {
+      preferencesQuery = preferencesQuery.is('subcategory', null);
+    }
+    
+    const { data: preferences, error: prefError } = await preferencesQuery;
 
     if (prefError) {
       console.error('Error fetching notification preferences:', prefError);
