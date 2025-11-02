@@ -20,6 +20,7 @@ import Contact from "./pages/Contact";
 import FAQ from "./pages/FAQ";
 import CGV from "./pages/CGV";
 import Privacy from "./pages/Privacy";
+import Confidentialite from "./pages/Confidentialite";
 import Refund from "./pages/Refund";
 import Support from "./pages/Support";
 import Ticket from "./pages/Ticket";
@@ -69,6 +70,7 @@ const App = () => (
             <Route path="/faq" element={<FAQ />} />
             <Route path="/cgv" element={<CGV />} />
             <Route path="/privacy" element={<Privacy />} />
+            <Route path="/confidentialite" element={<Confidentialite />} />
             <Route path="/refund" element={<Refund />} />
             <Route path="/support" element={<Support />} />
             <Route path="/ticket/:id" element={<Ticket />} />
