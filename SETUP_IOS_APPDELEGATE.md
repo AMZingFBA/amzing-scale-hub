@@ -8,6 +8,7 @@ Remplacez TOUT le contenu de `ios/App/App/AppDelegate.swift` par ce code:
 import UIKit
 import Capacitor
 import Firebase
+import FirebaseMessaging
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -16,6 +17,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Configure Firebase
         FirebaseApp.configure()
+        
+        // Set Firebase Messaging delegate
+        Messaging.messaging().delegate = self
         
         // Register for remote notifications
         UNUserNotificationCenter.current().delegate = self
@@ -55,13 +59,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     // IMPORTANT: Ces méthodes sont CRITIQUES pour les push notifications
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
-        // Passer le token à Firebase Messaging
         print("📱 APNs Device Token received")
         
         // Convertir le token en string pour le debug
         let tokenParts = deviceToken.map { data in String(format: "%02.2hhx", data) }
         let token = tokenParts.joined()
         print("📱 APNs Token: \(token)")
+        
+        // CRITIQUE: Passer le token APNs à Firebase Messaging
+        Messaging.messaging().apnsToken = deviceToken
         
         // Passer à Capacitor pour que le plugin PushNotifications reçoive le token
         NotificationCenter.default.post(name: .capacitorDidRegisterForRemoteNotifications, object: deviceToken)
@@ -70,6 +76,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
         print("❌ Failed to register for remote notifications: \(error)")
         NotificationCenter.default.post(name: .capacitorDidFailToRegisterForRemoteNotifications, object: error)
+    }
+}
+
+// Extension pour Firebase Messaging
+extension AppDelegate: MessagingDelegate {
+    func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?) {
+        print("🔥 Firebase FCM Token: \(fcmToken ?? "nil")")
+        
+        // Le token FCM est maintenant disponible
+        // Capacitor va le récupérer automatiquement
     }
 }
 
