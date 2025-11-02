@@ -7,11 +7,6 @@ const config: CapacitorConfig = {
   server: {
     url: "https://6c002a1c-db75-4b68-b43b-8e5c9b112692.lovableproject.com?forceHideBadge=true",
     cleartext: true
-  },
-  plugins: {
-    FirebaseMessaging: {
-      presentationOptions: ["badge", "sound", "alert"]
-    }
   }
 };
 
