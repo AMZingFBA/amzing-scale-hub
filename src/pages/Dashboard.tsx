@@ -100,7 +100,6 @@ const Dashboard = () => {
                   </div>
                 </AccordionTrigger>
                 <AccordionContent className="px-4 pb-4">
-                  <CategoryAlerts category="introduction" />
                   <div className="grid gap-3 pt-2">
                     <CategoryItem icon={Bell} label="notifications" link="/notification-alerts" badge={notifications.introduction?.subcategories?.notifications} />
                     <CategoryItem icon={BookOpen} label="règles" link="/rules-alerts" badge={notifications.introduction?.subcategories?.règles} />
@@ -122,7 +121,6 @@ const Dashboard = () => {
                   </div>
                 </AccordionTrigger>
                 <AccordionContent>
-                  <CategoryAlerts category="outils" />
                   <div className="grid gap-3 pt-2">
                     <CategoryItem icon={Eye} label="création-société" badge={notifications.outils?.subcategories?.['création-société']} />
                     <CategoryItem icon={FileText} label="facture-autorisation" onClick={() => setInvoiceAuthOpen(true)} badge={notifications.outils?.subcategories?.['facture-autorisation']} />
@@ -141,7 +139,6 @@ const Dashboard = () => {
                   </div>
                 </AccordionTrigger>
                 <AccordionContent>
-                  <CategoryAlerts category="produits" />
                   <div className="grid gap-3 pt-2">
                     <CategoryItem icon={Sparkles} label="product find" link="/produits-find" badge={notifications.produits?.subcategories?.['produits-find']} />
                     <CategoryItem icon={Sparkles} label="produits qogita" link="/produits-qogita" badge={notifications.produits?.subcategories?.['produits-qogita']} />
@@ -163,7 +160,6 @@ const Dashboard = () => {
                   </div>
                 </AccordionTrigger>
                 <AccordionContent>
-                  <CategoryAlerts category="expedition" />
                   <div className="grid gap-3 pt-2">
                     <CategoryItem icon={Settings} label="fournitures" badge={notifications.expedition?.subcategories?.fournitures} />
                     <CategoryItem icon={Package} label="cartons" badge={notifications.expedition?.subcategories?.cartons} />

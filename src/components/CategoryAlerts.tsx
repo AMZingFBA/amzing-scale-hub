@@ -113,11 +113,7 @@ const CategoryAlerts = ({ category, subcategory }: CategoryAlertsProps) => {
         {alerts.map((alert) => (
           <Card 
             key={alert.id} 
-            className="border-l-4 border-l-primary bg-primary/5 cursor-pointer hover:bg-primary/10 transition-colors"
-            onClick={(e) => {
-              e.stopPropagation();
-              handleAlertClick(alert);
-            }}
+            className="border-l-4 border-l-primary bg-primary/5"
           >
             <CardContent className="pt-4 space-y-3">
               <div className="flex items-start justify-between gap-2">
@@ -136,8 +132,7 @@ const CategoryAlerts = ({ category, subcategory }: CategoryAlertsProps) => {
                   href={alert.link_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-2 text-primary hover:underline text-sm font-medium"
-                  onClick={(e) => e.stopPropagation()}
+                  className="inline-flex items-center gap-2 text-primary hover:underline text-sm font-medium"
                 >
                   <Link2 className="w-3 h-3" />
                   Voir le lien
@@ -178,6 +173,13 @@ const CategoryAlerts = ({ category, subcategory }: CategoryAlertsProps) => {
                   minute: '2-digit'
                 })}
               </p>
+
+              <button
+                onClick={() => handleAlertClick(alert)}
+                className="text-sm text-primary hover:underline font-medium"
+              >
+                Voir plus de détails
+              </button>
             </CardContent>
           </Card>
         ))}
