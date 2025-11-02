@@ -32,9 +32,7 @@ export const usePushNotifications = () => {
         if (permStatus.receive === 'granted' || permStatus.receive === 'prompt-with-rationale') {
           console.log('✅ Push notification permission granted');
 
-          // Enregistrer pour recevoir des notifications
-          await PushNotifications.register();
-
+          // Ajouter les listeners AVANT d'enregistrer
           // Écouter l'enregistrement réussi
           await PushNotifications.addListener('registration', async (token: Token) => {
             console.log('🔔 Push registration success!');
@@ -85,7 +83,7 @@ export const usePushNotifications = () => {
 
           // Écouter les actions sur les notifications
           await PushNotifications.addListener('pushNotificationActionPerformed', (notification: ActionPerformed) => {
-            console.log('Push notification action performed:', notification);
+              console.log('Push notification action performed:', notification);
             
             // Rediriger selon le type de notification
             const data = notification.notification.data;
@@ -101,8 +99,12 @@ export const usePushNotifications = () => {
             }
           });
 
+          // Enregistrer pour recevoir des notifications APRÈS avoir ajouté les listeners
+          console.log('📱 Registering for push notifications...');
+          await PushNotifications.register();
+
           setIsInitialized(true);
-          console.log('Push notifications initialized successfully');
+          console.log('✅ Push notifications initialized successfully');
         } else {
           console.log('Push notification permission denied');
         }
