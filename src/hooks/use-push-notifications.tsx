@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { PushNotifications, Token, ActionPerformed } from '@capacitor/push-notifications';
+import { FirebaseMessaging } from '@capacitor-firebase/messaging';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './use-auth';
 import { useNavigate } from 'react-router-dom';
@@ -21,73 +21,65 @@ export const usePushNotifications = () => {
 
     const initializePushNotifications = async () => {
       try {
-        console.log('Initializing push notifications...');
+        console.log('Initializing Firebase push notifications...');
 
         // Demander la permission
         console.log('🔐 Requesting push notification permissions...');
-        const permStatus = await PushNotifications.requestPermissions();
+        const permStatus = await FirebaseMessaging.requestPermissions();
         console.log('📋 Permission status received:', JSON.stringify(permStatus));
         console.log('📋 Receive permission:', permStatus.receive);
         
-        if (permStatus.receive === 'granted' || permStatus.receive === 'prompt-with-rationale') {
+        if (permStatus.receive === 'granted') {
           console.log('✅ Push notification permission granted');
 
-          // Ajouter les listeners AVANT d'enregistrer
-          // Écouter l'enregistrement réussi
-          await PushNotifications.addListener('registration', async (token: Token) => {
-            console.log('🔔 Push registration success!');
-            console.log('📱 Token:', token.value);
-            console.log('👤 User ID:', user.id);
+          // Obtenir le token FCM
+          console.log('📱 Getting FCM token...');
+          const result = await FirebaseMessaging.getToken();
+          console.log('🔔 FCM Token received!');
+          console.log('📱 Token:', result.token);
+          console.log('👤 User ID:', user.id);
+          
+          // Déterminer la plateforme
+          const platform = (window as any).Capacitor.getPlatform();
+          console.log('🖥️ Platform:', platform);
+          
+          // Sauvegarder le token dans la base de données
+          try {
+            console.log('💾 Attempting to save token to database...');
             
-            // Déterminer la plateforme
-            const platform = (window as any).Capacitor.getPlatform();
-            console.log('🖥️ Platform:', platform);
-            
-            // Sauvegarder le token dans la base de données
-            try {
-              console.log('💾 Attempting to save token to database...');
-              
-              const { data, error } = await supabase
-                .from('push_notification_tokens')
-                .upsert({
-                  user_id: user.id,
-                  token: token.value,
-                  platform: platform,
-                  updated_at: new Date().toISOString()
-                }, {
-                  onConflict: 'user_id,token'
-                })
-                .select();
+            const { data, error } = await supabase
+              .from('push_notification_tokens')
+              .upsert({
+                user_id: user.id,
+                token: result.token,
+                platform: platform,
+                updated_at: new Date().toISOString()
+              }, {
+                onConflict: 'user_id,token'
+              })
+              .select();
 
-              if (error) {
-                console.error('❌ Error saving push token:', error);
-              } else {
-                console.log('✅ Push token saved successfully!', data);
-              }
-            } catch (error) {
-              console.error('❌ Exception saving push token:', error);
+            if (error) {
+              console.error('❌ Error saving push token:', error);
+            } else {
+              console.log('✅ Push token saved successfully!', data);
             }
-          });
-
-          // Écouter les erreurs d'enregistrement
-          await PushNotifications.addListener('registrationError', (error: any) => {
-            console.error('❌ Push registration error:', error);
-          });
+          } catch (error) {
+            console.error('❌ Exception saving push token:', error);
+          }
 
           // Écouter les notifications reçues
-          await PushNotifications.addListener('pushNotificationReceived', (notification) => {
-            console.log('📬 Push notification received:', notification);
-            console.log('📬 Title:', notification.title);
-            console.log('📬 Body:', notification.body);
+          await FirebaseMessaging.addListener('notificationReceived', (event) => {
+            console.log('📬 Push notification received:', event.notification);
           });
 
           // Écouter les actions sur les notifications
-          await PushNotifications.addListener('pushNotificationActionPerformed', (notification: ActionPerformed) => {
-              console.log('Push notification action performed:', notification);
+          await FirebaseMessaging.addListener('notificationActionPerformed', (event) => {
+            console.log('Push notification action performed:', event);
             
             // Rediriger selon le type de notification
-            const data = notification.notification.data;
-            if (data.type === 'admin_alert' && data.category) {
+            const data = event.notification.data as any;
+            if (data?.type === 'admin_alert' && data?.category) {
               // Rediriger vers la page d'alertes appropriée
               if (data.category === 'introduction') {
                 navigate('/actualite');
@@ -99,12 +91,8 @@ export const usePushNotifications = () => {
             }
           });
 
-          // Enregistrer pour recevoir des notifications APRÈS avoir ajouté les listeners
-          console.log('📱 Registering for push notifications...');
-          await PushNotifications.register();
-
           setIsInitialized(true);
-          console.log('✅ Push notifications initialized successfully');
+          console.log('✅ Firebase push notifications initialized successfully');
         } else {
           console.log('Push notification permission denied');
         }
@@ -118,7 +106,7 @@ export const usePushNotifications = () => {
     // Cleanup
     return () => {
       if (isInitialized) {
-        PushNotifications.removeAllListeners();
+        FirebaseMessaging.removeAllListeners();
       }
     };
   }, [user, isInitialized, navigate]);
