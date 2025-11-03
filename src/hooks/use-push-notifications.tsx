@@ -16,6 +16,56 @@ export const usePushNotifications = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
+  // Register FCM token listener FIRST, before anything else
+  useEffect(() => {
+    if (!isNativePlatform()) return;
+
+    const handleFCMToken = async (event: any) => {
+      const fcmToken = event.detail.token;
+      console.log('🔥 FCM Token received from native:', fcmToken);
+
+      if (!user) {
+        console.log('⚠️ User not logged in, waiting...');
+        return;
+      }
+
+      console.log('👤 User ID:', user.id);
+      
+      const platform = (window as any).Capacitor.getPlatform();
+      console.log('🖥️ Platform:', platform);
+      
+      try {
+        console.log('💾 Attempting to save FCM token to database...');
+        
+        const { data, error } = await supabase
+          .from('push_notification_tokens')
+          .upsert({
+            user_id: user.id,
+            token: fcmToken,
+            platform: platform,
+            updated_at: new Date().toISOString()
+          }, {
+            onConflict: 'user_id,token'
+          })
+          .select();
+
+        if (error) {
+          console.error('❌ Error saving FCM token:', error);
+        } else {
+          console.log('✅ FCM token saved successfully!', data);
+        }
+      } catch (error) {
+        console.error('❌ Exception saving FCM token:', error);
+      }
+    };
+
+    window.addEventListener('fcmTokenReceived', handleFCMToken);
+
+    return () => {
+      window.removeEventListener('fcmTokenReceived', handleFCMToken);
+    };
+  }, [user]);
+
   useEffect(() => {
     if (!user || !isNativePlatform() || isInitialized) return;
 
@@ -72,42 +122,6 @@ export const usePushNotifications = () => {
           console.log('📱 Registering for push notifications...');
           await PushNotifications.register();
 
-          // Écouter les messages personnalisés du native (pour le token FCM)
-          window.addEventListener('fcmTokenReceived', async (event: any) => {
-            const fcmToken = event.detail.token;
-            console.log('🔥 FCM Token received from native:', fcmToken);
-            console.log('👤 User ID:', user.id);
-            
-            // Déterminer la plateforme
-            const platform = (window as any).Capacitor.getPlatform();
-            console.log('🖥️ Platform:', platform);
-            
-            // Sauvegarder le token FCM dans la base de données
-            try {
-              console.log('💾 Attempting to save FCM token to database...');
-              
-              const { data, error } = await supabase
-                .from('push_notification_tokens')
-                .upsert({
-                  user_id: user.id,
-                  token: fcmToken,
-                  platform: platform,
-                  updated_at: new Date().toISOString()
-                }, {
-                  onConflict: 'user_id,token'
-                })
-                .select();
-
-              if (error) {
-                console.error('❌ Error saving FCM token:', error);
-              } else {
-                console.log('✅ FCM token saved successfully!', data);
-              }
-            } catch (error) {
-              console.error('❌ Exception saving FCM token:', error);
-            }
-          });
-
           setIsInitialized(true);
           console.log('✅ Push notifications initialized successfully');
         } else {
@@ -124,7 +138,6 @@ export const usePushNotifications = () => {
     return () => {
       if (isInitialized) {
         PushNotifications.removeAllListeners();
-        window.removeEventListener('fcmTokenReceived', () => {});
       }
     };
   }, [user, isInitialized, navigate]);
