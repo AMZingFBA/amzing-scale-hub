@@ -74,7 +74,7 @@ export const usePushNotifications = () => {
 
           // Écouter les messages personnalisés du native (pour le token FCM)
           window.addEventListener('fcmTokenReceived', async (event: any) => {
-            const fcmToken = event.detail;
+            const fcmToken = event.detail.token;
             console.log('🔥 FCM Token received from native:', fcmToken);
             console.log('👤 User ID:', user.id);
             
