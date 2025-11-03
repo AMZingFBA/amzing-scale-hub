@@ -96,10 +96,26 @@ extension AppDelegate: MessagingDelegate {
     func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?) {
         print("🔥 Firebase FCM Token: \(fcmToken ?? "nil")")
         
-        // CRITIQUE: Passer le token FCM (pas APNs) à Capacitor
+        // CRITIQUE: Envoyer le token FCM à JavaScript via evaluateJavaScript
         if let fcmToken = fcmToken {
-            NotificationCenter.default.post(name: .capacitorDidRegisterForRemoteNotifications, object: fcmToken)
-            print("✅ FCM Token passed to Capacitor")
+            DispatchQueue.main.async {
+                if let bridge = self.bridge, let webView = bridge.webView {
+                    let jsCode = """
+                        window.dispatchEvent(new CustomEvent('fcmTokenReceived', { 
+                            detail: '\(fcmToken)' 
+                        }));
+                    """
+                    webView.evaluateJavaScript(jsCode) { (result, error) in
+                        if let error = error {
+                            print("❌ Error sending FCM token to JavaScript:", error)
+                        } else {
+                            print("✅ FCM Token sent to JavaScript")
+                        }
+                    }
+                } else {
+                    print("❌ Bridge or WebView not available")
+                }
+            }
         }
     }
 }

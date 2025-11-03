@@ -33,40 +33,11 @@ export const usePushNotifications = () => {
           console.log('✅ Push notification permission granted');
 
           // Ajouter les listeners AVANT d'enregistrer
-          // Écouter l'enregistrement réussi
+          // Écouter l'enregistrement réussi - on va recevoir le token APNs mais on va aussi
+          // écouter les paramètres d'URL pour le token FCM
           await PushNotifications.addListener('registration', async (token: Token) => {
             console.log('🔔 Push registration success!');
-            console.log('📱 Token:', token.value);
-            console.log('👤 User ID:', user.id);
-            
-            // Déterminer la plateforme
-            const platform = (window as any).Capacitor.getPlatform();
-            console.log('🖥️ Platform:', platform);
-            
-            // Sauvegarder le token dans la base de données
-            try {
-              console.log('💾 Attempting to save token to database...');
-              
-              const { data, error } = await supabase
-                .from('push_notification_tokens')
-                .upsert({
-                  user_id: user.id,
-                  token: token.value,
-                  platform: platform,
-                  updated_at: new Date().toISOString()
-                }, {
-                  onConflict: 'user_id,token'
-                })
-                .select();
-
-              if (error) {
-                console.error('❌ Error saving push token:', error);
-              } else {
-                console.log('✅ Push token saved successfully!', data);
-              }
-            } catch (error) {
-              console.error('❌ Exception saving push token:', error);
-            }
+            console.log('📱 APNs Token received:', token.value);
           });
 
           // Écouter les erreurs d'enregistrement
@@ -103,6 +74,42 @@ export const usePushNotifications = () => {
           console.log('📱 Registering for push notifications...');
           await PushNotifications.register();
 
+          // Écouter les messages personnalisés du native (pour le token FCM)
+          window.addEventListener('fcmTokenReceived', async (event: any) => {
+            const fcmToken = event.detail;
+            console.log('🔥 FCM Token received from native:', fcmToken);
+            console.log('👤 User ID:', user.id);
+            
+            // Déterminer la plateforme
+            const platform = (window as any).Capacitor.getPlatform();
+            console.log('🖥️ Platform:', platform);
+            
+            // Sauvegarder le token FCM dans la base de données
+            try {
+              console.log('💾 Attempting to save FCM token to database...');
+              
+              const { data, error } = await supabase
+                .from('push_notification_tokens')
+                .upsert({
+                  user_id: user.id,
+                  token: fcmToken,
+                  platform: platform,
+                  updated_at: new Date().toISOString()
+                }, {
+                  onConflict: 'user_id,token'
+                })
+                .select();
+
+              if (error) {
+                console.error('❌ Error saving FCM token:', error);
+              } else {
+                console.log('✅ FCM token saved successfully!', data);
+              }
+            } catch (error) {
+              console.error('❌ Exception saving FCM token:', error);
+            }
+          });
+
           setIsInitialized(true);
           console.log('✅ Push notifications initialized successfully');
         } else {
@@ -119,6 +126,7 @@ export const usePushNotifications = () => {
     return () => {
       if (isInitialized) {
         PushNotifications.removeAllListeners();
+        window.removeEventListener('fcmTokenReceived', () => {});
       }
     };
   }, [user, isInitialized, navigate]);
