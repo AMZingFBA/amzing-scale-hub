@@ -13,6 +13,39 @@ interface NotificationRequest {
   subcategory?: string;
 }
 
+// Fonction pour obtenir le titre de notification selon la catégorie et sous-catégorie
+function getNotificationTitle(category: string, subcategory?: string): string {
+  if (category === 'product') {
+    return '🎯 Nouveau Produit Rentable !';
+  }
+  
+  if (category === 'marketplace') {
+    if (subcategory === 'buy') {
+      return '🛒 Nouvelle Demande d\'Achat';
+    } else if (subcategory === 'sell') {
+      return '💰 Nouvelle Offre de Vente';
+    }
+    return '📦 Nouvelle Annonce Marketplace';
+  }
+  
+  if (category === 'rules') {
+    return '⚠️ Alerte Règles Amazon';
+  }
+  
+  if (category === 'catalogue') {
+    return '📚 Nouveau Catalogue';
+  }
+  
+  if (category === 'informations') {
+    if (subcategory === 'actualités') {
+      return '📰 Nouvelle Actualité !';
+    }
+    return 'ℹ️ Nouvelle Information';
+  }
+  
+  return '🔔 Nouvelle Alerte';
+}
+
 const handler = async (req: Request): Promise<Response> => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -142,7 +175,7 @@ const handler = async (req: Request): Promise<Response> => {
             message: {
               token: token,
               notification: {
-                title: `✨ ${category === 'product' ? 'Nouveau Produit' : category === 'marketplace' ? 'Nouvelle Annonce' : category === 'rules' ? 'Alerte Règles' : 'Nouvelle Alerte'}`,
+                title: getNotificationTitle(category, subcategory),
                 body: `📢 ${title}`,
               },
               data: {
