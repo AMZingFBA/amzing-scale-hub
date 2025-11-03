@@ -17,40 +17,50 @@ export const usePushNotifications = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  // Register FCM token listener AND check for existing token
+  // Listen for FCM token from native layer
   useEffect(() => {
     if (!isNativePlatform()) return;
 
-    // Check if token was already set by native before React loaded
+    console.log('🎧 Setting up FCM token listener...');
+
+    // Check if token already exists from before React loaded
     const existingToken = (window as any).__FCM_TOKEN__;
-    if (existingToken && !pendingToken) {
-      console.log('🔥 Found existing FCM token from native (before React loaded):', existingToken);
+    if (existingToken) {
+      console.log('🔥 Found existing FCM token from native:', existingToken);
       setPendingToken(existingToken);
-      delete (window as any).__FCM_TOKEN__; // Clean up
+      delete (window as any).__FCM_TOKEN__;
     }
 
     const handleFCMToken = (event: any) => {
-      const fcmToken = event.detail.token;
-      console.log('🔥 FCM Token received from native event:', fcmToken);
-      setPendingToken(fcmToken);
+      console.log('📨 FCM token event received!', event);
+      const fcmToken = event.detail?.token;
+      if (fcmToken) {
+        console.log('🔥 FCM Token from event:', fcmToken);
+        setPendingToken(fcmToken);
+      } else {
+        console.error('❌ No token in event detail');
+      }
     };
 
     window.addEventListener('fcmTokenReceived', handleFCMToken);
+    console.log('✅ FCM token listener registered');
 
     return () => {
       window.removeEventListener('fcmTokenReceived', handleFCMToken);
+      console.log('🧹 FCM token listener cleaned up');
     };
   }, []);
 
-  // Save token when we have both user and pending token
+  // Save token to database when we have both user and token
   useEffect(() => {
     if (!user || !pendingToken || !isNativePlatform()) return;
 
-    console.log('💾 Saving FCM token...');
+    console.log('💾 Attempting to save FCM token to database...');
     console.log('👤 User ID:', user.id);
+    console.log('🎫 Token:', pendingToken);
     
-    const platform = (window as any).Capacitor.getPlatform();
-    console.log('🖥️ Platform:', platform);
+    const platform = (window as any).Capacitor?.getPlatform?.() || 'unknown';
+    console.log('📱 Platform:', platform);
 
     const saveToken = async () => {
       try {
@@ -69,11 +79,11 @@ export const usePushNotifications = () => {
         if (error) {
           console.error('❌ Error saving FCM token:', error);
         } else {
-          console.log('✅ FCM token saved successfully!', data);
+          console.log('✅ FCM token saved successfully to database!', data);
           setPendingToken(null);
         }
       } catch (error) {
-        console.error('❌ Exception saving FCM token:', error);
+        console.error('❌ Exception while saving FCM token:', error);
       }
     };
 
