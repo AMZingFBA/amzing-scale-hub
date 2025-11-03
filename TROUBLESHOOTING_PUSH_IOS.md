@@ -81,8 +81,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // CRITIQUE: Passer le token APNs à Firebase
         Messaging.messaging().apnsToken = deviceToken
         
-        // Passer à Capacitor
-        NotificationCenter.default.post(name: .capacitorDidRegisterForRemoteNotifications, object: deviceToken)
+        // NE PAS passer le token APNs à Capacitor ici
+        // On va passer le token FCM dans le delegate Firebase
     }
     
     func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
@@ -95,6 +95,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 extension AppDelegate: MessagingDelegate {
     func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?) {
         print("🔥 Firebase FCM Token: \(fcmToken ?? "nil")")
+        
+        // CRITIQUE: Passer le token FCM (pas APNs) à Capacitor
+        if let fcmToken = fcmToken {
+            NotificationCenter.default.post(name: .capacitorDidRegisterForRemoteNotifications, object: fcmToken)
+            print("✅ FCM Token passed to Capacitor")
+        }
     }
 }
 
