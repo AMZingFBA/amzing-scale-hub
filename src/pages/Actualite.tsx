@@ -49,7 +49,7 @@ const Actualite = () => {
             table: 'admin_alerts'
           },
           (payload) => {
-            if (payload.new.category === 'informations' && payload.new.subcategory === 'actualité') {
+            if (payload.new.category === 'informations' && payload.new.subcategory === 'actualités') {
               toast({
                 title: "📰 Nouvelle actualité !",
                 description: payload.new.title,
@@ -72,7 +72,7 @@ const Actualite = () => {
         .from('admin_alerts')
         .select('*')
         .eq('category', 'informations')
-        .eq('subcategory', 'actualité')
+        .eq('subcategory', 'actualités')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
