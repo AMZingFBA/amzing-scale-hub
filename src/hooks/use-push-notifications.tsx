@@ -17,14 +17,22 @@ export const usePushNotifications = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  // Listen for FCM token from native layer
+  // Listen for FCM token - MUST run on every mount
   useEffect(() => {
-    if (!isNativePlatform()) return;
+    console.log('🎧 FCM listener effect running...');
+    console.log('🎧 Is native platform?', isNativePlatform());
+    
+    if (!isNativePlatform()) {
+      console.log('⚠️ Not a native platform, skipping FCM setup');
+      return;
+    }
 
-    console.log('🎧 Setting up FCM token listener...');
+    console.log('✅ Setting up FCM token listener...');
 
     // Check if token already exists from before React loaded
     const existingToken = (window as any).__FCM_TOKEN__;
+    console.log('🔍 Checking for existing token:', existingToken ? 'FOUND' : 'NOT FOUND');
+    
     if (existingToken) {
       console.log('🔥 Found existing FCM token from native:', existingToken);
       setPendingToken(existingToken);
