@@ -107,8 +107,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             return
         }
         
-        // WebView is ready, send the event
-        let js = "window.dispatchEvent(new CustomEvent('fcmTokenReceived', { detail: { token: '\(token)' }}));"
+        // WebView is ready, store token globally and dispatch event
+        let js = """
+        window.__FCM_TOKEN__ = '\(token)';
+        window.dispatchEvent(new CustomEvent('fcmTokenReceived', { detail: { token: '\(token)' }}));
+        """
         webView.evaluateJavaScript(js) { result, error in
             if let error = error {
                 print("❌ Error sending FCM token to JavaScript: \(error)")

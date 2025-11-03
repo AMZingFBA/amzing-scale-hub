@@ -17,51 +17,22 @@ export const usePushNotifications = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  // Register FCM token listener FIRST, before anything else
+  // Register FCM token listener AND check for existing token
   useEffect(() => {
     if (!isNativePlatform()) return;
 
-    const handleFCMToken = async (event: any) => {
+    // Check if token was already set by native before React loaded
+    const existingToken = (window as any).__FCM_TOKEN__;
+    if (existingToken && !pendingToken) {
+      console.log('🔥 Found existing FCM token from native (before React loaded):', existingToken);
+      setPendingToken(existingToken);
+      delete (window as any).__FCM_TOKEN__; // Clean up
+    }
+
+    const handleFCMToken = (event: any) => {
       const fcmToken = event.detail.token;
-      console.log('🔥 FCM Token received from native:', fcmToken);
-
-      // Store token for later use
+      console.log('🔥 FCM Token received from native event:', fcmToken);
       setPendingToken(fcmToken);
-
-      if (!user) {
-        console.log('⚠️ User not logged in, token stored for later...');
-        return;
-      }
-
-      console.log('👤 User ID:', user.id);
-      
-      const platform = (window as any).Capacitor.getPlatform();
-      console.log('🖥️ Platform:', platform);
-      
-      try {
-        console.log('💾 Attempting to save FCM token to database...');
-        
-        const { data, error } = await supabase
-          .from('push_notification_tokens')
-          .upsert({
-            user_id: user.id,
-            token: fcmToken,
-            platform: platform,
-            updated_at: new Date().toISOString()
-          }, {
-            onConflict: 'user_id,token'
-          })
-          .select();
-
-        if (error) {
-          console.error('❌ Error saving FCM token:', error);
-        } else {
-          console.log('✅ FCM token saved successfully!', data);
-          setPendingToken(null); // Clear pending token
-        }
-      } catch (error) {
-        console.error('❌ Exception saving FCM token:', error);
-      }
     };
 
     window.addEventListener('fcmTokenReceived', handleFCMToken);
@@ -69,22 +40,20 @@ export const usePushNotifications = () => {
     return () => {
       window.removeEventListener('fcmTokenReceived', handleFCMToken);
     };
-  }, [user]);
+  }, []);
 
-  // Save pending token when user logs in
+  // Save token when we have both user and pending token
   useEffect(() => {
     if (!user || !pendingToken || !isNativePlatform()) return;
 
-    console.log('👤 User logged in, saving pending FCM token...');
+    console.log('💾 Saving FCM token...');
     console.log('👤 User ID:', user.id);
     
     const platform = (window as any).Capacitor.getPlatform();
     console.log('🖥️ Platform:', platform);
-    
-    const savePendingToken = async () => {
+
+    const saveToken = async () => {
       try {
-        console.log('💾 Saving pending FCM token:', pendingToken);
-        
         const { data, error } = await supabase
           .from('push_notification_tokens')
           .upsert({
@@ -98,18 +67,19 @@ export const usePushNotifications = () => {
           .select();
 
         if (error) {
-          console.error('❌ Error saving pending FCM token:', error);
+          console.error('❌ Error saving FCM token:', error);
         } else {
-          console.log('✅ Pending FCM token saved successfully!', data);
+          console.log('✅ FCM token saved successfully!', data);
           setPendingToken(null);
         }
       } catch (error) {
-        console.error('❌ Exception saving pending FCM token:', error);
+        console.error('❌ Exception saving FCM token:', error);
       }
     };
 
-    savePendingToken();
+    saveToken();
   }, [user, pendingToken]);
+
 
   useEffect(() => {
     if (!user || !isNativePlatform() || isInitialized) return;
