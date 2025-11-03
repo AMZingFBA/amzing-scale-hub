@@ -13,6 +13,7 @@ const isNativePlatform = () => {
 
 export const usePushNotifications = () => {
   const [isInitialized, setIsInitialized] = useState(false);
+  const [pendingToken, setPendingToken] = useState<string | null>(null);
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -24,8 +25,11 @@ export const usePushNotifications = () => {
       const fcmToken = event.detail.token;
       console.log('🔥 FCM Token received from native:', fcmToken);
 
+      // Store token for later use
+      setPendingToken(fcmToken);
+
       if (!user) {
-        console.log('⚠️ User not logged in, waiting...');
+        console.log('⚠️ User not logged in, token stored for later...');
         return;
       }
 
@@ -53,6 +57,7 @@ export const usePushNotifications = () => {
           console.error('❌ Error saving FCM token:', error);
         } else {
           console.log('✅ FCM token saved successfully!', data);
+          setPendingToken(null); // Clear pending token
         }
       } catch (error) {
         console.error('❌ Exception saving FCM token:', error);
@@ -65,6 +70,46 @@ export const usePushNotifications = () => {
       window.removeEventListener('fcmTokenReceived', handleFCMToken);
     };
   }, [user]);
+
+  // Save pending token when user logs in
+  useEffect(() => {
+    if (!user || !pendingToken || !isNativePlatform()) return;
+
+    console.log('👤 User logged in, saving pending FCM token...');
+    console.log('👤 User ID:', user.id);
+    
+    const platform = (window as any).Capacitor.getPlatform();
+    console.log('🖥️ Platform:', platform);
+    
+    const savePendingToken = async () => {
+      try {
+        console.log('💾 Saving pending FCM token:', pendingToken);
+        
+        const { data, error } = await supabase
+          .from('push_notification_tokens')
+          .upsert({
+            user_id: user.id,
+            token: pendingToken,
+            platform: platform,
+            updated_at: new Date().toISOString()
+          }, {
+            onConflict: 'user_id,token'
+          })
+          .select();
+
+        if (error) {
+          console.error('❌ Error saving pending FCM token:', error);
+        } else {
+          console.log('✅ Pending FCM token saved successfully!', data);
+          setPendingToken(null);
+        }
+      } catch (error) {
+        console.error('❌ Exception saving pending FCM token:', error);
+      }
+    };
+
+    savePendingToken();
+  }, [user, pendingToken]);
 
   useEffect(() => {
     if (!user || !isNativePlatform() || isInitialized) return;
