@@ -143,8 +143,23 @@ export const usePushNotifications = () => {
               console.log('🎯 Navigating to category:', data.category, 'subcategory:', data.subcategory);
               
               // Rediriger directement vers la bonne page/sous-catégorie
-              if (data.category === 'product') {
-                navigate('/produits-rentables');
+              if (data.category === 'produits') {
+                // Redirection vers la sous-catégorie spécifique de produits
+                if (data.subcategory === 'produits-find') {
+                  navigate('/produits-find');
+                } else if (data.subcategory === 'produits-qogita') {
+                  navigate('/produits-qogita');
+                } else if (data.subcategory === 'produits-eany') {
+                  navigate('/produits-eany');
+                } else if (data.subcategory === 'grossistes') {
+                  navigate('/grossistes');
+                } else if (data.subcategory === 'promotions') {
+                  navigate('/promotions');
+                } else if (data.subcategory === 'sitelist') {
+                  navigate('/sitelist');
+                } else {
+                  navigate('/produits-rentables');
+                }
               } else if (data.category === 'marketplace') {
                 // Redirection directe vers la bonne sous-catégorie
                 if (data.subcategory === 'buy') {
