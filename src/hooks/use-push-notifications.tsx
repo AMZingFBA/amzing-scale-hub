@@ -140,13 +140,24 @@ export const usePushNotifications = () => {
             // Rediriger selon le type de notification
             const data = notification.notification.data;
             if (data.type === 'admin_alert' && data.category) {
-              // Rediriger vers la page d'alertes appropriée
-              if (data.category === 'introduction') {
-                navigate('/actualite');
-              } else if (data.category === 'products') {
-                navigate('/notification-alerts/products');
+              console.log('🎯 Navigating to category:', data.category, 'subcategory:', data.subcategory);
+              
+              // Rediriger directement vers la bonne page/sous-catégorie
+              if (data.category === 'product') {
+                navigate('/produits-rentables');
+              } else if (data.category === 'marketplace') {
+                // Redirection directe vers la bonne sous-catégorie
+                if (data.subcategory === 'buy') {
+                  navigate('/veux-acheter');
+                } else if (data.subcategory === 'sell') {
+                  navigate('/veux-vendre');
+                } else {
+                  navigate('/marketplace');
+                }
               } else if (data.category === 'rules') {
-                navigate('/notification-alerts/rules');
+                navigate('/avis');
+              } else if (data.category === 'catalogue') {
+                navigate('/catalogue');
               }
             }
           });

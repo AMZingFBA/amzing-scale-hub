@@ -142,8 +142,8 @@ const handler = async (req: Request): Promise<Response> => {
             message: {
               token: token,
               notification: {
-                title: '🔔 Nouvelle alerte AMZing FBA',
-                body: title,
+                title: `✨ ${category === 'product' ? 'Nouveau Produit' : category === 'marketplace' ? 'Nouvelle Annonce' : category === 'rules' ? 'Alerte Règles' : 'Nouvelle Alerte'}`,
+                body: `📢 ${title}`,
               },
               data: {
                 alert_id,
