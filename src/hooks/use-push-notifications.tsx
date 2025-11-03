@@ -33,11 +33,10 @@ export const usePushNotifications = () => {
           console.log('✅ Push notification permission granted');
 
           // Ajouter les listeners AVANT d'enregistrer
-          // Écouter l'enregistrement réussi - on va recevoir le token APNs mais on va aussi
-          // écouter les paramètres d'URL pour le token FCM
+          // Écouter l'enregistrement réussi - on reçoit le token APNs (pour debug uniquement)
           await PushNotifications.addListener('registration', async (token: Token) => {
             console.log('🔔 Push registration success!');
-            console.log('📱 APNs Token received:', token.value);
+            console.log('📱 APNs Token received (DEBUG ONLY - NOT SAVED):', token.value);
           });
 
           // Écouter les erreurs d'enregistrement

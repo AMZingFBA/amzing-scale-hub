@@ -84,9 +84,10 @@ extension AppDelegate: MessagingDelegate {
     func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?) {
         print("🔥 Firebase FCM Token: \(fcmToken ?? "nil")")
         
-        // CRITIQUE: Envoyer le token FCM à JavaScript via evaluateJavaScript
+        // CRITIQUE: Envoyer le token FCM à JavaScript après un délai pour s'assurer que la WebView est prête
         if let fcmToken = fcmToken {
-            DispatchQueue.main.async {
+            // Attendre 3 secondes pour que la WebView soit chargée
+            DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
                 if let bridge = self.bridge, let webView = bridge.webView {
                     let jsCode = """
                         window.dispatchEvent(new CustomEvent('fcmTokenReceived', { 
@@ -97,11 +98,11 @@ extension AppDelegate: MessagingDelegate {
                         if let error = error {
                             print("❌ Error sending FCM token to JavaScript:", error)
                         } else {
-                            print("✅ FCM Token sent to JavaScript")
+                            print("✅ FCM Token sent to JavaScript successfully")
                         }
                     }
                 } else {
-                    print("❌ Bridge or WebView not available")
+                    print("❌ Bridge or WebView still not available after delay")
                 }
             }
         }
