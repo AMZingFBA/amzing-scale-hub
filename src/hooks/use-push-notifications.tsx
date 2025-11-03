@@ -158,6 +158,8 @@ export const usePushNotifications = () => {
                 navigate('/avis');
               } else if (data.category === 'catalogue') {
                 navigate('/catalogue');
+              } else if (data.category === 'informations' && data.subcategory === 'actualités') {
+                navigate('/actualite');
               }
             }
           });
