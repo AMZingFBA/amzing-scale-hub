@@ -177,7 +177,6 @@ const handler = async (req: Request): Promise<Response> => {
               notification: {
                 title: getNotificationTitle(category, subcategory),
                 body: `📢 ${title}`,
-                image: 'https://6c002a1c-db75-4b68-b43b-8e5c9b112692.lovableproject.com/app-icon.png',
               },
               data: {
                 alert_id,
@@ -189,23 +188,14 @@ const handler = async (req: Request): Promise<Response> => {
                 priority: 'high',
                 notification: {
                   sound: 'default',
-                  icon: 'ic_stat_notification',
-                  image: 'https://6c002a1c-db75-4b68-b43b-8e5c9b112692.lovableproject.com/app-icon.png',
                 },
               },
               apns: {
-                headers: {
-                  'apns-priority': '10',
-                },
                 payload: {
                   aps: {
                     sound: 'default',
                     badge: 1,
-                    'mutable-content': 1,
                   },
-                },
-                fcm_options: {
-                  image: 'https://6c002a1c-db75-4b68-b43b-8e5c9b112692.lovableproject.com/app-icon.png',
                 },
               },
             },
