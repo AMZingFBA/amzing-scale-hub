@@ -25,10 +25,16 @@ const Navbar = () => {
   // Détection si on est dans l'app native pour ajuster le padding pour la safe area
   const isNativeApp = Capacitor.isNativePlatform();
   
-  // Calculer le total de toutes les notifications
-  const totalNotifications = Object.values(notifications).reduce((acc, category) => {
-    return acc + (category.total || 0);
+  // Calculer le total de toutes les notifications de toutes les catégories
+  const totalNotifications = Object.keys(notifications).reduce((total, categoryKey) => {
+    const category = notifications[categoryKey];
+    if (category && typeof category === 'object' && 'total' in category) {
+      return total + (category.total || 0);
+    }
+    return total;
   }, 0);
+  
+  console.log('📊 Total notifications in Navbar:', totalNotifications, 'from', notifications);
 
   // Native App - Floating menu button only
   if (isNativeApp) {
