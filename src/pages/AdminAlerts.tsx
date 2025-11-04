@@ -316,17 +316,30 @@ const AdminAlerts = () => {
     if (!confirm('Êtes-vous sûr de vouloir supprimer cette alerte ?')) return;
 
     try {
-      const { error } = await supabase
+      console.log('🗑️ Attempting to delete alert:', alertId);
+      console.log('👤 User ID:', user?.id);
+      console.log('🔐 Is Admin:', isAdmin);
+      
+      const { data, error } = await supabase
         .from('admin_alerts')
         .delete()
-        .eq('id', alertId);
+        .eq('id', alertId)
+        .select();
 
-      if (error) throw error;
+      if (error) {
+        console.error('❌ Delete error:', error);
+        throw error;
+      }
 
+      console.log('✅ Alert deleted successfully:', data);
+      
       toast({
         title: "Alerte supprimée",
         description: "L'alerte a été supprimée avec succès",
       });
+
+      // Recharger la liste des alertes
+      await loadAlerts();
     } catch (error) {
       console.error('Error deleting alert:', error);
       toast({
