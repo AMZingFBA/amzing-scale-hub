@@ -54,7 +54,8 @@ const handler = async (req: Request): Promise<Response> => {
   try {
     const { alert_id, title, category, subcategory }: NotificationRequest = await req.json();
 
-    console.log('Sending push notifications for alert:', { alert_id, title, category, subcategory });
+    const callId = Math.random().toString(36).substring(7);
+    console.log(`🔵 [${callId}] START - Edge function appelée pour:`, { alert_id, title, category, subcategory });
 
     const supabaseAdmin = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
@@ -144,7 +145,7 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    console.log(`Found ${tokens.length} push tokens to send to`);
+    console.log(`🔵 [${callId}] Found ${tokens.length} push tokens to send to`);
 
     // 4. Générer un access token OAuth2 pour FCM v1 API
     const serviceAccountJson = Deno.env.get("FIREBASE_SERVICE_ACCOUNT_JSON");
@@ -250,7 +251,7 @@ const handler = async (req: Request): Promise<Response> => {
     const results = await Promise.all(notificationPromises);
     const successCount = results.filter(r => !r.error).length;
 
-    console.log(`Sent ${successCount}/${tokens.length} notifications successfully`);
+    console.log(`🔵 [${callId}] END - Sent ${successCount}/${tokens.length} notifications successfully`);
 
     return new Response(
       JSON.stringify({ 
