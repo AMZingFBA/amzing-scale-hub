@@ -150,14 +150,21 @@ export const useNotifications = () => {
 
   // RESET BADGE - EXECUTÉ À CHAQUE OUVERTURE ET DE MANIÈRE SYNCHRONE
   useEffect(() => {
+    const isNative = Capacitor.isNativePlatform();
+    const platform = Capacitor.getPlatform();
+    
     console.log('🔍 Badge reset hook - Platform check:', {
-      isNative: Capacitor.isNativePlatform(),
+      isNative,
+      platform,
+      hasCapacitor: !!Capacitor,
+      hasBadge: !!Badge,
       hasUser: !!user,
       userId: user?.id
     });
     
-    if (!Capacitor.isNativePlatform()) {
-      console.log('⚠️ Pas une plateforme native - reset ignoré');
+    // Vérifier si on est sur iOS ou Android (natif)
+    if (!isNative && platform !== 'ios' && platform !== 'android') {
+      console.log('⚠️ Pas une plateforme native - reset ignoré', { platform, isNative });
       return;
     }
     
@@ -171,6 +178,12 @@ export const useNotifications = () => {
       console.log(`🔄 [${timestamp}] DÉBUT RESET BADGE pour user ${user.id}`);
       
       try {
+        // Vérifier que Badge est disponible
+        if (!Badge || !Badge.set) {
+          console.error('❌ Badge API non disponible');
+          return;
+        }
+
         // 1. Reset badge iOS EN PREMIER (synchrone, immédiat)
         console.log('📱 Reset badge iOS IMMÉDIAT...');
         await Badge.set({ count: 0 });
@@ -197,10 +210,17 @@ export const useNotifications = () => {
     // Reset IMMÉDIAT ET SYNCHRONE au montage
     console.log('🚀 Exécution reset initial SYNCHRONE...');
     
-    // Forcer le reset iOS IMMÉDIATEMENT de manière synchrone
-    Badge.set({ count: 0 }).then(() => {
-      console.log('✅ Badge iOS mis à 0 de manière synchrone');
-    });
+    // Vérifier que Badge est disponible avant de l'utiliser
+    if (Badge && Badge.set) {
+      // Forcer le reset iOS IMMÉDIATEMENT de manière synchrone
+      Badge.set({ count: 0 }).then(() => {
+        console.log('✅ Badge iOS mis à 0 de manière synchrone');
+      }).catch((error) => {
+        console.error('❌ Erreur lors du reset synchrone:', error);
+      });
+    } else {
+      console.error('❌ Badge API non disponible pour reset synchrone');
+    }
     
     // Puis faire le reset complet
     resetBadge();
