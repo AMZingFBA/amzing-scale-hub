@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/hooks/use-auth';
 import { useNotifications } from '@/hooks/use-notifications';
 import { usePullRefresh } from '@/hooks/use-pull-refresh';
+import { useAutoRefresh } from '@/hooks/use-auto-refresh';
 import { supabase } from '@/integrations/supabase/client';
 import { Capacitor } from '@capacitor/core';
 import Navbar from '@/components/Navbar';
@@ -80,6 +81,9 @@ const RulesAlerts = () => {
   };
 
   const { isRefreshing, handleRefresh } = usePullRefresh(loadAlerts);
+  
+  // Auto-refresh every 30 seconds
+  useAutoRefresh(loadAlerts, { enabled: !!user, interval: 30000 });
 
   // Mark alerts as read when user visits the page
   useEffect(() => {

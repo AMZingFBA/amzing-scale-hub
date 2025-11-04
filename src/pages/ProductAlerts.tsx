@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/use-auth';
 import { useMarkAsRead } from '@/hooks/use-mark-as-read';
 import { usePullRefresh } from '@/hooks/use-pull-refresh';
+import { useAutoRefresh } from '@/hooks/use-auto-refresh';
 import { supabase } from '@/integrations/supabase/client';
 import { Capacitor } from '@capacitor/core';
 import Navbar from '@/components/Navbar';
@@ -120,6 +121,9 @@ const ProductAlerts = () => {
   };
 
   const { isRefreshing, handleRefresh } = usePullRefresh(loadAlerts);
+  
+  // Auto-refresh every 30 seconds
+  useAutoRefresh(loadAlerts, { enabled: isVIP, interval: 30000 });
 
   const getFileIcon = (fileType: string) => {
     switch (fileType) {

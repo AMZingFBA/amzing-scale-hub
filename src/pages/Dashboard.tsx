@@ -2,6 +2,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { useAdmin } from '@/hooks/use-admin';
 import { useNotifications } from '@/hooks/use-notifications';
 import { usePullRefresh } from '@/hooks/use-pull-refresh';
+import { useAutoRefresh } from '@/hooks/use-auto-refresh';
 import { Navigate, Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import Navbar from '@/components/Navbar';
@@ -74,6 +75,10 @@ const Dashboard = () => {
   };
 
   const { isRefreshing, handleRefresh } = usePullRefresh(handleRefreshDashboard);
+  
+  // Auto-refresh every 30 seconds
+  useAutoRefresh(loadNotifications, { enabled: true, interval: 30000 });
+  
   if (isLoading) {
     return <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
