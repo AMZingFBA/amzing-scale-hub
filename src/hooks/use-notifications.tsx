@@ -148,102 +148,54 @@ export const useNotifications = () => {
     };
   }, [user]);
 
-  // RESET BADGE - EXECUTÉ À CHAQUE OUVERTURE ET DE MANIÈRE SYNCHRONE
+  // RESET BADGE SIMPLE - Quand l'app s'ouvre → badge iOS = 0
   useEffect(() => {
-    // Détection améliorée : si Badge API est disponible, on est sur natif
-    const hasBadgeAPI = typeof Badge !== 'undefined' && Badge.set;
-    const platform = Capacitor.getPlatform();
-    const isNative = hasBadgeAPI || platform === 'ios' || platform === 'android';
+    const isNative = Capacitor.isNativePlatform();
     
-    console.log('🔍 Badge reset hook - Platform check:', {
-      isNative,
-      platform,
-      hasBadgeAPI,
-      hasCapacitor: !!Capacitor,
-      hasBadge: !!Badge,
-      hasUser: !!user,
-      userId: user?.id
-    });
-    
-    // Si on a l'API Badge, on est forcément sur natif
-    if (!isNative) {
-      console.log('⚠️ Pas une plateforme native - reset ignoré', { platform });
-      return;
-    }
-    
-    if (!user) {
-      console.log('⚠️ Pas d\'utilisateur - reset ignoré');
+    if (!isNative || !user) {
       return;
     }
 
-    const resetBadge = async () => {
-      const timestamp = new Date().toISOString();
-      console.log(`🔄 [${timestamp}] DÉBUT RESET BADGE pour user ${user.id}`);
-      
+    const resetBadgeSimple = async () => {
       try {
-        // Vérifier que Badge est disponible
-        if (!Badge || !Badge.set) {
-          console.error('❌ Badge API non disponible');
-          return;
+        console.log('🔄 RESET BADGE - User:', user.id);
+        
+        // 1. Reset iOS badge IMMÉDIATEMENT
+        if (Badge && Badge.set) {
+          await Badge.set({ count: 0 });
+          console.log('✅ Badge iOS → 0');
         }
 
-        // 1. Appeler l'edge function pour reset le badge côté serveur
-        console.log('📤 Appel edge function reset-badge...');
-        const { data, error: functionError } = await supabase.functions.invoke('reset-badge', {
-          body: { user_id: user.id }
+        // 2. Reset compteur en DB
+        const { error } = await supabase.rpc('reset_user_badge', {
+          user_id_param: user.id
         });
 
-        if (functionError) {
-          console.error('❌ Erreur edge function:', functionError);
+        if (error) {
+          console.error('❌ Erreur reset DB:', error);
         } else {
-          console.log('✅ Edge function appelée avec succès:', data);
+          console.log('✅ Badge DB → 0');
         }
-        
-        console.log(`✅ [${timestamp}] RESET BADGE - Notification silencieuse envoyée pour forcer badge=0`);
       } catch (error) {
-        console.error('❌ ERREUR critique lors du reset:', error);
+        console.error('❌ Erreur reset badge:', error);
       }
     };
 
-    // Reset IMMÉDIAT ET SYNCHRONE au montage
-    console.log('🚀 Appel edge function pour reset badge...');
-    
-    // Appeler l'edge function immédiatement
-    resetBadge();
-    
-    // Reset à CHAQUE retour au premier plan
+    // Reset au montage
+    resetBadgeSimple();
+
+    // Reset quand l'app revient au premier plan
     const handleVisibilityChange = () => {
-      console.log('👁️ Visibility change event:', { hidden: document.hidden });
-      
       if (!document.hidden) {
-        console.log('📱 App revenue visible - DÉCLENCHEMENT RESET');
-        // Reset iOS immédiat
-        Badge.set({ count: 0 });
-        resetBadge();
+        console.log('📱 App visible → reset badge');
+        resetBadgeSimple();
       }
-    };
-
-    // Ajouter aussi un listener pour l'événement resume de Capacitor
-    const handleAppResume = () => {
-      console.log('📱 App resume event - DÉCLENCHEMENT RESET');
-      // Reset iOS immédiat
-      Badge.set({ count: 0 });
-      resetBadge();
     };
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
-    
-    // Écouter aussi l'événement resume si disponible
-    if (typeof window !== 'undefined') {
-      window.addEventListener('resume', handleAppResume);
-    }
 
     return () => {
-      console.log('🧹 Nettoyage listeners badge reset');
       document.removeEventListener('visibilitychange', handleVisibilityChange);
-      if (typeof window !== 'undefined') {
-        window.removeEventListener('resume', handleAppResume);
-      }
     };
   }, [user]);
 
