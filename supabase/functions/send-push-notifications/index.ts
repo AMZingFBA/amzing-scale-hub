@@ -164,17 +164,28 @@ const handler = async (req: Request): Promise<Response> => {
     // 5. Envoyer les notifications par batch via FCM v1 API
     const notificationPromises = tokens.map(async ({ token, platform, user_id }) => {
       try {
-        // Incrémenter le badge pour cet utilisateur (+1 à chaque notification)
-        const { data: newBadgeCount, error: badgeError } = await supabaseAdmin.rpc('increment_user_badge', {
+        // Récupérer le nombre réel d'alertes non lues pour cet utilisateur
+        const { data: unreadData, error: unreadError } = await supabaseAdmin.rpc('get_all_notification_counts', {
           user_id_param: user_id
         });
         
-        if (badgeError) {
-          console.error('❌ Error incrementing badge:', badgeError);
+        if (unreadError) {
+          console.error('❌ Error getting unread count:', unreadError);
         }
         
-        const badgeCount = newBadgeCount || 1;
-        console.log(`📱 Badge pour user ${user_id}: DB=${badgeCount}, sera envoyé dans APNs payload`);
+        // Calculer le total de toutes les notifications non lues
+        let totalUnread = 0;
+        if (unreadData && unreadData.length > 0) {
+          const counts = unreadData[0];
+          Object.values(counts).forEach((category: any) => {
+            if (category && typeof category === 'object' && category.total) {
+              totalUnread += category.total;
+            }
+          });
+        }
+        
+        const badgeCount = totalUnread;
+        console.log(`📱 Badge pour user ${user_id}: ${badgeCount} alertes non lues au total`);
         
         const fcmUrl = `https://fcm.googleapis.com/v1/projects/${serviceAccount.project_id}/messages:send`;
         
