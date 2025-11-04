@@ -66,11 +66,6 @@ const RulesAlerts = () => {
           }
         }
         setUnreadCount(unread);
-        
-        toast({
-          title: "✅ Rafraîchi",
-          description: `${data?.length || 0} règles chargées`,
-        });
       }
     } catch (error) {
       console.error('Error loading alerts:', error);

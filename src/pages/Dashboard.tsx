@@ -68,10 +68,6 @@ const Dashboard = () => {
 
   const handleRefreshDashboard = async () => {
     await loadNotifications();
-    toast({
-      title: "✅ Rafraîchi",
-      description: "Dashboard mis à jour",
-    });
   };
 
   const { isRefreshing, handleRefresh } = usePullRefresh(handleRefreshDashboard);

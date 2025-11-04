@@ -84,11 +84,6 @@ const Actualite = () => {
 
       if (error) throw error;
       setAlerts(data || []);
-      
-      toast({
-        title: "✅ Rafraîchi",
-        description: `${data?.length || 0} actualités chargées`,
-      });
     } catch (error) {
       console.error('Error loading alerts:', error);
       toast({

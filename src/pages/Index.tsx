@@ -79,10 +79,6 @@ const Index = () => {
 
   const handleRefreshPage = async () => {
     setRefreshKey(prev => prev + 1);
-    toast({
-      title: "✅ Rafraîchi",
-      description: "Page mise à jour",
-    });
   };
 
   const { isRefreshing, handleRefresh } = usePullRefresh(handleRefreshPage);
