@@ -161,7 +161,7 @@ const handler = async (req: Request): Promise<Response> => {
     const serviceAccount = JSON.parse(serviceAccountJson);
     const accessToken = await getAccessToken(serviceAccount);
 
-    // 5. Envoyer les notifications avec badge simple
+    // 5. Envoyer les notifications avec incrémentation du badge
     const notificationPromises = tokens.map(async ({ token, platform, user_id }) => {
       try {
         // Tenter d'insérer dans l'historique pour déduplication
@@ -175,8 +175,16 @@ const handler = async (req: Request): Promise<Response> => {
           return { skipped: true };
         }
         
-        // Badge simple = 1 (le reset auto s'occupe du reste)
-        const badgeCount = 1;
+        // Incrémenter le badge (+1 par notification)
+        const { data: newBadgeCount, error: badgeError } = await supabaseAdmin.rpc('increment_user_badge', {
+          user_id_param: user_id
+        });
+        
+        if (badgeError) {
+          console.error('❌ Error incrementing badge:', badgeError);
+        }
+        
+        const badgeCount = newBadgeCount || 1;
         console.log(`📱 User ${user_id}: badge = ${badgeCount}`);
         
         const fcmUrl = `https://fcm.googleapis.com/v1/projects/${serviceAccount.project_id}/messages:send`;
