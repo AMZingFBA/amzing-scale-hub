@@ -87,6 +87,25 @@ export const useNotifications = () => {
 
       // Refresh notifications immediately
       await fetchNotifications();
+
+      // Mettre à jour le badge iOS immédiatement après markAsRead
+      if (Capacitor.isNativePlatform()) {
+        // Petit délai pour que fetchNotifications ait le temps de se terminer
+        setTimeout(async () => {
+          const { data } = await supabase.rpc('get_all_notification_counts', {
+            user_id_param: user.id
+          });
+          
+          const totalCount = Object.values((data as any) || {}).reduce((total: number, cat: any) => {
+            return total + (cat.total || 0);
+          }, 0) as number;
+          
+          console.log('📱 Mise à jour du badge après markAsRead:', totalCount);
+          await Badge.set({ count: totalCount }).catch(err => {
+            console.error('❌ Erreur lors de la mise à jour du badge:', err);
+          });
+        }, 500);
+      }
     } catch (error) {
       console.error('Error marking as read:', error);
     }
