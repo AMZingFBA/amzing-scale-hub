@@ -109,17 +109,17 @@ export const useNotifications = () => {
 
             // If not marked as read, count it
             if (!isRead) {
-              console.log(`Alert ${alert.id} (${alert.subcategory}) is UNREAD for user`);
+              const subcategoryKey = alert.subcategory || 'general';
+              console.log(`Alert ${alert.id} (${subcategoryKey}) is UNREAD for user`);
+              
               if (!counts[category]) {
                 counts[category] = { total: 0, subcategories: {} };
               }
               
+              // Always add to both total and subcategory count
               counts[category].total += 1;
-              
-              if (alert.subcategory) {
-                counts[category].subcategories[alert.subcategory] = 
-                  (counts[category].subcategories[alert.subcategory] || 0) + 1;
-              }
+              counts[category].subcategories[subcategoryKey] = 
+                (counts[category].subcategories[subcategoryKey] || 0) + 1;
             } else {
               console.log(`Alert ${alert.id} (${alert.subcategory}) is READ for user`);
             }
