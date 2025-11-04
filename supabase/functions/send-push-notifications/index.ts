@@ -175,16 +175,16 @@ const handler = async (req: Request): Promise<Response> => {
         
         // Calculer le total de toutes les notifications non lues
         let totalUnread = 0;
-        if (unreadData && unreadData.length > 0) {
-          const counts = unreadData[0];
-          Object.values(counts).forEach((category: any) => {
-            if (category && typeof category === 'object' && category.total) {
+        if (unreadData && typeof unreadData === 'object') {
+          // unreadData est un JSONB direct, pas un array
+          Object.values(unreadData).forEach((category: any) => {
+            if (category && typeof category === 'object' && typeof category.total === 'number') {
               totalUnread += category.total;
             }
           });
         }
         
-        const badgeCount = totalUnread;
+        const badgeCount = totalUnread > 0 ? totalUnread : 1; // Au moins 1 pour la nouvelle notification
         console.log(`📱 Badge pour user ${user_id}: ${badgeCount} alertes non lues au total`);
         
         const fcmUrl = `https://fcm.googleapis.com/v1/projects/${serviceAccount.project_id}/messages:send`;
