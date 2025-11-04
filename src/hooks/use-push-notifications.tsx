@@ -50,12 +50,11 @@ export const usePushNotifications = () => {
     window.addEventListener('fcmTokenReceived', handleFCMToken);
     console.log('✅ Event listener ajouté');
     
-    // Vérifier si token déjà disponible
+    // Vérifier si token déjà disponible (NE PAS supprimer pour permettre les retry)
     const existingToken = (window as any).__FCM_TOKEN__;
     if (existingToken) {
       console.log('🔥 Token déjà présent dans window:', existingToken.substring(0, 30) + '...');
       setPendingToken(existingToken);
-      delete (window as any).__FCM_TOKEN__;
     } else {
       console.log('⏳ Aucun token pré-existant, attente de l\'événement...');
     }
@@ -88,6 +87,8 @@ export const usePushNotifications = () => {
     if (savedTokens.has(tokenKey)) {
       console.log('✅ Token already saved for this user, skipping duplicate save');
       setPendingToken(null);
+      // Supprimer window.__FCM_TOKEN__ maintenant qu'il est sauvegardé
+      delete (window as any).__FCM_TOKEN__;
       return;
     }
 
@@ -121,6 +122,8 @@ export const usePushNotifications = () => {
           // Marquer ce token comme sauvegardé
           setSavedTokens(prev => new Set([...prev, tokenKey]));
           setPendingToken(null); // Clear seulement si succès
+          // Supprimer window.__FCM_TOKEN__ maintenant qu'il est sauvegardé
+          delete (window as any).__FCM_TOKEN__;
         }
       } catch (error) {
         console.error('❌ Exception while saving FCM token:', error);

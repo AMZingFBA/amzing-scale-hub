@@ -123,6 +123,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 }
             } else {
                 print("✅ FCM Token sent to JavaScript successfully on attempt \(attempt)")
+                
+                // Renvoyer le token après 5 secondes pour s'assurer que React est prêt
+                if attempt == 1 {
+                    print("⏳ Re-sending token in 5 seconds to ensure React is ready...")
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) { [weak self] in
+                        self?.sendFCMTokenToJS(token: token, attempt: 99)
+                    }
+                }
             }
         }
     }
