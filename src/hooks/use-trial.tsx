@@ -128,34 +128,54 @@ export const useTrial = () => {
       const expiresAt = new Date();
       expiresAt.setMonth(expiresAt.getMonth() + 1); // 1 mois d'abonnement payant
 
-      const { error: updateError } = await supabase
+      console.log('Mise à jour pour user_id:', user.id);
+      
+      // Utiliser upsert pour s'assurer que la ligne existe
+      const { data: updateData, error: updateError } = await supabase
         .from('subscriptions')
-        .update({
+        .upsert({
+          user_id: user.id,
           plan_type: 'vip',
           status: 'active',
           expires_at: expiresAt.toISOString(),
           is_trial: false,
           trial_used: true,
-          updated_at: new Date().toISOString()
+          updated_at: new Date().toISOString(),
+          started_at: new Date().toISOString()
+        }, {
+          onConflict: 'user_id'
         })
-        .eq('user_id', user.id);
+        .select();
 
       if (updateError) {
-        console.error('Error updating subscription:', updateError);
+        console.error('❌ Erreur lors de la mise à jour de l\'abonnement:', updateError);
         toast.error('Erreur lors de la mise à jour de l\'abonnement');
         return;
       }
 
-      console.log('✅ Abonnement mis à jour dans la base de données');
+      console.log('✅ Abonnement mis à jour dans la base de données:', updateData);
+
+      // Vérifier immédiatement dans la base de données
+      const { data: verifyData, error: verifyError } = await supabase
+        .from('subscriptions')
+        .select('*')
+        .eq('user_id', user.id)
+        .single();
+
+      console.log('🔍 Vérification abonnement dans DB:', verifyData, verifyError);
 
       // Rafraîchir l'état de l'abonnement dans l'app
+      console.log('🔄 Rafraîchissement de l\'état...');
       await refreshSubscription();
+      
+      // Attendre un peu pour s'assurer que l'état est propagé
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
       console.log('✅ État de l\'abonnement rafraîchi');
 
       toast.success('Abonnement VIP activé avec succès ! 🎉');
       
-      // Petit délai pour s'assurer que tout est bien synchronisé
+      // Rediriger vers le dashboard
       setTimeout(() => {
         navigate('/dashboard');
       }, 500);
