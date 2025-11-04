@@ -136,20 +136,27 @@ export const usePushNotifications = () => {
 
           // Écouter les actions sur les notifications
           await PushNotifications.addListener('pushNotificationActionPerformed', async (notification: ActionPerformed) => {
-            console.log('👆 Notification tapée - Reset badge à 0');
+            console.log('👆 Notification tapée - RESET COMPLET du badge');
             
-            // Réinitialiser le badge iOS
-            await Badge.set({ count: 0 }).catch(err => {
-              console.error('❌ Erreur reset badge:', err);
-            });
-            
-            // Réinitialiser le compteur en base
-            const { error: resetError } = await supabase.rpc('reset_user_badge', {
-              user_id_param: user.id
-            });
-            
-            if (resetError) {
-              console.error('❌ Erreur reset compteur:', resetError);
+            try {
+              // 1. RESET en base AVANT tout
+              const { error: dbError } = await supabase.rpc('reset_user_badge', {
+                user_id_param: user.id
+              });
+              
+              if (dbError) {
+                console.error('❌ Erreur reset DB:', dbError);
+              } else {
+                console.log('✅ Compteur DB remis à 0');
+              }
+
+              // 2. Reset badge iOS
+              await Badge.set({ count: 0 });
+              console.log('✅ Badge iOS remis à 0');
+              
+              console.log('✅ RESET COMPLET - Prochaine notification = 1');
+            } catch (error) {
+              console.error('❌ Erreur reset:', error);
             }
             
             // Rediriger selon le type de notification

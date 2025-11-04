@@ -148,37 +148,49 @@ export const useNotifications = () => {
     };
   }, [user]);
 
-  // Réinitialiser le badge à 0 quand l'app s'ouvre
+  // Réinitialiser le badge à 0 quand l'app s'ouvre - PRIORITÉ ABSOLUE
   useEffect(() => {
     if (!Capacitor.isNativePlatform() || !user) return;
 
+    let isResetting = false;
+
     const resetBadge = async () => {
-      console.log('📱 App ouverte - Réinitialisation du badge à 0');
+      if (isResetting) return;
+      isResetting = true;
+
+      console.log('🔄 RESET BADGE - Début de la réinitialisation complète');
       
-      // Mettre le badge iOS à 0
-      await Badge.set({ count: 0 }).catch(err => {
-        console.error('❌ Erreur badge iOS:', err);
-      });
-      
-      // Réinitialiser le compteur en base de données
-      const { error } = await supabase.rpc('reset_user_badge', {
-        user_id_param: user.id
-      });
-      
-      if (error) {
-        console.error('❌ Erreur reset compteur:', error);
-      } else {
-        console.log('✅ Badge et compteur réinitialisés à 0');
+      try {
+        // 1. Réinitialiser le compteur en base AVANT tout
+        const { error: dbError } = await supabase.rpc('reset_user_badge', {
+          user_id_param: user.id
+        });
+        
+        if (dbError) {
+          console.error('❌ Erreur reset compteur DB:', dbError);
+        } else {
+          console.log('✅ Compteur DB réinitialisé à 0');
+        }
+
+        // 2. Mettre le badge iOS à 0
+        await Badge.set({ count: 0 });
+        console.log('✅ Badge iOS réinitialisé à 0');
+        
+        console.log('✅ RESET COMPLET - Prochaine notification repartira à 1');
+      } catch (error) {
+        console.error('❌ Erreur lors du reset:', error);
+      } finally {
+        isResetting = false;
       }
     };
 
-    // Réinitialiser immédiatement au chargement
+    // Réinitialiser IMMÉDIATEMENT au chargement
     resetBadge();
     
     // Écouter quand l'app revient au premier plan
     const handleVisibilityChange = () => {
       if (!document.hidden) {
-        console.log('📱 App revenue au premier plan - Reset badge');
+        console.log('📱 App revenue au premier plan');
         resetBadge();
       }
     };
