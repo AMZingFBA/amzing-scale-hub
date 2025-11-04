@@ -671,37 +671,49 @@ export type Database = {
       }
       subscriptions: {
         Row: {
+          apple_transaction_id: string | null
           created_at: string
           expires_at: string | null
           id: string
           is_trial: boolean | null
+          payment_provider: string | null
           plan_type: string
           started_at: string
           status: string
+          stripe_customer_id: string | null
+          stripe_subscription_id: string | null
           trial_used: boolean
           updated_at: string
           user_id: string
         }
         Insert: {
+          apple_transaction_id?: string | null
           created_at?: string
           expires_at?: string | null
           id?: string
           is_trial?: boolean | null
+          payment_provider?: string | null
           plan_type: string
           started_at?: string
           status: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
           trial_used?: boolean
           updated_at?: string
           user_id: string
         }
         Update: {
+          apple_transaction_id?: string | null
           created_at?: string
           expires_at?: string | null
           id?: string
           is_trial?: boolean | null
+          payment_provider?: string | null
           plan_type?: string
           started_at?: string
           status?: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
           trial_used?: boolean
           updated_at?: string
           user_id?: string

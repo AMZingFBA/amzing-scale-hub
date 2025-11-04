@@ -79,36 +79,75 @@ serve(async (req) => {
       );
     }
 
+    logStep("Subscription details", { 
+      provider: subscription.payment_provider,
+      stripeCustomerId: subscription.stripe_customer_id,
+      stripeSubscriptionId: subscription.stripe_subscription_id,
+      appleTransactionId: subscription.apple_transaction_id
+    });
+
     // Annuler sur Stripe si applicable
-    const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
-    if (stripeKey) {
-      logStep("Attempting Stripe cancellation");
-      const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
-      
-      const customers = await stripe.customers.list({ email: user.email, limit: 1 });
-      
-      if (customers.data.length > 0) {
-        const customerId = customers.data[0].id;
-        logStep("Found Stripe customer", { customerId });
+    if (subscription.payment_provider === 'stripe') {
+      const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
+      if (!stripeKey) {
+        logStep("WARNING: Stripe key not configured");
+      } else {
+        logStep("Attempting Stripe cancellation");
+        const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
         
-        const subscriptions = await stripe.subscriptions.list({
-          customer: customerId,
-          status: "active",
-          limit: 1,
-        });
-        
-        if (subscriptions.data.length > 0) {
-          const stripeSubscription = subscriptions.data[0];
-          logStep("Canceling Stripe subscription", { subscriptionId: stripeSubscription.id });
-          
-          // Annuler à la fin de la période
-          await stripe.subscriptions.update(stripeSubscription.id, {
-            cancel_at_period_end: true
-          });
-          
-          logStep("Stripe subscription canceled at period end");
+        try {
+          // Utiliser les IDs stockés en priorité
+          if (subscription.stripe_subscription_id) {
+            logStep("Canceling using stored subscription ID", { subscriptionId: subscription.stripe_subscription_id });
+            await stripe.subscriptions.update(subscription.stripe_subscription_id, {
+              cancel_at_period_end: true
+            });
+            logStep("Stripe subscription canceled at period end via stored ID");
+          } else {
+            // Fallback: chercher par email
+            const customers = await stripe.customers.list({ email: user.email, limit: 1 });
+            
+            if (customers.data.length > 0) {
+              const customerId = customers.data[0].id;
+              logStep("Found Stripe customer via email", { customerId });
+              
+              const subscriptions = await stripe.subscriptions.list({
+                customer: customerId,
+                status: "active",
+                limit: 1,
+              });
+              
+              if (subscriptions.data.length > 0) {
+                const stripeSubscription = subscriptions.data[0];
+                logStep("Canceling Stripe subscription", { subscriptionId: stripeSubscription.id });
+                
+                await stripe.subscriptions.update(stripeSubscription.id, {
+                  cancel_at_period_end: true
+                });
+                
+                logStep("Stripe subscription canceled at period end via email lookup");
+              } else {
+                logStep("WARNING: No active Stripe subscription found for customer");
+              }
+            } else {
+              logStep("WARNING: No Stripe customer found with email", { email: user.email });
+            }
+          }
+        } catch (stripeError) {
+          const errorMessage = stripeError instanceof Error ? stripeError.message : String(stripeError);
+          logStep("ERROR during Stripe cancellation", { error: errorMessage });
+          throw new Error(`Échec de l'annulation Stripe: ${errorMessage}`);
         }
       }
+    } 
+    // Annuler sur Apple si applicable
+    else if (subscription.payment_provider === 'apple') {
+      logStep("Apple subscription detected - cancellation must be done by user in iOS settings");
+      // Note: Apple ne permet pas l'annulation programmatique côté serveur
+      // L'utilisateur doit annuler via les paramètres iOS
+      // On marque juste le statut comme canceled dans notre BDD
+    } else {
+      logStep("Free or unknown subscription provider", { provider: subscription.payment_provider });
     }
 
     // Mettre à jour le statut dans la base de données
