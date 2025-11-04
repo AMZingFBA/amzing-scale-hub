@@ -85,11 +85,25 @@ export const useNotifications = () => {
         }
       }
 
-      // Refresh notifications after a small delay to ensure DB sync
-      console.log('⏳ Waiting 500ms before refreshing...');
-      await new Promise(resolve => setTimeout(resolve, 500));
-      console.log('🔄 Refreshing notifications now...');
+      // Refresh notifications immediately
       await fetchNotifications();
+      
+      // Update badge iOS immédiatement après avoir marqué comme lu
+      if (Capacitor.isNativePlatform()) {
+        // Recalculer le total après refresh
+        setTimeout(async () => {
+          const { data } = await supabase.rpc('get_all_notification_counts', {
+            user_id_param: user.id
+          });
+          
+          const totalCount = Object.values((data as any) || {}).reduce((total: number, cat: any) => {
+            return total + (cat.total || 0);
+          }, 0) as number;
+          
+          console.log('📱 Mise à jour immédiate du badge après markAsRead:', totalCount);
+          await Badge.set({ count: totalCount });
+        }, 100);
+      }
     } catch (error) {
       console.error('Error marking as read:', error);
     }
@@ -167,28 +181,6 @@ export const useNotifications = () => {
       console.error('❌ Erreur lors de la mise à jour du badge:', err);
     });
   }, [notifications]);
-
-  // Réinitialiser le badge quand l'app est ouverte
-  useEffect(() => {
-    if (!Capacitor.isNativePlatform() || !user) return;
-
-    const handleAppStateChange = () => {
-      console.log('📱 App au premier plan, rafraîchissement des notifications...');
-      fetchNotifications();
-    };
-
-    // Rafraîchir immédiatement quand le hook est monté
-    fetchNotifications();
-
-    // Écouter les changements d'état de l'app
-    window.addEventListener('focus', handleAppStateChange);
-    document.addEventListener('resume', handleAppStateChange);
-
-    return () => {
-      window.removeEventListener('focus', handleAppStateChange);
-      document.removeEventListener('resume', handleAppStateChange);
-    };
-  }, [user]);
 
   return { notifications, isLoading, markAsRead, loadNotifications: fetchNotifications };
 };
