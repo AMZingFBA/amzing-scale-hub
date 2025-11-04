@@ -6,7 +6,7 @@ import { toast } from 'sonner';
 
 interface Subscription {
   plan_type: 'free' | 'vip';
-  status: 'active' | 'inactive' | 'cancelled' | 'expired';
+  status: 'active' | 'inactive' | 'canceled' | 'cancelled' | 'expired';
   expires_at: string | null;
   is_trial?: boolean;
 }
@@ -32,7 +32,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
-  const isVIP = subscription?.plan_type === 'vip' && subscription?.status === 'active';
+  // Un utilisateur est VIP si:
+  // - plan_type est 'vip'
+  // - status est 'active' ou 'canceled' (résilié mais encore dans la période payée)
+  // - expires_at est null (illimité) ou dans le futur
+  const isVIP = subscription?.plan_type === 'vip' && 
+    (subscription?.status === 'active' || subscription?.status === 'canceled') &&
+    (!subscription?.expires_at || new Date(subscription.expires_at) > new Date());
 
   const fetchSubscription = async (userId: string) => {
     try {
