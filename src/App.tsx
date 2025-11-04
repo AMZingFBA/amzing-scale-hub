@@ -44,6 +44,7 @@ import Avis from "./pages/Avis";
 import AdminProfiles from "./pages/AdminProfiles";
 import Profile from "./pages/Profile";
 import TestPushNotifications from "./pages/TestPushNotifications";
+import DebugPushNotifications from "./pages/DebugPushNotifications";
 
 const queryClient = new QueryClient();
 
@@ -100,6 +101,7 @@ const App = () => (
             <Route path="/admin/profiles" element={<AdminProfiles />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/test-push" element={<TestPushNotifications />} />
+            <Route path="/debug-push" element={<DebugPushNotifications />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
