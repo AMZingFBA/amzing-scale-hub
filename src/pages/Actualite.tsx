@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/use-auth';
+import { usePullRefresh } from '@/hooks/use-pull-refresh';
 import { supabase } from '@/integrations/supabase/client';
 import { Capacitor } from '@capacitor/core';
 import { ArrowLeft } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import { RefreshButton } from '@/components/RefreshButton';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Loader2, AlertCircle, Link2, Image, Video, Mic, FileText, Newspaper } from 'lucide-react';
@@ -77,6 +79,11 @@ const Actualite = () => {
 
       if (error) throw error;
       setAlerts(data || []);
+      
+      toast({
+        title: "✅ Rafraîchi",
+        description: `${data?.length || 0} actualités chargées`,
+      });
     } catch (error) {
       console.error('Error loading alerts:', error);
       toast({
@@ -88,6 +95,8 @@ const Actualite = () => {
       setIsLoading(false);
     }
   };
+
+  const { isRefreshing, handleRefresh } = usePullRefresh(loadAlerts);
 
   const getFileIcon = (fileType: string) => {
     switch (fileType) {
@@ -120,12 +129,17 @@ const Actualite = () => {
               <ArrowLeft className="w-6 h-6 md:w-5 md:h-5 text-white" />
             </button>
             <Newspaper className="w-8 h-8 text-primary" />
-            <div>
+            <div className="flex-1">
               <h1 className="text-3xl md:text-4xl font-bold">Actualité</h1>
               <p className="text-sm md:text-base text-muted-foreground">
                 Dernières actualités et mises à jour importantes
               </p>
             </div>
+            <RefreshButton 
+              onRefresh={handleRefresh} 
+              isRefreshing={isRefreshing}
+              className="bg-primary hover:bg-primary/90 text-primary-foreground"
+            />
           </div>
 
           {alerts.length === 0 ? (

@@ -2,20 +2,24 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/hooks/use-auth';
 import { useNotifications } from '@/hooks/use-notifications';
+import { usePullRefresh } from '@/hooks/use-pull-refresh';
 import { supabase } from '@/integrations/supabase/client';
 import { Capacitor } from '@capacitor/core';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import { RefreshButton } from '@/components/RefreshButton';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { BookOpen, Link2, Image, Video, Mic, FileText, ArrowLeft, Shield, Users, AlertCircle, Scale, Database, UserCog, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useToast } from '@/hooks/use-toast';
 
 const RulesAlerts = () => {
   const { user, isLoading: isAuthLoading } = useAuth();
   const { markAsRead } = useNotifications();
+  const { toast } = useToast();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [alerts, setAlerts] = useState<any[]>([]);
@@ -57,13 +61,25 @@ const RulesAlerts = () => {
           }
         }
         setUnreadCount(unread);
+        
+        toast({
+          title: "✅ Rafraîchi",
+          description: `${data?.length || 0} règles chargées`,
+        });
       }
     } catch (error) {
       console.error('Error loading alerts:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de charger les règles",
+        variant: "destructive",
+      });
     } finally {
       setIsLoading(false);
     }
   };
+
+  const { isRefreshing, handleRefresh } = usePullRefresh(loadAlerts);
 
   // Mark alerts as read when user visits the page
   useEffect(() => {
@@ -187,17 +203,23 @@ const RulesAlerts = () => {
       <Navbar />
       <main className="flex-grow pt-20">
         <div className="container mx-auto px-4 py-8">
-          <button
-            onClick={() => navigate('/dashboard')}
-            className="bg-[#FF9900] hover:bg-[#FF9900]/90 p-3 md:p-2 rounded-full shadow-lg transition-all shrink-0 mb-6"
-            aria-label="Retour au dashboard"
-          >
-            <ArrowLeft className="w-6 h-6 md:w-5 md:h-5 text-white" />
-          </button>
-
           <div className="flex items-center gap-3 mb-8">
+            <button
+              onClick={() => navigate('/dashboard')}
+              className="bg-[#FF9900] hover:bg-[#FF9900]/90 p-3 md:p-2 rounded-full shadow-lg transition-all shrink-0"
+              aria-label="Retour au dashboard"
+            >
+              <ArrowLeft className="w-6 h-6 md:w-5 md:h-5 text-white" />
+            </button>
             <BookOpen className="w-8 h-8 text-primary" />
-            <h1 className="text-3xl font-bold">Règles d'utilisation</h1>
+            <div className="flex-1">
+              <h1 className="text-3xl font-bold">Règles d'utilisation</h1>
+            </div>
+            <RefreshButton 
+              onRefresh={handleRefresh} 
+              isRefreshing={isRefreshing}
+              className="bg-primary hover:bg-primary/90 text-primary-foreground"
+            />
           </div>
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
