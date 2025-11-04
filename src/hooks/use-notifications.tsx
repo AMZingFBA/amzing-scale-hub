@@ -79,35 +79,34 @@ export const useNotifications = () => {
         }
       }
 
-      // Count unread alerts for each category with subcategory details
+      // Count unread alerts for each category with subcategory details - OPTIMIZED
       for (const category of categories) {
-        // Get all alerts for this category with their subcategories
-        const { data: unreadAlerts } = await supabase
+        // Get all alerts with their read status in ONE query using LEFT JOIN
+        const { data: alertsWithStatus } = await supabase
           .from('admin_alerts')
-          .select('id, subcategory')
-          .eq('category', category);
+          .select(`
+            id,
+            subcategory,
+            alert_read_status!left(is_read)
+          `)
+          .eq('category', category)
+          .or(`user_id.eq.${user.id},user_id.is.null`, { foreignTable: 'alert_read_status' });
 
-        if (unreadAlerts && unreadAlerts.length > 0) {
-          for (const alert of unreadAlerts) {
+        if (alertsWithStatus && alertsWithStatus.length > 0) {
+          for (const alert of alertsWithStatus) {
             // Check user preferences for this alert
             const prefKey = `${category}${alert.subcategory ? `-${alert.subcategory}` : ''}`;
-            const isEnabled = prefsMap.get(prefKey) !== false; // Default to enabled if no preference
+            const isEnabled = prefsMap.get(prefKey) !== false;
             
             if (!isEnabled) {
               console.log(`Alert ${alert.id} (${category}/${alert.subcategory}) is DISABLED by user preferences`);
-              continue; // Skip this alert
+              continue;
             }
 
-            // Check if this specific alert is unread for this user
-            const { data: isRead } = await supabase
-              .from('alert_read_status')
-              .select('is_read')
-              .eq('alert_id', alert.id)
-              .eq('user_id', user.id)
-              .eq('is_read', true)
-              .maybeSingle();
+            // Check if alert is read - alert_read_status is an array from the join
+            const readStatus = alert.alert_read_status?.[0];
+            const isRead = readStatus?.is_read === true;
 
-            // If not marked as read, count it
             if (!isRead) {
               const subcategoryKey = alert.subcategory || 'general';
               console.log(`Alert ${alert.id} (${subcategoryKey}) is UNREAD for user`);
@@ -116,7 +115,6 @@ export const useNotifications = () => {
                 counts[category] = { total: 0, subcategories: {} };
               }
               
-              // Always add to both total and subcategory count
               counts[category].total += 1;
               counts[category].subcategories[subcategoryKey] = 
                 (counts[category].subcategories[subcategoryKey] || 0) + 1;
