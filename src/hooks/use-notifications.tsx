@@ -150,19 +150,22 @@ export const useNotifications = () => {
 
   // RESET BADGE - EXECUTÉ À CHAQUE OUVERTURE ET DE MANIÈRE SYNCHRONE
   useEffect(() => {
+    // Détection améliorée : si Badge API est disponible, on est sur natif
+    const hasBadgeAPI = typeof Badge !== 'undefined' && Badge.set;
     const platform = Capacitor.getPlatform();
-    const isNative = platform === 'ios' || platform === 'android';
+    const isNative = hasBadgeAPI || platform === 'ios' || platform === 'android';
     
     console.log('🔍 Badge reset hook - Platform check:', {
       isNative,
       platform,
+      hasBadgeAPI,
       hasCapacitor: !!Capacitor,
       hasBadge: !!Badge,
       hasUser: !!user,
       userId: user?.id
     });
     
-    // Vérifier si on est sur iOS ou Android (natif)
+    // Si on a l'API Badge, on est forcément sur natif
     if (!isNative) {
       console.log('⚠️ Pas une plateforme native - reset ignoré', { platform });
       return;

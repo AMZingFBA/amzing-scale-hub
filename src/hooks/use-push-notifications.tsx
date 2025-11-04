@@ -6,8 +6,13 @@ import { useNavigate } from 'react-router-dom';
 import { Badge } from '@capawesome/capacitor-badge';
 
 const isNativePlatform = () => {
+  // Si l'API Badge est disponible, on est sur natif
   if (typeof window !== 'undefined' && (window as any).Capacitor) {
-    return (window as any).Capacitor.isNativePlatform();
+    const hasBadge = typeof Badge !== 'undefined' && Badge.set;
+    if (hasBadge) return true;
+    
+    const platform = (window as any).Capacitor.getPlatform?.();
+    return platform === 'ios' || platform === 'android';
   }
   return false;
 };
