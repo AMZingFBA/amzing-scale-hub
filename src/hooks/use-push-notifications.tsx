@@ -131,14 +131,17 @@ export const usePushNotifications = () => {
             console.log('📬 Push notification received:', notification);
             console.log('📬 Title:', notification.title);
             console.log('📬 Body:', notification.body);
-            
-            // Quand on reçoit une notif push, marquer qu'on n'a plus besoin de reset au prochain chargement
-            delete (window as any).__BADGE_RESET__;
           });
 
           // Écouter les actions sur les notifications
-          await PushNotifications.addListener('pushNotificationActionPerformed', (notification: ActionPerformed) => {
+          await PushNotifications.addListener('pushNotificationActionPerformed', async (notification: ActionPerformed) => {
             console.log('👆 Push notification action performed:', notification);
+            
+            // Réinitialiser le badge à 0 quand l'utilisateur ouvre l'app
+            console.log('📱 App opened from notification, resetting badge to 0');
+            await supabase.rpc('reset_user_badge', {
+              user_id_param: user.id
+            });
             
             // Rediriger selon le type de notification
             const data = notification.notification.data;

@@ -174,23 +174,6 @@ export const useNotifications = () => {
 
     // Réinitialiser immédiatement au chargement du hook
     resetBadge();
-
-    // Écouter quand l'app revient au premier plan
-    const handleVisibilityChange = () => {
-      if (!document.hidden) {
-        console.log('📱 App visible, réinitialisation du badge');
-        resetBadge();
-      }
-    };
-
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-
-    // Marquer dans window qu'on a réinitialisé pour que le push handler le sache
-    (window as any).__BADGE_RESET__ = true;
-
-    return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-    };
   }, [user]);
 
   return { notifications, isLoading, markAsRead, loadNotifications: fetchNotifications };
