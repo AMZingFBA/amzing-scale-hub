@@ -34,6 +34,8 @@ const Profile = () => {
   const [showPhoneDialog, setShowPhoneDialog] = useState(false);
   const [showCancelDialog, setShowCancelDialog] = useState(false);
   const [showCancelConfirmDialog, setShowCancelConfirmDialog] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [showDeleteConfirmDialog, setShowDeleteConfirmDialog] = useState(false);
   const [newEmail, setNewEmail] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [newPhone, setNewPhone] = useState('');
@@ -54,11 +56,11 @@ const Profile = () => {
 
   // Reset code state when dialogs are opened
   useEffect(() => {
-    if (showEmailDialog || showPasswordDialog || showPhoneDialog || showCancelDialog) {
+    if (showEmailDialog || showPasswordDialog || showPhoneDialog || showCancelDialog || showDeleteDialog) {
       setCodeSent(false);
       setVerificationCode('');
     }
-  }, [showEmailDialog, showPasswordDialog, showPhoneDialog, showCancelDialog]);
+  }, [showEmailDialog, showPasswordDialog, showPhoneDialog, showCancelDialog, showDeleteDialog]);
 
   useEffect(() => {
     if (!user && !isAuthLoading) {
@@ -629,6 +631,102 @@ const Profile = () => {
     }
   };
 
+  const handleSendDeleteCode = async () => {
+    setIsSendingCode(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        throw new Error("Session expirée. Veuillez vous reconnecter.");
+      }
+
+      const { error } = await supabase.functions.invoke('send-verification-code', {
+        body: { type: 'delete_account' },
+        headers: {
+          Authorization: `Bearer ${session.access_token}`
+        }
+      });
+
+      if (error) throw error;
+
+      setCodeSent(true);
+      toast({
+        title: "Code envoyé",
+        description: "Un code de vérification a été envoyé à votre email",
+      });
+    } catch (error: any) {
+      console.error('Error sending code:', error);
+      toast({
+        title: "Erreur",
+        description: error.message || "Impossible d'envoyer le code",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSendingCode(false);
+    }
+  };
+
+  const handleVerifyDeleteCode = async () => {
+    if (!verificationCode || verificationCode.length !== 6) {
+      toast({
+        title: "Erreur",
+        description: "Veuillez entrer un code à 6 chiffres",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsVerifying(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        throw new Error("Session expirée. Veuillez vous reconnecter.");
+      }
+
+      const response = await supabase.functions.invoke('delete-account', {
+        body: { code: verificationCode },
+        headers: {
+          Authorization: `Bearer ${session.access_token}`
+        }
+      });
+
+      if (response.error) {
+        const errorMessage = response.data?.error || "Code invalide ou expiré";
+        throw new Error(errorMessage);
+      }
+
+      if (response.data?.error) {
+        throw new Error(response.data.error);
+      }
+
+      toast({
+        title: "Compte supprimé",
+        description: "Votre compte a été supprimé définitivement",
+      });
+
+      // Déconnexion et redirection
+      await supabase.auth.signOut();
+      navigate('/');
+    } catch (error: any) {
+      console.error('Error deleting account:', error);
+      
+      let errorMessage = "Code invalide ou expiré";
+      if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      toast({
+        title: "Erreur",
+        description: errorMessage,
+        variant: "destructive",
+        duration: 7000,
+      });
+    } finally {
+      setIsVerifying(false);
+    }
+  };
+
   if (isLoading || isAuthLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -843,6 +941,161 @@ const Profile = () => {
               </CardHeader>
             </Card>
           )}
+
+          {/* Delete Account Section */}
+          <Card className="mt-6 border-red-500/50 bg-red-50/50 dark:bg-red-950/20">
+            <CardHeader>
+              <CardTitle className="text-red-700 dark:text-red-500">Zone dangereuse</CardTitle>
+              <CardDescription className="text-red-600 dark:text-red-400">
+                Supprimez définitivement votre compte et toutes vos données
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="bg-red-100 dark:bg-red-950/40 p-4 rounded-lg border border-red-300 dark:border-red-800">
+                  <p className="text-sm text-red-800 dark:text-red-200 font-medium">
+                    ⚠️ Attention : Cette action est irréversible
+                  </p>
+                  <ul className="text-sm text-red-700 dark:text-red-300 mt-2 space-y-1 list-disc list-inside">
+                    <li>Tous vos messages seront supprimés</li>
+                    <li>Votre profil sera définitivement effacé</li>
+                    <li>Vos annonces marketplace seront retirées</li>
+                    <li>Votre abonnement sera annulé</li>
+                  </ul>
+                </div>
+                <Button
+                  variant="destructive"
+                  onClick={() => setShowDeleteConfirmDialog(true)}
+                  className="w-full bg-red-600 hover:bg-red-700"
+                >
+                  Supprimer mon compte définitivement
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Delete Account Confirmation Dialog */}
+          <Dialog open={showDeleteConfirmDialog} onOpenChange={setShowDeleteConfirmDialog}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Confirmer la suppression du compte</DialogTitle>
+                <DialogDescription>
+                  Êtes-vous absolument sûr de vouloir supprimer votre compte ?
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4">
+                <div className="bg-red-50 dark:bg-red-950/20 p-4 rounded-lg border border-red-200 dark:border-red-800">
+                  <p className="text-sm text-red-800 dark:text-red-200 font-bold">
+                    ⛔ Cette action est DÉFINITIVE et IRRÉVERSIBLE
+                  </p>
+                  <p className="text-sm text-red-700 dark:text-red-300 mt-2">
+                    Toutes vos données seront supprimées immédiatement et de manière permanente. 
+                    Vous ne pourrez plus récupérer votre compte ou vos données.
+                  </p>
+                </div>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowDeleteConfirmDialog(false)}
+                    className="flex-1"
+                  >
+                    Annuler
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    onClick={() => {
+                      setShowDeleteConfirmDialog(false);
+                      setShowDeleteDialog(true);
+                    }}
+                    className="flex-1 bg-red-600 hover:bg-red-700"
+                  >
+                    Je comprends, continuer
+                  </Button>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
+
+          {/* Delete Account Verification Dialog */}
+          <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Vérification de suppression</DialogTitle>
+                <DialogDescription>
+                  Pour confirmer la suppression définitive, nous devons vérifier votre identité
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4">
+                {!codeSent ? (
+                  <>
+                    <div className="bg-muted p-4 rounded-lg">
+                      <p className="text-sm">
+                        Un code de vérification à 6 chiffres sera envoyé à votre email pour confirmer la suppression définitive de votre compte.
+                      </p>
+                    </div>
+                    <Button
+                      onClick={handleSendDeleteCode}
+                      disabled={isSendingCode}
+                      className="w-full"
+                    >
+                      {isSendingCode ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Envoi...
+                        </>
+                      ) : (
+                        'Envoyer le code'
+                      )}
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <div className="space-y-2">
+                      <Label htmlFor="delete_code">Code de vérification</Label>
+                      <Input
+                        id="delete_code"
+                        type="text"
+                        placeholder="123456"
+                        maxLength={6}
+                        value={verificationCode}
+                        onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, ''))}
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Le code a été envoyé à votre email
+                      </p>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        onClick={() => {
+                          setCodeSent(false);
+                          setVerificationCode('');
+                        }}
+                        className="flex-1"
+                      >
+                        Renvoyer
+                      </Button>
+                      <Button
+                        onClick={handleVerifyDeleteCode}
+                        disabled={isVerifying}
+                        variant="destructive"
+                        className="flex-1 bg-red-600 hover:bg-red-700"
+                      >
+                        {isVerifying ? (
+                          <>
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            Suppression...
+                          </>
+                        ) : (
+                          'Supprimer définitivement'
+                        )}
+                      </Button>
+                    </div>
+                  </>
+                )}
+              </div>
+            </DialogContent>
+          </Dialog>
 
           {/* Cancellation Confirmation Dialog */}
           <Dialog open={showCancelConfirmDialog} onOpenChange={setShowCancelConfirmDialog}>

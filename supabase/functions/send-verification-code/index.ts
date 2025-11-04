@@ -8,7 +8,7 @@ const corsHeaders = {
 };
 
 interface VerificationRequest {
-  type: 'email_change' | 'password_change' | 'phone_change' | 'password_reset' | 'email_signup' | 'cancel_subscription';
+  type: 'email_change' | 'password_change' | 'phone_change' | 'password_reset' | 'email_signup' | 'cancel_subscription' | 'delete_account';
   newValue?: string;
   email?: string; // For password_reset/email_signup when user is not authenticated
 }
@@ -150,6 +150,8 @@ const handler = async (req: Request): Promise<Response> => {
       ? 'Code de vérification - Inscription'
       : type === 'cancel_subscription'
       ? 'Code de vérification - Résiliation d\'abonnement'
+      : type === 'delete_account'
+      ? 'Code de vérification - Suppression de compte'
       : 'Code de vérification - Changement de mot de passe';
 
     const emailHtml = `
@@ -179,6 +181,7 @@ const handler = async (req: Request): Promise<Response> => {
                 type === 'password_reset' ? 'réinitialiser votre mot de passe' :
                 type === 'email_signup' ? 'créer votre compte' :
                 type === 'cancel_subscription' ? 'résilier votre abonnement' :
+                type === 'delete_account' ? 'supprimer définitivement votre compte' :
                 'changer votre mot de passe'
               } :</p>
               <div class="code">${code}</div>
