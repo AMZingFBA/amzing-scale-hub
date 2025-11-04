@@ -148,20 +148,15 @@ export const useNotifications = () => {
     };
   }, [user]);
 
-  // Réinitialiser le badge à 0 quand l'app s'ouvre - PRIORITÉ ABSOLUE
+  // Réinitialiser le badge à 0 quand l'app s'ouvre - RESET INCONDITIONNEL
   useEffect(() => {
     if (!Capacitor.isNativePlatform() || !user) return;
 
-    let isResetting = false;
-
     const resetBadge = async () => {
-      if (isResetting) return;
-      isResetting = true;
-
-      console.log('🔄 RESET BADGE - Début de la réinitialisation complète');
+      console.log('🔄 RESET BADGE INCONDITIONNEL - Début');
       
       try {
-        // 1. Réinitialiser le compteur en base AVANT tout
+        // 1. TOUJOURS réinitialiser le compteur en base EN PREMIER
         const { error: dbError } = await supabase.rpc('reset_user_badge', {
           user_id_param: user.id
         });
@@ -169,28 +164,26 @@ export const useNotifications = () => {
         if (dbError) {
           console.error('❌ Erreur reset compteur DB:', dbError);
         } else {
-          console.log('✅ Compteur DB réinitialisé à 0');
+          console.log('✅ Compteur DB forcé à 0');
         }
 
-        // 2. Mettre le badge iOS à 0
+        // 2. Puis mettre le badge iOS à 0
         await Badge.set({ count: 0 });
-        console.log('✅ Badge iOS réinitialisé à 0');
+        console.log('✅ Badge iOS forcé à 0');
         
-        console.log('✅ RESET COMPLET - Prochaine notification repartira à 1');
+        console.log('✅ RESET COMPLET - Prochaine notification = 1');
       } catch (error) {
         console.error('❌ Erreur lors du reset:', error);
-      } finally {
-        isResetting = false;
       }
     };
 
-    // Réinitialiser IMMÉDIATEMENT au chargement
+    // Reset immédiat au chargement
     resetBadge();
     
-    // Écouter quand l'app revient au premier plan
+    // Reset à CHAQUE retour au premier plan
     const handleVisibilityChange = () => {
       if (!document.hidden) {
-        console.log('📱 App revenue au premier plan');
+        console.log('📱 App revenue au premier plan - RESET INCONDITIONNEL');
         resetBadge();
       }
     };
