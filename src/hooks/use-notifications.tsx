@@ -152,18 +152,29 @@ export const useNotifications = () => {
   useEffect(() => {
     if (!Capacitor.isNativePlatform() || !user) return;
 
-    // Mettre le badge à 0 dès que l'app s'ouvre
-    console.log('📱 App ouverte, réinitialisation du badge à 0');
-    Badge.set({ count: 0 }).catch(err => {
-      console.error('❌ Erreur lors de la réinitialisation du badge:', err);
-    });
-
-    // Aussi réinitialiser quand l'app revient au premier plan
-    const handleAppStateChange = () => {
-      console.log('📱 App au premier plan, réinitialisation du badge à 0');
-      Badge.set({ count: 0 }).catch(err => {
+    const resetBadge = async () => {
+      // Mettre le badge à 0 dès que l'app s'ouvre
+      console.log('📱 App ouverte, réinitialisation du badge à 0');
+      await Badge.set({ count: 0 }).catch(err => {
         console.error('❌ Erreur lors de la réinitialisation du badge:', err);
       });
+      
+      // Réinitialiser le compteur dans la base de données
+      const { error } = await supabase.rpc('reset_user_badge', {
+        user_id_param: user.id
+      });
+      
+      if (error) {
+        console.error('❌ Erreur lors de la réinitialisation du compteur:', error);
+      }
+    };
+
+    resetBadge();
+
+    // Aussi réinitialiser quand l'app revient au premier plan
+    const handleAppStateChange = async () => {
+      console.log('📱 App au premier plan, réinitialisation du badge à 0');
+      await resetBadge();
       fetchNotifications();
     };
 

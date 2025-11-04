@@ -759,6 +759,24 @@ export type Database = {
         }
         Relationships: []
       }
+      user_badge_counts: {
+        Row: {
+          badge_count: number
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          badge_count?: number
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          badge_count?: number
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -858,6 +876,7 @@ export type Database = {
         Returns: boolean
       }
       has_used_trial: { Args: { _user_id: string }; Returns: boolean }
+      increment_user_badge: { Args: { user_id_param: string }; Returns: number }
       is_marketplace_room: { Args: { _room_id: string }; Returns: boolean }
       is_marketplace_room_creator: {
         Args: { _room_id: string; _user_id: string }
@@ -876,6 +895,7 @@ export type Database = {
         Args: { ticket_id_param: string }
         Returns: undefined
       }
+      reset_user_badge: { Args: { user_id_param: string }; Returns: undefined }
     }
     Enums: {
       app_role: "admin" | "user"
