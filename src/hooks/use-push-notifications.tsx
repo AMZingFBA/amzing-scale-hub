@@ -127,10 +127,13 @@ export const usePushNotifications = () => {
           });
 
           // Écouter les notifications reçues
-          await PushNotifications.addListener('pushNotificationReceived', (notification) => {
+          await PushNotifications.addListener('pushNotificationReceived', async (notification) => {
             console.log('📬 Push notification received:', notification);
             console.log('📬 Title:', notification.title);
             console.log('📬 Body:', notification.body);
+            
+            // Quand on reçoit une notif push, marquer qu'on n'a plus besoin de reset au prochain chargement
+            delete (window as any).__BADGE_RESET__;
           });
 
           // Écouter les actions sur les notifications

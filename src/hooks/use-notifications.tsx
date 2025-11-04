@@ -3,7 +3,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './use-auth';
 import { Capacitor } from '@capacitor/core';
 import { Badge } from '@capawesome/capacitor-badge';
-import { App as CapacitorApp } from '@capacitor/app';
 
 interface SubcategoryNotifications {
   [subcategory: string]: number;
@@ -173,29 +172,11 @@ export const useNotifications = () => {
       }
     };
 
-    // Réinitialiser immédiatement au chargement
+    // Réinitialiser immédiatement au chargement du hook
     resetBadge();
 
-    // Écouter quand l'app revient au premier plan (iOS/Android)
-    let appStateListener: any;
-    
-    const setupListener = async () => {
-      appStateListener = await CapacitorApp.addListener('appStateChange', ({ isActive }) => {
-        if (isActive) {
-          console.log('📱 App active, réinitialisation du badge');
-          resetBadge();
-          fetchNotifications();
-        }
-      });
-    };
-    
-    setupListener();
-
-    return () => {
-      if (appStateListener) {
-        appStateListener.remove();
-      }
-    };
+    // Marquer dans window qu'on a réinitialisé pour que le push handler le sache
+    (window as any).__BADGE_RESET__ = true;
   }, [user]);
 
   return { notifications, isLoading, markAsRead, loadNotifications: fetchNotifications };
