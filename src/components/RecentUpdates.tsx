@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/use-auth';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { useToast } from '@/hooks/use-toast';
 
 interface RecentUpdate {
   id: string;
@@ -96,6 +97,7 @@ const getCategoryRoute = (category: string, subcategory: string | null) => {
 
 export const RecentUpdates = () => {
   const { user } = useAuth();
+  const { toast } = useToast();
   const [updates, setUpdates] = useState<RecentUpdate[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -157,6 +159,7 @@ export const RecentUpdates = () => {
           <Link
             key={update.id}
             to={getCategoryRoute(update.category, update.subcategory)}
+            onClick={() => toast({ description: "✓ Ouverture de la section" })}
             className="flex items-start gap-2 p-2 rounded-lg hover:bg-primary/5 transition-colors group"
           >
             <ExternalLink className="w-4 h-4 text-muted-foreground group-hover:text-primary mt-0.5 flex-shrink-0" />

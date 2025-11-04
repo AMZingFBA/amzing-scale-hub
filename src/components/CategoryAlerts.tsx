@@ -23,6 +23,9 @@ const CategoryAlerts = ({ category, subcategory }: CategoryAlertsProps) => {
     setSelectedAlert(alert);
     // Mark as read when opening the alert
     markAsRead(category, subcategory);
+    toast({
+      description: "✓ Alerte ouverte",
+    });
   };
 
   useEffect(() => {
