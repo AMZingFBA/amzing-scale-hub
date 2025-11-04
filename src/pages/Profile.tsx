@@ -32,6 +32,8 @@ const Profile = () => {
   const [showEmailDialog, setShowEmailDialog] = useState(false);
   const [showPasswordDialog, setShowPasswordDialog] = useState(false);
   const [showPhoneDialog, setShowPhoneDialog] = useState(false);
+  const [showCancelDialog, setShowCancelDialog] = useState(false);
+  const [showCancelConfirmDialog, setShowCancelConfirmDialog] = useState(false);
   const [newEmail, setNewEmail] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [newPhone, setNewPhone] = useState('');
@@ -39,6 +41,8 @@ const Profile = () => {
   const [codeSent, setCodeSent] = useState(false);
   const [isSendingCode, setIsSendingCode] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
+  const [subscription, setSubscription] = useState<any>(null);
+  const [isLoadingSubscription, setIsLoadingSubscription] = useState(true);
   const [profileData, setProfileData] = useState<ProfileData>({
     full_name: '',
     nickname: '',
@@ -50,11 +54,11 @@ const Profile = () => {
 
   // Reset code state when dialogs are opened
   useEffect(() => {
-    if (showEmailDialog || showPasswordDialog || showPhoneDialog) {
+    if (showEmailDialog || showPasswordDialog || showPhoneDialog || showCancelDialog) {
       setCodeSent(false);
       setVerificationCode('');
     }
-  }, [showEmailDialog, showPasswordDialog, showPhoneDialog]);
+  }, [showEmailDialog, showPasswordDialog, showPhoneDialog, showCancelDialog]);
 
   useEffect(() => {
     if (!user && !isAuthLoading) {
@@ -64,8 +68,28 @@ const Profile = () => {
 
     if (user) {
       loadProfile();
+      loadSubscription();
     }
   }, [user, isAuthLoading, navigate]);
+
+  const loadSubscription = async () => {
+    if (!user) return;
+    
+    try {
+      const { data, error } = await supabase
+        .from('subscriptions')
+        .select('*')
+        .eq('user_id', user.id)
+        .single();
+
+      if (error) throw error;
+      setSubscription(data);
+    } catch (error) {
+      console.error('Error loading subscription:', error);
+    } finally {
+      setIsLoadingSubscription(false);
+    }
+  };
 
   const loadProfile = async () => {
     if (!user) return;
@@ -505,6 +529,106 @@ const Profile = () => {
     }
   };
 
+  const handleSendCancelCode = async () => {
+    setIsSendingCode(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        throw new Error("Session expirée. Veuillez vous reconnecter.");
+      }
+
+      const { error } = await supabase.functions.invoke('send-verification-code', {
+        body: { type: 'cancel_subscription' },
+        headers: {
+          Authorization: `Bearer ${session.access_token}`
+        }
+      });
+
+      if (error) throw error;
+
+      setCodeSent(true);
+      toast({
+        title: "Code envoyé",
+        description: "Un code de vérification a été envoyé à votre email",
+      });
+    } catch (error: any) {
+      console.error('Error sending code:', error);
+      toast({
+        title: "Erreur",
+        description: error.message || "Impossible d'envoyer le code",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSendingCode(false);
+    }
+  };
+
+  const handleVerifyCancelCode = async () => {
+    if (!verificationCode || verificationCode.length !== 6) {
+      toast({
+        title: "Erreur",
+        description: "Veuillez entrer un code à 6 chiffres",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsVerifying(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        throw new Error("Session expirée. Veuillez vous reconnecter.");
+      }
+
+      const response = await supabase.functions.invoke('cancel-subscription', {
+        body: { code: verificationCode },
+        headers: {
+          Authorization: `Bearer ${session.access_token}`
+        }
+      });
+
+      if (response.error) {
+        const errorMessage = response.data?.error || "Code invalide ou expiré";
+        throw new Error(errorMessage);
+      }
+
+      if (response.data?.error) {
+        throw new Error(response.data.error);
+      }
+
+      toast({
+        title: "Abonnement résilié",
+        description: response.data?.message || "Votre abonnement a été résilié avec succès",
+      });
+
+      setShowCancelDialog(false);
+      setShowCancelConfirmDialog(false);
+      setVerificationCode('');
+      setCodeSent(false);
+      
+      // Reload subscription
+      await loadSubscription();
+    } catch (error: any) {
+      console.error('Error canceling subscription:', error);
+      
+      let errorMessage = "Code invalide ou expiré";
+      if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      toast({
+        title: "Erreur",
+        description: errorMessage,
+        variant: "destructive",
+        duration: 7000,
+      });
+    } finally {
+      setIsVerifying(false);
+    }
+  };
+
   if (isLoading || isAuthLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -670,6 +794,183 @@ const Profile = () => {
               </Button>
             </CardContent>
           </Card>
+
+          {/* Subscription Management */}
+          {!isLoadingSubscription && subscription && subscription.plan_type === 'vip' && subscription.status === 'active' && (
+            <Card className="mt-6 border-destructive/50">
+              <CardHeader>
+                <CardTitle className="text-destructive">Résiliation d'abonnement</CardTitle>
+                <CardDescription>
+                  Annulez votre abonnement VIP. Vous garderez l'accès jusqu'à la fin de la période.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {subscription.expires_at && (
+                    <p className="text-sm text-muted-foreground">
+                      Votre abonnement expire le : {new Date(subscription.expires_at).toLocaleDateString('fr-FR', {
+                        day: 'numeric',
+                        month: 'long',
+                        year: 'numeric'
+                      })}
+                    </p>
+                  )}
+                  <Button
+                    variant="destructive"
+                    onClick={() => setShowCancelConfirmDialog(true)}
+                    className="w-full"
+                  >
+                    Résilier mon abonnement
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Canceled Subscription Notice */}
+          {!isLoadingSubscription && subscription && subscription.status === 'canceled' && (
+            <Card className="mt-6 border-yellow-500/50 bg-yellow-50 dark:bg-yellow-950/20">
+              <CardHeader>
+                <CardTitle className="text-yellow-700 dark:text-yellow-500">Abonnement résilié</CardTitle>
+                <CardDescription className="text-yellow-600 dark:text-yellow-400">
+                  Votre abonnement a été résilié. Vous conservez l'accès VIP jusqu'au{' '}
+                  {subscription.expires_at && new Date(subscription.expires_at).toLocaleDateString('fr-FR', {
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric'
+                  })}
+                </CardDescription>
+              </CardHeader>
+            </Card>
+          )}
+
+          {/* Cancellation Confirmation Dialog */}
+          <Dialog open={showCancelConfirmDialog} onOpenChange={setShowCancelConfirmDialog}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Confirmer la résiliation</DialogTitle>
+                <DialogDescription>
+                  Êtes-vous sûr de vouloir résilier votre abonnement VIP ?
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4">
+                <div className="bg-yellow-50 dark:bg-yellow-950/20 p-4 rounded-lg border border-yellow-200 dark:border-yellow-800">
+                  <p className="text-sm text-yellow-800 dark:text-yellow-200">
+                    ⚠️ Votre abonnement sera annulé mais vous garderez l'accès VIP jusqu'à la fin de la période payée.
+                  </p>
+                  {subscription?.expires_at && (
+                    <p className="text-sm text-yellow-700 dark:text-yellow-300 mt-2">
+                      Date d'expiration : {new Date(subscription.expires_at).toLocaleDateString('fr-FR', {
+                        day: 'numeric',
+                        month: 'long',
+                        year: 'numeric'
+                      })}
+                    </p>
+                  )}
+                </div>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowCancelConfirmDialog(false)}
+                    className="flex-1"
+                  >
+                    Annuler
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    onClick={() => {
+                      setShowCancelConfirmDialog(false);
+                      setShowCancelDialog(true);
+                    }}
+                    className="flex-1"
+                  >
+                    Continuer
+                  </Button>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
+
+          {/* Cancellation Verification Dialog */}
+          <Dialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Vérification de résiliation</DialogTitle>
+                <DialogDescription>
+                  Pour confirmer la résiliation, nous devons vérifier votre identité
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4">
+                {!codeSent ? (
+                  <>
+                    <div className="bg-muted p-4 rounded-lg">
+                      <p className="text-sm">
+                        Un code de vérification à 6 chiffres sera envoyé à votre email pour confirmer la résiliation.
+                      </p>
+                    </div>
+                    <Button
+                      onClick={handleSendCancelCode}
+                      disabled={isSendingCode}
+                      className="w-full"
+                    >
+                      {isSendingCode ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Envoi...
+                        </>
+                      ) : (
+                        'Envoyer le code'
+                      )}
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <div className="space-y-2">
+                      <Label htmlFor="cancel_code">Code de vérification</Label>
+                      <Input
+                        id="cancel_code"
+                        type="text"
+                        placeholder="123456"
+                        maxLength={6}
+                        value={verificationCode}
+                        onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, ''))}
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Le code a été envoyé à votre email
+                      </p>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        onClick={() => {
+                          setCodeSent(false);
+                          setVerificationCode('');
+                        }}
+                        className="flex-1"
+                      >
+                        Renvoyer
+                      </Button>
+                      <Button
+                        onClick={handleVerifyCancelCode}
+                        disabled={isVerifying}
+                        variant="destructive"
+                        className="flex-1"
+                      >
+                        {isVerifying ? (
+                          <>
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            Vérification...
+                          </>
+                        ) : (
+                          'Confirmer la résiliation'
+                        )}
+                      </Button>
+                    </div>
+                  </>
+                )}
+              </div>
+            </DialogContent>
+          </Dialog>
 
           {/* Email Change Dialog */}
           <Dialog open={showEmailDialog} onOpenChange={setShowEmailDialog}>
