@@ -60,13 +60,26 @@ export const usePushNotifications = () => {
     };
   }, []);
 
-  // Save token to database when we have both user and token
+  // Save token to database when we have both user and token - AVEC RETRY
   useEffect(() => {
-    if (!user || !pendingToken || !isNativePlatform()) return;
+    if (!isNativePlatform()) {
+      console.log('⚠️ Not native platform, skipping token save');
+      return;
+    }
+
+    if (!pendingToken) {
+      console.log('⚠️ No pending token to save');
+      return;
+    }
+
+    if (!user) {
+      console.log('⚠️ User not yet authenticated, will retry when user is available');
+      return;
+    }
 
     console.log('💾 Attempting to save FCM token to database...');
     console.log('👤 User ID:', user.id);
-    console.log('🎫 Token:', pendingToken);
+    console.log('🎫 Token:', pendingToken.substring(0, 20) + '...');
     
     const platform = (window as any).Capacitor?.getPlatform?.() || 'unknown';
     console.log('📱 Platform:', platform);
@@ -87,9 +100,11 @@ export const usePushNotifications = () => {
 
         if (error) {
           console.error('❌ Error saving FCM token:', error);
+          console.error('❌ Error details:', JSON.stringify(error));
+          // Ne pas clear le token en cas d'erreur pour retry
         } else {
           console.log('✅ FCM token saved successfully to database!', data);
-          setPendingToken(null);
+          setPendingToken(null); // Clear seulement si succès
         }
       } catch (error) {
         console.error('❌ Exception while saving FCM token:', error);
