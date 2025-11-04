@@ -1,6 +1,7 @@
 import { useAuth } from '@/hooks/use-auth';
 import { useAdmin } from '@/hooks/use-admin';
 import { useNotifications } from '@/hooks/use-notifications';
+import { usePullRefresh } from '@/hooks/use-pull-refresh';
 import { Navigate, Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import Navbar from '@/components/Navbar';
@@ -8,12 +9,14 @@ import Footer from '@/components/Footer';
 import CategoryAlerts from '@/components/CategoryAlerts';
 import { RecentUpdates } from '@/components/RecentUpdates';
 import { NotificationBadge } from '@/components/NotificationBadge';
+import { RefreshButton } from '@/components/RefreshButton';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Crown, BookOpen, Bell, CheckCircle, DollarSign, HelpCircle, Settings, Eye, FileText, Star, Calculator, Sparkles, Package, Truck, Megaphone, Newspaper, MessageCircle, LightbulbIcon, Trophy, ShoppingCart, Info, Users, Lock, AlertCircle, Scale, Database, Shield, UserCog } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 interface CategoryItemProps {
   icon: React.ElementType;
   label: string;
@@ -56,10 +59,21 @@ const Dashboard = () => {
     isLoading
   } = useAuth();
   const { isAdmin } = useAdmin();
-  const { notifications, markAsRead } = useNotifications();
+  const { notifications, markAsRead, loadNotifications } = useNotifications();
+  const { toast } = useToast();
   const [invoiceAuthOpen, setInvoiceAuthOpen] = useState(false);
   const [reviewsOpen, setReviewsOpen] = useState(false);
   const [gestionInfoOpen, setGestionInfoOpen] = useState(false);
+
+  const handleRefreshDashboard = async () => {
+    await loadNotifications();
+    toast({
+      title: "✅ Rafraîchi",
+      description: "Dashboard mis à jour",
+    });
+  };
+
+  const { isRefreshing, handleRefresh } = usePullRefresh(handleRefreshDashboard);
   if (isLoading) {
     return <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
@@ -84,7 +98,14 @@ const Dashboard = () => {
           <div className="max-w-4xl mx-auto">
             <div className="flex items-center gap-3 mb-8">
               <Crown className="w-8 h-8 text-primary" />
-              <h1 className="text-4xl font-bold">Espace VIP</h1>
+              <div className="flex-1">
+                <h1 className="text-4xl font-bold">Espace VIP</h1>
+              </div>
+              <RefreshButton 
+                onRefresh={handleRefresh} 
+                isRefreshing={isRefreshing}
+                className="bg-primary hover:bg-primary/90 text-primary-foreground"
+              />
             </div>
 
             <RecentUpdates />

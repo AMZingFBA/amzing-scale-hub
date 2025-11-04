@@ -238,5 +238,5 @@ export const useNotifications = () => {
     };
   }, [user]);
 
-  return { notifications, isLoading, markAsRead };
+  return { notifications, isLoading, markAsRead, loadNotifications: fetchNotifications };
 };
