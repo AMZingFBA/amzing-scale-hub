@@ -148,50 +148,86 @@ export const useNotifications = () => {
     };
   }, [user]);
 
-  // Réinitialiser le badge à 0 quand l'app s'ouvre - RESET INCONDITIONNEL
+  // RESET BADGE - EXECUTÉ À CHAQUE OUVERTURE
   useEffect(() => {
-    if (!Capacitor.isNativePlatform() || !user) return;
+    console.log('🔍 Badge reset hook - Platform check:', {
+      isNative: Capacitor.isNativePlatform(),
+      hasUser: !!user,
+      userId: user?.id
+    });
+    
+    if (!Capacitor.isNativePlatform()) {
+      console.log('⚠️ Pas une plateforme native - reset ignoré');
+      return;
+    }
+    
+    if (!user) {
+      console.log('⚠️ Pas d\'utilisateur - reset ignoré');
+      return;
+    }
 
     const resetBadge = async () => {
-      console.log('🔄 RESET BADGE INCONDITIONNEL - Début');
+      const timestamp = new Date().toISOString();
+      console.log(`🔄 [${timestamp}] DÉBUT RESET BADGE pour user ${user.id}`);
       
       try {
-        // 1. TOUJOURS réinitialiser le compteur en base EN PREMIER
+        // 1. FORCER le reset à 0 dans la base EN PREMIER
+        console.log('📤 Appel reset_user_badge...');
         const { error: dbError } = await supabase.rpc('reset_user_badge', {
           user_id_param: user.id
         });
         
         if (dbError) {
-          console.error('❌ Erreur reset compteur DB:', dbError);
-        } else {
-          console.log('✅ Compteur DB forcé à 0');
+          console.error('❌ ERREUR reset DB:', dbError);
+          throw dbError;
         }
-
-        // 2. Puis mettre le badge iOS à 0
-        await Badge.set({ count: 0 });
-        console.log('✅ Badge iOS forcé à 0');
         
-        console.log('✅ RESET COMPLET - Prochaine notification = 1');
+        console.log('✅ Compteur DB = 0');
+
+        // 2. Reset badge iOS
+        console.log('📱 Reset badge iOS...');
+        await Badge.set({ count: 0 });
+        console.log('✅ Badge iOS = 0');
+        
+        console.log(`✅ [${timestamp}] RESET TERMINÉ - Prochaine notif doit être badge=1`);
       } catch (error) {
-        console.error('❌ Erreur lors du reset:', error);
+        console.error('❌ ERREUR critique lors du reset:', error);
       }
     };
 
-    // Reset immédiat au chargement
+    // Reset IMMÉDIAT au montage
+    console.log('🚀 Exécution reset initial...');
     resetBadge();
     
     // Reset à CHAQUE retour au premier plan
     const handleVisibilityChange = () => {
+      console.log('👁️ Visibility change event:', { hidden: document.hidden });
+      
       if (!document.hidden) {
-        console.log('📱 App revenue au premier plan - RESET INCONDITIONNEL');
+        console.log('📱 App revenue visible - DÉCLENCHEMENT RESET');
         resetBadge();
       }
     };
 
+    // Ajouter aussi un listener pour l'événement resume de Capacitor
+    const handleAppResume = () => {
+      console.log('📱 App resume event - DÉCLENCHEMENT RESET');
+      resetBadge();
+    };
+
     document.addEventListener('visibilitychange', handleVisibilityChange);
+    
+    // Écouter aussi l'événement resume si disponible
+    if (typeof window !== 'undefined') {
+      window.addEventListener('resume', handleAppResume);
+    }
 
     return () => {
+      console.log('🧹 Nettoyage listeners badge reset');
       document.removeEventListener('visibilitychange', handleVisibilityChange);
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('resume', handleAppResume);
+      }
     };
   }, [user]);
 
