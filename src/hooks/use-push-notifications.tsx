@@ -136,11 +136,21 @@ export const usePushNotifications = () => {
 
           // Écouter les actions sur les notifications
           await PushNotifications.addListener('pushNotificationActionPerformed', async (notification: ActionPerformed) => {
-            console.log('👆 Push notification action performed:', notification);
+            console.log('👆 Notification tapée - Reset badge à 0');
             
-            // Réinitialiser le badge à 0 quand l'utilisateur ouvre l'app
-            console.log('📱 App opened from notification, resetting badge to 0');
-            await Badge.set({ count: 0 });
+            // Réinitialiser le badge iOS
+            await Badge.set({ count: 0 }).catch(err => {
+              console.error('❌ Erreur reset badge:', err);
+            });
+            
+            // Réinitialiser le compteur en base
+            const { error: resetError } = await supabase.rpc('reset_user_badge', {
+              user_id_param: user.id
+            });
+            
+            if (resetError) {
+              console.error('❌ Erreur reset compteur:', resetError);
+            }
             
             // Rediriger selon le type de notification
             const data = notification.notification.data;
