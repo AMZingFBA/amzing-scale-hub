@@ -163,6 +163,20 @@ const handler = async (req: Request): Promise<Response> => {
     // 5. Envoyer les notifications par batch via FCM v1 API
     const notificationPromises = tokens.map(async ({ token, platform, user_id }) => {
       try {
+        // Calculer le nombre total de notifications non lues pour cet utilisateur
+        const { data: notifCounts } = await supabaseAdmin.rpc('get_all_notification_counts', {
+          user_id_param: user_id
+        });
+        
+        const totalCount = Object.values((notifCounts as any) || {}).reduce((total: number, cat: any) => {
+          return total + (cat.total || 0);
+        }, 0) as number;
+        
+        // Le badge sera le nombre actuel + 1 (pour cette nouvelle notification)
+        const badgeCount = (totalCount as number) + 1;
+        
+        console.log(`📱 Setting badge to ${badgeCount} for user ${user_id}`);
+        
         const fcmUrl = `https://fcm.googleapis.com/v1/projects/${serviceAccount.project_id}/messages:send`;
         
         const response = await fetch(fcmUrl, {
@@ -194,7 +208,7 @@ const handler = async (req: Request): Promise<Response> => {
                 payload: {
                   aps: {
                     sound: 'default',
-                    badge: 1,
+                    badge: badgeCount,
                   },
                 },
               },
