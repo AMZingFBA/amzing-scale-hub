@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './use-auth';
+import { Capacitor } from '@capacitor/core';
+import { Badge } from '@capawesome/capacitor-badge';
 
 interface SubcategoryNotifications {
   [subcategory: string]: number;
@@ -148,6 +150,23 @@ export const useNotifications = () => {
       supabase.removeChannel(channel);
     };
   }, [user]);
+
+  // Mettre à jour le badge iOS/Android quand les notifications changent
+  useEffect(() => {
+    if (!Capacitor.isNativePlatform()) return;
+
+    // Calculer le total des notifications
+    const totalCount = Object.values(notifications).reduce((total, category) => {
+      return total + (category.total || 0);
+    }, 0);
+
+    console.log('📱 Mise à jour du badge de l\'app à:', totalCount);
+
+    // Mettre à jour le badge
+    Badge.set({ count: totalCount }).catch(err => {
+      console.error('❌ Erreur lors de la mise à jour du badge:', err);
+    });
+  }, [notifications]);
 
   return { notifications, isLoading, markAsRead, loadNotifications: fetchNotifications };
 };
