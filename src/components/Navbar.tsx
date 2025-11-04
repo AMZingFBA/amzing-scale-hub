@@ -26,15 +26,22 @@ const Navbar = () => {
   const isNativeApp = Capacitor.isNativePlatform();
   
   // Calculer le total de toutes les notifications de toutes les catégories
-  const totalNotifications = Object.keys(notifications).reduce((total, categoryKey) => {
-    const category = notifications[categoryKey];
-    if (category && typeof category === 'object' && 'total' in category) {
-      return total + (category.total || 0);
-    }
-    return total;
-  }, 0);
+  let totalNotifications = 0;
   
-  console.log('📊 Total notifications in Navbar:', totalNotifications, 'from', notifications);
+  console.log('🔍 Calcul des notifications - Objet notifications:', notifications);
+  
+  Object.keys(notifications).forEach((categoryKey) => {
+    const category = notifications[categoryKey];
+    console.log(`📂 Catégorie: ${categoryKey}`, category);
+    
+    if (category && typeof category === 'object' && 'total' in category) {
+      const categoryTotal = category.total || 0;
+      console.log(`  ➕ Ajout de ${categoryTotal} notifications pour ${categoryKey}`);
+      totalNotifications += categoryTotal;
+    }
+  });
+  
+  console.log('✅ TOTAL FINAL des notifications:', totalNotifications);
 
   // Native App - Floating menu button only
   if (isNativeApp) {
