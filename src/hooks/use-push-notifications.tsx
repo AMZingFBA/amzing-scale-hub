@@ -15,6 +15,7 @@ const isNativePlatform = () => {
 export const usePushNotifications = () => {
   const [isInitialized, setIsInitialized] = useState(false);
   const [pendingToken, setPendingToken] = useState<string | null>(null);
+  const [savedTokens, setSavedTokens] = useState<Set<string>>(new Set());
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -60,7 +61,7 @@ export const usePushNotifications = () => {
     };
   }, []);
 
-  // Save token to database when we have both user and token - AVEC RETRY
+  // Save token to database when we have both user and token - AVEC RETRY ET DEDUPLICATION
   useEffect(() => {
     if (!isNativePlatform()) {
       console.log('⚠️ Not native platform, skipping token save');
@@ -74,6 +75,14 @@ export const usePushNotifications = () => {
 
     if (!user) {
       console.log('⚠️ User not yet authenticated, will retry when user is available');
+      return;
+    }
+
+    // Vérifier si on a déjà sauvegardé ce token pour cet utilisateur
+    const tokenKey = `${user.id}:${pendingToken}`;
+    if (savedTokens.has(tokenKey)) {
+      console.log('✅ Token already saved for this user, skipping duplicate save');
+      setPendingToken(null);
       return;
     }
 
@@ -104,6 +113,8 @@ export const usePushNotifications = () => {
           // Ne pas clear le token en cas d'erreur pour retry
         } else {
           console.log('✅ FCM token saved successfully to database!', data);
+          // Marquer ce token comme sauvegardé
+          setSavedTokens(prev => new Set([...prev, tokenKey]));
           setPendingToken(null); // Clear seulement si succès
         }
       } catch (error) {
@@ -112,7 +123,7 @@ export const usePushNotifications = () => {
     };
 
     saveToken();
-  }, [user, pendingToken]);
+  }, [user, pendingToken, savedTokens]);
 
 
   useEffect(() => {
