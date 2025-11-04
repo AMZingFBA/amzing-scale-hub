@@ -102,11 +102,13 @@ const Dashboard = () => {
               <div className="flex-1">
                 <h1 className="text-4xl font-bold">Espace VIP</h1>
               </div>
-              <RefreshButton 
-                onRefresh={handleRefresh} 
-                isRefreshing={isRefreshing}
-                className="bg-primary hover:bg-primary/90 text-primary-foreground"
-              />
+              {isVIP && (
+                <RefreshButton 
+                  onRefresh={handleRefresh} 
+                  isRefreshing={isRefreshing}
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground"
+                />
+              )}
             </div>
 
             <RecentUpdates />
