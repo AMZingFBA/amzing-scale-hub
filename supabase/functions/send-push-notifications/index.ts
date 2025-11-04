@@ -56,6 +56,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     const callId = Math.random().toString(36).substring(7);
     console.log(`🔵 [${callId}] START - Edge function appelée pour:`, { alert_id, title, category, subcategory });
+    console.log(`🔵 [${callId}] Timestamp:`, new Date().toISOString());
 
     const supabaseAdmin = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
@@ -164,16 +165,25 @@ const handler = async (req: Request): Promise<Response> => {
     // 5. Envoyer les notifications avec incrémentation du badge
     const notificationPromises = tokens.map(async ({ token, platform, user_id }) => {
       try {
+        console.log(`🔵 [${callId}] Tentative envoi à user ${user_id} pour alert ${alert_id}`);
+        
         // Tenter d'insérer dans l'historique pour déduplication
-        const { error: historyError } = await supabaseAdmin
+        const { data: inserted, error: historyError } = await supabaseAdmin
           .from('push_notification_history')
-          .insert({ user_id, alert_id });
+          .insert({ user_id, alert_id })
+          .select();
         
         // Si erreur de contrainte unique = déjà envoyé
-        if (historyError?.code === '23505') {
-          console.log(`⏭️ Skip: déjà envoyé à user ${user_id}`);
-          return { skipped: true };
+        if (historyError) {
+          if (historyError.code === '23505') {
+            console.log(`⏭️ [${callId}] DUPLICATE détecté pour user ${user_id} alert ${alert_id}`);
+            return { skipped: true };
+          }
+          console.error(`❌ [${callId}] Erreur insertion history:`, historyError);
+          return { error: historyError };
         }
+        
+        console.log(`✅ [${callId}] Historique inséré pour user ${user_id}, incrémentation badge...`);
         
         // Incrémenter le badge (+1 par notification)
         const { data: newBadgeCount, error: badgeError } = await supabaseAdmin.rpc('increment_user_badge', {
@@ -181,11 +191,11 @@ const handler = async (req: Request): Promise<Response> => {
         });
         
         if (badgeError) {
-          console.error('❌ Error incrementing badge:', badgeError);
+          console.error(`❌ [${callId}] Error incrementing badge:`, badgeError);
         }
         
         const badgeCount = newBadgeCount || 1;
-        console.log(`📱 User ${user_id}: badge = ${badgeCount}`);
+        console.log(`📱 [${callId}] User ${user_id}: badge = ${badgeCount}`);
         
         const fcmUrl = `https://fcm.googleapis.com/v1/projects/${serviceAccount.project_id}/messages:send`;
         
