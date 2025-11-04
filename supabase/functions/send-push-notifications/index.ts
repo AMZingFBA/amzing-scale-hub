@@ -161,40 +161,38 @@ const handler = async (req: Request): Promise<Response> => {
     const serviceAccount = JSON.parse(serviceAccountJson);
     const accessToken = await getAccessToken(serviceAccount);
 
-    // 5. Envoyer les notifications par batch via FCM v1 API avec déduplication DB
+    // 5. Envoyer les notifications avec le vrai badge count
     const notificationPromises = tokens.map(async ({ token, platform, user_id }) => {
       try {
-        // Tenter d'insérer dans l'historique AVANT toute autre opération
-        // Si déjà existant, la contrainte UNIQUE va rejeter l'insert
-        const { data: historyInsert, error: historyError } = await supabaseAdmin
+        // Tenter d'insérer dans l'historique pour déduplication
+        const { error: historyError } = await supabaseAdmin
           .from('push_notification_history')
-          .insert({ user_id, alert_id })
-          .select()
-          .single();
+          .insert({ user_id, alert_id });
         
-        // Si l'insertion échoue à cause d'une contrainte unique, c'est un duplicate
-        if (historyError) {
-          if (historyError.code === '23505') { // Unique violation
-            console.log(`⏭️ Notification already sent to user ${user_id} for alert ${alert_id}`);
-            return { skipped: true };
-          }
-          // Autre erreur, on la log mais on continue quand même
-          console.error('❌ Error inserting history:', historyError);
-          return { error: historyError };
+        // Si erreur de contrainte unique = déjà envoyé
+        if (historyError?.code === '23505') {
+          console.log(`⏭️ Skip: déjà envoyé à user ${user_id}`);
+          return { skipped: true };
         }
         
-        // L'insertion a réussi = première notification pour cet utilisateur/alerte
-        // MAINTENANT on peut incrémenter le badge en toute sécurité
-        const { data: newBadgeCount, error: badgeError } = await supabaseAdmin.rpc('increment_user_badge', {
+        // Calculer le VRAI nombre total d'alertes non lues pour cet utilisateur
+        const { data: unreadData } = await supabaseAdmin.rpc('get_all_notification_counts', {
           user_id_param: user_id
         });
         
-        if (badgeError) {
-          console.error('❌ Error incrementing badge:', badgeError);
+        // Parser le résultat et compter le total
+        let totalUnread = 0;
+        if (unreadData) {
+          for (const category of Object.values(unreadData)) {
+            if (category && typeof category === 'object' && 'total' in category) {
+              totalUnread += (category as any).total || 0;
+            }
+          }
         }
         
-        const badgeCount = newBadgeCount || 1;
-        console.log(`📱 Badge pour user ${user_id}: ${badgeCount}`);
+        // Badge = nombre réel d'alertes non lues (minimum 1 pour la nouvelle)
+        const badgeCount = Math.max(totalUnread, 1);
+        console.log(`📱 User ${user_id}: ${badgeCount} alertes non lues`);
         
         const fcmUrl = `https://fcm.googleapis.com/v1/projects/${serviceAccount.project_id}/messages:send`;
         

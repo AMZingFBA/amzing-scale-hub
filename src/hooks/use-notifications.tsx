@@ -148,7 +148,7 @@ export const useNotifications = () => {
     };
   }, [user]);
 
-  // RESET BADGE - Direct + Edge function
+  // RESET BADGE - FORCER À 0 IMMÉDIATEMENT AU DÉMARRAGE
   useEffect(() => {
     const isNative = Capacitor.isNativePlatform();
     
@@ -156,15 +156,32 @@ export const useNotifications = () => {
       return;
     }
 
+    // FORCER BADGE À 0 IMMÉDIATEMENT (sync)
+    const forceResetBadge = async () => {
+      try {
+        await Badge.set({ count: 0 });
+        console.log('✅ Badge iOS forcé à 0 au démarrage');
+      } catch (error) {
+        console.error('❌ Erreur reset badge:', error);
+      }
+    };
+
+    forceResetBadge();
+
     const resetBadge = async () => {
       try {
         console.log('🔄 RESET BADGE pour user:', user.id);
         
-        // 1. Reset iOS badge IMMÉDIATEMENT côté client
+        // 1. Reset iOS badge côté client
         await Badge.set({ count: 0 });
         console.log('✅ Badge iOS → 0');
         
-        // 2. Appeler edge function pour reset DB + envoyer notification silencieuse
+        // 2. Reset DB
+        await supabase.rpc('reset_user_badge', {
+          user_id_param: user.id
+        });
+        
+        // 3. Appeler edge function pour envoyer notification silencieuse
         const { data, error } = await supabase.functions.invoke('reset-badge', {
           body: { user_id: user.id }
         });
@@ -179,13 +196,16 @@ export const useNotifications = () => {
       }
     };
 
-    // Reset au montage
-    resetBadge();
+    // Reset complet après 1 seconde
+    const resetTimeout = setTimeout(() => {
+      resetBadge();
+    }, 1000);
 
     // Reset quand l'app revient au premier plan
     const handleVisibilityChange = () => {
       if (!document.hidden) {
         console.log('📱 App visible → reset badge');
+        forceResetBadge();
         resetBadge();
       }
     };
@@ -193,6 +213,7 @@ export const useNotifications = () => {
     document.addEventListener('visibilitychange', handleVisibilityChange);
 
     return () => {
+      clearTimeout(resetTimeout);
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, [user]);
