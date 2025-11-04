@@ -161,31 +161,31 @@ const handler = async (req: Request): Promise<Response> => {
     const serviceAccount = JSON.parse(serviceAccountJson);
     const accessToken = await getAccessToken(serviceAccount);
 
-    // 5. Envoyer les notifications par batch via FCM v1 API
+    // 5. Créer un Set pour déduplication par (user_id, alert_id)
+    const seenNotifications = new Set<string>();
+    
+    // 6. Envoyer les notifications par batch via FCM v1 API
     const notificationPromises = tokens.map(async ({ token, platform, user_id }) => {
       try {
-        // Récupérer le nombre réel d'alertes non lues pour cet utilisateur
-        const { data: unreadData, error: unreadError } = await supabaseAdmin.rpc('get_all_notification_counts', {
+        // Déduplication: vérifier si on a déjà envoyé cette notification à cet utilisateur
+        const notificationKey = `${user_id}_${alert_id}`;
+        if (seenNotifications.has(notificationKey)) {
+          console.log(`⏭️ Skip duplicate notification for user ${user_id}`);
+          return { skipped: true };
+        }
+        seenNotifications.add(notificationKey);
+        
+        // Incrémenter le badge pour cet utilisateur (+1 par nouvelle notification)
+        const { data: newBadgeCount, error: badgeError } = await supabaseAdmin.rpc('increment_user_badge', {
           user_id_param: user_id
         });
         
-        if (unreadError) {
-          console.error('❌ Error getting unread count:', unreadError);
+        if (badgeError) {
+          console.error('❌ Error incrementing badge:', badgeError);
         }
         
-        // Calculer le total de toutes les notifications non lues
-        let totalUnread = 0;
-        if (unreadData && typeof unreadData === 'object') {
-          // unreadData est un JSONB direct, pas un array
-          Object.values(unreadData).forEach((category: any) => {
-            if (category && typeof category === 'object' && typeof category.total === 'number') {
-              totalUnread += category.total;
-            }
-          });
-        }
-        
-        const badgeCount = totalUnread > 0 ? totalUnread : 1; // Au moins 1 pour la nouvelle notification
-        console.log(`📱 Badge pour user ${user_id}: ${badgeCount} alertes non lues au total`);
+        const badgeCount = newBadgeCount || 1;
+        console.log(`📱 Badge pour user ${user_id}: ${badgeCount}`);
         
         const fcmUrl = `https://fcm.googleapis.com/v1/projects/${serviceAccount.project_id}/messages:send`;
         
@@ -260,9 +260,10 @@ const handler = async (req: Request): Promise<Response> => {
     });
 
     const results = await Promise.all(notificationPromises);
-    const successCount = results.filter(r => !r.error).length;
+    const successCount = results.filter(r => !r.error && !r.skipped).length;
+    const skippedCount = results.filter(r => r.skipped).length;
 
-    console.log(`🔵 [${callId}] END - Sent ${successCount}/${tokens.length} notifications successfully`);
+    console.log(`🔵 [${callId}] END - Sent ${successCount}/${tokens.length} notifications successfully (${skippedCount} duplicates skipped)`);
 
     return new Response(
       JSON.stringify({ 
