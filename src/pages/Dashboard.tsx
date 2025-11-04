@@ -276,6 +276,7 @@ const Dashboard = () => {
                       <CategoryItem icon={Users} label="gestion des profils" link="/admin/profiles" />
                       <CategoryItem icon={Eye} label="gestion des tickets" link="/admin/tickets" />
                       <CategoryItem icon={Bell} label="gestion des alertes" link="/admin/alerts" />
+                      <CategoryItem icon={Database} label="debug notifications push" link="/debug-push" />
                     </div>
                   </AccordionContent>
                 </AccordionItem>
