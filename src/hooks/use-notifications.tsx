@@ -87,23 +87,6 @@ export const useNotifications = () => {
 
       // Refresh notifications immediately
       await fetchNotifications();
-      
-      // Update badge iOS immédiatement après avoir marqué comme lu
-      if (Capacitor.isNativePlatform()) {
-        // Recalculer le total après refresh
-        setTimeout(async () => {
-          const { data } = await supabase.rpc('get_all_notification_counts', {
-            user_id_param: user.id
-          });
-          
-          const totalCount = Object.values((data as any) || {}).reduce((total: number, cat: any) => {
-            return total + (cat.total || 0);
-          }, 0) as number;
-          
-          console.log('📱 Mise à jour immédiate du badge après markAsRead:', totalCount);
-          await Badge.set({ count: totalCount });
-        }, 100);
-      }
     } catch (error) {
       console.error('Error marking as read:', error);
     }
@@ -165,22 +148,33 @@ export const useNotifications = () => {
     };
   }, [user]);
 
-  // Mettre à jour le badge iOS/Android quand les notifications changent
+  // Réinitialiser le badge à 0 quand l'app s'ouvre
   useEffect(() => {
-    if (!Capacitor.isNativePlatform()) return;
+    if (!Capacitor.isNativePlatform() || !user) return;
 
-    // Calculer le total des notifications
-    const totalCount = Object.values(notifications).reduce((total, category) => {
-      return total + (category.total || 0);
-    }, 0);
-
-    console.log('📱 Mise à jour du badge de l\'app à:', totalCount);
-
-    // Mettre à jour le badge
-    Badge.set({ count: totalCount }).catch(err => {
-      console.error('❌ Erreur lors de la mise à jour du badge:', err);
+    // Mettre le badge à 0 dès que l'app s'ouvre
+    console.log('📱 App ouverte, réinitialisation du badge à 0');
+    Badge.set({ count: 0 }).catch(err => {
+      console.error('❌ Erreur lors de la réinitialisation du badge:', err);
     });
-  }, [notifications]);
+
+    // Aussi réinitialiser quand l'app revient au premier plan
+    const handleAppStateChange = () => {
+      console.log('📱 App au premier plan, réinitialisation du badge à 0');
+      Badge.set({ count: 0 }).catch(err => {
+        console.error('❌ Erreur lors de la réinitialisation du badge:', err);
+      });
+      fetchNotifications();
+    };
+
+    window.addEventListener('focus', handleAppStateChange);
+    document.addEventListener('resume', handleAppStateChange);
+
+    return () => {
+      window.removeEventListener('focus', handleAppStateChange);
+      document.removeEventListener('resume', handleAppStateChange);
+    };
+  }, [user]);
 
   return { notifications, isLoading, markAsRead, loadNotifications: fetchNotifications };
 };
