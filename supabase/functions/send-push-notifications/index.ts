@@ -173,9 +173,45 @@ const handler = async (req: Request): Promise<Response> => {
         }
         
         const badgeCount = newBadgeCount || 1;
-        console.log(`📱 Badge incrémenté à ${badgeCount} pour user ${user_id}`);
+        console.log(`📱 Badge pour user ${user_id}: DB=${badgeCount}, sera envoyé dans APNs payload`);
         
         const fcmUrl = `https://fcm.googleapis.com/v1/projects/${serviceAccount.project_id}/messages:send`;
+        
+        const payload = {
+          message: {
+            token: token,
+            notification: {
+              title: getNotificationTitle(category, subcategory),
+              body: `📢 ${title}`,
+            },
+            data: {
+              alert_id,
+              category,
+              subcategory: subcategory || '',
+              type: 'admin_alert',
+            },
+            android: {
+              priority: 'high',
+              notification: {
+                sound: 'default',
+              },
+            },
+            apns: {
+              payload: {
+                aps: {
+                  sound: 'default',
+                  badge: badgeCount,
+                },
+              },
+            },
+          },
+        };
+        
+        console.log(`🔥 Payload FCM pour ${user_id}:`, JSON.stringify({
+          badge: badgeCount,
+          title: getNotificationTitle(category, subcategory),
+          platform
+        }));
         
         const response = await fetch(fcmUrl, {
           method: 'POST',
@@ -183,35 +219,7 @@ const handler = async (req: Request): Promise<Response> => {
             'Authorization': `Bearer ${accessToken}`,
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({
-            message: {
-              token: token,
-              notification: {
-                title: getNotificationTitle(category, subcategory),
-                body: `📢 ${title}`,
-              },
-              data: {
-                alert_id,
-                category,
-                subcategory: subcategory || '',
-                type: 'admin_alert',
-              },
-              android: {
-                priority: 'high',
-                notification: {
-                  sound: 'default',
-                },
-              },
-              apns: {
-                payload: {
-                  aps: {
-                    sound: 'default',
-                    badge: badgeCount,
-                  },
-                },
-              },
-            },
-          }),
+          body: JSON.stringify(payload),
         });
 
         const result = await response.json();
