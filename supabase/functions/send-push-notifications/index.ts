@@ -128,17 +128,18 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     // 3. Récupérer les tokens de notification push des utilisateurs
-    const { data: tokens, error: tokensError } = await supabaseAdmin
+    const { data: allTokens, error: tokensError } = await supabaseAdmin
       .from('push_notification_tokens')
-      .select('token, platform, user_id')
-      .in('user_id', usersToNotify);
+      .select('token, platform, user_id, updated_at')
+      .in('user_id', usersToNotify)
+      .order('updated_at', { ascending: false });
 
     if (tokensError) {
       console.error('Error fetching push tokens:', tokensError);
       throw tokensError;
     }
 
-    if (!tokens || tokens.length === 0) {
+    if (!allTokens || allTokens.length === 0) {
       console.log('No push tokens found for users');
       return new Response(
         JSON.stringify({ message: 'No push tokens registered' }),
@@ -146,7 +147,17 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    console.log(`🔵 [${callId}] Found ${tokens.length} push tokens to send to`);
+    // ✅ DÉDUPLICATION: Ne garder que le token le plus récent par user_id
+    // Cela évite d'envoyer plusieurs fois à un même user qui a plusieurs tokens
+    const tokensByUser = new Map();
+    allTokens.forEach(t => {
+      if (!tokensByUser.has(t.user_id)) {
+        tokensByUser.set(t.user_id, t);
+      }
+    });
+    const tokens = Array.from(tokensByUser.values());
+
+    console.log(`🔵 [${callId}] Found ${tokens.length} unique users with tokens (${allTokens.length} total tokens, ${allTokens.length - tokens.length} duplicates removed)`);
 
     // 4. Générer un access token OAuth2 pour FCM v1 API
     const serviceAccountJson = Deno.env.get("FIREBASE_SERVICE_ACCOUNT_JSON");
