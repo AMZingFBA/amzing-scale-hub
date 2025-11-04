@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/hooks/use-auth';
+import { useMarkAsRead } from '@/hooks/use-mark-as-read';
 import { useNotifications } from '@/hooks/use-notifications';
 import { usePullRefresh } from '@/hooks/use-pull-refresh';
 import { useAutoRefresh } from '@/hooks/use-auto-refresh';
@@ -28,6 +29,9 @@ const RulesAlerts = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState(searchParams.get('tab') === 'updates' ? 'updates' : 'base');
   const isNativeApp = Capacitor.isNativePlatform();
+
+  // Mark rules as read when visiting this page
+  useMarkAsRead({ category: 'introduction', subcategory: 'règles' });
 
   const loadAlerts = async () => {
     if (!user) return;

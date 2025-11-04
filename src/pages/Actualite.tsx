@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/use-auth';
+import { useMarkAsRead } from '@/hooks/use-mark-as-read';
 import { usePullRefresh } from '@/hooks/use-pull-refresh';
 import { useAutoRefresh } from '@/hooks/use-auto-refresh';
 import { supabase } from '@/integrations/supabase/client';
@@ -21,6 +22,9 @@ const Actualite = () => {
   const [alerts, setAlerts] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const isNativeApp = Capacitor.isNativePlatform();
+
+  // Mark actualités as read when visiting this page
+  useMarkAsRead({ category: 'informations', subcategory: 'actualités' });
 
   useEffect(() => {
     if (!user && !isAuthLoading) {

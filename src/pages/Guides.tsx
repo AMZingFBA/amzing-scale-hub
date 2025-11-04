@@ -1,5 +1,6 @@
 import { ArrowLeft, CheckCircle2, TrendingUp, Euro, Package, Store, Shield, Clock, Target, Building2, Wrench, BookOpen, GraduationCap, Search, Users, CreditCard, ShoppingCart, TrendingDown, AlertTriangle } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useMarkAsRead } from '@/hooks/use-mark-as-read';
 import { Capacitor } from '@capacitor/core';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -11,6 +12,9 @@ import processFlow from '@/assets/amazon-process-flow.png';
 const Guides = () => {
   const navigate = useNavigate();
   const isNativeApp = Capacitor.isNativePlatform();
+
+  // Mark guides as read when visiting this page
+  useMarkAsRead({ category: 'introduction', subcategory: 'guides' });
 
   return (
     <div className="min-h-screen flex flex-col">

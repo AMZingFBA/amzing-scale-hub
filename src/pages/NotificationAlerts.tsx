@@ -21,7 +21,7 @@ const NotificationAlerts = () => {
   const isNativeApp = Capacitor.isNativePlatform();
 
   // Mark notifications as read when visiting this page
-  useMarkAsRead({ category: 'informations', subcategory: 'notifications' });
+  useMarkAsRead({ category: 'introduction', subcategory: 'notifications' });
 
   useEffect(() => {
     if (!user && !isAuthLoading) {
