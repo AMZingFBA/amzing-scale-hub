@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/use-auth";
+import { useAdmin } from "@/hooks/use-admin";
 import { useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Capacitor } from "@capacitor/core";
@@ -48,6 +49,7 @@ interface BuyRequest {
 
 const Marketplace = () => {
   const { user, isVIP } = useAuth();
+  const { isAdmin } = useAdmin();
   const navigate = useNavigate();
   const location = useLocation();
   const { unreadCount } = useMarketplaceBuyUnread();
@@ -85,7 +87,6 @@ const Marketplace = () => {
   const [selectedTicket, setSelectedTicket] = useState<string | null>(null);
   
   const [loading, setLoading] = useState(true);
-  const [isAdmin, setIsAdmin] = useState(false);
 
   // Form states
   const [isCreating, setIsCreating] = useState(false);
@@ -119,7 +120,6 @@ const Marketplace = () => {
       return;
     }
 
-    checkAdmin();
     loadListings();
     loadMyListings();
     loadBuyRequests();
@@ -161,11 +161,6 @@ const Marketplace = () => {
     };
   }, [user, navigate]);
 
-  const checkAdmin = async () => {
-    if (!user) return;
-    const { data } = await supabase.rpc("has_role", { _user_id: user.id, _role: "admin" });
-    setIsAdmin(data || false);
-  };
 
   const loadListings = async () => {
     try {
