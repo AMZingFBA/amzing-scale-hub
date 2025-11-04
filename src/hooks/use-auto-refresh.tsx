@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { Capacitor } from '@capacitor/core';
 
 interface UseAutoRefreshOptions {
   enabled?: boolean;
@@ -9,7 +10,10 @@ export const useAutoRefresh = (
   onRefresh: () => Promise<void> | void,
   options: UseAutoRefreshOptions = {}
 ) => {
-  const { enabled = true, interval = 30000 } = options; // 30 secondes par défaut
+  // Sur mobile, rafraîchir moins souvent pour économiser batterie et data
+  const isNative = Capacitor.isNativePlatform();
+  const defaultInterval = isNative ? 60000 : 30000; // 60s sur mobile, 30s sur web
+  const { enabled = true, interval = defaultInterval } = options;
 
   useEffect(() => {
     if (!enabled) return;
