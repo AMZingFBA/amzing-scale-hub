@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './use-auth';
 import { Capacitor } from '@capacitor/core';
 import { Badge } from '@capawesome/capacitor-badge';
+import { App as CapacitorApp } from '@capacitor/app';
 
 interface SubcategoryNotifications {
   [subcategory: string]: number;
@@ -153,8 +154,9 @@ export const useNotifications = () => {
     if (!Capacitor.isNativePlatform() || !user) return;
 
     const resetBadge = async () => {
-      // Mettre le badge à 0 dès que l'app s'ouvre
-      console.log('📱 App ouverte, réinitialisation du badge à 0');
+      console.log('📱 Réinitialisation du badge à 0');
+      
+      // Mettre le badge iOS à 0
       await Badge.set({ count: 0 }).catch(err => {
         console.error('❌ Erreur lors de la réinitialisation du badge:', err);
       });
@@ -166,24 +168,33 @@ export const useNotifications = () => {
       
       if (error) {
         console.error('❌ Erreur lors de la réinitialisation du compteur:', error);
+      } else {
+        console.log('✅ Badge et compteur réinitialisés avec succès');
       }
     };
 
+    // Réinitialiser immédiatement au chargement
     resetBadge();
 
-    // Aussi réinitialiser quand l'app revient au premier plan
-    const handleAppStateChange = async () => {
-      console.log('📱 App au premier plan, réinitialisation du badge à 0');
-      await resetBadge();
-      fetchNotifications();
+    // Écouter quand l'app revient au premier plan (iOS/Android)
+    let appStateListener: any;
+    
+    const setupListener = async () => {
+      appStateListener = await CapacitorApp.addListener('appStateChange', ({ isActive }) => {
+        if (isActive) {
+          console.log('📱 App active, réinitialisation du badge');
+          resetBadge();
+          fetchNotifications();
+        }
+      });
     };
-
-    window.addEventListener('focus', handleAppStateChange);
-    document.addEventListener('resume', handleAppStateChange);
+    
+    setupListener();
 
     return () => {
-      window.removeEventListener('focus', handleAppStateChange);
-      document.removeEventListener('resume', handleAppStateChange);
+      if (appStateListener) {
+        appStateListener.remove();
+      }
     };
   }, [user]);
 
