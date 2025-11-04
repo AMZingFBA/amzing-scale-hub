@@ -18,7 +18,7 @@ const APPLE_SUBSCRIPTION_ID = 'com.amzing.vip.monthly';
 
 export const useTrial = () => {
   const [isStarting, setIsStarting] = useState(false);
-  const { user } = useAuth();
+  const { user, refreshSubscription } = useAuth();
   const navigate = useNavigate();
 
   const startFreeTrial = async () => {
@@ -110,36 +110,55 @@ export const useTrial = () => {
       });
 
       console.log('Purchase successful:', purchaseResult);
+      console.log('Customer Info:', JSON.stringify(purchaseResult.customerInfo));
+      console.log('Active Entitlements:', purchaseResult.customerInfo.entitlements.active);
 
-      // Vérifier que l'achat est actif
-      if (purchaseResult.customerInfo.entitlements.active['AMZing FBA VIP']) {
-        // Mettre à jour la base de données - Abonnement mensuel direct (pas d'essai gratuit)
-        const expiresAt = new Date();
-        expiresAt.setMonth(expiresAt.getMonth() + 1); // 1 mois d'abonnement payant
-
-        const { error: updateError } = await supabase
-          .from('subscriptions')
-          .update({
-            plan_type: 'vip',
-            status: 'active',
-            expires_at: expiresAt.toISOString(),
-            is_trial: false,
-            trial_used: true,
-            updated_at: new Date().toISOString()
-          })
-          .eq('user_id', user.id);
-
-        if (updateError) {
-          console.error('Error updating subscription:', updateError);
-          toast.error('Erreur lors de la mise à jour de l\'abonnement');
-          return;
-        }
-
-        toast.success('Abonnement VIP activé avec succès ! 🎉');
-        navigate('/dashboard');
-      } else {
-        throw new Error('L\'abonnement n\'est pas actif après l\'achat');
+      // Vérifier que le paiement a bien été validé par Apple
+      const hasActiveEntitlement = Object.keys(purchaseResult.customerInfo.entitlements.active).length > 0;
+      
+      if (!hasActiveEntitlement) {
+        console.error('Aucun entitlement actif trouvé après l\'achat');
+        toast.error('Le paiement n\'a pas été validé. Veuillez réessayer.');
+        return;
       }
+
+      console.log('✅ Paiement validé par Apple, mise à jour de l\'abonnement...');
+
+      // Mettre à jour la base de données - Abonnement mensuel direct
+      const expiresAt = new Date();
+      expiresAt.setMonth(expiresAt.getMonth() + 1); // 1 mois d'abonnement payant
+
+      const { error: updateError } = await supabase
+        .from('subscriptions')
+        .update({
+          plan_type: 'vip',
+          status: 'active',
+          expires_at: expiresAt.toISOString(),
+          is_trial: false,
+          trial_used: true,
+          updated_at: new Date().toISOString()
+        })
+        .eq('user_id', user.id);
+
+      if (updateError) {
+        console.error('Error updating subscription:', updateError);
+        toast.error('Erreur lors de la mise à jour de l\'abonnement');
+        return;
+      }
+
+      console.log('✅ Abonnement mis à jour dans la base de données');
+
+      // Rafraîchir l'état de l'abonnement dans l'app
+      await refreshSubscription();
+      
+      console.log('✅ État de l\'abonnement rafraîchi');
+
+      toast.success('Abonnement VIP activé avec succès ! 🎉');
+      
+      // Petit délai pour s'assurer que tout est bien synchronisé
+      setTimeout(() => {
+        navigate('/dashboard');
+      }, 500);
 
     } catch (error: any) {
       console.error('Apple IAP Error:', error);
