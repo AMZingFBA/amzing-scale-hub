@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Menu, X, User, LogOut, Crown, Shield, LayoutDashboard, MessageSquare, ShoppingBag, Store } from "lucide-react";
+import { Menu, X, User, LogOut, Crown, Shield, LayoutDashboard, MessageSquare, ShoppingBag, Store, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/use-auth";
 import { useAdmin } from "@/hooks/use-admin";
+import { useNotifications } from "@/hooks/use-notifications";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,22 +20,39 @@ const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { user, isVIP, signOut } = useAuth();
   const { isAdmin } = useAdmin();
+  const { notifications } = useNotifications();
   
   // Détection si on est dans l'app native pour ajuster le padding pour la safe area
   const isNativeApp = Capacitor.isNativePlatform();
+  
+  // Calculer le total de toutes les notifications
+  const totalNotifications = Object.values(notifications).reduce((acc, category) => {
+    return acc + (category.total || 0);
+  }, 0);
 
   // Native App - Floating menu button only
   if (isNativeApp) {
     return (
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button 
-            variant="outline" 
-            className="fixed top-[46px] right-[18px] z-[100] h-14 w-14 border-2 border-primary bg-primary/10 hover:bg-primary/20 hover:scale-110 active:scale-95 transition-all duration-300 rounded-lg animate-border-glow font-bold shadow-glow backdrop-blur-sm"
-          >
-            <Menu className="h-7 w-7 text-primary" />
-          </Button>
-        </DropdownMenuTrigger>
+      <>
+        {/* Bannière de notifications pour les utilisateurs VIP */}
+        {isVIP && totalNotifications > 0 && (
+          <Link to="/dashboard">
+            <div className="fixed top-[46px] left-[18px] z-[100] h-14 px-4 border-2 border-primary bg-primary/90 hover:bg-primary hover:scale-105 active:scale-95 transition-all duration-300 rounded-lg shadow-glow backdrop-blur-sm flex items-center gap-2">
+              <Bell className="h-5 w-5 text-white animate-pulse" />
+              <span className="text-white font-bold text-lg">{totalNotifications}</span>
+            </div>
+          </Link>
+        )}
+        
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button 
+              variant="outline" 
+              className="fixed top-[46px] right-[18px] z-[100] h-14 w-14 border-2 border-primary bg-primary/10 hover:bg-primary/20 hover:scale-110 active:scale-95 transition-all duration-300 rounded-lg animate-border-glow font-bold shadow-glow backdrop-blur-sm"
+            >
+              <Menu className="h-7 w-7 text-primary" />
+            </Button>
+          </DropdownMenuTrigger>
         <DropdownMenuContent 
           align="end" 
           className="w-72 bg-background/98 backdrop-blur-lg z-50 shadow-elegant border-2 border-primary/20 mr-4 mt-2 animate-in slide-in-from-top-4 fade-in duration-300"
@@ -121,6 +139,7 @@ const Navbar = () => {
           )}
         </DropdownMenuContent>
       </DropdownMenu>
+      </>
     );
   }
 
@@ -135,6 +154,21 @@ const Navbar = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
+            {/* Bannière de notifications pour les utilisateurs VIP */}
+            {user && isVIP && totalNotifications > 0 && (
+              <Link to="/dashboard">
+                <Button 
+                  variant="outline" 
+                  className="border-2 border-primary bg-primary/10 hover:bg-primary/20 hover:scale-105 transition-all duration-300 shadow-glow gap-2"
+                >
+                  <Bell className="h-5 w-5 text-primary" />
+                  <Badge className="bg-primary text-white font-bold text-base px-2 py-1">
+                    {totalNotifications}
+                  </Badge>
+                </Button>
+              </Link>
+            )}
+            
             {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
