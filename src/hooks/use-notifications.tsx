@@ -148,7 +148,7 @@ export const useNotifications = () => {
     };
   }, [user]);
 
-  // RESET BADGE - EXECUTÉ À CHAQUE OUVERTURE
+  // RESET BADGE - EXECUTÉ À CHAQUE OUVERTURE ET DE MANIÈRE SYNCHRONE
   useEffect(() => {
     console.log('🔍 Badge reset hook - Platform check:', {
       isNative: Capacitor.isNativePlatform(),
@@ -171,7 +171,12 @@ export const useNotifications = () => {
       console.log(`🔄 [${timestamp}] DÉBUT RESET BADGE pour user ${user.id}`);
       
       try {
-        // 1. FORCER le reset à 0 dans la base EN PREMIER
+        // 1. Reset badge iOS EN PREMIER (synchrone, immédiat)
+        console.log('📱 Reset badge iOS IMMÉDIAT...');
+        await Badge.set({ count: 0 });
+        console.log('✅ Badge iOS = 0');
+
+        // 2. PUIS reset dans la base de données
         console.log('📤 Appel reset_user_badge...');
         const { error: dbError } = await supabase.rpc('reset_user_badge', {
           user_id_param: user.id
@@ -183,20 +188,21 @@ export const useNotifications = () => {
         }
         
         console.log('✅ Compteur DB = 0');
-
-        // 2. Reset badge iOS
-        console.log('📱 Reset badge iOS...');
-        await Badge.set({ count: 0 });
-        console.log('✅ Badge iOS = 0');
-        
         console.log(`✅ [${timestamp}] RESET TERMINÉ - Prochaine notif doit être badge=1`);
       } catch (error) {
         console.error('❌ ERREUR critique lors du reset:', error);
       }
     };
 
-    // Reset IMMÉDIAT au montage
-    console.log('🚀 Exécution reset initial...');
+    // Reset IMMÉDIAT ET SYNCHRONE au montage
+    console.log('🚀 Exécution reset initial SYNCHRONE...');
+    
+    // Forcer le reset iOS IMMÉDIATEMENT de manière synchrone
+    Badge.set({ count: 0 }).then(() => {
+      console.log('✅ Badge iOS mis à 0 de manière synchrone');
+    });
+    
+    // Puis faire le reset complet
     resetBadge();
     
     // Reset à CHAQUE retour au premier plan
@@ -205,6 +211,8 @@ export const useNotifications = () => {
       
       if (!document.hidden) {
         console.log('📱 App revenue visible - DÉCLENCHEMENT RESET');
+        // Reset iOS immédiat
+        Badge.set({ count: 0 });
         resetBadge();
       }
     };
@@ -212,6 +220,8 @@ export const useNotifications = () => {
     // Ajouter aussi un listener pour l'événement resume de Capacitor
     const handleAppResume = () => {
       console.log('📱 App resume event - DÉCLENCHEMENT RESET');
+      // Reset iOS immédiat
+      Badge.set({ count: 0 });
       resetBadge();
     };
 
