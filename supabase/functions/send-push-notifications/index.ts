@@ -163,17 +163,7 @@ const handler = async (req: Request): Promise<Response> => {
     // 5. Envoyer les notifications par batch via FCM v1 API
     const notificationPromises = tokens.map(async ({ token, platform, user_id }) => {
       try {
-        // Incrémenter le badge pour cet utilisateur (+1 à chaque notification)
-        const { data: newBadgeCount, error: badgeError } = await supabaseAdmin.rpc('increment_user_badge', {
-          user_id_param: user_id
-        });
-        
-        if (badgeError) {
-          console.error('❌ Error incrementing badge:', badgeError);
-        }
-        
-        const badgeCount = newBadgeCount || 1;
-        console.log(`📱 Badge pour user ${user_id}: DB=${badgeCount}, sera envoyé dans APNs payload`);
+        console.log(`📱 Envoi notification pour user ${user_id} (${platform})`);
         
         const fcmUrl = `https://fcm.googleapis.com/v1/projects/${serviceAccount.project_id}/messages:send`;
         
@@ -200,15 +190,14 @@ const handler = async (req: Request): Promise<Response> => {
               payload: {
                 aps: {
                   sound: 'default',
-                  badge: badgeCount,
+                  // NE PAS ENVOYER le badge - laisse l'app le gérer localement
                 },
               },
             },
           },
         };
         
-        console.log(`🔥 Payload FCM pour ${user_id}:`, JSON.stringify({
-          badge: badgeCount,
+        console.log(`🔥 Payload FCM pour ${user_id} (sans badge):`, JSON.stringify({
           title: getNotificationTitle(category, subcategory),
           platform
         }));

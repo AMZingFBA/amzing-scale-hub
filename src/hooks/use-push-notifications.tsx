@@ -153,11 +153,21 @@ export const usePushNotifications = () => {
             console.error('❌ Push registration error:', error);
           });
 
-          // Écouter les notifications reçues
+          // Écouter les notifications reçues (quand l'app est au premier plan)
           await PushNotifications.addListener('pushNotificationReceived', async (notification) => {
             console.log('📬 Push notification received:', notification);
             console.log('📬 Title:', notification.title);
             console.log('📬 Body:', notification.body);
+            
+            // Incrémenter le badge localement
+            try {
+              const currentBadge = await Badge.get();
+              const newCount = (currentBadge.count || 0) + 1;
+              await Badge.set({ count: newCount });
+              console.log(`📱 Badge incrémenté localement: ${currentBadge.count} → ${newCount}`);
+            } catch (error) {
+              console.error('❌ Erreur incrémentation badge:', error);
+            }
           });
 
           // Écouter les actions sur les notifications
