@@ -148,7 +148,7 @@ export const useNotifications = () => {
     };
   }, [user]);
 
-  // RESET BADGE - Via edge function qui envoie notification silencieuse
+  // RESET BADGE - Direct + Edge function
   useEffect(() => {
     const isNative = Capacitor.isNativePlatform();
     
@@ -158,8 +158,13 @@ export const useNotifications = () => {
 
     const resetBadge = async () => {
       try {
-        console.log('🔄 APPEL reset-badge edge function pour user:', user.id);
+        console.log('🔄 RESET BADGE pour user:', user.id);
         
+        // 1. Reset iOS badge IMMÉDIATEMENT côté client
+        await Badge.set({ count: 0 });
+        console.log('✅ Badge iOS → 0');
+        
+        // 2. Appeler edge function pour reset DB + envoyer notification silencieuse
         const { data, error } = await supabase.functions.invoke('reset-badge', {
           body: { user_id: user.id }
         });
