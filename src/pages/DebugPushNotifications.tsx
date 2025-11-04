@@ -138,6 +138,21 @@ export default function DebugPushNotifications() {
         </Button>
       </div>
 
+      <Card className="border-yellow-500 bg-yellow-50 dark:bg-yellow-950">
+        <CardHeader>
+          <CardTitle className="text-yellow-900 dark:text-yellow-100">⚠️ Attention</CardTitle>
+          <CardDescription className="text-yellow-800 dark:text-yellow-200">
+            Avant de tester, tu DOIS reset le badge à 0 !
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Button onClick={handleResetBadge} variant="default" size="lg" className="w-full">
+            <Trash2 className="w-4 h-4 mr-2" />
+            🔴 RESET BADGE → 0 (obligatoire avant test)
+          </Button>
+        </CardContent>
+      </Card>
+
       <Card>
         <CardHeader>
           <CardTitle>Informations utilisateur</CardTitle>
