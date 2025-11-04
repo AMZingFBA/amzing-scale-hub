@@ -148,7 +148,7 @@ export const useNotifications = () => {
     };
   }, [user]);
 
-  // RESET BADGE SIMPLE - Quand l'app s'ouvre → badge iOS = 0
+  // RESET BADGE - Via edge function qui envoie notification silencieuse
   useEffect(() => {
     const isNative = Capacitor.isNativePlatform();
     
@@ -156,39 +156,32 @@ export const useNotifications = () => {
       return;
     }
 
-    const resetBadgeSimple = async () => {
+    const resetBadge = async () => {
       try {
-        console.log('🔄 RESET BADGE - User:', user.id);
+        console.log('🔄 APPEL reset-badge edge function pour user:', user.id);
         
-        // 1. Reset iOS badge IMMÉDIATEMENT
-        if (Badge && Badge.set) {
-          await Badge.set({ count: 0 });
-          console.log('✅ Badge iOS → 0');
-        }
-
-        // 2. Reset compteur en DB
-        const { error } = await supabase.rpc('reset_user_badge', {
-          user_id_param: user.id
+        const { data, error } = await supabase.functions.invoke('reset-badge', {
+          body: { user_id: user.id }
         });
 
         if (error) {
-          console.error('❌ Erreur reset DB:', error);
+          console.error('❌ Erreur edge function:', error);
         } else {
-          console.log('✅ Badge DB → 0');
+          console.log('✅ Edge function réponse:', data);
         }
       } catch (error) {
-        console.error('❌ Erreur reset badge:', error);
+        console.error('❌ Erreur:', error);
       }
     };
 
     // Reset au montage
-    resetBadgeSimple();
+    resetBadge();
 
     // Reset quand l'app revient au premier plan
     const handleVisibilityChange = () => {
       if (!document.hidden) {
         console.log('📱 App visible → reset badge');
-        resetBadgeSimple();
+        resetBadge();
       }
     };
 

@@ -24,45 +24,45 @@ export const usePushNotifications = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  // Listen for FCM token - MUST run on every mount
+  // Listen for FCM token - AVEC DEBUG
   useEffect(() => {
-    console.log('🎧 FCM listener effect running...');
-    console.log('🎧 Is native platform?', isNativePlatform());
+    console.log('🎧 FCM listener setup...');
+    console.log('🔍 window.__FCM_TOKEN__ au démarrage:', (window as any).__FCM_TOKEN__);
     
     if (!isNativePlatform()) {
-      console.log('⚠️ Not a native platform, skipping FCM setup');
       return;
     }
 
-    console.log('✅ Setting up FCM token listener...');
-
-    // Check if token already exists from before React loaded
-    const existingToken = (window as any).__FCM_TOKEN__;
-    console.log('🔍 Checking for existing token:', existingToken ? 'FOUND' : 'NOT FOUND');
-    
-    if (existingToken) {
-      console.log('🔥 Found existing FCM token from native:', existingToken);
-      setPendingToken(existingToken);
-      delete (window as any).__FCM_TOKEN__;
-    }
-
     const handleFCMToken = (event: any) => {
-      console.log('📨 FCM token event received!', event);
-      const fcmToken = event.detail?.token;
-      if (fcmToken) {
-        console.log('🔥 FCM Token from event:', fcmToken);
+      console.log('📨 FCM token event complet:', event);
+      const fcmToken = event.detail?.token || event.detail;
+      console.log('📨 FCM token extrait:', fcmToken);
+      
+      if (fcmToken && typeof fcmToken === 'string') {
+        console.log('✅ Token valide, sauvegarde...:', fcmToken.substring(0, 30) + '...');
         setPendingToken(fcmToken);
       } else {
-        console.error('❌ No token in event detail');
+        console.error('❌ Token invalide ou manquant');
       }
     };
 
+    // Écouter l'événement custom
     window.addEventListener('fcmTokenReceived', handleFCMToken);
-    console.log('✅ FCM token listener registered');
+    console.log('✅ Event listener ajouté');
+    
+    // Vérifier si token déjà disponible
+    const existingToken = (window as any).__FCM_TOKEN__;
+    if (existingToken) {
+      console.log('🔥 Token déjà présent dans window:', existingToken.substring(0, 30) + '...');
+      setPendingToken(existingToken);
+      delete (window as any).__FCM_TOKEN__;
+    } else {
+      console.log('⏳ Aucun token pré-existant, attente de l\'événement...');
+    }
 
     return () => {
       window.removeEventListener('fcmTokenReceived', handleFCMToken);
-      console.log('🧹 FCM token listener cleaned up');
+      console.log('🧹 Listener nettoyé');
     };
   }, []);
 
