@@ -160,16 +160,7 @@ export const useNotifications = () => {
         console.error('❌ Erreur lors de la réinitialisation du badge:', err);
       });
       
-      // Réinitialiser le compteur dans la base de données
-      const { error } = await supabase.rpc('reset_user_badge', {
-        user_id_param: user.id
-      });
-      
-      if (error) {
-        console.error('❌ Erreur lors de la réinitialisation du compteur:', error);
-      } else {
-        console.log('✅ Badge et compteur réinitialisés avec succès');
-      }
+      console.log('✅ Badge réinitialisé avec succès');
     };
 
     // Réinitialiser immédiatement au chargement du hook

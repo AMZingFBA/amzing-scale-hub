@@ -3,6 +3,7 @@ import { PushNotifications, Token, ActionPerformed } from '@capacitor/push-notif
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './use-auth';
 import { useNavigate } from 'react-router-dom';
+import { Badge } from '@capawesome/capacitor-badge';
 
 const isNativePlatform = () => {
   if (typeof window !== 'undefined' && (window as any).Capacitor) {
@@ -139,9 +140,7 @@ export const usePushNotifications = () => {
             
             // Réinitialiser le badge à 0 quand l'utilisateur ouvre l'app
             console.log('📱 App opened from notification, resetting badge to 0');
-            await supabase.rpc('reset_user_badge', {
-              user_id_param: user.id
-            });
+            await Badge.set({ count: 0 });
             
             // Rediriger selon le type de notification
             const data = notification.notification.data;
