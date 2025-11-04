@@ -642,6 +642,27 @@ export type Database = {
         }
         Relationships: []
       }
+      push_notification_history: {
+        Row: {
+          alert_id: string
+          id: string
+          sent_at: string | null
+          user_id: string
+        }
+        Insert: {
+          alert_id: string
+          id?: string
+          sent_at?: string | null
+          user_id: string
+        }
+        Update: {
+          alert_id?: string
+          id?: string
+          sent_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       push_notification_tokens: {
         Row: {
           created_at: string

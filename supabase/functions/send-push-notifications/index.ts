@@ -161,19 +161,21 @@ const handler = async (req: Request): Promise<Response> => {
     const serviceAccount = JSON.parse(serviceAccountJson);
     const accessToken = await getAccessToken(serviceAccount);
 
-    // 5. Créer un Set pour déduplication par (user_id, alert_id)
-    const seenNotifications = new Set<string>();
-    
-    // 6. Envoyer les notifications par batch via FCM v1 API
+    // 5. Envoyer les notifications par batch via FCM v1 API avec déduplication DB
     const notificationPromises = tokens.map(async ({ token, platform, user_id }) => {
       try {
-        // Déduplication: vérifier si on a déjà envoyé cette notification à cet utilisateur
-        const notificationKey = `${user_id}_${alert_id}`;
-        if (seenNotifications.has(notificationKey)) {
-          console.log(`⏭️ Skip duplicate notification for user ${user_id}`);
+        // Vérifier si on a déjà envoyé cette notification à cet utilisateur
+        const { data: existingNotif } = await supabaseAdmin
+          .from('push_notification_history')
+          .select('id')
+          .eq('user_id', user_id)
+          .eq('alert_id', alert_id)
+          .single();
+        
+        if (existingNotif) {
+          console.log(`⏭️ Notification already sent to user ${user_id} for alert ${alert_id}`);
           return { skipped: true };
         }
-        seenNotifications.add(notificationKey);
         
         // Incrémenter le badge pour cet utilisateur (+1 par nouvelle notification)
         const { data: newBadgeCount, error: badgeError } = await supabaseAdmin.rpc('increment_user_badge', {
@@ -250,6 +252,11 @@ const handler = async (req: Request): Promise<Response> => {
           }
         } else {
           console.log(`Notification sent successfully to ${platform}`);
+          
+          // Enregistrer dans l'historique après envoi réussi
+          await supabaseAdmin
+            .from('push_notification_history')
+            .insert({ user_id, alert_id });
         }
 
         return result;
