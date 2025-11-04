@@ -127,6 +127,7 @@ export const useNotifications = () => {
         }
       }
 
+      console.log('📊 Final notification counts:', JSON.stringify(counts, null, 2));
       setNotifications(counts);
       console.log('📊 Notifications updated:', counts);
     } catch (error) {
