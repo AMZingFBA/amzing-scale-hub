@@ -83,6 +83,60 @@ export default function DebugPushNotifications() {
     }
   };
 
+  const handleCompleteReset = async () => {
+    if (!user) return;
+    
+    if (!confirm('⚠️ RESET TOTAL : Effacer badge + historique notifs + marquer tout comme lu ?')) {
+      return;
+    }
+    
+    try {
+      setLoading(true);
+      
+      // 1. Reset badge en DB
+      await supabase.rpc('reset_user_badge', {
+        user_id_param: user.id
+      });
+
+      // 2. Reset iOS
+      if (isNative) {
+        await Badge.set({ count: 0 });
+      }
+
+      // 3. Vider l'historique des notifications push
+      await supabase
+        .from('push_notification_history')
+        .delete()
+        .eq('user_id', user.id);
+
+      // 4. Marquer toutes les alertes comme lues
+      const { data: allAlerts } = await supabase
+        .from('admin_alerts')
+        .select('id');
+
+      if (allAlerts && allAlerts.length > 0) {
+        await supabase
+          .from('alert_read_status')
+          .upsert(
+            allAlerts.map(alert => ({
+              alert_id: alert.id,
+              user_id: user.id,
+              is_read: true
+            })),
+            { onConflict: 'alert_id,user_id' }
+          );
+      }
+
+      toast.success('🔥 RESET TOTAL effectué !');
+      await loadData();
+    } catch (error) {
+      console.error('Error complete reset:', error);
+      toast.error('Erreur lors du reset total');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleDeleteToken = async (tokenId: string) => {
     try {
       const { error } = await supabase
@@ -142,13 +196,13 @@ export default function DebugPushNotifications() {
         <CardHeader>
           <CardTitle className="text-yellow-900 dark:text-yellow-100">⚠️ Attention</CardTitle>
           <CardDescription className="text-yellow-800 dark:text-yellow-200">
-            Avant de tester, tu DOIS reset le badge à 0 !
+            Pour tester proprement : clique sur le bouton rouge 🔥 RESET TOTAL en bas !
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Button onClick={handleResetBadge} variant="default" size="lg" className="w-full">
+          <Button onClick={handleCompleteReset} variant="default" size="lg" className="w-full bg-red-600 hover:bg-red-700">
             <Trash2 className="w-4 h-4 mr-2" />
-            🔴 RESET BADGE → 0 (obligatoire avant test)
+            🔥 RESET TOTAL (badge + historique + alertes)
           </Button>
         </CardContent>
       </Card>
@@ -188,6 +242,10 @@ export default function DebugPushNotifications() {
           <Button onClick={handleResetBadge} variant="destructive" className="w-full">
             <Trash2 className="w-4 h-4 mr-2" />
             Forcer le reset du badge
+          </Button>
+          <Button onClick={handleCompleteReset} variant="destructive" className="w-full bg-red-600 hover:bg-red-700">
+            <Trash2 className="w-4 h-4 mr-2" />
+            🔥 RESET TOTAL (badge + historique + alertes)
           </Button>
         </CardContent>
       </Card>
