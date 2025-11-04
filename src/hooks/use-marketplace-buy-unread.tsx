@@ -16,35 +16,14 @@ export const useMarketplaceBuyUnread = () => {
 
     const loadUnreadCount = async () => {
       try {
-        // Get only user's open/in_progress marketplace buy tickets
-        const { data: tickets, error: ticketsError } = await supabase
-          .from('tickets')
-          .select('id')
-          .eq('user_id', user.id)
-          .eq('category', 'marketplace')
-          .eq('subcategory', 'buy')
-          .in('status', ['open', 'in_progress']);
+        const { data, error } = await supabase
+          .rpc('get_marketplace_buy_unread_count' as any, {
+            user_id_param: user.id
+          });
 
-        if (ticketsError) throw ticketsError;
+        if (error) throw error;
 
-        if (!tickets || tickets.length === 0) {
-          setUnreadCount(0);
-          setIsLoading(false);
-          return;
-        }
-
-        // Get unread count for each ticket and sum them
-        let totalUnread = 0;
-        for (const ticket of tickets) {
-          const { data: count } = await supabase
-            .rpc('get_unread_count', {
-              ticket_id_param: ticket.id,
-              user_id_param: user.id
-            });
-          totalUnread += (count || 0);
-        }
-
-        setUnreadCount(totalUnread);
+        setUnreadCount(data || 0);
       } catch (error) {
         console.error('Error loading marketplace buy unread count:', error);
         setUnreadCount(0);

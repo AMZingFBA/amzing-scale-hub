@@ -20,54 +20,18 @@ export const useCategoryUnread = () => {
     if (!user) return;
 
     try {
-      // Fetch all tickets for categories: introduction, outils, expedition, informations
-      const { data: tickets, error } = await supabase
-        .from('tickets')
-        .select('id, category, subcategory')
-        .eq('user_id', user.id)
-        .in('category', ['introduction', 'outils', 'expedition', 'informations'])
-        .in('status', ['open', 'in_progress']);
+      // Appeler la fonction SQL optimisée
+      const { data, error } = await supabase
+        .rpc('get_category_unread_counts' as any, {
+          user_id_param: user.id
+        });
 
       if (error) {
-        console.error('Error fetching tickets:', error);
+        console.error('Error fetching category unread counts:', error);
         return;
       }
 
-      if (!tickets || tickets.length === 0) {
-        setUnreadCounts({});
-        return;
-      }
-
-      // Get unread count for each ticket
-      const counts: CategoryUnreadCounts = {};
-      
-      for (const ticket of tickets) {
-        const { data: unreadCount } = await supabase
-          .rpc('get_unread_count', {
-            ticket_id_param: ticket.id,
-            user_id_param: user.id
-          });
-
-        const count = unreadCount || 0;
-        
-        if (count > 0) {
-          const category = ticket.category || 'general';
-          const subcategory = ticket.subcategory || 'general';
-
-          if (!counts[category]) {
-            counts[category] = {
-              total: 0,
-              subcategories: {}
-            };
-          }
-
-          counts[category].total += count;
-          counts[category].subcategories[subcategory] = 
-            (counts[category].subcategories[subcategory] || 0) + count;
-        }
-      }
-
-      setUnreadCounts(counts);
+      setUnreadCounts((data as unknown as CategoryUnreadCounts) || {});
     } catch (error) {
       console.error('Error in fetchUnreadCounts:', error);
     } finally {
