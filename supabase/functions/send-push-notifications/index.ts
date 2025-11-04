@@ -146,7 +146,36 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log(`Found ${tokens.length} push tokens to send to`);
 
-    // 4. Générer un access token OAuth2 pour FCM v1 API
+    // 4. Récupérer le nombre de notifications non lues pour chaque utilisateur
+    const userNotificationCounts = new Map<string, number>();
+    
+    for (const userId of usersToNotify) {
+      try {
+        const { data: counts } = await supabaseAdmin
+          .rpc('get_all_notification_counts', {
+            user_id_param: userId
+          });
+        
+        // Calculer le total des notifications
+        let totalCount = 0;
+        if (counts && typeof counts === 'object') {
+          for (const category of Object.values(counts as Record<string, any>)) {
+            if (category && typeof category === 'object' && 'total' in category) {
+              totalCount += (category.total || 0);
+            }
+          }
+        }
+        
+        // Ajouter 1 pour la nouvelle notification qui arrive
+        userNotificationCounts.set(userId, totalCount + 1);
+        console.log(`User ${userId} will have badge count: ${totalCount + 1}`);
+      } catch (error) {
+        console.error(`Error fetching notification count for user ${userId}:`, error);
+        userNotificationCounts.set(userId, 1); // Fallback à 1 si erreur
+      }
+    }
+
+    // 5. Générer un access token OAuth2 pour FCM v1 API
     const serviceAccountJson = Deno.env.get("FIREBASE_SERVICE_ACCOUNT_JSON");
     
     if (!serviceAccountJson) {
@@ -160,8 +189,9 @@ const handler = async (req: Request): Promise<Response> => {
     const serviceAccount = JSON.parse(serviceAccountJson);
     const accessToken = await getAccessToken(serviceAccount);
 
-    // 5. Envoyer les notifications par batch via FCM v1 API
-    const notificationPromises = tokens.map(async ({ token, platform }) => {
+    // 6. Envoyer les notifications par batch via FCM v1 API
+    const notificationPromises = tokens.map(async ({ token, platform, user_id }) => {
+      const badgeCount = userNotificationCounts.get(user_id) || 1;
       try {
         const fcmUrl = `https://fcm.googleapis.com/v1/projects/${serviceAccount.project_id}/messages:send`;
         
@@ -194,7 +224,7 @@ const handler = async (req: Request): Promise<Response> => {
                 payload: {
                   aps: {
                     sound: 'default',
-                    badge: 1,
+                    badge: badgeCount,
                   },
                 },
               },
