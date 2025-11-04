@@ -164,20 +164,27 @@ const handler = async (req: Request): Promise<Response> => {
     // 5. Envoyer les notifications par batch via FCM v1 API avec déduplication DB
     const notificationPromises = tokens.map(async ({ token, platform, user_id }) => {
       try {
-        // Vérifier si on a déjà envoyé cette notification à cet utilisateur
-        const { data: existingNotif } = await supabaseAdmin
+        // Tenter d'insérer dans l'historique AVANT toute autre opération
+        // Si déjà existant, la contrainte UNIQUE va rejeter l'insert
+        const { data: historyInsert, error: historyError } = await supabaseAdmin
           .from('push_notification_history')
-          .select('id')
-          .eq('user_id', user_id)
-          .eq('alert_id', alert_id)
+          .insert({ user_id, alert_id })
+          .select()
           .single();
         
-        if (existingNotif) {
-          console.log(`⏭️ Notification already sent to user ${user_id} for alert ${alert_id}`);
-          return { skipped: true };
+        // Si l'insertion échoue à cause d'une contrainte unique, c'est un duplicate
+        if (historyError) {
+          if (historyError.code === '23505') { // Unique violation
+            console.log(`⏭️ Notification already sent to user ${user_id} for alert ${alert_id}`);
+            return { skipped: true };
+          }
+          // Autre erreur, on la log mais on continue quand même
+          console.error('❌ Error inserting history:', historyError);
+          return { error: historyError };
         }
         
-        // Incrémenter le badge pour cet utilisateur (+1 par nouvelle notification)
+        // L'insertion a réussi = première notification pour cet utilisateur/alerte
+        // MAINTENANT on peut incrémenter le badge en toute sécurité
         const { data: newBadgeCount, error: badgeError } = await supabaseAdmin.rpc('increment_user_badge', {
           user_id_param: user_id
         });
@@ -252,11 +259,6 @@ const handler = async (req: Request): Promise<Response> => {
           }
         } else {
           console.log(`Notification sent successfully to ${platform}`);
-          
-          // Enregistrer dans l'historique après envoi réussi
-          await supabaseAdmin
-            .from('push_notification_history')
-            .insert({ user_id, alert_id });
         }
 
         return result;
