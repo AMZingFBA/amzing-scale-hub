@@ -102,6 +102,12 @@ const Navbar = () => {
           ) : (
             <>
               <DropdownMenuItem asChild className="py-3 text-base">
+                <Link to="/contact" className="cursor-pointer">
+                  Contact
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator className="my-2" />
+              <DropdownMenuItem asChild className="py-3 text-base">
                 <Link to="/auth" className="cursor-pointer">
                   Connexion
                 </Link>

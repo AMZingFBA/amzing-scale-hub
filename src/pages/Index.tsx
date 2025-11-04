@@ -1,12 +1,11 @@
 import { ArrowRight, Package, GraduationCap, Warehouse, Users, CheckCircle2, TrendingUp } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { RefreshButton } from "@/components/RefreshButton";
 import TestimonialsCarousel from "@/components/TestimonialsCarousel";
 import TestimonialsMobile from "@/components/TestimonialsMobile";
 import AppInstallBanner from "@/components/AppInstallBanner";
@@ -15,7 +14,6 @@ import teamWorking from "@/assets/team-working.jpg";
 import logistics from "@/assets/logistics.jpg";
 import { useTrial } from "@/hooks/use-trial";
 import { useAuth } from "@/hooks/use-auth";
-import { usePullRefresh } from "@/hooks/use-pull-refresh";
 import { useScrollReveal } from "@/hooks/use-scroll-reveal";
 import { Capacitor } from "@capacitor/core";
 import { useToast } from "@/hooks/use-toast";
@@ -75,13 +73,6 @@ const Index = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const isNativeApp = Capacitor.isNativePlatform();
-  const [refreshKey, setRefreshKey] = useState(0);
-
-  const handleRefreshPage = async () => {
-    setRefreshKey(prev => prev + 1);
-  };
-
-  const { isRefreshing, handleRefresh } = usePullRefresh(handleRefreshPage);
 
   // Redirect VIP users to dashboard
   useEffect(() => {
@@ -91,7 +82,7 @@ const Index = () => {
   }, [isVIP, isLoading, navigate]);
 
   return (
-    <div className="min-h-screen" key={refreshKey}>
+    <div className="min-h-screen">
       <Navbar />
       <AppInstallBanner />
       
@@ -104,15 +95,6 @@ const Index = () => {
             className="w-full h-full object-cover opacity-10"
           />
           <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-background to-secondary/20" />
-        </div>
-        
-        {/* Bouton de rafraîchissement */}
-        <div className="absolute top-24 right-4 z-20">
-          <RefreshButton 
-            onRefresh={handleRefresh} 
-            isRefreshing={isRefreshing}
-            className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-xl"
-          />
         </div>
         
         <div className="container mx-auto px-4 relative z-10">
