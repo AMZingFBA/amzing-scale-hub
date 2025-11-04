@@ -45,11 +45,12 @@ serve(async (req) => {
       .eq('user_id', user.id)
       .eq('code', code)
       .eq('type', 'delete_account')
+      .eq('used', false)
       .gte('expires_at', new Date().toISOString())
       .single();
 
     if (verificationError || !verificationData) {
-      logStep("Invalid verification code");
+      logStep("Invalid verification code", { error: verificationError });
       return new Response(
         JSON.stringify({ error: "Code invalide ou expiré" }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 400 }
@@ -58,10 +59,10 @@ serve(async (req) => {
 
     logStep("Verification code validated, proceeding with account deletion");
 
-    // Supprimer le code de vérification
+    // Marquer le code comme utilisé (on le supprimera avec les autres à la fin)
     await supabaseClient
       .from('verification_codes')
-      .delete()
+      .update({ used: true })
       .eq('id', verificationData.id);
 
     // Supprimer toutes les données associées à l'utilisateur

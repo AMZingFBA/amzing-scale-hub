@@ -46,21 +46,22 @@ serve(async (req) => {
       .eq('user_id', user.id)
       .eq('code', code)
       .eq('type', 'cancel_subscription')
+      .eq('used', false)
       .gte('expires_at', new Date().toISOString())
       .single();
 
     if (verificationError || !verificationData) {
-      logStep("Invalid verification code");
+      logStep("Invalid verification code", { error: verificationError });
       return new Response(
         JSON.stringify({ error: "Code invalide ou expiré" }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 400 }
       );
     }
 
-    // Supprimer le code après utilisation
+    // Marquer le code comme utilisé (on ne le supprime pas encore en cas d'erreur)
     await supabaseClient
       .from('verification_codes')
-      .delete()
+      .update({ used: true })
       .eq('id', verificationData.id);
 
     // Récupérer l'abonnement actuel
@@ -126,6 +127,12 @@ serve(async (req) => {
     }
 
     logStep("Subscription successfully canceled");
+
+    // Supprimer le code de vérification maintenant que tout a réussi
+    await supabaseClient
+      .from('verification_codes')
+      .delete()
+      .eq('id', verificationData.id);
 
     return new Response(
       JSON.stringify({ 
