@@ -168,5 +168,27 @@ export const useNotifications = () => {
     });
   }, [notifications]);
 
+  // Réinitialiser le badge quand l'app est ouverte
+  useEffect(() => {
+    if (!Capacitor.isNativePlatform() || !user) return;
+
+    const handleAppStateChange = () => {
+      console.log('📱 App au premier plan, rafraîchissement des notifications...');
+      fetchNotifications();
+    };
+
+    // Rafraîchir immédiatement quand le hook est monté
+    fetchNotifications();
+
+    // Écouter les changements d'état de l'app
+    window.addEventListener('focus', handleAppStateChange);
+    document.addEventListener('resume', handleAppStateChange);
+
+    return () => {
+      window.removeEventListener('focus', handleAppStateChange);
+      document.removeEventListener('resume', handleAppStateChange);
+    };
+  }, [user]);
+
   return { notifications, isLoading, markAsRead, loadNotifications: fetchNotifications };
 };
