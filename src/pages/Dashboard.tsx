@@ -161,7 +161,9 @@ const Dashboard = () => {
                   <div className="flex items-center gap-3 w-full">
                     <Sparkles className="w-6 h-6 text-primary" />
                     <span className="text-xl font-bold">PRODUITS GAGNANTS</span>
-                    <NotificationBadge count={notifications.produits?.total} size="md" className="ml-2" />
+                    {notifications.produits?.total > 0 && (
+                      <NotificationBadge count={notifications.produits.total} size="md" className="ml-2" />
+                    )}
                   </div>
                 </AccordionTrigger>
                 <AccordionContent>
