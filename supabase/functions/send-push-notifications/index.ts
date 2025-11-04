@@ -161,7 +161,7 @@ const handler = async (req: Request): Promise<Response> => {
     const serviceAccount = JSON.parse(serviceAccountJson);
     const accessToken = await getAccessToken(serviceAccount);
 
-    // 5. Envoyer les notifications avec le vrai badge count
+    // 5. Envoyer les notifications avec badge simple
     const notificationPromises = tokens.map(async ({ token, platform, user_id }) => {
       try {
         // Tenter d'insérer dans l'historique pour déduplication
@@ -175,24 +175,9 @@ const handler = async (req: Request): Promise<Response> => {
           return { skipped: true };
         }
         
-        // Calculer le VRAI nombre total d'alertes non lues pour cet utilisateur
-        const { data: unreadData } = await supabaseAdmin.rpc('get_all_notification_counts', {
-          user_id_param: user_id
-        });
-        
-        // Parser le résultat et compter le total
-        let totalUnread = 0;
-        if (unreadData) {
-          for (const category of Object.values(unreadData)) {
-            if (category && typeof category === 'object' && 'total' in category) {
-              totalUnread += (category as any).total || 0;
-            }
-          }
-        }
-        
-        // Badge = nombre réel d'alertes non lues (minimum 1 pour la nouvelle)
-        const badgeCount = Math.max(totalUnread, 1);
-        console.log(`📱 User ${user_id}: ${badgeCount} alertes non lues`);
+        // Badge simple = 1 (le reset auto s'occupe du reste)
+        const badgeCount = 1;
+        console.log(`📱 User ${user_id}: badge = ${badgeCount}`);
         
         const fcmUrl = `https://fcm.googleapis.com/v1/projects/${serviceAccount.project_id}/messages:send`;
         
