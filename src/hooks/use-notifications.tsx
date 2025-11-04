@@ -187,45 +187,28 @@ export const useNotifications = () => {
           return;
         }
 
-        // 1. Reset badge iOS EN PREMIER (synchrone, immédiat)
-        console.log('📱 Reset badge iOS IMMÉDIAT...');
-        await Badge.set({ count: 0 });
-        console.log('✅ Badge iOS = 0');
-
-        // 2. PUIS reset dans la base de données
-        console.log('📤 Appel reset_user_badge...');
-        const { error: dbError } = await supabase.rpc('reset_user_badge', {
-          user_id_param: user.id
+        // 1. Appeler l'edge function pour reset le badge côté serveur
+        console.log('📤 Appel edge function reset-badge...');
+        const { data, error: functionError } = await supabase.functions.invoke('reset-badge', {
+          body: { user_id: user.id }
         });
-        
-        if (dbError) {
-          console.error('❌ ERREUR reset DB:', dbError);
-          throw dbError;
+
+        if (functionError) {
+          console.error('❌ Erreur edge function:', functionError);
+        } else {
+          console.log('✅ Edge function appelée avec succès:', data);
         }
         
-        console.log('✅ Compteur DB = 0');
-        console.log(`✅ [${timestamp}] RESET TERMINÉ - Prochaine notif doit être badge=1`);
+        console.log(`✅ [${timestamp}] RESET BADGE - Notification silencieuse envoyée pour forcer badge=0`);
       } catch (error) {
         console.error('❌ ERREUR critique lors du reset:', error);
       }
     };
 
     // Reset IMMÉDIAT ET SYNCHRONE au montage
-    console.log('🚀 Exécution reset initial SYNCHRONE...');
+    console.log('🚀 Appel edge function pour reset badge...');
     
-    // Vérifier que Badge est disponible avant de l'utiliser
-    if (Badge && Badge.set) {
-      // Forcer le reset iOS IMMÉDIATEMENT de manière synchrone
-      Badge.set({ count: 0 }).then(() => {
-        console.log('✅ Badge iOS mis à 0 de manière synchrone');
-      }).catch((error) => {
-        console.error('❌ Erreur lors du reset synchrone:', error);
-      });
-    } else {
-      console.error('❌ Badge API non disponible pour reset synchrone');
-    }
-    
-    // Puis faire le reset complet
+    // Appeler l'edge function immédiatement
     resetBadge();
     
     // Reset à CHAQUE retour au premier plan
