@@ -808,6 +808,10 @@ export type Database = {
     Functions: {
       check_and_expire_subscriptions: { Args: never; Returns: undefined }
       get_admin_user_id: { Args: never; Returns: string }
+      get_all_notification_counts: {
+        Args: { user_id_param: string }
+        Returns: Json
+      }
       get_or_create_conversation: {
         Args: { other_user_id: string }
         Returns: string

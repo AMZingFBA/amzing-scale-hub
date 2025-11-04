@@ -26,108 +26,20 @@ export const useNotifications = () => {
     console.log('🔍 Fetching notifications for user:', user.id);
 
     try {
-      // Load user notification preferences
-      const { data: preferencesData } = await supabase
-        .from('notification_preferences')
-        .select('*')
-        .eq('user_id', user.id);
+      // Appeler la fonction SQL optimisée qui calcule tout en une seule requête
+      const { data, error } = await supabase
+        .rpc('get_all_notification_counts', {
+          user_id_param: user.id
+        });
 
-      const prefsMap = new Map(
-        preferencesData?.map(pref => [
-          `${pref.category}${pref.subcategory ? `-${pref.subcategory}` : ''}`,
-          pref.enabled
-        ]) || []
-      );
-      // Fetch all tickets with unread messages
-      const { data: tickets } = await supabase
-        .from('tickets')
-        .select('id, category, subcategory')
-        .eq('user_id', user.id)
-        .in('status', ['open', 'in_progress']);
-
-      // Fetch all unread alerts counts by category
-      const categories = [
-        'introduction', 'outils', 'produits', 'expedition', 
-        'informations', 'communaute', 'marketplace', 'gestion_produit'
-      ];
-
-      const counts: NotificationCounts = {};
-
-      // Count unread ticket messages
-      if (tickets && tickets.length > 0) {
-        for (const ticket of tickets) {
-          const { data: unreadCount } = await supabase
-            .rpc('get_unread_count', {
-              ticket_id_param: ticket.id,
-              user_id_param: user.id
-            });
-
-          const count = unreadCount || 0;
-          
-          if (count > 0) {
-            const category = ticket.category || 'general';
-            const subcategory = ticket.subcategory || 'general';
-
-            if (!counts[category]) {
-              counts[category] = { total: 0, subcategories: {} };
-            }
-
-            counts[category].total += count;
-            counts[category].subcategories[subcategory] = 
-              (counts[category].subcategories[subcategory] || 0) + count;
-          }
-        }
+      if (error) {
+        console.error('Error fetching notifications:', error);
+        return;
       }
 
-      // Count unread alerts for each category with subcategory details - OPTIMIZED
-      for (const category of categories) {
-        // Get all alerts with their read status in ONE query using LEFT JOIN
-        const { data: alertsWithStatus } = await supabase
-          .from('admin_alerts')
-          .select(`
-            id,
-            subcategory,
-            alert_read_status!left(is_read)
-          `)
-          .eq('category', category)
-          .or(`user_id.eq.${user.id},user_id.is.null`, { foreignTable: 'alert_read_status' });
-
-        if (alertsWithStatus && alertsWithStatus.length > 0) {
-          for (const alert of alertsWithStatus) {
-            // Check user preferences for this alert
-            const prefKey = `${category}${alert.subcategory ? `-${alert.subcategory}` : ''}`;
-            const isEnabled = prefsMap.get(prefKey) !== false;
-            
-            if (!isEnabled) {
-              console.log(`Alert ${alert.id} (${category}/${alert.subcategory}) is DISABLED by user preferences`);
-              continue;
-            }
-
-            // Check if alert is read - alert_read_status is an array from the join
-            const readStatus = alert.alert_read_status?.[0];
-            const isRead = readStatus?.is_read === true;
-
-            if (!isRead) {
-              const subcategoryKey = alert.subcategory || 'general';
-              console.log(`Alert ${alert.id} (${subcategoryKey}) is UNREAD for user`);
-              
-              if (!counts[category]) {
-                counts[category] = { total: 0, subcategories: {} };
-              }
-              
-              counts[category].total += 1;
-              counts[category].subcategories[subcategoryKey] = 
-                (counts[category].subcategories[subcategoryKey] || 0) + 1;
-            } else {
-              console.log(`Alert ${alert.id} (${alert.subcategory}) is READ for user`);
-            }
-          }
-        }
-      }
-
-      console.log('📊 Final notification counts:', JSON.stringify(counts, null, 2));
-      setNotifications(counts);
-      console.log('📊 Notifications updated:', counts);
+      console.log('📊 Final notification counts:', JSON.stringify(data, null, 2));
+      setNotifications((data as unknown as NotificationCounts) || {});
+      console.log('📊 Notifications updated:', data);
     } catch (error) {
       console.error('Error fetching notifications:', error);
     } finally {
