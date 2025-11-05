@@ -127,7 +127,6 @@ const Dashboard = () => {
                   <div className="grid gap-3 pt-2">
                     <CategoryItem icon={Bell} label="notifications" link="/notification-alerts" badge={notifications.introduction?.subcategories?.notifications} />
                     <CategoryItem icon={BookOpen} label="règles" link="/rules-alerts" badge={notifications.introduction?.subcategories?.règles} />
-                    <CategoryItem icon={CheckCircle} label="débuter" badge={notifications.introduction?.subcategories?.débuter} />
                     <CategoryItem icon={BookOpen} label="guides" link="/guides" badge={notifications.introduction?.subcategories?.guides} />
                     <CategoryItem icon={DollarSign} label="affiliation" badge={notifications.introduction?.subcategories?.affiliation} />
                     <CategoryItem icon={HelpCircle} label="support" link="/support" badge={notifications.introduction?.subcategories?.support} />

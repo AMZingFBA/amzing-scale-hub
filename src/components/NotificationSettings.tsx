@@ -17,7 +17,6 @@ const NOTIFICATION_CATEGORIES = [
   { category: 'introduction', label: '📚 Introduction', subcategories: [
     { key: 'notifications', label: 'Notifications' },
     { key: 'règles', label: 'Règles' },
-    { key: 'débuter', label: 'Débuter' },
     { key: 'guides', label: 'Guides' },
     { key: 'affiliation', label: 'Affiliation' }
   ]},

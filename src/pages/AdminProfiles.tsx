@@ -3,10 +3,13 @@ import { useAuth } from '@/hooks/use-auth';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { Loader2, Users, Mail, Phone, UserCircle, ArrowLeft, Search, Calendar } from 'lucide-react';
+import { Loader2, Users, Mail, Phone, UserCircle, ArrowLeft, Search, Calendar, MessageCircle, Crown, Shield, Filter, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import ScrollToTop from '@/components/ScrollToTop';
@@ -18,8 +21,16 @@ interface ProfileData {
   email: string;
   phone: string | null;
   nickname: string | null;
+  avatar_url: string | null;
   created_at: string;
   updated_at: string;
+  subscription?: {
+    plan_type: string;
+    status: string;
+    expires_at: string | null;
+    is_trial: boolean;
+  };
+  role?: string;
 }
 
 const AdminProfiles = () => {
@@ -29,6 +40,10 @@ const AdminProfiles = () => {
   const [loading, setLoading] = useState(true);
   const [profiles, setProfiles] = useState<ProfileData[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [filterRole, setFilterRole] = useState<string>('all');
+  const [filterPlan, setFilterPlan] = useState<string>('all');
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 20;
 
   useEffect(() => {
     if (!user) {
@@ -47,13 +62,41 @@ const AdminProfiles = () => {
 
   const loadProfiles = async () => {
     try {
-      const { data, error } = await supabase
+      // Fetch profiles with their subscriptions and roles
+      const { data: profilesData, error: profilesError } = await supabase
         .from('profiles')
-        .select('id, full_name, email, phone, nickname, created_at, updated_at')
+        .select('id, full_name, email, phone, nickname, avatar_url, created_at, updated_at')
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
-      setProfiles(data || []);
+      if (profilesError) throw profilesError;
+
+      // Fetch subscriptions for all users
+      const { data: subscriptionsData, error: subsError } = await supabase
+        .from('subscriptions')
+        .select('user_id, plan_type, status, expires_at, is_trial');
+
+      if (subsError) throw subsError;
+
+      // Fetch roles for all users
+      const { data: rolesData, error: rolesError } = await supabase
+        .from('user_roles')
+        .select('user_id, role');
+
+      if (rolesError) throw rolesError;
+
+      // Combine the data
+      const enrichedProfiles = profilesData?.map(profile => {
+        const subscription = subscriptionsData?.find(s => s.user_id === profile.id);
+        const userRole = rolesData?.find(r => r.user_id === profile.id);
+        
+        return {
+          ...profile,
+          subscription: subscription || undefined,
+          role: userRole?.role || 'user'
+        };
+      });
+
+      setProfiles(enrichedProfiles || []);
     } catch (error: any) {
       console.error('Error loading profiles:', error);
       toast.error('Erreur lors du chargement des profils');
@@ -62,15 +105,46 @@ const AdminProfiles = () => {
     }
   };
 
+  const handleContactUser = async (userId: string) => {
+    try {
+      // Create or get conversation with the user
+      const { data, error } = await supabase.rpc('get_or_create_conversation', {
+        other_user_id: userId
+      });
+
+      if (error) throw error;
+
+      // Navigate to the direct messages
+      navigate('/chat', { state: { openDirectMessage: userId } });
+      toast.success('Conversation ouverte');
+    } catch (error) {
+      console.error('Error opening conversation:', error);
+      toast.error('Erreur lors de l\'ouverture de la conversation');
+    }
+  };
+
   const filteredProfiles = profiles.filter(profile => {
     const search = searchTerm.toLowerCase();
-    return (
+    const matchesSearch = (
       profile.full_name.toLowerCase().includes(search) ||
       profile.email.toLowerCase().includes(search) ||
       (profile.nickname && profile.nickname.toLowerCase().includes(search)) ||
-      (profile.phone && profile.phone.includes(search))
+      (profile.phone && profile.phone.includes(search)) ||
+      profile.id.toLowerCase().includes(search)
     );
+
+    const matchesRole = filterRole === 'all' || profile.role === filterRole;
+    const matchesPlan = filterPlan === 'all' || profile.subscription?.plan_type === filterPlan;
+
+    return matchesSearch && matchesRole && matchesPlan;
   });
+
+  // Pagination
+  const totalPages = Math.ceil(filteredProfiles.length / itemsPerPage);
+  const paginatedProfiles = filteredProfiles.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('fr-FR', {
@@ -116,33 +190,101 @@ const AdminProfiles = () => {
             </div>
           </div>
 
-          {/* Search Bar */}
+          {/* Search & Filters */}
           <Card className="mb-6">
             <CardContent className="pt-6">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                <Input
-                  type="text"
-                  placeholder="Rechercher par nom, email, pseudo ou téléphone..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
-                />
+              <div className="grid gap-4 md:grid-cols-3">
+                <div className="md:col-span-1">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                    <Input
+                      type="text"
+                      placeholder="Rechercher..."
+                      value={searchTerm}
+                      onChange={(e) => {
+                        setSearchTerm(e.target.value);
+                        setCurrentPage(1);
+                      }}
+                      className="pl-10"
+                    />
+                  </div>
+                </div>
+                
+                <div>
+                  <Select value={filterRole} onValueChange={(value) => {
+                    setFilterRole(value);
+                    setCurrentPage(1);
+                  }}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Filtrer par rôle" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Tous les rôles</SelectItem>
+                      <SelectItem value="admin">Administrateurs</SelectItem>
+                      <SelectItem value="user">Utilisateurs</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <Select value={filterPlan} onValueChange={(value) => {
+                    setFilterPlan(value);
+                    setCurrentPage(1);
+                  }}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Filtrer par plan" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Tous les plans</SelectItem>
+                      <SelectItem value="vip">VIP</SelectItem>
+                      <SelectItem value="free">Gratuit</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             </CardContent>
           </Card>
 
           {/* Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
             <Card>
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-medium flex items-center gap-2">
                   <Users className="w-4 h-4 text-primary" />
-                  Total utilisateurs
+                  Total
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{profiles.length}</div>
+                <div className="text-2xl font-bold">{filteredProfiles.length}</div>
+                <p className="text-xs text-muted-foreground">sur {profiles.length}</p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm font-medium flex items-center gap-2">
+                  <Crown className="w-4 h-4 text-primary" />
+                  VIP
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">
+                  {filteredProfiles.filter(p => p.subscription?.plan_type === 'vip').length}
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm font-medium flex items-center gap-2">
+                  <Shield className="w-4 h-4 text-primary" />
+                  Admins
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">
+                  {filteredProfiles.filter(p => p.role === 'admin').length}
+                </div>
               </CardContent>
             </Card>
 
@@ -150,101 +292,159 @@ const AdminProfiles = () => {
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-medium flex items-center gap-2">
                   <Phone className="w-4 h-4 text-primary" />
-                  Avec téléphone
+                  Téléphone
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
-                  {profiles.filter(p => p.phone).length}
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium flex items-center gap-2">
-                  <UserCircle className="w-4 h-4 text-primary" />
-                  Avec pseudo
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">
-                  {profiles.filter(p => p.nickname).length}
+                  {filteredProfiles.filter(p => p.phone).length}
                 </div>
               </CardContent>
             </Card>
           </div>
 
-          {/* Profiles List */}
-          <div className="space-y-4">
-            {filteredProfiles.length === 0 ? (
-              <Card>
-                <CardContent className="p-12 text-center">
+          {/* Profiles Table */}
+          <Card>
+            <CardContent className="p-0">
+              {paginatedProfiles.length === 0 ? (
+                <div className="p-12 text-center">
                   <Users className="w-12 h-12 mx-auto mb-4 text-muted-foreground opacity-50" />
                   <p className="text-muted-foreground">
-                    {searchTerm ? 'Aucun profil trouvé' : 'Aucun profil disponible'}
+                    {searchTerm || filterRole !== 'all' || filterPlan !== 'all' 
+                      ? 'Aucun profil trouvé avec ces critères' 
+                      : 'Aucun profil disponible'}
                   </p>
-                </CardContent>
-              </Card>
-            ) : (
-              filteredProfiles.map((profile) => (
-                <Card key={profile.id} className="hover:shadow-lg transition-shadow">
-                  <CardContent className="p-6">
-                    <div className="flex flex-col md:flex-row md:items-center gap-4">
-                      <div className="flex-1 space-y-3">
-                        <div className="flex items-start gap-3">
-                          <div className="bg-primary/10 p-2 rounded-full">
-                            <Users className="w-5 h-5 text-primary" />
-                          </div>
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-1">
-                              <h3 className="font-semibold text-lg">{profile.full_name}</h3>
-                              {profile.nickname && (
-                                <Badge variant="secondary" className="text-xs">
-                                  @{profile.nickname}
-                                </Badge>
-                              )}
-                            </div>
-                            <div className="space-y-1 text-sm text-muted-foreground">
-                              <div className="flex items-center gap-2">
-                                <Mail className="w-4 h-4" />
-                                <span>{profile.email}</span>
-                              </div>
-                              {profile.phone && (
-                                <div className="flex items-center gap-2">
-                                  <Phone className="w-4 h-4" />
-                                  <span>{profile.phone}</span>
+                </div>
+              ) : (
+                <>
+                  <div className="overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Utilisateur</TableHead>
+                          <TableHead>Contact</TableHead>
+                          <TableHead>Statut</TableHead>
+                          <TableHead>Plan</TableHead>
+                          <TableHead>Inscrit</TableHead>
+                          <TableHead className="text-right">Actions</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {paginatedProfiles.map((profile) => (
+                          <TableRow key={profile.id}>
+                            <TableCell>
+                              <div className="flex items-center gap-3">
+                                <div className="bg-primary/10 p-2 rounded-full">
+                                  <Users className="w-4 h-4 text-primary" />
                                 </div>
+                                <div>
+                                  <div className="font-semibold flex items-center gap-2">
+                                    {profile.full_name}
+                                    {profile.role === 'admin' && (
+                                      <Badge variant="destructive" className="text-xs">
+                                        <Shield className="w-3 h-3 mr-1" />
+                                        Admin
+                                      </Badge>
+                                    )}
+                                  </div>
+                                  {profile.nickname && (
+                                    <div className="text-xs text-muted-foreground">
+                                      @{profile.nickname}
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <div className="space-y-1 text-sm">
+                                <div className="flex items-center gap-2">
+                                  <Mail className="w-3 h-3 text-muted-foreground" />
+                                  <span className="truncate max-w-[200px]">{profile.email}</span>
+                                </div>
+                                {profile.phone && (
+                                  <div className="flex items-center gap-2">
+                                    <Phone className="w-3 h-3 text-muted-foreground" />
+                                    <span>{profile.phone}</span>
+                                  </div>
+                                )}
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              {profile.subscription?.status === 'active' ? (
+                                <Badge variant="default" className="bg-green-500">Actif</Badge>
+                              ) : profile.subscription?.status === 'canceled' ? (
+                                <Badge variant="secondary">Annulé</Badge>
+                              ) : (
+                                <Badge variant="outline">Expiré</Badge>
                               )}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
+                            </TableCell>
+                            <TableCell>
+                              {profile.subscription?.plan_type === 'vip' ? (
+                                <Badge className="bg-[#FF9900] hover:bg-[#FF9900]/90">
+                                  <Crown className="w-3 h-3 mr-1" />
+                                  VIP
+                                </Badge>
+                              ) : (
+                                <Badge variant="outline">Gratuit</Badge>
+                              )}
+                              {profile.subscription?.is_trial && (
+                                <Badge variant="secondary" className="ml-1 text-xs">Essai</Badge>
+                              )}
+                            </TableCell>
+                            <TableCell>
+                              <div className="text-sm text-muted-foreground">
+                                {formatDate(profile.created_at)}
+                              </div>
+                            </TableCell>
+                            <TableCell className="text-right">
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => handleContactUser(profile.id)}
+                                className="gap-2"
+                              >
+                                <MessageCircle className="w-4 h-4" />
+                                Contact
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
 
-                      <div className="border-t md:border-t-0 md:border-l pt-4 md:pt-0 md:pl-6 space-y-2 text-sm text-muted-foreground">
-                        <div className="flex items-center gap-2">
-                          <Calendar className="w-4 h-4" />
-                          <div>
-                            <div className="font-medium">Inscrit le</div>
-                            <div>{formatDate(profile.created_at)}</div>
-                          </div>
-                        </div>
-                        {profile.updated_at !== profile.created_at && (
-                          <div className="flex items-center gap-2">
-                            <Calendar className="w-4 h-4" />
-                            <div>
-                              <div className="font-medium">Modifié le</div>
-                              <div>{formatDate(profile.updated_at)}</div>
-                            </div>
-                          </div>
-                        )}
+                  {/* Pagination */}
+                  {totalPages > 1 && (
+                    <div className="flex items-center justify-between p-4 border-t">
+                      <div className="text-sm text-muted-foreground">
+                        Page {currentPage} sur {totalPages} ({filteredProfiles.length} résultat{filteredProfiles.length > 1 ? 's' : ''})
+                      </div>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                          disabled={currentPage === 1}
+                        >
+                          <ChevronLeft className="w-4 h-4" />
+                          Précédent
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                          disabled={currentPage === totalPages}
+                        >
+                          Suivant
+                          <ChevronRight className="w-4 h-4" />
+                        </Button>
                       </div>
                     </div>
-                  </CardContent>
-                </Card>
-              ))
-            )}
-          </div>
+                  )}
+                </>
+              )}
+            </CardContent>
+          </Card>
         </div>
       </main>
       <Footer />
