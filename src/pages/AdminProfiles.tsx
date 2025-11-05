@@ -35,7 +35,7 @@ interface ProfileData {
 
 const AdminProfiles = () => {
   const { user } = useAuth();
-  const { isAdmin } = useAdmin();
+  const { isAdmin, isLoading: isAdminLoading } = useAdmin();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [profiles, setProfiles] = useState<ProfileData[]>([]);
@@ -51,14 +51,18 @@ const AdminProfiles = () => {
       return;
     }
 
-    if (!isAdmin) {
+    // Wait for admin check to complete before redirecting
+    if (!isAdminLoading && !isAdmin) {
       toast.error('Accès réservé aux administrateurs');
       navigate('/dashboard');
       return;
     }
 
-    loadProfiles();
-  }, [user, isAdmin, navigate]);
+    // Only load profiles if user is confirmed admin
+    if (!isAdminLoading && isAdmin) {
+      loadProfiles();
+    }
+  }, [user, isAdmin, isAdminLoading, navigate]);
 
   const loadProfiles = async () => {
     try {
