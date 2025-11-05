@@ -16,6 +16,9 @@ import { toast } from "sonner";
 import { Loader2, Package, Search, Upload, Trash2, ShoppingCart, ShoppingBag, MessageCircle, X, CheckCircle, Copy, ZoomIn, ChevronLeft, ChevronRight, Edit, ArrowLeft } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useMarketplaceBuyUnread } from "@/hooks/use-marketplace-buy-unread";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+import ScrollToTop from "@/components/ScrollToTop";
 
 interface Listing {
   id: string;
@@ -867,9 +870,13 @@ const Marketplace = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted/20 p-4 md:p-8">
-      <div className="max-w-7xl mx-auto space-y-6">
-        {/* Image Gallery Dialog */}
+    <div className="min-h-screen bg-background">
+      <ScrollToTop />
+      <Navbar />
+      
+      <main className="container mx-auto px-4 pt-28 md:pt-24 pb-12">
+        <div className="max-w-7xl mx-auto space-y-6">
+          {/* Image Gallery Dialog */}
         <Dialog open={showImageDialog} onOpenChange={setShowImageDialog}>
           <DialogContent className="max-w-4xl p-0">
             <div className="relative">
@@ -1632,9 +1639,8 @@ const Marketplace = () => {
             </Tabs>
           </div>
         )}
-      </div>
 
-      {/* Product Confirmation Dialog */}
+        {/* Product Confirmation Dialog */}
       <Dialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
         <DialogContent>
           <DialogHeader>
@@ -1666,6 +1672,9 @@ const Marketplace = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      </div>
+      </main>
+      <Footer />
     </div>
   );
 };
