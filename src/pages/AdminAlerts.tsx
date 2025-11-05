@@ -104,7 +104,7 @@ const AdminAlerts = () => {
   };
 
   const categories = {
-    introduction: ['notifications', 'règles', 'guides', 'affiliation'],
+    introduction: ['débuter', 'notifications', 'règles', 'guides', 'affiliation', 'support'],
     outils: ['création-société', 'facture-autorisation', 'cashback', 'avis', 'fiscalité-simplifiée'],
     expedition: ['fournitures', 'cartons'],
     informations: ['annonces', 'actualités'],

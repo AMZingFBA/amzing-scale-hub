@@ -15,10 +15,12 @@ interface NotificationPreference {
 const NOTIFICATION_CATEGORIES = [
   // 📚 INTRODUCTION
   { category: 'introduction', label: '📚 Introduction', subcategories: [
+    { key: 'débuter', label: 'Débuter' },
     { key: 'notifications', label: 'Notifications' },
     { key: 'règles', label: 'Règles' },
     { key: 'guides', label: 'Guides' },
-    { key: 'affiliation', label: 'Affiliation' }
+    { key: 'affiliation', label: 'Affiliation' },
+    { key: 'support', label: 'Support' }
   ]},
   
   // 🔧 OUTILS

@@ -125,6 +125,7 @@ const Dashboard = () => {
                 </AccordionTrigger>
                 <AccordionContent className="px-4 pb-4">
                   <div className="grid gap-3 pt-2">
+                    <CategoryItem icon={Bell} label="débuter" badge={notifications.introduction?.subcategories?.débuter} />
                     <CategoryItem icon={Bell} label="notifications" link="/notification-alerts" badge={notifications.introduction?.subcategories?.notifications} />
                     <CategoryItem icon={BookOpen} label="règles" link="/rules-alerts" badge={notifications.introduction?.subcategories?.règles} />
                     <CategoryItem icon={BookOpen} label="guides" link="/guides" badge={notifications.introduction?.subcategories?.guides} />
@@ -275,7 +276,6 @@ const Dashboard = () => {
                       <CategoryItem icon={Users} label="gestion des profils" link="/admin/profiles" />
                       <CategoryItem icon={Eye} label="gestion des tickets" link="/admin/tickets" />
                       <CategoryItem icon={Bell} label="gestion des alertes" link="/admin/alerts" />
-                      <CategoryItem icon={Database} label="debug notifications push" link="/debug-push" />
                     </div>
                   </AccordionContent>
                 </AccordionItem>
