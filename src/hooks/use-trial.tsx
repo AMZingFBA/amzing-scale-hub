@@ -34,12 +34,14 @@ export const useTrial = () => {
 
     const store = CdvPurchase.store;
     
-    // Enregistrer les listeners pour les achats
+    // Enregistrer les listeners pour les achats (séparément)
     store.when()
       .approved(async (transaction: any) => {
         console.log('✅ Purchase approved:', transaction);
         await handlePurchaseSuccess(transaction);
-      })
+      });
+
+    store.when()
       .error((error: any) => {
         console.error('❌ Purchase error:', error);
         toast.error('Erreur lors du paiement');
