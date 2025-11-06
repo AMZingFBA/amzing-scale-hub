@@ -58,13 +58,20 @@ export const useTrial = () => {
 
 
   const startFreeTrial = async () => {
+    console.log('🚀 [startFreeTrial] Button clicked!');
+    
     if (!user) {
+      console.log('❌ [startFreeTrial] No user, redirecting to auth');
       navigate('/auth');
       return;
     }
 
+    console.log('✅ [startFreeTrial] User found:', user.id);
     setIsStarting(true);
+    
     try {
+      console.log('🔍 [startFreeTrial] Checking if trial already used...');
+      
       // Check if user has already used their trial
       const { data: subscription } = await supabase
         .from('subscriptions')
@@ -72,17 +79,26 @@ export const useTrial = () => {
         .eq('user_id', user.id)
         .single();
 
+      console.log('📋 [startFreeTrial] Subscription data:', subscription);
+
       if (subscription?.trial_used) {
+        console.log('⚠️ [startFreeTrial] Trial already used');
         toast.error('Vous avez déjà un abonnement actif');
         setIsStarting(false);
         return;
       }
 
+      console.log('✅ [startFreeTrial] Trial not used, proceeding...');
+      console.log('📱 [startFreeTrial] Is native platform?', isNativePlatform());
+
       // Si c'est l'app mobile, utiliser Apple IAP
       if (isNativePlatform()) {
+        console.log('📱 [startFreeTrial] Calling handleAppleIAP...');
         await handleAppleIAP();
         return;
       }
+
+      console.log('🌐 [startFreeTrial] Web platform, using Stripe...');
 
       // Sur le web, créer une session de paiement Stripe
       console.log('Creating Stripe checkout session...');
@@ -226,6 +242,18 @@ export const useTrial = () => {
       
       const orderResult = await offer.order();
       console.log('✅ [useTrial] Order result:', orderResult);
+      
+      // Si l'ordre est annulé ou échoue, on affiche un message
+      if (orderResult?.state === 'cancelled' || orderResult === null) {
+        console.log('❌ [useTrial] Order cancelled by user');
+        toast.error('Paiement annulé');
+        setIsStarting(false);
+        return;
+      }
+      
+      // Si l'ordre est réussi, le listener handlePurchaseSuccess sera appelé automatiquement
+      console.log('✅ [useTrial] Order initiated, waiting for Apple approval...');
+      toast.info('En attente de la confirmation Apple...');
 
     } catch (error: any) {
       console.error('❌ [useTrial] Apple IAP Error:', error);
