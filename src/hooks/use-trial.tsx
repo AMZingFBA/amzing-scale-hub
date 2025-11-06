@@ -168,32 +168,34 @@ export const useTrial = () => {
         owned: product.owned
       });
 
-      // Si l'abonnement est déjà possédé, traiter les transactions en attente
+      // Si l'abonnement est déjà possédé, vérifier si l'utilisateur a vraiment un abonnement actif
       if (product.owned) {
-        console.log('⚠️ [useTrial] Product already owned, processing pending transactions...');
-        toast.info('Vérification de votre abonnement existant...');
+        console.log('⚠️ [useTrial] Product shows as owned, checking database...');
         
-        // Traiter les transactions en attente
-        const transactions = store.transactions;
-        console.log('📋 [useTrial] Pending transactions:', transactions);
+        // Vérifier dans la base de données si l'utilisateur a vraiment un abonnement
+        const { data: subscription } = await supabase
+          .from('subscriptions')
+          .select('plan_type, status, expires_at')
+          .eq('user_id', user.id)
+          .single();
         
-        if (transactions && transactions.length > 0) {
-          const pendingTx = transactions.find((tx: any) => 
-            tx.products.some((p: any) => p.id === APPLE_SUBSCRIPTION_ID) &&
-            tx.state === 'approved'
-          );
-          
-          if (pendingTx) {
-            console.log('✅ [useTrial] Found pending approved transaction:', pendingTx);
-            await handlePurchaseSuccess(pendingTx);
-            setIsStarting(false);
-            return;
-          }
+        const hasActiveSubscription = subscription?.plan_type === 'vip' && 
+          subscription?.status === 'active' &&
+          (!subscription?.expires_at || new Date(subscription.expires_at) > new Date());
+        
+        if (hasActiveSubscription) {
+          console.log('✅ [useTrial] User has active subscription in database');
+          toast.error('Vous avez déjà un abonnement actif.');
+          setIsStarting(false);
+          return;
         }
         
-        toast.error('Vous avez déjà un abonnement actif. Annulez-le d\'abord dans les réglages iOS.');
-        setIsStarting(false);
-        return;
+        // Si pas d'abonnement actif en base, on peut continuer l'achat
+        console.log('⚠️ [useTrial] Product owned but no active subscription in DB, allowing purchase...');
+        toast.info('Finalisation des transactions en attente...');
+        
+        // Attendre un peu que le StoreProvider finisse les transactions
+        await new Promise(resolve => setTimeout(resolve, 1000));
       }
 
       if (!product.canPurchase) {

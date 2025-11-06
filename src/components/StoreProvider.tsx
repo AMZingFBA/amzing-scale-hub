@@ -66,17 +66,26 @@ export const StoreProvider = ({ children }: { children: React.ReactNode }) => {
       await store.initialize([CdvPurchase.Platform.APPLE_APPSTORE]);
       console.log('✅ [StoreProvider] Store initialized');
       
-      // Traiter les transactions en attente (qui sont arrivées avant l'init)
+      // Finaliser automatiquement toutes les transactions en attente
       const pendingTransactions = store.transactions || [];
       console.log('📋 [StoreProvider] Checking pending transactions:', pendingTransactions.length);
       
-      pendingTransactions.forEach((tx: any) => {
-        console.log('📝 [StoreProvider] Pending transaction:', {
-          id: tx.transactionId,
-          state: tx.state,
-          products: tx.products?.map((p: any) => p.id)
+      if (pendingTransactions.length > 0) {
+        console.log('🧹 [StoreProvider] Finishing all pending transactions to clear "owned" state...');
+        pendingTransactions.forEach((tx: any) => {
+          console.log('📝 [StoreProvider] Finishing transaction:', {
+            id: tx.transactionId,
+            state: tx.state,
+            products: tx.products?.map((p: any) => p.id)
+          });
+          try {
+            tx.finish();
+            console.log('✅ [StoreProvider] Transaction finished:', tx.transactionId);
+          } catch (error) {
+            console.error('❌ [StoreProvider] Error finishing transaction:', error);
+          }
         });
-      });
+      }
       
       // Attendre que le produit soit chargé
       await new Promise(resolve => setTimeout(resolve, 2000));
