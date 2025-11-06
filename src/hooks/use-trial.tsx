@@ -27,6 +27,12 @@ export const useTrial = () => {
 
   // Écouter les événements d'achat
   useEffect(() => {
+    // DÉSACTIVÉ TEMPORAIREMENT pour éviter les erreurs de cache
+    // Les listeners seront réactivés après le nettoyage du cache Xcode
+    console.log('⚠️ Purchase listeners désactivés temporairement');
+    return;
+    
+    /*
     if (!isNativePlatform()) return;
     
     const { CdvPurchase } = window;
@@ -35,7 +41,6 @@ export const useTrial = () => {
     const store = CdvPurchase.store;
     
     // Enregistrer les listeners pour les achats
-    // IMPORTANT: Utiliser des appels séparés, pas de chaînage
     const approvedHandler = store.when().approved(async (transaction: any) => {
       console.log('✅ Purchase approved:', transaction);
       await handlePurchaseSuccess(transaction);
@@ -50,6 +55,7 @@ export const useTrial = () => {
     return () => {
       // Cleanup si nécessaire
     };
+    */
   }, [user]);
 
 
