@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { Capacitor } from '@capacitor/core';
+import 'cordova-plugin-purchase';
 
 declare global {
   interface Window {
