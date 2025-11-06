@@ -36,15 +36,16 @@ export const useTrial = () => {
     
     console.log('🎧 [useTrial] Setting up purchase listeners...');
     
-    // Enregistrer les listeners séparément
+    // Enregistrer le listener pour les transactions approuvées
     store.when().approved(async (transaction: any) => {
       console.log('✅ [useTrial] Purchase approved:', transaction);
       await handlePurchaseSuccess(transaction);
     });
 
-    store.when().error((error: any) => {
+    // Enregistrer le listener pour les erreurs (syntaxe différente)
+    store.error((error: any) => {
       console.error('❌ [useTrial] Purchase error:', error);
-      toast.error('Erreur lors du paiement');
+      toast.error('Erreur lors du paiement: ' + (error.message || 'Erreur inconnue'));
       setIsStarting(false);
     });
 
@@ -237,9 +238,22 @@ export const useTrial = () => {
     try {
       console.log('✅ Paiement validé par Apple, mise à jour de l\'abonnement...');
       
+      // Vérifier que c'est bien notre produit
+      const hasOurProduct = transaction.products?.some((p: any) => p.id === APPLE_SUBSCRIPTION_ID);
+      if (!hasOurProduct) {
+        console.log('⚠️ Transaction ignorée, pas notre produit:', transaction.products);
+        // Finaliser quand même la transaction pour la supprimer
+        const { CdvPurchase } = window;
+        if (CdvPurchase) {
+          transaction.finish();
+        }
+        return;
+      }
+      
       if (!user) {
-        console.error('❌ No user found');
-        toast.error('Erreur: utilisateur non connecté');
+        console.error('❌ No user found, transaction will be retried later');
+        // Ne pas finaliser la transaction si pas d'utilisateur
+        // Elle sera retraitée au prochain lancement
         return;
       }
 

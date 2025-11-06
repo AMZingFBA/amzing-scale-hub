@@ -66,23 +66,30 @@ export const StoreProvider = ({ children }: { children: React.ReactNode }) => {
       await store.initialize([CdvPurchase.Platform.APPLE_APPSTORE]);
       console.log('✅ [StoreProvider] Store initialized');
       
-      // Finaliser automatiquement toutes les transactions en attente
+      // Finaliser automatiquement toutes les transactions en attente non liées à notre produit
       const pendingTransactions = store.transactions || [];
       console.log('📋 [StoreProvider] Checking pending transactions:', pendingTransactions.length);
       
       if (pendingTransactions.length > 0) {
-        console.log('🧹 [StoreProvider] Finishing all pending transactions to clear "owned" state...');
+        console.log('🧹 [StoreProvider] Finishing irrelevant pending transactions...');
         pendingTransactions.forEach((tx: any) => {
-          console.log('📝 [StoreProvider] Finishing transaction:', {
+          const hasOurProduct = tx.products?.some((p: any) => p.id === APPLE_SUBSCRIPTION_ID);
+          
+          console.log('📝 [StoreProvider] Transaction:', {
             id: tx.transactionId,
             state: tx.state,
-            products: tx.products?.map((p: any) => p.id)
+            products: tx.products?.map((p: any) => p.id),
+            isOurProduct: hasOurProduct
           });
-          try {
-            tx.finish();
-            console.log('✅ [StoreProvider] Transaction finished:', tx.transactionId);
-          } catch (error) {
-            console.error('❌ [StoreProvider] Error finishing transaction:', error);
+          
+          // Finaliser seulement les transactions qui ne sont pas notre produit
+          if (!hasOurProduct) {
+            try {
+              tx.finish();
+              console.log('✅ [StoreProvider] Irrelevant transaction finished:', tx.transactionId);
+            } catch (error) {
+              console.error('❌ [StoreProvider] Error finishing transaction:', error);
+            }
           }
         });
       }
