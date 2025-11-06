@@ -6,10 +6,22 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Link, useNavigate } from "react-router-dom";
 import { Capacitor } from "@capacitor/core";
+import { useTrial } from "@/hooks/use-trial";
+import { useAuth } from "@/hooks/use-auth";
 
 const Tarifs = () => {
   const navigate = useNavigate();
   const isNativeApp = Capacitor.isNativePlatform();
+  const { startFreeTrial, isStarting } = useTrial();
+  const { user } = useAuth();
+
+  const handleStartTrial = async () => {
+    if (!user) {
+      navigate('/auth?tab=signup');
+      return;
+    }
+    await startFreeTrial();
+  };
 
   return (
     <div className="min-h-screen relative overflow-hidden">
@@ -53,10 +65,10 @@ const Tarifs = () => {
           {/* Single Pricing Card */}
           <div className="max-w-2xl mx-auto mb-16 animate-fade-in" style={{ animationDelay: '0.3s' }}>
             <Card className="border-2 border-primary shadow-2xl relative group hover:scale-[1.02] hover:shadow-primary/30 transition-all duration-500">
-              <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-10">
+                 <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-10">
                 <Badge className="bg-gradient-to-r from-primary to-secondary text-white px-6 py-2 text-lg animate-float hover:scale-110 transition-transform cursor-pointer">
                   <Star className="w-5 h-5 inline mr-2 animate-pulse" />
-                  15 jours gratuits
+                  7 jours gratuits
                 </Badge>
               </div>
               <CardHeader className="text-center pb-8 pt-12">
@@ -128,8 +140,14 @@ const Tarifs = () => {
                 </div>
               </CardContent>
               <CardFooter className="px-8 pb-8">
-                <Button variant="hero" className="w-full text-lg py-6 hover:scale-105 transition-transform" size="lg">
-                  Commencer l'essai gratuit (15 jours)
+                <Button 
+                  variant="hero" 
+                  className="w-full text-lg py-6 hover:scale-105 transition-transform" 
+                  size="lg"
+                  onClick={handleStartTrial}
+                  disabled={isStarting}
+                >
+                  {isStarting ? 'Chargement...' : 'Commencer l\'essai gratuit (7 jours)'}
                 </Button>
               </CardFooter>
             </Card>
@@ -140,7 +158,7 @@ const Tarifs = () => {
             <CardContent className="p-8 text-center">
               <h3 className="text-2xl font-bold mb-2">Sans engagement</h3>
               <p className="text-muted-foreground mb-4">
-                Teste pendant 15 jours gratuitement. Annule à tout moment sans frais.
+                Teste pendant 7 jours gratuitement. Annule à tout moment sans frais.
               </p>
               <div className="flex flex-wrap justify-center gap-4">
                 <Badge className="bg-primary/20 text-primary border-primary/30">Paiement sécurisé</Badge>
@@ -183,7 +201,7 @@ const Tarifs = () => {
                 </CardHeader>
                 <CardContent>
                   <p className="text-muted-foreground group-hover:translate-x-1 transition-transform duration-300">
-                    Les 15 jours d{"'"}essai gratuits vous donnent accès complet à tous les services : formation, catalogue produits, outils et communauté Discord VIP.
+                    Les 7 jours d{"'"}essai gratuits vous donnent accès complet à tous les services : formation, catalogue produits, outils et communauté Discord VIP.
                   </p>
                 </CardContent>
               </Card>

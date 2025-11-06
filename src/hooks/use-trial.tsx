@@ -1,16 +1,19 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from './use-auth';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
-import { Purchases } from '@revenuecat/purchases-capacitor';
+import { Capacitor } from '@capacitor/core';
+
+declare global {
+  interface Window {
+    CdvPurchase?: any;
+  }
+}
 
 // Fonction pour détecter si on est sur une app mobile Capacitor
 const isNativePlatform = () => {
-  if (typeof window !== 'undefined' && (window as any).Capacitor) {
-    return (window as any).Capacitor.isNativePlatform();
-  }
-  return false;
+  return Capacitor.isNativePlatform();
 };
 
 // ID du produit IAP (à configurer dans App Store Connect)
@@ -18,8 +21,67 @@ const APPLE_SUBSCRIPTION_ID = 'com.amzing.vip.monthly';
 
 export const useTrial = () => {
   const [isStarting, setIsStarting] = useState(false);
+  const [isStoreReady, setIsStoreReady] = useState(false);
   const { user, refreshSubscription } = useAuth();
   const navigate = useNavigate();
+
+  // Initialiser StoreKit au chargement du hook
+  useEffect(() => {
+    if (isNativePlatform()) {
+      initializeStore();
+    }
+  }, []);
+
+  const initializeStore = async () => {
+    try {
+      console.log('Initializing Apple StoreKit...');
+      
+      const { CdvPurchase } = window;
+      if (!CdvPurchase) {
+        console.error('CdvPurchase not available');
+        return;
+      }
+
+      const store = CdvPurchase.store;
+      
+      // Enregistrer le produit
+      store.register([{
+        id: APPLE_SUBSCRIPTION_ID,
+        type: CdvPurchase.ProductType.PAID_SUBSCRIPTION,
+        platform: CdvPurchase.Platform.APPLE_APPSTORE
+      }]);
+
+      console.log('Product registered:', APPLE_SUBSCRIPTION_ID);
+
+      // Écouter les événements d'approbation d'achat
+      store.when()
+        .productUpdated((product: any) => {
+          console.log('Product updated:', product);
+          if (product.id === APPLE_SUBSCRIPTION_ID && product.canPurchase) {
+            setIsStoreReady(true);
+          }
+        })
+        .approved((transaction: any) => {
+          console.log('Purchase approved:', transaction);
+          handlePurchaseSuccess(transaction);
+        })
+        .finished((transaction: any) => {
+          console.log('Purchase finished:', transaction);
+        })
+        .error((error: any) => {
+          console.error('Purchase error:', error);
+          toast.error('Erreur lors du paiement');
+          setIsStarting(false);
+        });
+
+      // Initialiser le store
+      await store.initialize([CdvPurchase.Platform.APPLE_APPSTORE]);
+      console.log('Store initialized');
+      
+    } catch (error: any) {
+      console.error('Error initializing store:', error);
+    }
+  };
 
   const startFreeTrial = async () => {
     if (!user) {
@@ -78,55 +140,67 @@ export const useTrial = () => {
 
   const handleAppleIAP = async () => {
     try {
-      console.log('Initializing Apple IAP with RevenueCat...');
-      
-      // Initialiser RevenueCat avec votre API key iOS
-      await Purchases.configure({
-        apiKey: 'appl_UkTXpjsXWtjIplSVBRXeCXGdALQ',
-      });
-
-      // Identifier l'utilisateur
-      if (user?.id) {
-        await Purchases.logIn({ appUserID: user.id });
-      }
-
-      toast.info('Chargement des produits...');
-
-      // Récupérer les offres disponibles
-      const offerings = await Purchases.getOfferings();
-      
-      if (!offerings.current?.availablePackages || offerings.current.availablePackages.length === 0) {
-        throw new Error('Aucun produit d\'abonnement disponible');
-      }
-
-      const package_to_purchase = offerings.current.availablePackages[0];
-      console.log('Package found:', package_to_purchase);
-      
-      toast.info('Ouverture du paiement Apple...');
-
-      // Effectuer l'achat
-      const purchaseResult = await Purchases.purchasePackage({ 
-        aPackage: package_to_purchase 
-      });
-
-      console.log('Purchase successful:', purchaseResult);
-      console.log('Customer Info:', JSON.stringify(purchaseResult.customerInfo));
-      console.log('Active Entitlements:', purchaseResult.customerInfo.entitlements.active);
-
-      // Vérifier que le paiement a bien été validé par Apple
-      const hasActiveEntitlement = Object.keys(purchaseResult.customerInfo.entitlements.active).length > 0;
-      
-      if (!hasActiveEntitlement) {
-        console.error('Aucun entitlement actif trouvé après l\'achat');
-        toast.error('Le paiement n\'a pas été validé. Veuillez réessayer.');
+      const { CdvPurchase } = window;
+      if (!CdvPurchase) {
+        console.error('CdvPurchase not available');
+        toast.error('Store non disponible');
+        setIsStarting(false);
         return;
       }
 
-      console.log('✅ Paiement validé par Apple, mise à jour de l\'abonnement...');
+      const store = CdvPurchase.store;
 
-      // Mettre à jour la base de données - Abonnement mensuel direct
+      if (!isStoreReady) {
+        toast.info('Initialisation du store...');
+        await initializeStore();
+        // Attendre que le store soit prêt
+        await new Promise(resolve => setTimeout(resolve, 2000));
+      }
+
+      console.log('Starting Apple IAP purchase...');
+      toast.info('Ouverture du paiement Apple...');
+
+      // Récupérer le produit
+      const product = store.get(APPLE_SUBSCRIPTION_ID);
+      
+      if (!product) {
+        console.error('Product not found');
+        toast.error('Produit non disponible');
+        setIsStarting(false);
+        return;
+      }
+
+      console.log('Product found:', product);
+
+      // Déclencher l'achat du produit
+      const offer = product.getOffer();
+      if (offer) {
+        await offer.order();
+        console.log('Purchase initiated for:', APPLE_SUBSCRIPTION_ID);
+      } else {
+        throw new Error('No offer available for product');
+      }
+
+    } catch (error: any) {
+      console.error('Apple IAP Error:', error);
+      toast.error('Erreur lors du paiement');
+      setIsStarting(false);
+    }
+  };
+
+  const handlePurchaseSuccess = async (transaction: any) => {
+    try {
+      console.log('✅ Paiement validé par Apple, mise à jour de l\'abonnement...');
+      
+      if (!user) {
+        console.error('No user found');
+        return;
+      }
+
+      // Mettre à jour la base de données - Abonnement mensuel avec 7 jours d'essai
       const expiresAt = new Date();
-      expiresAt.setMonth(expiresAt.getMonth() + 1); // 1 mois d'abonnement payant
+      expiresAt.setDate(expiresAt.getDate() + 7); // 7 jours d'essai
+      expiresAt.setMonth(expiresAt.getMonth() + 1); // + 1 mois d'abonnement payant
 
       console.log('Mise à jour pour user_id:', user.id);
       
@@ -138,7 +212,7 @@ export const useTrial = () => {
           plan_type: 'vip',
           status: 'active',
           expires_at: expiresAt.toISOString(),
-          is_trial: false,
+          is_trial: true,
           trial_used: true,
           updated_at: new Date().toISOString(),
           started_at: new Date().toISOString()
@@ -155,25 +229,21 @@ export const useTrial = () => {
 
       console.log('✅ Abonnement mis à jour dans la base de données:', updateData);
 
-      // Vérifier immédiatement dans la base de données
-      const { data: verifyData, error: verifyError } = await supabase
-        .from('subscriptions')
-        .select('*')
-        .eq('user_id', user.id)
-        .single();
-
-      console.log('🔍 Vérification abonnement dans DB:', verifyData, verifyError);
+      // Finaliser la transaction
+      const { CdvPurchase } = window;
+      if (CdvPurchase) {
+        transaction.finish();
+        console.log('Transaction finished');
+      }
 
       // Rafraîchir l'état de l'abonnement dans l'app
       console.log('🔄 Rafraîchissement de l\'état...');
       await refreshSubscription();
       
-      // Attendre un peu pour s'assurer que l'état est propagé
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
       console.log('✅ État de l\'abonnement rafraîchi');
 
       toast.success('Abonnement VIP activé avec succès ! 🎉');
+      setIsStarting(false);
       
       // Rediriger vers le dashboard
       setTimeout(() => {
@@ -181,15 +251,8 @@ export const useTrial = () => {
       }, 500);
 
     } catch (error: any) {
-      console.error('Apple IAP Error:', error);
-      
-      // Gérer les erreurs spécifiques
-      if (error.code === '1') {
-        toast.error('Achat annulé');
-      } else {
-        toast.error('Erreur lors du paiement: ' + error.message);
-      }
-    } finally {
+      console.error('Error handling purchase success:', error);
+      toast.error('Erreur lors de la finalisation');
       setIsStarting(false);
     }
   };
