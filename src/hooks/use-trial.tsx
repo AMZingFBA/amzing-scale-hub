@@ -140,41 +140,62 @@ export const useTrial = () => {
 
   const handleAppleIAP = async () => {
     try {
+      console.log('handleAppleIAP called');
+      console.log('Capacitor.isNativePlatform():', Capacitor.isNativePlatform());
+      console.log('window.CdvPurchase available:', !!window.CdvPurchase);
+
       const { CdvPurchase } = window;
       if (!CdvPurchase) {
-        console.error('CdvPurchase not available');
-        toast.error('Store non disponible');
+        console.error('CdvPurchase not available - plugin may not be installed');
+        toast.error('Fonctionnalité disponible uniquement dans l\'app iOS');
         setIsStarting(false);
         return;
       }
 
       const store = CdvPurchase.store;
+      console.log('Store object:', store);
 
-      if (!isStoreReady) {
-        toast.info('Initialisation du store...');
-        await initializeStore();
-        // Attendre que le store soit prêt
-        await new Promise(resolve => setTimeout(resolve, 2000));
-      }
+      // Toujours réinitialiser le store pour s'assurer qu'il est prêt
+      console.log('Initializing store...');
+      toast.info('Préparation du paiement...');
+      await initializeStore();
+      
+      // Attendre que le store soit complètement initialisé
+      await new Promise(resolve => setTimeout(resolve, 3000));
 
       console.log('Starting Apple IAP purchase...');
       toast.info('Ouverture du paiement Apple...');
 
       // Récupérer le produit
       const product = store.get(APPLE_SUBSCRIPTION_ID);
+      console.log('Product retrieved:', product);
       
       if (!product) {
-        console.error('Product not found');
-        toast.error('Produit non disponible');
+        console.error('Product not found:', APPLE_SUBSCRIPTION_ID);
+        toast.error('Produit non trouvé. Veuillez réessayer.');
         setIsStarting(false);
         return;
       }
 
-      console.log('Product found:', product);
+      console.log('Product details:', {
+        id: product.id,
+        title: product.title,
+        canPurchase: product.canPurchase
+      });
+
+      if (!product.canPurchase) {
+        console.error('Product cannot be purchased');
+        toast.error('Produit non disponible à l\'achat');
+        setIsStarting(false);
+        return;
+      }
 
       // Déclencher l'achat du produit
       const offer = product.getOffer();
+      console.log('Offer retrieved:', offer);
+      
       if (offer) {
+        console.log('Ordering product...');
         await offer.order();
         console.log('Purchase initiated for:', APPLE_SUBSCRIPTION_ID);
       } else {
@@ -183,7 +204,7 @@ export const useTrial = () => {
 
     } catch (error: any) {
       console.error('Apple IAP Error:', error);
-      toast.error('Erreur lors du paiement');
+      toast.error('Erreur lors du paiement: ' + (error.message || 'Erreur inconnue'));
       setIsStarting(false);
     }
   };
