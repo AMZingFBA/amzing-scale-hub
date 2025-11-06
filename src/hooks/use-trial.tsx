@@ -108,50 +108,67 @@ export const useTrial = () => {
 
   const handleAppleIAP = async () => {
     try {
-      console.log('🛒 handleAppleIAP called');
+      console.log('🛒 [useTrial] handleAppleIAP called');
 
       const { CdvPurchase } = window;
       if (!CdvPurchase) {
-        console.error('❌ CdvPurchase not available');
+        console.error('❌ [useTrial] CdvPurchase not available');
         toast.error('Abonnement temporairement indisponible. Veuillez réessayer plus tard.');
         setIsStarting(false);
         return;
       }
 
       const store = CdvPurchase.store;
-      console.log('✅ Store object available');
+      console.log('✅ [useTrial] Store object available');
 
       toast.info('Chargement du produit...');
       
-      // Attendre un peu pour s'assurer que le store est initialisé
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      // Récupérer le produit
-      const product = store.get(APPLE_SUBSCRIPTION_ID);
-      console.log('📦 Product retrieved:', product);
+      // Attendre que le produit soit chargé (le StoreProvider l'a déjà initialisé)
+      let product = store.get(APPLE_SUBSCRIPTION_ID);
+      let attempts = 0;
+      
+      while (!product && attempts < 10) {
+        console.log(`🔄 [useTrial] Waiting for product... (attempt ${attempts + 1})`);
+        await new Promise(resolve => setTimeout(resolve, 500));
+        product = store.get(APPLE_SUBSCRIPTION_ID);
+        attempts++;
+      }
+      
+      console.log('📦 [useTrial] Product retrieved:', product);
       
       if (!product) {
-        console.error('❌ Product not found:', APPLE_SUBSCRIPTION_ID);
-        console.error('⚠️ Vérifiez que:');
-        console.error('  1. Le bundle ID correspond à App Store Connect');
-        console.error('  2. Le produit est bien configuré dans App Store Connect');
-        console.error('  3. Le produit ID est correct:', APPLE_SUBSCRIPTION_ID);
+        console.error('❌ [useTrial] Product not found:', APPLE_SUBSCRIPTION_ID);
+        console.error('⚠️ [useTrial] Vérifications nécessaires:');
+        console.error('  1. Bundle ID doit être: com.amzing.app');
+        console.error('  2. Produit doit exister dans App Store Connect:', APPLE_SUBSCRIPTION_ID);
+        console.error('  3. Certificats et provisioning corrects');
+        console.error('  4. Compte de test sandbox sur l\'appareil');
+        
+        // Afficher tous les produits disponibles pour debug
+        const allProducts = store.products;
+        console.log('📦 [useTrial] All available products:', allProducts);
+        
         toast.error('Abonnement temporairement indisponible. Contactez le support.');
         setIsStarting(false);
         return;
       }
 
-      console.log('📦 Product details:', {
+      console.log('📦 [useTrial] Product details:', {
         id: product.id,
         title: product.title,
         description: product.description,
         price: product.pricing?.price,
         canPurchase: product.canPurchase,
-        state: product.state
+        state: product.state,
+        owned: product.owned
       });
 
       if (!product.canPurchase) {
-        console.error('❌ Product cannot be purchased. State:', product.state);
+        console.error('❌ [useTrial] Product cannot be purchased. State:', product.state);
+        console.error('❌ [useTrial] Possible reasons:');
+        console.error('  - Product not approved in App Store Connect');
+        console.error('  - Wrong bundle ID');
+        console.error('  - Not logged in with sandbox account');
         toast.error('Abonnement temporairement indisponible. Veuillez réessayer.');
         setIsStarting(false);
         return;
@@ -159,23 +176,23 @@ export const useTrial = () => {
 
       // Déclencher l'achat du produit
       const offer = product.getOffer();
-      console.log('💰 Offer retrieved:', offer);
+      console.log('💰 [useTrial] Offer retrieved:', offer);
       
       if (!offer) {
-        console.error('❌ No offer available for product');
+        console.error('❌ [useTrial] No offer available for product');
         toast.error('Impossible de récupérer les informations d\'achat.');
         setIsStarting(false);
         return;
       }
 
-      console.log('🚀 Ordering product...');
+      console.log('🚀 [useTrial] Ordering product...');
       toast.info('Ouverture du paiement Apple...');
       
       const orderResult = await offer.order();
-      console.log('✅ Order result:', orderResult);
+      console.log('✅ [useTrial] Order result:', orderResult);
 
     } catch (error: any) {
-      console.error('❌ Apple IAP Error:', error);
+      console.error('❌ [useTrial] Apple IAP Error:', error);
       toast.error('Erreur lors du paiement: ' + (error.message || 'Erreur inconnue'));
       setIsStarting(false);
     }
