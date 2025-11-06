@@ -168,6 +168,34 @@ export const useTrial = () => {
         owned: product.owned
       });
 
+      // Si l'abonnement est déjà possédé, traiter les transactions en attente
+      if (product.owned) {
+        console.log('⚠️ [useTrial] Product already owned, processing pending transactions...');
+        toast.info('Vérification de votre abonnement existant...');
+        
+        // Traiter les transactions en attente
+        const transactions = store.transactions;
+        console.log('📋 [useTrial] Pending transactions:', transactions);
+        
+        if (transactions && transactions.length > 0) {
+          const pendingTx = transactions.find((tx: any) => 
+            tx.products.some((p: any) => p.id === APPLE_SUBSCRIPTION_ID) &&
+            tx.state === 'approved'
+          );
+          
+          if (pendingTx) {
+            console.log('✅ [useTrial] Found pending approved transaction:', pendingTx);
+            await handlePurchaseSuccess(pendingTx);
+            setIsStarting(false);
+            return;
+          }
+        }
+        
+        toast.error('Vous avez déjà un abonnement actif. Annulez-le d\'abord dans les réglages iOS.');
+        setIsStarting(false);
+        return;
+      }
+
       if (!product.canPurchase) {
         console.error('❌ [useTrial] Product cannot be purchased. State:', product.state);
         console.error('❌ [useTrial] Possible reasons:');
