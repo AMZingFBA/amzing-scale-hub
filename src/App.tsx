@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import ScrollToTop from "./components/ScrollToTop";
 import { AuthProvider } from "./hooks/use-auth";
 import { PushNotificationsProvider } from "./components/PushNotificationsProvider";
+import { StoreProvider } from "./components/StoreProvider";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import ForgotPassword from "./pages/ForgotPassword";
@@ -55,8 +56,9 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <AuthProvider>
-          <PushNotificationsProvider>
-            <ScrollToTop />
+          <StoreProvider>
+            <PushNotificationsProvider>
+              <ScrollToTop />
             <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
@@ -105,7 +107,8 @@ const App = () => (
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
-          </PushNotificationsProvider>
+            </PushNotificationsProvider>
+          </StoreProvider>
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
