@@ -34,19 +34,18 @@ export const useTrial = () => {
 
     const store = CdvPurchase.store;
     
-    // Enregistrer les listeners pour les achats (séparément)
-    store.when()
-      .approved(async (transaction: any) => {
-        console.log('✅ Purchase approved:', transaction);
-        await handlePurchaseSuccess(transaction);
-      });
+    // Enregistrer les listeners pour les achats
+    // IMPORTANT: Utiliser des appels séparés, pas de chaînage
+    const approvedHandler = store.when().approved(async (transaction: any) => {
+      console.log('✅ Purchase approved:', transaction);
+      await handlePurchaseSuccess(transaction);
+    });
 
-    store.when()
-      .error((error: any) => {
-        console.error('❌ Purchase error:', error);
-        toast.error('Erreur lors du paiement');
-        setIsStarting(false);
-      });
+    const errorHandler = store.when().error((error: any) => {
+      console.error('❌ Purchase error:', error);
+      toast.error('Erreur lors du paiement');
+      setIsStarting(false);
+    });
 
     return () => {
       // Cleanup si nécessaire
