@@ -135,8 +135,7 @@ const AffiliateDashboard = () => {
           </div>
           <div className="flex gap-2">
             <Button variant="outline" onClick={() => {
-              const subject = encodeURIComponent('Question sur mon programme d\'affiliation');
-              window.location.href = `mailto:amzingfba26@gmail.com?subject=${subject}`;
+              window.open('https://amzingfba.com/contact', '_blank');
             }}>
               <Mail className="mr-2 h-4 w-4" />
               Contact
