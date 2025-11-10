@@ -155,7 +155,7 @@ const AffiliateDashboard = () => {
                 <TableHeader>
                   <TableRow>
                     <TableHead>Email du filleul</TableHead>
-                    <TableHead>Date d'inscription</TableHead>
+                    <TableHead>Date et heure d'inscription</TableHead>
                     <TableHead>Statut de paiement</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -164,7 +164,7 @@ const AffiliateDashboard = () => {
                     <TableRow key={referral.id}>
                       <TableCell className="font-medium">{referral.referred_email}</TableCell>
                       <TableCell>
-                        {format(new Date(referral.signup_date), "dd MMMM yyyy", { locale: fr })}
+                        {format(new Date(referral.signup_date), "dd MMMM yyyy 'à' HH:mm", { locale: fr })}
                       </TableCell>
                       <TableCell>
                         <Badge variant={referral.payment_status === "payé" ? "default" : "secondary"}>

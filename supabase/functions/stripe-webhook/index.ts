@@ -113,6 +113,26 @@ serve(async (req) => {
       }
 
       logStep("Subscription updated successfully", { userId: profile.id, expiresAt });
+
+      // Update referral payment status if this user was referred
+      const { data: referral } = await supabaseClient
+        .from("affiliate_referrals")
+        .select("id")
+        .eq("referred_user_id", profile.id)
+        .eq("payment_status", "en attente")
+        .single();
+
+      if (referral) {
+        await supabaseClient
+          .from("affiliate_referrals")
+          .update({
+            payment_status: "payé",
+            payment_month: new Date().toISOString().slice(0, 7) // YYYY-MM
+          })
+          .eq("id", referral.id);
+        
+        logStep("Referral payment status updated", { referralId: referral.id });
+      }
     }
 
     // Handle subscription events
@@ -165,6 +185,26 @@ serve(async (req) => {
           .eq("user_id", profile.id);
         
         logStep("Subscription activated", { userId: profile.id });
+
+        // Update referral payment status if this user was referred
+        const { data: referral } = await supabaseClient
+          .from("affiliate_referrals")
+          .select("id")
+          .eq("referred_user_id", profile.id)
+          .eq("payment_status", "en attente")
+          .single();
+
+        if (referral) {
+          await supabaseClient
+            .from("affiliate_referrals")
+            .update({
+              payment_status: "payé",
+              payment_month: new Date().toISOString().slice(0, 7) // YYYY-MM
+            })
+            .eq("id", referral.id);
+          
+          logStep("Referral payment status updated", { referralId: referral.id });
+        }
       } else if (subscription.status === "canceled" || subscription.status === "unpaid") {
         await supabaseClient
           .from("subscriptions")
