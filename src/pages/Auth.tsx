@@ -28,9 +28,10 @@ export default function Auth() {
   const [error, setError] = useState<string | null>(null);
   const isNativeApp = Capacitor.isNativePlatform();
   
-  // Check URL params for default tab
+  // Check URL params for default tab and referral code
   const searchParams = new URLSearchParams(window.location.search);
   const defaultTab = searchParams.get("tab") === "signup" ? "signup" : "login";
+  const referralCode = searchParams.get("ref");
   const [activeTab, setActiveTab] = useState(defaultTab);
 
   useEffect(() => {
@@ -134,6 +135,7 @@ export default function Auth() {
             fullName: signupData.fullName,
             nickname: signupData.nickname,
             phone: signupData.phone,
+            referralCode: referralCode || null,
           }),
         }
       );

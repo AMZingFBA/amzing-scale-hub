@@ -13,6 +13,7 @@ interface SignupRequest {
   fullName: string;
   nickname: string;
   phone: string;
+  referralCode?: string;
 }
 
 const handler = async (req: Request): Promise<Response> => {
@@ -21,11 +22,12 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { code, email, password, fullName, nickname, phone }: SignupRequest = await req.json();
+    const { code, email, password, fullName, nickname, phone, referralCode }: SignupRequest = await req.json();
 
     console.log("=== SIGNUP VERIFICATION REQUEST ===");
     console.log("Email:", email);
     console.log("Code reçu:", code);
+    console.log("Referral Code:", referralCode);
 
     // Use service role key for database operations
     const supabaseAdmin = createClient(
@@ -97,6 +99,39 @@ const handler = async (req: Request): Promise<Response> => {
       .from("verification_codes")
       .update({ used: true, user_id: authData.user.id })
       .eq("id", verificationData.id);
+
+    // If there's a referral code, create referral relationship
+    if (referralCode) {
+      console.log("Processing referral code:", referralCode);
+      
+      // Find the affiliate user by referral code
+      const { data: affiliateUser, error: affiliateError } = await supabaseAdmin
+        .from("affiliate_users")
+        .select("id")
+        .eq("referral_code", referralCode)
+        .single();
+      
+      if (affiliateUser && !affiliateError) {
+        console.log("Creating referral for affiliate:", affiliateUser.id);
+        
+        // Create referral record
+        const { error: referralError } = await supabaseAdmin
+          .from("affiliate_referrals")
+          .insert({
+            referrer_user_id: affiliateUser.id,
+            referred_email: email.toLowerCase(),
+            referred_user_id: authData.user.id,
+          });
+        
+        if (referralError) {
+          console.error("Error creating referral:", referralError);
+        } else {
+          console.log("Referral created successfully");
+        }
+      } else {
+        console.log("Affiliate user not found for code:", referralCode);
+      }
+    }
 
     console.log("User created successfully:", authData.user.id);
 

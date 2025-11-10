@@ -33,7 +33,7 @@ const AffiliateDashboard = () => {
   const [referrals, setReferrals] = useState<Referral[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  const affiliateLink = `${window.location.origin}/affiliate/signup?ref=${user?.referralCode || ""}`;
+  const affiliateLink = `${window.location.origin}/auth?tab=signup&ref=${user?.referralCode || ""}`;
 
   useEffect(() => {
     const affiliateUser = localStorage.getItem("affiliate_user");
