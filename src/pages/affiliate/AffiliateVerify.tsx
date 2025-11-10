@@ -78,14 +78,11 @@ const AffiliateVerify = () => {
         },
       });
 
-      if (error) {
-        console.error("API Error:", error);
-        toast.error("Une erreur est survenue. Veuillez réessayer.");
-        return;
-      }
+      console.log("Response data:", data);
+      console.log("Response error:", error);
 
+      // Check for data.error first (this is the backend error response)
       if (data?.error) {
-        // Handle specific error types
         const errorMessage = data.errorType === "expired" 
           ? "Code de vérification expiré. Renvoyez un nouveau code."
           : data.errorType === "invalid"
@@ -95,6 +92,13 @@ const AffiliateVerify = () => {
           : data.error;
         
         toast.error(errorMessage);
+        return;
+      }
+
+      // Then check for network/function errors
+      if (error) {
+        console.error("API Error:", error);
+        toast.error("Une erreur est survenue. Veuillez réessayer.");
         return;
       }
 
