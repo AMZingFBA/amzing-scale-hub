@@ -90,10 +90,17 @@ const AffiliateVerify = () => {
           : data.errorType === "invalid"
           ? "Code de vérification incorrect. Veuillez réessayer."
           : data.errorType === "already_verified"
-          ? "Email déjà vérifié. Connectez-vous directement."
+          ? "Votre email est déjà vérifié ! Vous pouvez vous connecter."
           : data.error;
         
         setErrorMessage(message);
+        
+        // Redirect to login after 2 seconds if already verified
+        if (data.errorType === "already_verified") {
+          setTimeout(() => {
+            navigate("/affiliate/login");
+          }, 2000);
+        }
         return;
       }
 
