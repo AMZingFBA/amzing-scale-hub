@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Copy, LogOut, Users } from "lucide-react";
+import { Copy, LogOut, Users, Mail, Phone, User } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 
@@ -23,6 +23,11 @@ interface Referral {
   referred_email: string;
   signup_date: string;
   referred_user_id: string;
+  profile?: {
+    phone: string | null;
+    nickname: string | null;
+    full_name: string | null;
+  };
 }
 
 const AffiliateDashboard = () => {
@@ -73,10 +78,25 @@ const AffiliateDashboard = () => {
 
       if (subsError) throw subsError;
 
-      // Filter referrals to only show those with active VIP subscriptions
+      // Get profile info for each referred user
+      const { data: profiles, error: profilesError } = await supabase
+        .from("profiles")
+        .select("id, phone, nickname, full_name")
+        .in("id", referredUserIds);
+
+      if (profilesError) throw profilesError;
+
+      // Create a map of profiles for easy lookup
+      const profilesMap = new Map(profiles?.map(p => [p.id, p]) || []);
+
+      // Filter referrals to only show those with active VIP subscriptions and add profile data
       const vipUserIds = new Set(subscriptions?.map(s => s.user_id) || []);
       const vipReferrals = allReferrals
         .filter(r => vipUserIds.has(r.referred_user_id))
+        .map(r => ({
+          ...r,
+          profile: profilesMap.get(r.referred_user_id)
+        }))
         .sort((a, b) => new Date(b.signup_date).getTime() - new Date(a.signup_date).getTime());
 
       setReferrals(vipReferrals);
@@ -175,16 +195,46 @@ const AffiliateDashboard = () => {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Email du filleul</TableHead>
-                    <TableHead>Date et heure d'inscription</TableHead>
+                    <TableHead>Nom</TableHead>
+                    <TableHead>Email</TableHead>
+                    <TableHead>Téléphone</TableHead>
+                    <TableHead>Date d'inscription</TableHead>
+                    <TableHead>Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {referrals.map((referral) => (
                     <TableRow key={referral.id}>
-                      <TableCell className="font-medium">{referral.referred_email}</TableCell>
+                      <TableCell className="font-medium">
+                        <div className="flex items-center gap-2">
+                          <User className="h-4 w-4 text-muted-foreground" />
+                          {referral.profile?.full_name || referral.profile?.nickname || "Non renseigné"}
+                        </div>
+                      </TableCell>
                       <TableCell>
-                        {format(new Date(referral.signup_date), "dd MMMM yyyy 'à' HH:mm", { locale: fr })}
+                        <div className="flex items-center gap-2">
+                          <Mail className="h-4 w-4 text-muted-foreground" />
+                          {referral.referred_email}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <Phone className="h-4 w-4 text-muted-foreground" />
+                          {referral.profile?.phone || "Non renseigné"}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        {format(new Date(referral.signup_date), "dd MMM yyyy 'à' HH:mm", { locale: fr })}
+                      </TableCell>
+                      <TableCell>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => window.location.href = `mailto:${referral.referred_email}`}
+                        >
+                          <Mail className="h-4 w-4 mr-1" />
+                          Contacter
+                        </Button>
                       </TableCell>
                     </TableRow>
                   ))}
