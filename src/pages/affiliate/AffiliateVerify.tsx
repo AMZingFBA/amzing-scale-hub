@@ -81,8 +81,8 @@ const AffiliateVerify = () => {
       console.log("Response data:", data);
       console.log("Response error:", error);
 
-      // Check for data.error first (this is the backend error response)
-      if (data?.error) {
+      // Check for backend validation errors (success: false)
+      if (data && !data.success && data.error) {
         const errorMessage = data.errorType === "expired" 
           ? "Code de vérification expiré. Renvoyez un nouveau code."
           : data.errorType === "invalid"

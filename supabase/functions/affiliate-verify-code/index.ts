@@ -51,11 +51,12 @@ const handler = async (req: Request): Promise<Response> => {
       console.log("Email already verified");
       return new Response(
         JSON.stringify({ 
+          success: false,
           error: "Email déjà vérifié",
           errorType: "already_verified"
         }),
         {
-          status: 400,
+          status: 200,
           headers: { "Content-Type": "application/json", ...corsHeaders },
         }
       );
@@ -65,11 +66,12 @@ const handler = async (req: Request): Promise<Response> => {
       console.log("No verification code in database");
       return new Response(
         JSON.stringify({ 
+          success: false,
           error: "Code de vérification expiré",
           errorType: "expired"
         }),
         {
-          status: 400,
+          status: 200,
           headers: { "Content-Type": "application/json", ...corsHeaders },
         }
       );
@@ -79,11 +81,12 @@ const handler = async (req: Request): Promise<Response> => {
       console.log("Code mismatch - Invalid code");
       return new Response(
         JSON.stringify({ 
+          success: false,
           error: "Code de vérification invalide",
           errorType: "invalid"
         }),
         {
-          status: 400,
+          status: 200,
           headers: { "Content-Type": "application/json", ...corsHeaders },
         }
       );
