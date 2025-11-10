@@ -59,6 +59,146 @@ export type Database = {
         }
         Relationships: []
       }
+      affiliate_clicks: {
+        Row: {
+          clicked_at: string
+          id: string
+          referrer_user_id: string
+          source_ip: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          clicked_at?: string
+          id?: string
+          referrer_user_id: string
+          source_ip?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          clicked_at?: string
+          id?: string
+          referrer_user_id?: string
+          source_ip?: string | null
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "affiliate_clicks_referrer_user_id_fkey"
+            columns: ["referrer_user_id"]
+            isOneToOne: false
+            referencedRelation: "affiliate_users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      affiliate_referrals: {
+        Row: {
+          created_at: string
+          id: string
+          payment_month: string | null
+          payment_status: string
+          referred_email: string
+          referred_user_id: string | null
+          referrer_user_id: string
+          signup_date: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          payment_month?: string | null
+          payment_status?: string
+          referred_email: string
+          referred_user_id?: string | null
+          referrer_user_id: string
+          signup_date?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          payment_month?: string | null
+          payment_status?: string
+          referred_email?: string
+          referred_user_id?: string | null
+          referrer_user_id?: string
+          signup_date?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "affiliate_referrals_referred_user_id_fkey"
+            columns: ["referred_user_id"]
+            isOneToOne: false
+            referencedRelation: "affiliate_users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "affiliate_referrals_referrer_user_id_fkey"
+            columns: ["referrer_user_id"]
+            isOneToOne: false
+            referencedRelation: "affiliate_users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      affiliate_users: {
+        Row: {
+          bic: string
+          billing_address: string
+          company_name: string | null
+          company_type: string
+          created_at: string
+          email: string
+          email_verified: boolean
+          first_name: string
+          iban: string
+          id: string
+          last_name: string
+          password_hash: string
+          phone: string
+          referral_code: string
+          siret: string | null
+          updated_at: string
+          verification_code: string | null
+        }
+        Insert: {
+          bic: string
+          billing_address: string
+          company_name?: string | null
+          company_type: string
+          created_at?: string
+          email: string
+          email_verified?: boolean
+          first_name: string
+          iban: string
+          id?: string
+          last_name: string
+          password_hash: string
+          phone: string
+          referral_code: string
+          siret?: string | null
+          updated_at?: string
+          verification_code?: string | null
+        }
+        Update: {
+          bic?: string
+          billing_address?: string
+          company_name?: string | null
+          company_type?: string
+          created_at?: string
+          email?: string
+          email_verified?: boolean
+          first_name?: string
+          iban?: string
+          id?: string
+          last_name?: string
+          password_hash?: string
+          phone?: string
+          referral_code?: string
+          siret?: string | null
+          updated_at?: string
+          verification_code?: string | null
+        }
+        Relationships: []
+      }
       alert_read_status: {
         Row: {
           alert_id: string
@@ -858,6 +998,7 @@ export type Database = {
     }
     Functions: {
       check_and_expire_subscriptions: { Args: never; Returns: undefined }
+      generate_affiliate_referral_code: { Args: never; Returns: string }
       get_admin_user_id: { Args: never; Returns: string }
       get_all_notification_counts: {
         Args: { user_id_param: string }

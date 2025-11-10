@@ -46,6 +46,11 @@ import AdminProfiles from "./pages/AdminProfiles";
 import Profile from "./pages/Profile";
 import TestPushNotifications from "./pages/TestPushNotifications";
 import DebugPushNotifications from "./pages/DebugPushNotifications";
+import AffiliateLanding from "./pages/affiliate/AffiliateLanding";
+import AffiliateSignup from "./pages/affiliate/AffiliateSignup";
+import AffiliateLogin from "./pages/affiliate/AffiliateLogin";
+import AffiliateVerify from "./pages/affiliate/AffiliateVerify";
+import AffiliateDashboard from "./pages/affiliate/AffiliateDashboard";
 
 const queryClient = new QueryClient();
 
@@ -104,6 +109,11 @@ const App = () => (
             <Route path="/profile" element={<Profile />} />
             <Route path="/test-push" element={<TestPushNotifications />} />
             <Route path="/debug-push" element={<DebugPushNotifications />} />
+            <Route path="/affiliate" element={<AffiliateLanding />} />
+            <Route path="/affiliate/signup" element={<AffiliateSignup />} />
+            <Route path="/affiliate/login" element={<AffiliateLogin />} />
+            <Route path="/affiliate/verify" element={<AffiliateVerify />} />
+            <Route path="/affiliate/dashboard" element={<AffiliateDashboard />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
