@@ -2,6 +2,9 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 import { Resend } from "https://esm.sh/resend@4.0.0";
 import { hash } from "https://deno.land/x/scrypt@v4.2.1/mod.ts";
+import React from 'npm:react@18.3.1';
+import { renderAsync } from 'npm:@react-email/components@0.0.22';
+import { VerificationEmail } from './_templates/verification-email.tsx';
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
@@ -111,18 +114,19 @@ const handler = async (req: Request): Promise<Response> => {
       }
     }
 
-    // Send verification email
+    // Send verification email with React Email template
+    const html = await renderAsync(
+      React.createElement(VerificationEmail, {
+        verificationCode,
+        firstName: data.firstName,
+      })
+    );
+
     const emailResponse = await resend.emails.send({
       from: "AMZing FBA Affiliate <affiliation@amzingfba.com>",
       to: [data.email],
       subject: "Code de vérification - AMZing FBA Affiliate",
-      html: `
-        <h1>Bienvenue sur AMZing FBA Affiliate !</h1>
-        <p>Votre code de vérification est :</p>
-        <h2 style="font-size: 32px; font-weight: bold; color: #2563eb;">${verificationCode}</h2>
-        <p>Ce code est valable pendant 10 minutes.</p>
-        <p>Si vous n'avez pas demandé ce code, ignorez cet email.</p>
-      `,
+      html,
     });
 
     console.log("Email sent:", emailResponse);

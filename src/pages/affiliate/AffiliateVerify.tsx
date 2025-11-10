@@ -36,6 +36,20 @@ const AffiliateVerify = () => {
 
       if (error) throw error;
 
+      if (data.error) {
+        // Handle specific error types
+        const errorMessage = data.errorType === "expired" 
+          ? "Code de vérification expiré. Veuillez vous réinscrire."
+          : data.errorType === "invalid"
+          ? "Code de vérification incorrect. Veuillez réessayer."
+          : data.errorType === "already_verified"
+          ? "Email déjà vérifié. Connectez-vous directement."
+          : data.error;
+        
+        toast.error(errorMessage);
+        return;
+      }
+
       toast.success("Email vérifié avec succès !");
       
       // Store user data in localStorage for affiliate system
@@ -44,7 +58,7 @@ const AffiliateVerify = () => {
       navigate("/affiliate/dashboard");
     } catch (error: any) {
       console.error("Verify error:", error);
-      toast.error(error.message || "Code de vérification invalide");
+      toast.error("Une erreur est survenue. Veuillez réessayer.");
     } finally {
       setIsLoading(false);
     }

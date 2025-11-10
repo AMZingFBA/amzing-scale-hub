@@ -40,11 +40,42 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     if (user.email_verified) {
-      throw new Error("Email déjà vérifié");
+      return new Response(
+        JSON.stringify({ 
+          error: "Email déjà vérifié",
+          errorType: "already_verified"
+        }),
+        {
+          status: 400,
+          headers: { "Content-Type": "application/json", ...corsHeaders },
+        }
+      );
+    }
+
+    if (!user.verification_code) {
+      return new Response(
+        JSON.stringify({ 
+          error: "Code de vérification expiré",
+          errorType: "expired"
+        }),
+        {
+          status: 400,
+          headers: { "Content-Type": "application/json", ...corsHeaders },
+        }
+      );
     }
 
     if (user.verification_code !== code) {
-      throw new Error("Code de vérification invalide");
+      return new Response(
+        JSON.stringify({ 
+          error: "Code de vérification invalide",
+          errorType: "invalid"
+        }),
+        {
+          status: 400,
+          headers: { "Content-Type": "application/json", ...corsHeaders },
+        }
+      );
     }
 
     // Update user to mark email as verified
