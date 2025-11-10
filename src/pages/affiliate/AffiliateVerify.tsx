@@ -34,9 +34,13 @@ const AffiliateVerify = () => {
         },
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error("API Error:", error);
+        toast.error("Une erreur est survenue. Veuillez réessayer.");
+        return;
+      }
 
-      if (data.error) {
+      if (data?.error) {
         // Handle specific error types
         const errorMessage = data.errorType === "expired" 
           ? "Code de vérification expiré. Veuillez vous réinscrire."

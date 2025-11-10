@@ -2,9 +2,6 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 import { Resend } from "https://esm.sh/resend@4.0.0";
 import { hash } from "https://deno.land/x/scrypt@v4.2.1/mod.ts";
-import React from 'npm:react@18.3.1';
-import { renderAsync } from 'npm:@react-email/components@0.0.22';
-import { VerificationEmail } from './_templates/verification-email.tsx';
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
@@ -114,19 +111,79 @@ const handler = async (req: Request): Promise<Response> => {
       }
     }
 
-    // Send verification email with React Email template
-    const html = await renderAsync(
-      React.createElement(VerificationEmail, {
-        verificationCode,
-        firstName: data.firstName,
-      })
-    );
-
+    // Send verification email with custom HTML
     const emailResponse = await resend.emails.send({
       from: "AMZing FBA Affiliate <affiliation@amzingfba.com>",
       to: [data.email],
       subject: "Code de vérification - AMZing FBA Affiliate",
-      html,
+      html: `
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          </head>
+          <body style="margin: 0; padding: 0; background-color: #f6f9fc; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Ubuntu, sans-serif;">
+            <table role="presentation" style="width: 100%; border-collapse: collapse;">
+              <tr>
+                <td style="padding: 40px 0; text-align: center;">
+                  <table role="presentation" style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                    <tr>
+                      <td style="padding: 40px 40px 20px;">
+                        <h1 style="margin: 0; color: #1a1a1a; font-size: 32px; font-weight: bold; text-align: center;">
+                          Bienvenue sur AMZing FBA Affiliate ! 🎉
+                        </h1>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style="padding: 0 40px;">
+                        <p style="margin: 16px 0; color: #525252; font-size: 16px; line-height: 24px;">
+                          Bonjour ${data.firstName},
+                        </p>
+                        <p style="margin: 16px 0; color: #525252; font-size: 16px; line-height: 24px;">
+                          Merci de vous être inscrit au programme d'affiliation AMZing FBA. 
+                          Pour activer votre compte, veuillez utiliser le code de vérification ci-dessous :
+                        </p>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style="padding: 32px 40px;">
+                        <table role="presentation" style="width: 100%; background-color: #f4f4f4; border-radius: 8px;">
+                          <tr>
+                            <td style="padding: 24px; text-align: center;">
+                              <div style="font-size: 48px; font-weight: bold; letter-spacing: 8px; color: #000000; font-family: monospace;">
+                                ${verificationCode}
+                              </div>
+                            </td>
+                          </tr>
+                        </table>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style="padding: 0 40px;">
+                        <p style="margin: 16px 0; color: #525252; font-size: 16px; line-height: 24px;">
+                          Ce code est valable pendant <strong>10 minutes</strong>.
+                        </p>
+                        <p style="margin: 16px 0; color: #525252; font-size: 16px; line-height: 24px;">
+                          Si vous n'avez pas demandé ce code, vous pouvez ignorer cet email en toute sécurité.
+                        </p>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style="padding: 48px 40px 40px;">
+                        <p style="margin: 0; color: #898989; font-size: 14px; line-height: 24px;">
+                          Cordialement,<br>
+                          L'équipe AMZing FBA
+                        </p>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            </table>
+          </body>
+        </html>
+      `,
     });
 
     console.log("Email sent:", emailResponse);
