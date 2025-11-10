@@ -133,10 +133,19 @@ const AffiliateDashboard = () => {
               {user.firstName} {user.lastName} • {user.email}
             </p>
           </div>
-          <Button variant="outline" onClick={handleLogout}>
-            <LogOut className="mr-2 h-4 w-4" />
-            Déconnexion
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={() => {
+              const subject = encodeURIComponent('Question sur mon programme d\'affiliation');
+              window.location.href = `mailto:amzingfba26@gmail.com?subject=${subject}`;
+            }}>
+              <Mail className="mr-2 h-4 w-4" />
+              Contact
+            </Button>
+            <Button variant="outline" onClick={handleLogout}>
+              <LogOut className="mr-2 h-4 w-4" />
+              Déconnexion
+            </Button>
+          </div>
         </div>
 
         <div className="grid md:grid-cols-2 gap-6 mb-8">
@@ -199,7 +208,6 @@ const AffiliateDashboard = () => {
                     <TableHead>Email</TableHead>
                     <TableHead>Téléphone</TableHead>
                     <TableHead>Date d'inscription</TableHead>
-                    <TableHead>Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -225,26 +233,6 @@ const AffiliateDashboard = () => {
                       </TableCell>
                       <TableCell>
                         {format(new Date(referral.signup_date), "dd MMM yyyy 'à' HH:mm", { locale: fr })}
-                      </TableCell>
-                      <TableCell>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => {
-                            const subject = encodeURIComponent(`Question concernant mon filleul ${referral.referred_email}`);
-                            const body = encodeURIComponent(
-                              `Bonjour,\n\nJ'ai une question concernant mon filleul :\n\n` +
-                              `Nom: ${referral.profile?.full_name || referral.profile?.nickname || 'Non renseigné'}\n` +
-                              `Email: ${referral.referred_email}\n` +
-                              `Date d'inscription: ${format(new Date(referral.signup_date), "dd MMMM yyyy 'à' HH:mm", { locale: fr })}\n\n` +
-                              `Ma question :\n\n`
-                            );
-                            window.location.href = `mailto:amzingfba26@gmail.com?subject=${subject}&body=${body}`;
-                          }}
-                        >
-                          <Mail className="h-4 w-4 mr-1" />
-                          Contacter le staff
-                        </Button>
                       </TableCell>
                     </TableRow>
                   ))}
