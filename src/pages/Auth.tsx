@@ -55,6 +55,27 @@ export default function Auth() {
         description: error.message,
       });
     } else {
+      // Si un code de parrainage est présent, l'enregistrer
+      if (referralCode) {
+        try {
+          const { supabase } = await import("@/integrations/supabase/client");
+          const { data: userData } = await supabase.auth.getUser();
+          
+          if (userData.user) {
+            await supabase.functions.invoke('track-referral-login', {
+              body: {
+                userId: userData.user.id,
+                email: userData.user.email,
+                referralCode: referralCode,
+              }
+            });
+            console.log("Referral tracked for existing user");
+          }
+        } catch (e) {
+          console.error("Failed to track referral:", e);
+        }
+      }
+      
       toast.success("Connexion réussie!");
       navigate("/");
     }
