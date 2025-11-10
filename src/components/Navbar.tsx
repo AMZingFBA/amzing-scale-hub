@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Menu, X, User, LogOut, Crown, Shield, LayoutDashboard, MessageSquare, ShoppingBag, Store } from "lucide-react";
+import { Menu, X, User, LogOut, Crown, Shield, LayoutDashboard, MessageSquare, ShoppingBag, Store, Handshake } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/use-auth";
@@ -107,6 +107,13 @@ const Navbar = () => {
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator className="my-2" />
+              <DropdownMenuItem asChild className="py-3 text-base bg-gradient-to-r from-primary/10 to-secondary/10">
+                <Link to="/affiliate" className="cursor-pointer font-semibold">
+                  <Handshake className="w-5 h-5 mr-3" />
+                  Deviens partenaire
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator className="my-2" />
               <DropdownMenuItem asChild className="py-3 text-base">
                 <Link to="/auth" className="cursor-pointer">
                   Connexion
@@ -196,6 +203,12 @@ const Navbar = () => {
               </DropdownMenu>
             ) : (
               <div className="flex items-center gap-2">
+                <Button variant="outline" size="lg" asChild className="hover-scale transition-all duration-300">
+                  <Link to="/affiliate" className="gap-2">
+                    <Handshake className="w-4 h-4" />
+                    Deviens partenaire
+                  </Link>
+                </Button>
                 <Button variant="outline" size="lg" asChild>
                   <Link to="/auth">Connexion</Link>
                 </Button>
@@ -268,6 +281,12 @@ const Navbar = () => {
               </div>
             ) : (
               <div className="space-y-2 pt-2 border-t">
+                <Button variant="outline" size="lg" className="w-full" asChild>
+                  <Link to="/affiliate" onClick={() => setIsOpen(false)}>
+                    <Handshake className="w-4 h-4 mr-2" />
+                    Deviens partenaire
+                  </Link>
+                </Button>
                 <Button variant="outline" size="lg" className="w-full" asChild>
                   <Link to="/auth" onClick={() => setIsOpen(false)}>
                     Connexion
