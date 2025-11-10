@@ -113,7 +113,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Send verification email with custom HTML
     const emailResponse = await resend.emails.send({
-      from: "AMZing FBA Affiliate <affiliation@amzingfba.com>",
+      from: "AMZing FBA Affiliate <onboarding@resend.dev>",
       to: [data.email],
       subject: "Code de vérification - AMZing FBA Affiliate",
       html: `
