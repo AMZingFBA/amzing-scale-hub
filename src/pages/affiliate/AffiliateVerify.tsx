@@ -4,9 +4,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { ArrowLeft, RefreshCw } from "lucide-react";
+import { ArrowLeft, RefreshCw, AlertCircle } from "lucide-react";
 
 const AffiliateVerify = () => {
   const navigate = useNavigate();
@@ -17,6 +18,7 @@ const AffiliateVerify = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isResending, setIsResending] = useState(false);
   const [countdown, setCountdown] = useState(0);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleResendCode = async () => {
     if (countdown > 0) return;
@@ -83,7 +85,7 @@ const AffiliateVerify = () => {
 
       // Check for backend validation errors (success: false)
       if (data && !data.success && data.error) {
-        const errorMessage = data.errorType === "expired" 
+        const message = data.errorType === "expired" 
           ? "Code de vérification expiré. Renvoyez un nouveau code."
           : data.errorType === "invalid"
           ? "Code de vérification incorrect. Veuillez réessayer."
@@ -91,17 +93,18 @@ const AffiliateVerify = () => {
           ? "Email déjà vérifié. Connectez-vous directement."
           : data.error;
         
-        toast.error(errorMessage);
+        setErrorMessage(message);
         return;
       }
 
       // Then check for network/function errors
       if (error) {
         console.error("API Error:", error);
-        toast.error("Une erreur est survenue. Veuillez réessayer.");
+        setErrorMessage("Une erreur est survenue. Veuillez réessayer.");
         return;
       }
 
+      setErrorMessage("");
       toast.success("Email vérifié avec succès !");
       
       // Store user data in localStorage for affiliate system
@@ -137,6 +140,15 @@ const AffiliateVerify = () => {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
+              {errorMessage && (
+                <Alert variant="destructive" className="border-2">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription className="font-medium">
+                    {errorMessage}
+                  </AlertDescription>
+                </Alert>
+              )}
+              
               <div className="space-y-2">
                 <Label htmlFor="code">Code de vérification</Label>
                 <Input
