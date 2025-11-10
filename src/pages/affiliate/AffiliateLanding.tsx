@@ -22,10 +22,10 @@ const AffiliateLanding = () => {
             
             <h1 className="text-5xl md:text-7xl font-bold mb-6 animate-fade-in" style={{ animationDelay: '0.2s' }}>
               <span className="bg-gradient-to-r from-primary via-primary to-secondary bg-clip-text text-transparent">
-                Gagne jusqu'à 139€
+                Génère des revenus
               </span>
               <br />
-              <span className="text-foreground">par mois et plus</span>
+              <span className="text-foreground">passifs illimités</span>
             </h1>
             
             <p className="text-xl md:text-2xl text-muted-foreground mb-10 max-w-2xl mx-auto animate-fade-in" style={{ animationDelay: '0.3s' }}>
