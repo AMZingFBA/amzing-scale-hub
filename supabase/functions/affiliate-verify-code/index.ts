@@ -35,11 +35,20 @@ const handler = async (req: Request): Promise<Response> => {
       .eq("email", email.toLowerCase())
       .single();
 
+    console.log("User found:", user ? "Yes" : "No");
+    console.log("User ID:", user?.id);
+    console.log("Email verified:", user?.email_verified);
+    console.log("Stored code:", user?.verification_code);
+    console.log("Received code:", code);
+    console.log("Codes match:", user?.verification_code === code);
+
     if (getUserError || !user) {
+      console.error("Get user error:", getUserError);
       throw new Error("Utilisateur non trouvé");
     }
 
     if (user.email_verified) {
+      console.log("Email already verified");
       return new Response(
         JSON.stringify({ 
           error: "Email déjà vérifié",
@@ -53,6 +62,7 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     if (!user.verification_code) {
+      console.log("No verification code in database");
       return new Response(
         JSON.stringify({ 
           error: "Code de vérification expiré",
@@ -66,6 +76,7 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     if (user.verification_code !== code) {
+      console.log("Code mismatch - Invalid code");
       return new Response(
         JSON.stringify({ 
           error: "Code de vérification invalide",
