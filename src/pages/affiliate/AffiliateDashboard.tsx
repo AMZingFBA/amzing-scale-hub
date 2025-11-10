@@ -230,10 +230,20 @@ const AffiliateDashboard = () => {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => window.location.href = `mailto:${referral.referred_email}`}
+                          onClick={() => {
+                            const subject = encodeURIComponent(`Question concernant mon filleul ${referral.referred_email}`);
+                            const body = encodeURIComponent(
+                              `Bonjour,\n\nJ'ai une question concernant mon filleul :\n\n` +
+                              `Nom: ${referral.profile?.full_name || referral.profile?.nickname || 'Non renseigné'}\n` +
+                              `Email: ${referral.referred_email}\n` +
+                              `Date d'inscription: ${format(new Date(referral.signup_date), "dd MMMM yyyy 'à' HH:mm", { locale: fr })}\n\n` +
+                              `Ma question :\n\n`
+                            );
+                            window.location.href = `mailto:amzingfba26@gmail.com?subject=${subject}&body=${body}`;
+                          }}
                         >
                           <Mail className="h-4 w-4 mr-1" />
-                          Contacter
+                          Contacter le staff
                         </Button>
                       </TableCell>
                     </TableRow>
