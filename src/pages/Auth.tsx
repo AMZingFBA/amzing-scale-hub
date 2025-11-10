@@ -185,13 +185,23 @@ export default function Auth() {
         return;
       }
 
+      // Attendre que la session soit établie
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
       // Rediriger vers le paiement selon la plateforme
       if (!isNativeApp) {
         // Sur le site web, rediriger vers Stripe
         try {
+          toast.info("Préparation du paiement...");
+          
+          const { data: sessionData } = await supabase.auth.getSession();
+          if (!sessionData.session?.access_token) {
+            throw new Error("Session non établie");
+          }
+
           const { data: checkoutData, error: checkoutError } = await supabase.functions.invoke('create-checkout', {
             headers: {
-              Authorization: `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
+              Authorization: `Bearer ${sessionData.session.access_token}`,
             },
           });
 
@@ -203,12 +213,14 @@ export default function Auth() {
           }
 
           if (checkoutData?.url) {
-            window.open(checkoutData.url, '_blank');
             toast.success("Redirection vers le paiement sécurisé...");
+            // Rediriger dans le même onglet au lieu d'ouvrir un nouvel onglet
+            window.location.href = checkoutData.url;
           }
         } catch (error: any) {
           console.error('Error starting checkout:', error);
-          toast.error('Erreur lors de la redirection vers le paiement');
+          toast.error('Erreur lors de la redirection vers le paiement: ' + error.message);
+          setIsLoading(false);
         }
       } else {
         // Sur l'app native iOS, lancer le processus d'achat Apple
