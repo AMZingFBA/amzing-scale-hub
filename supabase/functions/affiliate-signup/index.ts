@@ -1,7 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 import { Resend } from "https://esm.sh/resend@4.0.0";
-import * as bcrypt from "https://deno.land/x/bcrypt@v0.4.1/mod.ts";
+import { hash } from "https://deno.land/x/scrypt@v4.2.1/mod.ts";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
@@ -64,7 +64,7 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     // Hash password
-    const passwordHash = await bcrypt.hash(data.password);
+    const passwordHash = await hash(data.password);
 
     // Create user
     const { data: newUser, error: insertError } = await supabaseAdmin
