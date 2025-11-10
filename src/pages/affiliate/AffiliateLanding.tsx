@@ -1,7 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useNavigate } from "react-router-dom";
-import { Users, TrendingUp, Euro, Gift } from "lucide-react";
+import { Users, TrendingUp, Euro, Gift, Award, Zap, CheckCircle, AlertCircle } from "lucide-react";
 
 const AffiliateLanding = () => {
   const navigate = useNavigate();
@@ -76,7 +77,7 @@ const AffiliateLanding = () => {
           </Card>
         </div>
 
-        <div className="max-w-3xl mx-auto">
+        <div className="max-w-3xl mx-auto mb-16">
           <Card>
             <CardHeader>
               <CardTitle className="text-2xl">Comment ça marche ?</CardTitle>
@@ -119,6 +120,200 @@ const AffiliateLanding = () => {
               </div>
             </CardContent>
           </Card>
+        </div>
+
+        <div className="max-w-5xl mx-auto mb-16">
+          <div className="text-center mb-8">
+            <Zap className="h-16 w-16 mx-auto mb-4 text-primary" />
+            <h2 className="text-3xl font-bold mb-3 bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+              🚀 Programme de parrainage AMZing FBA
+            </h2>
+            <p className="text-lg text-muted-foreground">
+              Recommande l'application et gagne de l'argent chaque mois grâce à ton lien de parrainage
+            </p>
+          </div>
+
+          <Card className="mb-8 border-primary/20 bg-gradient-to-br from-primary/5 to-transparent">
+            <CardHeader>
+              <div className="flex items-center gap-3">
+                <Award className="h-8 w-8 text-primary" />
+                <div>
+                  <CardTitle className="text-2xl">Abonnement : 34,99 € / mois</CardTitle>
+                  <CardDescription className="text-base mt-1">
+                    1 seul niveau de parrainage – simple, transparent et 100 % automatique
+                  </CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+          </Card>
+
+          <Card className="mb-8">
+            <CardHeader>
+              <CardTitle className="text-2xl flex items-center gap-2">
+                <Euro className="h-6 w-6 text-primary" />
+                Barème de commission
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="font-bold">Niveau</TableHead>
+                      <TableHead className="font-bold">Qui c'est ?</TableHead>
+                      <TableHead className="font-bold">Pourcentage</TableHead>
+                      <TableHead className="font-bold">Combien tu gagnes</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    <TableRow className="bg-primary/5">
+                      <TableCell className="font-bold">🥇 Parrain direct</TableCell>
+                      <TableCell>La personne qui s'abonne via ton lien</TableCell>
+                      <TableCell>
+                        <span className="font-bold text-primary">20%</span> sur l'abonnement (34,99 €)
+                      </TableCell>
+                      <TableCell>
+                        <span className="font-bold text-primary text-lg">6,99 € / mois</span>
+                      </TableCell>
+                    </TableRow>
+                  </TableBody>
+                </Table>
+              </div>
+              <div className="mt-6 p-4 bg-muted/50 rounded-lg border border-primary/20">
+                <p className="text-sm font-medium flex items-start gap-2">
+                  <CheckCircle className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
+                  <span>
+                    👉 Tant que ton filleul reste abonné, tu touches <strong className="text-primary">6,99 €</strong> chaque mois, automatiquement.<br />
+                    💸 Le paiement est effectué à la fin du mois du filleul, après la validation de son abonnement.
+                  </span>
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="mb-8">
+            <CardHeader>
+              <CardTitle className="text-2xl flex items-center gap-2">
+                <TrendingUp className="h-6 w-6 text-primary" />
+                📊 Exemple concret
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="font-bold">Nombre de filleuls</TableHead>
+                      <TableHead className="font-bold text-right">Revenu mensuel total</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    <TableRow>
+                      <TableCell>1 filleul</TableCell>
+                      <TableCell className="text-right font-semibold">6,99 €</TableCell>
+                    </TableRow>
+                    <TableRow className="bg-muted/30">
+                      <TableCell>5 filleuls</TableCell>
+                      <TableCell className="text-right font-semibold">34,95 €</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell>10 filleuls</TableCell>
+                      <TableCell className="text-right font-semibold text-primary">69,90 €</TableCell>
+                    </TableRow>
+                    <TableRow className="bg-primary/10">
+                      <TableCell className="font-bold">20 filleuls</TableCell>
+                      <TableCell className="text-right font-bold text-primary text-lg">139,80 €</TableCell>
+                    </TableRow>
+                  </TableBody>
+                </Table>
+              </div>
+              <div className="mt-6 space-y-2">
+                <p className="text-sm font-medium flex items-center gap-2">
+                  <CheckCircle className="h-5 w-5 text-primary" />
+                  Tu peux parrainer autant de personnes que tu veux
+                </p>
+                <p className="text-sm font-medium flex items-center gap-2">
+                  <CheckCircle className="h-5 w-5 text-primary" />
+                  Chaque abonnement actif te rapporte chaque mois sans limite de durée
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="mb-8">
+            <CardHeader>
+              <CardTitle className="text-2xl">🧾 Fonctionnement</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex gap-3">
+                <CheckCircle className="h-6 w-6 text-primary flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-medium mb-1">Calcul des commissions</p>
+                  <p className="text-sm text-muted-foreground">
+                    Les commissions sont calculées à la fin de chaque mois, après la validation du paiement du filleul
+                  </p>
+                </div>
+              </div>
+              
+              <div className="flex gap-3">
+                <CheckCircle className="h-6 w-6 text-primary flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-medium mb-1">Méthode de paiement</p>
+                  <p className="text-sm text-muted-foreground">
+                    Le paiement est envoyé par virement bancaire (RIB demandé à l'inscription)
+                  </p>
+                </div>
+              </div>
+              
+              <div className="flex gap-3">
+                <CheckCircle className="h-6 w-6 text-primary flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-medium mb-1">Seuil minimum</p>
+                  <p className="text-sm text-muted-foreground">
+                    Le seuil minimum de paiement est fixé à <strong className="text-primary">50 € cumulés</strong>
+                  </p>
+                </div>
+              </div>
+              
+              <div className="flex gap-3">
+                <CheckCircle className="h-6 w-6 text-primary flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-medium mb-1">Suivi en temps réel</p>
+                  <p className="text-sm text-muted-foreground">
+                    Depuis ton espace affilié, tu peux suivre la liste de tes filleuls, leurs dates d'inscription et tes gains mensuels en temps réel
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-2 border-primary/30 bg-primary/5">
+            <CardHeader>
+              <div className="flex items-start gap-3">
+                <AlertCircle className="h-6 w-6 text-primary flex-shrink-0 mt-1" />
+                <div>
+                  <CardTitle className="text-xl">Important</CardTitle>
+                  <CardDescription className="mt-3 text-foreground/80 space-y-2">
+                    <p>
+                      Le programme AMZing FBA est un système d'affiliation à <strong>un seul niveau</strong>.
+                    </p>
+                    <p>
+                      Les commissions sont versées uniquement sur les abonnements <strong>réellement payés et validés</strong>.
+                    </p>
+                    <p className="font-medium">
+                      Ce modèle garantit une structure simple, durable et <strong className="text-primary">100 % conforme à la loi</strong>.
+                    </p>
+                  </CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+          </Card>
+
+          <div className="text-center mt-12">
+            <Button size="lg" onClick={() => navigate("/affiliate/signup")} className="text-lg px-8 py-6">
+              Rejoindre le programme maintenant
+            </Button>
+          </div>
         </div>
       </div>
     </div>
