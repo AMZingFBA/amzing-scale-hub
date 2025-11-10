@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, RefreshCw } from "lucide-react";
 
 const AffiliateVerify = () => {
   const navigate = useNavigate();
@@ -15,6 +15,50 @@ const AffiliateVerify = () => {
 
   const [code, setCode] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isResending, setIsResending] = useState(false);
+  const [countdown, setCountdown] = useState(0);
+
+  const handleResendCode = async () => {
+    if (countdown > 0) return;
+
+    setIsResending(true);
+
+    try {
+      const { data, error } = await supabase.functions.invoke("affiliate-resend-code", {
+        body: { email },
+      });
+
+      if (error) {
+        console.error("Resend error:", error);
+        toast.error("Erreur lors du renvoi du code");
+        return;
+      }
+
+      if (data?.error) {
+        toast.error(data.error);
+        return;
+      }
+
+      toast.success("Nouveau code envoyé par email !");
+      
+      // Start 30 second countdown
+      setCountdown(30);
+      const timer = setInterval(() => {
+        setCountdown((prev) => {
+          if (prev <= 1) {
+            clearInterval(timer);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    } catch (error: any) {
+      console.error("Resend error:", error);
+      toast.error("Erreur lors du renvoi du code");
+    } finally {
+      setIsResending(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,7 +87,7 @@ const AffiliateVerify = () => {
       if (data?.error) {
         // Handle specific error types
         const errorMessage = data.errorType === "expired" 
-          ? "Code de vérification expiré. Veuillez vous réinscrire."
+          ? "Code de vérification expiré. Renvoyez un nouveau code."
           : data.errorType === "invalid"
           ? "Code de vérification incorrect. Veuillez réessayer."
           : data.errorType === "already_verified"
@@ -106,9 +150,26 @@ const AffiliateVerify = () => {
                 {isLoading ? "Vérification..." : "Valider"}
               </Button>
 
-              <p className="text-sm text-center text-muted-foreground">
-                Vous n'avez pas reçu le code ? Vérifiez vos spams
-              </p>
+              <div className="text-center space-y-2">
+                <p className="text-sm text-muted-foreground">
+                  Vous n'avez pas reçu le code ?
+                </p>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full"
+                  onClick={handleResendCode}
+                  disabled={isResending || countdown > 0}
+                >
+                  <RefreshCw className={`mr-2 h-4 w-4 ${isResending ? 'animate-spin' : ''}`} />
+                  {countdown > 0 
+                    ? `Renvoyer le code (${countdown}s)`
+                    : isResending 
+                    ? "Envoi en cours..." 
+                    : "Renvoyer le code"
+                  }
+                </Button>
+              </div>
             </form>
           </CardContent>
         </Card>
