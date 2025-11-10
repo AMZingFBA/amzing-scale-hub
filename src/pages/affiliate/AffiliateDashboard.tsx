@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Copy, LogOut, Users, Mail, Phone, User } from "lucide-react";
+import { Copy, LogOut, Users, Mail, User } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 
@@ -205,7 +205,6 @@ const AffiliateDashboard = () => {
                   <TableRow>
                     <TableHead>Nom</TableHead>
                     <TableHead>Email</TableHead>
-                    <TableHead>Téléphone</TableHead>
                     <TableHead>Date d'inscription</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -222,12 +221,6 @@ const AffiliateDashboard = () => {
                         <div className="flex items-center gap-2">
                           <Mail className="h-4 w-4 text-muted-foreground" />
                           {referral.referred_email}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          <Phone className="h-4 w-4 text-muted-foreground" />
-                          {referral.profile?.phone || "Non renseigné"}
                         </div>
                       </TableCell>
                       <TableCell>
