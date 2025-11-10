@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Copy, LogOut, Users } from "lucide-react";
@@ -23,8 +22,7 @@ interface Referral {
   id: string;
   referred_email: string;
   signup_date: string;
-  payment_status: string;
-  payment_month: string | null;
+  referred_user_id: string;
 }
 
 const AffiliateDashboard = () => {
@@ -50,15 +48,38 @@ const AffiliateDashboard = () => {
 
   const fetchReferrals = async (userId: string) => {
     try {
-      const { data, error } = await supabase
+      // Fetch all referrals first
+      const { data: allReferrals, error: referralsError } = await supabase
         .from("affiliate_referrals")
         .select("*")
-        .eq("referrer_user_id", userId)
-        .order("signup_date", { ascending: false });
+        .eq("referrer_user_id", userId);
 
-      if (error) throw error;
+      if (referralsError) throw referralsError;
 
-      setReferrals(data || []);
+      if (!allReferrals || allReferrals.length === 0) {
+        setReferrals([]);
+        setIsLoading(false);
+        return;
+      }
+
+      // Get subscription status for each referred user
+      const referredUserIds = allReferrals.map(r => r.referred_user_id);
+      const { data: subscriptions, error: subsError } = await supabase
+        .from("subscriptions")
+        .select("user_id, plan_type, status")
+        .in("user_id", referredUserIds)
+        .eq("plan_type", "vip")
+        .eq("status", "active");
+
+      if (subsError) throw subsError;
+
+      // Filter referrals to only show those with active VIP subscriptions
+      const vipUserIds = new Set(subscriptions?.map(s => s.user_id) || []);
+      const vipReferrals = allReferrals
+        .filter(r => vipUserIds.has(r.referred_user_id))
+        .sort((a, b) => new Date(b.signup_date).getTime() - new Date(a.signup_date).getTime());
+
+      setReferrals(vipReferrals);
     } catch (error) {
       console.error("Error fetching referrals:", error);
       toast.error("Erreur lors du chargement des filleuls");
@@ -124,10 +145,10 @@ const AffiliateDashboard = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Users className="h-5 w-5" />
-                Total filleuls
+                Total filleuls VIP
               </CardTitle>
               <CardDescription>
-                Nombre de personnes inscrites via ton lien
+                Nombre de personnes qui ont souscrit via ton lien
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -140,7 +161,7 @@ const AffiliateDashboard = () => {
           <CardHeader>
             <CardTitle>Tes filleuls</CardTitle>
             <CardDescription>
-              Liste de toutes les personnes que tu as parrainées
+              Uniquement les personnes ayant souscrit à l'abonnement VIP
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -148,7 +169,7 @@ const AffiliateDashboard = () => {
               <p className="text-center py-8 text-muted-foreground">Chargement...</p>
             ) : referrals.length === 0 ? (
               <p className="text-center py-8 text-muted-foreground">
-                Aucun filleul pour le moment. Partage ton lien pour commencer !
+                Aucun filleul VIP pour le moment. Partage ton lien et tes filleuls apparaîtront ici une fois qu'ils auront souscrit à l'abonnement !
               </p>
             ) : (
               <Table>
@@ -156,7 +177,6 @@ const AffiliateDashboard = () => {
                   <TableRow>
                     <TableHead>Email du filleul</TableHead>
                     <TableHead>Date et heure d'inscription</TableHead>
-                    <TableHead>Statut de paiement</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -165,11 +185,6 @@ const AffiliateDashboard = () => {
                       <TableCell className="font-medium">{referral.referred_email}</TableCell>
                       <TableCell>
                         {format(new Date(referral.signup_date), "dd MMMM yyyy 'à' HH:mm", { locale: fr })}
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant={referral.payment_status === "payé" ? "default" : "secondary"}>
-                          {referral.payment_status}
-                        </Badge>
                       </TableCell>
                     </TableRow>
                   ))}
