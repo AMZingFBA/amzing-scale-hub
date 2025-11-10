@@ -68,13 +68,22 @@ const AffiliateSignup = () => {
         },
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error("API Error:", error);
+        toast.error("Une erreur est survenue lors de l'inscription");
+        return;
+      }
+
+      if (data?.error) {
+        toast.error(data.error);
+        return;
+      }
 
       toast.success("Code de vérification envoyé par email !");
       navigate(`/affiliate/verify?email=${encodeURIComponent(formData.email)}`);
     } catch (error: any) {
       console.error("Signup error:", error);
-      toast.error(error.message || "Erreur lors de l'inscription");
+      toast.error("Une erreur est survenue lors de l'inscription");
     } finally {
       setIsLoading(false);
     }

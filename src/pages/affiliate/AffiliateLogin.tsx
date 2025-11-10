@@ -27,7 +27,16 @@ const AffiliateLogin = () => {
         },
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error("API Error:", error);
+        toast.error("Une erreur est survenue lors de la connexion");
+        return;
+      }
+
+      if (data?.error) {
+        toast.error(data.error);
+        return;
+      }
 
       toast.success("Connexion réussie !");
       
@@ -37,7 +46,7 @@ const AffiliateLogin = () => {
       navigate("/affiliate/dashboard");
     } catch (error: any) {
       console.error("Login error:", error);
-      toast.error(error.message || "Erreur lors de la connexion");
+      toast.error("Une erreur est survenue lors de la connexion");
     } finally {
       setIsLoading(false);
     }
