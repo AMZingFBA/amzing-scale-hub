@@ -211,10 +211,11 @@ const AffiliateAdmin = () => {
       .flatMap(([_, data]) => data.referrals.filter(r => r.payment_status === "en attente"));
   };
 
-  // Get monthly statistics
+  // Get monthly statistics (current month)
   const getMonthlyStats = () => {
-    const startDate = startOfMonth(selectedMonth);
-    const endDate = endOfMonth(selectedMonth);
+    const now = new Date();
+    const startDate = startOfMonth(now);
+    const endDate = endOfMonth(now);
     
     const monthReferrals = referrals.filter(r => {
       const signupDate = new Date(r.signup_date);
@@ -223,12 +224,14 @@ const AffiliateAdmin = () => {
     });
 
     const paidReferrals = monthReferrals.filter(r => r.payment_status === "payé");
+    const pendingReferrals = monthReferrals.filter(r => r.payment_status !== "payé");
     const totalPaid = paidReferrals.length * 6.99;
-    const totalPending = monthReferrals.filter(r => r.payment_status === "en attente").length * 6.99;
+    const totalPending = pendingReferrals.length * 6.99;
 
     return {
       totalReferrals: monthReferrals.length,
       paidCount: paidReferrals.length,
+      pendingCount: pendingReferrals.length,
       totalPaid,
       totalPending,
       uniqueAffiliates: new Set(monthReferrals.map(r => r.referrer_user_id)).size
@@ -316,6 +319,7 @@ const AffiliateAdmin = () => {
                           {referral.affiliate?.first_name} {referral.affiliate?.last_name}
                         </p>
                         <p className="text-xs text-muted-foreground">{referral.affiliate?.email}</p>
+                        <p className="text-xs text-muted-foreground">📞 {referral.affiliate?.phone}</p>
                       </div>
                       <div>
                         <p className="text-sm text-muted-foreground">Filleul</p>
@@ -324,23 +328,32 @@ const AffiliateAdmin = () => {
                         </p>
                       </div>
                       <div>
-                        <p className="text-sm text-muted-foreground">RIB</p>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleCopyRIB(
-                            referral.affiliate?.iban || "",
-                            referral.affiliate?.bic || "",
-                            referral.affiliate?.id || ""
-                          )}
-                        >
-                          {copiedRIB === referral.affiliate?.id ? (
-                            <Check className="h-4 w-4 mr-2" />
-                          ) : (
-                            <Copy className="h-4 w-4 mr-2" />
-                          )}
-                          {copiedRIB === referral.affiliate?.id ? "Copié" : "Copier"}
-                        </Button>
+                        <p className="text-sm text-muted-foreground mb-1">RIB</p>
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2">
+                            <p className="text-xs font-mono bg-muted px-2 py-1 rounded">
+                              {referral.affiliate?.iban}
+                            </p>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleCopyRIB(
+                                referral.affiliate?.iban || "",
+                                referral.affiliate?.bic || "",
+                                referral.affiliate?.id || ""
+                              )}
+                            >
+                              {copiedRIB === referral.affiliate?.id ? (
+                                <Check className="h-4 w-4" />
+                              ) : (
+                                <Copy className="h-4 w-4" />
+                              )}
+                            </Button>
+                          </div>
+                          <p className="text-xs text-muted-foreground">
+                            BIC: {referral.affiliate?.bic}
+                          </p>
+                        </div>
                       </div>
                       <div className="text-center">
                         <div className="inline-flex items-center gap-1 px-3 py-2 bg-gradient-to-r from-primary to-primary-glow text-white rounded-lg font-bold">
@@ -397,16 +410,16 @@ const AffiliateAdmin = () => {
             </CardContent>
           </Card>
 
-          <Card className="border-2 border-primary/20">
+          <Card className="border-2 border-orange-500/20">
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-medium flex items-center gap-2">
-                <CreditCard className="h-4 w-4 text-primary" />
+                <CreditCard className="h-4 w-4 text-orange-500" />
                 En attente
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-3xl font-bold">
-                {monthlyStats.totalReferrals - monthlyStats.paidCount}
+              <p className="text-3xl font-bold text-orange-500">
+                {monthlyStats.pendingCount}
               </p>
               <p className="text-xs text-muted-foreground mt-1">
                 {monthlyStats.totalPending.toFixed(2)} € à verser
@@ -478,8 +491,7 @@ const AffiliateAdmin = () => {
                               <TableRow>
                                 <TableHead>Parrain</TableHead>
                                 <TableHead>Filleul</TableHead>
-                                <TableHead>Contact</TableHead>
-                                <TableHead>RIB</TableHead>
+                                <TableHead>RIB (IBAN / BIC)</TableHead>
                                 <TableHead>Montant</TableHead>
                                 <TableHead>Statut</TableHead>
                                 <TableHead>Action</TableHead>
@@ -496,6 +508,9 @@ const AffiliateAdmin = () => {
                                       <p className="text-xs text-muted-foreground">
                                         {referral.affiliate?.email}
                                       </p>
+                                      <p className="text-xs text-muted-foreground">
+                                        📞 {referral.affiliate?.phone}
+                                      </p>
                                     </div>
                                   </TableCell>
                                   <TableCell>
@@ -507,44 +522,54 @@ const AffiliateAdmin = () => {
                                     </p>
                                   </TableCell>
                                   <TableCell>
-                                    <p className="text-sm">{referral.affiliate?.phone}</p>
+                                    <div className="space-y-1">
+                                      <div className="flex items-center gap-2">
+                                        <p className="text-xs font-mono bg-muted px-2 py-1 rounded">
+                                          {referral.affiliate?.iban}
+                                        </p>
+                                        <Button
+                                          variant="ghost"
+                                          size="sm"
+                                          onClick={() => handleCopyRIB(
+                                            referral.affiliate?.iban || "",
+                                            referral.affiliate?.bic || "",
+                                            referral.affiliate?.id || ""
+                                          )}
+                                        >
+                                          {copiedRIB === referral.affiliate?.id ? (
+                                            <Check className="h-4 w-4" />
+                                          ) : (
+                                            <Copy className="h-4 w-4" />
+                                          )}
+                                        </Button>
+                                      </div>
+                                      <p className="text-xs text-muted-foreground">
+                                        BIC: {referral.affiliate?.bic}
+                                      </p>
+                                    </div>
                                   </TableCell>
                                   <TableCell>
-                                    <Button
-                                      variant="ghost"
-                                      size="sm"
-                                      onClick={() => handleCopyRIB(
-                                        referral.affiliate?.iban || "",
-                                        referral.affiliate?.bic || "",
-                                        referral.affiliate?.id || ""
-                                      )}
-                                    >
-                                      {copiedRIB === referral.affiliate?.id ? (
-                                        <Check className="h-4 w-4" />
-                                      ) : (
-                                        <Copy className="h-4 w-4" />
-                                      )}
-                                    </Button>
-                                  </TableCell>
-                                  <TableCell>
-                                    <span className="font-bold">6,99 €</span>
+                                    <span className="font-bold text-primary">6,99 €</span>
                                   </TableCell>
                                   <TableCell>
                                     {referral.payment_status === "payé" ? (
-                                      <Badge variant="secondary">
+                                      <Badge className="bg-green-500 hover:bg-green-600">
                                         <Check className="h-3 w-3 mr-1" />
                                         Payé
                                       </Badge>
                                     ) : (
-                                      <Badge variant="outline">En attente</Badge>
+                                      <Badge variant="outline" className="border-orange-500 text-orange-500">
+                                        En attente
+                                      </Badge>
                                     )}
                                   </TableCell>
                                   <TableCell>
-                                    {referral.payment_status === "en attente" && (
+                                    {referral.payment_status !== "payé" && (
                                       <Button
                                         size="sm"
                                         onClick={() => handleMarkAsPaid(referral.id, paymentDate)}
                                       >
+                                        <Check className="mr-2 h-4 w-4" />
                                         Marquer payé
                                       </Button>
                                     )}
