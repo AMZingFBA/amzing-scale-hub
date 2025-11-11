@@ -133,15 +133,43 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const signIn = async (email: string, password: string) => {
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
       if (error) throw error;
 
+      // Vérifier le rôle admin
+      const { data: roleData } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', data.user.id)
+        .eq('role', 'admin')
+        .single();
+
+      // Vérifier le statut VIP
+      const { data: subData } = await supabase
+        .from('subscriptions')
+        .select('plan_type, status, expires_at')
+        .eq('user_id', data.user.id)
+        .single();
+
+      const isUserVIP = subData?.plan_type === 'vip' && 
+        (subData?.status === 'active' || subData?.status === 'canceled') &&
+        (!subData?.expires_at || new Date(subData.expires_at) > new Date());
+
+      const isUserAdmin = roleData?.role === 'admin';
+
       toast.success('Connexion réussie !');
-      navigate('/');
+
+      // Rediriger selon le statut
+      if (isUserAdmin || isUserVIP) {
+        navigate('/dashboard');
+      } else {
+        navigate('/');
+      }
+
       return { error: null };
     } catch (error: any) {
       toast.error(error.message || 'Erreur lors de la connexion');

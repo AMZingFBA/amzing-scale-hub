@@ -75,11 +75,11 @@ const Index = () => {
   const navigate = useNavigate();
   const isNativeApp = Capacitor.isNativePlatform();
 
-  // Redirect VIP users and admins to dashboard
+  // Redirect VIP users and admins to dashboard immediately when they land on homepage
   useEffect(() => {
+    if (isLoading || !user) return;
+    
     const checkAndRedirect = async () => {
-      if (isLoading || !user) return;
-      
       // Check admin status
       const { data: roleData } = await supabase
         .from('user_roles')
@@ -88,8 +88,11 @@ const Index = () => {
         .eq('role', 'admin')
         .single();
       
-      if (isVIP || roleData?.role === 'admin') {
-        navigate('/dashboard');
+      const isAdmin = roleData?.role === 'admin';
+      
+      if (isVIP || isAdmin) {
+        console.log('Redirecting to dashboard - VIP:', isVIP, 'Admin:', isAdmin);
+        navigate('/dashboard', { replace: true });
       }
     };
     
