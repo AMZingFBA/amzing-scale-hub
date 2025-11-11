@@ -126,14 +126,20 @@ const AffiliateAdmin = () => {
       const affiliateMap = new Map(affiliateUsers?.map(a => [a.id, a]) || []);
       const vipUserIds = new Set(subscriptions?.map(s => s.user_id) || []);
 
+      console.log("Affiliate map:", affiliateMap); // Debug
+
       // Filter and enrich referrals
       const enrichedReferrals = allReferrals
         .filter(r => vipUserIds.has(r.referred_user_id))
-        .map(r => ({
-          ...r,
-          profile: profilesMap.get(r.referred_user_id),
-          affiliate: affiliateMap.get(r.referrer_user_id)
-        }));
+        .map(r => {
+          const affiliate = affiliateMap.get(r.referrer_user_id);
+          console.log(`Referral ${r.id} - Referrer ID: ${r.referrer_user_id}, Affiliate:`, affiliate);
+          return {
+            ...r,
+            profile: profilesMap.get(r.referred_user_id),
+            affiliate: affiliate
+          };
+        });
 
       console.log("Enriched referrals:", enrichedReferrals); // Debug
       setReferrals(enrichedReferrals);
@@ -159,7 +165,8 @@ const AffiliateAdmin = () => {
       if (error) throw error;
 
       toast.success("Paiement marqué comme effectué");
-      fetchAllReferrals();
+      // Recharger les données
+      await fetchAllReferrals();
     } catch (error) {
       console.error("Error marking as paid:", error);
       toast.error("Erreur lors de la mise à jour");
