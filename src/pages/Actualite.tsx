@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/use-auth';
+import { useAdmin } from '@/hooks/use-admin';
 import { useMarkAsRead } from '@/hooks/use-mark-as-read';
 import { usePullRefresh } from '@/hooks/use-pull-refresh';
 import { useAutoRefresh } from '@/hooks/use-auto-refresh';
@@ -17,6 +18,7 @@ import { useToast } from '@/hooks/use-toast';
 
 const Actualite = () => {
   const { user, isVIP, isLoading: isAuthLoading } = useAuth();
+  const { isAdmin } = useAdmin();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [alerts, setAlerts] = useState<any[]>([]);
@@ -32,7 +34,7 @@ const Actualite = () => {
       return;
     }
 
-    if (!isAuthLoading && !isVIP) {
+    if (!isAuthLoading && !isVIP && !isAdmin) {
       toast({
         title: "Accès VIP requis",
         description: "Cette section est réservée aux membres VIP",
@@ -42,7 +44,7 @@ const Actualite = () => {
       return;
     }
 
-    if (isVIP) {
+    if (isVIP || isAdmin) {
       loadAlerts();
       
       // Real-time subscription
@@ -71,7 +73,7 @@ const Actualite = () => {
         supabase.removeChannel(alertsChannel);
       };
     }
-  }, [user, isVIP, isAuthLoading, navigate]);
+  }, [user, isVIP, isAdmin, isAuthLoading, navigate]);
 
   const loadAlerts = async () => {
     try {
