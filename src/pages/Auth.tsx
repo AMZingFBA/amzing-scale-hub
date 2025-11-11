@@ -75,9 +75,7 @@ export default function Auth() {
           console.error("Failed to track referral:", e);
         }
       }
-      
-      toast.success("Connexion réussie!");
-      navigate("/");
+      // La redirection est gérée par le hook useAuth dans signIn
     }
 
     setIsLoading(false);
