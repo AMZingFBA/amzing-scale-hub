@@ -51,6 +51,7 @@ import AffiliateSignup from "./pages/affiliate/AffiliateSignup";
 import AffiliateLogin from "./pages/affiliate/AffiliateLogin";
 import AffiliateVerify from "./pages/affiliate/AffiliateVerify";
 import AffiliateDashboard from "./pages/affiliate/AffiliateDashboard";
+import AffiliateAdmin from "./pages/affiliate/AffiliateAdmin";
 
 const queryClient = new QueryClient();
 
@@ -114,6 +115,7 @@ const App = () => (
             <Route path="/affiliate/login" element={<AffiliateLogin />} />
             <Route path="/affiliate/verify" element={<AffiliateVerify />} />
             <Route path="/affiliate/dashboard" element={<AffiliateDashboard />} />
+            <Route path="/affiliate/admin" element={<AffiliateAdmin />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

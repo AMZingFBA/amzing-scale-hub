@@ -95,6 +95,7 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          payment_date: string | null
           payment_month: string | null
           payment_status: string
           referred_email: string
@@ -105,6 +106,7 @@ export type Database = {
         Insert: {
           created_at?: string
           id?: string
+          payment_date?: string | null
           payment_month?: string | null
           payment_status?: string
           referred_email: string
@@ -115,6 +117,7 @@ export type Database = {
         Update: {
           created_at?: string
           id?: string
+          payment_date?: string | null
           payment_month?: string | null
           payment_status?: string
           referred_email?: string
