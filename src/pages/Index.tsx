@@ -17,6 +17,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useScrollReveal } from "@/hooks/use-scroll-reveal";
 import { Capacitor } from "@capacitor/core";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const ServiceCard = ({ 
   children, 
@@ -69,17 +70,31 @@ const ServiceCard = ({
 
 const Index = () => {
   const { startFreeTrial, isStarting } = useTrial();
-  const { isVIP, isLoading } = useAuth();
+  const { isVIP, isLoading, user } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
   const isNativeApp = Capacitor.isNativePlatform();
 
-  // Redirect VIP users to dashboard
+  // Redirect VIP users and admins to dashboard
   useEffect(() => {
-    if (!isLoading && isVIP) {
-      navigate('/dashboard');
-    }
-  }, [isVIP, isLoading, navigate]);
+    const checkAndRedirect = async () => {
+      if (isLoading || !user) return;
+      
+      // Check admin status
+      const { data: roleData } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id)
+        .eq('role', 'admin')
+        .single();
+      
+      if (isVIP || roleData?.role === 'admin') {
+        navigate('/dashboard');
+      }
+    };
+    
+    checkAndRedirect();
+  }, [isVIP, isLoading, user, navigate]);
 
   return (
     <div className="min-h-screen">
