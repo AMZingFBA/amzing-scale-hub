@@ -1042,6 +1042,7 @@ export type Database = {
       }
       has_used_trial: { Args: { _user_id: string }; Returns: boolean }
       increment_user_badge: { Args: { user_id_param: string }; Returns: number }
+      is_affiliate_admin: { Args: { _email: string }; Returns: boolean }
       is_marketplace_room: { Args: { _room_id: string }; Returns: boolean }
       is_marketplace_room_creator: {
         Args: { _room_id: string; _user_id: string }
