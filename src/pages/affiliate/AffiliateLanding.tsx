@@ -372,18 +372,6 @@ const AffiliateLanding = () => {
                   </div>
                 </div>
                 
-                <div className="flex gap-4 bg-gradient-to-br from-primary/5 to-transparent rounded-xl p-6 border border-primary/20">
-                  <div className="w-12 h-12 rounded-xl bg-primary/20 flex items-center justify-center flex-shrink-0">
-                    <CheckCircle className="h-6 w-6 text-primary" />
-                  </div>
-                  <div>
-                    <p className="font-bold mb-2">Seuil de 50 €</p>
-                    <p className="text-sm text-muted-foreground">
-                      Minimum de paiement fixé à 50 € cumulés
-                    </p>
-                  </div>
-                </div>
-                
                 <div className="flex gap-4 bg-gradient-to-br from-secondary/5 to-transparent rounded-xl p-6 border border-secondary/20">
                   <div className="w-12 h-12 rounded-xl bg-secondary/20 flex items-center justify-center flex-shrink-0">
                     <CheckCircle className="h-6 w-6 text-secondary" />
