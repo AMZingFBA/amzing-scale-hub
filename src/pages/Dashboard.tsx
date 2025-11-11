@@ -86,8 +86,8 @@ const Dashboard = () => {
     return <Navigate to="/auth" replace />;
   }
 
-  // Redirect to home if not VIP
-  if (!isVIP) {
+  // Redirect to home if not VIP and not admin
+  if (!isVIP && !isAdmin) {
     return <Navigate to="/" replace />;
   }
   const daysRemaining = subscription?.expires_at ? Math.ceil((new Date(subscription.expires_at).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)) : null;
