@@ -17,7 +17,7 @@ import { useToast } from '@/hooks/use-toast';
 
 const ProductAlerts = () => {
   const { user, isVIP, isLoading: isAuthLoading } = useAuth();
-  const { isAdmin } = useAdmin();
+  const { isAdmin, isLoading: isAdminLoading } = useAdmin();
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
@@ -48,7 +48,9 @@ const ProductAlerts = () => {
       return;
     }
 
-    if (!isAuthLoading && !isVIP && !isAdmin) {
+    if (isAuthLoading || isAdminLoading) return;
+
+    if (!isVIP && !isAdmin) {
       toast({
         title: "Accès VIP requis",
         description: "Cette section est réservée aux membres VIP",
@@ -87,7 +89,7 @@ const ProductAlerts = () => {
         supabase.removeChannel(alertsChannel);
       };
     }
-  }, [user, isVIP, isAdmin, isAuthLoading, navigate]);
+  }, [user, isVIP, isAdmin, isAuthLoading, isAdminLoading, navigate]);
 
   const loadAlerts = async () => {
     try {
