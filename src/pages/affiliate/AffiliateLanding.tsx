@@ -383,6 +383,18 @@ const AffiliateLanding = () => {
                     </p>
                   </div>
                 </div>
+                
+                <div className="flex gap-4 bg-gradient-to-br from-primary/5 to-transparent rounded-xl p-6 border border-primary/20">
+                  <div className="w-12 h-12 rounded-xl bg-primary/20 flex items-center justify-center flex-shrink-0">
+                    <CheckCircle className="h-6 w-6 text-primary" />
+                  </div>
+                  <div>
+                    <p className="font-bold mb-2">Aucun frais</p>
+                    <p className="text-sm text-muted-foreground">
+                      Inscription gratuite, aucun frais caché
+                    </p>
+                  </div>
+                </div>
               </div>
             </CardContent>
           </Card>
