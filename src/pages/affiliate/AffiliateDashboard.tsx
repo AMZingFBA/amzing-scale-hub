@@ -6,8 +6,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Copy, LogOut, Users, Mail, User } from "lucide-react";
-import { format } from "date-fns";
+import { Copy, LogOut, Users, Mail, User, Calendar, Euro, TrendingUp, Clock } from "lucide-react";
+import { format, addMonths, addDays, isBefore } from "date-fns";
 import { fr } from "date-fns/locale";
 
 interface AffiliateUser {
@@ -234,16 +234,170 @@ const AffiliateDashboard = () => {
           </CardContent>
         </Card>
 
-        <Card className="mt-6">
-          <CardHeader>
-            <CardTitle>Prochain paiement</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-muted-foreground">
-              Les paiements sont effectués chaque mois sur le RIB fourni lors de votre inscription.
-            </p>
-          </CardContent>
-        </Card>
+        {/* Prochain paiement section */}
+        <div className="mt-6 grid md:grid-cols-3 gap-6">
+          <Card className="border-2 border-primary/20 bg-gradient-to-br from-primary/5 via-card to-card">
+            <CardHeader>
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-primary-glow flex items-center justify-center shadow-glow">
+                  <Calendar className="h-6 w-6 text-white" />
+                </div>
+                <div>
+                  <CardDescription className="text-xs">Prochain versement</CardDescription>
+                  <CardTitle className="text-lg">
+                    {referrals.length > 0 ? (() => {
+                      const nextPayment = referrals
+                        .map(r => {
+                          const signupDate = new Date(r.signup_date);
+                          return addDays(addMonths(signupDate, 1), 7);
+                        })
+                        .filter(date => isBefore(new Date(), date))
+                        .sort((a, b) => a.getTime() - b.getTime())[0];
+                      
+                      return nextPayment 
+                        ? format(nextPayment, "dd MMM yyyy", { locale: fr })
+                        : "Aucun prévu";
+                    })() : "Aucun filleul"}
+                  </CardTitle>
+                </div>
+              </div>
+            </CardHeader>
+          </Card>
+
+          <Card className="border-2 border-secondary/20 bg-gradient-to-br from-secondary/5 via-card to-card">
+            <CardHeader>
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-secondary to-secondary/80 flex items-center justify-center shadow-blue">
+                  <Euro className="h-6 w-6 text-white" />
+                </div>
+                <div>
+                  <CardDescription className="text-xs">Montant à recevoir</CardDescription>
+                  <CardTitle className="text-lg">
+                    {referrals.length > 0 ? (() => {
+                      const activeReferrals = referrals.filter(r => {
+                        const signupDate = new Date(r.signup_date);
+                        const paymentDate = addDays(addMonths(signupDate, 1), 7);
+                        return isBefore(new Date(), paymentDate);
+                      });
+                      return `${(activeReferrals.length * 6.99).toFixed(2)} €`;
+                    })() : "0.00 €"}
+                  </CardTitle>
+                </div>
+              </div>
+            </CardHeader>
+          </Card>
+
+          <Card className="border-2 border-primary/20 bg-gradient-to-br from-primary/5 via-card to-card">
+            <CardHeader>
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-primary-glow flex items-center justify-center shadow-glow">
+                  <TrendingUp className="h-6 w-6 text-white" />
+                </div>
+                <div>
+                  <CardDescription className="text-xs">Filleuls actifs</CardDescription>
+                  <CardTitle className="text-lg">
+                    {referrals.filter(r => {
+                      const signupDate = new Date(r.signup_date);
+                      const paymentDate = addDays(addMonths(signupDate, 1), 7);
+                      return isBefore(new Date(), paymentDate);
+                    }).length} filleuls
+                  </CardTitle>
+                </div>
+              </div>
+            </CardHeader>
+          </Card>
+        </div>
+
+        {/* Détails des paiements à venir */}
+        {referrals.length > 0 && (
+          <Card className="mt-6">
+            <CardHeader>
+              <div className="flex items-center gap-3">
+                <Clock className="h-5 w-5 text-primary" />
+                <div>
+                  <CardTitle>Calendrier des paiements</CardTitle>
+                  <CardDescription>
+                    Détail des commissions à recevoir pour chaque filleul (6,99 € par filleul)
+                  </CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {referrals
+                  .map(r => {
+                    const signupDate = new Date(r.signup_date);
+                    const paymentDate = addDays(addMonths(signupDate, 1), 7);
+                    return { ...r, paymentDate };
+                  })
+                  .sort((a, b) => a.paymentDate.getTime() - b.paymentDate.getTime())
+                  .map((referral) => {
+                    const isPaid = isBefore(referral.paymentDate, new Date());
+                    return (
+                      <div 
+                        key={referral.id}
+                        className={`flex items-center justify-between p-4 rounded-xl border-2 transition-all ${
+                          isPaid 
+                            ? 'bg-muted/30 border-muted' 
+                            : 'bg-gradient-to-r from-primary/5 to-secondary/5 border-primary/20 hover:border-primary/40'
+                        }`}
+                      >
+                        <div className="flex items-center gap-4 flex-1">
+                          <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+                            isPaid ? 'bg-muted' : 'bg-gradient-to-br from-primary/20 to-secondary/20'
+                          }`}>
+                            <User className={`h-5 w-5 ${isPaid ? 'text-muted-foreground' : 'text-primary'}`} />
+                          </div>
+                          <div className="flex-1">
+                            <p className={`font-semibold ${isPaid ? 'text-muted-foreground' : ''}`}>
+                              {referral.profile?.full_name || referral.profile?.nickname || referral.referred_email}
+                            </p>
+                            <p className="text-sm text-muted-foreground">
+                              Inscrit le {format(new Date(referral.signup_date), "dd MMM yyyy", { locale: fr })}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-6">
+                          <div className="text-right">
+                            <p className={`text-sm text-muted-foreground ${isPaid ? 'line-through' : ''}`}>
+                              {isPaid ? 'Payé le' : 'Paiement prévu le'}
+                            </p>
+                            <p className={`font-bold ${isPaid ? 'text-muted-foreground' : 'text-primary'}`}>
+                              {format(referral.paymentDate, "dd MMM yyyy", { locale: fr })}
+                            </p>
+                          </div>
+                          <div className={`px-4 py-2 rounded-lg font-bold text-lg ${
+                            isPaid 
+                              ? 'bg-muted text-muted-foreground' 
+                              : 'bg-gradient-to-r from-primary to-primary-glow text-white'
+                          }`}>
+                            6,99 €
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+              </div>
+              
+              <div className="mt-6 p-4 bg-gradient-to-r from-muted/50 to-muted/20 rounded-xl border border-border">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                    <Euro className="h-5 w-5 text-primary" />
+                  </div>
+                  <div className="space-y-1">
+                    <p className="font-semibold">Comment ça marche ?</p>
+                    <ul className="text-sm text-muted-foreground space-y-1">
+                      <li>• Chaque filleul bénéficie de 7 jours d'essai gratuit</li>
+                      <li>• Le premier paiement est effectué 1 mois + 7 jours après son inscription</li>
+                      <li>• Tu reçois 6,99 € par filleul chaque mois tant qu'il reste abonné</li>
+                      <li>• Les paiements sont virés sur ton RIB fourni lors de l'inscription</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
     </div>
   );
