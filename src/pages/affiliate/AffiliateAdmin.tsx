@@ -103,8 +103,7 @@ const AffiliateAdmin = () => {
         .from("subscriptions")
         .select("user_id, plan_type, status")
         .in("user_id", referredUserIds)
-        .eq("plan_type", "vip")
-        .eq("status", "active");
+        .eq("plan_type", "vip");
 
       if (subsError) throw subsError;
 
@@ -129,20 +128,30 @@ const AffiliateAdmin = () => {
 
       const profilesMap = new Map(profiles?.map(p => [p.id, p]) || []);
       const affiliateMap = new Map(affiliateUsers?.map(a => [a.id, a]) || []);
-      const vipUserIds = new Set(subscriptions?.map(s => s.user_id) || []);
+      const subscriptionsMap = new Map(subscriptions?.map(s => [s.user_id, s]) || []);
+      
+      // Ne garder que les utilisateurs avec un abonnement VIP actif
+      const vipUserIds = new Set(
+        subscriptions?.filter(s => s.status === "active").map(s => s.user_id) || []
+      );
 
       console.log("Affiliate map:", affiliateMap); // Debug
 
-      // Filter and enrich referrals
+      // Filter and enrich referrals - ne garder que les abonnements actifs
       const enrichedReferrals = allReferrals
-        .filter(r => vipUserIds.has(r.referred_user_id))
+        .filter(r => {
+          const subscription = subscriptionsMap.get(r.referred_user_id);
+          return subscription && subscription.status === "active";
+        })
         .map(r => {
           const affiliate = affiliateMap.get(r.referrer_user_id);
+          const subscription = subscriptionsMap.get(r.referred_user_id);
           console.log(`Referral ${r.id} - Referrer ID: ${r.referrer_user_id}, Affiliate:`, affiliate);
           return {
             ...r,
             profile: profilesMap.get(r.referred_user_id),
-            affiliate: affiliate
+            affiliate: affiliate,
+            subscription_status: subscription?.status
           };
         });
 
@@ -158,6 +167,26 @@ const AffiliateAdmin = () => {
 
   const handleMarkAsPaid = async (referralId: string, paymentDate: Date) => {
     try {
+      // Vérifier que l'abonnement est toujours actif avant de payer
+      const referral = referrals.find(r => r.id === referralId);
+      if (!referral) {
+        toast.error("Parrainage introuvable");
+        return;
+      }
+
+      const { data: subscription } = await supabase
+        .from("subscriptions")
+        .select("status, plan_type")
+        .eq("user_id", referral.referred_user_id)
+        .eq("plan_type", "vip")
+        .single();
+
+      if (!subscription || subscription.status !== "active") {
+        toast.error("Impossible de payer : l'abonnement n'est plus actif");
+        await fetchAllReferrals(); // Rafraîchir pour supprimer de la liste
+        return;
+      }
+
       const { error } = await supabase
         .from("affiliate_referrals")
         .update({
