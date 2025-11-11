@@ -136,14 +136,17 @@ const AdminProfiles = () => {
     try {
       setLoading(true);
       
-      const { data: sessionData } = await supabase.auth.getSession();
-      if (!sessionData.session?.access_token) {
+      // Rafraîchir la session pour s'assurer d'avoir un token valide
+      const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession();
+      if (refreshError) throw refreshError;
+      
+      if (!refreshData.session?.access_token) {
         throw new Error("Session non établie");
       }
 
       const { data, error } = await supabase.functions.invoke('admin-delete-user', {
         headers: {
-          Authorization: `Bearer ${sessionData.session.access_token}`,
+          Authorization: `Bearer ${refreshData.session.access_token}`,
         },
         body: {
           userId

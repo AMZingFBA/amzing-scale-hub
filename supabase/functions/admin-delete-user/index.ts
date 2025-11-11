@@ -19,6 +19,13 @@ serve(async (req) => {
   try {
     logStep("Function started");
 
+    // Use anon key for authentication verification
+    const supabaseAuth = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_ANON_KEY") ?? "",
+      { auth: { persistSession: false } }
+    );
+
     // Use service role key for admin operations
     const supabaseAdmin = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
@@ -28,14 +35,17 @@ serve(async (req) => {
 
     // Vérifier que l'utilisateur est admin
     const authHeader = req.headers.get("Authorization");
-    if (!authHeader) throw new Error("No authorization header");
+    if (!authHeader) {
+      logStep("No authorization header");
+      throw new Error("No authorization header");
+    }
     
     logStep("Auth header found");
     
     const token = authHeader.replace("Bearer ", "");
     
-    // Vérifier le token avec l'API admin
-    const { data: { user: adminUser }, error: userError } = await supabaseAdmin.auth.getUser(token);
+    // Vérifier le token avec l'anon client
+    const { data: { user: adminUser }, error: userError } = await supabaseAuth.auth.getUser(token);
     if (userError) {
       logStep("Auth error", { error: userError.message });
       throw new Error(`Authentication error: ${userError.message}`);
