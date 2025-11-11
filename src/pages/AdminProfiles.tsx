@@ -3,7 +3,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { Loader2, Users, Mail, Phone, UserCircle, ArrowLeft, Search, Calendar, MessageCircle, Crown, Shield, Filter, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Loader2, Users, Mail, Phone, UserCircle, ArrowLeft, Search, Calendar, MessageCircle, Crown, Shield, Filter, ChevronLeft, ChevronRight, Clock, AlertCircle } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -42,6 +42,7 @@ const AdminProfiles = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterRole, setFilterRole] = useState<string>('all');
   const [filterPlan, setFilterPlan] = useState<string>('all');
+  const [filterExpiry, setFilterExpiry] = useState<string>('all');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
 
@@ -140,7 +141,23 @@ const AdminProfiles = () => {
     const matchesRole = filterRole === 'all' || profile.role === filterRole;
     const matchesPlan = filterPlan === 'all' || profile.subscription?.plan_type === filterPlan;
 
-    return matchesSearch && matchesRole && matchesPlan;
+    // Filter by expiry status
+    let matchesExpiry = true;
+    if (filterExpiry !== 'all' && profile.subscription?.expires_at) {
+      const expiresAt = new Date(profile.subscription.expires_at);
+      const now = new Date();
+      const daysUntilExpiry = Math.ceil((expiresAt.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+      
+      if (filterExpiry === 'expiring_soon') {
+        matchesExpiry = daysUntilExpiry <= 7 && daysUntilExpiry > 0;
+      } else if (filterExpiry === 'expired') {
+        matchesExpiry = daysUntilExpiry < 0;
+      }
+    } else if (filterExpiry !== 'all') {
+      matchesExpiry = false;
+    }
+
+    return matchesSearch && matchesRole && matchesPlan && matchesExpiry;
   });
 
   // Pagination
@@ -197,7 +214,7 @@ const AdminProfiles = () => {
           {/* Search & Filters */}
           <Card className="mb-6">
             <CardContent className="pt-6">
-              <div className="grid gap-4 md:grid-cols-3">
+              <div className="grid gap-4 md:grid-cols-4">
                 <div className="md:col-span-1">
                   <div className="relative">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
@@ -245,12 +262,28 @@ const AdminProfiles = () => {
                     </SelectContent>
                   </Select>
                 </div>
+
+                <div>
+                  <Select value={filterExpiry} onValueChange={(value) => {
+                    setFilterExpiry(value);
+                    setCurrentPage(1);
+                  }}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Filtrer par expiration" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Toutes les expirations</SelectItem>
+                      <SelectItem value="expiring_soon">Expire bientôt (7j)</SelectItem>
+                      <SelectItem value="expired">Expirés</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             </CardContent>
           </Card>
 
           {/* Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
             <Card>
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-medium flex items-center gap-2">
@@ -268,13 +301,54 @@ const AdminProfiles = () => {
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-medium flex items-center gap-2">
                   <Crown className="w-4 h-4 text-primary" />
-                  VIP
+                  VIP Actifs
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
-                  {filteredProfiles.filter(p => p.subscription?.plan_type === 'vip').length}
+                  {profiles.filter(p => p.subscription?.plan_type === 'vip' && p.subscription?.status === 'active').length}
                 </div>
+              </CardContent>
+            </Card>
+
+            <Card className="border-orange-200 dark:border-orange-800">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm font-medium flex items-center gap-2">
+                  <Clock className="w-4 h-4 text-orange-500" />
+                  Expire bientôt
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-orange-500">
+                  {profiles.filter(p => {
+                    if (!p.subscription?.expires_at) return false;
+                    const expiresAt = new Date(p.subscription.expires_at);
+                    const now = new Date();
+                    const daysUntilExpiry = Math.ceil((expiresAt.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+                    return daysUntilExpiry <= 7 && daysUntilExpiry > 0;
+                  }).length}
+                </div>
+                <p className="text-xs text-muted-foreground">dans 7 jours</p>
+              </CardContent>
+            </Card>
+
+            <Card className="border-red-200 dark:border-red-800">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm font-medium flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4 text-red-500" />
+                  Expirés
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-red-500">
+                  {profiles.filter(p => {
+                    if (!p.subscription?.expires_at) return false;
+                    const expiresAt = new Date(p.subscription.expires_at);
+                    const now = new Date();
+                    return expiresAt < now && p.subscription.plan_type === 'vip';
+                  }).length}
+                </div>
+                <p className="text-xs text-muted-foreground">à traiter</p>
               </CardContent>
             </Card>
 
@@ -287,21 +361,7 @@ const AdminProfiles = () => {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
-                  {filteredProfiles.filter(p => p.role === 'admin').length}
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium flex items-center gap-2">
-                  <Phone className="w-4 h-4 text-primary" />
-                  Téléphone
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">
-                  {filteredProfiles.filter(p => p.phone).length}
+                  {profiles.filter(p => p.role === 'admin').length}
                 </div>
               </CardContent>
             </Card>
@@ -329,6 +389,7 @@ const AdminProfiles = () => {
                           <TableHead>Contact</TableHead>
                           <TableHead>Statut</TableHead>
                           <TableHead>Plan</TableHead>
+                          <TableHead>Expiration</TableHead>
                           <TableHead>Inscrit</TableHead>
                           <TableHead className="text-right">Actions</TableHead>
                         </TableRow>
@@ -393,6 +454,59 @@ const AdminProfiles = () => {
                               )}
                               {profile.subscription?.is_trial && (
                                 <Badge variant="secondary" className="ml-1 text-xs">Essai</Badge>
+                              )}
+                            </TableCell>
+                            <TableCell>
+                              {profile.subscription?.expires_at ? (
+                                (() => {
+                                  const expiresAt = new Date(profile.subscription.expires_at);
+                                  const now = new Date();
+                                  const daysUntilExpiry = Math.ceil((expiresAt.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+                                  
+                                  if (daysUntilExpiry < 0) {
+                                    return (
+                                      <div className="flex items-center gap-2">
+                                        <AlertCircle className="w-4 h-4 text-red-500" />
+                                        <div>
+                                          <div className="text-sm font-medium text-red-500">Expiré</div>
+                                          <div className="text-xs text-muted-foreground">
+                                            {expiresAt.toLocaleDateString('fr-FR')}
+                                          </div>
+                                        </div>
+                                      </div>
+                                    );
+                                  } else if (daysUntilExpiry <= 7) {
+                                    return (
+                                      <div className="flex items-center gap-2">
+                                        <Clock className="w-4 h-4 text-orange-500" />
+                                        <div>
+                                          <div className="text-sm font-medium text-orange-500">
+                                            {daysUntilExpiry} jour{daysUntilExpiry > 1 ? 's' : ''}
+                                          </div>
+                                          <div className="text-xs text-muted-foreground">
+                                            {expiresAt.toLocaleDateString('fr-FR')}
+                                          </div>
+                                        </div>
+                                      </div>
+                                    );
+                                  } else {
+                                    return (
+                                      <div className="flex items-center gap-2">
+                                        <Calendar className="w-4 h-4 text-muted-foreground" />
+                                        <div>
+                                          <div className="text-sm">
+                                            {daysUntilExpiry} jours
+                                          </div>
+                                          <div className="text-xs text-muted-foreground">
+                                            {expiresAt.toLocaleDateString('fr-FR')}
+                                          </div>
+                                        </div>
+                                      </div>
+                                    );
+                                  }
+                                })()
+                              ) : (
+                                <span className="text-sm text-muted-foreground">-</span>
                               )}
                             </TableCell>
                             <TableCell>
