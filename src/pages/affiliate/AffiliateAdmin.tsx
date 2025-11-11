@@ -301,8 +301,9 @@ const AffiliateAdmin = () => {
     const monthReferrals = paymentMonths.get(targetMonthKey) || [];
     const paidReferrals = monthReferrals.filter(r => r.payment_status === "payé");
     const pendingReferrals = monthReferrals.filter(r => r.payment_status !== "payé");
-    const totalPaid = paidReferrals.length * 6.99;
-    const totalPending = pendingReferrals.length * 6.99;
+    const commissionPerReferral = 34.99 - 6.99; // 28€ par personne
+    const totalPaid = paidReferrals.length * commissionPerReferral;
+    const totalPending = pendingReferrals.length * commissionPerReferral;
 
     return {
       totalReferrals: monthReferrals.length,
