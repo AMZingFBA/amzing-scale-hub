@@ -19,7 +19,15 @@ serve(async (req) => {
   try {
     logStep("Function started");
 
-    const supabaseClient = createClient(
+    // Use anon key for authentication
+    const supabaseAuth = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_ANON_KEY") ?? "",
+      { auth: { persistSession: false } }
+    );
+
+    // Use service role key for admin operations
+    const supabaseAdmin = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
       { auth: { persistSession: false } }
@@ -30,14 +38,14 @@ serve(async (req) => {
     if (!authHeader) throw new Error("No authorization header");
     
     const token = authHeader.replace("Bearer ", "");
-    const { data: userData, error: userError } = await supabaseClient.auth.getUser(token);
+    const { data: userData, error: userError } = await supabaseAuth.auth.getUser(token);
     if (userError) throw new Error(`Authentication error: ${userError.message}`);
     
     const adminUser = userData.user;
     if (!adminUser) throw new Error("User not authenticated");
     
     // Vérifier le rôle admin
-    const { data: roleData, error: roleError } = await supabaseClient
+    const { data: roleData, error: roleError } = await supabaseAdmin
       .from('user_roles')
       .select('role')
       .eq('user_id', adminUser.id)
@@ -61,7 +69,7 @@ serve(async (req) => {
     }
 
     // Vérifier que l'utilisateur à supprimer existe
-    const { data: targetUser, error: targetUserError } = await supabaseClient.auth.admin.getUserById(userId);
+    const { data: targetUser, error: targetUserError } = await supabaseAdmin.auth.admin.getUserById(userId);
     
     if (targetUserError || !targetUser) {
       throw new Error("Utilisateur introuvable");
@@ -72,90 +80,90 @@ serve(async (req) => {
     // Supprimer toutes les données associées à l'utilisateur
     
     // Supprimer les préférences de notifications
-    await supabaseClient
+    await supabaseAdmin
       .from('notification_preferences')
       .delete()
       .eq('user_id', userId);
     logStep("Deleted notification preferences");
 
     // Supprimer les tokens de push notifications
-    await supabaseClient
+    await supabaseAdmin
       .from('push_notification_tokens')
       .delete()
       .eq('user_id', userId);
     logStep("Deleted push notification tokens");
 
     // Supprimer les statuts de lecture d'alertes
-    await supabaseClient
+    await supabaseAdmin
       .from('alert_read_status')
       .delete()
       .eq('user_id', userId);
     logStep("Deleted alert read status");
 
     // Supprimer les statuts de lecture de messages
-    await supabaseClient
+    await supabaseAdmin
       .from('message_read_status')
       .delete()
       .eq('user_id', userId);
     logStep("Deleted message read status");
 
     // Supprimer les épingles de salons
-    await supabaseClient
+    await supabaseAdmin
       .from('chat_room_pins')
       .delete()
       .eq('user_id', userId);
     logStep("Deleted chat room pins");
 
     // Supprimer la visibilité des conversations directes
-    await supabaseClient
+    await supabaseAdmin
       .from('direct_conversation_visibility')
       .delete()
       .eq('user_id', userId);
     logStep("Deleted direct conversation visibility");
 
     // Supprimer la visibilité des salons
-    await supabaseClient
+    await supabaseAdmin
       .from('chat_room_visibility')
       .delete()
       .eq('user_id', userId);
     logStep("Deleted chat room visibility");
 
     // Supprimer les annonces marketplace
-    await supabaseClient
+    await supabaseAdmin
       .from('marketplace_listings')
       .delete()
       .eq('user_id', userId);
     logStep("Deleted marketplace listings");
 
-    await supabaseClient
+    await supabaseAdmin
       .from('marketplace_buy_requests')
       .delete()
       .eq('user_id', userId);
     logStep("Deleted marketplace buy requests");
 
     // Supprimer les messages de chat
-    await supabaseClient
+    await supabaseAdmin
       .from('chat_messages')
       .delete()
       .eq('user_id', userId);
     logStep("Deleted chat messages");
 
     // Supprimer les messages directs
-    await supabaseClient
+    await supabaseAdmin
       .from('direct_messages')
       .delete()
       .eq('sender_id', userId);
     logStep("Deleted direct messages");
 
     // Supprimer les membres de salons
-    await supabaseClient
+    await supabaseAdmin
       .from('chat_room_members')
       .delete()
       .eq('user_id', userId);
     logStep("Deleted chat room members");
 
     // Supprimer les salons créés par l'utilisateur
-    await supabaseClient
+    await supabaseAdmin
       .from('chat_rooms')
       .delete()
       .eq('created_by', userId)
@@ -163,56 +171,56 @@ serve(async (req) => {
     logStep("Deleted user-created chat rooms");
 
     // Supprimer les conversations directes
-    await supabaseClient
+    await supabaseAdmin
       .from('direct_conversations')
       .delete()
       .or(`user1_id.eq.${userId},user2_id.eq.${userId}`);
     logStep("Deleted direct conversations");
 
     // Supprimer les messages de tickets
-    await supabaseClient
+    await supabaseAdmin
       .from('messages')
       .delete()
       .eq('user_id', userId);
     logStep("Deleted ticket messages");
 
     // Supprimer les tickets
-    await supabaseClient
+    await supabaseAdmin
       .from('tickets')
       .delete()
       .eq('user_id', userId);
     logStep("Deleted tickets");
 
     // Supprimer l'abonnement
-    await supabaseClient
+    await supabaseAdmin
       .from('subscriptions')
       .delete()
       .eq('user_id', userId);
     logStep("Deleted subscription");
 
     // Supprimer les rôles utilisateur
-    await supabaseClient
+    await supabaseAdmin
       .from('user_roles')
       .delete()
       .eq('user_id', userId);
     logStep("Deleted user roles");
 
     // Supprimer le profil
-    await supabaseClient
+    await supabaseAdmin
       .from('profiles')
       .delete()
       .eq('id', userId);
     logStep("Deleted profile");
 
     // Supprimer tous les codes de vérification
-    await supabaseClient
+    await supabaseAdmin
       .from('verification_codes')
       .delete()
       .eq('user_id', userId);
     logStep("Deleted verification codes");
 
     // Supprimer l'utilisateur de l'authentification
-    const { error: deleteUserError } = await supabaseClient.auth.admin.deleteUser(userId);
+    const { error: deleteUserError } = await supabaseAdmin.auth.admin.deleteUser(userId);
     
     if (deleteUserError) {
       logStep("Error deleting user from auth", { error: deleteUserError });
