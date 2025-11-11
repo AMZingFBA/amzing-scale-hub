@@ -39,6 +39,12 @@ export default function Auth() {
     if (!user) return;
     
     const checkAndRedirect = async () => {
+      // Redirection directe pour l'admin principal
+      if (user.email === 'amzingfba26@gmail.com') {
+        navigate("/dashboard");
+        return;
+      }
+      
       // Vérifier le rôle admin
       const { data: roleData } = await supabase
         .from('user_roles')
