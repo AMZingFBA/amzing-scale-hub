@@ -5,11 +5,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { LogOut, Copy, Check, Euro, TrendingUp, Users, Calendar, Award, CreditCard } from "lucide-react";
+import { LogOut, Copy, Check, Euro, TrendingUp, Users, Calendar as CalendarIcon, Award, CreditCard } from "lucide-react";
 import { format, addMonths, addDays, startOfMonth, endOfMonth, isSameDay } from "date-fns";
 import { fr } from "date-fns/locale";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 interface AffiliateUser {
   id: string;
@@ -50,6 +52,7 @@ const AffiliateAdmin = () => {
   const [referrals, setReferrals] = useState<Referral[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [copiedRIB, setCopiedRIB] = useState<string | null>(null);
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [selectedMonth, setSelectedMonth] = useState(new Date());
 
   useEffect(() => {
@@ -324,6 +327,29 @@ const AffiliateAdmin = () => {
       .slice(0, 10);
   };
 
+  // Get payments for a specific date
+  const getPaymentsForDate = (date: Date) => {
+    return referrals.filter(referral => {
+      const signupDate = new Date(referral.signup_date);
+      const paymentDate = addDays(addMonths(signupDate, 1), 7);
+      return isSameDay(paymentDate, date);
+    });
+  };
+
+  // Get all dates with payments
+  const getDatesWithPayments = () => {
+    const dates = new Set<string>();
+    referrals.forEach(referral => {
+      const signupDate = new Date(referral.signup_date);
+      const paymentDate = addDays(addMonths(signupDate, 1), 7);
+      dates.add(format(paymentDate, "yyyy-MM-dd"));
+    });
+    return dates;
+  };
+
+  const datesWithPayments = getDatesWithPayments();
+  const selectedDatePayments = selectedDate ? getPaymentsForDate(selectedDate) : [];
+
   const todayPayments = getTodayPayments();
   const paymentsByDate = getPaymentsByDate();
   const monthlyStats = getMonthlyStats();
@@ -350,18 +376,135 @@ const AffiliateAdmin = () => {
               Gestion des paiements et statistiques
             </p>
           </div>
-          <Button variant="outline" onClick={handleLogout}>
-            <LogOut className="mr-2 h-4 w-4" />
-            Déconnexion
-          </Button>
+          <div className="flex gap-2">
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline">
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {selectedDate ? format(selectedDate, "dd MMM yyyy", { locale: fr }) : "Sélectionner une date"}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="end">
+                <Calendar
+                  mode="single"
+                  selected={selectedDate}
+                  onSelect={setSelectedDate}
+                  initialFocus
+                  className="p-3 pointer-events-auto"
+                  modifiers={{
+                    hasPayment: (date) => datesWithPayments.has(format(date, "yyyy-MM-dd"))
+                  }}
+                  modifiersClassNames={{
+                    hasPayment: "bg-primary/20 font-bold"
+                  }}
+                />
+              </PopoverContent>
+            </Popover>
+            <Button variant="outline" onClick={handleLogout}>
+              <LogOut className="mr-2 h-4 w-4" />
+              Déconnexion
+            </Button>
+          </div>
         </div>
+
+        {/* Selected Date Payments */}
+        {selectedDate && selectedDatePayments.length > 0 && (
+          <Card className="mb-6 border-2 border-blue-500/20 bg-gradient-to-r from-blue-500/10 to-primary/10">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <CalendarIcon className="h-5 w-5 text-blue-500" />
+                Paiements prévus le {format(selectedDate, "dd MMMM yyyy", { locale: fr })}
+              </CardTitle>
+              <CardDescription>
+                {selectedDatePayments.length} paiement{selectedDatePayments.length > 1 ? "s" : ""} à effectuer ({(selectedDatePayments.filter(r => r.payment_status !== "payé").length * 6.99).toFixed(2)} €)
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {selectedDatePayments.map((referral) => (
+                  <Card key={referral.id} className="p-4">
+                    <div className="grid md:grid-cols-5 gap-4 items-center">
+                      <div>
+                        <p className="text-sm text-muted-foreground">Parrain</p>
+                        <p className="font-semibold">
+                          {referral.affiliate?.first_name} {referral.affiliate?.last_name}
+                        </p>
+                        <p className="text-xs text-muted-foreground">{referral.affiliate?.email}</p>
+                        <p className="text-xs text-muted-foreground">📞 {referral.affiliate?.phone}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">Filleul</p>
+                        <p className="font-medium">
+                          {referral.profile?.full_name || referral.profile?.nickname || referral.referred_email}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground mb-1">RIB</p>
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2">
+                            <p className="text-xs font-mono bg-muted px-2 py-1 rounded">
+                              {referral.affiliate?.iban}
+                            </p>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleCopyRIB(
+                                referral.affiliate?.iban || "",
+                                referral.affiliate?.bic || "",
+                                referral.affiliate?.id || ""
+                              )}
+                            >
+                              {copiedRIB === referral.affiliate?.id ? (
+                                <Check className="h-4 w-4" />
+                              ) : (
+                                <Copy className="h-4 w-4" />
+                              )}
+                            </Button>
+                          </div>
+                          <p className="text-xs text-muted-foreground">
+                            BIC: {referral.affiliate?.bic}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="text-center">
+                        <div className="inline-flex items-center gap-1 px-3 py-2 bg-gradient-to-r from-primary to-primary-glow text-white rounded-lg font-bold">
+                          <Euro className="h-4 w-4" />
+                          6,99 €
+                        </div>
+                      </div>
+                      <div>
+                        {referral.payment_status === "payé" ? (
+                          <Button
+                            variant="outline"
+                            onClick={() => handleMarkAsUnpaid(referral.id)}
+                            className="w-full"
+                          >
+                            Annuler paiement
+                          </Button>
+                        ) : (
+                          <Button
+                            onClick={() => handleMarkAsPaid(referral.id, selectedDate)}
+                            className="w-full"
+                          >
+                            <Check className="mr-2 h-4 w-4" />
+                            Marquer payé
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Today's Payments Alert */}
         {todayPayments.length > 0 && (
           <Card className="mb-6 border-2 border-primary bg-gradient-to-r from-primary/10 to-secondary/10">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Calendar className="h-5 w-5 text-primary" />
+                <CalendarIcon className="h-5 w-5 text-primary" />
                 Paiements à effectuer aujourd'hui
               </CardTitle>
               <CardDescription>
@@ -541,7 +684,7 @@ const AffiliateAdmin = () => {
                         <div key={dateStr} className="space-y-3">
                           <div className="flex items-center justify-between">
                             <h3 className="text-lg font-semibold flex items-center gap-2">
-                              <Calendar className="h-5 w-5 text-primary" />
+                              <CalendarIcon className="h-5 w-5 text-primary" />
                               {format(paymentDate, "EEEE dd MMMM yyyy", { locale: fr })}
                             </h3>
                             <div className="flex items-center gap-4">
