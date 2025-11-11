@@ -6,15 +6,14 @@ import { useNavigate } from 'react-router-dom';
 import { Badge } from '@capawesome/capacitor-badge';
 
 const isNativePlatform = () => {
-  // Si l'API Badge est disponible, on est sur natif
-  if (typeof window !== 'undefined' && (window as any).Capacitor) {
-    const hasBadge = typeof Badge !== 'undefined' && Badge.set;
-    if (hasBadge) return true;
-    
-    const platform = (window as any).Capacitor.getPlatform?.();
-    return platform === 'ios' || platform === 'android';
-  }
-  return false;
+  // Vérifier si nous sommes sur une plateforme native
+  if (typeof window === 'undefined') return false;
+  
+  const Capacitor = (window as any).Capacitor;
+  if (!Capacitor) return false;
+  
+  const platform = Capacitor.getPlatform();
+  return platform === 'ios' || platform === 'android';
 };
 
 export const usePushNotifications = () => {
@@ -135,7 +134,13 @@ export const usePushNotifications = () => {
 
 
   useEffect(() => {
-    if (!user || !isNativePlatform() || isInitialized) return;
+    // Ne rien faire sur le web
+    if (!isNativePlatform()) {
+      console.log('⚠️ Push notifications not available on web - skipping initialization');
+      return;
+    }
+    
+    if (!user || isInitialized) return;
 
     const initializePushNotifications = async () => {
       try {
