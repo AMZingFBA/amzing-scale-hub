@@ -9,20 +9,17 @@ const AffiliateLanding = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-secondary/10">
-      {/* Back Button */}
-      <div className="container mx-auto px-4 pt-6">
+      {/* Hero Section with Gradient Background */}
+      <div className="relative overflow-hidden">
         <Button
           variant="ghost"
           size="lg"
           onClick={() => navigate(-1)}
-          className="gap-2 hover:bg-primary/10 transition-all duration-300"
+          className="absolute top-6 left-6 z-20 gap-2 hover:bg-primary/10 transition-all duration-300"
         >
           <ArrowLeft className="h-6 w-6 text-primary" />
         </Button>
-      </div>
-
-      {/* Hero Section with Gradient Background */}
-      <div className="relative overflow-hidden">
+        
         <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-transparent to-secondary/10 animate-gradient-shift" />
         
         <div className="container relative mx-auto px-4 py-20 md:py-32">
