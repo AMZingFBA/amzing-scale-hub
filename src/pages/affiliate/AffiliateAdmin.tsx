@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -53,6 +53,8 @@ const AffiliateAdmin = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [copiedRIB, setCopiedRIB] = useState<string | null>(null);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+  const selectedDateRef = useRef<HTMLDivElement>(null);
   const [selectedMonth, setSelectedMonth] = useState(new Date());
 
   useEffect(() => {
@@ -202,6 +204,18 @@ const AffiliateAdmin = () => {
     setCopiedRIB(affiliateId);
     toast.success("RIB copié dans le presse-papier");
     setTimeout(() => setCopiedRIB(null), 2000);
+  };
+
+  const handleDateSelect = (date: Date | undefined) => {
+    setSelectedDate(date);
+    setIsCalendarOpen(false);
+    
+    // Scroll to selected date payments after a short delay
+    if (date) {
+      setTimeout(() => {
+        selectedDateRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
+    }
   };
 
   const handleLogout = () => {
@@ -377,7 +391,7 @@ const AffiliateAdmin = () => {
             </p>
           </div>
           <div className="flex gap-2">
-            <Popover>
+            <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
               <PopoverTrigger asChild>
                 <Button variant="outline">
                   <CalendarIcon className="mr-2 h-4 w-4" />
@@ -388,7 +402,7 @@ const AffiliateAdmin = () => {
                 <Calendar
                   mode="single"
                   selected={selectedDate}
-                  onSelect={setSelectedDate}
+                  onSelect={handleDateSelect}
                   initialFocus
                   className="p-3 pointer-events-auto"
                   modifiers={{
@@ -400,6 +414,11 @@ const AffiliateAdmin = () => {
                 />
               </PopoverContent>
             </Popover>
+            {selectedDate && (
+              <Button variant="ghost" onClick={() => setSelectedDate(undefined)}>
+                Réinitialiser
+              </Button>
+            )}
             <Button variant="outline" onClick={handleLogout}>
               <LogOut className="mr-2 h-4 w-4" />
               Déconnexion
@@ -409,7 +428,7 @@ const AffiliateAdmin = () => {
 
         {/* Selected Date Payments */}
         {selectedDate && selectedDatePayments.length > 0 && (
-          <Card className="mb-6 border-2 border-blue-500/20 bg-gradient-to-r from-blue-500/10 to-primary/10">
+          <Card ref={selectedDateRef} className="mb-6 border-2 border-blue-500/20 bg-gradient-to-r from-blue-500/10 to-primary/10">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <CalendarIcon className="h-5 w-5 text-blue-500" />
@@ -658,13 +677,66 @@ const AffiliateAdmin = () => {
           </Card>
         </div>
 
-        <Tabs defaultValue="payments" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="payments">Calendrier des paiements</TabsTrigger>
+        <Tabs defaultValue="calendar" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="calendar">Calendrier</TabsTrigger>
+            <TabsTrigger value="all">Tous les paiements</TabsTrigger>
             <TabsTrigger value="affiliates">Top parrains</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="payments">
+          <TabsContent value="calendar">
+            <Card>
+              <CardHeader>
+                <CardTitle>Calendrier des paiements</CardTitle>
+                <CardDescription>
+                  Sélectionnez une date dans le calendrier ci-dessus pour voir les paiements prévus
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-6">
+                  {Object.entries(paymentsByDate)
+                    .sort(([dateA], [dateB]) => new Date(dateA).getTime() - new Date(dateB).getTime())
+                    .slice(0, 5)
+                    .map(([dateStr, data]) => {
+                      const paymentDate = new Date(dateStr);
+                      const pendingCount = data.referrals.filter(r => r.payment_status === "en attente").length;
+                      
+                      return (
+                        <div key={dateStr} className="p-4 border rounded-lg">
+                          <div className="flex items-center justify-between mb-2">
+                            <h3 className="text-lg font-semibold flex items-center gap-2">
+                              <CalendarIcon className="h-5 w-5 text-primary" />
+                              {format(paymentDate, "EEEE dd MMMM yyyy", { locale: fr })}
+                            </h3>
+                            <div className="flex items-center gap-4">
+                              <Badge variant="secondary">
+                                {data.referrals.length} paiement{data.referrals.length > 1 ? "s" : ""}
+                              </Badge>
+                              {pendingCount > 0 && (
+                                <Badge variant="destructive">
+                                  {pendingCount} en attente
+                                </Badge>
+                              )}
+                            </div>
+                          </div>
+                          <p className="text-sm text-muted-foreground">
+                            Cliquez sur cette date dans le calendrier pour voir les détails
+                          </p>
+                        </div>
+                      );
+                    })}
+                  
+                  {Object.keys(paymentsByDate).length === 0 && (
+                    <p className="text-center py-8 text-muted-foreground">
+                      Aucun paiement prévu pour le moment
+                    </p>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="all">
             <Card>
               <CardHeader>
                 <CardTitle>Tous les paiements</CardTitle>
