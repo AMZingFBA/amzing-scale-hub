@@ -4,16 +4,10 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './use-auth';
 import { useNavigate } from 'react-router-dom';
 import { Badge } from '@capawesome/capacitor-badge';
+import { Capacitor } from '@capacitor/core';
 
 const isNativePlatform = () => {
-  // Vérifier si nous sommes sur une plateforme native
-  if (typeof window === 'undefined') return false;
-  
-  const Capacitor = (window as any).Capacitor;
-  if (!Capacitor) return false;
-  
-  const platform = Capacitor.getPlatform();
-  return platform === 'ios' || platform === 'android';
+  return Capacitor.isNativePlatform();
 };
 
 export const usePushNotifications = () => {
