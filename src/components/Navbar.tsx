@@ -143,22 +143,29 @@ const Navbar = () => {
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
             {user ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button 
-                    variant="outline" 
-                    size="lg" 
-                    className={`gap-2 transition-all ${isVIP ? 'border-primary/50 hover:border-primary bg-gradient-to-r from-primary/5 to-secondary/5' : ''}`}
-                  >
-                    <User className="w-5 h-5" />
-                    <span className="font-semibold">Mon compte</span>
-                    {isVIP && (
-                      <Badge className="ml-1 bg-gradient-to-r from-primary to-secondary text-white border-0 shadow-lg">
-                        VIP
-                      </Badge>
-                    )}
-                  </Button>
-                </DropdownMenuTrigger>
+              <>
+                <Button variant="outline" size="lg" asChild className="hover-scale transition-all duration-300">
+                  <Link to="/affiliate" className="gap-2">
+                    <Handshake className="w-4 h-4" />
+                    Deviens partenaire
+                  </Link>
+                </Button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button 
+                      variant="outline" 
+                      size="lg" 
+                      className={`gap-2 transition-all ${isVIP ? 'border-primary/50 hover:border-primary bg-gradient-to-r from-primary/5 to-secondary/5' : ''}`}
+                    >
+                      <User className="w-5 h-5" />
+                      <span className="font-semibold">Mon compte</span>
+                      {isVIP && (
+                        <Badge className="ml-1 bg-gradient-to-r from-primary to-secondary text-white border-0 shadow-lg">
+                          VIP
+                        </Badge>
+                      )}
+                    </Button>
+                  </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48">
                   <div className="px-2 py-1.5">
                     <p className="text-sm font-medium">{user.email}</p>
@@ -201,6 +208,7 @@ const Navbar = () => {
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
+              </>
             ) : (
               <div className="flex items-center gap-2">
                 <Button variant="outline" size="lg" asChild className="hover-scale transition-all duration-300">
