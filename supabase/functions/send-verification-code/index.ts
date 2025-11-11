@@ -11,6 +11,7 @@ interface VerificationRequest {
   type: 'email_change' | 'password_change' | 'phone_change' | 'password_reset' | 'email_signup' | 'cancel_subscription' | 'delete_account';
   newValue?: string;
   email?: string; // For password_reset/email_signup when user is not authenticated
+  phone?: string; // For email_signup to check for duplicates
 }
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
@@ -21,7 +22,7 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { type, newValue, email: requestEmail }: VerificationRequest = await req.json();
+    const { type, newValue, email: requestEmail, phone }: VerificationRequest = await req.json();
 
     let user: { id: string; email: string };
     let userEmail: string;
@@ -52,6 +53,29 @@ const handler = async (req: Request): Promise<Response> => {
         if (foundUser) {
           throw new Error("Un compte existe déjà avec cet email");
         }
+        
+        // Check if phone already exists
+        if (phone) {
+          const phoneExists = users.users.some(u => 
+            u.user_metadata?.phone === phone
+          );
+          
+          if (phoneExists) {
+            throw new Error("Ce numéro de téléphone est déjà utilisé");
+          }
+          
+          // Also check in profiles table
+          const { data: existingProfiles } = await supabaseAdmin
+            .from('profiles')
+            .select('phone')
+            .eq('phone', phone)
+            .maybeSingle();
+          
+          if (existingProfiles) {
+            throw new Error("Ce numéro de téléphone est déjà utilisé");
+          }
+        }
+        
         // For signup, we don't have a user yet, so use a temporary ID
         user = { id: 'pending', email: requestEmail };
         userEmail = requestEmail;

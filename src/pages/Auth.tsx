@@ -139,6 +139,7 @@ export default function Auth() {
         body: {
           type: 'email_signup',
           email: email.toLowerCase(),
+          phone: phone,
         },
       });
 
