@@ -60,12 +60,6 @@ const Support = () => {
       return;
     }
 
-    // Si l'utilisateur est admin, le rediriger vers la page d'administration
-    if (!isAdminLoading && isAdmin) {
-      navigate('/support');
-      return;
-    }
-
     loadTickets();
 
     // Listen for new messages
