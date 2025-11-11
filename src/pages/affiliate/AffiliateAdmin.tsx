@@ -111,14 +111,16 @@ const AffiliateAdmin = () => {
 
       if (profilesError) throw profilesError;
 
-      // Get affiliate users info
+      // Get affiliate users info with all details
       const affiliateUserIds = [...new Set(allReferrals.map(r => r.referrer_user_id))];
       const { data: affiliateUsers, error: affiliateError } = await supabase
         .from("affiliate_users")
-        .select("*")
+        .select("id, first_name, last_name, email, phone, iban, bic, referral_code")
         .in("id", affiliateUserIds);
 
       if (affiliateError) throw affiliateError;
+
+      console.log("Affiliate users data:", affiliateUsers); // Debug
 
       const profilesMap = new Map(profiles?.map(p => [p.id, p]) || []);
       const affiliateMap = new Map(affiliateUsers?.map(a => [a.id, a]) || []);
@@ -133,6 +135,7 @@ const AffiliateAdmin = () => {
           affiliate: affiliateMap.get(r.referrer_user_id)
         }));
 
+      console.log("Enriched referrals:", enrichedReferrals); // Debug
       setReferrals(enrichedReferrals);
     } catch (error) {
       console.error("Error fetching referrals:", error);
