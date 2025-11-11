@@ -39,26 +39,20 @@ export default function Auth() {
     if (!user) return;
     
     const checkAndRedirect = async () => {
-      // Redirection directe pour l'admin principal
-      if (user.email === 'amzingfba26@gmail.com') {
-        navigate("/dashboard");
-        return;
-      }
-      
       // Vérifier le rôle admin
       const { data: roleData } = await supabase
         .from('user_roles')
         .select('role')
         .eq('user_id', user.id)
         .eq('role', 'admin')
-        .single();
+        .maybeSingle();
       
       // Vérifier le statut VIP
       const { data: subData } = await supabase
         .from('subscriptions')
         .select('plan_type, status, expires_at')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
       const isUserVIP = subData?.plan_type === 'vip' && 
         (subData?.status === 'active' || subData?.status === 'canceled') &&
@@ -68,9 +62,9 @@ export default function Auth() {
 
       // Rediriger selon le statut
       if (isUserAdmin || isUserVIP) {
-        navigate("/dashboard");
+        navigate("/dashboard", { replace: true });
       } else {
-        navigate("/");
+        navigate("/", { replace: true });
       }
     };
     

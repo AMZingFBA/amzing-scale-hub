@@ -59,7 +59,7 @@ const Dashboard = () => {
     subscription,
     isLoading
   } = useAuth();
-  const { isAdmin } = useAdmin();
+  const { isAdmin, isLoading: isAdminLoading } = useAdmin();
   const { notifications, markAsRead, loadNotifications } = useNotifications();
   const { toast } = useToast();
   const [invoiceAuthOpen, setInvoiceAuthOpen] = useState(false);
@@ -75,7 +75,7 @@ const Dashboard = () => {
   // Auto-refresh every 30 seconds
   useAutoRefresh(loadNotifications, { enabled: true, interval: 30000 });
   
-  if (isLoading) {
+  if (isLoading || isAdminLoading) {
     return <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
       </div>;
