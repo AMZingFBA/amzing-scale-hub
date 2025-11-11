@@ -247,16 +247,30 @@ const AffiliateAdmin = () => {
     const startDate = startOfMonth(now);
     const endDate = endOfMonth(now);
     
+    console.log("Calculating monthly stats for:", format(startDate, "MMM yyyy"), "Total referrals:", referrals.length);
+    
     const monthReferrals = referrals.filter(r => {
       const signupDate = new Date(r.signup_date);
       const paymentDate = addDays(addMonths(signupDate, 1), 7);
-      return paymentDate >= startDate && paymentDate <= endDate;
+      const isInMonth = paymentDate >= startDate && paymentDate <= endDate;
+      if (isInMonth) {
+        console.log("Referral in month:", r.referred_email, "Payment date:", format(paymentDate, "dd/MM/yyyy"), "Status:", r.payment_status);
+      }
+      return isInMonth;
     });
 
     const paidReferrals = monthReferrals.filter(r => r.payment_status === "payé");
     const pendingReferrals = monthReferrals.filter(r => r.payment_status !== "payé");
     const totalPaid = paidReferrals.length * 6.99;
     const totalPending = pendingReferrals.length * 6.99;
+
+    console.log("Month stats:", {
+      total: monthReferrals.length,
+      paid: paidReferrals.length,
+      pending: pendingReferrals.length,
+      totalPaid,
+      totalPending
+    });
 
     return {
       totalReferrals: monthReferrals.length,
