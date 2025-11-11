@@ -43,7 +43,12 @@ const AffiliateLogin = () => {
       // Store user data in localStorage for affiliate system
       localStorage.setItem("affiliate_user", JSON.stringify(data.user));
       
-      navigate("/affiliate/dashboard");
+      // Redirect admin to admin page directly
+      if (data.user.email === 'amzingfba26@gmail.com') {
+        navigate("/affiliate/admin");
+      } else {
+        navigate("/affiliate/dashboard");
+      }
     } catch (error: any) {
       console.error("Login error:", error);
       toast.error("Une erreur est survenue lors de la connexion");
