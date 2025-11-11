@@ -43,6 +43,26 @@ const handler = async (req: Request): Promise<Response> => {
       throw new Error("Un compte existe déjà avec cet email");
     }
 
+    // Check if phone already exists in user metadata
+    const phoneExists = existingUsers?.users.some(u => 
+      u.user_metadata?.phone === phone
+    );
+    
+    if (phoneExists) {
+      throw new Error("Ce numéro de téléphone est déjà utilisé");
+    }
+
+    // Check if phone exists in profiles table
+    const { data: existingProfiles } = await supabaseAdmin
+      .from('profiles')
+      .select('phone')
+      .eq('phone', phone)
+      .maybeSingle();
+    
+    if (existingProfiles) {
+      throw new Error("Ce numéro de téléphone est déjà utilisé");
+    }
+
     // Verify code - look for codes without user_id (signup codes)
     const { data: verificationData, error: verifyError } = await supabaseAdmin
       .from("verification_codes")
@@ -82,12 +102,6 @@ const handler = async (req: Request): Promise<Response> => {
 
     if (signupError) {
       console.error("Error creating user:", signupError);
-      
-      // Handle specific error for duplicate phone
-      if (signupError.message?.includes("duplicate") || signupError.message?.includes("unique")) {
-        throw new Error("Ce numéro de téléphone est déjà utilisé");
-      }
-      
       throw new Error("Impossible de créer le compte");
     }
 

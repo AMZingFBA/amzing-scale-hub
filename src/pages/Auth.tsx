@@ -196,6 +196,7 @@ export default function Auth() {
       if (!response.ok || data.error) {
         const errorMessage = data.error || 'Une erreur est survenue';
         setError(errorMessage);
+        toast.error(errorMessage);
         setIsLoading(false);
         return;
       }
