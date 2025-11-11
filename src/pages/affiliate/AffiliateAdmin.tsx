@@ -296,6 +296,7 @@ const AffiliateAdmin = () => {
         pendingCount: 0,
         totalPaid: 0,
         totalPending: 0,
+        totalRevenue: 0,
         uniqueAffiliates: 0
       };
     }
@@ -330,9 +331,13 @@ const AffiliateAdmin = () => {
     const monthReferrals = paymentMonths.get(targetMonthKey) || [];
     const paidReferrals = monthReferrals.filter(r => r.payment_status === "payé");
     const pendingReferrals = monthReferrals.filter(r => r.payment_status !== "payé");
-    const commissionPerReferral = 34.99 - 6.99; // 28€ par personne
-    const totalPaid = paidReferrals.length * commissionPerReferral;
-    const totalPending = pendingReferrals.length * commissionPerReferral;
+    
+    const paymentPerReferral = 6.99; // Ce que vous payez par parrain
+    const commissionPerReferral = 34.99 - 6.99; // 28€ de revenus par personne
+    
+    const totalPaid = paidReferrals.length * paymentPerReferral; // Ce que vous avez payé
+    const totalPending = pendingReferrals.length * paymentPerReferral; // Ce qu'il reste à payer
+    const totalRevenue = monthReferrals.length * commissionPerReferral; // Vos revenus
 
     return {
       totalReferrals: monthReferrals.length,
@@ -340,6 +345,7 @@ const AffiliateAdmin = () => {
       pendingCount: pendingReferrals.length,
       totalPaid,
       totalPending,
+      totalRevenue,
       uniqueAffiliates: new Set(monthReferrals.map(r => r.referrer_user_id)).size,
       displayMonth: targetMonthKey
     };
@@ -698,7 +704,7 @@ const AffiliateAdmin = () => {
             </CardHeader>
             <CardContent>
               <p className="text-3xl font-bold">
-                {(monthlyStats.totalPaid + monthlyStats.totalPending).toFixed(2)} €
+                {monthlyStats.totalRevenue?.toFixed(2) || '0.00'} €
               </p>
               <p className="text-xs text-muted-foreground mt-1">
                 Revenus du mois
