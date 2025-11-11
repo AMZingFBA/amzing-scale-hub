@@ -51,6 +51,12 @@ const Navbar = () => {
               </div>
               <DropdownMenuSeparator className="my-2" />
               <DropdownMenuItem asChild className="py-3 text-base">
+                <Link to="/affiliate" className="cursor-pointer">
+                  <Handshake className="w-5 h-5 mr-3" />
+                  Deviens partenaire
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild className="py-3 text-base">
                 <Link to="/profile" className="cursor-pointer">
                   <User className="w-5 h-5 mr-3" />
                   Profil
@@ -250,6 +256,12 @@ const Navbar = () => {
                     </Badge>
                   )}
                 </div>
+                <Button variant="outline" size="lg" className="w-full" asChild>
+                  <Link to="/affiliate" onClick={() => setIsOpen(false)}>
+                    <Handshake className="w-4 h-4 mr-2" />
+                    Deviens partenaire
+                  </Link>
+                </Button>
                 <Button
                   variant="outline"
                   size="lg"
