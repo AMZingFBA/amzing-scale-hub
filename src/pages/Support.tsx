@@ -33,7 +33,7 @@ import {
 } from "@/components/ui/select";
 
 const Support = () => {
-  const { user, isVIP } = useAuth();
+  const { user, isVIP, isLoading: isAuthLoading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const { isAdmin, isLoading: isAdminLoading } = useAdmin();
@@ -55,6 +55,11 @@ const Support = () => {
   const isNativeApp = Capacitor.isNativePlatform();
 
   useEffect(() => {
+    // Wait for auth to load
+    if (isAuthLoading || isAdminLoading) {
+      return;
+    }
+
     if (!user || !isVIP) {
       navigate('/');
       return;
@@ -88,7 +93,7 @@ const Support = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [user, isVIP, isAdmin, isAdminLoading, navigate]);
+  }, [user, isVIP, isAdmin, isAdminLoading, isAuthLoading, navigate]);
 
   // Handle URL params for category
   useEffect(() => {
@@ -215,7 +220,7 @@ const Support = () => {
     );
   };
 
-  if (isLoading) {
+  if (isLoading || isAuthLoading || isAdminLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
