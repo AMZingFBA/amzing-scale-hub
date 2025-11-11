@@ -165,10 +165,30 @@ const AffiliateAdmin = () => {
       if (error) throw error;
 
       toast.success("Paiement marqué comme effectué");
-      // Recharger les données
       await fetchAllReferrals();
     } catch (error) {
       console.error("Error marking as paid:", error);
+      toast.error("Erreur lors de la mise à jour");
+    }
+  };
+
+  const handleMarkAsUnpaid = async (referralId: string) => {
+    try {
+      const { error } = await supabase
+        .from("affiliate_referrals")
+        .update({
+          payment_status: "en attente",
+          payment_date: null,
+          payment_month: null
+        })
+        .eq("id", referralId);
+
+      if (error) throw error;
+
+      toast.success("Paiement marqué comme non payé");
+      await fetchAllReferrals();
+    } catch (error) {
+      console.error("Error marking as unpaid:", error);
       toast.error("Erreur lors de la mise à jour");
     }
   };
@@ -372,13 +392,23 @@ const AffiliateAdmin = () => {
                         </div>
                       </div>
                       <div>
-                        <Button
-                          onClick={() => handleMarkAsPaid(referral.id, new Date())}
-                          className="w-full"
-                        >
-                          <Check className="mr-2 h-4 w-4" />
-                          Marquer payé
-                        </Button>
+                        {referral.payment_status === "payé" ? (
+                          <Button
+                            variant="outline"
+                            onClick={() => handleMarkAsUnpaid(referral.id)}
+                            className="w-full"
+                          >
+                            Annuler paiement
+                          </Button>
+                        ) : (
+                          <Button
+                            onClick={() => handleMarkAsPaid(referral.id, new Date())}
+                            className="w-full"
+                          >
+                            <Check className="mr-2 h-4 w-4" />
+                            Marquer payé
+                          </Button>
+                        )}
                       </div>
                     </div>
                   </Card>
@@ -574,7 +604,15 @@ const AffiliateAdmin = () => {
                                     )}
                                   </TableCell>
                                   <TableCell>
-                                    {referral.payment_status !== "payé" && (
+                                    {referral.payment_status === "payé" ? (
+                                      <Button
+                                        size="sm"
+                                        variant="outline"
+                                        onClick={() => handleMarkAsUnpaid(referral.id)}
+                                      >
+                                        Annuler paiement
+                                      </Button>
+                                    ) : (
                                       <Button
                                         size="sm"
                                         onClick={() => handleMarkAsPaid(referral.id, paymentDate)}
