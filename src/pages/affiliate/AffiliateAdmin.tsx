@@ -241,48 +241,61 @@ const AffiliateAdmin = () => {
       .flatMap(([_, data]) => data.referrals.filter(r => r.payment_status === "en attente"));
   };
 
-  // Get monthly statistics (current month)
+  // Get monthly statistics (for the month with most payments coming up)
   const getMonthlyStats = () => {
-    const now = new Date();
-    const startDate = startOfMonth(now);
-    const endDate = endOfMonth(now);
+    if (referrals.length === 0) {
+      return {
+        totalReferrals: 0,
+        paidCount: 0,
+        pendingCount: 0,
+        totalPaid: 0,
+        totalPending: 0,
+        uniqueAffiliates: 0
+      };
+    }
+
+    // Find the month with the most upcoming payments
+    const paymentMonths = new Map<string, typeof referrals>();
     
-    console.log("=== MONTHLY STATS DEBUG ===");
-    console.log("Current date:", format(now, "dd/MM/yyyy"));
-    console.log("Month range:", format(startDate, "dd/MM/yyyy"), "to", format(endDate, "dd/MM/yyyy"));
-    console.log("Total referrals:", referrals.length);
-    
-    const monthReferrals = referrals.filter(r => {
+    referrals.forEach(r => {
       const signupDate = new Date(r.signup_date);
       const paymentDate = addDays(addMonths(signupDate, 1), 7);
-      const isInMonth = paymentDate >= startDate && paymentDate <= endDate;
+      const monthKey = format(paymentDate, "yyyy-MM");
       
-      console.log("Referral:", r.referred_email);
-      console.log("  Signup date:", format(signupDate, "dd/MM/yyyy"));
-      console.log("  Payment date:", format(paymentDate, "dd/MM/yyyy"));
-      console.log("  Is in current month?", isInMonth);
-      console.log("  Status:", r.payment_status);
-      
-      return isInMonth;
+      if (!paymentMonths.has(monthKey)) {
+        paymentMonths.set(monthKey, []);
+      }
+      paymentMonths.get(monthKey)!.push(r);
     });
 
+    // Get the month with most payments (prioritize current or upcoming months)
+    const now = new Date();
+    const currentMonthKey = format(now, "yyyy-MM");
+    
+    let targetMonthKey = currentMonthKey;
+    let maxCount = paymentMonths.get(currentMonthKey)?.length || 0;
+    
+    // If current month has no payments, find the next month with payments
+    if (maxCount === 0) {
+      const sortedMonths = Array.from(paymentMonths.keys()).sort();
+      targetMonthKey = sortedMonths.find(m => m >= currentMonthKey) || sortedMonths[sortedMonths.length - 1];
+    }
+
+    const monthReferrals = paymentMonths.get(targetMonthKey) || [];
     const paidReferrals = monthReferrals.filter(r => r.payment_status === "payé");
     const pendingReferrals = monthReferrals.filter(r => r.payment_status !== "payé");
     const totalPaid = paidReferrals.length * 6.99;
     const totalPending = pendingReferrals.length * 6.99;
 
-    const stats = {
+    return {
       totalReferrals: monthReferrals.length,
       paidCount: paidReferrals.length,
       pendingCount: pendingReferrals.length,
       totalPaid,
       totalPending,
-      uniqueAffiliates: new Set(monthReferrals.map(r => r.referrer_user_id)).size
+      uniqueAffiliates: new Set(monthReferrals.map(r => r.referrer_user_id)).size,
+      displayMonth: targetMonthKey
     };
-
-    console.log("=== FINAL STATS ===", stats);
-
-    return stats;
   };
 
   // Get top affiliates
@@ -441,7 +454,7 @@ const AffiliateAdmin = () => {
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-medium flex items-center gap-2">
                 <Users className="h-4 w-4 text-primary" />
-                Filleuls ce mois
+                Filleuls {monthlyStats.displayMonth && `(${format(new Date(monthlyStats.displayMonth + "-01"), "MMMM yyyy", { locale: fr })})`}
               </CardTitle>
             </CardHeader>
             <CardContent>
