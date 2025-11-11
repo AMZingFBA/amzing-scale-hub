@@ -39,28 +39,23 @@ const AffiliateDashboard = () => {
   const affiliateLink = `${window.location.origin}/auth?tab=signup&ref=${user?.referralCode || ""}`;
 
   useEffect(() => {
-    const checkAccess = async () => {
-      const affiliateUser = localStorage.getItem("affiliate_user");
-      
-      if (!affiliateUser) {
-        navigate("/affiliate/login");
-        return;
-      }
-
-      const userData = JSON.parse(affiliateUser);
-      
-      // Check if user is admin and redirect to admin page
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user && user.email === 'amzingfba26@gmail.com') {
-        navigate("/affiliate/admin");
-        return;
-      }
-      
-      setUser(userData);
-      fetchReferrals(userData.id);
-    };
+    const affiliateUser = localStorage.getItem("affiliate_user");
     
-    checkAccess();
+    if (!affiliateUser) {
+      navigate("/affiliate/login");
+      return;
+    }
+
+    const userData = JSON.parse(affiliateUser);
+    
+    // Check if user is admin and redirect to admin page
+    if (userData.email === 'amzingfba26@gmail.com') {
+      navigate("/affiliate/admin");
+      return;
+    }
+    
+    setUser(userData);
+    fetchReferrals(userData.id);
   }, [navigate]);
 
   const fetchReferrals = async (userId: string) => {

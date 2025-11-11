@@ -54,17 +54,26 @@ const AffiliateAdmin = () => {
 
   useEffect(() => {
     checkAdminAccess();
-    fetchAllReferrals();
   }, [navigate]);
 
-  const checkAdminAccess = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
+  const checkAdminAccess = () => {
+    const affiliateUser = localStorage.getItem("affiliate_user");
     
-    if (!user || user.email !== 'amzingfba26@gmail.com') {
+    if (!affiliateUser) {
       toast.error("Accès non autorisé");
-      navigate("/affiliate");
+      navigate("/affiliate/login");
       return;
     }
+
+    const userData = JSON.parse(affiliateUser);
+    
+    if (userData.email !== 'amzingfba26@gmail.com') {
+      toast.error("Accès non autorisé - Admin uniquement");
+      navigate("/affiliate/dashboard");
+      return;
+    }
+    
+    fetchAllReferrals();
   };
 
   const fetchAllReferrals = async () => {
