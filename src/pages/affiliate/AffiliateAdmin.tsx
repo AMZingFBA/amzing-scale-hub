@@ -247,15 +247,22 @@ const AffiliateAdmin = () => {
     const startDate = startOfMonth(now);
     const endDate = endOfMonth(now);
     
-    console.log("Calculating monthly stats for:", format(startDate, "MMM yyyy"), "Total referrals:", referrals.length);
+    console.log("=== MONTHLY STATS DEBUG ===");
+    console.log("Current date:", format(now, "dd/MM/yyyy"));
+    console.log("Month range:", format(startDate, "dd/MM/yyyy"), "to", format(endDate, "dd/MM/yyyy"));
+    console.log("Total referrals:", referrals.length);
     
     const monthReferrals = referrals.filter(r => {
       const signupDate = new Date(r.signup_date);
       const paymentDate = addDays(addMonths(signupDate, 1), 7);
       const isInMonth = paymentDate >= startDate && paymentDate <= endDate;
-      if (isInMonth) {
-        console.log("Referral in month:", r.referred_email, "Payment date:", format(paymentDate, "dd/MM/yyyy"), "Status:", r.payment_status);
-      }
+      
+      console.log("Referral:", r.referred_email);
+      console.log("  Signup date:", format(signupDate, "dd/MM/yyyy"));
+      console.log("  Payment date:", format(paymentDate, "dd/MM/yyyy"));
+      console.log("  Is in current month?", isInMonth);
+      console.log("  Status:", r.payment_status);
+      
       return isInMonth;
     });
 
@@ -264,15 +271,7 @@ const AffiliateAdmin = () => {
     const totalPaid = paidReferrals.length * 6.99;
     const totalPending = pendingReferrals.length * 6.99;
 
-    console.log("Month stats:", {
-      total: monthReferrals.length,
-      paid: paidReferrals.length,
-      pending: pendingReferrals.length,
-      totalPaid,
-      totalPending
-    });
-
-    return {
+    const stats = {
       totalReferrals: monthReferrals.length,
       paidCount: paidReferrals.length,
       pendingCount: pendingReferrals.length,
@@ -280,6 +279,10 @@ const AffiliateAdmin = () => {
       totalPending,
       uniqueAffiliates: new Set(monthReferrals.map(r => r.referrer_user_id)).size
     };
+
+    console.log("=== FINAL STATS ===", stats);
+
+    return stats;
   };
 
   // Get top affiliates
