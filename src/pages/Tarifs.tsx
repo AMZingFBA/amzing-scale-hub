@@ -65,13 +65,7 @@ const Tarifs = () => {
           {/* Single Pricing Card */}
           <div className="max-w-2xl mx-auto mb-16 animate-fade-in" style={{ animationDelay: '0.3s' }}>
             <Card className="border-2 border-primary shadow-2xl relative group hover:scale-[1.02] hover:shadow-primary/30 transition-all duration-500">
-                 <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-10">
-                <Badge className="bg-gradient-to-r from-primary to-secondary text-white px-6 py-2 text-lg animate-float hover:scale-110 transition-transform cursor-pointer">
-                  <Star className="w-5 h-5 inline mr-2 animate-pulse" />
-                  7 jours gratuits
-                </Badge>
-              </div>
-              <CardHeader className="text-center pb-8 pt-12">
+              <CardHeader className="text-center pb-8 pt-8">
                 <CardTitle className="text-4xl mb-4 group-hover:text-primary transition-colors">Espace VIP AMZing FBA</CardTitle>
                 <CardDescription className="text-lg">Accès complet à tous les outils et services</CardDescription>
                 <div className="mt-8">
@@ -147,7 +141,7 @@ const Tarifs = () => {
                   onClick={handleStartTrial}
                   disabled={isStarting}
                 >
-                  {isStarting ? 'Chargement...' : 'Commencer l\'essai gratuit (7 jours)'}
+                  {isStarting ? 'Chargement...' : 'S\'abonner maintenant'}
                 </Button>
               </CardFooter>
             </Card>
@@ -158,7 +152,7 @@ const Tarifs = () => {
             <CardContent className="p-8 text-center">
               <h3 className="text-2xl font-bold mb-2">Sans engagement</h3>
               <p className="text-muted-foreground mb-4">
-                Teste pendant 7 jours gratuitement. Annule à tout moment sans frais.
+                Annule à tout moment sans frais.
               </p>
               <div className="flex flex-wrap justify-center gap-4">
                 <Badge className="bg-primary/20 text-primary border-primary/30">Paiement sécurisé</Badge>
@@ -197,11 +191,11 @@ const Tarifs = () => {
 
               <Card className="group hover:shadow-lg hover:shadow-primary/10 hover:scale-[1.02] hover:border-primary/30 transition-all duration-300 animate-fade-in" style={{ animationDelay: '0.3s' }}>
                 <CardHeader>
-                  <CardTitle className="text-lg group-hover:text-primary transition-colors">Que comprend la période d{"'"}essai ?</CardTitle>
+                  <CardTitle className="text-lg group-hover:text-primary transition-colors">Que comprend l{"'"}abonnement ?</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-muted-foreground group-hover:translate-x-1 transition-transform duration-300">
-                    Les 7 jours d{"'"}essai gratuits vous donnent accès complet à tous les services : formation, catalogue produits, outils et communauté Discord VIP.
+                    L{"'"}abonnement vous donne accès complet à tous les services : formation, catalogue produits, outils et communauté Discord VIP.
                   </p>
                 </CardContent>
               </Card>

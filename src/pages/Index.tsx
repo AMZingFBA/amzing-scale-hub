@@ -118,7 +118,7 @@ const Index = () => {
         <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-4xl mx-auto text-center">
             <Badge className="mb-6 bg-primary/10 text-primary border-primary/20">
-              7 jours gratuits | Sans engagement | Moniteurs automatiques
+              Sans engagement | Moniteurs automatiques | Outils professionnels
             </Badge>
             
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
@@ -137,7 +137,7 @@ const Index = () => {
                 onClick={startFreeTrial}
                 disabled={isStarting}
               >
-                {isStarting ? 'Activation...' : 'Commencer l\'essai gratuit'} <ArrowRight className="ml-2" />
+                {isStarting ? 'Activation...' : 'S\'abonner maintenant'} <ArrowRight className="ml-2" />
               </Button>
               <Button variant="outline" size="xl" asChild>
                 <Link to="/services">
@@ -146,7 +146,7 @@ const Index = () => {
               </Button>
             </div>
             <p className="mt-6 text-muted-foreground text-lg">
-              34,99€/mois après l'essai gratuit
+              34,99€/mois
             </p>
           </div>
         </div>
@@ -467,7 +467,7 @@ const Index = () => {
             Prêt à démarrer sur Amazon ?
           </h2>
           <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
-            Essaie gratuitement pendant 15 jours, sans engagement
+            Commence dès aujourd'hui, sans engagement
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button 
@@ -477,7 +477,7 @@ const Index = () => {
               onClick={startFreeTrial}
               disabled={isStarting}
             >
-              {isStarting ? 'Activation...' : 'Commencer l\'essai gratuit'}
+              {isStarting ? 'Activation...' : 'S\'abonner maintenant'}
             </Button>
             <Button variant="outline" size="xl" className="border-white text-white hover:bg-white/10" asChild>
               <Link to="/contact">
@@ -486,7 +486,7 @@ const Index = () => {
             </Button>
           </div>
           <p className="mt-6 text-white/90 text-lg">
-            34,99€/mois après l'essai gratuit
+            34,99€/mois
           </p>
         </div>
       </section>

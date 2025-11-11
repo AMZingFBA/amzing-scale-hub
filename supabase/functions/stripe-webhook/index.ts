@@ -88,9 +88,9 @@ serve(async (req) => {
 
       logStep("User found", { userId: profile.id });
 
-      // Calculate expiry date (7 days trial + 30 days subscription)
+      // Calculate expiry date (30 days subscription, no trial)
       const expiresAt = new Date();
-      expiresAt.setDate(expiresAt.getDate() + 37); // 7 days trial + 30 days
+      expiresAt.setMonth(expiresAt.getMonth() + 1); // 30 days subscription
 
       // Update subscription to VIP
       const { error: updateError } = await supabaseClient
@@ -98,7 +98,7 @@ serve(async (req) => {
         .update({
           plan_type: "vip",
           status: "active",
-          is_trial: true,
+          is_trial: false,
           trial_used: true,
           expires_at: expiresAt.toISOString(),
         })

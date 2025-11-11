@@ -83,7 +83,7 @@ export const useTrial = () => {
 
       if (subscription?.trial_used) {
         console.log('⚠️ [startFreeTrial] Trial already used');
-        toast.error('Vous avez déjà un abonnement actif');
+        toast.error('Vous avez déjà utilisé votre période d\'essai');
         setIsStarting(false);
         return;
       }
@@ -285,10 +285,9 @@ export const useTrial = () => {
         return;
       }
 
-      // Mettre à jour la base de données - Abonnement mensuel avec 7 jours d'essai
+      // Mettre à jour la base de données - Abonnement mensuel sans essai
       const expiresAt = new Date();
-      expiresAt.setDate(expiresAt.getDate() + 7); // 7 jours d'essai
-      expiresAt.setMonth(expiresAt.getMonth() + 1); // + 1 mois d'abonnement payant
+      expiresAt.setMonth(expiresAt.getMonth() + 1); // 1 mois d'abonnement
 
       console.log('📝 Mise à jour pour user_id:', user.id);
       
@@ -300,7 +299,7 @@ export const useTrial = () => {
           plan_type: 'vip',
           status: 'active',
           expires_at: expiresAt.toISOString(),
-          is_trial: true,
+          is_trial: false,
           trial_used: true,
           updated_at: new Date().toISOString(),
           started_at: new Date().toISOString()
