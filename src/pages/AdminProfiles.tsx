@@ -3,7 +3,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { Loader2, Users, Mail, Phone, UserCircle, ArrowLeft, Search, Calendar, MessageCircle, Crown, Shield, Filter, ChevronLeft, ChevronRight, Clock, AlertCircle } from 'lucide-react';
+import { Loader2, Users, Mail, Phone, UserCircle, ArrowLeft, Search, Calendar, MessageCircle, Crown, Shield, Filter, ChevronLeft, ChevronRight, Clock, AlertCircle, Trash2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -125,6 +125,42 @@ const AdminProfiles = () => {
     } catch (error) {
       console.error('Error opening conversation:', error);
       toast.error('Erreur lors de l\'ouverture de la conversation');
+    }
+  };
+
+  const handleDeleteUser = async (userId: string, userEmail: string) => {
+    if (!confirm(`Êtes-vous sûr de vouloir supprimer définitivement le compte de ${userEmail} ?\n\nCette action est irréversible et supprimera :\n- Le profil utilisateur\n- Tous les messages\n- L'abonnement\n- Toutes les données associées`)) {
+      return;
+    }
+
+    try {
+      setLoading(true);
+      
+      const { data: sessionData } = await supabase.auth.getSession();
+      if (!sessionData.session?.access_token) {
+        throw new Error("Session non établie");
+      }
+
+      const { data, error } = await supabase.functions.invoke('admin-delete-user', {
+        headers: {
+          Authorization: `Bearer ${sessionData.session.access_token}`,
+        },
+        body: {
+          userId
+        }
+      });
+
+      if (error) throw error;
+
+      toast.success('Utilisateur supprimé avec succès');
+      
+      // Recharger la liste des profils
+      await loadProfiles();
+    } catch (error: any) {
+      console.error('Error deleting user:', error);
+      toast.error(error.message || 'Erreur lors de la suppression de l\'utilisateur');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -515,15 +551,29 @@ const AdminProfiles = () => {
                               </div>
                             </TableCell>
                             <TableCell className="text-right">
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => handleContactUser(profile.id)}
-                                className="gap-2"
-                              >
-                                <MessageCircle className="w-4 h-4" />
-                                Contact
-                              </Button>
+                              <div className="flex gap-2 justify-end">
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => handleContactUser(profile.id)}
+                                  className="gap-2"
+                                >
+                                  <MessageCircle className="w-4 h-4" />
+                                  Contact
+                                </Button>
+                                {profile.role !== 'admin' && (
+                                  <Button
+                                    size="sm"
+                                    variant="destructive"
+                                    onClick={() => handleDeleteUser(profile.id, profile.email)}
+                                    className="gap-2"
+                                    disabled={loading}
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                    Supprimer
+                                  </Button>
+                                )}
+                              </div>
                             </TableCell>
                           </TableRow>
                         ))}
