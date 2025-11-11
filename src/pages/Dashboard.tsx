@@ -65,6 +65,7 @@ const Dashboard = () => {
   const [invoiceAuthOpen, setInvoiceAuthOpen] = useState(false);
   const [reviewsOpen, setReviewsOpen] = useState(false);
   const [gestionInfoOpen, setGestionInfoOpen] = useState(false);
+  const [cashbackOpen, setCashbackOpen] = useState(false);
 
   const handleRefreshDashboard = async () => {
     await loadNotifications();
@@ -148,7 +149,7 @@ const Dashboard = () => {
                   <div className="grid gap-3 pt-2">
                     <CategoryItem icon={Eye} label="création-société" badge={notifications.outils?.subcategories?.['création-société']} />
                     <CategoryItem icon={FileText} label="facture-autorisation" onClick={() => setInvoiceAuthOpen(true)} badge={notifications.outils?.subcategories?.['facture-autorisation']} />
-                    <CategoryItem icon={DollarSign} label="cashback" badge={notifications.outils?.subcategories?.cashback} />
+                    <CategoryItem icon={DollarSign} label="cashback" onClick={() => setCashbackOpen(true)} badge={notifications.outils?.subcategories?.cashback} />
                     <CategoryItem icon={Star} label="avis" onClick={() => setReviewsOpen(true)} badge={notifications.outils?.subcategories?.avis} />
                   </div>
                 </AccordionContent>
@@ -736,6 +737,200 @@ const Dashboard = () => {
                   <p className="text-sm text-muted-foreground">
                     Solution logistique clé en main pour vendeurs Amazon professionnels
                   </p>
+                </CardContent>
+              </Card>
+            </div>
+          </ScrollArea>
+        </DialogContent>
+      </Dialog>
+
+      {/* Cashback Dialog */}
+      <Dialog open={cashbackOpen} onOpenChange={setCashbackOpen}>
+        <DialogContent className="max-w-4xl max-h-[80vh]">
+          <DialogHeader>
+            <DialogTitle className="text-2xl flex items-center gap-3">
+              <DollarSign className="w-7 h-7 text-primary" />
+              💸 Gagne plus à chaque achat avec le Cashback !
+            </DialogTitle>
+            <DialogDescription>
+              Récupère une partie de ton argent sur tes achats en ligne
+            </DialogDescription>
+          </DialogHeader>
+          <ScrollArea className="h-[70vh] pr-4">
+            <div className="space-y-6">
+              {/* Hero Section */}
+              <Card className="border-primary/30 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent overflow-hidden relative">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl" />
+                <CardContent className="pt-6 relative">
+                  <div className="space-y-4">
+                    <div className="flex items-start gap-4">
+                      <div className="p-3 bg-primary/20 rounded-xl animate-pulse">
+                        <Sparkles className="w-8 h-8 text-primary" />
+                      </div>
+                      <div>
+                        <h3 className="text-xl font-bold mb-3">Le cashback, c'est un moyen simple de récupérer une partie de ton argent à chaque achat en ligne 🛍️</h3>
+                        <p className="text-base leading-relaxed text-muted-foreground mb-2">
+                          <strong className="text-foreground">Tu achètes → tu gagnes un pourcentage → tu encaisses 💰</strong>
+                        </p>
+                        <p className="text-base leading-relaxed text-muted-foreground">
+                          En passant par <strong className="text-foreground">Widilo</strong>, tu profites de centaines de partenaires : Amazon, Nike, Sephora, Shein, et plein d'autres !
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Features Grid */}
+              <div className="grid md:grid-cols-3 gap-4">
+                <Card className="border-primary/20 hover:border-primary/40 transition-all duration-300 hover:scale-105">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-lg flex items-center gap-2">
+                      <div className="p-2 bg-primary/10 rounded-lg">
+                        <ShoppingCart className="w-5 h-5 text-primary" />
+                      </div>
+                      Achète normalement
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm text-muted-foreground">
+                      Fais tes achats comme d'habitude sur tes sites préférés
+                    </p>
+                  </CardContent>
+                </Card>
+
+                <Card className="border-primary/20 hover:border-primary/40 transition-all duration-300 hover:scale-105">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-lg flex items-center gap-2">
+                      <div className="p-2 bg-primary/10 rounded-lg">
+                        <DollarSign className="w-5 h-5 text-primary" />
+                      </div>
+                      Gagne du cashback
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm text-muted-foreground">
+                      Récupère automatiquement un pourcentage sur chaque achat
+                    </p>
+                  </CardContent>
+                </Card>
+
+                <Card className="border-primary/20 hover:border-primary/40 transition-all duration-300 hover:scale-105">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-lg flex items-center gap-2">
+                      <div className="p-2 bg-primary/10 rounded-lg">
+                        <CheckCircle className="w-5 h-5 text-primary" />
+                      </div>
+                      Encaisse ton argent
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm text-muted-foreground">
+                      Retire tes gains facilement sur ton compte bancaire
+                    </p>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Stats Section */}
+              <Card className="border-primary/30 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent">
+                <CardContent className="pt-6">
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <div className="text-center p-4 bg-background/80 rounded-lg backdrop-blur-sm">
+                      <div className="text-4xl font-bold text-primary mb-2">Centaines €</div>
+                      <p className="text-sm text-muted-foreground">Économisés par an 💰</p>
+                    </div>
+                    <div className="text-center p-4 bg-background/80 rounded-lg backdrop-blur-sm">
+                      <div className="text-4xl font-bold text-primary mb-2">100% Gratuit</div>
+                      <p className="text-sm text-muted-foreground">Extension automatique 🚀</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* How it Works */}
+              <Card className="border-primary/20">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-lg">
+                    <Sparkles className="w-5 h-5 text-primary" />
+                    Comment ça marche ?
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    <div className="flex items-start gap-3 p-3 rounded-lg bg-accent/30">
+                      <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold flex-shrink-0">1</div>
+                      <p className="text-sm pt-1">
+                        Installe l'extension gratuite Widilo sur ton navigateur
+                      </p>
+                    </div>
+                    
+                    <div className="flex items-start gap-3 p-3 rounded-lg bg-accent/30">
+                      <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold flex-shrink-0">2</div>
+                      <p className="text-sm pt-1">
+                        L'extension active automatiquement ton cashback sur les sites partenaires
+                      </p>
+                    </div>
+                    
+                    <div className="flex items-start gap-3 p-3 rounded-lg bg-accent/30">
+                      <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold flex-shrink-0">3</div>
+                      <p className="text-sm pt-1">
+                        Achète normalement, sans rien changer à tes habitudes
+                      </p>
+                    </div>
+                    
+                    <div className="flex items-start gap-3 p-3 rounded-lg bg-accent/30">
+                      <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold flex-shrink-0">4</div>
+                      <p className="text-sm pt-1">
+                        Regarde ton cashback s'accumuler et retire-le quand tu veux ! 💸
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Partner Brands */}
+              <Card className="border-primary/20">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-lg">
+                    <Star className="w-5 h-5 text-primary" />
+                    Partenaires disponibles
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex flex-wrap gap-3 justify-center">
+                    {['Amazon', 'Nike', 'Sephora', 'Shein', 'AliExpress', 'Booking', 'H&M', 'Zalando'].map((brand) => (
+                      <Badge key={brand} variant="secondary" className="text-sm px-4 py-2">
+                        {brand}
+                      </Badge>
+                    ))}
+                  </div>
+                  <p className="text-sm text-muted-foreground text-center mt-4">
+                    Et des centaines d'autres partenaires ! 🎉
+                  </p>
+                </CardContent>
+              </Card>
+
+              {/* CTA Section */}
+              <Card className="bg-gradient-to-r from-primary/20 via-primary/10 to-transparent border-primary/30">
+                <CardContent className="pt-6">
+                  <div className="text-center space-y-4">
+                    <p className="text-lg font-bold">
+                      🚀 Sur une année, ça peut représenter des centaines d'euros économisés — sans rien changer à tes habitudes d'achat !
+                    </p>
+                    <a 
+                      href="https://www.widilo.fr/i/2U26W5" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-primary/90 transition-all duration-300 hover:scale-105"
+                    >
+                      Commencer à gagner maintenant
+                      <Sparkles className="w-5 h-5" />
+                    </a>
+                    <p className="text-xs text-muted-foreground">
+                      Installation gratuite • Activation automatique • Aucun engagement
+                    </p>
+                  </div>
                 </CardContent>
               </Card>
             </div>

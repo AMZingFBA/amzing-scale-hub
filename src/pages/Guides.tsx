@@ -1,4 +1,4 @@
-import { ArrowLeft, CheckCircle2, TrendingUp, Euro, Package, Store, Shield, Clock, Target, Building2, Wrench, BookOpen, GraduationCap, Search, Users, CreditCard, ShoppingCart, TrendingDown, AlertTriangle, Wallet, Sparkles, ArrowRight, Gift } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, TrendingUp, Euro, Package, Store, Shield, Clock, Target, Building2, Wrench, BookOpen, GraduationCap, Search, Users, CreditCard, ShoppingCart, TrendingDown, AlertTriangle } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useMarkAsRead } from '@/hooks/use-mark-as-read';
 import { Capacitor } from '@capacitor/core';
@@ -8,173 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { useScrollReveal } from '@/hooks/use-scroll-reveal';
 import processFlow from '@/assets/amazon-process-flow.png';
-
-// Composant pour la section Cashback avec animations
-const CashbackSection = () => {
-  const reveal1 = useScrollReveal({ delay: 0, animation: 'fade-up' });
-  const reveal2 = useScrollReveal({ delay: 100, animation: 'fade-up' });
-  const reveal3 = useScrollReveal({ delay: 200, animation: 'fade-up' });
-
-  return (
-    <div className="prose prose-sm max-w-none">
-      {/* Hero Section */}
-      <div 
-        ref={reveal1.ref}
-        className={`relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary via-primary/80 to-primary/60 p-8 md:p-12 mb-8 transition-all duration-700 ${
-          reveal1.isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-        }`}
-      >
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0zNiAxOGMzLjMxNCAwIDYgMi42ODYgNiA2cy0yLjY4NiA2LTYgNi02LTIuNjg2LTYtNiAyLjY4Ni02IDYtNnoiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLW9wYWNpdHk9Ii4xIi8+PC9nPjwvc3ZnPg==')] opacity-20"></div>
-        
-        <div className="relative z-10 text-center text-white">
-          <div className="inline-flex items-center gap-2 mb-4 animate-fade-in">
-            <Sparkles className="w-8 h-8 animate-pulse" />
-            <h3 className="text-3xl md:text-4xl font-bold m-0">💸 Gagne plus à chaque achat avec le Cashback !</h3>
-          </div>
-          
-          <p className="text-xl md:text-2xl mb-6 text-white/90 animate-fade-in animation-delay-100">
-            Le cashback, c'est un moyen simple de récupérer une partie de ton argent à chaque achat en ligne 🛍️
-          </p>
-          
-          <div className="flex items-center justify-center gap-3 text-lg mb-8 flex-wrap animate-fade-in animation-delay-200">
-            <span className="flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full">
-              <ShoppingCart className="w-5 h-5" />
-              Tu achètes
-            </span>
-            <ArrowRight className="w-6 h-6" />
-            <span className="flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full">
-              <TrendingUp className="w-5 h-5" />
-              Tu gagnes un %
-            </span>
-            <ArrowRight className="w-6 h-6" />
-            <span className="flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full">
-              <Euro className="w-5 h-5" />
-              Tu encaisses 💰
-            </span>
-          </div>
-        </div>
-      </div>
-
-      {/* Features Cards */}
-      <div 
-        ref={reveal2.ref}
-        className={`grid md:grid-cols-2 gap-6 mb-8 transition-all duration-700 delay-100 ${
-          reveal2.isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-        }`}
-      >
-        <Card className="border-2 border-primary/20 hover:border-primary/40 transition-all hover:shadow-lg group">
-          <CardHeader>
-            <div className="flex items-center gap-3 mb-2">
-              <div className="p-3 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-colors">
-                <Sparkles className="w-6 h-6 text-primary" />
-              </div>
-              <CardTitle className="text-lg">✨ Widilo - Des centaines de partenaires</CardTitle>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <p className="text-muted-foreground">
-              Profite de cashback sur des centaines de sites partenaires :
-            </p>
-            <div className="flex flex-wrap gap-2">
-              {['Amazon', 'Nike', 'Sephora', 'Shein', 'Booking', 'AliExpress'].map((brand) => (
-                <span key={brand} className="px-3 py-1 bg-primary/10 rounded-full text-sm font-medium">
-                  {brand}
-                </span>
-              ))}
-              <span className="px-3 py-1 bg-primary/10 rounded-full text-sm font-medium">
-                et plein d'autres !
-              </span>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="border-2 border-primary/20 hover:border-primary/40 transition-all hover:shadow-lg group">
-          <CardHeader>
-            <div className="flex items-center gap-3 mb-2">
-              <div className="p-3 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-colors">
-                <Gift className="w-6 h-6 text-primary" />
-              </div>
-              <CardTitle className="text-lg">🚀 Extension gratuite et automatique</CardTitle>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <p className="text-muted-foreground">
-              Installe l'extension gratuite Widilo et laisse-la activer automatiquement ton cashback à chaque achat.
-            </p>
-            <p className="font-semibold text-primary">
-              Aucun effort requis - tout se fait automatiquement ! ✨
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Savings Highlight */}
-      <div 
-        ref={reveal3.ref}
-        className={`relative overflow-hidden rounded-xl bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-primary/10 border-2 border-primary/30 p-6 md:p-8 mb-8 transition-all duration-700 delay-200 ${
-          reveal3.isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-        }`}
-      >
-        <div className="flex items-start gap-4 mb-4">
-          <div className="p-3 rounded-full bg-primary/20 animate-pulse">
-            <TrendingUp className="w-8 h-8 text-primary" />
-          </div>
-          <div>
-            <h4 className="text-xl font-bold mb-2 m-0">💰 Des centaines d'euros économisés sur une année !</h4>
-            <p className="text-muted-foreground text-base m-0">
-              Sans rien changer à tes habitudes d'achat, le cashback s'accumule automatiquement.
-            </p>
-          </div>
-        </div>
-        
-        <div className="bg-background/50 backdrop-blur-sm rounded-lg p-4 border border-primary/20">
-          <div className="grid md:grid-cols-3 gap-4 text-center">
-            <div>
-              <div className="text-3xl font-bold text-primary mb-1">2-15%</div>
-              <div className="text-sm text-muted-foreground">de cashback moyen</div>
-            </div>
-            <div>
-              <div className="text-3xl font-bold text-primary mb-1">500+</div>
-              <div className="text-sm text-muted-foreground">sites partenaires</div>
-            </div>
-            <div>
-              <div className="text-3xl font-bold text-primary mb-1">0€</div>
-              <div className="text-sm text-muted-foreground">frais d'inscription</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* CTA Section */}
-      <div className="text-center bg-gradient-to-br from-primary/5 to-primary/10 rounded-xl p-8 border-2 border-primary/20">
-        <h4 className="text-2xl font-bold mb-4 m-0">🎁 Prêt à économiser sur tous tes achats ?</h4>
-        <p className="text-lg text-muted-foreground mb-6">
-          Rejoins des milliers d'utilisateurs qui profitent déjà du cashback Widilo !
-        </p>
-        <a 
-          href="https://www.widilo.fr/i/2U26W5" 
-          target="_blank" 
-          rel="noopener noreferrer"
-          className="inline-block no-underline"
-        >
-          <Button 
-            size="lg" 
-            className="text-lg px-8 py-6 bg-primary hover:bg-primary/90 shadow-lg hover:shadow-xl transition-all hover:scale-105 group"
-          >
-            <Sparkles className="w-5 h-5 mr-2 group-hover:animate-pulse" />
-            Commencer à gagner maintenant
-            <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
-          </Button>
-        </a>
-        <p className="text-sm text-muted-foreground mt-4 m-0">
-          💡 Inscription gratuite - Aucune carte bancaire requise
-        </p>
-      </div>
-    </div>
-  );
-};
 
 const Guides = () => {
   const navigate = useNavigate();
@@ -1491,19 +1325,6 @@ const Guides = () => {
                           </ul>
                         </div>
                       </div>
-                    </AccordionContent>
-                  </AccordionItem>
-
-                  {/* Cashback Widilo */}
-                  <AccordionItem value="cashback" className="border rounded-lg px-6 bg-card">
-                    <AccordionTrigger className="text-lg font-semibold hover:no-underline">
-                      <div className="flex items-center gap-3">
-                        <Wallet className="w-5 h-5 text-primary" />
-                        <span>Cashback - Gagne de l'argent sur tes achats</span>
-                      </div>
-                    </AccordionTrigger>
-                    <AccordionContent className="space-y-6 pt-4">
-                      <CashbackSection />
                     </AccordionContent>
                   </AccordionItem>
 
