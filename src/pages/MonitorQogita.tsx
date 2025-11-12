@@ -9,15 +9,17 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { AlertCircle, Crown, Database, ExternalLink, RefreshCw } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 interface QogitaAlert {
   id: string;
+  external_id: string;
   title: string;
-  description: string;
-  price?: number;
-  url?: string;
-  timestamp: string;
-  category?: string;
+  description: string | null;
+  price: number | null;
+  url: string | null;
+  created_at: string;
+  category: string | null;
 }
 
 const MonitorQogita = () => {
@@ -32,12 +34,13 @@ const MonitorQogita = () => {
     setIsLoadingAlerts(true);
     setError(null);
     try {
-      const response = await fetch('http://localhost:3000/monitor/qogita');
-      if (!response.ok) {
-        throw new Error('Erreur lors du chargement des alertes');
-      }
-      const data = await response.json();
-      setAlerts(data);
+      const { data, error } = await supabase
+        .from('qogita_alerts')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setAlerts(data || []);
     } catch (err) {
       setError('Impossible de charger les alertes Qogita');
       toast({
@@ -50,9 +53,69 @@ const MonitorQogita = () => {
     }
   };
 
+  const syncAlerts = async () => {
+    try {
+      toast({
+        title: "Synchronisation",
+        description: "Synchronisation des alertes en cours...",
+      });
+
+      const { error } = await supabase.functions.invoke('sync-qogita-alerts');
+      
+      if (error) throw error;
+
+      toast({
+        title: "Succès",
+        description: "Alertes synchronisées avec succès",
+      });
+
+      loadAlerts();
+    } catch (err) {
+      toast({
+        title: "Erreur",
+        description: "Échec de la synchronisation",
+        variant: "destructive",
+      });
+    }
+  };
+
   useEffect(() => {
     if (user && (isVIP || isAdmin)) {
       loadAlerts();
+
+      // Configuration du realtime
+      const channel = supabase
+        .channel('qogita-alerts-changes')
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'qogita_alerts'
+          },
+          (payload) => {
+            console.log('Realtime update:', payload);
+            
+            if (payload.eventType === 'INSERT') {
+              setAlerts(prev => [payload.new as QogitaAlert, ...prev]);
+              toast({
+                title: "Nouvelle alerte",
+                description: (payload.new as QogitaAlert).title,
+              });
+            } else if (payload.eventType === 'UPDATE') {
+              setAlerts(prev => prev.map(alert => 
+                alert.id === payload.new.id ? payload.new as QogitaAlert : alert
+              ));
+            } else if (payload.eventType === 'DELETE') {
+              setAlerts(prev => prev.filter(alert => alert.id !== payload.old.id));
+            }
+          }
+        )
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(channel);
+      };
     }
   }, [user, isVIP, isAdmin]);
 
@@ -147,14 +210,23 @@ const MonitorQogita = () => {
                   </p>
                 </div>
               </div>
-              <Button
-                onClick={loadAlerts}
-                disabled={isLoadingAlerts}
-                variant="outline"
-              >
-                <RefreshCw className={`w-4 h-4 mr-2 ${isLoadingAlerts ? 'animate-spin' : ''}`} />
-                Actualiser
-              </Button>
+              <div className="flex gap-2">
+                <Button
+                  onClick={syncAlerts}
+                  variant="outline"
+                >
+                  <Database className="w-4 h-4 mr-2" />
+                  Synchroniser
+                </Button>
+                <Button
+                  onClick={loadAlerts}
+                  disabled={isLoadingAlerts}
+                  variant="outline"
+                >
+                  <RefreshCw className={`w-4 h-4 mr-2 ${isLoadingAlerts ? 'animate-spin' : ''}`} />
+                  Actualiser
+                </Button>
+              </div>
             </div>
 
             {error && (
@@ -206,7 +278,7 @@ const MonitorQogita = () => {
                             </span>
                           )}
                           <span>
-                            {new Date(alert.timestamp).toLocaleDateString('fr-FR', {
+                            {new Date(alert.created_at).toLocaleDateString('fr-FR', {
                               day: '2-digit',
                               month: 'short',
                               year: 'numeric',

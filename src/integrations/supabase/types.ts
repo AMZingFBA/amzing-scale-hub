@@ -833,6 +833,42 @@ export type Database = {
         }
         Relationships: []
       }
+      qogita_alerts: {
+        Row: {
+          category: string | null
+          created_at: string
+          description: string | null
+          external_id: string | null
+          id: string
+          price: number | null
+          title: string
+          updated_at: string
+          url: string | null
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          external_id?: string | null
+          id?: string
+          price?: number | null
+          title: string
+          updated_at?: string
+          url?: string | null
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          external_id?: string | null
+          id?: string
+          price?: number | null
+          title?: string
+          updated_at?: string
+          url?: string | null
+        }
+        Relationships: []
+      }
       subscriptions: {
         Row: {
           apple_transaction_id: string | null
