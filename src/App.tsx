@@ -52,6 +52,7 @@ import AffiliateLogin from "./pages/affiliate/AffiliateLogin";
 import AffiliateVerify from "./pages/affiliate/AffiliateVerify";
 import AffiliateDashboard from "./pages/affiliate/AffiliateDashboard";
 import AffiliateAdmin from "./pages/affiliate/AffiliateAdmin";
+import MonitorQogita from "./pages/MonitorQogita";
 
 const queryClient = new QueryClient();
 
@@ -116,6 +117,7 @@ const App = () => (
             <Route path="/affiliate/verify" element={<AffiliateVerify />} />
             <Route path="/affiliate/dashboard" element={<AffiliateDashboard />} />
             <Route path="/affiliate/admin" element={<AffiliateAdmin />} />
+            <Route path="/monitor/qogita" element={<MonitorQogita />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
