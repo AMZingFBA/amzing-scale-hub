@@ -72,20 +72,30 @@ serve(async (req) => {
       };
     });
 
-    // Upsert dans la DB (mise à jour si existe, insertion sinon)
+    // Supprimer tous les anciens produits
+    const { error: deleteError } = await supabase
+      .from('qogita_products')
+      .delete()
+      .neq('id', '00000000-0000-0000-0000-000000000000'); // Delete all
+
+    if (deleteError) {
+      console.error('❌ Erreur lors de la suppression des anciens produits:', deleteError);
+      throw deleteError;
+    }
+
+    console.log('🗑️ Anciens produits supprimés');
+
+    // Insérer les nouveaux produits
     const { data, error } = await supabase
       .from('qogita_products')
-      .upsert(transformedProducts, { 
-        onConflict: 'ean,timestamp',
-        ignoreDuplicates: false 
-      });
+      .insert(transformedProducts);
 
     if (error) {
-      console.error('❌ Erreur lors de la synchronisation:', error);
+      console.error('❌ Erreur lors de l\'insertion:', error);
       throw error;
     }
 
-    console.log(`✅ ${transformedProducts.length} produits synchronisés vers la DB`);
+    console.log(`✅ ${transformedProducts.length} nouveaux produits insérés dans la DB`);
 
     return new Response(
       JSON.stringify({ 
