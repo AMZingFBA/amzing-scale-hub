@@ -187,6 +187,20 @@ export default function ProduitsQogita() {
     currentPage * PRODUCTS_PER_PAGE
   );
 
+  // Reset to page 1 if current page is out of bounds
+  useEffect(() => {
+    if (currentPage > totalPages && totalPages > 0) {
+      setCurrentPage(1);
+      localStorage.setItem(CURRENT_PAGE_KEY, '1');
+    }
+  }, [currentPage, totalPages]);
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+    localStorage.setItem(CURRENT_PAGE_KEY, '1');
+  }, [minProfit, minROI, maxBSR, searchEAN, profitType, fbmCost]);
+
   // Save scroll position
   const saveScrollPosition = () => {
     localStorage.setItem(SCROLL_POSITION_KEY, window.scrollY.toString());
