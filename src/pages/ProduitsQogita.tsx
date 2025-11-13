@@ -131,10 +131,12 @@ export default function ProduitsQogita() {
 
       setProducts(transformedProducts);
       
-      // Get the most recent timestamp from products
+      // Get the most recent timestamp from ALL products (not just first by profit)
       if (transformedProducts.length > 0) {
-        const mostRecent = transformedProducts[0].timestamp;
-        setLastUpdate(mostRecent);
+        const mostRecentProduct = transformedProducts.reduce((latest, current) => {
+          return new Date(current.timestamp) > new Date(latest.timestamp) ? current : latest;
+        });
+        setLastUpdate(mostRecentProduct.timestamp);
       }
     } catch (error) {
       console.error('Error loading products:', error);
