@@ -425,11 +425,20 @@ export default function ProduitsQogita() {
                     if (value === '' || value === '0') {
                       setFbmCost('0');
                     } else {
-                      // Enlève les zéros du début automatiquement
                       const numValue = parseFloat(value);
                       if (!isNaN(numValue) && numValue >= 0) {
-                        setFbmCost(value);
+                        // Convertir en nombre puis en string pour enlever les zéros du début
+                        setFbmCost(String(numValue));
                       }
+                    }
+                  }}
+                  onBlur={(e) => {
+                    // Au blur, nettoyer la valeur
+                    const numValue = parseFloat(e.target.value);
+                    if (!isNaN(numValue) && numValue > 0) {
+                      setFbmCost(String(numValue));
+                    } else {
+                      setFbmCost('0');
                     }
                   }}
                   className="h-11 border-2 focus:ring-2"
@@ -443,6 +452,8 @@ export default function ProduitsQogita() {
                 <label className="text-sm font-semibold mb-3 block text-foreground">Profit min (€)</label>
                 <Input
                   type="number"
+                  min="0"
+                  step="0.01"
                   placeholder="Ex: 2.00"
                   value={minProfit}
                   onChange={(e) => setMinProfit(e.target.value)}
@@ -453,6 +464,8 @@ export default function ProduitsQogita() {
                 <label className="text-sm font-semibold mb-3 block text-foreground">ROI min (%)</label>
                 <Input
                   type="number"
+                  min="0"
+                  step="0.01"
                   placeholder="Ex: 20"
                   value={minROI}
                   onChange={(e) => setMinROI(e.target.value)}
