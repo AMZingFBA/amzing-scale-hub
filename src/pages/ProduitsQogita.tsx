@@ -80,6 +80,7 @@ export default function ProduitsQogita() {
     return saved ? parseInt(saved) : 1;
   });
   const [lastUpdate, setLastUpdate] = useState<string>('');
+  const [lastRefresh, setLastRefresh] = useState<string>('');
 
   // Filters
   const [minProfit, setMinProfit] = useState('');
@@ -138,6 +139,9 @@ export default function ProduitsQogita() {
         });
         setLastUpdate(mostRecentProduct.timestamp);
       }
+      
+      // Set the current time as last refresh time
+      setLastRefresh(new Date().toISOString());
     } catch (error) {
       console.error('Error loading products:', error);
       toast.error('Erreur lors du chargement des produits');
@@ -311,9 +315,13 @@ export default function ProduitsQogita() {
           <Card>
             <CardContent className="flex items-center justify-between p-6">
               <div>
-                <p className="text-sm text-muted-foreground">Dernière MAJ</p>
+                <p className="text-sm text-muted-foreground">Dernier chargement</p>
                 <p className="text-sm font-semibold">
-                  {lastUpdate ? new Date(lastUpdate).toLocaleString('fr-FR') : '-'}
+                  {lastRefresh ? new Date(lastRefresh).toLocaleString('fr-FR', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit'
+                  }) : '-'}
                 </p>
               </div>
               <Clock className="w-8 h-8 text-primary" />
