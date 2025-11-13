@@ -1,6 +1,5 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { useAdmin } from '@/hooks/use-admin';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -31,6 +30,38 @@ interface QogitaProduct {
   created_at: string;
 }
 
+interface GistProduct {
+  ean: string;
+  timestamp: string;
+  qogita: {
+    priceHT: number;
+    priceTTC: number;
+    stock: number;
+  };
+  selleramp: {
+    bsr: string;
+    salePrice: number;
+    sales: string;
+    sellers: string;
+    variations: string;
+  };
+  fbm: {
+    profit: number;
+    roi: number;
+  };
+  fba: {
+    profit: number;
+    roi: number;
+  };
+  alerts: string[];
+}
+
+interface GistData {
+  generated: string;
+  total: number;
+  products: GistProduct[];
+}
+
 const PRODUCTS_PER_PAGE = 50;
 const SCROLL_POSITION_KEY = 'qogita_scroll_position';
 const CURRENT_PAGE_KEY = 'qogita_current_page';
@@ -46,6 +77,7 @@ export default function ProduitsQogita() {
     const saved = localStorage.getItem(CURRENT_PAGE_KEY);
     return saved ? parseInt(saved) : 1;
   });
+  const [lastUpdate, setLastUpdate] = useState<string>('');
 
   // Filters
   const [minProfit, setMinProfit] = useState('');
@@ -53,16 +85,38 @@ export default function ProduitsQogita() {
   const [maxBSR, setMaxBSR] = useState('');
   const [searchEAN, setSearchEAN] = useState('');
 
-  // Load products
+  // Load products from GitHub Gist
   const loadProducts = async () => {
     try {
-      const { data, error } = await supabase
-        .from('qogita_products')
-        .select('*')
-        .order('timestamp', { ascending: false });
+      const response = await fetch('https://gist.githubusercontent.com/AMZingFBA/9692a715b1722675304b151235a98660/raw');
+      const gistData: GistData = await response.json();
+      
+      // Transform Gist data to app format
+      const transformedProducts: QogitaProduct[] = gistData.products.map((p, index) => ({
+        id: `${p.ean}-${index}`,
+        ean: p.ean,
+        timestamp: p.timestamp,
+        qogita_price_ht: p.qogita.priceHT,
+        qogita_price_ttc: p.qogita.priceTTC,
+        qogita_stock: p.qogita.stock,
+        selleramp_bsr: p.selleramp.bsr,
+        selleramp_sale_price: p.selleramp.salePrice,
+        selleramp_sales: p.selleramp.sales,
+        selleramp_sellers: p.selleramp.sellers,
+        selleramp_variations: p.selleramp.variations,
+        fbm_profit: p.fbm.profit,
+        fbm_roi: p.fbm.roi,
+        fba_profit: p.fba.profit,
+        fba_roi: p.fba.roi,
+        alerts: p.alerts,
+        created_at: new Date().toISOString()
+      }));
 
-      if (error) throw error;
-      setProducts(data || []);
+      // Sort by FBM profit descending
+      transformedProducts.sort((a, b) => (b.fbm_profit || 0) - (a.fbm_profit || 0));
+
+      setProducts(transformedProducts);
+      setLastUpdate(gistData.generated);
     } catch (error) {
       console.error('Error loading products:', error);
       toast.error('Erreur lors du chargement des produits');
@@ -126,38 +180,16 @@ export default function ProduitsQogita() {
     }
   }, [user, authLoading]);
 
-  // Realtime subscription
-  useEffect(() => {
-    if (!user) return;
-
-    const channel = supabase
-      .channel('qogita_products_changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'qogita_products',
-        },
-        () => {
-          loadProducts();
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [user]);
-
   // Auto-refresh every 60 seconds
   useEffect(() => {
+    if (!user) return;
+    
     const interval = setInterval(() => {
       loadProducts();
     }, 60000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [user]);
 
   const handleRefresh = () => {
     setIsRefreshing(true);
@@ -236,7 +268,7 @@ export default function ProduitsQogita() {
               <div>
                 <p className="text-sm text-muted-foreground">Dernière MAJ</p>
                 <p className="text-sm font-semibold">
-                  {products[0] ? new Date(products[0].timestamp).toLocaleString('fr-FR') : '-'}
+                  {lastUpdate ? new Date(lastUpdate).toLocaleString('fr-FR') : '-'}
                 </p>
               </div>
               <Clock className="w-8 h-8 text-primary" />
