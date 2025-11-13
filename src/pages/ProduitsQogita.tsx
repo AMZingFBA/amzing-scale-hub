@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/use-auth';
 import { useAdmin } from '@/hooks/use-admin';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -69,6 +69,7 @@ const CURRENT_PAGE_KEY = 'qogita_current_page';
 
 export default function ProduitsQogita() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user, isLoading: authLoading, isVIP } = useAuth();
   const { isAdmin } = useAdmin();
   const [products, setProducts] = useState<QogitaProduct[]>([]);
@@ -197,6 +198,17 @@ export default function ProduitsQogita() {
       loadProducts();
     }
   }, [user, authLoading]);
+
+  // Écouter les changements d'URL pour forcer le reload
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    if (params.get('refresh') === 'true') {
+      console.log('🔄 Force refresh depuis URL');
+      loadProducts();
+      // Nettoyer l'URL
+      navigate('/produits-gagnants/produits-qogita', { replace: true });
+    }
+  }, [location.search]);
 
   // Auto-refresh every 30 seconds
   useEffect(() => {

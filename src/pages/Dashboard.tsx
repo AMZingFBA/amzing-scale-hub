@@ -87,17 +87,29 @@ const Dashboard = () => {
           description: "Impossible de synchroniser les produits",
           variant: "destructive"
         });
-      } else {
-        toast({
-          title: "✅ Synchronisé !",
-          description: "Produits mis à jour avec succès"
-        });
+        setIsSyncing(false);
+        return;
       }
+      
+      // Attendre un peu pour que la DB se mette à jour
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      toast({
+        title: "✅ Synchronisé !",
+        description: "Produits mis à jour avec succès"
+      });
+      
+      // Naviguer avec un paramètre pour forcer le reload
+      navigate('/produits-gagnants/produits-qogita?refresh=true');
     } catch (error) {
       console.error('Erreur:', error);
+      toast({
+        title: "⚠️ Erreur",
+        description: "Impossible de synchroniser les produits",
+        variant: "destructive"
+      });
     } finally {
       setIsSyncing(false);
-      navigate('/produits-gagnants/produits-qogita');
     }
   };
 
