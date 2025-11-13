@@ -325,7 +325,7 @@ export default function ProduitsQogita() {
               <ArrowLeft className="w-6 h-6 md:w-5 md:h-5 text-white" />
             </button>
             <div className="text-center flex-1">
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-orange-500 via-amber-500 to-yellow-500 bg-[length:200%_auto] animate-gradient-shift bg-clip-text text-transparent">
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-orange-500 via-amber-500 via-yellow-500 via-green-500 via-cyan-500 to-blue-500 bg-[length:200%_auto] animate-[gradient-shift_2s_ease-in-out_infinite] bg-clip-text text-transparent pb-2 leading-tight">
                 🚀 Monitor Qogita
               </h1>
               <p className="text-muted-foreground text-lg">
