@@ -541,8 +541,8 @@ export default function ProduitsQogita() {
                             <div className="flex items-center gap-2">
                               <span className="text-sm text-muted-foreground">Profit FBM</span>
                               {fbmCostValue > 0 && (
-                                <span className="px-2 py-0.5 text-xs font-medium bg-orange-100 text-orange-700 rounded-full">
-                                  Ajusté -{fbmCostValue}€
+                                <span className="px-2 py-0.5 text-xs font-medium bg-orange-100 text-orange-700 rounded-full border border-orange-300">
+                                  Coûts FBM -{fbmCostValue}€
                                 </span>
                               )}
                             </div>
