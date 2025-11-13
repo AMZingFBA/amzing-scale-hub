@@ -9,6 +9,9 @@ verify_jwt = false
 [functions.sync-qogita-to-gist]
 verify_jwt = false
 
+[functions.sync-gist-to-db]
+verify_jwt = false
+
 [functions.stripe-webhook]
 verify_jwt = false
 
