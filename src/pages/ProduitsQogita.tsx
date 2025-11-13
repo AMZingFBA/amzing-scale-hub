@@ -127,9 +127,7 @@ export default function ProduitsQogita() {
         created_at: p.created_at
       }));
 
-      // Sort by FBM profit descending
-      transformedProducts.sort((a, b) => (b.fbm_profit || 0) - (a.fbm_profit || 0));
-
+      // Garde l'ordre par timestamp de la requête SQL (du plus récent au moins récent)
       setProducts(transformedProducts);
       
       // Get the most recent timestamp from ALL products (not just first by profit)
