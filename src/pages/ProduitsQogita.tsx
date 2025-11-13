@@ -378,9 +378,9 @@ export default function ProduitsQogita() {
                   <CardHeader>
                     <CardTitle className="text-lg flex items-center justify-between">
                       <span className="font-mono">{product.ean}</span>
-                      {product.alerts && product.alerts.length > 0 && (
+                      {product.alerts && product.alerts.filter(alert => alert !== 'V').length > 0 && (
                         <Badge variant="outline" className="bg-orange-100 text-orange-800 border-orange-300">
-                          {product.alerts.join(', ')}
+                          {product.alerts.filter(alert => alert !== 'V').join(', ')}
                         </Badge>
                       )}
                     </CardTitle>
@@ -419,6 +419,12 @@ export default function ProduitsQogita() {
                       <div className="flex justify-between items-center">
                         <span className="text-sm text-muted-foreground">Sellers</span>
                         <span className="font-semibold">{product.selleramp_sellers}</span>
+                      </div>
+                    )}
+                    {product.selleramp_variations && product.selleramp_variations !== 'None' && product.selleramp_variations !== 'No' && (
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-muted-foreground">Variations</span>
+                        <span className="font-semibold">{product.selleramp_variations}</span>
                       </div>
                     )}
 
