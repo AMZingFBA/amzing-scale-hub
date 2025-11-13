@@ -88,7 +88,7 @@ export default function ProduitsQogita() {
   // Load products from GitHub Gist
   const loadProducts = async () => {
     try {
-      const response = await fetch('https://gist.githubusercontent.com/AMZingFBA/9692a715b1722675304b151235a98660/raw');
+      const response = await fetch('https://gist.githubusercontent.com/raw/8152fd7f63434f16118c967e041a9144/results.json');
       
       if (!response.ok) {
         throw new Error('Failed to fetch products');
