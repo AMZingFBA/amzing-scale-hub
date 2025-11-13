@@ -524,12 +524,6 @@ export default function ProduitsQogita() {
                         <span className="font-semibold">{product.selleramp_bsr}</span>
                       </div>
                     )}
-                    {product.selleramp_sale_price && product.selleramp_sale_price > 0 && (
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm text-muted-foreground">Sale Price</span>
-                        <span className="font-semibold">{product.selleramp_sale_price}€</span>
-                      </div>
-                    )}
                     {product.selleramp_sales && (
                       <div className="flex justify-between items-center">
                         <span className="text-sm text-muted-foreground">Ventes</span>
