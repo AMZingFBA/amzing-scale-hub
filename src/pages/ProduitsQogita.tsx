@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 
-import { Loader2, TrendingUp, Package, Clock, ArrowLeft, Copy, ExternalLink, Store, BarChart3, ShoppingCart } from 'lucide-react';
+import { Loader2, TrendingUp, Package, Clock, ArrowLeft, Copy, ExternalLink, Store, BarChart3, ShoppingCart, RotateCcw } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -378,6 +378,26 @@ export default function ProduitsQogita() {
         {/* Filters */}
         <Card className="mb-8 border-2">
           <CardContent className="p-8">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-lg font-semibold text-foreground">Filtres</h3>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  setProfitType('both');
+                  setFbmCost('0');
+                  setMinProfit('');
+                  setMinROI('');
+                  setMaxBSR('');
+                  setSearchEAN('');
+                  toast.success('Filtres réinitialisés');
+                }}
+                className="gap-2"
+              >
+                <RotateCcw className="w-4 h-4" />
+                Réinitialiser
+              </Button>
+            </div>
             {/* Type de profit section */}
             <div className="flex flex-col lg:flex-row items-center justify-between gap-6 pb-6 border-b border-border">
               <div className="flex-1 w-full">
