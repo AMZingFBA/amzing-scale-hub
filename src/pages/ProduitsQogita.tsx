@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 
-import { Loader2, TrendingUp, Package, Clock, ArrowLeft, Copy } from 'lucide-react';
+import { Loader2, TrendingUp, Package, Clock, ArrowLeft, Copy, ExternalLink, Store, BarChart3, ShoppingCart } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -18,16 +18,19 @@ interface QogitaProduct {
   qogita_price_ht: number;
   qogita_price_ttc: number;
   qogita_stock: number;
+  qogita_url?: string;
   selleramp_bsr?: string;
   selleramp_sale_price?: number;
   selleramp_sales?: string;
   selleramp_sellers?: string;
   selleramp_variations?: string;
+  selleramp_url?: string;
   fbm_profit?: number;
   fbm_roi?: number;
   fba_profit?: number;
   fba_roi?: number;
   alerts?: string[];
+  amazon_url?: string;
   created_at: string;
 }
 
@@ -38,6 +41,7 @@ interface GistProduct {
     priceHT: number;
     priceTTC: number;
     stock: number;
+    url?: string;
   };
   selleramp?: {
     bsr: string;
@@ -45,6 +49,7 @@ interface GistProduct {
     sales: string;
     sellers: string;
     variations: string;
+    url?: string;
   };
   fbm?: {
     profit: number;
@@ -55,6 +60,9 @@ interface GistProduct {
     roi: number;
   };
   alerts?: string[];
+  amazon?: {
+    url?: string;
+  };
 }
 
 interface GistData {
@@ -116,16 +124,19 @@ export default function ProduitsQogita() {
         qogita_price_ht: p.qogita_price_ht,
         qogita_price_ttc: p.qogita_price_ttc,
         qogita_stock: p.qogita_stock,
+        qogita_url: p.qogita_url,
         selleramp_bsr: p.selleramp_bsr || 'N/A',
         selleramp_sale_price: p.selleramp_sale_price || null,
         selleramp_sales: p.selleramp_sales || 'Unknown',
         selleramp_sellers: p.selleramp_sellers || 'N/A',
         selleramp_variations: p.selleramp_variations || 'None',
+        selleramp_url: p.selleramp_url,
         fbm_profit: p.fbm_profit || 0,
         fbm_roi: p.fbm_roi || 0,
         fba_profit: p.fba_profit || 0,
         fba_roi: p.fba_roi || 0,
         alerts: p.alerts || [],
+        amazon_url: p.amazon_url,
         created_at: p.created_at
       }));
 
@@ -570,6 +581,46 @@ export default function ProduitsQogita() {
                           </span>
                         </div>
                       )}
+                    </div>
+
+                    {/* Quick Links - Professional & Creative */}
+                    <div className="pt-4 border-t">
+                      <p className="text-xs font-semibold text-muted-foreground mb-3">Liens rapides</p>
+                      <div className="grid grid-cols-3 gap-2">
+                        {product.qogita_url && (
+                          <a
+                            href={product.qogita_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex flex-col items-center justify-center gap-1.5 p-3 rounded-lg bg-gradient-to-br from-blue-50 to-blue-100 hover:from-blue-100 hover:to-blue-200 border border-blue-200 transition-all hover:shadow-md group"
+                          >
+                            <Store className="h-4 w-4 text-blue-600 group-hover:scale-110 transition-transform" />
+                            <span className="text-xs font-semibold text-blue-700">Qogita</span>
+                          </a>
+                        )}
+                        {product.selleramp_url && (
+                          <a
+                            href={product.selleramp_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex flex-col items-center justify-center gap-1.5 p-3 rounded-lg bg-gradient-to-br from-purple-50 to-purple-100 hover:from-purple-100 hover:to-purple-200 border border-purple-200 transition-all hover:shadow-md group"
+                          >
+                            <BarChart3 className="h-4 w-4 text-purple-600 group-hover:scale-110 transition-transform" />
+                            <span className="text-xs font-semibold text-purple-700">SellerAmp</span>
+                          </a>
+                        )}
+                        {product.amazon_url && (
+                          <a
+                            href={product.amazon_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex flex-col items-center justify-center gap-1.5 p-3 rounded-lg bg-gradient-to-br from-orange-50 to-orange-100 hover:from-orange-100 hover:to-orange-200 border border-orange-200 transition-all hover:shadow-md group"
+                          >
+                            <ShoppingCart className="h-4 w-4 text-orange-600 group-hover:scale-110 transition-transform" />
+                            <span className="text-xs font-semibold text-orange-700">Amazon</span>
+                          </a>
+                        )}
+                      </div>
                     </div>
                   </CardContent>
                 </Card>

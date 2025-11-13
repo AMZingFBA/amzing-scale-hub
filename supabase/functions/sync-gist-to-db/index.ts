@@ -72,16 +72,19 @@ serve(async (req) => {
         qogita_price_ht: product.qogita?.priceHT || 0,
         qogita_price_ttc: product.qogita?.priceTTC || 0,
         qogita_stock: product.qogita?.stock || 0,
+        qogita_url: product.qogita?.url || null,
         selleramp_bsr: product.selleramp?.bsr || null,
         selleramp_sale_price: product.selleramp?.salePrice || null,
         selleramp_sales: product.selleramp?.sales || null,
         selleramp_sellers: product.selleramp?.sellers || null,
         selleramp_variations: product.selleramp?.variations || null,
+        selleramp_url: product.selleramp?.url || null,
         fbm_profit: product.fbm?.profit || null,
         fbm_roi: product.fbm?.roi || null,
         fba_profit: product.fba?.profit || null,
         fba_roi: product.fba?.roi || null,
         alerts: product.alerts || [],
+        amazon_url: product.amazon?.url || null,
       };
     });
 
