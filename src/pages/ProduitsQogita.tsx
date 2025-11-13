@@ -325,8 +325,8 @@ export default function ProduitsQogita() {
               <ArrowLeft className="w-6 h-6 md:w-5 md:h-5 text-white" />
             </button>
             <div className="text-center flex-1">
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-primary via-purple-500 to-primary bg-clip-text text-transparent">
-                🚀 Monitor Qogita → SellerAmp
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-orange-500 via-amber-500 to-orange-500 bg-clip-text text-transparent animate-pulse">
+                🚀 Monitor Qogita
               </h1>
               <p className="text-muted-foreground text-lg">
                 Produits rentables en temps réel
