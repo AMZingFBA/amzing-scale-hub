@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { RefreshButton } from '@/components/RefreshButton';
-import { Loader2, TrendingUp, Package, Clock } from 'lucide-react';
+import { Loader2, TrendingUp, Package, Clock, ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface QogitaProduct {
@@ -243,13 +243,24 @@ export default function ProduitsQogita() {
     <div className="min-h-screen bg-gradient-to-br from-background via-secondary/10 to-primary/5">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
-        <div className="mb-8 text-center space-y-2">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-primary via-purple-500 to-primary bg-clip-text text-transparent">
-            🚀 Monitor Qogita → SellerAmp
-          </h1>
-          <p className="text-muted-foreground text-lg">
-            Produits rentables en temps réel
-          </p>
+        <div className="mb-8">
+          <div className="flex items-center gap-3 mb-4">
+            <button
+              onClick={() => navigate('/dashboard')}
+              className="bg-[#FF9900] hover:bg-[#FF9900]/90 p-3 md:p-2 rounded-full shadow-lg transition-all shrink-0"
+              aria-label="Retour au dashboard"
+            >
+              <ArrowLeft className="w-6 h-6 md:w-5 md:h-5 text-white" />
+            </button>
+            <div className="text-center flex-1">
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-primary via-purple-500 to-primary bg-clip-text text-transparent">
+                🚀 Monitor Qogita → SellerAmp
+              </h1>
+              <p className="text-muted-foreground text-lg">
+                Produits rentables en temps réel
+              </p>
+            </div>
+          </div>
         </div>
 
         {/* Statistics */}
