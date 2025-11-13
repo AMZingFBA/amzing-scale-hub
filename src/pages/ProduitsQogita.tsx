@@ -340,8 +340,11 @@ export default function ProduitsQogita() {
           <Card>
             <CardContent className="flex items-center justify-between p-6">
               <div>
-                <p className="text-sm text-muted-foreground">Produits traités</p>
+                <p className="text-sm text-muted-foreground">Produits filtrés</p>
                 <p className="text-2xl font-bold">{filteredProducts.length}</p>
+                {products.length > 0 && (
+                  <p className="text-xs text-muted-foreground mt-1">sur {products.length} total</p>
+                )}
               </div>
               <Package className="w-8 h-8 text-primary" />
             </CardContent>
