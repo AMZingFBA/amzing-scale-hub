@@ -88,6 +88,7 @@ export default function ProduitsQogita() {
   const [maxBSR, setMaxBSR] = useState('');
   const [searchEAN, setSearchEAN] = useState('');
   const [profitType, setProfitType] = useState<'both' | 'fbm' | 'fba'>('both');
+  const [fbmCost, setFbmCost] = useState('');
 
   // Load products from Supabase
   const loadProducts = async () => {
@@ -154,7 +155,12 @@ export default function ProduitsQogita() {
   const filteredProducts = useMemo(() => {
     return products.filter(product => {
       // Filter by profit type
-      const profit = profitType === 'fbm' ? product.fbm_profit : profitType === 'fba' ? product.fba_profit : Math.max(product.fbm_profit || 0, product.fba_profit || 0);
+      const fbmCostValue = fbmCost ? parseFloat(fbmCost) : 0;
+      const profit = profitType === 'fbm' 
+        ? (product.fbm_profit ? product.fbm_profit - fbmCostValue : null)
+        : profitType === 'fba' 
+        ? product.fba_profit 
+        : Math.max((product.fbm_profit || 0) - fbmCostValue, product.fba_profit || 0);
       const roi = profitType === 'fbm' ? product.fbm_roi : profitType === 'fba' ? product.fba_roi : Math.max(product.fbm_roi || 0, product.fba_roi || 0);
       
       if (minProfit && profit < parseFloat(minProfit)) {
@@ -172,7 +178,7 @@ export default function ProduitsQogita() {
       }
       return true;
     });
-  }, [products, minProfit, minROI, maxBSR, searchEAN, profitType]);
+  }, [products, minProfit, minROI, maxBSR, searchEAN, profitType, fbmCost]);
 
   // Pagination
   const totalPages = Math.ceil(filteredProducts.length / PRODUCTS_PER_PAGE);
@@ -379,7 +385,16 @@ export default function ProduitsQogita() {
                 </button>
               </div>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+              <div>
+                <label className="text-sm font-medium mb-2 block">Coûts FBM (€)</label>
+                <Input
+                  type="number"
+                  placeholder="Ex: 2.50"
+                  value={fbmCost}
+                  onChange={(e) => setFbmCost(e.target.value)}
+                />
+              </div>
               <div>
                 <label className="text-sm font-medium mb-2 block">Profit min (€)</label>
                 <Input
