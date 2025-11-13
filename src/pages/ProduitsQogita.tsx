@@ -198,14 +198,14 @@ export default function ProduitsQogita() {
     }
   }, [user, authLoading]);
 
-  // Auto-refresh every 60 seconds
+  // Auto-refresh every 30 seconds
   useEffect(() => {
     if (!user) return;
     
     const interval = setInterval(() => {
       console.log('🔄 Auto-refresh produits Qogita...');
       loadProducts();
-    }, 60000); // 60 secondes
+    }, 30000); // 30 secondes
 
     return () => clearInterval(interval);
   }, [user]);
