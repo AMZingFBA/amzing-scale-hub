@@ -6,7 +6,7 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-const GIST_URL = 'https://gist.githubusercontent.com/raw/8152fd7f63434f16118c967e041a9144/results.json';
+const GIST_URL = 'https://gist.githubusercontent.com/raw/e21e9263794219260d0fd291a5361cc0/results.json';
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
