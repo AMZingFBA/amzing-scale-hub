@@ -46,6 +46,19 @@ serve(async (req) => {
       );
     }
 
+    // Supprimer tous les anciens produits avant la synchronisation
+    const { error: deleteError } = await supabase
+      .from('qogita_products')
+      .delete()
+      .neq('id', '00000000-0000-0000-0000-000000000000'); // Delete all
+
+    if (deleteError) {
+      console.error('❌ Erreur lors de la suppression:', deleteError);
+      throw deleteError;
+    }
+
+    console.log('🗑️ Anciens produits supprimés');
+
     // Transformer les données au format DB
     const transformedProducts = products.map((product: any) => {
       // Convertir le timestamp du format français au format ISO
@@ -72,13 +85,10 @@ serve(async (req) => {
       };
     });
 
-    // Upsert dans la DB (mise à jour si existe, insertion sinon)
+    // Insérer les nouveaux produits
     const { data, error } = await supabase
       .from('qogita_products')
-      .upsert(transformedProducts, { 
-        onConflict: 'ean,timestamp',
-        ignoreDuplicates: false 
-      });
+      .insert(transformedProducts);
 
     if (error) {
       console.error('❌ Erreur lors de la synchronisation:', error);
