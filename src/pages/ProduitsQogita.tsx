@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { RefreshButton } from '@/components/RefreshButton';
-import { Loader2, TrendingUp, Package, Clock, ArrowLeft } from 'lucide-react';
+import { Loader2, TrendingUp, Package, Clock, ArrowLeft, Copy } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -399,7 +399,21 @@ export default function ProduitsQogita() {
                 <Card key={product.id} className="hover:shadow-lg transition-shadow">
                   <CardHeader>
                     <CardTitle className="text-lg flex items-center justify-between">
-                      <span className="font-mono">{product.ean}</span>
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono">{product.ean}</span>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigator.clipboard.writeText(product.ean);
+                            toast.success('EAN copié !');
+                          }}
+                          className="h-7 w-7 p-0"
+                        >
+                          <Copy className="h-3.5 w-3.5" />
+                        </Button>
+                      </div>
                       {product.alerts && product.alerts.filter(alert => alert !== 'V').length > 0 && (
                         <Badge variant="outline" className="bg-orange-100 text-orange-800 border-orange-300">
                           {product.alerts.filter(alert => alert !== 'V').join(', ')}
