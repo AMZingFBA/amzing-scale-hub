@@ -530,14 +530,21 @@ export default function ProduitsQogita() {
 
                     {/* Profits */}
                     <div className="pt-3 border-t space-y-2">
-                      {product.fbm_profit !== null && product.fbm_profit !== undefined && (
-                        <div className="flex justify-between items-center">
-                          <span className="text-sm text-muted-foreground">Profit FBM</span>
-                          <span className={`font-bold ${product.fbm_profit > 0 ? 'text-green-600' : 'text-red-600'}`}>
-                            {product.fbm_profit.toFixed(2)}€ ({product.fbm_roi?.toFixed(2)}%)
-                          </span>
-                        </div>
-                      )}
+                      {product.fbm_profit !== null && product.fbm_profit !== undefined && (() => {
+                        const fbmCostValue = parseFloat(fbmCost) || 0;
+                        const adjustedFbmProfit = product.fbm_profit - fbmCostValue;
+                        const priceTTC = product.qogita_price_ttc || (product.qogita_price_ht * 1.2);
+                        const adjustedFbmRoi = priceTTC > 0 ? (adjustedFbmProfit / priceTTC) * 100 : 0;
+                        
+                        return (
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm text-muted-foreground">Profit FBM</span>
+                            <span className={`font-bold ${adjustedFbmProfit > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                              {adjustedFbmProfit.toFixed(2)}€ ({adjustedFbmRoi.toFixed(2)}%)
+                            </span>
+                          </div>
+                        );
+                      })()}
                       {product.fba_profit !== null && product.fba_profit !== undefined && (
                         <div className="flex justify-between items-center">
                           <span className="text-sm text-muted-foreground">Profit FBA</span>
