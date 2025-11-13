@@ -113,7 +113,7 @@ export default function ProduitsQogita() {
         qogita_price_ttc: p.qogita_price_ttc,
         qogita_stock: p.qogita_stock,
         selleramp_bsr: p.selleramp_bsr || 'N/A',
-        selleramp_sale_price: p.selleramp_sale_price || 0,
+        selleramp_sale_price: p.selleramp_sale_price || null,
         selleramp_sales: p.selleramp_sales || 'Unknown',
         selleramp_sellers: p.selleramp_sellers || 'N/A',
         selleramp_variations: p.selleramp_variations || 'None',
@@ -403,7 +403,7 @@ export default function ProduitsQogita() {
                         <span className="font-semibold">{product.selleramp_bsr}</span>
                       </div>
                     )}
-                    {product.selleramp_sale_price && (
+                    {product.selleramp_sale_price && product.selleramp_sale_price > 0 && (
                       <div className="flex justify-between items-center">
                         <span className="text-sm text-muted-foreground">Sale Price</span>
                         <span className="font-semibold">{product.selleramp_sale_price}€</span>
