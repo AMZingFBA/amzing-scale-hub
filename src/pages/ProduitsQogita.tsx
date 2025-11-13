@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { RefreshButton } from '@/components/RefreshButton';
 import { Loader2, TrendingUp, Package, Clock, ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 
 interface QogitaProduct {
   id: string;
@@ -85,50 +86,54 @@ export default function ProduitsQogita() {
   const [maxBSR, setMaxBSR] = useState('');
   const [searchEAN, setSearchEAN] = useState('');
 
-  // Load products from GitHub Gist
+  // Load products from Supabase
   const loadProducts = async () => {
     try {
-      const response = await fetch('https://gist.githubusercontent.com/raw/8152fd7f63434f16118c967e041a9144/results.json');
-      
-      if (!response.ok) {
-        throw new Error('Failed to fetch products');
+      const { data, error } = await (supabase as any)
+        .from('qogita_products')
+        .select('*')
+        .order('timestamp', { ascending: false });
+
+      if (error) throw error;
+
+      if (!data || data.length === 0) {
+        console.log('No products found in database');
+        setProducts([]);
+        setLastUpdate(new Date().toISOString());
+        toast.info('Aucun produit disponible pour le moment');
+        return;
       }
 
-      const gistData: GistData = await response.json();
-      
-      console.log('Gist data received:', gistData);
-      
-      // Transform Gist data to app format with safety checks
-      const transformedProducts: QogitaProduct[] = gistData.products
-        .filter(p => p && p.ean)
-        .map((p, index) => ({
-          id: `${p.ean}-${index}`,
-          ean: p.ean || '',
-          timestamp: p.timestamp || '',
-          qogita_price_ht: p.qogita?.priceHT || 0,
-          qogita_price_ttc: p.qogita?.priceTTC || 0,
-          qogita_stock: p.qogita?.stock || 0,
-          selleramp_bsr: p.selleramp?.bsr || 'N/A',
-          selleramp_sale_price: p.selleramp?.salePrice || 0,
-          selleramp_sales: p.selleramp?.sales || 'Unknown',
-          selleramp_sellers: p.selleramp?.sellers || 'N/A',
-          selleramp_variations: p.selleramp?.variations || 'None',
-          fbm_profit: p.fbm?.profit || 0,
-          fbm_roi: p.fbm?.roi || 0,
-          fba_profit: p.fba?.profit || 0,
-          fba_roi: p.fba?.roi || 0,
-          alerts: p.alerts || [],
-          created_at: new Date().toISOString()
-        }));
+      // Transform DB data to app format
+      const transformedProducts: QogitaProduct[] = data.map((p: any) => ({
+        id: p.id,
+        ean: p.ean,
+        timestamp: p.timestamp,
+        qogita_price_ht: p.qogita_price_ht,
+        qogita_price_ttc: p.qogita_price_ttc,
+        qogita_stock: p.qogita_stock,
+        selleramp_bsr: p.selleramp_bsr || 'N/A',
+        selleramp_sale_price: p.selleramp_sale_price || 0,
+        selleramp_sales: p.selleramp_sales || 'Unknown',
+        selleramp_sellers: p.selleramp_sellers || 'N/A',
+        selleramp_variations: p.selleramp_variations || 'None',
+        fbm_profit: p.fbm_profit || 0,
+        fbm_roi: p.fbm_roi || 0,
+        fba_profit: p.fba_profit || 0,
+        fba_roi: p.fba_roi || 0,
+        alerts: p.alerts || [],
+        created_at: p.created_at
+      }));
 
       // Sort by FBM profit descending
       transformedProducts.sort((a, b) => (b.fbm_profit || 0) - (a.fbm_profit || 0));
 
       setProducts(transformedProducts);
-      setLastUpdate(gistData.generated);
       
-      if (transformedProducts.length === 0) {
-        toast.info('Aucun produit disponible pour le moment');
+      // Get the most recent timestamp from products
+      if (transformedProducts.length > 0) {
+        const mostRecent = transformedProducts[0].timestamp;
+        setLastUpdate(mostRecent);
       }
     } catch (error) {
       console.error('Error loading products:', error);
