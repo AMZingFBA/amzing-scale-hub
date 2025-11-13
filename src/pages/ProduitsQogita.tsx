@@ -88,7 +88,7 @@ export default function ProduitsQogita() {
   const [maxBSR, setMaxBSR] = useState('');
   const [searchEAN, setSearchEAN] = useState('');
   const [profitType, setProfitType] = useState<'both' | 'fbm' | 'fba'>('both');
-  const [fbmCost, setFbmCost] = useState('');
+  const [fbmCost, setFbmCost] = useState('0');
 
   // Load products from Supabase
   const loadProducts = async () => {
@@ -393,7 +393,7 @@ export default function ProduitsQogita() {
                   type="number"
                   placeholder="Ex: 2.50"
                   value={fbmCost}
-                  onChange={(e) => setFbmCost(e.target.value)}
+                  onChange={(e) => setFbmCost(e.target.value || '0')}
                   className="h-11 border-2 focus:ring-2"
                 />
               </div>
