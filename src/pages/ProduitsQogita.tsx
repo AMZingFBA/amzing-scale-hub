@@ -33,27 +33,27 @@ interface QogitaProduct {
 interface GistProduct {
   ean: string;
   timestamp: string;
-  qogita: {
+  qogita?: {
     priceHT: number;
     priceTTC: number;
     stock: number;
   };
-  selleramp: {
+  selleramp?: {
     bsr: string;
-    salePrice: number;
+    salePrice: number | null;
     sales: string;
     sellers: string;
     variations: string;
   };
-  fbm: {
+  fbm?: {
     profit: number;
     roi: number;
   };
-  fba: {
+  fba?: {
     profit: number;
     roi: number;
   };
-  alerts: string[];
+  alerts?: string[];
 }
 
 interface GistData {
@@ -100,7 +100,7 @@ export default function ProduitsQogita() {
       
       // Transform Gist data to app format with safety checks
       const transformedProducts: QogitaProduct[] = gistData.products
-        .filter(p => p && p.qogita && p.selleramp && p.fbm && p.fba)
+        .filter(p => p && p.ean)
         .map((p, index) => ({
           id: `${p.ean}-${index}`,
           ean: p.ean || '',
@@ -108,11 +108,11 @@ export default function ProduitsQogita() {
           qogita_price_ht: p.qogita?.priceHT || 0,
           qogita_price_ttc: p.qogita?.priceTTC || 0,
           qogita_stock: p.qogita?.stock || 0,
-          selleramp_bsr: p.selleramp?.bsr || '',
+          selleramp_bsr: p.selleramp?.bsr || 'N/A',
           selleramp_sale_price: p.selleramp?.salePrice || 0,
-          selleramp_sales: p.selleramp?.sales || '',
-          selleramp_sellers: p.selleramp?.sellers || '',
-          selleramp_variations: p.selleramp?.variations || '',
+          selleramp_sales: p.selleramp?.sales || 'Unknown',
+          selleramp_sellers: p.selleramp?.sellers || 'N/A',
+          selleramp_variations: p.selleramp?.variations || 'None',
           fbm_profit: p.fbm?.profit || 0,
           fbm_roi: p.fbm?.roi || 0,
           fba_profit: p.fba?.profit || 0,
