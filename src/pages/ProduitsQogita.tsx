@@ -87,6 +87,7 @@ export default function ProduitsQogita() {
   const [minROI, setMinROI] = useState('');
   const [maxBSR, setMaxBSR] = useState('');
   const [searchEAN, setSearchEAN] = useState('');
+  const [profitType, setProfitType] = useState<'both' | 'fbm' | 'fba'>('both');
 
   // Load products from Supabase
   const loadProducts = async () => {
@@ -152,10 +153,14 @@ export default function ProduitsQogita() {
   // Filtered products
   const filteredProducts = useMemo(() => {
     return products.filter(product => {
-      if (minProfit && product.fbm_profit && product.fbm_profit < parseFloat(minProfit)) {
+      // Filter by profit type
+      const profit = profitType === 'fbm' ? product.fbm_profit : profitType === 'fba' ? product.fba_profit : Math.max(product.fbm_profit || 0, product.fba_profit || 0);
+      const roi = profitType === 'fbm' ? product.fbm_roi : profitType === 'fba' ? product.fba_roi : Math.max(product.fbm_roi || 0, product.fba_roi || 0);
+      
+      if (minProfit && profit < parseFloat(minProfit)) {
         return false;
       }
-      if (minROI && product.fbm_roi && product.fbm_roi < parseFloat(minROI)) {
+      if (minROI && roi < parseFloat(minROI)) {
         return false;
       }
       if (maxBSR && product.selleramp_bsr) {
@@ -167,7 +172,7 @@ export default function ProduitsQogita() {
       }
       return true;
     });
-  }, [products, minProfit, minROI, maxBSR, searchEAN]);
+  }, [products, minProfit, minROI, maxBSR, searchEAN, profitType]);
 
   // Pagination
   const totalPages = Math.ceil(filteredProducts.length / PRODUCTS_PER_PAGE);
@@ -339,7 +344,36 @@ export default function ProduitsQogita() {
         {/* Filters */}
         <Card className="mb-8">
           <CardContent className="p-6">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+              <div>
+                <label className="text-sm font-medium mb-2 block">Type de profit</label>
+                <div className="flex gap-2">
+                  <Button
+                    variant={profitType === 'both' ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setProfitType('both')}
+                    className="flex-1"
+                  >
+                    Les 2
+                  </Button>
+                  <Button
+                    variant={profitType === 'fbm' ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setProfitType('fbm')}
+                    className="flex-1"
+                  >
+                    FBM
+                  </Button>
+                  <Button
+                    variant={profitType === 'fba' ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setProfitType('fba')}
+                    className="flex-1"
+                  >
+                    FBA
+                  </Button>
+                </div>
+              </div>
               <div>
                 <label className="text-sm font-medium mb-2 block">Profit min (€)</label>
                 <Input
