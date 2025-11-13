@@ -42,14 +42,16 @@ serve(async (req) => {
         qogita: {
           priceHT: p.qogita_price_ht,
           priceTTC: p.qogita_price_ttc,
-          stock: p.qogita_stock
+          stock: p.qogita_stock,
+          url: p.qogita_url
         },
         selleramp: {
           bsr: p.selleramp_bsr,
           salePrice: p.selleramp_sale_price,
           sales: p.selleramp_sales,
           sellers: p.selleramp_sellers,
-          variations: p.selleramp_variations
+          variations: p.selleramp_variations,
+          url: p.selleramp_url
         },
         fbm: {
           profit: p.fbm_profit,
@@ -59,7 +61,10 @@ serve(async (req) => {
           profit: p.fba_profit,
           roi: p.fba_roi
         },
-        alerts: p.alerts || []
+        alerts: p.alerts || [],
+        amazon: {
+          url: p.amazon_url
+        }
       }))
     };
 
