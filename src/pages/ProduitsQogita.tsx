@@ -456,7 +456,25 @@ export default function ProduitsQogita() {
                   step="0.01"
                   placeholder="Ex: 2.00"
                   value={minProfit}
-                  onChange={(e) => setMinProfit(e.target.value)}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (value === '' || value === '0') {
+                      setMinProfit('0');
+                    } else {
+                      const numValue = parseFloat(value);
+                      if (!isNaN(numValue) && numValue >= 0) {
+                        setMinProfit(String(numValue));
+                      }
+                    }
+                  }}
+                  onBlur={(e) => {
+                    const numValue = parseFloat(e.target.value);
+                    if (!isNaN(numValue) && numValue > 0) {
+                      setMinProfit(String(numValue));
+                    } else {
+                      setMinProfit('0');
+                    }
+                  }}
                   className="h-11 border-2 focus:ring-2"
                 />
               </div>
@@ -468,7 +486,25 @@ export default function ProduitsQogita() {
                   step="0.01"
                   placeholder="Ex: 20"
                   value={minROI}
-                  onChange={(e) => setMinROI(e.target.value)}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (value === '' || value === '0') {
+                      setMinROI('0');
+                    } else {
+                      const numValue = parseFloat(value);
+                      if (!isNaN(numValue) && numValue >= 0) {
+                        setMinROI(String(numValue));
+                      }
+                    }
+                  }}
+                  onBlur={(e) => {
+                    const numValue = parseFloat(e.target.value);
+                    if (!isNaN(numValue) && numValue > 0) {
+                      setMinROI(String(numValue));
+                    } else {
+                      setMinROI('0');
+                    }
+                  }}
                   className="h-11 border-2 focus:ring-2"
                 />
               </div>
