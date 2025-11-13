@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { RefreshButton } from '@/components/RefreshButton';
+
 import { Loader2, TrendingUp, Package, Clock, ArrowLeft, Copy } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
@@ -441,10 +441,6 @@ export default function ProduitsQogita() {
                   className="h-11 border-2 focus:ring-2"
                 />
               </div>
-            </div>
-            
-            <div className="mt-6 pt-6 border-t border-border flex justify-center">
-              <RefreshButton onRefresh={handleRefresh} isRefreshing={isRefreshing} />
             </div>
           </CardContent>
         </Card>
