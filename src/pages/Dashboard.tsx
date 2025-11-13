@@ -3,7 +3,7 @@ import { useAdmin } from '@/hooks/use-admin';
 import { useNotifications } from '@/hooks/use-notifications';
 import { usePullRefresh } from '@/hooks/use-pull-refresh';
 import { useAutoRefresh } from '@/hooks/use-auto-refresh';
-import { Navigate, Link } from 'react-router-dom';
+import { Navigate, Link, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -18,6 +18,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Crown, BookOpen, Bell, CheckCircle, DollarSign, HelpCircle, Settings, Eye, FileText, Star, Calculator, Sparkles, Package, Truck, Megaphone, Newspaper, MessageCircle, LightbulbIcon, Trophy, ShoppingCart, Info, Users, Lock, AlertCircle, Scale, Database, Shield, UserCog } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 interface CategoryItemProps {
   icon: React.ElementType;
   label: string;
@@ -53,6 +54,7 @@ const CategoryItem = ({
   return content;
 };
 const Dashboard = () => {
+  const navigate = useNavigate();
   const {
     user,
     isVIP,
@@ -66,6 +68,38 @@ const Dashboard = () => {
   const [reviewsOpen, setReviewsOpen] = useState(false);
   const [gestionInfoOpen, setGestionInfoOpen] = useState(false);
   const [cashbackOpen, setCashbackOpen] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
+
+  const handleQogitaClick = async () => {
+    setIsSyncing(true);
+    toast({
+      title: "🔄 Synchronisation...",
+      description: "Mise à jour des produits Qogita en cours..."
+    });
+    
+    try {
+      const { error } = await supabase.functions.invoke('sync-gist-to-db');
+      
+      if (error) {
+        console.error('Erreur sync:', error);
+        toast({
+          title: "⚠️ Erreur",
+          description: "Impossible de synchroniser les produits",
+          variant: "destructive"
+        });
+      } else {
+        toast({
+          title: "✅ Synchronisé !",
+          description: "Produits mis à jour avec succès"
+        });
+      }
+    } catch (error) {
+      console.error('Erreur:', error);
+    } finally {
+      setIsSyncing(false);
+      navigate('/produits-gagnants/produits-qogita');
+    }
+  };
 
   const handleRefreshDashboard = async () => {
     await loadNotifications();
@@ -166,7 +200,12 @@ const Dashboard = () => {
                 <AccordionContent>
                   <div className="grid gap-3 pt-2">
                     <CategoryItem icon={Sparkles} label="product find" link="/produits-find" badge={notifications.produits?.subcategories?.['produits-find']} />
-                    <CategoryItem icon={Sparkles} label="produits qogita" link="/produits-gagnants/produits-qogita" badge={notifications.produits?.subcategories?.['produits-qogita']} />
+                    <CategoryItem 
+                      icon={Sparkles} 
+                      label="produits qogita" 
+                      onClick={handleQogitaClick}
+                      badge={notifications.produits?.subcategories?.['produits-qogita']} 
+                    />
                     <CategoryItem icon={Sparkles} label="produits eany" link="/produits-eany" badge={notifications.produits?.subcategories?.['produits-eany']} />
                     <CategoryItem icon={Package} label="grossistes" link="/grossistes" badge={notifications.produits?.subcategories?.['grossistes']} />
                     <CategoryItem icon={DollarSign} label="promotions" link="/promotions" badge={notifications.produits?.subcategories?.['promotions']} />
