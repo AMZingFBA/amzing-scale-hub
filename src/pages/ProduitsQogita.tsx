@@ -416,9 +416,22 @@ export default function ProduitsQogita() {
                 <label className="text-sm font-semibold mb-3 block text-foreground">Coûts FBM (€)</label>
                 <Input
                   type="number"
+                  min="0"
+                  step="0.01"
                   placeholder="Ex: 2.50"
                   value={fbmCost}
-                  onChange={(e) => setFbmCost(e.target.value || '0')}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (value === '' || value === '0') {
+                      setFbmCost('0');
+                    } else {
+                      // Enlève les zéros du début automatiquement
+                      const numValue = parseFloat(value);
+                      if (!isNaN(numValue) && numValue >= 0) {
+                        setFbmCost(value);
+                      }
+                    }
+                  }}
                   className="h-11 border-2 focus:ring-2"
                 />
               </div>
