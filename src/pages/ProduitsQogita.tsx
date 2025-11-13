@@ -352,49 +352,51 @@ export default function ProduitsQogita() {
           <CardContent className="p-6">
             <div className="mb-4">
               <label className="text-sm font-medium mb-3 block">Type de profit</label>
-              <div className="inline-flex rounded-lg border border-border p-1 bg-muted/50">
-                <button
-                  onClick={() => setProfitType('both')}
-                  className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
-                    profitType === 'both'
-                      ? 'bg-primary text-primary-foreground shadow-sm'
-                      : 'text-muted-foreground hover:text-foreground'
-                  }`}
-                >
-                  Les 2
-                </button>
-                <button
-                  onClick={() => setProfitType('fbm')}
-                  className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
-                    profitType === 'fbm'
-                      ? 'bg-primary text-primary-foreground shadow-sm'
-                      : 'text-muted-foreground hover:text-foreground'
-                  }`}
-                >
-                  FBM
-                </button>
-                <button
-                  onClick={() => setProfitType('fba')}
-                  className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
-                    profitType === 'fba'
-                      ? 'bg-primary text-primary-foreground shadow-sm'
-                      : 'text-muted-foreground hover:text-foreground'
-                  }`}
-                >
-                  FBA
-                </button>
+              <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+                <div className="inline-flex rounded-lg border border-border p-1 bg-muted/50">
+                  <button
+                    onClick={() => setProfitType('both')}
+                    className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                      profitType === 'both'
+                        ? 'bg-primary text-primary-foreground shadow-sm'
+                        : 'text-muted-foreground hover:text-foreground'
+                    }`}
+                  >
+                    Les 2
+                  </button>
+                  <button
+                    onClick={() => setProfitType('fbm')}
+                    className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                      profitType === 'fbm'
+                        ? 'bg-primary text-primary-foreground shadow-sm'
+                        : 'text-muted-foreground hover:text-foreground'
+                    }`}
+                  >
+                    FBM
+                  </button>
+                  <button
+                    onClick={() => setProfitType('fba')}
+                    className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                      profitType === 'fba'
+                        ? 'bg-primary text-primary-foreground shadow-sm'
+                        : 'text-muted-foreground hover:text-foreground'
+                    }`}
+                  >
+                    FBA
+                  </button>
+                </div>
+                <div className="flex-1 max-w-xs">
+                  <label className="text-sm font-medium mb-2 block">Coûts FBM (€)</label>
+                  <Input
+                    type="number"
+                    placeholder="Ex: 2.50"
+                    value={fbmCost}
+                    onChange={(e) => setFbmCost(e.target.value)}
+                  />
+                </div>
               </div>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-              <div>
-                <label className="text-sm font-medium mb-2 block">Coûts FBM (€)</label>
-                <Input
-                  type="number"
-                  placeholder="Ex: 2.50"
-                  value={fbmCost}
-                  onChange={(e) => setFbmCost(e.target.value)}
-                />
-              </div>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div>
                 <label className="text-sm font-medium mb-2 block">Profit min (€)</label>
                 <Input
