@@ -7,7 +7,7 @@ const corsHeaders = {
 };
 
 const GITHUB_TOKEN = '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';
-const GIST_ID = 'e85e0cf04f92a8acf34cc8a4a0bc61fe';
+const GIST_ID = '8152fd7f63434f16118c967e041a9144';
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -73,7 +73,7 @@ serve(async (req) => {
       },
       body: JSON.stringify({
         files: {
-          'qogita-products.json': {
+          'results.json': {
             content: JSON.stringify(formattedData, null, 2)
           }
         }
