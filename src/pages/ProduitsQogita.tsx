@@ -348,93 +348,102 @@ export default function ProduitsQogita() {
         </div>
 
         {/* Filters */}
-        <Card className="mb-8">
-          <CardContent className="p-6">
-            <div className="mb-4">
-              <label className="text-sm font-medium mb-3 block">Type de profit</label>
-              <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-                <div className="inline-flex rounded-lg border border-border p-1 bg-muted/50">
+        <Card className="mb-8 border-2">
+          <CardContent className="p-8">
+            {/* Type de profit section */}
+            <div className="flex flex-col lg:flex-row items-center justify-between gap-6 pb-6 border-b border-border">
+              <div className="flex-1 w-full">
+                <label className="text-sm font-semibold mb-3 block text-foreground">Type de profit</label>
+                <div className="inline-flex rounded-xl border-2 border-border p-1.5 bg-muted/30 shadow-sm">
                   <button
                     onClick={() => setProfitType('both')}
-                    className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                    className={`px-6 py-2.5 rounded-lg text-sm font-semibold transition-all ${
                       profitType === 'both'
-                        ? 'bg-primary text-primary-foreground shadow-sm'
-                        : 'text-muted-foreground hover:text-foreground'
+                        ? 'bg-primary text-primary-foreground shadow-md scale-105'
+                        : 'text-muted-foreground hover:text-foreground hover:bg-background'
                     }`}
                   >
                     Les 2
                   </button>
                   <button
                     onClick={() => setProfitType('fbm')}
-                    className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                    className={`px-6 py-2.5 rounded-lg text-sm font-semibold transition-all ${
                       profitType === 'fbm'
-                        ? 'bg-primary text-primary-foreground shadow-sm'
-                        : 'text-muted-foreground hover:text-foreground'
+                        ? 'bg-primary text-primary-foreground shadow-md scale-105'
+                        : 'text-muted-foreground hover:text-foreground hover:bg-background'
                     }`}
                   >
                     FBM
                   </button>
                   <button
                     onClick={() => setProfitType('fba')}
-                    className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                    className={`px-6 py-2.5 rounded-lg text-sm font-semibold transition-all ${
                       profitType === 'fba'
-                        ? 'bg-primary text-primary-foreground shadow-sm'
-                        : 'text-muted-foreground hover:text-foreground'
+                        ? 'bg-primary text-primary-foreground shadow-md scale-105'
+                        : 'text-muted-foreground hover:text-foreground hover:bg-background'
                     }`}
                   >
                     FBA
                   </button>
                 </div>
-                <div className="flex-1 max-w-xs">
-                  <label className="text-sm font-medium mb-2 block">Coûts FBM (€)</label>
-                  <Input
-                    type="number"
-                    placeholder="Ex: 2.50"
-                    value={fbmCost}
-                    onChange={(e) => setFbmCost(e.target.value)}
-                  />
-                </div>
+              </div>
+              <div className="flex-1 w-full lg:max-w-xs">
+                <label className="text-sm font-semibold mb-3 block text-foreground">Coûts FBM (€)</label>
+                <Input
+                  type="number"
+                  placeholder="Ex: 2.50"
+                  value={fbmCost}
+                  onChange={(e) => setFbmCost(e.target.value)}
+                  className="h-11 border-2 focus:ring-2"
+                />
               </div>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            
+            {/* Other filters */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 pt-6">
               <div>
-                <label className="text-sm font-medium mb-2 block">Profit min (€)</label>
+                <label className="text-sm font-semibold mb-3 block text-foreground">Profit min (€)</label>
                 <Input
                   type="number"
                   placeholder="Ex: 2.00"
                   value={minProfit}
                   onChange={(e) => setMinProfit(e.target.value)}
+                  className="h-11 border-2 focus:ring-2"
                 />
               </div>
               <div>
-                <label className="text-sm font-medium mb-2 block">ROI min (%)</label>
+                <label className="text-sm font-semibold mb-3 block text-foreground">ROI min (%)</label>
                 <Input
                   type="number"
                   placeholder="Ex: 20"
                   value={minROI}
                   onChange={(e) => setMinROI(e.target.value)}
+                  className="h-11 border-2 focus:ring-2"
                 />
               </div>
               <div>
-                <label className="text-sm font-medium mb-2 block">BSR max</label>
+                <label className="text-sm font-semibold mb-3 block text-foreground">BSR max</label>
                 <Input
                   type="number"
                   placeholder="Ex: 1000"
                   value={maxBSR}
                   onChange={(e) => setMaxBSR(e.target.value)}
+                  className="h-11 border-2 focus:ring-2"
                 />
               </div>
               <div>
-                <label className="text-sm font-medium mb-2 block">Recherche EAN</label>
+                <label className="text-sm font-semibold mb-3 block text-foreground">Recherche EAN</label>
                 <Input
                   type="text"
                   placeholder="Ex: 0000030095656"
                   value={searchEAN}
                   onChange={(e) => setSearchEAN(e.target.value)}
+                  className="h-11 border-2 focus:ring-2"
                 />
               </div>
             </div>
-            <div className="mt-4 flex justify-end">
+            
+            <div className="mt-6 pt-6 border-t border-border flex justify-center">
               <RefreshButton onRefresh={handleRefresh} isRefreshing={isRefreshing} />
             </div>
           </CardContent>
