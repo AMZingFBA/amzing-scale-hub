@@ -89,34 +89,47 @@ export default function ProduitsQogita() {
   const loadProducts = async () => {
     try {
       const response = await fetch('https://gist.githubusercontent.com/AMZingFBA/9692a715b1722675304b151235a98660/raw');
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch products');
+      }
+
       const gistData: GistData = await response.json();
       
-      // Transform Gist data to app format
-      const transformedProducts: QogitaProduct[] = gistData.products.map((p, index) => ({
-        id: `${p.ean}-${index}`,
-        ean: p.ean,
-        timestamp: p.timestamp,
-        qogita_price_ht: p.qogita.priceHT,
-        qogita_price_ttc: p.qogita.priceTTC,
-        qogita_stock: p.qogita.stock,
-        selleramp_bsr: p.selleramp.bsr,
-        selleramp_sale_price: p.selleramp.salePrice,
-        selleramp_sales: p.selleramp.sales,
-        selleramp_sellers: p.selleramp.sellers,
-        selleramp_variations: p.selleramp.variations,
-        fbm_profit: p.fbm.profit,
-        fbm_roi: p.fbm.roi,
-        fba_profit: p.fba.profit,
-        fba_roi: p.fba.roi,
-        alerts: p.alerts,
-        created_at: new Date().toISOString()
-      }));
+      console.log('Gist data received:', gistData);
+      
+      // Transform Gist data to app format with safety checks
+      const transformedProducts: QogitaProduct[] = gistData.products
+        .filter(p => p && p.qogita && p.selleramp && p.fbm && p.fba)
+        .map((p, index) => ({
+          id: `${p.ean}-${index}`,
+          ean: p.ean || '',
+          timestamp: p.timestamp || '',
+          qogita_price_ht: p.qogita?.priceHT || 0,
+          qogita_price_ttc: p.qogita?.priceTTC || 0,
+          qogita_stock: p.qogita?.stock || 0,
+          selleramp_bsr: p.selleramp?.bsr || '',
+          selleramp_sale_price: p.selleramp?.salePrice || 0,
+          selleramp_sales: p.selleramp?.sales || '',
+          selleramp_sellers: p.selleramp?.sellers || '',
+          selleramp_variations: p.selleramp?.variations || '',
+          fbm_profit: p.fbm?.profit || 0,
+          fbm_roi: p.fbm?.roi || 0,
+          fba_profit: p.fba?.profit || 0,
+          fba_roi: p.fba?.roi || 0,
+          alerts: p.alerts || [],
+          created_at: new Date().toISOString()
+        }));
 
       // Sort by FBM profit descending
       transformedProducts.sort((a, b) => (b.fbm_profit || 0) - (a.fbm_profit || 0));
 
       setProducts(transformedProducts);
       setLastUpdate(gistData.generated);
+      
+      if (transformedProducts.length === 0) {
+        toast.info('Aucun produit disponible pour le moment');
+      }
     } catch (error) {
       console.error('Error loading products:', error);
       toast.error('Erreur lors du chargement des produits');
