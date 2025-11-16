@@ -869,6 +869,78 @@ export type Database = {
         }
         Relationships: []
       }
+      qogita_products: {
+        Row: {
+          alerts: string[] | null
+          amazon_url: string | null
+          created_at: string | null
+          ean: string
+          fba_profit: number | null
+          fba_roi: number | null
+          fbm_profit: number | null
+          fbm_roi: number | null
+          id: string
+          qogita_price_ht: number
+          qogita_price_ttc: number
+          qogita_stock: number
+          qogita_url: string | null
+          selleramp_bsr: string | null
+          selleramp_sale_price: number | null
+          selleramp_sales: string | null
+          selleramp_sellers: string | null
+          selleramp_url: string | null
+          selleramp_variations: string | null
+          timestamp: string
+          updated_at: string | null
+        }
+        Insert: {
+          alerts?: string[] | null
+          amazon_url?: string | null
+          created_at?: string | null
+          ean: string
+          fba_profit?: number | null
+          fba_roi?: number | null
+          fbm_profit?: number | null
+          fbm_roi?: number | null
+          id?: string
+          qogita_price_ht: number
+          qogita_price_ttc: number
+          qogita_stock: number
+          qogita_url?: string | null
+          selleramp_bsr?: string | null
+          selleramp_sale_price?: number | null
+          selleramp_sales?: string | null
+          selleramp_sellers?: string | null
+          selleramp_url?: string | null
+          selleramp_variations?: string | null
+          timestamp: string
+          updated_at?: string | null
+        }
+        Update: {
+          alerts?: string[] | null
+          amazon_url?: string | null
+          created_at?: string | null
+          ean?: string
+          fba_profit?: number | null
+          fba_roi?: number | null
+          fbm_profit?: number | null
+          fbm_roi?: number | null
+          id?: string
+          qogita_price_ht?: number
+          qogita_price_ttc?: number
+          qogita_stock?: number
+          qogita_url?: string | null
+          selleramp_bsr?: string | null
+          selleramp_sale_price?: number | null
+          selleramp_sales?: string | null
+          selleramp_sellers?: string | null
+          selleramp_url?: string | null
+          selleramp_variations?: string | null
+          timestamp?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       subscriptions: {
         Row: {
           apple_transaction_id: string | null
