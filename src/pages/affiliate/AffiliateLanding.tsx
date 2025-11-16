@@ -3,9 +3,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useNavigate } from "react-router-dom";
 import { Users, TrendingUp, Euro, Gift, Award, Zap, CheckCircle, AlertCircle, Handshake, ArrowLeft } from "lucide-react";
+import { useAuth } from "@/hooks/use-auth";
 
 const AffiliateLanding = () => {
   const navigate = useNavigate();
+  const { isVIP } = useAuth();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-secondary/10">
@@ -14,7 +16,7 @@ const AffiliateLanding = () => {
         <Button
           variant="ghost"
           size="lg"
-          onClick={() => navigate(-1)}
+          onClick={() => navigate(isVIP ? "/dashboard" : "/dashboard")}
           className="absolute top-6 left-6 z-20 gap-2 hover:bg-primary/10 transition-all duration-300"
         >
           <ArrowLeft className="h-6 w-6 text-primary" />
