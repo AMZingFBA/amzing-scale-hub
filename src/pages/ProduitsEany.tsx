@@ -124,12 +124,6 @@ export default function ProduitsEany() {
   // Filtered products
   const filteredProducts = useMemo(() => {
     return products.filter(product => {
-      // Filter out products with 0 variations or no variations
-      if (product.selleramp_variations === '0' || 
-          product.selleramp_variations === 'None' || 
-          product.selleramp_variations === 'No') {
-        return false;
-      }
       
       const fbmCostValue = fbmCost ? parseFloat(fbmCost) : 0;
       const profit = profitType === 'fbm' 
@@ -635,16 +629,15 @@ export default function ProduitsEany() {
                       <span className="font-semibold">{product.selleramp_sellers}</span>
                     </div>
                   )}
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-muted-foreground">Variations</span>
-                    <span className="font-semibold">
-                      {product.selleramp_variations && 
-                       product.selleramp_variations !== 'None' && 
-                       product.selleramp_variations !== 'No' 
-                        ? product.selleramp_variations 
-                        : '0'}
-                    </span>
-                  </div>
+                  {product.selleramp_variations && 
+                   product.selleramp_variations !== '0' &&
+                   product.selleramp_variations !== 'None' && 
+                   product.selleramp_variations !== 'No' && (
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-muted-foreground">Variations</span>
+                      <span className="font-semibold">{product.selleramp_variations}</span>
+                    </div>
+                  )}
 
                   {/* Profits */}
                   <div className="pt-3 border-t space-y-2">
