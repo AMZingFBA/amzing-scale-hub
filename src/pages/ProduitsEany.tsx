@@ -124,8 +124,10 @@ export default function ProduitsEany() {
   // Filtered products
   const filteredProducts = useMemo(() => {
     return products.filter(product => {
-      // Filter out products with 0 variations
-      if (product.selleramp_variations === '0') {
+      // Filter out products with 0 variations or no variations
+      if (product.selleramp_variations === '0' || 
+          product.selleramp_variations === 'None' || 
+          product.selleramp_variations === 'No') {
         return false;
       }
       
