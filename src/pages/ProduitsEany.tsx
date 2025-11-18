@@ -1,17 +1,14 @@
-import { useState, useEffect, useMemo } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import { Card } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
-import { ChevronLeft, ChevronRight, Search, ExternalLink, RefreshCw } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { useEffect, useState, useMemo } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/use-auth';
 import { useAdmin } from '@/hooks/use-admin';
-import { useNavigate } from 'react-router-dom';
-import { Skeleton } from '@/components/ui/skeleton';
-import { RefreshButton } from '@/components/RefreshButton';
-import { usePullRefresh } from '@/hooks/use-pull-refresh';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { Loader2, TrendingUp, Package, Clock, ArrowLeft, Copy, ExternalLink, Store, BarChart3, ShoppingCart, RotateCcw } from 'lucide-react';
+import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 
 interface EanyProduct {
   id: string;
