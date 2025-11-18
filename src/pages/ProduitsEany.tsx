@@ -49,7 +49,7 @@ const ProduitsEany = () => {
   
   const productsPerPage = 24;
   const { toast } = useToast();
-  const { user, isVIP } = useAuth();
+  const { user, isVIP, isLoading: authLoading } = useAuth();
   const navigate = useNavigate();
 
   const loadProducts = async () => {
@@ -105,7 +105,9 @@ const ProduitsEany = () => {
   });
 
   useEffect(() => {
-    loadProducts();
+    if (!authLoading && user) {
+      loadProducts();
+    }
     
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('refresh') === 'true') {
@@ -127,7 +129,7 @@ const ProduitsEany = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, []);
+  }, [user, authLoading]);
 
   useEffect(() => {
     const savedScroll = sessionStorage.getItem('eanyProductsScroll');
@@ -169,7 +171,7 @@ const ProduitsEany = () => {
 
   const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
 
-  if (loading) {
+  if (loading || authLoading) {
     return (
       <div className="min-h-screen bg-background p-6">
         <div className="max-w-7xl mx-auto space-y-6">
