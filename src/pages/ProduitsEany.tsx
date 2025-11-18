@@ -163,10 +163,26 @@ export default function ProduitsEany() {
     }
   }, [totalPages, currentPage]);
 
-  // Initial load
+  // Refresh function
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('sync-eany-gist-to-db');
+      if (error) throw error;
+      toast.success(`${data?.synced || 0} produits synchronisés`);
+      await loadProducts();
+    } catch (error) {
+      console.error('Error refreshing:', error);
+      toast.error('Erreur lors de la synchronisation');
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
+
+  // Initial load with auto-sync
   useEffect(() => {
     if (user && !authLoading) {
-      loadProducts();
+      handleRefresh();
     }
   }, [user, authLoading]);
 
@@ -210,20 +226,6 @@ export default function ProduitsEany() {
     window.open(url, '_blank');
   };
 
-  const handleRefresh = async () => {
-    setIsRefreshing(true);
-    try {
-      const { data, error } = await supabase.functions.invoke('sync-eany-gist-to-db');
-      if (error) throw error;
-      toast.success(`${data?.synced || 0} produits synchronisés`);
-      await loadProducts();
-    } catch (error) {
-      console.error('Error refreshing:', error);
-      toast.error('Erreur lors de la synchronisation');
-    } finally {
-      setIsRefreshing(false);
-    }
-  };
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
