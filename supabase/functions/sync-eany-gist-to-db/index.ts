@@ -61,30 +61,25 @@ serve(async (req) => {
 
     // Transformer les données au format DB
     const transformedProducts = products.map((product: any) => {
-      // Convertir le timestamp du format français au format ISO
-      const [datePart, timePart] = product.timestamp.split(' ');
-      const [day, month, year] = datePart.split('/');
-      const isoTimestamp = `${year}-${month}-${day}T${timePart}.000Z`;
-
       return {
         ean: product.ean,
-        timestamp: isoTimestamp,
-        qogita_price_ht: product.qogita?.priceHT || 0,
-        qogita_price_ttc: product.qogita?.priceTTC || 0,
-        qogita_stock: product.qogita?.stock || 0,
-        qogita_url: product.qogita?.url || null,
-        selleramp_bsr: product.selleramp?.bsr || null,
-        selleramp_sale_price: product.selleramp?.salePrice || null,
-        selleramp_sales: product.selleramp?.sales || null,
-        selleramp_sellers: product.selleramp?.sellers || null,
-        selleramp_variations: product.selleramp?.variations || null,
-        selleramp_url: product.selleramp?.url || null,
-        fbm_profit: product.fbm?.profit || null,
-        fbm_roi: product.fbm?.roi || null,
-        fba_profit: product.fba?.profit || null,
-        fba_roi: product.fba?.roi || null,
-        alerts: product.alerts || [],
-        amazon_url: product.amazon?.url || null,
+        timestamp: new Date().toISOString(),
+        qogita_price_ht: product.eanyPriceHT || 0,
+        qogita_price_ttc: product.eanyPriceTTC || 0,
+        qogita_stock: product.eanyStock || 0,
+        qogita_url: product.eanyUrl || null,
+        selleramp_bsr: product.bsr?.toString() || null,
+        selleramp_sale_price: product.salePrice || null,
+        selleramp_sales: product.sales?.toString() || null,
+        selleramp_sellers: product.sellers?.toString() || null,
+        selleramp_variations: product.variations?.toString() || null,
+        selleramp_url: product.sellerampUrl || null,
+        fbm_profit: product.profitFBM || null,
+        fbm_roi: product.roiFBM || null,
+        fba_profit: product.profitFBA || null,
+        fba_roi: product.roiFBA || null,
+        alerts: [],
+        amazon_url: product.amazonUrl || null,
       };
     });
 
