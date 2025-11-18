@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight, Search, ExternalLink, RefreshCw } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/use-auth';
+import { useAdmin } from '@/hooks/use-admin';
 import { useNavigate } from 'react-router-dom';
 import { Skeleton } from '@/components/ui/skeleton';
 import { RefreshButton } from '@/components/RefreshButton';
@@ -50,6 +51,7 @@ const ProduitsEany = () => {
   const productsPerPage = 24;
   const { toast } = useToast();
   const { user, isVIP, isLoading: authLoading } = useAuth();
+  const { isAdmin, isLoading: adminLoading } = useAdmin();
   const navigate = useNavigate();
 
   const loadProducts = async () => {
@@ -171,7 +173,7 @@ const ProduitsEany = () => {
 
   const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
 
-  if (loading || authLoading) {
+  if (loading || authLoading || adminLoading) {
     return (
       <div className="min-h-screen bg-background p-6">
         <div className="max-w-7xl mx-auto space-y-6">
@@ -186,7 +188,7 @@ const ProduitsEany = () => {
     );
   }
 
-  if (!user || !isVIP) {
+  if (!user || (!isVIP && !isAdmin)) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-6">
         <Card className="p-8 max-w-md text-center">
