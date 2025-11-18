@@ -218,7 +218,7 @@ const Dashboard = () => {
                       onClick={handleQogitaClick}
                       badge={notifications.produits?.subcategories?.['produits-qogita']} 
                     />
-                    <CategoryItem icon={Sparkles} label="produits eany" link="/produits-eany" badge={notifications.produits?.subcategories?.['produits-eany']} />
+                    <CategoryItem icon={Sparkles} label="produits eany" link="/products/eany" badge={notifications.produits?.subcategories?.['produits-eany']} />
                     <CategoryItem icon={Package} label="grossistes" link="/grossistes" badge={notifications.produits?.subcategories?.['grossistes']} />
                     <CategoryItem icon={DollarSign} label="promotions" link="/promotions" badge={notifications.produits?.subcategories?.['promotions']} />
                     <CategoryItem icon={FileText} label="sitelist" link="/sitelist" badge={notifications.produits?.subcategories?.['sitelist']} />
