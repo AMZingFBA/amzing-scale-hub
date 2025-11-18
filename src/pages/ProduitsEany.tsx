@@ -265,148 +265,295 @@ export default function ProduitsEany() {
 
   if (authLoading || isLoading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-background to-secondary/20 flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
       </div>
     );
   }
 
-  if (!user || (!isVIP && !isAdmin)) {
-    navigate('/tarifs');
+  // Not authenticated
+  if (!user) {
+    navigate('/auth');
     return null;
   }
 
+  // Not VIP
+  if (!isVIP && !isAdmin) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-background to-secondary/20 flex items-center justify-center p-6">
+        <Card className="max-w-md w-full">
+          <CardHeader>
+            <CardTitle className="text-center">💳 Accès réservé aux membres VIP</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4 text-center">
+            <p className="text-muted-foreground">
+              Ton abonnement ne permet pas d'accéder au moniteur Eany.
+              Mets à niveau ton compte pour débloquer les produits rentables en temps réel.
+            </p>
+            <Button onClick={() => navigate('/tarifs')} className="w-full">
+              Devenir VIP
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
-      <div className="container mx-auto px-4 py-8 space-y-6">
+    <div className="min-h-screen bg-gradient-to-br from-background via-secondary/10 to-primary/5">
+      <div className="container mx-auto px-4 py-8">
         {/* Header */}
-        <div className="flex items-center justify-between">
-          <Button
-            variant="ghost"
-            onClick={() => navigate('/dashboard')}
-            className="gap-2"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Retour
-          </Button>
-          <Button
-            onClick={handleRefresh}
-            disabled={isRefreshing}
-            variant="outline"
-            className="gap-2"
-          >
-            <RotateCcw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
-            {isRefreshing ? 'Synchronisation...' : 'Synchroniser'}
-          </Button>
+        <div className="mb-8">
+          <div className="flex items-center gap-3 mb-4">
+            <button
+              onClick={() => navigate('/dashboard')}
+              className="bg-[#FF9900] hover:bg-[#FF9900]/90 p-3 md:p-2 rounded-full shadow-lg transition-all shrink-0"
+              aria-label="Retour au dashboard"
+            >
+              <ArrowLeft className="w-6 h-6 md:w-5 md:h-5 text-white" />
+            </button>
+            <div className="text-center flex-1">
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-orange-500 via-amber-500 via-yellow-500 via-green-500 via-cyan-500 to-blue-500 bg-[length:200%_auto] animate-[gradient-shift_2s_ease-in-out_infinite] bg-clip-text text-transparent pb-2 leading-tight">
+                🚀 Monitor Eany
+              </h1>
+              <p className="text-muted-foreground text-lg">
+                Produits rentables en temps réel
+              </p>
+            </div>
+          </div>
         </div>
 
-        {/* Title */}
-        <div className="text-center space-y-2">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent">
-            Monitor Eany
-          </h1>
-          <p className="text-muted-foreground">
-            {lastRefresh && `Dernière mise à jour: ${new Date(lastRefresh).toLocaleString('fr-FR')}`}
-          </p>
-        </div>
-
-        {/* Statistics Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card className="border-primary/20">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Total Produits</CardTitle>
-              <Package className="w-4 h-4 text-primary" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.total}</div>
+        {/* Statistics */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+          <Card>
+            <CardContent className="flex items-center justify-between p-6">
+              <div>
+                <p className="text-sm text-muted-foreground">Produits filtrés</p>
+                <p className="text-2xl font-bold">{filteredProducts.length}</p>
+                {products.length > 0 && (
+                  <p className="text-xs text-muted-foreground mt-1">sur {products.length} total</p>
+                )}
+              </div>
+              <Package className="w-8 h-8 text-primary" />
             </CardContent>
           </Card>
-          <Card className="border-primary/20">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Profit Moyen</CardTitle>
-              <TrendingUp className="w-4 h-4 text-primary" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.avgProfit.toFixed(2)}€</div>
+          <Card>
+            <CardContent className="flex items-center justify-between p-6">
+              <div>
+                <p className="text-sm text-muted-foreground">Dernier chargement</p>
+                <p className="text-sm font-semibold">
+                  {lastRefresh ? new Date(lastRefresh).toLocaleString('fr-FR', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit'
+                  }) : '-'}
+                </p>
+              </div>
+              <Clock className="w-8 h-8 text-primary" />
             </CardContent>
           </Card>
-          <Card className="border-primary/20">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">ROI Moyen</CardTitle>
-              <BarChart3 className="w-4 h-4 text-primary" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.avgROI.toFixed(0)}%</div>
+          <Card>
+            <CardContent className="flex items-center justify-between p-6">
+              <div>
+                <p className="text-sm text-muted-foreground">Page actuelle</p>
+                <p className="text-2xl font-bold">{currentPage} / {totalPages}</p>
+              </div>
+              <TrendingUp className="w-8 h-8 text-primary" />
             </CardContent>
           </Card>
         </div>
 
         {/* Filters */}
-        <Card className="border-primary/20">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle>Filtres</CardTitle>
-              <Button onClick={resetFilters} variant="ghost" size="sm">
+        <Card className="mb-8 border-2">
+          <CardContent className="p-8">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-lg font-semibold text-foreground">Filtres</h3>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  setProfitType('both');
+                  setFbmCost('0');
+                  setMinProfit('');
+                  setMinROI('');
+                  setMaxBSR('');
+                  setSearchEAN('');
+                  toast.success('Filtres réinitialisés');
+                }}
+                className="gap-2"
+              >
+                <RotateCcw className="w-4 h-4" />
                 Réinitialiser
               </Button>
             </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Profit Min (€)</label>
+            {/* Type de profit section */}
+            <div className="flex flex-col lg:flex-row items-center justify-between gap-6 pb-6 border-b border-border">
+              <div className="flex-1 w-full">
+                <label className="text-sm font-semibold mb-3 block text-foreground">Type de profit</label>
+                <div className="inline-flex rounded-xl border-2 border-border p-1.5 bg-muted/30 shadow-sm">
+                  <button
+                    onClick={() => setProfitType('both')}
+                    className={`px-6 py-2.5 rounded-lg text-sm font-semibold transition-all ${
+                      profitType === 'both'
+                        ? 'bg-primary text-primary-foreground shadow-md scale-105'
+                        : 'text-muted-foreground hover:text-foreground hover:bg-background'
+                    }`}
+                  >
+                    Les 2
+                  </button>
+                  <button
+                    onClick={() => setProfitType('fbm')}
+                    className={`px-6 py-2.5 rounded-lg text-sm font-semibold transition-all ${
+                      profitType === 'fbm'
+                        ? 'bg-primary text-primary-foreground shadow-md scale-105'
+                        : 'text-muted-foreground hover:text-foreground hover:bg-background'
+                    }`}
+                  >
+                    FBM
+                  </button>
+                  <button
+                    onClick={() => setProfitType('fba')}
+                    className={`px-6 py-2.5 rounded-lg text-sm font-semibold transition-all ${
+                      profitType === 'fba'
+                        ? 'bg-primary text-primary-foreground shadow-md scale-105'
+                        : 'text-muted-foreground hover:text-foreground hover:bg-background'
+                    }`}
+                  >
+                    FBA
+                  </button>
+                </div>
+              </div>
+              <div className="flex-1 w-full lg:max-w-xs">
+                <label className="text-sm font-semibold mb-3 block text-foreground">Coûts FBM (€)</label>
                 <Input
                   type="number"
+                  min="0"
+                  step="0.01"
+                  placeholder="Ex: 2.50"
+                  value={fbmCost}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (value === '' || value === '0') {
+                      setFbmCost('0');
+                    } else {
+                      const numValue = parseFloat(value);
+                      if (!isNaN(numValue) && numValue >= 0) {
+                        setFbmCost(String(numValue));
+                      }
+                    }
+                  }}
+                  onBlur={(e) => {
+                    const numValue = parseFloat(e.target.value);
+                    if (!isNaN(numValue) && numValue > 0) {
+                      setFbmCost(String(numValue));
+                    } else {
+                      setFbmCost('0');
+                    }
+                  }}
+                  className="h-11 border-2 focus:ring-2"
+                />
+              </div>
+            </div>
+            
+            {/* Other filters */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 pt-6">
+              <div>
+                <label className="text-sm font-semibold mb-3 block text-foreground">Profit min (€)</label>
+                <Input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  placeholder="Ex: 2.00"
                   value={minProfit}
-                  onChange={(e) => setMinProfit(e.target.value)}
-                  placeholder="Ex: 5"
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (value === '' || value === '0') {
+                      setMinProfit('0');
+                    } else {
+                      const numValue = parseFloat(value);
+                      if (!isNaN(numValue) && numValue >= 0) {
+                        setMinProfit(String(numValue));
+                      }
+                    }
+                  }}
+                  onBlur={(e) => {
+                    const numValue = parseFloat(e.target.value);
+                    if (!isNaN(numValue) && numValue > 0) {
+                      setMinProfit(String(numValue));
+                    } else {
+                      setMinProfit('0');
+                    }
+                  }}
+                  className="h-11 border-2 focus:ring-2"
                 />
               </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium">ROI Min (%)</label>
+              <div>
+                <label className="text-sm font-semibold mb-3 block text-foreground">ROI min (%)</label>
                 <Input
                   type="number"
+                  min="0"
+                  step="0.01"
+                  placeholder="Ex: 20"
                   value={minROI}
-                  onChange={(e) => setMinROI(e.target.value)}
-                  placeholder="Ex: 30"
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (value === '' || value === '0') {
+                      setMinROI('0');
+                    } else {
+                      const numValue = parseFloat(value);
+                      if (!isNaN(numValue) && numValue >= 0) {
+                        setMinROI(String(numValue));
+                      }
+                    }
+                  }}
+                  onBlur={(e) => {
+                    const numValue = parseFloat(e.target.value);
+                    if (!isNaN(numValue) && numValue > 0) {
+                      setMinROI(String(numValue));
+                    } else {
+                      setMinROI('0');
+                    }
+                  }}
+                  className="h-11 border-2 focus:ring-2"
                 />
               </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium">BSR Max</label>
+              <div>
+                <label className="text-sm font-semibold mb-3 block text-foreground">BSR max</label>
                 <Input
                   type="number"
+                  min="0"
+                  placeholder="Ex: 1000"
                   value={maxBSR}
-                  onChange={(e) => setMaxBSR(e.target.value)}
-                  placeholder="Ex: 100000"
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (value === '' || value === '0') {
+                      setMaxBSR('0');
+                    } else {
+                      const numValue = parseFloat(value);
+                      if (!isNaN(numValue) && numValue >= 0) {
+                        setMaxBSR(String(numValue));
+                      }
+                    }
+                  }}
+                  onBlur={(e) => {
+                    const numValue = parseFloat(e.target.value);
+                    if (!isNaN(numValue) && numValue > 0) {
+                      setMaxBSR(String(numValue));
+                    } else {
+                      setMaxBSR('0');
+                    }
+                  }}
+                  className="h-11 border-2 focus:ring-2"
                 />
               </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Recherche EAN</label>
+              <div>
+                <label className="text-sm font-semibold mb-3 block text-foreground">Recherche EAN</label>
                 <Input
+                  type="text"
+                  placeholder="Ex: 0000030095656"
                   value={searchEAN}
                   onChange={(e) => setSearchEAN(e.target.value)}
-                  placeholder="Entrer un EAN"
-                />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Type de Profit</label>
-                <select
-                  value={profitType}
-                  onChange={(e) => setProfitType(e.target.value as 'both' | 'fbm' | 'fba')}
-                  className="w-full px-3 py-2 rounded-md border bg-background"
-                >
-                  <option value="both">FBA et FBM (Max)</option>
-                  <option value="fba">FBA uniquement</option>
-                  <option value="fbm">FBM uniquement</option>
-                </select>
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Coûts FBM (€)</label>
-                <Input
-                  type="number"
-                  value={fbmCost}
-                  onChange={(e) => setFbmCost(e.target.value)}
-                  placeholder="Ex: 3"
+                  className="h-11 border-2 focus:ring-2"
                 />
               </div>
             </div>
