@@ -226,21 +226,6 @@ const Dashboard = () => {
                 </AccordionContent>
               </AccordionItem>
 
-              {/* PRODUCT FUND */}
-              <AccordionItem value="product-fund" className="border rounded-lg px-6 bg-card">
-                <AccordionTrigger className="hover:no-underline">
-                  <div className="flex items-center gap-3 w-full">
-                    <Database className="w-6 h-6 text-primary" />
-                    <span className="text-xl font-bold">PRODUCT FUND</span>
-                    <NotificationBadge count={notifications['product-fund']?.total} size="md" className="ml-2" />
-                  </div>
-                </AccordionTrigger>
-                <AccordionContent>
-                  <div className="grid gap-3 pt-2">
-                    <CategoryItem icon={Database} label="qogita" link="/monitor/qogita" badge={notifications['product-fund']?.subcategories?.qogita} />
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
 
               {/* EXPÉDITION */}
               <AccordionItem value="expedition" className="border rounded-lg px-6 bg-card">
