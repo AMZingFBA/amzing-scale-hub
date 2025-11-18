@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, TrendingUp, Package, Clock, ArrowLeft, Copy, ExternalLink, Store, BarChart3, ShoppingCart, RotateCcw, ShoppingBag } from 'lucide-react';
+import { Loader2, TrendingUp, Package, Clock, ArrowLeft, Copy, ExternalLink, Store, BarChart3, ShoppingCart, RotateCcw } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -572,158 +572,153 @@ export default function ProduitsEany() {
             const displayROI = profitType === 'fbm' ? product.fbm_roi : profitType === 'fba' ? product.fba_roi : Math.max(product.fbm_roi || 0, product.fba_roi || 0);
 
             return (
-              <Card 
-                key={product.id} 
-                className="group hover:shadow-xl transition-all duration-300 border-2 hover:border-primary/20 bg-gradient-to-br from-card/95 to-background cursor-pointer relative overflow-hidden"
-              >
-                {/* Gradient overlay on hover */}
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
-                
-                <CardHeader className="relative pb-4">
-                  <div className="flex items-start justify-between mb-4">
-                    <CardTitle className="text-2xl font-bold text-primary group-hover:text-primary/80 transition-colors">
-                      {product.ean}
-                    </CardTitle>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        copyToClipboard(product.ean);
-                      }}
-                      className="shrink-0 hover:bg-primary/10"
-                    >
-                      <Copy className="h-4 w-4" />
-                    </Button>
+              <Card key={product.id} className="hover:shadow-lg transition-shadow">
+                <CardHeader>
+                  <CardTitle className="text-lg flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="font-mono">{product.ean}</span>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          copyToClipboard(product.ean);
+                        }}
+                        className="h-7 w-7 p-0"
+                      >
+                        <Copy className="h-3.5 w-3.5" />
+                      </Button>
+                    </div>
+                    {product.alerts && product.alerts.filter(alert => alert !== 'V').length > 0 && (
+                      <Badge variant="outline" className="bg-orange-100 text-orange-800 border-orange-300">
+                        {product.alerts.filter(alert => alert !== 'V').join(', ')}
+                      </Badge>
+                    )}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  {/* Qogita Prices */}
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-muted-foreground">Prix Qogita HT/TTC</span>
+                    <span className="font-semibold">{product.qogita_price_ht}€ / {product.qogita_price_ttc}€</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-muted-foreground">Stock</span>
+                    <span className="font-semibold">{product.qogita_stock}</span>
                   </div>
 
-                  <div className="space-y-3">
-                    {/* Prix Eany HT/TTC */}
-                    <div className="flex justify-between items-center p-3 rounded-lg bg-muted/50">
-                      <span className="text-sm font-medium text-muted-foreground">Prix Eany HT/TTC</span>
-                      <div className="text-right">
-                        <span className="text-base font-bold text-foreground">
-                          {product.qogita_price_ht?.toFixed(2)}€ / {product.qogita_price_ttc?.toFixed(2)}€
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Stock */}
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-muted-foreground">Stock</span>
-                      <span className="font-semibold text-foreground">{product.qogita_stock || 0}</span>
-                    </div>
-
-                    {/* BSR avec pourcentage */}
+                  {/* SellerAmp Data */}
+                  {product.selleramp_bsr && (
                     <div className="flex justify-between items-center">
                       <span className="text-sm text-muted-foreground">BSR</span>
-                      <span className="font-semibold text-foreground">
-                        {product.selleramp_bsr ? (
-                          <>
-                            {parseInt(product.selleramp_bsr).toLocaleString()}k
-                            {product.selleramp_sales && (
-                              <span className="text-muted-foreground ml-1">
-                                ({((parseInt(product.selleramp_sales) / 30) * 100).toFixed(0)}%)
-                              </span>
-                            )}
-                          </>
-                        ) : 'N/A'}
-                      </span>
+                      <span className="font-semibold">{product.selleramp_bsr}</span>
                     </div>
-
-                    {/* Ventes */}
+                  )}
+                  {product.selleramp_sales && (
                     <div className="flex justify-between items-center">
                       <span className="text-sm text-muted-foreground">Ventes</span>
-                      <span className="font-semibold text-foreground">
-                        {product.selleramp_sales || 'Unknown'}
-                      </span>
+                      <span className="font-semibold">{product.selleramp_sales}</span>
                     </div>
-
-                    {/* Sellers */}
+                  )}
+                  {product.selleramp_sellers && (
                     <div className="flex justify-between items-center">
                       <span className="text-sm text-muted-foreground">Sellers</span>
-                      <span className="font-semibold text-foreground">
-                        {product.selleramp_sellers || 'N/A'}
-                      </span>
+                      <span className="font-semibold">{product.selleramp_sellers}</span>
                     </div>
-
-                    {/* Variations */}
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-muted-foreground">Variations</span>
-                      <span className="font-semibold text-foreground">
-                        {product.selleramp_variations || 'N/A'}
-                      </span>
-                    </div>
-
-                    {/* Separator */}
-                    <div className="border-t border-border my-4"></div>
-
-                    {/* Profit FBM */}
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm font-medium text-muted-foreground">Profit FBM</span>
-                      <span className="text-lg font-bold text-emerald-600">
-                        {displayProfit?.toFixed(2)}€ ({displayROI?.toFixed(2)}%)
-                      </span>
-                    </div>
-
-                    {/* Profit FBA */}
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm font-medium text-muted-foreground">Profit FBA</span>
-                      <span className="text-lg font-bold text-emerald-600">
-                        {product.fba_profit?.toFixed(2) || '0.00'}€ ({product.fba_roi?.toFixed(2) || '0.00'}%)
-                      </span>
-                    </div>
+                  )}
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-muted-foreground">Variations</span>
+                    <span className="font-semibold">
+                      {product.selleramp_variations && 
+                       product.selleramp_variations !== 'None' && 
+                       product.selleramp_variations !== 'No' 
+                        ? product.selleramp_variations 
+                        : '0'}
+                    </span>
                   </div>
-                </CardHeader>
 
-                <CardContent className="relative pt-0">
-                  {/* Liens rapides */}
-                  <div className="mb-4">
-                    <p className="text-sm font-medium text-muted-foreground mb-3">Liens rapides</p>
+                  {/* Profits */}
+                  <div className="pt-3 border-t space-y-2">
+                    {product.fbm_profit !== null && product.fbm_profit !== undefined && (() => {
+                      const fbmCostValue = parseFloat(fbmCost) || 0;
+                      const adjustedFbmProfit = product.fbm_profit - fbmCostValue;
+                      const priceTTC = product.qogita_price_ttc || (product.qogita_price_ht * 1.2);
+                      const adjustedFbmRoi = priceTTC > 0 ? (adjustedFbmProfit / priceTTC) * 100 : 0;
+                      
+                      return (
+                        <div className="flex justify-between items-center">
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm text-muted-foreground">Profit FBM</span>
+                            {fbmCostValue > 0 && (
+                              <span className="px-2 py-0.5 text-xs font-medium bg-orange-100 text-orange-700 rounded-full border border-orange-300">
+                                Coûts FBM -{fbmCostValue}€
+                              </span>
+                            )}
+                          </div>
+                          <span className={`font-bold ${adjustedFbmProfit > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                            {adjustedFbmProfit.toFixed(2)}€ ({adjustedFbmRoi.toFixed(2)}%)
+                          </span>
+                        </div>
+                      );
+                    })()}
+                    {product.fba_profit !== null && product.fba_profit !== undefined && (
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-muted-foreground">Profit FBA</span>
+                        <span className={`font-bold ${product.fba_profit > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                          {product.fba_profit.toFixed(2)}€ ({product.fba_roi?.toFixed(2)}%)
+                        </span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Quick Links - Professional & Creative */}
+                  <div className="pt-4 border-t">
+                    <p className="text-xs font-semibold text-muted-foreground mb-3">Liens rapides</p>
                     <div className="grid grid-cols-3 gap-2">
                       {product.qogita_url && (
-                        <Button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleProductClick(product.qogita_url!);
+                        <a
+                          href={product.qogita_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex flex-col items-center justify-center gap-1.5 p-3 rounded-lg bg-gradient-to-br from-blue-50 to-blue-100 hover:from-blue-100 hover:to-blue-200 border border-blue-200 transition-all hover:shadow-md group"
+                          onClick={() => {
+                            const scrollPos = window.scrollY;
+                            sessionStorage.setItem('eanyScrollPos', scrollPos.toString());
                           }}
-                          variant="outline"
-                          size="sm"
-                          className="w-full bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-200"
                         >
-                          <ShoppingBag className="w-4 h-4 mr-1" />
-                          Eany
-                        </Button>
+                          <Store className="h-4 w-4 text-blue-600 group-hover:scale-110 transition-transform" />
+                          <span className="text-xs font-semibold text-blue-700">Qogita</span>
+                        </a>
                       )}
-                      
                       {product.selleramp_url && (
-                        <Button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleProductClick(product.selleramp_url!);
+                        <a
+                          href={product.selleramp_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex flex-col items-center justify-center gap-1.5 p-3 rounded-lg bg-gradient-to-br from-purple-50 to-purple-100 hover:from-purple-100 hover:to-purple-200 border border-purple-200 transition-all hover:shadow-md group"
+                          onClick={() => {
+                            const scrollPos = window.scrollY;
+                            sessionStorage.setItem('eanyScrollPos', scrollPos.toString());
                           }}
-                          variant="outline"
-                          size="sm"
-                          className="w-full bg-purple-50 hover:bg-purple-100 text-purple-700 border-purple-200"
                         >
-                          <BarChart3 className="w-4 h-4 mr-1" />
-                          SellerAmp
-                        </Button>
+                          <BarChart3 className="h-4 w-4 text-purple-600 group-hover:scale-110 transition-transform" />
+                          <span className="text-xs font-semibold text-purple-700">SellerAmp</span>
+                        </a>
                       )}
-                      
                       {product.amazon_url && (
-                        <Button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleProductClick(product.amazon_url!);
+                        <a
+                          href={product.amazon_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex flex-col items-center justify-center gap-1.5 p-3 rounded-lg bg-gradient-to-br from-orange-50 to-orange-100 hover:from-orange-100 hover:to-orange-200 border border-orange-200 transition-all hover:shadow-md group"
+                          onClick={() => {
+                            const scrollPos = window.scrollY;
+                            sessionStorage.setItem('eanyScrollPos', scrollPos.toString());
                           }}
-                          variant="outline"
-                          size="sm"
-                          className="w-full bg-orange-50 hover:bg-orange-100 text-orange-700 border-orange-200"
                         >
-                          <ShoppingCart className="w-4 h-4 mr-1" />
-                          Amazon
-                        </Button>
+                          <ShoppingCart className="h-4 w-4 text-orange-600 group-hover:scale-110 transition-transform" />
+                          <span className="text-xs font-semibold text-orange-700">Amazon</span>
+                        </a>
                       )}
                     </div>
                   </div>
