@@ -634,9 +634,10 @@ export default function ProduitsEany() {
                     <span className="font-semibold">
                       {product.selleramp_variations && 
                        product.selleramp_variations !== 'None' && 
-                       product.selleramp_variations !== 'No' 
+                       product.selleramp_variations !== 'No' &&
+                       product.selleramp_variations !== '0'
                         ? product.selleramp_variations 
-                        : '0'}
+                        : '-'}
                     </span>
                   </div>
 

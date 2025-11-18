@@ -626,9 +626,10 @@ export default function ProduitsQogita() {
                       <span className="font-semibold">
                         {product.selleramp_variations && 
                          product.selleramp_variations !== 'None' && 
-                         product.selleramp_variations !== 'No' 
+                         product.selleramp_variations !== 'No' &&
+                         product.selleramp_variations !== '0'
                           ? product.selleramp_variations 
-                          : '0'}
+                          : '-'}
                       </span>
                     </div>
 
