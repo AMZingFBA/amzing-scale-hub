@@ -23,3 +23,6 @@ verify_jwt = false
 
 [functions.reset-badge]
 verify_jwt = false
+
+[functions.sync-eany-gist-to-db]
+verify_jwt = false
