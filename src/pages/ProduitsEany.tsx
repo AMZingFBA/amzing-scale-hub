@@ -2,7 +2,7 @@ import { useEffect, useState, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/use-auth';
 import { useAdmin } from '@/hooks/use-admin';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -17,103 +17,161 @@ interface EanyProduct {
   qogita_price_ht: number;
   qogita_price_ttc: number;
   qogita_stock: number;
-  qogita_url: string | null;
-  selleramp_bsr: string | null;
-  selleramp_sale_price: number | null;
-  selleramp_sales: string | null;
-  selleramp_sellers: string | null;
-  selleramp_variations: string | null;
-  selleramp_url: string | null;
-  fbm_profit: number | null;
-  fbm_roi: number | null;
-  fba_profit: number | null;
-  fba_roi: number | null;
-  alerts: string[] | null;
-  amazon_url: string | null;
+  qogita_url?: string;
+  selleramp_bsr?: string;
+  selleramp_sale_price?: number;
+  selleramp_sales?: string;
+  selleramp_sellers?: string;
+  selleramp_variations?: string;
+  selleramp_url?: string;
+  fbm_profit?: number;
+  fbm_roi?: number;
+  fba_profit?: number;
+  fba_roi?: number;
+  alerts?: string[];
+  amazon_url?: string;
+  created_at: string;
 }
 
-const ProduitsEany = () => {
-  const [products, setProducts] = useState<EanyProduct[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [syncing, setSyncing] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [minProfit, setMinProfit] = useState('');
-  const [minRoi, setMinRoi] = useState('');
-  const [maxBsr, setMaxBsr] = useState('');
-  const [eanFilter, setEanFilter] = useState('');
-  const [profitType, setProfitType] = useState<'fba' | 'fbm'>('fba');
-  const [fbmCosts, setFbmCosts] = useState('3');
-  const [lastRefresh, setLastRefresh] = useState<Date | null>(null);
-  
-  const productsPerPage = 24;
-  const { toast } = useToast();
-  const { user, isVIP, isLoading: authLoading } = useAuth();
-  const { isAdmin, isLoading: adminLoading } = useAdmin();
-  const navigate = useNavigate();
+const PRODUCTS_PER_PAGE = 50;
+const SCROLL_POSITION_KEY = 'eany_scroll_position';
+const CURRENT_PAGE_KEY = 'eany_current_page';
 
+export default function ProduitsEany() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { user, isLoading: authLoading, isVIP } = useAuth();
+  const { isAdmin } = useAdmin();
+  const [products, setProducts] = useState<EanyProduct[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [currentPage, setCurrentPage] = useState(() => {
+    const saved = localStorage.getItem(CURRENT_PAGE_KEY);
+    return saved ? parseInt(saved) : 1;
+  });
+  const [lastUpdate, setLastUpdate] = useState<string>('');
+  const [lastRefresh, setLastRefresh] = useState<string>('');
+
+  // Filters
+  const [minProfit, setMinProfit] = useState('');
+  const [minROI, setMinROI] = useState('');
+  const [maxBSR, setMaxBSR] = useState('');
+  const [searchEAN, setSearchEAN] = useState('');
+  const [profitType, setProfitType] = useState<'both' | 'fbm' | 'fba'>('both');
+  const [fbmCost, setFbmCost] = useState('0');
+
+  // Load products from Supabase
   const loadProducts = async () => {
     try {
-      setLoading(true);
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('eany_products')
         .select('*')
         .order('timestamp', { ascending: false });
 
       if (error) throw error;
-      setProducts(data || []);
-      setLastRefresh(new Date());
+
+      if (!data || data.length === 0) {
+        console.log('No products found in database');
+        setProducts([]);
+        setLastUpdate(new Date().toISOString());
+        toast.info('Aucun produit disponible pour le moment');
+        return;
+      }
+
+      // Transform DB data to app format
+      const transformedProducts: EanyProduct[] = data.map((p: any) => ({
+        id: p.id,
+        ean: p.ean,
+        timestamp: p.timestamp,
+        qogita_price_ht: p.qogita_price_ht,
+        qogita_price_ttc: p.qogita_price_ttc,
+        qogita_stock: p.qogita_stock,
+        qogita_url: p.qogita_url,
+        selleramp_bsr: p.selleramp_bsr || 'N/A',
+        selleramp_sale_price: p.selleramp_sale_price || null,
+        selleramp_sales: p.selleramp_sales || 'Unknown',
+        selleramp_sellers: p.selleramp_sellers || 'N/A',
+        selleramp_variations: p.selleramp_variations || 'None',
+        selleramp_url: p.selleramp_url,
+        fbm_profit: p.fbm_profit || 0,
+        fbm_roi: p.fbm_roi || 0,
+        fba_profit: p.fba_profit || 0,
+        fba_roi: p.fba_roi || 0,
+        alerts: p.alerts || [],
+        amazon_url: p.amazon_url,
+        created_at: p.created_at
+      }));
+
+      setProducts(transformedProducts);
+      
+      if (transformedProducts.length > 0) {
+        const mostRecentProduct = transformedProducts.reduce((latest, current) => {
+          return new Date(current.timestamp) > new Date(latest.timestamp) ? current : latest;
+        });
+        setLastUpdate(mostRecentProduct.timestamp);
+      }
+      
+      setLastRefresh(new Date().toISOString());
     } catch (error) {
-      console.error('Erreur:', error);
-      toast({
-        title: "Erreur",
-        description: "Impossible de charger les produits Eany",
-        variant: "destructive"
-      });
+      console.error('Error loading products:', error);
+      toast.error('Erreur lors du chargement des produits');
     } finally {
-      setLoading(false);
+      setIsLoading(false);
+      setIsRefreshing(false);
     }
   };
 
-  const syncFromGist = async () => {
-    try {
-      setSyncing(true);
-      const { data, error } = await supabase.functions.invoke('sync-eany-gist-to-db');
+  // Filtered products
+  const filteredProducts = useMemo(() => {
+    return products.filter(product => {
+      const fbmCostValue = fbmCost ? parseFloat(fbmCost) : 0;
+      const profit = profitType === 'fbm' 
+        ? (product.fbm_profit ? product.fbm_profit - fbmCostValue : null)
+        : profitType === 'fba' 
+        ? product.fba_profit 
+        : Math.max((product.fbm_profit || 0) - fbmCostValue, product.fba_profit || 0);
+      const roi = profitType === 'fbm' ? product.fbm_roi : profitType === 'fba' ? product.fba_roi : Math.max(product.fbm_roi || 0, product.fba_roi || 0);
       
-      if (error) throw error;
-      
-      toast({
-        title: "Synchronisation réussie",
-        description: `${data.synced} produits Eany synchronisés`,
-      });
-      
-      await loadProducts();
-    } catch (error) {
-      console.error('Erreur de synchronisation:', error);
-      toast({
-        title: "Erreur de synchronisation",
-        description: "Impossible de synchroniser les produits Eany",
-        variant: "destructive"
-      });
-    } finally {
-      setSyncing(false);
-    }
-  };
+      if (minProfit && profit < parseFloat(minProfit)) {
+        return false;
+      }
+      if (minROI && roi < parseFloat(minROI)) {
+        return false;
+      }
+      if (maxBSR && product.selleramp_bsr) {
+        const bsr = parseInt(product.selleramp_bsr.replace(/\D/g, ''));
+        if (bsr > parseInt(maxBSR)) return false;
+      }
+      if (searchEAN && !product.ean.includes(searchEAN)) {
+        return false;
+      }
+      return true;
+    });
+  }, [products, minProfit, minROI, maxBSR, searchEAN, profitType, fbmCost]);
 
-  const { isRefreshing, handleRefresh } = usePullRefresh(async () => {
-    await syncFromGist();
-  });
+  // Pagination
+  const totalPages = Math.ceil(filteredProducts.length / PRODUCTS_PER_PAGE);
+  const paginatedProducts = filteredProducts.slice(
+    (currentPage - 1) * PRODUCTS_PER_PAGE,
+    currentPage * PRODUCTS_PER_PAGE
+  );
 
+  // Reset to page 1 if current page is out of bounds
   useEffect(() => {
-    if (!authLoading && user) {
+    if (currentPage > totalPages && totalPages > 0) {
+      setCurrentPage(1);
+    }
+  }, [totalPages, currentPage]);
+
+  // Initial load
+  useEffect(() => {
+    if (user && !authLoading) {
       loadProducts();
     }
-    
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('refresh') === 'true') {
-      syncFromGist();
-      window.history.replaceState({}, '', window.location.pathname);
-    }
+  }, [user, authLoading]);
 
+  // Realtime subscription
+  useEffect(() => {
     const channel = supabase
       .channel('eany-products-changes')
       .on('postgres_changes', { 
@@ -128,322 +186,339 @@ const ProduitsEany = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [user, authLoading]);
+  }, []);
 
+  // Save current page to localStorage
   useEffect(() => {
-    const savedScroll = sessionStorage.getItem('eanyProductsScroll');
-    if (savedScroll) {
-      window.scrollTo(0, parseInt(savedScroll));
-      sessionStorage.removeItem('eanyProductsScroll');
+    localStorage.setItem(CURRENT_PAGE_KEY, currentPage.toString());
+  }, [currentPage]);
+
+  // Restore scroll position
+  useEffect(() => {
+    const savedPosition = localStorage.getItem(SCROLL_POSITION_KEY);
+    if (savedPosition) {
+      setTimeout(() => {
+        window.scrollTo(0, parseInt(savedPosition));
+        localStorage.removeItem(SCROLL_POSITION_KEY);
+      }, 100);
     }
-  }, [products]);
+  }, []);
 
-  useEffect(() => {
+  // Save scroll position before navigation
+  const handleProductClick = (url: string) => {
+    localStorage.setItem(SCROLL_POSITION_KEY, window.scrollY.toString());
+    window.open(url, '_blank');
+  };
+
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('sync-eany-gist-to-db');
+      if (error) throw error;
+      toast.success(`${data?.synced || 0} produits synchronisés`);
+      await loadProducts();
+    } catch (error) {
+      console.error('Error refreshing:', error);
+      toast.error('Erreur lors de la synchronisation');
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    toast.success('EAN copié dans le presse-papier');
+  };
+
+  const resetFilters = () => {
+    setMinProfit('');
+    setMinROI('');
+    setMaxBSR('');
+    setSearchEAN('');
+    setProfitType('both');
+    setFbmCost('0');
     setCurrentPage(1);
-  }, [minProfit, minRoi, maxBsr, eanFilter, profitType, fbmCosts]);
+  };
 
-  const filteredProducts = useMemo(() => {
-    return products.filter(product => {
-      const profit = profitType === 'fba' ? product.fba_profit : product.fbm_profit;
-      const roi = profitType === 'fba' ? product.fba_roi : product.fbm_roi;
-      
-      const adjustedProfit = profitType === 'fbm' && profit !== null
-        ? profit - parseFloat(fbmCosts)
-        : profit;
-      
-      const profitMatch = !minProfit || (adjustedProfit !== null && adjustedProfit >= parseFloat(minProfit));
-      const roiMatch = !minRoi || (roi !== null && roi >= parseFloat(minRoi));
-      
-      const bsrNumber = product.selleramp_bsr ? parseInt(product.selleramp_bsr.replace(/\s/g, '')) : null;
-      const bsrMatch = !maxBsr || (bsrNumber !== null && bsrNumber <= parseInt(maxBsr));
-      
-      const eanMatch = !eanFilter || product.ean.includes(eanFilter);
-      
-      return profitMatch && roiMatch && bsrMatch && eanMatch;
-    });
-  }, [products, minProfit, minRoi, maxBsr, eanFilter, profitType, fbmCosts]);
+  // Calculate statistics
+  const stats = useMemo(() => {
+    const fbmCostValue = fbmCost ? parseFloat(fbmCost) : 0;
+    const total = filteredProducts.length;
+    const avgProfit = total > 0 
+      ? filteredProducts.reduce((sum, p) => {
+          const profit = profitType === 'fbm' 
+            ? (p.fbm_profit || 0) - fbmCostValue
+            : profitType === 'fba' 
+            ? (p.fba_profit || 0)
+            : Math.max((p.fbm_profit || 0) - fbmCostValue, p.fba_profit || 0);
+          return sum + profit;
+        }, 0) / total
+      : 0;
+    const avgROI = total > 0
+      ? filteredProducts.reduce((sum, p) => {
+          const roi = profitType === 'fbm' ? (p.fbm_roi || 0) : profitType === 'fba' ? (p.fba_roi || 0) : Math.max(p.fbm_roi || 0, p.fba_roi || 0);
+          return sum + roi;
+        }, 0) / total
+      : 0;
+    return { total, avgProfit, avgROI };
+  }, [filteredProducts, profitType, fbmCost]);
 
-  const paginatedProducts = useMemo(() => {
-    const startIndex = (currentPage - 1) * productsPerPage;
-    return filteredProducts.slice(startIndex, startIndex + productsPerPage);
-  }, [filteredProducts, currentPage]);
-
-  const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
-
-  if (loading || authLoading || adminLoading) {
+  if (authLoading || isLoading) {
     return (
-      <div className="min-h-screen bg-background p-6">
-        <div className="max-w-7xl mx-auto space-y-6">
-          <Skeleton className="h-12 w-full" />
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {[...Array(6)].map((_, i) => (
-              <Skeleton key={i} className="h-96" />
-            ))}
-          </div>
-        </div>
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
       </div>
     );
   }
 
   if (!user || (!isVIP && !isAdmin)) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-6">
-        <Card className="p-8 max-w-md text-center">
-          <h2 className="text-2xl font-bold mb-4">Accès VIP requis</h2>
-          <p className="text-muted-foreground mb-6">
-            Cette page est réservée aux membres VIP.
-          </p>
-          <Button onClick={() => navigate('/tarifs')}>
-            Devenir VIP
-          </Button>
-        </Card>
-      </div>
-    );
+    navigate('/tarifs');
+    return null;
   }
 
   return (
-    <div className="min-h-screen bg-background p-6">
-      <div className="max-w-7xl mx-auto">
-        <div className="flex items-center gap-4 mb-6">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
+      <div className="container mx-auto px-4 py-8 space-y-6">
+        {/* Header */}
+        <div className="flex items-center justify-between">
           <Button
             variant="ghost"
-            size="icon"
-            onClick={() => {
-              sessionStorage.setItem('eanyProductsScroll', window.scrollY.toString());
-              navigate('/dashboard');
-            }}
+            onClick={() => navigate('/dashboard')}
+            className="gap-2"
           >
-            <ChevronLeft className="w-6 h-6" />
+            <ArrowLeft className="w-4 h-4" />
+            Retour
           </Button>
-          <h1 className="text-3xl font-bold">Products Eany</h1>
-          <RefreshButton
-            onRefresh={handleRefresh}
-            isRefreshing={isRefreshing || syncing}
-            className="ml-auto"
-          />
+          <Button
+            onClick={handleRefresh}
+            disabled={isRefreshing}
+            variant="outline"
+            className="gap-2"
+          >
+            <RotateCcw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+            {isRefreshing ? 'Synchronisation...' : 'Synchroniser'}
+          </Button>
         </div>
 
-        <Card className="p-6 mb-6">
-          <div className="space-y-4">
+        {/* Title */}
+        <div className="text-center space-y-2">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent">
+            Monitor Eany
+          </h1>
+          <p className="text-muted-foreground">
+            {lastRefresh && `Dernière mise à jour: ${new Date(lastRefresh).toLocaleString('fr-FR')}`}
+          </p>
+        </div>
+
+        {/* Statistics Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <Card className="border-primary/20">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Total Produits</CardTitle>
+              <Package className="w-4 h-4 text-primary" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{stats.total}</div>
+            </CardContent>
+          </Card>
+          <Card className="border-primary/20">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Profit Moyen</CardTitle>
+              <TrendingUp className="w-4 h-4 text-primary" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{stats.avgProfit.toFixed(2)}€</div>
+            </CardContent>
+          </Card>
+          <Card className="border-primary/20">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">ROI Moyen</CardTitle>
+              <BarChart3 className="w-4 h-4 text-primary" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{stats.avgROI.toFixed(0)}%</div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Filters */}
+        <Card className="border-primary/20">
+          <CardHeader>
             <div className="flex items-center justify-between">
-              <p className="text-lg font-semibold">
-                {filteredProducts.length} produit{filteredProducts.length > 1 ? 's' : ''} trouvé{filteredProducts.length > 1 ? 's' : ''}
-              </p>
-              {lastRefresh && (
-                <p className="text-sm text-muted-foreground">
-                  Dernière mise à jour : {lastRefresh.toLocaleTimeString('fr-FR')}
-                </p>
-              )}
+              <CardTitle>Filtres</CardTitle>
+              <Button onClick={resetFilters} variant="ghost" size="sm">
+                Réinitialiser
+              </Button>
             </div>
-
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-              <div>
-                <Label>Type de profit</Label>
-                <div className="flex gap-2 mt-2">
-                  <Button
-                    variant={profitType === 'fba' ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => setProfitType('fba')}
-                    className="flex-1"
-                  >
-                    FBA
-                  </Button>
-                  <Button
-                    variant={profitType === 'fbm' ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => setProfitType('fbm')}
-                    className="flex-1"
-                  >
-                    FBM
-                  </Button>
-                </div>
-              </div>
-
-              {profitType === 'fbm' && (
-                <div>
-                  <Label htmlFor="fbm-costs">Coûts FBM (€)</Label>
-                  <Input
-                    id="fbm-costs"
-                    type="number"
-                    step="0.01"
-                    value={fbmCosts}
-                    onChange={(e) => setFbmCosts(e.target.value)}
-                    placeholder="Ex: 3"
-                  />
-                </div>
-              )}
-
-              <div>
-                <Label htmlFor="min-profit">Profit min (€)</Label>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Profit Min (€)</label>
                 <Input
-                  id="min-profit"
                   type="number"
                   value={minProfit}
                   onChange={(e) => setMinProfit(e.target.value)}
                   placeholder="Ex: 5"
                 />
               </div>
-
-              <div>
-                <Label htmlFor="min-roi">ROI min (%)</Label>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">ROI Min (%)</label>
                 <Input
-                  id="min-roi"
                   type="number"
-                  value={minRoi}
-                  onChange={(e) => setMinRoi(e.target.value)}
-                  placeholder="Ex: 20"
+                  value={minROI}
+                  onChange={(e) => setMinROI(e.target.value)}
+                  placeholder="Ex: 30"
                 />
               </div>
-
-              <div>
-                <Label htmlFor="max-bsr">BSR max</Label>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">BSR Max</label>
                 <Input
-                  id="max-bsr"
                   type="number"
-                  value={maxBsr}
-                  onChange={(e) => setMaxBsr(e.target.value)}
+                  value={maxBSR}
+                  onChange={(e) => setMaxBSR(e.target.value)}
                   placeholder="Ex: 100000"
                 />
               </div>
-
-              <div>
-                <Label htmlFor="ean-filter">Recherche EAN</Label>
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                  <Input
-                    id="ean-filter"
-                    type="text"
-                    value={eanFilter}
-                    onChange={(e) => setEanFilter(e.target.value)}
-                    placeholder="Ex: 5449000"
-                    className="pl-10"
-                  />
-                </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Recherche EAN</label>
+                <Input
+                  value={searchEAN}
+                  onChange={(e) => setSearchEAN(e.target.value)}
+                  placeholder="Entrer un EAN"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Type de Profit</label>
+                <select
+                  value={profitType}
+                  onChange={(e) => setProfitType(e.target.value as 'both' | 'fbm' | 'fba')}
+                  className="w-full px-3 py-2 rounded-md border bg-background"
+                >
+                  <option value="both">FBA et FBM (Max)</option>
+                  <option value="fba">FBA uniquement</option>
+                  <option value="fbm">FBM uniquement</option>
+                </select>
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Coûts FBM (€)</label>
+                <Input
+                  type="number"
+                  value={fbmCost}
+                  onChange={(e) => setFbmCost(e.target.value)}
+                  placeholder="Ex: 3"
+                />
               </div>
             </div>
-          </div>
+          </CardContent>
         </Card>
 
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 mb-6">
+        {/* Products Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {paginatedProducts.map((product) => {
-            const profit = profitType === 'fba' ? product.fba_profit : product.fbm_profit;
-            const roi = profitType === 'fba' ? product.fba_roi : product.fbm_roi;
-            const adjustedProfit = profitType === 'fbm' && profit !== null
-              ? profit - parseFloat(fbmCosts)
-              : profit;
+            const fbmCostValue = fbmCost ? parseFloat(fbmCost) : 0;
+            const displayProfit = profitType === 'fbm' 
+              ? (product.fbm_profit || 0) - fbmCostValue
+              : profitType === 'fba' 
+              ? (product.fba_profit || 0)
+              : Math.max((product.fbm_profit || 0) - fbmCostValue, product.fba_profit || 0);
+            const displayROI = profitType === 'fbm' ? product.fbm_roi : profitType === 'fba' ? product.fba_roi : Math.max(product.fbm_roi || 0, product.fba_roi || 0);
 
             return (
-              <Card key={product.id} className="p-4 hover:shadow-lg transition-shadow">
-                <div className="space-y-3">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <p className="font-mono text-sm text-muted-foreground">EAN: {product.ean}</p>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        {new Date(product.timestamp).toLocaleString('fr-FR')}
-                      </p>
-                    </div>
-                    {product.alerts && product.alerts.length > 0 && (
-                      <div className="flex flex-wrap gap-1">
-                        {product.alerts.map((alert, idx) => (
-                          <span key={idx} className="text-xs px-2 py-1 rounded bg-yellow-500/10 text-yellow-500 border border-yellow-500/20">
-                            {alert}
-                          </span>
-                        ))}
-                      </div>
-                    )}
+              <Card key={product.id} className="border-primary/20 hover:border-primary/40 transition-all">
+                <CardContent className="p-4 space-y-3">
+                  {/* EAN */}
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-mono text-muted-foreground">{product.ean}</span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => copyToClipboard(product.ean)}
+                    >
+                      <Copy className="w-4 h-4" />
+                    </Button>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-3 text-sm">
-                    <div>
-                      <p className="text-muted-foreground">Prix TTC</p>
-                      <p className="font-semibold">{product.qogita_price_ttc.toFixed(2)}€</p>
+                  {/* Profit & ROI */}
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="space-y-1">
+                      <div className="text-xs text-muted-foreground">Profit</div>
+                      <div className="text-lg font-bold text-primary">{displayProfit?.toFixed(2)}€</div>
                     </div>
-                    <div>
-                      <p className="text-muted-foreground">Stock</p>
-                      <p className="font-semibold">{product.qogita_stock}</p>
-                    </div>
-                    <div>
-                      <p className="text-muted-foreground">Profit {profitType.toUpperCase()}</p>
-                      <p className={`font-bold ${adjustedProfit && adjustedProfit > 0 ? 'text-green-600' : 'text-red-600'}`}>
-                        {adjustedProfit !== null ? `${adjustedProfit.toFixed(2)}€` : 'N/A'}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-muted-foreground">ROI {profitType.toUpperCase()}</p>
-                      <p className={`font-bold ${roi && roi > 0 ? 'text-green-600' : 'text-red-600'}`}>
-                        {roi !== null ? `${roi.toFixed(0)}%` : 'N/A'}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-muted-foreground">Prix vente</p>
-                      <p className="font-semibold">
-                        {product.selleramp_sale_price ? `${product.selleramp_sale_price.toFixed(2)}€` : 'N/A'}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-muted-foreground">BSR</p>
-                      <p className="font-semibold">{product.selleramp_bsr || 'N/A'}</p>
+                    <div className="space-y-1">
+                      <div className="text-xs text-muted-foreground">ROI</div>
+                      <div className="text-lg font-bold text-primary">{displayROI?.toFixed(0)}%</div>
                     </div>
                   </div>
 
+                  {/* Eany Price */}
+                  <div className="space-y-1">
+                    <div className="text-xs text-muted-foreground">Prix Eany</div>
+                    <div className="text-sm font-medium">{product.qogita_price_ttc.toFixed(2)}€ TTC</div>
+                  </div>
+
+                  {/* BSR */}
+                  {product.selleramp_bsr && (
+                    <div className="space-y-1">
+                      <div className="text-xs text-muted-foreground">BSR</div>
+                      <Badge variant="outline">{product.selleramp_bsr}</Badge>
+                    </div>
+                  )}
+
+                  {/* Links */}
                   <div className="flex gap-2 pt-2">
                     {product.qogita_url && (
-                      <Button size="sm" variant="outline" asChild className="flex-1">
-                        <a href={product.qogita_url} target="_blank" rel="noopener noreferrer">
-                          <ExternalLink className="w-4 h-4 mr-1" />
-                          Eany
-                        </a>
-                      </Button>
-                    )}
-                    {product.selleramp_url && (
-                      <Button size="sm" variant="outline" asChild className="flex-1">
-                        <a href={product.selleramp_url} target="_blank" rel="noopener noreferrer">
-                          <ExternalLink className="w-4 h-4 mr-1" />
-                          SellerAmp
-                        </a>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleProductClick(product.qogita_url!)}
+                        className="flex-1 gap-2"
+                      >
+                        <Store className="w-4 h-4" />
+                        Eany
                       </Button>
                     )}
                     {product.amazon_url && (
-                      <Button size="sm" variant="outline" asChild className="flex-1">
-                        <a href={product.amazon_url} target="_blank" rel="noopener noreferrer">
-                          <ExternalLink className="w-4 h-4 mr-1" />
-                          Amazon
-                        </a>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleProductClick(product.amazon_url!)}
+                        className="flex-1 gap-2"
+                      >
+                        <ShoppingCart className="w-4 h-4" />
+                        Amazon
                       </Button>
                     )}
                   </div>
-                </div>
+                </CardContent>
               </Card>
             );
           })}
         </div>
 
+        {/* Pagination */}
         {totalPages > 1 && (
-          <div className="flex items-center justify-center gap-4 mt-8">
+          <div className="flex items-center justify-center gap-2">
             <Button
               variant="outline"
-              size="icon"
               onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
               disabled={currentPage === 1}
             >
-              <ChevronLeft className="w-4 h-4" />
+              Précédent
             </Button>
-            <span className="text-sm">
+            <span className="text-sm text-muted-foreground">
               Page {currentPage} sur {totalPages}
             </span>
             <Button
               variant="outline"
-              size="icon"
               onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
               disabled={currentPage === totalPages}
             >
-              <ChevronRight className="w-4 h-4" />
+              Suivant
             </Button>
           </div>
         )}
       </div>
     </div>
   );
-};
-
-export default ProduitsEany;
+}
