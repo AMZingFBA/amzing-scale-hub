@@ -124,6 +124,11 @@ export default function ProduitsEany() {
   // Filtered products
   const filteredProducts = useMemo(() => {
     return products.filter(product => {
+      // Filter out products with 0 variations
+      if (product.selleramp_variations === '0') {
+        return false;
+      }
+      
       const fbmCostValue = fbmCost ? parseFloat(fbmCost) : 0;
       const profit = profitType === 'fbm' 
         ? (product.fbm_profit ? product.fbm_profit - fbmCostValue : null)
