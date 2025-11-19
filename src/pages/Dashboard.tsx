@@ -272,7 +272,7 @@ const Dashboard = () => {
                 </AccordionTrigger>
                 <AccordionContent>
                   <div className="grid gap-3 pt-2">
-                    <CategoryItem icon={MessageCircle} label="général" link="/chat" badge={notifications.communaute?.subcategories?.général} />
+                    <CategoryItem icon={MessageCircle} label="général" link="/questions" badge={notifications.communaute?.subcategories?.général} />
                     <CategoryItem icon={LightbulbIcon} label="suggestions" link="/suggestions" badge={notifications.communaute?.subcategories?.suggestions} />
                     <CategoryItem icon={Trophy} label="succès" link="/success" badge={notifications.communaute?.subcategories?.succès} />
                     <CategoryItem icon={ShoppingCart} label="ventes" link="/sales" badge={notifications.communaute?.subcategories?.ventes} />
