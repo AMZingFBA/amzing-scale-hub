@@ -14,7 +14,6 @@ import { RefreshButton } from '@/components/RefreshButton';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Crown, BookOpen, Bell, CheckCircle, CheckCircle2, DollarSign, HelpCircle, Settings, Eye, FileText, Star, Calculator, Sparkles, Package, Truck, Megaphone, Newspaper, MessageCircle, LightbulbIcon, Trophy, ShoppingCart, Info, Users, Lock, AlertCircle, Scale, Database, Shield, UserCog, Building2, Store, Euro, Wrench, Search, CreditCard } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -133,9 +132,13 @@ const Dashboard = () => {
   if (!isVIP && !isAdmin) {
     return <Navigate to="/" replace />;
   }
-  const daysRemaining = subscription?.expires_at ? Math.ceil((new Date(subscription.expires_at).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)) : null;
+  const daysRemaining = subscription?.expires_at 
+    ? Math.ceil((new Date(subscription.expires_at).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)) 
+    : null;
   const isTrialActive = subscription?.is_trial && daysRemaining && daysRemaining > 0;
-  return <div className="min-h-screen flex flex-col">
+  
+  return (
+    <div className="min-h-screen flex flex-col">
       <Navbar />
       <main className="flex-grow pt-20">
         <div className="container mx-auto px-4 py-8">
@@ -334,8 +337,8 @@ const Dashboard = () => {
         </div>
       </main>
       <Footer />
-
     </div>
   );
 };
+
 export default Dashboard;
