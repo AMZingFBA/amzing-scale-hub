@@ -8,10 +8,10 @@ import { DollarSign, CheckCircle, Sparkles, ArrowLeft, TrendingUp, Gift, Zap } f
 import { Link } from 'react-router-dom';
 
 const Cashback = () => {
-  const { ref: heroRef, isVisible: heroVisible } = useScrollReveal({ delay: 0.1 });
-  const { ref: benefitsRef, isVisible: benefitsVisible } = useScrollReveal({ delay: 0.2 });
-  const { ref: howItWorksRef, isVisible: howItWorksVisible } = useScrollReveal({ delay: 0.3 });
-  const { ref: ctaRef, isVisible: ctaVisible } = useScrollReveal({ delay: 0.4 });
+  const heroReveal = useScrollReveal({ animation: "fade-up", delay: 0 });
+  const benefitsReveal = useScrollReveal({ animation: "scale", delay: 100 });
+  const howItWorksReveal = useScrollReveal({ animation: "fade-up", delay: 200 });
+  const ctaReveal = useScrollReveal({ animation: "scale", delay: 300 });
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-background via-background to-accent/20">
