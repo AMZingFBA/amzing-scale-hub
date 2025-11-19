@@ -28,7 +28,10 @@ const Cashback = () => {
           </Button>
 
           {/* Hero Section */}
-          <div ref={heroRef} className={cn("mb-12", heroVisible && "animate-fade-in")}>
+          <div ref={heroReveal.ref} className={cn(
+            "mb-12 transition-all duration-700",
+            heroReveal.isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+          )}>
             <Card className="border-primary/30 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent relative overflow-hidden">
               <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl" />
               <div className="absolute bottom-0 left-0 w-48 h-48 bg-secondary/10 rounded-full blur-3xl" />
@@ -58,7 +61,10 @@ const Cashback = () => {
           </div>
 
           {/* Benefits Section */}
-          <div ref={benefitsRef} className={cn("mb-12", benefitsVisible && "animate-fade-in")}>
+          <div ref={benefitsReveal.ref} className={cn(
+            "mb-12 transition-all duration-700 transform",
+            benefitsReveal.isVisible ? "opacity-100 scale-100" : "opacity-0 scale-95"
+          )}>
             <h2 className="text-3xl font-bold mb-6 flex items-center gap-3">
               <Sparkles className="w-8 h-8 text-primary" />
               Pourquoi utiliser le cashback ?
@@ -115,7 +121,10 @@ const Cashback = () => {
           </div>
 
           {/* How it works */}
-          <div ref={howItWorksRef} className={cn("mb-12", howItWorksVisible && "animate-fade-in")}>
+          <div ref={howItWorksReveal.ref} className={cn(
+            "mb-12 transition-all duration-700",
+            howItWorksReveal.isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+          )}>
             <h2 className="text-3xl font-bold mb-6 flex items-center gap-3">
               <CheckCircle className="w-8 h-8 text-primary" />
               Comment ça marche ?
@@ -220,7 +229,10 @@ const Cashback = () => {
           </div>
 
           {/* CTA Final */}
-          <div ref={ctaRef} className={cn("", ctaVisible && "animate-fade-in")}>
+          <div ref={ctaReveal.ref} className={cn(
+            "transition-all duration-700 transform",
+            ctaReveal.isVisible ? "opacity-100 scale-100" : "opacity-0 scale-95"
+          )}>
             <Card className="bg-gradient-to-r from-primary/20 via-primary/10 to-transparent border-primary/30 overflow-hidden relative">
               <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-secondary/5 animate-pulse" />
               <CardContent className="pt-10 pb-12 text-center relative">
