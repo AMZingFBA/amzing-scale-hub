@@ -29,7 +29,10 @@ const FactureAutorisation = () => {
           </Button>
 
           {/* Hero Section */}
-          <div ref={heroRef} className={cn("mb-12", heroVisible && "animate-fade-in")}>
+          <div ref={heroReveal.ref} className={cn(
+            "mb-12 transition-all duration-700",
+            heroReveal.isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+          )}>
             <Card className="border-primary/30 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent relative overflow-hidden">
               <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl animate-pulse" />
               <CardContent className="pt-8 pb-10 relative">
@@ -58,7 +61,7 @@ const FactureAutorisation = () => {
           </div>
 
           {/* Main Content */}
-          <div ref={contentRef} className={cn("mb-12", contentVisible && "animate-fade-in")}>
+          <div ref={card1Reveal.ref} className="grid md:grid-cols-2 gap-6 mb-12">
             <div className="grid md:grid-cols-2 gap-6 mb-8">
               <Card className="border-primary/20 hover:border-primary/40 transition-all duration-300 hover:shadow-lg hover:shadow-primary/10">
                 <CardHeader>
@@ -150,8 +153,11 @@ const FactureAutorisation = () => {
             </Card>
           </div>
 
-          {/* Steps Section */}
-          <div ref={stepsRef} className={cn("mb-12", stepsVisible && "animate-fade-in")}>
+          {/* CTA Section */}
+          <div ref={ctaReveal.ref} className={cn(
+            "transition-all duration-700 transform",
+            ctaReveal.isVisible ? "opacity-100 scale-100" : "opacity-0 scale-95"
+          )}>
             <h2 className="text-3xl font-bold mb-6 flex items-center gap-3">
               <Sparkles className="w-8 h-8 text-primary" />
               Comment obtenir vos documents ?
@@ -208,7 +214,10 @@ const FactureAutorisation = () => {
           </div>
 
           {/* CTA Final */}
-          <div ref={ctaRef} className={cn("", ctaVisible && "animate-fade-in")}>
+          <div ref={ctaReveal.ref} className={cn(
+            "transition-all duration-700 transform",
+            ctaReveal.isVisible ? "opacity-100 scale-100" : "opacity-0 scale-95"
+          )}>
             <Card className="bg-gradient-to-r from-primary/20 via-primary/10 to-transparent border-primary/30 overflow-hidden relative">
               <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-secondary/5 animate-pulse" />
               <CardContent className="pt-10 pb-12 text-center relative">
