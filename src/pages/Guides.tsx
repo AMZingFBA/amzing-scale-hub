@@ -50,195 +50,372 @@ const Guides = () => {
               </TabsList>
 
               {/* ========== ONGLET DÉBUTER ========== */}
-              <TabsContent value="debuter" className="space-y-8">
+              <TabsContent value="debuter" className="space-y-8 animate-fade-in">
                 
-                {/* Découvrir l'achat-revente sur Amazon */}
-                <section>
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="p-3 rounded-lg bg-primary/10">
-                      <TrendingUp className="w-8 h-8 text-primary" />
+                {/* Hero Welcome Section */}
+                <section className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary via-primary/90 to-primary/70 p-8 md:p-12 shadow-2xl animate-scale-in">
+                  <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS1vcGFjaXR5PSIwLjEiIHN0cm9rZS13aWR0aD0iMSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIvPjwvc3ZnPg==')] opacity-30"></div>
+                  <div className="relative z-10">
+                    <div className="flex items-center gap-3 mb-4">
+                      <span className="text-6xl animate-bounce">🎉</span>
+                      <h2 className="text-3xl md:text-5xl font-bold text-white">
+                        Bienvenue sur AMZing FBA !
+                      </h2>
                     </div>
-                    <div>
-                      <h2 className="text-3xl font-bold">Découvrir l'achat-revente sur Amazon</h2>
-                      <p className="text-muted-foreground">Comprends le concept et les bases du business model</p>
+                    <div className="space-y-4 text-white/95 text-lg">
+                      <p className="flex items-center gap-2">
+                        Nous sommes ravis de t'accueillir parmi les membres AMZing FBA <span className="text-2xl">🤝</span>
+                      </p>
+                      <p className="font-semibold text-xl">
+                        Prépare-toi : tu entres dans l'un des meilleurs écosystèmes francophones pour réussir sur Amazon FBA/FBM.
+                      </p>
+                      <p className="text-white/90">
+                        Lis tout attentivement : tu vas comprendre exactement comment démarrer, comment utiliser ton abonnement et comment faire tes premiers bénéfices rapidement. ⬇️
+                      </p>
                     </div>
                   </div>
+                </section>
 
-                  <Card className="bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20 mb-6">
+                {/* Quick Start Section */}
+                <section className="animate-fade-in" style={{ animationDelay: '0.1s' }}>
+                  <Card className="bg-gradient-to-br from-orange-500/10 to-red-500/10 border-orange-500/30">
                     <CardHeader>
-                      <CardTitle className="text-xl">💼 L'achat-revente sur Amazon, c'est quoi ?</CardTitle>
+                      <CardTitle className="text-2xl md:text-3xl flex items-center gap-3">
+                        <span className="text-3xl">🔥</span>
+                        Tout comprendre en 2 minutes
+                      </CardTitle>
+                      <CardDescription className="text-lg">
+                        Pour commencer l'achat-revente sur Amazon, tu dois maîtriser quelques bases essentielles.
+                        Voici les étapes à suivre dans l'ordre, simples et efficaces :
+                      </CardDescription>
                     </CardHeader>
-                    <CardContent className="space-y-4">
-                      <p className="text-lg">
-                        C'est un modèle de business très développé aux États-Unis 🇺🇸 qui se démocratise rapidement en France 🇫🇷.
-                      </p>
-                      <p>
-                        Une version beaucoup plus professionnelle, stable et scalable de l'achat-revente classique.
-                      </p>
-                      <div className="bg-background/80 rounded-lg p-6 my-6">
-                        <img 
-                          src={processFlow} 
-                          alt="Processus d'achat-revente sur Amazon" 
-                          className="w-full max-w-3xl mx-auto"
-                        />
+                  </Card>
+                </section>
+
+                {/* Step 1: Read Guides */}
+                <section className="animate-fade-in" style={{ animationDelay: '0.2s' }}>
+                  <Card className="border-blue-500/30 hover:border-blue-500/60 transition-all duration-300 hover:shadow-xl hover:scale-[1.02]">
+                    <CardHeader className="bg-gradient-to-r from-blue-500/10 to-blue-600/10">
+                      <div className="flex items-start gap-4">
+                        <div className="p-3 rounded-xl bg-blue-500 text-white text-2xl font-bold shadow-lg">
+                          2
+                        </div>
+                        <div className="flex-1">
+                          <CardTitle className="text-2xl flex items-center gap-2 mb-2">
+                            <BookOpen className="w-6 h-6 text-blue-500" />
+                            Débute correctement
+                          </CardTitle>
+                          <CardDescription className="text-base">
+                            La base solide pour ton succès
+                          </CardDescription>
+                        </div>
                       </div>
-                      <div className="grid md:grid-cols-2 gap-4 mt-6">
-                        <div className="flex items-start gap-3">
-                          <TrendingUp className="w-5 h-5 text-primary mt-1 flex-shrink-0" />
-                          <div>
-                            <h4 className="font-semibold mb-1">3 milliards de visites/mois</h4>
-                            <p className="text-sm text-muted-foreground">Amazon est la plus grande marketplace au monde</p>
-                          </div>
-                        </div>
-                        <div className="flex items-start gap-3">
-                          <Euro className="w-5 h-5 text-primary mt-1 flex-shrink-0" />
-                          <div>
-                            <h4 className="font-semibold mb-1">1,4 milliard $/jour</h4>
-                            <p className="text-sm text-muted-foreground">De chiffre d'affaires généré quotidiennement</p>
-                          </div>
-                        </div>
+                    </CardHeader>
+                    <CardContent className="space-y-4 pt-6">
+                      <p className="text-lg">
+                        Si tu es débutant → va lire nos guides complets dans les autres onglets ci-dessus.
+                      </p>
+                      <p className="text-muted-foreground">
+                        Tu y trouveras tout : FBA, FBM, produits rentables, règles Amazon, taxes, etc.
+                      </p>
+                      <div className="flex gap-3 mt-4">
+                        <Button
+                          onClick={() => (document.querySelector('[value="entreprise"]') as HTMLElement)?.click()}
+                          className="bg-blue-500 hover:bg-blue-600"
+                        >
+                          <Building2 className="w-4 h-4 mr-2" />
+                          Guide Entreprise
+                        </Button>
+                        <Button
+                          onClick={() => (document.querySelector('[value="vendre"]') as HTMLElement)?.click()}
+                          variant="outline"
+                          className="border-blue-500 text-blue-500 hover:bg-blue-500/10"
+                        >
+                          <Store className="w-4 h-4 mr-2" />
+                          Guide Vendre
+                        </Button>
                       </div>
                     </CardContent>
                   </Card>
-
-                  <Accordion type="single" collapsible className="space-y-4">
-                    <AccordionItem value="comment" className="border rounded-lg px-6 bg-card">
-                      <AccordionTrigger className="text-lg font-semibold hover:no-underline">
-                        <div className="flex items-center gap-3">
-                          <Euro className="w-5 h-5 text-primary" />
-                          <span>Comment ça fonctionne ?</span>
-                        </div>
-                      </AccordionTrigger>
-                      <AccordionContent className="space-y-4 pt-4">
-                        <p>Tu achètes des produits à bas prix (en ligne ou en magasin), puis tu les revends plus cher sur Amazon.</p>
-                        <p className="font-medium">La différence entre ton prix d'achat et ton prix de vente, c'est ton bénéfice 💰</p>
-                        
-                        <div className="bg-primary/5 rounded-lg p-4 space-y-2">
-                          <h4 className="font-semibold">Quelques exemples concrets :</h4>
-                          <ul className="space-y-2 text-sm">
-                            <li>🎲 Un UNO Edition Deluxe acheté 5,80 € → revendu 19,90 € en 3 jours (+240% de marge)</li>
-                            <li>🧸 Un jouet acheté 12 € → revendu 35 € en 1 semaine</li>
-                            <li>💄 Des produits beauté achetés 8 € → revendus 24 € en quelques jours</li>
-                          </ul>
-                        </div>
-                      </AccordionContent>
-                    </AccordionItem>
-
-                    <AccordionItem value="pourquoi" className="border rounded-lg px-6 bg-card">
-                      <AccordionTrigger className="text-lg font-semibold hover:no-underline">
-                        <div className="flex items-center gap-3">
-                          <CheckCircle2 className="w-5 h-5 text-primary" />
-                          <span>Pourquoi Amazon plutôt qu'ailleurs ?</span>
-                        </div>
-                      </AccordionTrigger>
-                      <AccordionContent className="space-y-4 pt-4">
-                        <div className="grid md:grid-cols-2 gap-4">
-                          <Card>
-                            <CardHeader className="pb-3">
-                              <CardTitle className="text-base">📦 Expédition simplifiée</CardTitle>
-                            </CardHeader>
-                            <CardContent className="text-sm text-muted-foreground">
-                              Avec FBA, Amazon gère le stockage, l'emballage et la livraison
-                            </CardContent>
-                          </Card>
-                          <Card>
-                            <CardHeader className="pb-3">
-                              <CardTitle className="text-base">👥 Trafic énorme</CardTitle>
-                            </CardHeader>
-                            <CardContent className="text-sm text-muted-foreground">
-                              Des millions de clients potentiels visitent Amazon chaque jour
-                            </CardContent>
-                          </Card>
-                          <Card>
-                            <CardHeader className="pb-3">
-                              <CardTitle className="text-base">🔒 Confiance client</CardTitle>
-                            </CardHeader>
-                            <CardContent className="text-sm text-muted-foreground">
-                              Les acheteurs font confiance à Amazon, donc à tes produits
-                            </CardContent>
-                          </Card>
-                          <Card>
-                            <CardHeader className="pb-3">
-                              <CardTitle className="text-base">⚡ Automatisation</CardTitle>
-                            </CardHeader>
-                            <CardContent className="text-sm text-muted-foreground">
-                              Gère tout depuis ton ordinateur ou smartphone
-                            </CardContent>
-                          </Card>
-                        </div>
-                      </AccordionContent>
-                    </AccordionItem>
-                  </Accordion>
                 </section>
 
-                {/* Lexique Amazon */}
-                <section>
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="p-3 rounded-lg bg-primary/10">
-                      <BookOpen className="w-8 h-8 text-primary" />
-                    </div>
-                    <div>
-                      <h2 className="text-3xl font-bold">Lexique Amazon</h2>
-                      <p className="text-muted-foreground">Les mots-clés indispensables pour comprendre la plateforme</p>
-                    </div>
-                  </div>
-
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <Card>
-                      <CardHeader>
-                        <CardTitle className="text-base">📦 FBA (Fulfillment by Amazon)</CardTitle>
-                      </CardHeader>
-                      <CardContent className="text-sm text-muted-foreground">
-                        Service d'Amazon qui gère le stockage, l'emballage et l'expédition de tes produits.
-                      </CardContent>
-                    </Card>
-
-                    <Card>
-                      <CardHeader>
-                        <CardTitle className="text-base">🚚 FBM (Fulfillment by Merchant)</CardTitle>
-                      </CardHeader>
-                      <CardContent className="text-sm text-muted-foreground">
-                        Tu gères toi-même le stockage et l'expédition de tes produits.
-                      </CardContent>
-                    </Card>
-
-                    <Card>
-                      <CardHeader>
-                        <CardTitle className="text-base">🔍 ASIN</CardTitle>
-                      </CardHeader>
-                      <CardContent className="text-sm text-muted-foreground">
-                        Code unique à 10 caractères attribué par Amazon à chaque produit.
-                      </CardContent>
-                    </Card>
-
-                    <Card>
-                      <CardHeader>
-                        <CardTitle className="text-base">📊 Buy Box</CardTitle>
-                      </CardHeader>
-                      <CardContent className="text-sm text-muted-foreground">
-                        L'encadré "Ajouter au panier" qui génère 80% des ventes.
-                      </CardContent>
-                    </Card>
-
-                    <Card>
-                      <CardHeader>
-                        <CardTitle className="text-base">💰 ROI (Return on Investment)</CardTitle>
-                      </CardHeader>
-                      <CardContent className="text-sm text-muted-foreground">
-                        Retour sur investissement. Un bon ROI en FBA est d'au moins 40-50%.
-                      </CardContent>
-                    </Card>
-
-                    <Card>
-                      <CardHeader>
-                        <CardTitle className="text-base">📈 BSR (Best Seller Rank)</CardTitle>
-                      </CardHeader>
-                      <CardContent className="text-sm text-muted-foreground">
-                        Classement des meilleures ventes. Plus le chiffre est bas, mieux ça vend.
-                      </CardContent>
-                    </Card>
-                  </div>
+                {/* Step 2: Create Company */}
+                <section className="animate-fade-in" style={{ animationDelay: '0.3s' }}>
+                  <Card className="border-green-500/30 hover:border-green-500/60 transition-all duration-300 hover:shadow-xl hover:scale-[1.02]">
+                    <CardHeader className="bg-gradient-to-r from-green-500/10 to-green-600/10">
+                      <div className="flex items-start gap-4">
+                        <div className="p-3 rounded-xl bg-green-500 text-white text-2xl font-bold shadow-lg">
+                          3
+                        </div>
+                        <div className="flex-1">
+                          <CardTitle className="text-2xl flex items-center gap-2 mb-2">
+                            <Building2 className="w-6 h-6 text-green-500" />
+                            Créer ta société
+                          </CardTitle>
+                          <CardDescription className="text-base">
+                            Obligatoire pour vendre sur Amazon
+                          </CardDescription>
+                        </div>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="space-y-4 pt-6">
+                      <p className="text-lg font-semibold">
+                        Pour vendre sur Amazon, tu dois avoir un statut professionnel :
+                      </p>
+                      <ul className="space-y-2">
+                        <li className="flex items-center gap-2">
+                          <CheckCircle2 className="w-5 h-5 text-green-500" />
+                          <span>Micro-entreprise</span>
+                        </li>
+                        <li className="flex items-center gap-2">
+                          <CheckCircle2 className="w-5 h-5 text-green-500" />
+                          <span>SASU</span>
+                        </li>
+                        <li className="flex items-center gap-2">
+                          <CheckCircle2 className="w-5 h-5 text-green-500" />
+                          <span>SARL</span>
+                        </li>
+                        <li className="flex items-center gap-2">
+                          <CheckCircle2 className="w-5 h-5 text-green-500" />
+                          <span>Ou toute autre forme de société adaptée</span>
+                        </li>
+                      </ul>
+                      <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4 flex items-start gap-3">
+                        <AlertTriangle className="w-5 h-5 text-yellow-500 shrink-0 mt-0.5" />
+                        <p className="text-sm">
+                          Il faut aussi ajouter l'activité e-commerce dans ton entreprise.
+                        </p>
+                      </div>
+                      <div className="bg-muted/50 rounded-lg p-4 space-y-2">
+                        <p className="font-medium">
+                          Tu peux créer ta société facilement avec notre partenaire.
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          Avec LegalPlace, tout est simple, rapide et fiable.
+                        </p>
+                      </div>
+                      <Button className="w-full bg-green-500 hover:bg-green-600 text-lg py-6" asChild>
+                        <Link to="/contact">
+                          <Building2 className="w-5 h-5 mr-2" />
+                          En savoir plus sur la création de société
+                        </Link>
+                      </Button>
+                    </CardContent>
+                  </Card>
                 </section>
+
+                {/* Step 3: Amazon Seller Account */}
+                <section className="animate-fade-in" style={{ animationDelay: '0.4s' }}>
+                  <Card className="border-yellow-500/30 hover:border-yellow-500/60 transition-all duration-300 hover:shadow-xl hover:scale-[1.02]">
+                    <CardHeader className="bg-gradient-to-r from-yellow-500/10 to-yellow-600/10">
+                      <div className="flex items-start gap-4">
+                        <div className="p-3 rounded-xl bg-yellow-500 text-white text-2xl font-bold shadow-lg">
+                          4
+                        </div>
+                        <div className="flex-1">
+                          <CardTitle className="text-2xl flex items-center gap-2 mb-2">
+                            <Store className="w-6 h-6 text-yellow-500" />
+                            Créer ton compte vendeur Amazon
+                          </CardTitle>
+                          <CardDescription className="text-base">
+                            Amazon Seller - Ta boutique professionnelle
+                          </CardDescription>
+                        </div>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="space-y-4 pt-6">
+                      <p className="text-lg">
+                        Quand ta société est créée → tu peux t'inscrire sur Amazon.
+                      </p>
+                      <div className="bg-gradient-to-r from-[#FF9900]/10 to-[#FF9900]/5 border border-[#FF9900]/30 rounded-lg p-5">
+                        <div className="flex items-start gap-3 mb-3">
+                          <Euro className="w-6 h-6 text-[#FF9900] shrink-0" />
+                          <div>
+                            <p className="font-semibold text-lg mb-2">Coût Amazon :</p>
+                            <ul className="space-y-1 text-muted-foreground">
+                              <li>– 39 €/mois (hors TVA)</li>
+                              <li>– + frais de vente par produit</li>
+                            </ul>
+                          </div>
+                        </div>
+                      </div>
+                      <p className="text-sm text-muted-foreground italic">
+                        Ton compte Seller est la base de ton business = prends ton temps pour bien le remplir.
+                      </p>
+                      <Button className="w-full bg-[#FF9900] hover:bg-[#FF9900]/90 text-lg py-6" asChild>
+                        <a href="https://sell.amazon.fr/" target="_blank" rel="noopener noreferrer">
+                          <ShoppingCart className="w-5 h-5 mr-2" />
+                          Créer mon compte Amazon Seller
+                        </a>
+                      </Button>
+                    </CardContent>
+                  </Card>
+                </section>
+
+                {/* Step 4: SellerAmp */}
+                <section className="animate-fade-in" style={{ animationDelay: '0.5s' }}>
+                  <Card className="border-purple-500/30 hover:border-purple-500/60 transition-all duration-300 hover:shadow-xl hover:scale-[1.02]">
+                    <CardHeader className="bg-gradient-to-r from-purple-500/10 to-purple-600/10">
+                      <div className="flex items-start gap-4">
+                        <div className="p-3 rounded-xl bg-purple-500 text-white text-2xl font-bold shadow-lg">
+                          5
+                        </div>
+                        <div className="flex-1">
+                          <CardTitle className="text-2xl flex items-center gap-2 mb-2">
+                            <Wrench className="w-6 h-6 text-purple-500" />
+                            L'outil obligatoire : SellerAmp
+                          </CardTitle>
+                          <CardDescription className="text-base">
+                            L'outil N°1 pour scanner et analyser tes produits
+                          </CardDescription>
+                        </div>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="space-y-4 pt-6">
+                      <p className="text-lg font-semibold">
+                        SellerAmp est l'outil N°1 pour :
+                      </p>
+                      <div className="grid md:grid-cols-2 gap-3">
+                        <div className="flex items-start gap-2">
+                          <CheckCircle2 className="w-5 h-5 text-purple-500 shrink-0 mt-0.5" />
+                          <span>Scanner les codes-barres</span>
+                        </div>
+                        <div className="flex items-start gap-2">
+                          <CheckCircle2 className="w-5 h-5 text-purple-500 shrink-0 mt-0.5" />
+                          <span>Vérifier si un produit est rentable</span>
+                        </div>
+                        <div className="flex items-start gap-2">
+                          <CheckCircle2 className="w-5 h-5 text-purple-500 shrink-0 mt-0.5" />
+                          <span>Vérifier si tu es autorisé à le vendre</span>
+                        </div>
+                        <div className="flex items-start gap-2">
+                          <CheckCircle2 className="w-5 h-5 text-purple-500 shrink-0 mt-0.5" />
+                          <span>Voir les ventes/mois</span>
+                        </div>
+                        <div className="flex items-start gap-2">
+                          <CheckCircle2 className="w-5 h-5 text-purple-500 shrink-0 mt-0.5" />
+                          <span>Voir les ROI, FEES Amazon</span>
+                        </div>
+                        <div className="flex items-start gap-2">
+                          <CheckCircle2 className="w-5 h-5 text-purple-500 shrink-0 mt-0.5" />
+                          <span>Analyser le BSR</span>
+                        </div>
+                      </div>
+                      <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4">
+                        <p className="font-semibold text-center">
+                          Sans SellerAmp → impossible d'avancer proprement.
+                        </p>
+                      </div>
+                      <Button className="w-full bg-purple-500 hover:bg-purple-600 text-lg py-6" asChild>
+                        <a href="https://selleramp.idevaffiliate.com/2167.html" target="_blank" rel="noopener noreferrer">
+                          <Search className="w-5 h-5 mr-2" />
+                          Découvrir SellerAmp
+                        </a>
+                      </Button>
+                    </CardContent>
+                  </Card>
+                </section>
+
+                {/* Step 5: Qonto Bank */}
+                <section className="animate-fade-in" style={{ animationDelay: '0.6s' }}>
+                  <Card className="border-cyan-500/30 hover:border-cyan-500/60 transition-all duration-300 hover:shadow-xl hover:scale-[1.02]">
+                    <CardHeader className="bg-gradient-to-r from-cyan-500/10 to-cyan-600/10">
+                      <div className="flex items-start gap-4">
+                        <div className="p-3 rounded-xl bg-cyan-500 text-white text-2xl font-bold shadow-lg">
+                          6
+                        </div>
+                        <div className="flex-1">
+                          <CardTitle className="text-2xl flex items-center gap-2 mb-2">
+                            <CreditCard className="w-6 h-6 text-cyan-500" />
+                            Choisir ton compte bancaire pro
+                          </CardTitle>
+                          <CardDescription className="text-base">
+                            Recommandé : Qonto
+                          </CardDescription>
+                        </div>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="space-y-4 pt-6">
+                      <p className="text-lg font-semibold">
+                        Pourquoi Qonto ?
+                      </p>
+                      <div className="space-y-2">
+                        <div className="flex items-start gap-2">
+                          <CheckCircle2 className="w-5 h-5 text-cyan-500 shrink-0 mt-0.5" />
+                          <span>Ultra simple</span>
+                        </div>
+                        <div className="flex items-start gap-2">
+                          <CheckCircle2 className="w-5 h-5 text-cyan-500 shrink-0 mt-0.5" />
+                          <span>Comptabilité automatisée</span>
+                        </div>
+                        <div className="flex items-start gap-2">
+                          <CheckCircle2 className="w-5 h-5 text-cyan-500 shrink-0 mt-0.5" />
+                          <span>Factures / reçus faciles</span>
+                        </div>
+                        <div className="flex items-start gap-2">
+                          <CheckCircle2 className="w-5 h-5 text-cyan-500 shrink-0 mt-0.5" />
+                          <span>Support client très réactif</span>
+                        </div>
+                        <div className="flex items-start gap-2">
+                          <CheckCircle2 className="w-5 h-5 text-cyan-500 shrink-0 mt-0.5" />
+                          <span>Parfait si tu as des associés (multi-utilisateurs)</span>
+                        </div>
+                      </div>
+                      <Button className="w-full bg-cyan-500 hover:bg-cyan-600 text-lg py-6" asChild>
+                        <a href="https://qonto.com/r/i79cui" target="_blank" rel="noopener noreferrer">
+                          <CreditCard className="w-5 h-5 mr-2" />
+                          Ouvrir mon compte Qonto
+                        </a>
+                      </Button>
+                    </CardContent>
+                  </Card>
+                </section>
+
+                {/* Help Section */}
+                <section className="animate-fade-in" style={{ animationDelay: '0.7s' }}>
+                  <Card className="border-primary/30 bg-gradient-to-br from-primary/5 to-primary/10">
+                    <CardHeader>
+                      <div className="flex items-start gap-4">
+                        <div className="p-3 rounded-xl bg-primary text-white text-2xl font-bold shadow-lg">
+                          7
+                        </div>
+                        <div className="flex-1">
+                          <CardTitle className="text-2xl flex items-center gap-2 mb-2">
+                            <Users className="w-6 h-6 text-primary" />
+                            Besoin d'aide ?
+                          </CardTitle>
+                          <CardDescription className="text-base">
+                            La communauté est là pour toi
+                          </CardDescription>
+                        </div>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <p className="text-lg">
+                        Chez AMZing FBA, tu n'es pas seul : on t'explique chaque étape pour réussir.
+                      </p>
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <Button variant="outline" className="border-primary hover:bg-primary/10 h-auto py-4" asChild>
+                          <Link to="/chat">
+                            <div className="flex flex-col items-start gap-1 w-full">
+                              <span className="font-semibold">💬 Chat général</span>
+                              <span className="text-xs text-muted-foreground">Pose tes questions à la communauté</span>
+                            </div>
+                          </Link>
+                        </Button>
+                        <Button variant="outline" className="border-primary hover:bg-primary/10 h-auto py-4" asChild>
+                          <Link to="/support">
+                            <div className="flex flex-col items-start gap-1 w-full">
+                              <span className="font-semibold">📥 Support privé</span>
+                              <span className="text-xs text-muted-foreground">Aide personnalisée</span>
+                            </div>
+                          </Link>
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </section>
+
               </TabsContent>
 
               {/* ========== ONGLET ENTREPRISE ========== */}
