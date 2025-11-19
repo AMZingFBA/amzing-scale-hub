@@ -66,7 +66,6 @@ const Dashboard = () => {
   const { toast } = useToast();
   const [invoiceAuthOpen, setInvoiceAuthOpen] = useState(false);
   const [reviewsOpen, setReviewsOpen] = useState(false);
-  const [gestionInfoOpen, setGestionInfoOpen] = useState(false);
   const [cashbackOpen, setCashbackOpen] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
 
@@ -308,7 +307,7 @@ const Dashboard = () => {
                 </AccordionTrigger>
                 <AccordionContent className="px-4 pb-4">
                   <div className="grid gap-3 pt-2">
-                    <CategoryItem icon={Info} label="informations" onClick={() => setGestionInfoOpen(true)} badge={notifications.gestion_produit?.subcategories?.informations} />
+                    <CategoryItem icon={Info} label="informations" link="/gestion-produits-info" badge={notifications.gestion_produit?.subcategories?.informations} />
                     <CategoryItem icon={Package} label="catalogue-produits" link="/catalogue-produits" badge={notifications.gestion_produit?.subcategories?.['catalogue-produits']} />
                     <CategoryItem icon={MessageCircle} label="questions" link="/questions" badge={notifications.gestion_produit?.subcategories?.questions} />
                   </div>
@@ -615,186 +614,6 @@ const Dashboard = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Dialog Gestion Produits - Informations */}
-      <Dialog open={gestionInfoOpen} onOpenChange={setGestionInfoOpen}>
-        <DialogContent className="max-w-4xl mt-24 md:mt-0">
-          <DialogHeader>
-            <DialogTitle className="text-2xl flex items-center gap-3">
-              <Package className="w-7 h-7 text-primary" />
-              Gestion complète de vos produits — sans effort
-            </DialogTitle>
-            <DialogDescription>
-              AMZing FBA 360 : Votre partenaire logistique intégral pour Amazon
-            </DialogDescription>
-          </DialogHeader>
-          <ScrollArea className="h-[70vh] pr-4">
-            <div className="space-y-6">
-              {/* Hero Section */}
-              <Card className="border-primary/30 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent">
-                <CardContent className="pt-6">
-                  <div className="space-y-4">
-                    <div className="flex items-start gap-4">
-                      <div className="p-3 bg-primary/20 rounded-xl">
-                        <Sparkles className="w-8 h-8 text-primary" />
-                      </div>
-                      <div>
-                        <h3 className="text-xl font-bold mb-2">Votre business Amazon, simplifié à 100 %</h3>
-                        <p className="text-base leading-relaxed text-muted-foreground">
-                          Avec AMZing FBA 360, nous prenons en charge 100 % du processus logistique pour les vendeurs professionnels Amazon. Confiez-nous la logistique : nous stockons, préparons, expédions et gérons le SAV de vos produits.
-                        </p>
-                      </div>
-                    </div>
-                    
-                    <div className="bg-background/80 backdrop-blur-sm rounded-lg p-5 mt-4">
-                      <p className="text-lg font-semibold text-center">
-                        Vous vendez, nous faisons le reste. 🚀
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Services Grid */}
-              <div className="grid md:grid-cols-2 gap-4">
-                <Card className="border-primary/20 hover:border-primary/40 transition-colors">
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-lg flex items-center gap-2">
-                      <div className="p-2 bg-primary/10 rounded-lg">
-                        <Package className="w-5 h-5 text-primary" />
-                      </div>
-                      Entrepôt sécurisé
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-muted-foreground">
-                      Stockage sécurisé de vos produits dans nos locaux avec gestion complète de l'inventaire en temps réel.
-                    </p>
-                  </CardContent>
-                </Card>
-
-                <Card className="border-primary/20 hover:border-primary/40 transition-colors">
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-lg flex items-center gap-2">
-                      <div className="p-2 bg-primary/10 rounded-lg">
-                        <CheckCircle className="w-5 h-5 text-primary" />
-                      </div>
-                      Emballage conforme Amazon
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-muted-foreground">
-                      Préparation et emballage conformes aux normes Amazon FBA pour garantir l'acceptation de vos envois.
-                    </p>
-                  </CardContent>
-                </Card>
-
-                <Card className="border-primary/20 hover:border-primary/40 transition-colors">
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-lg flex items-center gap-2">
-                      <div className="p-2 bg-primary/10 rounded-lg">
-                        <Truck className="w-5 h-5 text-primary" />
-                      </div>
-                      Livraison rapide sous 24h
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-muted-foreground">
-                      Expédition rapide sous 24h à vos clients avec suivi en temps réel de toutes vos commandes.
-                    </p>
-                  </CardContent>
-                </Card>
-
-                <Card className="border-primary/20 hover:border-primary/40 transition-colors">
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-lg flex items-center gap-2">
-                      <div className="p-2 bg-primary/10 rounded-lg">
-                        <Users className="w-5 h-5 text-primary" />
-                      </div>
-                      Gestion du SAV client
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-muted-foreground">
-                      Gestion complète du service après-vente (SAV), retours et suivi client pour vous libérer du temps.
-                    </p>
-                  </CardContent>
-                </Card>
-              </div>
-
-              {/* Objectif Section */}
-              <Card className="border-primary/30 bg-primary/5">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-lg">
-                    <Trophy className="w-5 h-5 text-primary" />
-                    Notre objectif
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <p className="text-base leading-relaxed">
-                    Vous permettre de vous concentrer sur vos ventes pendant que nous gérons toute la logistique, du stock au client final.
-                  </p>
-                  <p className="text-base font-semibold">
-                    Grâce à notre modèle intégré, vous bénéficiez d'un contrôle total sur vos marges et d'un gain de temps maximal.
-                  </p>
-                </CardContent>
-              </Card>
-
-              {/* Avantages */}
-              <Card className="border-primary/20">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-lg">
-                    <Star className="w-5 h-5 text-primary" />
-                    Vos avantages avec AMZing FBA 360
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    <div className="flex items-start gap-3 p-3 rounded-lg bg-accent/30">
-                      <CheckCircle className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-                      <p className="text-sm">
-                        <strong>Infrastructure complète :</strong> Nous agissons comme votre grossiste, entrepôt et partenaire logistique tout-en-un.
-                      </p>
-                    </div>
-                    
-                    <div className="flex items-start gap-3 p-3 rounded-lg bg-accent/30">
-                      <CheckCircle className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-                      <p className="text-sm">
-                        <strong>Solution clé en main :</strong> De la réception de vos produits à la livraison finale, nous gérons l'intégralité de la chaîne.
-                      </p>
-                    </div>
-                    
-                    <div className="flex items-start gap-3 p-3 rounded-lg bg-accent/30">
-                      <CheckCircle className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-                      <p className="text-sm">
-                        <strong>Gain de temps maximal :</strong> Concentrez-vous uniquement sur le développement de vos ventes et votre stratégie commerciale.
-                      </p>
-                    </div>
-                    
-                    <div className="flex items-start gap-3 p-3 rounded-lg bg-accent/30">
-                      <CheckCircle className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-                      <p className="text-sm">
-                        <strong>Conformité garantie :</strong> Respect strict des normes et exigences Amazon pour éviter tout refus d'envoi.
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* CTA Final */}
-              <Card className="bg-gradient-to-r from-primary/20 via-primary/10 to-transparent border-primary/30">
-                <CardContent className="pt-6 text-center">
-                  <p className="text-lg font-bold mb-2">
-                    Vous n'avez plus qu'à vendre — on s'occupe de tout le reste. ✨
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    Solution logistique clé en main pour vendeurs Amazon professionnels
-                  </p>
-                </CardContent>
-              </Card>
-            </div>
-          </ScrollArea>
-        </DialogContent>
-      </Dialog>
 
       {/* Cashback Dialog */}
       <Dialog open={cashbackOpen} onOpenChange={setCashbackOpen}>
