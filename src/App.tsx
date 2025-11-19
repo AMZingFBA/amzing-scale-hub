@@ -15,6 +15,9 @@ import Dashboard from "./pages/Dashboard";
 import Debuter from "./pages/Debuter";
 import CreationSociete from "./pages/CreationSociete";
 import GestionProduitsInfo from "./pages/GestionProduitsInfo";
+import FactureAutorisation from "./pages/FactureAutorisation";
+import Cashback from "./pages/Cashback";
+import AvisPage from "./pages/AvisPage";
 import Guides from "./pages/Guides";
 import Services from "./pages/Services";
 import Formation from "./pages/Formation";
@@ -80,6 +83,9 @@ const App = () => (
             <Route path="/debuter" element={<Debuter />} />
             <Route path="/creation-societe" element={<CreationSociete />} />
             <Route path="/gestion-produits-info" element={<GestionProduitsInfo />} />
+            <Route path="/facture-autorisation" element={<FactureAutorisation />} />
+            <Route path="/cashback" element={<Cashback />} />
+            <Route path="/avis-page" element={<AvisPage />} />
             <Route path="/guides" element={<Guides />} />
             <Route path="/services" element={<Services />} />
             <Route path="/formation" element={<Formation />} />
