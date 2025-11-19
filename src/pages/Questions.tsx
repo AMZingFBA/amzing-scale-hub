@@ -33,7 +33,7 @@ interface Message {
 
 const Questions = () => {
   const { user, isVIP } = useAuth();
-  const { isAdmin } = useAdmin();
+  const { isAdmin, isLoading: isAdminLoading } = useAdmin();
   const navigate = useNavigate();
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
@@ -48,6 +48,11 @@ const Questions = () => {
       return;
     }
 
+    // Wait for admin status to load before checking access
+    if (isAdminLoading) {
+      return;
+    }
+
     if (!isVIP && !isAdmin) {
       toast.error('Accès réservé aux membres VIP');
       navigate('/');
@@ -55,7 +60,7 @@ const Questions = () => {
     }
 
     fetchQuestionsRoom();
-  }, [user, isVIP, isAdmin, navigate]);
+  }, [user, isVIP, isAdmin, isAdminLoading, navigate]);
 
   useEffect(() => {
     if (roomId) {
