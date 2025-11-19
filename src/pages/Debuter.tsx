@@ -1,6 +1,8 @@
 import { ArrowLeft, CheckCircle2, Building2, Store, Euro, Wrench, Search, CreditCard, Users, BookOpen, ShoppingCart, AlertCircle } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useMarkAsRead } from '@/hooks/use-mark-as-read';
+import { useScrollReveal } from '@/hooks/use-scroll-reveal';
+import { cn } from '@/lib/utils';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -10,6 +12,17 @@ const Debuter = () => {
 
   // Mark as read when visiting this page
   useMarkAsRead({ category: 'introduction', subcategory: 'débuter' });
+
+  // Animations
+  const heroAnim = useScrollReveal({ animation: 'fade-up', delay: 100 });
+  const quickStartAnim = useScrollReveal({ animation: 'scale', delay: 150 });
+  const step1Anim = useScrollReveal({ animation: 'fade-left', delay: 100 });
+  const step2Anim = useScrollReveal({ animation: 'fade-right', delay: 100 });
+  const step3Anim = useScrollReveal({ animation: 'fade-left', delay: 100 });
+  const step4Anim = useScrollReveal({ animation: 'slide-rotate', delay: 100 });
+  const step5Anim = useScrollReveal({ animation: 'fade-right', delay: 100 });
+  const step6Anim = useScrollReveal({ animation: 'fade-up', delay: 100 });
+  const step7Anim = useScrollReveal({ animation: 'scale', delay: 100 });
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -38,7 +51,13 @@ const Debuter = () => {
 
             <div className="space-y-8">
               {/* Hero Welcome Section */}
-              <section className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary via-primary/90 to-primary/70 p-8 md:p-12 shadow-2xl animate-fade-in">
+              <section 
+                ref={heroAnim.ref}
+                className={cn(
+                  "relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary via-primary/90 to-primary/70 p-8 md:p-12 shadow-2xl transition-all duration-700",
+                  heroAnim.isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+                )}
+              >
                 <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS1vcGFjaXR5PSIwLjEiIHN0cm9rZS13aWR0aD0iMSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIvPjwvc3ZnPg==')] opacity-30"></div>
                 <div className="relative z-10 space-y-4 text-white/95 text-lg">
                   <p className="flex items-center gap-2">
@@ -54,7 +73,13 @@ const Debuter = () => {
               </section>
 
               {/* Quick Start */}
-              <section className="animate-fade-in" style={{ animationDelay: '0.1s' }}>
+              <section 
+                ref={quickStartAnim.ref}
+                className={cn(
+                  "transition-all duration-700",
+                  quickStartAnim.isVisible ? "opacity-100 scale-100" : "opacity-0 scale-95"
+                )}
+              >
                 <Card className="bg-gradient-to-br from-orange-500/10 to-red-500/10 border-orange-500/30">
                   <CardHeader>
                     <CardTitle className="text-2xl md:text-3xl flex items-center gap-3">
@@ -70,7 +95,13 @@ const Debuter = () => {
               </section>
 
               {/* Step 1: Read Guides */}
-              <section className="animate-fade-in" style={{ animationDelay: '0.2s' }}>
+              <section 
+                ref={step1Anim.ref}
+                className={cn(
+                  "transition-all duration-700",
+                  step1Anim.isVisible ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-10"
+                )}
+              >
                 <Card className="border-blue-500/30 hover:border-blue-500/60 transition-all duration-300 hover:shadow-xl hover:scale-[1.02]">
                   <CardHeader className="bg-gradient-to-r from-blue-500/10 to-blue-600/10">
                     <div className="flex items-start gap-4">
@@ -104,7 +135,13 @@ const Debuter = () => {
               </section>
 
               {/* Step 2: Create Company */}
-              <section className="animate-fade-in" style={{ animationDelay: '0.3s' }}>
+              <section 
+                ref={step2Anim.ref}
+                className={cn(
+                  "transition-all duration-700",
+                  step2Anim.isVisible ? "opacity-100 translate-x-0" : "opacity-0 translate-x-10"
+                )}
+              >
                 <Card className="border-green-500/30 hover:border-green-500/60 transition-all duration-300 hover:shadow-xl hover:scale-[1.02]">
                   <CardHeader className="bg-gradient-to-r from-green-500/10 to-green-600/10">
                     <div className="flex items-start gap-4">
@@ -167,7 +204,13 @@ const Debuter = () => {
               </section>
 
               {/* Step 3: Amazon Seller Account */}
-              <section className="animate-fade-in" style={{ animationDelay: '0.4s' }}>
+              <section 
+                ref={step3Anim.ref}
+                className={cn(
+                  "transition-all duration-700",
+                  step3Anim.isVisible ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-10"
+                )}
+              >
                 <Card className="border-yellow-500/30 hover:border-yellow-500/60 transition-all duration-300 hover:shadow-xl hover:scale-[1.02]">
                   <CardHeader className="bg-gradient-to-r from-yellow-500/10 to-yellow-600/10">
                     <div className="flex items-start gap-4">
@@ -213,7 +256,13 @@ const Debuter = () => {
               </section>
 
               {/* Step 4: SellerAmp */}
-              <section className="animate-fade-in" style={{ animationDelay: '0.5s' }}>
+              <section 
+                ref={step4Anim.ref}
+                className={cn(
+                  "transition-all duration-700",
+                  step4Anim.isVisible ? "opacity-100 translate-x-0 rotate-0" : "opacity-0 translate-x-10 rotate-3"
+                )}
+              >
                 <Card className="border-purple-500/30 hover:border-purple-500/60 transition-all duration-300 hover:shadow-xl hover:scale-[1.02]">
                   <CardHeader className="bg-gradient-to-r from-purple-500/10 to-purple-600/10">
                     <div className="flex items-start gap-4">
@@ -275,7 +324,13 @@ const Debuter = () => {
               </section>
 
               {/* Step 5: Qonto Bank */}
-              <section className="animate-fade-in" style={{ animationDelay: '0.6s' }}>
+              <section 
+                ref={step5Anim.ref}
+                className={cn(
+                  "transition-all duration-700",
+                  step5Anim.isVisible ? "opacity-100 translate-x-0" : "opacity-0 translate-x-10"
+                )}
+              >
                 <Card className="border-cyan-500/30 hover:border-cyan-500/60 transition-all duration-300 hover:shadow-xl hover:scale-[1.02]">
                   <CardHeader className="bg-gradient-to-r from-cyan-500/10 to-cyan-600/10">
                     <div className="flex items-start gap-4">
@@ -328,7 +383,13 @@ const Debuter = () => {
               </section>
 
               {/* Step 6: Help */}
-              <section className="animate-fade-in" style={{ animationDelay: '0.7s' }}>
+              <section 
+                ref={step6Anim.ref}
+                className={cn(
+                  "transition-all duration-700",
+                  step6Anim.isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+                )}
+              >
                 <Card className="border-primary/30 bg-gradient-to-br from-primary/5 to-primary/10">
                   <CardHeader>
                     <div className="flex items-start gap-4">
