@@ -12,6 +12,7 @@ import Auth from "./pages/Auth";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import Dashboard from "./pages/Dashboard";
+import Debuter from "./pages/Debuter";
 import Guides from "./pages/Guides";
 import Services from "./pages/Services";
 import Formation from "./pages/Formation";
@@ -74,6 +75,7 @@ const App = () => (
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/debuter" element={<Debuter />} />
             <Route path="/guides" element={<Guides />} />
             <Route path="/services" element={<Services />} />
             <Route path="/formation" element={<Formation />} />
