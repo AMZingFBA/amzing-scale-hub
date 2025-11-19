@@ -71,21 +71,6 @@ const Suggestions = () => {
     fetchSuggestions();
   }, [user, isVIP, isAdmin, isAdminLoading, navigate]);
 
-  useEffect(() => {
-    if (!user) {
-      navigate('/auth');
-      return;
-    }
-
-    if (!isVIP) {
-      toast.error('Accès réservé aux membres VIP');
-      navigate('/');
-      return;
-    }
-
-    fetchSuggestions();
-  }, [user, isVIP, navigate]);
-
   const fetchSuggestions = async () => {
     try {
       const { data, error } = await supabase
