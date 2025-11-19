@@ -37,7 +37,7 @@ interface Room {
 
 const Chat = () => {
   const { user, isVIP } = useAuth();
-  const { isAdmin } = useAdmin();
+  const { isAdmin, isLoading: isAdminLoading } = useAdmin();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const isNativeApp = Capacitor.isNativePlatform();
@@ -63,6 +63,11 @@ const Chat = () => {
       return;
     }
 
+    // Wait for admin status to load before checking access
+    if (isAdminLoading) {
+      return;
+    }
+
     if (!isVIP && !isAdmin) {
       toast.error('Accès réservé aux membres VIP');
       navigate('/');
@@ -78,7 +83,7 @@ const Chat = () => {
     if (roomId) {
       setSelectedRoom(roomId);
     }
-  }, [user, isVIP, isAdmin, navigate, searchParams]);
+  }, [user, isVIP, isAdmin, isAdminLoading, navigate, searchParams]);
 
   const fetchPinnedRooms = async () => {
     if (!user) return;

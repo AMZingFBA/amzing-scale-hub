@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/use-auth';
+import { useAdmin } from '@/hooks/use-admin';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -36,6 +37,7 @@ interface Message {
 
 const Suggestions = () => {
   const { user, isVIP } = useAuth();
+  const { isAdmin, isLoading: isAdminLoading } = useAdmin();
   const navigate = useNavigate();
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [loading, setLoading] = useState(true);
@@ -48,6 +50,26 @@ const Suggestions = () => {
   const [newSubject, setNewSubject] = useState('');
   const [newContent, setNewContent] = useState('');
   const isNativeApp = Capacitor.isNativePlatform();
+
+  useEffect(() => {
+    if (!user) {
+      navigate('/auth');
+      return;
+    }
+
+    // Wait for admin status to load before checking access
+    if (isAdminLoading) {
+      return;
+    }
+
+    if (!isVIP && !isAdmin) {
+      toast.error('Accès réservé aux membres VIP');
+      navigate('/');
+      return;
+    }
+
+    fetchSuggestions();
+  }, [user, isVIP, isAdmin, isAdminLoading, navigate]);
 
   useEffect(() => {
     if (!user) {
