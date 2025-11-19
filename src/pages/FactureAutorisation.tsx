@@ -8,10 +8,11 @@ import { FileText, CheckCircle, AlertCircle, Sparkles, ArrowLeft, Shield, Lock }
 import { Link } from 'react-router-dom';
 
 const FactureAutorisation = () => {
-  const { ref: heroRef, isVisible: heroVisible } = useScrollReveal({ delay: 0.1 });
-  const { ref: contentRef, isVisible: contentVisible } = useScrollReveal({ delay: 0.2 });
-  const { ref: stepsRef, isVisible: stepsVisible } = useScrollReveal({ delay: 0.3 });
-  const { ref: ctaRef, isVisible: ctaVisible } = useScrollReveal({ delay: 0.4 });
+  const heroReveal = useScrollReveal({ animation: "fade-up", delay: 0 });
+  const card1Reveal = useScrollReveal({ animation: "fade-left", delay: 100 });
+  const card2Reveal = useScrollReveal({ animation: "fade-right", delay: 200 });
+  const benefitsReveal = useScrollReveal({ animation: "scale", delay: 100 });
+  const ctaReveal = useScrollReveal({ animation: "scale", delay: 200 });
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-background via-background to-accent/20">
