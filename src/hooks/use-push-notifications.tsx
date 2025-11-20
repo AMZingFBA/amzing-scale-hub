@@ -25,6 +25,13 @@ export const usePushNotifications = () => {
     if (!isNativePlatform()) {
       return;
     }
+    
+    // Désactiver sur Android (Firebase non configuré)
+    const platform = Capacitor.getPlatform();
+    if (platform === 'android') {
+      console.log('⚠️ FCM disabled on Android (Firebase not configured)');
+      return;
+    }
 
     const handleFCMToken = (event: any) => {
       console.log('📨 FCM token event complet:', event);
@@ -64,6 +71,12 @@ export const usePushNotifications = () => {
       console.log('⚠️ Not native platform, skipping token save');
       return;
     }
+    
+    // Désactiver sur Android (Firebase non configuré)
+    const platform = Capacitor.getPlatform();
+    if (platform === 'android') {
+      return;
+    }
 
     if (!pendingToken) {
       console.log('⚠️ No pending token to save');
@@ -89,8 +102,8 @@ export const usePushNotifications = () => {
     console.log('👤 User ID:', user.id);
     console.log('🎫 Token:', pendingToken.substring(0, 20) + '...');
     
-    const platform = (window as any).Capacitor?.getPlatform?.() || 'unknown';
-    console.log('📱 Platform:', platform);
+    const devicePlatform = (window as any).Capacitor?.getPlatform?.() || 'unknown';
+    console.log('📱 Platform:', devicePlatform);
 
     const saveToken = async () => {
       try {
@@ -99,7 +112,7 @@ export const usePushNotifications = () => {
           .upsert({
             user_id: user.id,
             token: pendingToken,
-            platform: platform,
+            platform: devicePlatform,
             updated_at: new Date().toISOString()
           }, {
             onConflict: 'user_id,token'
@@ -131,6 +144,13 @@ export const usePushNotifications = () => {
     // Ne rien faire sur le web
     if (!isNativePlatform()) {
       console.log('⚠️ Push notifications not available on web - skipping initialization');
+      return;
+    }
+    
+    // Désactiver temporairement sur Android (Firebase non configuré)
+    const platform = Capacitor.getPlatform();
+    if (platform === 'android') {
+      console.log('⚠️ Push notifications disabled on Android (Firebase not configured) - skipping initialization');
       return;
     }
     
