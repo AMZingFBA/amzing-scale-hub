@@ -252,10 +252,16 @@ const handler = async (req: Request): Promise<Response> => {
     );
   } catch (error: any) {
     console.error("Error in send-verification-code:", error);
+    
+    // Determine if this is a user error (400) or server error (500)
+    const isUserError = error.message?.includes("existe déjà") ||
+                        error.message?.includes("déjà utilisé") ||
+                        error.message?.includes("Email is required");
+    
     return new Response(
       JSON.stringify({ error: error.message }),
       {
-        status: 500,
+        status: isUserError ? 400 : 500,
         headers: { "Content-Type": "application/json", ...corsHeaders },
       }
     );
