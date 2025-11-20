@@ -131,7 +131,15 @@ export default function Auth() {
     const confirmPassword = formData.get("confirmPassword") as string;
     const fullName = formData.get("fullName") as string;
     const nickname = formData.get("nickname") as string;
-    const phone = formData.get("phone") as string;
+    let phone = formData.get("phone") as string;
+
+    // Normalize phone number
+    phone = phone.replace(/[\s\-\(\)\.]/g, '');
+    if (phone.startsWith('+33')) {
+      phone = '0' + phone.substring(3);
+    } else if (phone.startsWith('0033')) {
+      phone = '0' + phone.substring(4);
+    }
 
     if (password !== confirmPassword) {
       toast.error("Les mots de passe ne correspondent pas");
@@ -153,7 +161,9 @@ export default function Auth() {
       });
 
       if (error) {
-        throw error;
+        // Extract the actual error message from the function response
+        const errorMessage = (error as any).context?.body?.error || error.message || "Erreur lors de l'envoi du code";
+        throw new Error(errorMessage);
       }
 
       toast.success("Code de vérification envoyé par email");
