@@ -39,31 +39,40 @@ export default function Auth() {
     if (!user) return;
     
     const checkAndRedirect = async () => {
-      // Vérifier le rôle admin
-      const { data: roleData } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', user.id)
-        .eq('role', 'admin')
-        .maybeSingle();
+      // Attendre un peu pour laisser la session s'établir correctement sur mobile
+      await new Promise(resolve => setTimeout(resolve, 500));
       
-      // Vérifier le statut VIP
-      const { data: subData } = await supabase
-        .from('subscriptions')
-        .select('plan_type, status, expires_at')
-        .eq('user_id', user.id)
-        .maybeSingle();
+      try {
+        // Vérifier le rôle admin
+        const { data: roleData } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', user.id)
+          .eq('role', 'admin')
+          .maybeSingle();
+        
+        // Vérifier le statut VIP
+        const { data: subData } = await supabase
+          .from('subscriptions')
+          .select('plan_type, status, expires_at')
+          .eq('user_id', user.id)
+          .maybeSingle();
 
-      const isUserVIP = subData?.plan_type === 'vip' && 
-        (subData?.status === 'active' || subData?.status === 'canceled') &&
-        (!subData?.expires_at || new Date(subData.expires_at) > new Date());
+        const isUserVIP = subData?.plan_type === 'vip' && 
+          (subData?.status === 'active' || subData?.status === 'canceled') &&
+          (!subData?.expires_at || new Date(subData.expires_at) > new Date());
 
-      const isUserAdmin = roleData?.role === 'admin';
+        const isUserAdmin = roleData?.role === 'admin';
 
-      // Rediriger selon le statut
-      if (isUserAdmin || isUserVIP) {
-        navigate("/dashboard", { replace: true });
-      } else {
+        // Rediriger selon le statut
+        if (isUserAdmin || isUserVIP) {
+          navigate("/dashboard", { replace: true });
+        } else {
+          navigate("/", { replace: true });
+        }
+      } catch (error) {
+        console.error('Error checking user status:', error);
+        // En cas d'erreur, rediriger vers la page d'accueil
         navigate("/", { replace: true });
       }
     };
