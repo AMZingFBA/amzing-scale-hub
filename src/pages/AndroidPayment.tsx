@@ -86,17 +86,17 @@ const AndroidPayment = () => {
           </div>
 
           {/* Price */}
-          <div className="text-center mb-8 animate-fade-in" style={{ animationDelay: '0.1s' }}>
-            <div className="relative inline-block">
+          <div className="text-center mb-8 px-4 animate-fade-in" style={{ animationDelay: '0.1s' }}>
+            <div className="relative w-full flex justify-center">
               <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-secondary/20 blur-2xl animate-pulse"></div>
-              <div className="relative inline-flex items-baseline gap-2 px-8 py-4 rounded-2xl bg-gradient-to-br from-primary/10 to-secondary/10 border-2 border-primary/30">
-                <span className="text-6xl font-black bg-gradient-to-r from-primary via-primary to-secondary bg-clip-text text-transparent">
+              <div className="relative flex items-baseline justify-center gap-2 w-full max-w-xs px-6 py-5 rounded-2xl bg-gradient-to-br from-primary/10 to-secondary/10 border-2 border-primary/30">
+                <span className="text-5xl sm:text-6xl font-black bg-gradient-to-r from-primary via-primary to-secondary bg-clip-text text-transparent">
                   34,99€
                 </span>
-                <span className="text-2xl font-semibold text-muted-foreground">/mois</span>
+                <span className="text-xl sm:text-2xl font-semibold text-muted-foreground">/mois</span>
               </div>
             </div>
-            <p className="text-sm text-muted-foreground mt-4 font-medium">Sans engagement • Annulable à tout moment</p>
+            <p className="text-xs sm:text-sm text-muted-foreground mt-4 font-medium px-4">Sans engagement • Annulable à tout moment</p>
           </div>
 
           {/* Features */}
