@@ -3,7 +3,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { Loader2, Users, Mail, Phone, UserCircle, ArrowLeft, Search, Calendar, MessageCircle, Crown, Shield, Filter, ChevronLeft, ChevronRight, Clock, AlertCircle, Trash2 } from 'lucide-react';
+import { Loader2, Users, Mail, Phone, UserCircle, ArrowLeft, Search, Calendar, MessageCircle, Crown, Shield, Filter, ChevronLeft, ChevronRight, Clock, AlertCircle, Trash2, Copy, CheckCircle } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -45,6 +45,7 @@ const AdminProfiles = () => {
   const [filterExpiry, setFilterExpiry] = useState<string>('all');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
+  const [copiedText, setCopiedText] = useState<string>('');
 
   useEffect(() => {
     if (!user) {
@@ -128,6 +129,17 @@ const AdminProfiles = () => {
     }
   };
 
+  const copyToClipboard = async (text: string, label: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopiedText(text);
+      toast.success(`${label} copié !`);
+      setTimeout(() => setCopiedText(''), 2000);
+    } catch (error) {
+      toast.error('Erreur lors de la copie');
+    }
+  };
+
   const handleDeleteUser = async (userId: string, userEmail: string) => {
     if (!confirm(`Êtes-vous sûr de vouloir supprimer définitivement le compte de ${userEmail} ?\n\nCette action est irréversible et supprimera :\n- Le profil utilisateur\n- Tous les messages\n- L'abonnement\n- Toutes les données associées`)) {
       return;
@@ -178,7 +190,8 @@ const AdminProfiles = () => {
     );
 
     const matchesRole = filterRole === 'all' || profile.role === filterRole;
-    const matchesPlan = filterPlan === 'all' || profile.subscription?.plan_type === filterPlan;
+    const matchesPlan = filterPlan === 'all' || 
+      (filterPlan === 'unpaid' ? profile.subscription?.status === 'unpaid' : profile.subscription?.plan_type === filterPlan);
 
     // Filter by expiry status
     let matchesExpiry = true;
@@ -298,6 +311,7 @@ const AdminProfiles = () => {
                       <SelectItem value="all">Tous les plans</SelectItem>
                       <SelectItem value="vip">VIP</SelectItem>
                       <SelectItem value="free">Gratuit</SelectItem>
+                      <SelectItem value="unpaid">Paiements échoués</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -391,17 +405,18 @@ const AdminProfiles = () => {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="border-red-200 dark:border-red-800">
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-medium flex items-center gap-2">
-                  <Shield className="w-4 h-4 text-primary" />
-                  Admins
+                  <AlertCircle className="w-4 h-4 text-red-500" />
+                  Paiements échoués
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">
-                  {profiles.filter(p => p.role === 'admin').length}
+                <div className="text-2xl font-bold text-red-500">
+                  {profiles.filter(p => p.subscription?.status === 'unpaid').length}
                 </div>
+                <p className="text-xs text-muted-foreground">à relancer</p>
               </CardContent>
             </Card>
           </div>
@@ -462,37 +477,64 @@ const AdminProfiles = () => {
                               <div className="space-y-1 text-sm">
                                 <div className="flex items-center gap-2">
                                   <Mail className="w-3 h-3 text-muted-foreground" />
-                                  <span className="truncate max-w-[200px]">{profile.email}</span>
+                                  <button
+                                    onClick={() => copyToClipboard(profile.email, 'Email')}
+                                    className="truncate max-w-[200px] hover:text-primary transition-colors flex items-center gap-1 group"
+                                  >
+                                    <span>{profile.email}</span>
+                                    {copiedText === profile.email ? (
+                                      <CheckCircle className="w-3 h-3 text-green-500" />
+                                    ) : (
+                                      <Copy className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                                    )}
+                                  </button>
                                 </div>
                                 {profile.phone && (
                                   <div className="flex items-center gap-2">
                                     <Phone className="w-3 h-3 text-muted-foreground" />
-                                    <span>{profile.phone}</span>
+                                    <button
+                                      onClick={() => copyToClipboard(profile.phone!, 'Téléphone')}
+                                      className="hover:text-primary transition-colors flex items-center gap-1 group"
+                                    >
+                                      <span>{profile.phone}</span>
+                                      {copiedText === profile.phone ? (
+                                        <CheckCircle className="w-3 h-3 text-green-500" />
+                                      ) : (
+                                        <Copy className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                                      )}
+                                    </button>
                                   </div>
                                 )}
                               </div>
                             </TableCell>
                             <TableCell>
-                              {profile.subscription?.plan_type === 'vip' ? (
-                                profile.subscription?.status === 'active' ? (
-                                  <Badge className="bg-green-500 hover:bg-green-600">
-                                    <Crown className="w-3 h-3 mr-1" />
-                                    VIP Actif
-                                  </Badge>
-                                ) : profile.subscription?.status === 'canceled' ? (
-                                  <Badge variant="secondary">
-                                    <Crown className="w-3 h-3 mr-1" />
-                                    VIP Annulé
-                                  </Badge>
+                              <div className="flex flex-col gap-1">
+                                {profile.subscription?.plan_type === 'vip' ? (
+                                  profile.subscription?.status === 'active' ? (
+                                    <Badge className="bg-green-500 hover:bg-green-600">
+                                      <Crown className="w-3 h-3 mr-1" />
+                                      VIP Actif
+                                    </Badge>
+                                  ) : profile.subscription?.status === 'canceled' ? (
+                                    <Badge variant="secondary">
+                                      <Crown className="w-3 h-3 mr-1" />
+                                      VIP Annulé
+                                    </Badge>
+                                  ) : profile.subscription?.status === 'unpaid' ? (
+                                    <Badge variant="destructive">
+                                      <AlertCircle className="w-3 h-3 mr-1" />
+                                      Paiement échoué
+                                    </Badge>
+                                  ) : (
+                                    <Badge variant="outline" className="text-red-500 border-red-500">
+                                      <Crown className="w-3 h-3 mr-1" />
+                                      VIP Expiré
+                                    </Badge>
+                                  )
                                 ) : (
-                                  <Badge variant="outline" className="text-red-500 border-red-500">
-                                    <Crown className="w-3 h-3 mr-1" />
-                                    VIP Expiré
-                                  </Badge>
-                                )
-                              ) : (
-                                <Badge variant="outline">Gratuit</Badge>
-                              )}
+                                  <Badge variant="outline">Gratuit</Badge>
+                                )}
+                              </div>
                             </TableCell>
                             <TableCell>
                               {profile.subscription?.expires_at ? (
