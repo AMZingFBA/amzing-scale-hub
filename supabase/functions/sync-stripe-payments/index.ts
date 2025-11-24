@@ -50,9 +50,21 @@ serve(async (req) => {
     for (const profile of profiles) {
       try {
         results.checked++;
+        console.log(`[SYNC-STRIPE] Checking profile: ${profile.email} (id: ${profile.id})`);
         
         // Find subscription for this profile
         const userSubscription = userSubscriptions?.find((s: any) => s.user_id === profile.id);
+        
+        if (!userSubscription) {
+          console.log(`[SYNC-STRIPE] No subscription found for ${profile.email}, skipping`);
+          continue;
+        }
+        
+        console.log(`[SYNC-STRIPE] Current subscription for ${profile.email}:`, {
+          status: userSubscription.status,
+          plan_type: userSubscription.plan_type,
+          stripe_customer_id: userSubscription.stripe_customer_id
+        });
         
         // Search for customer in Stripe by email
         const customers = await stripe.customers.list({
@@ -105,31 +117,55 @@ serve(async (req) => {
         );
 
         // Determine correct status
-        let newStatus = userSubscription?.status || "active";
-        let newPlanType = userSubscription?.plan_type || "free";
+        let newStatus = userSubscription.status || "active";
+        let newPlanType = userSubscription.plan_type || "free";
+
+        console.log(`[SYNC-STRIPE] Stripe data for ${profile.email}:`, {
+          activeSubscription: !!activeSubscription,
+          hasUnpaidSubscription,
+          failedPaymentsCount: failedPayments.length,
+          totalSubscriptions: subscriptions.data.length
+        });
 
         if (activeSubscription) {
           newStatus = "active";
           newPlanType = "vip";
+          console.log(`[SYNC-STRIPE] ${profile.email}: Active subscription found`);
         } else if (hasUnpaidSubscription || failedPayments.length > 0) {
           newStatus = "unpaid";
           newPlanType = "free";
+          console.log(`[SYNC-STRIPE] ${profile.email}: Unpaid/failed payment detected`);
         } else if (subscriptions.data.length > 0) {
           const lastSub = subscriptions.data[0];
           if (lastSub.status === "canceled" || lastSub.status === "incomplete_expired") {
             newStatus = lastSub.status === "canceled" ? "canceled" : "expired";
             newPlanType = "free";
+            console.log(`[SYNC-STRIPE] ${profile.email}: Subscription ${newStatus}`);
           }
         }
 
-        // Update subscription in database if needed
-        if (userSubscription) {
-          const needsUpdate = 
-            userSubscription.stripe_customer_id !== customer.id ||
-            userSubscription.status !== newStatus ||
-            userSubscription.plan_type !== newPlanType;
+        console.log(`[SYNC-STRIPE] Determined status for ${profile.email}:`, {
+          newStatus,
+          newPlanType
+        });
 
-          if (needsUpdate) {
+        // Update subscription in database if needed
+        const needsUpdate = 
+          userSubscription.stripe_customer_id !== customer.id ||
+          userSubscription.status !== newStatus ||
+          userSubscription.plan_type !== newPlanType;
+
+        console.log(`[SYNC-STRIPE] Update check for ${profile.email}:`, {
+          needsUpdate,
+          currentCustomerId: userSubscription.stripe_customer_id,
+          newCustomerId: customer.id,
+          currentStatus: userSubscription.status,
+          newStatus,
+          currentPlanType: userSubscription.plan_type,
+          newPlanType
+        });
+
+        if (needsUpdate) {
             const updateData: any = {
               stripe_customer_id: customer.id,
               status: newStatus,
@@ -164,7 +200,6 @@ serve(async (req) => {
               results.updated++;
             }
           }
-        }
       } catch (error) {
         console.error(`[SYNC-STRIPE] Error processing ${profile.email}:`, error);
         results.errors.push({ 
