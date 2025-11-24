@@ -276,39 +276,41 @@ const AdminProfiles = () => {
       <main className="flex-grow pt-20 bg-gradient-to-b from-background to-muted/20 p-4 md:p-8">
         <div className="max-w-7xl mx-auto">
           {/* Header avec flèche retour */}
-          <div className="mb-6 flex items-start gap-3">
-            <button
-              onClick={() => navigate('/dashboard')}
-              className="bg-[#FF9900] hover:bg-[#FF9900]/90 p-2 rounded-full shadow-lg transition-all shrink-0 mt-1"
-              aria-label="Retour"
-            >
-              <ArrowLeft className="w-5 h-5 text-white" />
-            </button>
-            
-            <div className="flex-1">
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent mb-2">
-                Gestion des Profils
-              </h1>
-              <p className="text-muted-foreground">
-                Vue d'ensemble de tous les profils utilisateurs
-              </p>
+          <div className="mb-6">
+            <div className="flex items-start gap-3 mb-4">
+              <button
+                onClick={() => navigate('/dashboard')}
+                className="bg-[#FF9900] hover:bg-[#FF9900]/90 p-2 rounded-full shadow-lg transition-all shrink-0 mt-1"
+                aria-label="Retour"
+              >
+                <ArrowLeft className="w-5 h-5 text-white" />
+              </button>
+              
+              <div className="flex-1">
+                <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent mb-2">
+                  Gestion des Profils
+                </h1>
+                <p className="text-muted-foreground">
+                  Vue d'ensemble de tous les profils utilisateurs
+                </p>
+              </div>
             </div>
 
             <Button
               onClick={syncStripePayments}
               disabled={syncing}
               variant="outline"
-              className="gap-2"
+              className="gap-2 w-full sm:w-auto"
             >
               {syncing ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  Synchronisation...
+                  Synchronisation en cours...
                 </>
               ) : (
                 <>
                   <RefreshCw className="w-4 h-4" />
-                  Sync Stripe
+                  Synchroniser avec Stripe
                 </>
               )}
             </Button>
