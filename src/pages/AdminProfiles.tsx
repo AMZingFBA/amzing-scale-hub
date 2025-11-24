@@ -475,7 +475,13 @@ const AdminProfiles = () => {
               </CardContent>
             </Card>
 
-            <Card className="border-red-200 dark:border-red-800">
+            <Card 
+              className="border-red-200 dark:border-red-800 cursor-pointer hover:shadow-md transition-shadow"
+              onClick={() => {
+                setFilterPlan('unpaid');
+                setCurrentPage(1);
+              }}
+            >
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-medium flex items-center gap-2">
                   <AlertCircle className="w-4 h-4 text-red-500" />
@@ -486,7 +492,7 @@ const AdminProfiles = () => {
                 <div className="text-2xl font-bold text-red-500">
                   {profiles.filter(p => p.subscription?.status === 'unpaid').length}
                 </div>
-                <p className="text-xs text-muted-foreground">à relancer</p>
+                <p className="text-xs text-muted-foreground">cliquez pour filtrer</p>
               </CardContent>
             </Card>
           </div>
