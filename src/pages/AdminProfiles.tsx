@@ -3,7 +3,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { Loader2, Users, Mail, Phone, UserCircle, ArrowLeft, Search, Calendar, MessageCircle, Crown, Shield, Filter, ChevronLeft, ChevronRight, Clock, AlertCircle, Trash2, Copy, CheckCircle } from 'lucide-react';
+import { Loader2, Users, Mail, Phone, UserCircle, ArrowLeft, Search, Calendar, MessageCircle, Crown, Shield, Filter, ChevronLeft, ChevronRight, Clock, AlertCircle, Trash2, Copy, CheckCircle, RefreshCw } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -46,6 +46,7 @@ const AdminProfiles = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
   const [copiedText, setCopiedText] = useState<string>('');
+  const [syncing, setSyncing] = useState(false);
 
   useEffect(() => {
     if (!user) {
@@ -179,6 +180,37 @@ const AdminProfiles = () => {
     }
   };
 
+  const syncStripePayments = async () => {
+    try {
+      setSyncing(true);
+      toast.info('Synchronisation avec Stripe en cours...');
+
+      const { data, error } = await supabase.functions.invoke('sync-stripe-payments');
+
+      if (error) throw error;
+
+      if (data.success) {
+        toast.success(
+          `Synchronisation terminée : ${data.summary.subscriptions_updated} abonnements mis à jour, ${data.summary.failed_payments_found} paiements échoués trouvés`
+        );
+
+        if (data.failed_payments.length > 0) {
+          console.log('[STRIPE-SYNC] Paiements échoués détectés:', data.failed_payments);
+        }
+
+        // Recharger les profils
+        await loadProfiles();
+      } else {
+        throw new Error('Erreur lors de la synchronisation');
+      }
+    } catch (error: any) {
+      console.error('Error syncing Stripe:', error);
+      toast.error(error.message || 'Erreur lors de la synchronisation avec Stripe');
+    } finally {
+      setSyncing(false);
+    }
+  };
+
   const filteredProfiles = profiles.filter(profile => {
     const search = searchTerm.toLowerCase();
     const matchesSearch = (
@@ -261,6 +293,25 @@ const AdminProfiles = () => {
                 Vue d'ensemble de tous les profils utilisateurs
               </p>
             </div>
+
+            <Button
+              onClick={syncStripePayments}
+              disabled={syncing}
+              variant="outline"
+              className="gap-2"
+            >
+              {syncing ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Synchronisation...
+                </>
+              ) : (
+                <>
+                  <RefreshCw className="w-4 h-4" />
+                  Sync Stripe
+                </>
+              )}
+            </Button>
           </div>
 
           {/* Search & Filters */}
