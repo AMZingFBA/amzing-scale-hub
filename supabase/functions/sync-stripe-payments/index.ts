@@ -27,9 +27,17 @@ serve(async (req) => {
     // Get all profiles with their subscriptions
     const { data: profiles, error: profilesError } = await supabaseAdmin
       .from("profiles")
-      .select("id, email, subscriptions(*)");
+      .select("id, email");
 
     if (profilesError) throw profilesError;
+    
+    // Get all subscriptions separately
+    const { data: userSubscriptions, error: subsError } = await supabaseAdmin
+      .from("subscriptions")
+      .select("*");
+      
+    if (subsError) throw subsError;
+
     console.log(`[SYNC-STRIPE] Found ${profiles.length} profiles to check`);
 
     const results = {
@@ -43,6 +51,9 @@ serve(async (req) => {
       try {
         results.checked++;
         
+        // Find subscription for this profile
+        const userSubscription = userSubscriptions?.find((s: any) => s.user_id === profile.id);
+        
         // Search for customer in Stripe by email
         const customers = await stripe.customers.list({
           email: profile.email,
@@ -55,7 +66,6 @@ serve(async (req) => {
         }
 
         const customer = customers.data[0];
-        const subscription = profile.subscriptions?.[0];
 
         // Get recent payment intents for this customer
         const paymentIntents = await stripe.paymentIntents.list({
@@ -95,8 +105,8 @@ serve(async (req) => {
         );
 
         // Determine correct status
-        let newStatus = subscription?.status || "active";
-        let newPlanType = subscription?.plan_type || "free";
+        let newStatus = userSubscription?.status || "active";
+        let newPlanType = userSubscription?.plan_type || "free";
 
         if (activeSubscription) {
           newStatus = "active";
@@ -113,11 +123,11 @@ serve(async (req) => {
         }
 
         // Update subscription in database if needed
-        if (subscription) {
+        if (userSubscription) {
           const needsUpdate = 
-            subscription.stripe_customer_id !== customer.id ||
-            subscription.status !== newStatus ||
-            subscription.plan_type !== newPlanType;
+            userSubscription.stripe_customer_id !== customer.id ||
+            userSubscription.status !== newStatus ||
+            userSubscription.plan_type !== newPlanType;
 
           if (needsUpdate) {
             const updateData: any = {
