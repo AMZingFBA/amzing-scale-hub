@@ -426,8 +426,7 @@ const AdminProfiles = () => {
                         <TableRow>
                           <TableHead>Utilisateur</TableHead>
                           <TableHead>Contact</TableHead>
-                          <TableHead>Statut</TableHead>
-                          <TableHead>Plan</TableHead>
+                          <TableHead>Abonnement</TableHead>
                           <TableHead>Expiration</TableHead>
                           <TableHead>Inscrit</TableHead>
                           <TableHead className="text-right">Actions</TableHead>
@@ -474,20 +473,23 @@ const AdminProfiles = () => {
                               </div>
                             </TableCell>
                             <TableCell>
-                              {profile.subscription?.status === 'active' ? (
-                                <Badge variant="default" className="bg-green-500">Actif</Badge>
-                              ) : profile.subscription?.status === 'canceled' ? (
-                                <Badge variant="secondary">Annulé</Badge>
-                              ) : (
-                                <Badge variant="outline">Expiré</Badge>
-                              )}
-                            </TableCell>
-                            <TableCell>
                               {profile.subscription?.plan_type === 'vip' ? (
-                                <Badge className="bg-[#FF9900] hover:bg-[#FF9900]/90">
-                                  <Crown className="w-3 h-3 mr-1" />
-                                  VIP
-                                </Badge>
+                                profile.subscription?.status === 'active' ? (
+                                  <Badge className="bg-green-500 hover:bg-green-600">
+                                    <Crown className="w-3 h-3 mr-1" />
+                                    VIP Actif
+                                  </Badge>
+                                ) : profile.subscription?.status === 'canceled' ? (
+                                  <Badge variant="secondary">
+                                    <Crown className="w-3 h-3 mr-1" />
+                                    VIP Annulé
+                                  </Badge>
+                                ) : (
+                                  <Badge variant="outline" className="text-red-500 border-red-500">
+                                    <Crown className="w-3 h-3 mr-1" />
+                                    VIP Expiré
+                                  </Badge>
+                                )
                               ) : (
                                 <Badge variant="outline">Gratuit</Badge>
                               )}
