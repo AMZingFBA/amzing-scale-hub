@@ -491,7 +491,7 @@ const AdminProfiles = () => {
                               ) : (
                                 <Badge variant="outline">Gratuit</Badge>
                               )}
-                              {profile.subscription?.is_trial && (
+                              {profile.subscription?.is_trial && profile.subscription?.status === 'active' && (
                                 <Badge variant="secondary" className="ml-1 text-xs">Essai</Badge>
                               )}
                             </TableCell>
