@@ -112,30 +112,6 @@ const AdminProfiles = () => {
     }
   };
 
-  const handleMarkAsTreated = async (userId: string, email: string) => {
-    if (!window.confirm(`Marquer ${email} comme traité ?`)) {
-      return;
-    }
-
-    try {
-      const { error } = await supabase
-        .from('subscriptions')
-        .update({ 
-          status: 'expired',
-          updated_at: new Date().toISOString()
-        })
-        .eq('user_id', userId);
-
-      if (error) throw error;
-
-      toast.success('Utilisateur marqué comme traité');
-      loadProfiles();
-    } catch (error: any) {
-      console.error('Error marking as treated:', error);
-      toast.error('Erreur lors du traitement');
-    }
-  };
-
   const handleContactUser = async (userId: string) => {
     try {
       // Create or get conversation with the user
@@ -727,17 +703,6 @@ const AdminProfiles = () => {
                             </TableCell>
                             <TableCell className="text-right">
                               <div className="flex gap-2 justify-end">
-                                {profile.subscription?.status === 'unpaid' && (
-                                  <Button
-                                    size="sm"
-                                    variant="outline"
-                                    onClick={() => handleMarkAsTreated(profile.id, profile.email)}
-                                    className="gap-2 text-green-600 hover:text-green-700 border-green-600 hover:border-green-700"
-                                  >
-                                    <CheckCircle className="w-4 h-4" />
-                                    Traité
-                                  </Button>
-                                )}
                                 <Button
                                   size="sm"
                                   variant="outline"
