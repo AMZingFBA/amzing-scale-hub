@@ -70,30 +70,44 @@ export const useTrial = () => {
     setIsStarting(true);
     
     try {
-      console.log('🔍 [startFreeTrial] Checking if trial already used...');
+      console.log('🔍 [startFreeTrial] Checking subscription status...');
       
-      // Check if user has already used their trial
+      // Vérifier si l'utilisateur a déjà un abonnement ACTIF
       const { data: subscription } = await supabase
         .from('subscriptions')
-        .select('trial_used')
+        .select('plan_type, status, expires_at')
         .eq('user_id', user.id)
         .single();
 
       console.log('📋 [startFreeTrial] Subscription data:', subscription);
 
-      if (subscription?.trial_used) {
-        console.log('⚠️ [startFreeTrial] Trial already used');
-        toast.error('Vous avez déjà utilisé votre période d\'essai');
+      // Vérifier si abonnement actif ET non expiré
+      const hasActiveSubscription = subscription?.plan_type === 'vip' && 
+        subscription?.status === 'active' &&
+        (!subscription?.expires_at || new Date(subscription.expires_at) > new Date());
+
+      if (hasActiveSubscription) {
+        console.log('⚠️ [startFreeTrial] User already has active subscription');
+        toast.error('Vous avez déjà un abonnement actif');
         setIsStarting(false);
         return;
       }
 
-      console.log('✅ [startFreeTrial] Trial not used, proceeding...');
+      console.log('✅ [startFreeTrial] No active subscription, proceeding to payment...');
       console.log('📱 [startFreeTrial] Is native platform?', isNativePlatform());
+      console.log('📱 [startFreeTrial] Platform:', Capacitor.getPlatform());
 
-      // Si c'est l'app mobile, utiliser Apple IAP
-      if (isNativePlatform()) {
-        console.log('📱 [startFreeTrial] Calling handleAppleIAP...');
+      // Si c'est Android, rediriger vers la page de paiement Android
+      if (isNativePlatform() && Capacitor.getPlatform() === 'android') {
+        console.log('🤖 [startFreeTrial] Android platform, redirecting to payment page...');
+        navigate('/android-payment');
+        setIsStarting(false);
+        return;
+      }
+
+      // Si c'est iOS, utiliser Apple IAP
+      if (isNativePlatform() && Capacitor.getPlatform() === 'ios') {
+        console.log('🍎 [startFreeTrial] iOS platform, using Apple IAP...');
         await handleAppleIAP();
         return;
       }
