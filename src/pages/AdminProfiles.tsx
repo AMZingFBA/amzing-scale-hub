@@ -296,24 +296,39 @@ const AdminProfiles = () => {
               </div>
             </div>
 
-            <Button
-              onClick={syncStripePayments}
-              disabled={syncing}
-              variant="outline"
-              className="gap-2 w-full sm:w-auto"
-            >
-              {syncing ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  Synchronisation en cours...
-                </>
-              ) : (
-                <>
-                  <RefreshCw className="w-4 h-4" />
-                  Synchroniser avec Stripe
-                </>
+            <div className="flex gap-2">
+              {filterPlan === 'unpaid' && (
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setFilterPlan('all');
+                    setCurrentPage(1);
+                  }}
+                  className="gap-2 w-full sm:w-auto"
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                  Retour
+                </Button>
               )}
-            </Button>
+              <Button
+                onClick={syncStripePayments}
+                disabled={syncing}
+                variant="outline"
+                className="gap-2 w-full sm:w-auto"
+              >
+                {syncing ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Synchronisation en cours...
+                  </>
+                ) : (
+                  <>
+                    <RefreshCw className="w-4 h-4" />
+                    Synchroniser avec Stripe
+                  </>
+                )}
+              </Button>
+            </div>
           </div>
 
           {/* Search & Filters */}
