@@ -336,7 +336,7 @@ const AdminProfiles = () => {
           </Card>
 
           {/* Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-6 gap-4 mb-6">
             <Card>
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-medium flex items-center gap-2">
@@ -361,6 +361,23 @@ const AdminProfiles = () => {
                 <div className="text-2xl font-bold">
                   {profiles.filter(p => p.subscription?.plan_type === 'vip' && p.subscription?.status === 'active').length}
                 </div>
+              </CardContent>
+            </Card>
+
+            <Card className="border-orange-200 dark:border-orange-800">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm font-medium flex items-center gap-2">
+                  <Clock className="w-4 h-4 text-orange-500" />
+                  Anciens VIP
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-orange-500">
+                  {profiles.filter(p => {
+                    return p.subscription?.plan_type === 'free' && p.subscription?.expires_at;
+                  }).length}
+                </div>
+                <p className="text-xs text-muted-foreground">ont résilié</p>
               </CardContent>
             </Card>
 
@@ -531,6 +548,14 @@ const AdminProfiles = () => {
                                       VIP Expiré
                                     </Badge>
                                   )
+                                ) : profile.subscription?.expires_at ? (
+                                  <div className="flex flex-col gap-1">
+                                    <Badge variant="outline">Gratuit</Badge>
+                                    <Badge variant="outline" className="text-orange-500 border-orange-500">
+                                      <Clock className="w-3 h-3 mr-1" />
+                                      Ancien VIP
+                                    </Badge>
+                                  </div>
                                 ) : (
                                   <Badge variant="outline">Gratuit</Badge>
                                 )}
@@ -542,13 +567,19 @@ const AdminProfiles = () => {
                                   const expiresAt = new Date(profile.subscription.expires_at);
                                   const now = new Date();
                                   const daysUntilExpiry = Math.ceil((expiresAt.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+                                  const daysSinceExpiry = Math.abs(daysUntilExpiry);
                                   
                                   if (daysUntilExpiry < 0) {
                                     return (
                                       <div className="flex items-center gap-2">
                                         <AlertCircle className="w-4 h-4 text-red-500" />
                                         <div>
-                                          <div className="text-sm font-medium text-red-500">Expiré</div>
+                                          <div className="text-sm font-medium text-red-500">
+                                            {profile.subscription?.status === 'canceled' || profile.subscription?.status === 'expired' ? 'Résilié' : 'Expiré'}
+                                          </div>
+                                          <div className="text-xs text-muted-foreground">
+                                            Il y a {daysSinceExpiry} jour{daysSinceExpiry > 1 ? 's' : ''}
+                                          </div>
                                           <div className="text-xs text-muted-foreground">
                                             {expiresAt.toLocaleDateString('fr-FR')}
                                           </div>
