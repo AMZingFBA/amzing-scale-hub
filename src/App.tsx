@@ -23,6 +23,7 @@ import Services from "./pages/Services";
 import Formation from "./pages/Formation";
 import Catalogue from "./pages/Catalogue";
 import Tarifs from "./pages/Tarifs";
+import AndroidPayment from "./pages/AndroidPayment";
 import Contact from "./pages/Contact";
 import FAQ from "./pages/FAQ";
 import CGV from "./pages/CGV";
@@ -91,6 +92,7 @@ const App = () => (
             <Route path="/formation" element={<Formation />} />
             <Route path="/catalogue" element={<Catalogue />} />
             <Route path="/tarifs" element={<Tarifs />} />
+            <Route path="/android-payment" element={<AndroidPayment />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/faq" element={<FAQ />} />
             <Route path="/cgv" element={<CGV />} />

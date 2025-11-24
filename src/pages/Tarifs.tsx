@@ -15,6 +15,12 @@ const Tarifs = () => {
   const { startFreeTrial, isStarting } = useTrial();
   const { user } = useAuth();
 
+  // Rediriger vers la page Android si sur Android
+  if (Capacitor.isNativePlatform() && Capacitor.getPlatform() === 'android') {
+    navigate('/android-payment');
+    return null;
+  }
+
   const handleStartTrial = async () => {
     if (!user) {
       navigate('/auth?tab=signup');
