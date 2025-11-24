@@ -166,26 +166,28 @@ serve(async (req) => {
         });
 
         if (needsUpdate) {
-            const updateData: any = {
-              stripe_customer_id: customer.id,
-              status: newStatus,
-              plan_type: newPlanType,
-              payment_provider: "stripe",
-              updated_at: new Date().toISOString()
-            };
+          const updateData: any = {
+            stripe_customer_id: customer.id,
+            status: newStatus,
+            plan_type: newPlanType,
+            payment_provider: "stripe",
+            updated_at: new Date().toISOString()
+          };
 
-            // Update expires_at for unpaid/canceled
-            if (newStatus === "unpaid" || newStatus === "canceled" || newStatus === "expired") {
-              if (subscriptions.data.length > 0) {
-                const lastSub = subscriptions.data[0];
+          // Update expires_at for unpaid/canceled
+          if (newStatus === "unpaid" || newStatus === "canceled" || newStatus === "expired") {
+            if (subscriptions.data.length > 0) {
+              const lastSub = subscriptions.data[0];
+              if (lastSub.current_period_end) {
                 updateData.expires_at = new Date(lastSub.current_period_end * 1000).toISOString();
               }
             }
+          }
 
-            if (activeSubscription) {
-              updateData.stripe_subscription_id = activeSubscription.id;
-              updateData.expires_at = new Date(activeSubscription.current_period_end * 1000).toISOString();
-            }
+          if (activeSubscription && activeSubscription.current_period_end) {
+            updateData.stripe_subscription_id = activeSubscription.id;
+            updateData.expires_at = new Date(activeSubscription.current_period_end * 1000).toISOString();
+          }
 
             const { error: updateError } = await supabaseAdmin
               .from("subscriptions")
