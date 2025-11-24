@@ -133,10 +133,19 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const signIn = async (email: string, password: string) => {
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      console.log('🔐 [signIn] Starting login...');
+      console.log('📧 Email:', email);
+      console.log('🌐 Supabase URL:', import.meta.env.VITE_SUPABASE_URL);
+      console.log('🔑 Has Anon Key:', !!import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY);
+      
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
+
+      console.log('📊 [signIn] Response received');
+      console.log('✅ Data:', data);
+      console.log('❌ Error:', error);
 
       if (error) throw error;
 
@@ -144,6 +153,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       // Ne pas rediriger ici - laissez le useEffect dans Auth.tsx s'en charger
       return { error: null };
     } catch (error: any) {
+      console.error('💥 [signIn] Catch block error:', error);
+      console.error('💥 Error details:', {
+        message: error.message,
+        name: error.name,
+        stack: error.stack,
+      });
       toast.error(error.message || 'Erreur lors de la connexion');
       return { error };
     }
