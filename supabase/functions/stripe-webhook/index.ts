@@ -212,6 +212,7 @@ serve(async (req) => {
             plan_type: "free",
             status: "expired",
             is_trial: false,
+            expires_at: new Date().toISOString(), // Force expiration immédiate
           })
           .eq("user_id", profile.id);
         
@@ -263,6 +264,7 @@ serve(async (req) => {
           plan_type: "free",
           status: "unpaid",
           is_trial: false,
+          expires_at: new Date().toISOString(), // Force expiration immédiate
         })
         .eq("user_id", profile.id);
       
