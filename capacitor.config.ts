@@ -5,7 +5,6 @@ const config: CapacitorConfig = {
   appName: 'AMZing FBA',
   webDir: 'dist',
   server: {
-    cleartext: true,
     androidScheme: 'https'
   }
 };
