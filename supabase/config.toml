@@ -26,3 +26,6 @@ verify_jwt = false
 
 [functions.sync-eany-gist-to-db]
 verify_jwt = false
+
+[functions.sync-stripe-payments]
+verify_jwt = false
