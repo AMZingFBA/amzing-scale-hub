@@ -87,78 +87,105 @@ const AndroidPayment = () => {
 
           {/* Price */}
           <div className="text-center mb-8 animate-fade-in" style={{ animationDelay: '0.1s' }}>
-            <div className="inline-flex items-baseline gap-2">
-              <span className="text-5xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-                29,90€
-              </span>
-              <span className="text-lg text-muted-foreground">/mois</span>
+            <div className="relative inline-block">
+              <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-secondary/20 blur-2xl animate-pulse"></div>
+              <div className="relative inline-flex items-baseline gap-2 px-8 py-4 rounded-2xl bg-gradient-to-br from-primary/10 to-secondary/10 border-2 border-primary/30">
+                <span className="text-6xl font-black bg-gradient-to-r from-primary via-primary to-secondary bg-clip-text text-transparent">
+                  34,99€
+                </span>
+                <span className="text-2xl font-semibold text-muted-foreground">/mois</span>
+              </div>
             </div>
-            <p className="text-sm text-muted-foreground mt-2">Annulable à tout moment</p>
+            <p className="text-sm text-muted-foreground mt-4 font-medium">Sans engagement • Annulable à tout moment</p>
           </div>
 
           {/* Features */}
-          <div className="space-y-4 mb-8">
+          <div className="space-y-3 mb-8">
             {[
-              { icon: Zap, text: "Accès à tous les produits rentables", delay: '0.2s' },
-              { icon: Shield, text: "Alertes personnalisées en temps réel", delay: '0.3s' },
-              { icon: Check, text: "Support prioritaire 24/7", delay: '0.4s' },
-              { icon: Check, text: "Outils d'analyse avancés", delay: '0.5s' },
+              { icon: Zap, text: "Moniteurs automatiques Qogita, Auchan & plus", subtext: "Notifications instantanées sur produits rentables", delay: '0.2s' },
+              { icon: Shield, text: "Guides Amazon FBA complets", subtext: "De zéro aux premières ventes", delay: '0.3s' },
+              { icon: Check, text: "Fournisseurs privés exclusifs", subtext: "Produits sourcés et testés", delay: '0.4s' },
+              { icon: Check, text: "Outils pro inclus", subtext: "Stock Checker, alertes, conseils niches", delay: '0.5s' },
             ].map((feature, index) => (
               <div
                 key={index}
-                className="flex items-center gap-3 p-3 rounded-lg bg-primary/5 hover:bg-primary/10 transition-all duration-300 hover-scale animate-fade-in"
-                style={{ animationDelay: feature.delay }}
+                className="relative group"
               >
-                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
-                  <feature.icon className="h-4 w-4 text-primary" />
+                <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-secondary/5 rounded-xl blur group-hover:blur-md transition-all"></div>
+                <div
+                  className="relative flex items-start gap-4 p-4 rounded-xl bg-card/50 backdrop-blur border border-primary/10 hover:border-primary/30 transition-all duration-300 hover-scale animate-fade-in"
+                  style={{ animationDelay: feature.delay }}
+                >
+                  <div className="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <feature.icon className="h-5 w-5 text-primary" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-foreground mb-0.5">{feature.text}</p>
+                    <p className="text-xs text-muted-foreground">{feature.subtext}</p>
+                  </div>
                 </div>
-                <span className="text-sm font-medium">{feature.text}</span>
               </div>
             ))}
           </div>
 
           {/* CTA Button */}
-          <Button
-            onClick={handleSubscribe}
-            disabled={isProcessing}
-            className="w-full h-14 text-lg font-semibold hover-scale animate-fade-in"
-            style={{ animationDelay: '0.6s' }}
-          >
-            {isProcessing ? (
-              <div className="flex items-center gap-2">
-                <div className="w-5 h-5 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin" />
-                <span>Chargement...</span>
-              </div>
-            ) : (
-              <div className="flex items-center gap-2">
-                <CreditCard className="h-5 w-5" />
-                <span>S'abonner maintenant</span>
-              </div>
-            )}
-          </Button>
+          <div className="relative animate-fade-in" style={{ animationDelay: '0.6s' }}>
+            <div className="absolute inset-0 bg-gradient-to-r from-primary to-secondary blur-xl opacity-50 animate-pulse"></div>
+            <Button
+              onClick={handleSubscribe}
+              disabled={isProcessing}
+              className="relative w-full h-16 text-lg font-bold bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 shadow-2xl hover:shadow-primary/50 transition-all duration-300 hover-scale"
+            >
+              {isProcessing ? (
+                <div className="flex items-center gap-3">
+                  <div className="w-5 h-5 border-3 border-primary-foreground border-t-transparent rounded-full animate-spin" />
+                  <span>Traitement...</span>
+                </div>
+              ) : (
+                <div className="flex items-center gap-3">
+                  <CreditCard className="h-6 w-6" />
+                  <span>S'abonner maintenant</span>
+                </div>
+              )}
+            </Button>
+          </div>
 
           {/* Security Badge */}
-          <div className="mt-6 pt-6 border-t border-border animate-fade-in" style={{ animationDelay: '0.7s' }}>
-            <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
-              <Shield className="h-4 w-4" />
-              <span>Paiement 100% sécurisé par Stripe</span>
+          <div className="mt-8 pt-6 border-t border-border/50 animate-fade-in" style={{ animationDelay: '0.7s' }}>
+            <div className="flex flex-col items-center gap-3">
+              <div className="flex items-center justify-center gap-2 text-sm font-medium text-muted-foreground">
+                <Shield className="h-5 w-5 text-primary" />
+                <span>Paiement 100% sécurisé par Stripe</span>
+              </div>
+              <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                <span>🔒 SSL Crypté</span>
+                <span>•</span>
+                <span>💳 Cartes acceptées</span>
+                <span>•</span>
+                <span>✨ Sans engagement</span>
+              </div>
             </div>
           </div>
         </Card>
 
         {/* Info Cards */}
-        <div className="max-w-lg mx-auto mt-6 grid grid-cols-2 gap-4">
+        <div className="max-w-lg mx-auto mt-6 grid grid-cols-3 gap-3">
           {[
-            { title: "Sans engagement", desc: "Annulez quand vous voulez" },
-            { title: "Support 24/7", desc: "Assistance prioritaire" },
+            { icon: "✓", title: "Sans engagement", desc: "Annulez en 1 clic" },
+            { icon: "⚡", title: "Accès immédiat", desc: "Dès le paiement" },
+            { icon: "💬", title: "Support 24/7", desc: "Réponse rapide" },
           ].map((info, index) => (
             <Card
               key={index}
-              className="p-4 text-center hover-scale animate-fade-in bg-card/80 backdrop-blur"
+              className="relative group overflow-hidden animate-fade-in bg-card/90 backdrop-blur border-primary/20 hover:border-primary/40"
               style={{ animationDelay: `${0.8 + index * 0.1}s` }}
             >
-              <p className="font-semibold text-sm mb-1">{info.title}</p>
-              <p className="text-xs text-muted-foreground">{info.desc}</p>
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+              <div className="relative p-4 text-center">
+                <div className="text-2xl mb-2 group-hover:scale-110 transition-transform">{info.icon}</div>
+                <p className="font-bold text-xs mb-1">{info.title}</p>
+                <p className="text-[10px] text-muted-foreground">{info.desc}</p>
+              </div>
             </Card>
           ))}
         </div>
