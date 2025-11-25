@@ -239,7 +239,7 @@ const AndroidPayment = () => {
                 >
                   Conditions Générales de Vente
                 </Link>
-                {" "}et je demande l'exécution immédiate du service. Je renonce expressément à mon droit de rétractation conformément à l'article L. 221-28 du Code de la consommation.
+                {" "}et je demande l'exécution immédiate du service.
               </label>
             </div>
           </div>
