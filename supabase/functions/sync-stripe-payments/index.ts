@@ -201,8 +201,8 @@ serve(async (req) => {
               console.log(`[SYNC-STRIPE] Updated ${profile.email}: ${newStatus}, ${newPlanType}`);
               results.updated++;
               
-              // Send email if payment failed and status changed to unpaid
-              if (newStatus === "unpaid" && userSubscription.status !== "unpaid") {
+              // TEMPORARY: Send email to all unpaid users for testing
+              if (newStatus === "unpaid") {
                 console.log(`[SYNC-STRIPE] Sending payment failed email to ${profile.email}`);
                 try {
                   const emailResponse = await fetch(
