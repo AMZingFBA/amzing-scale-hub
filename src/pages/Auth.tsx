@@ -5,10 +5,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import logo from "@/assets/logo.png";
-import { Mail, Lock, User, Phone, Package, TrendingUp, BarChart3, CheckCircle2 } from "lucide-react";
+import { Mail, Lock, User, Phone, Package, TrendingUp, BarChart3, CheckCircle2, AlertCircle } from "lucide-react";
 import { Capacitor } from "@capacitor/core";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { supabase } from "@/integrations/supabase/client";
@@ -171,9 +172,9 @@ export default function Auth() {
         },
       });
 
-      if (error) {
-        // Extract the actual error message from the function response
-        const errorMessage = (error as any).context?.body?.error || error.message || "Erreur lors de l'envoi du code";
+      // Check for errors in both error object and data response
+      if (error || (data && data.error)) {
+        const errorMessage = data?.error || (error as any).context?.body?.error || error?.message || "Erreur lors de l'envoi du code";
         throw new Error(errorMessage);
       }
 
@@ -182,6 +183,7 @@ export default function Auth() {
     } catch (error: any) {
       console.error('Error sending verification code:', error);
       toast.error(error.message || "Erreur lors de l'envoi du code");
+      setError(error.message);
     } finally {
       setIsLoading(false);
     }
@@ -350,6 +352,7 @@ export default function Auth() {
                 value={activeTab} 
                 onValueChange={(value) => {
                   setActiveTab(value);
+                  setError(null); // Reset error when switching tabs
                 }} 
                 className="w-full"
               >
@@ -430,6 +433,15 @@ export default function Auth() {
                 >
                   {verificationStep === 'form' ? (
                     <form onSubmit={handleSendVerificationCode} className="space-y-4">
+                    {error && (
+                      <Alert variant="destructive" className="border-2 animate-slide-in-up">
+                        <AlertCircle className="h-4 w-4" />
+                        <AlertDescription className="font-medium">
+                          {error}
+                        </AlertDescription>
+                      </Alert>
+                    )}
+                    
                     <div className="space-y-2 animate-slide-in-up" style={{ animationDelay: "50ms" }}>
                       <Label htmlFor="signup-fullname">Nom complet</Label>
                       <div className="relative group">
