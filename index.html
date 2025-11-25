@@ -17,6 +17,13 @@
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#FF9900">
     
+    <!-- Meta tags pour webmaster tools -->
+    <meta name="google-site-verification" content="your-google-verification-code">
+    <meta name="msvalidate.01" content="your-bing-verification-code">
+    
+    <!-- Humans.txt et Security.txt -->
+    <link type="text/plain" rel="author" href="/humans.txt">
+    
     <link rel="icon" type="image/png" href="/favicon.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AMZing FBA - Formation, Sourcing & Logistique Amazon FBA France</title>
@@ -61,6 +68,30 @@
       }
     }
     </script>
+    
+    <!-- WebSite Schema avec SearchAction -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "AMZing FBA",
+      "url": "https://amzingfba.com",
+      "description": "Formation, sourcing et outils pour réussir sur Amazon FBA",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": {
+          "@type": "EntryPoint",
+          "urlTemplate": "https://amzingfba.com/search?q={search_term_string}"
+        },
+        "query-input": "required name=search_term_string"
+      }
+    }
+    </script>
+    
+    <!-- Resource hints pour prefetch des pages suivantes probables -->
+    <link rel="prefetch" href="/formation" as="document">
+    <link rel="prefetch" href="/tarifs" as="document">
+    <link rel="prefetch" href="/guides" as="document">
   
   <meta property="og:title" content="AMZing FBA - Formation, Sourcing & Logistique Amazon FBA France">
   <meta name="twitter:title" content="AMZing FBA - Formation, Sourcing & Logistique Amazon FBA France">
