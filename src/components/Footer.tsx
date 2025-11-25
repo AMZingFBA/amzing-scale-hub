@@ -19,31 +19,63 @@ const Footer = () => {
       <div className="container mx-auto px-4 py-12 relative z-10">
         {/* Main Footer Content */}
         {(isVIP || isAdmin) ? (
-          // Elegant footer for VIP members and admins
-          <div className="max-w-2xl mx-auto">
-            <div className="flex flex-col md:flex-row items-center justify-between gap-6 py-8">
-              <div className="group">
+          // Rich footer for VIP members and admins
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+            {/* Logo & Description */}
+            <div className="group animate-fade-in">
+              <div className="relative inline-block mb-4">
                 <img 
                   src={logo} 
                   alt="AMZing FBA" 
                   className="h-12 transition-all duration-500 group-hover:scale-110 group-hover:drop-shadow-[0_0_15px_rgba(255,153,0,0.5)]" 
                 />
+                <div className="absolute -inset-2 bg-gradient-to-r from-primary/0 via-primary/20 to-primary/0 rounded-lg blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
               </div>
-              <div className="flex flex-wrap items-center justify-center gap-6">
-                <Link 
-                  to="/support" 
-                  className="text-muted-foreground hover:text-primary transition-all duration-300 hover:scale-105 font-medium"
-                >
-                  Support
-                </Link>
-                <Link 
-                  to="/contact" 
-                  className="inline-flex items-center gap-2 px-5 py-2 bg-primary/10 hover:bg-primary hover:text-white text-primary rounded-lg transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-primary/20"
-                >
-                  <Mail className="w-4 h-4" />
-                  <span className="font-semibold">Contact</span>
-                </Link>
-              </div>
+              <p className="text-muted-foreground max-w-sm leading-relaxed">
+                Votre espace VIP pour réussir sur <span className="text-primary font-semibold">Amazon FBA</span>
+              </p>
+            </div>
+
+            {/* Quick Links */}
+            <div className="animate-fade-in" style={{ animationDelay: '0.1s' }}>
+              <h3 className="text-lg font-semibold mb-4 text-foreground">Liens rapides</h3>
+              <ul className="space-y-2">
+                <li>
+                  <Link to="/dashboard" className="text-muted-foreground hover:text-primary transition-all duration-300 hover:translate-x-1 inline-block">
+                    Dashboard
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/chat" className="text-muted-foreground hover:text-primary transition-all duration-300 hover:translate-x-1 inline-block">
+                    Communauté
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/support" className="text-muted-foreground hover:text-primary transition-all duration-300 hover:translate-x-1 inline-block">
+                    Support
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/profile" className="text-muted-foreground hover:text-primary transition-all duration-300 hover:translate-x-1 inline-block">
+                    Mon profil
+                  </Link>
+                </li>
+              </ul>
+            </div>
+
+            {/* Contact */}
+            <div className="animate-fade-in" style={{ animationDelay: '0.2s' }}>
+              <h3 className="text-lg font-semibold mb-4 text-foreground">Besoin d'aide ?</h3>
+              <p className="text-muted-foreground mb-4 text-sm">
+                Notre équipe est disponible pour vous accompagner
+              </p>
+              <Link 
+                to="/contact"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-primary/10 hover:bg-primary hover:text-white text-primary rounded-lg transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-primary/20 group"
+              >
+                <Mail className="w-4 h-4 group-hover:animate-pulse" />
+                <span className="font-semibold">Nous contacter</span>
+              </Link>
             </div>
           </div>
         ) : (
