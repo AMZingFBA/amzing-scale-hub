@@ -1,7 +1,22 @@
 <!doctype html>
-<html lang="en">
+<html lang="fr">
   <head>
     <meta charset="UTF-8" />
+    
+    <!-- DNS Prefetch & Preconnect pour optimiser les connexions externes -->
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+    <link rel="dns-prefetch" href="https://www.googletagmanager.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <!-- Preload des ressources critiques -->
+    <link rel="preload" href="/hero-warehouse.jpg" as="image" type="image/jpeg">
+    <link rel="preload" href="/src/main.tsx" as="script">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#FF9900">
+    
     <link rel="icon" type="image/png" href="/favicon.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AMZing FBA - Formation, Sourcing & Logistique Amazon FBA France</title>

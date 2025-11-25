@@ -105,10 +105,18 @@
 
   body {
     @apply bg-background text-foreground;
+    font-display: swap; /* Optimise le chargement des polices */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
   
   h1, h2, h3, h4, h5, h6 {
     @apply font-bold;
+  }
+  
+  /* Optimisation du rendu des images */
+  img {
+    content-visibility: auto;
   }
 }
 

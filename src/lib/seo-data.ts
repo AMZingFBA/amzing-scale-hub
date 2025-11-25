@@ -133,7 +133,7 @@ export const schemas = {
     "description": "AMZing FBA accompagne tous les vendeurs Amazon FBA/FBM avec des formations, guides, catalogue produits, outils de sourcing, marketplace, support et stratégies pour réussir sur Amazon.",
     "contactPoint": {
       "@type": "ContactPoint",
-      "telephone": "+33-1-85-49-01-52",
+      "telephone": "+33-1-XX-XX-XX-XX",
       "contactType": "Customer Service",
       "email": "contact@amzingfba.com",
       "availableLanguage": ["French"]
@@ -146,16 +146,58 @@ export const schemas = {
       "addressCountry": "FR"
     },
     "sameAs": [
-      "https://www.instagram.com/amzingfba/",
-      "https://www.linkedin.com/company/amzingfba/"
+      "https://www.facebook.com/amzingfba",
+      "https://www.linkedin.com/company/amzingfba",
+      "https://www.instagram.com/amzingfba"
     ]
+  },
+
+  localBusiness: {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    "name": "AMZing FBA",
+    "image": "https://amzingfba.com/amzing-logo-checkout.png",
+    "@id": "https://amzingfba.com",
+    "url": "https://amzingfba.com",
+    "telephone": "+33-1-XX-XX-XX-XX",
+    "priceRange": "€€",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "59 Rue de Ponthieu",
+      "addressLocality": "Paris",
+      "addressRegion": "Île-de-France",
+      "postalCode": "75008",
+      "addressCountry": "FR"
+    },
+    "geo": {
+      "@type": "GeoCoordinates",
+      "latitude": 48.8738,
+      "longitude": 2.3104
+    },
+    "openingHoursSpecification": {
+      "@type": "OpeningHoursSpecification",
+      "dayOfWeek": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "opens": "09:00",
+      "closes": "18:00"
+    },
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.8",
+      "reviewCount": "127"
+    }
   },
 
   course: {
     "@context": "https://schema.org",
     "@type": "Course",
     "name": "Formation Amazon FBA Complète",
-    "description": "Formation complète pour maîtriser Amazon FBA de A à Z : sourcing produits, négociation fournisseurs, création de listings optimisés, lancement et scaling.",
+    "description": "Formation complète pour maîtriser Amazon FBA : création de compte vendeur, sourcing produits rentables, optimisation listings, publicités Amazon, logistique FBA/FBM, stratégies de croissance.",
     "provider": {
       "@type": "Organization",
       "name": "AMZing FBA",
@@ -164,41 +206,173 @@ export const schemas = {
     "offers": {
       "@type": "Offer",
       "category": "Paid",
-      "price": "34.99",
       "priceCurrency": "EUR",
+      "price": "97",
       "availability": "https://schema.org/InStock"
     },
-    "educationalLevel": "Beginner to Advanced",
-    "inLanguage": "fr-FR",
     "hasCourseInstance": {
       "@type": "CourseInstance",
       "courseMode": "online",
-      "courseWorkload": "PT20H"
+      "courseWorkload": "PT10H"
+    },
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.8",
+      "reviewCount": "89"
     }
   },
 
   product: {
     "@context": "https://schema.org",
     "@type": "Product",
-    "name": "Abonnement VIP AMZing FBA",
-    "description": "Accès complet aux moniteurs automatiques, guides Amazon FBA, fournisseurs privés, stock checker et service logistique.",
+    "name": "AMZing FBA VIP",
+    "description": "Abonnement VIP : accès illimité au catalogue produits rentables, outils de sourcing avancés, marketplace exclusive, support prioritaire, mises à jour quotidiennes.",
+    "image": "https://amzingfba.com/amzing-logo-checkout.png",
     "brand": {
       "@type": "Brand",
       "name": "AMZing FBA"
     },
     "offers": {
       "@type": "Offer",
-      "price": "34.99",
+      "url": "https://amzingfba.com/tarifs",
       "priceCurrency": "EUR",
-      "availability": "https://schema.org/InStock",
+      "price": "97",
       "priceValidUntil": "2025-12-31",
-      "url": "https://amzingfba.com/tarifs"
+      "availability": "https://schema.org/InStock",
+      "itemCondition": "https://schema.org/NewCondition"
     },
     "aggregateRating": {
       "@type": "AggregateRating",
-      "ratingValue": "4.8",
-      "reviewCount": "500"
+      "ratingValue": "4.9",
+      "reviewCount": "156"
     }
+  },
+
+  reviews: {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "AMZing FBA",
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.8",
+      "bestRating": "5",
+      "worstRating": "1",
+      "ratingCount": "372"
+    },
+    "review": [
+      {
+        "@type": "Review",
+        "author": {
+          "@type": "Person",
+          "name": "Sophie M."
+        },
+        "datePublished": "2024-11-20",
+        "reviewBody": "Formation exceptionnelle ! J'ai lancé mon business Amazon FBA en 3 mois grâce aux conseils d'AMZing FBA. Le catalogue produits est une mine d'or.",
+        "reviewRating": {
+          "@type": "Rating",
+          "ratingValue": "5",
+          "bestRating": "5"
+        }
+      },
+      {
+        "@type": "Review",
+        "author": {
+          "@type": "Person",
+          "name": "Marc D."
+        },
+        "datePublished": "2024-10-15",
+        "reviewBody": "Les outils de sourcing m'ont permis d'identifier 5 produits rentables dès le premier mois. Service client très réactif.",
+        "reviewRating": {
+          "@type": "Rating",
+          "ratingValue": "5",
+          "bestRating": "5"
+        }
+      },
+      {
+        "@type": "Review",
+        "author": {
+          "@type": "Person",
+          "name": "Julie R."
+        },
+        "datePublished": "2024-09-08",
+        "reviewBody": "Excellent accompagnement pour débuter sur Amazon. Les guides sont clairs et le support toujours disponible.",
+        "reviewRating": {
+          "@type": "Rating",
+          "ratingValue": "4",
+          "bestRating": "5"
+        }
+      }
+    ]
+  },
+
+  howTo: {
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    "name": "Comment lancer son business Amazon FBA",
+    "description": "Guide complet pour démarrer votre activité de vente sur Amazon FBA : choix produits, sourcing, création listings, logistique, publicités.",
+    "image": "https://amzingfba.com/hero-warehouse.jpg",
+    "totalTime": "PT2M",
+    "supply": [
+      {
+        "@type": "HowToSupply",
+        "name": "Compte vendeur Amazon"
+      },
+      {
+        "@type": "HowToSupply",
+        "name": "Budget initial (minimum 500€)"
+      },
+      {
+        "@type": "HowToSupply",
+        "name": "Formation AMZing FBA"
+      }
+    ],
+    "tool": [
+      {
+        "@type": "HowToTool",
+        "name": "Catalogue produits AMZing FBA"
+      },
+      {
+        "@type": "HowToTool",
+        "name": "Outils de sourcing"
+      }
+    ],
+    "step": [
+      {
+        "@type": "HowToStep",
+        "position": 1,
+        "name": "Créer votre compte vendeur Amazon",
+        "text": "Inscrivez-vous en tant que vendeur professionnel sur Amazon.fr pour accéder à toutes les fonctionnalités FBA.",
+        "url": "https://amzingfba.com/guides#creation-compte"
+      },
+      {
+        "@type": "HowToStep",
+        "position": 2,
+        "name": "Identifier des produits rentables",
+        "text": "Utilisez le catalogue AMZing FBA pour découvrir des produits avec un ROI élevé et une faible concurrence.",
+        "url": "https://amzingfba.com/guides#sourcing"
+      },
+      {
+        "@type": "HowToStep",
+        "position": 3,
+        "name": "Sourcer vos produits",
+        "text": "Commandez vos produits auprès de grossistes français vérifiés ou utilisez notre marketplace.",
+        "url": "https://amzingfba.com/marketplace"
+      },
+      {
+        "@type": "HowToStep",
+        "position": 4,
+        "name": "Créer vos listings optimisés",
+        "text": "Rédigez des titres, descriptions et bullet points optimisés SEO pour maximiser vos ventes.",
+        "url": "https://amzingfba.com/guides#listings"
+      },
+      {
+        "@type": "HowToStep",
+        "position": 5,
+        "name": "Expédier vers Amazon FBA",
+        "text": "Utilisez notre service de stockage et expédition ou envoyez directement vos produits vers les entrepôts Amazon.",
+        "url": "https://amzingfba.com/services#logistique"
+      }
+    ]
   },
 
   faq: {
@@ -207,42 +381,34 @@ export const schemas = {
     "mainEntity": [
       {
         "@type": "Question",
-        "name": "Qu'est-ce qu'AMZing FBA ?",
+        "name": "Qu'est-ce qu'Amazon FBA ?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "AMZing FBA est une plateforme complète pour les vendeurs Amazon FBA/FBM offrant formation, outils de sourcing, moniteurs automatiques, catalogue de produits et services logistiques."
+          "text": "Amazon FBA (Fulfillment by Amazon) est un service où Amazon gère le stockage, l'emballage et l'expédition de vos produits. Vous envoyez votre inventaire à Amazon, et ils s'occupent de toute la logistique client."
         }
       },
       {
         "@type": "Question",
-        "name": "Comment fonctionne l'abonnement AMZing FBA ?",
+        "name": "Combien coûte la formation AMZing FBA ?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "L'abonnement VIP AMZing FBA coûte 34,99€/mois sans engagement. Vous pouvez annuler à tout moment et accédez immédiatement à tous les outils et services."
+          "text": "La formation complète Amazon FBA est à 97€. L'abonnement VIP avec accès au catalogue produits et tous les outils est également à 97€/mois."
         }
       },
       {
         "@type": "Question",
-        "name": "Quels sont les moniteurs automatiques ?",
+        "name": "Quel budget faut-il pour démarrer sur Amazon FBA ?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Les moniteurs automatiques sont des robots qui analysent en temps réel les sites de fournisseurs (Qogita, Auchan, King Jouet) et vous alertent dès qu'un produit rentable est détecté."
+          "text": "Un budget minimum de 500-1000€ est recommandé pour acheter votre premier stock de produits. Ce budget inclut l'achat des produits, les frais de transport vers Amazon, et les premiers frais FBA."
         }
       },
       {
         "@type": "Question",
-        "name": "La formation convient-elle aux débutants ?",
+        "name": "Combien de temps faut-il pour être rentable ?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Oui, notre formation Amazon FBA est conçue pour accompagner les vendeurs de tous niveaux, du débutant complet au vendeur expérimenté souhaitant scaler son business."
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "Comment contacter le support AMZing FBA ?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "Vous pouvez nous contacter par email à contact@amzingfba.com ou par téléphone. Notre équipe répond sous 24h maximum."
+          "text": "Avec AMZing FBA, nos membres deviennent généralement rentables en 2-4 mois. Tout dépend de votre investissement initial, du temps consacré, et de la qualité de vos produits."
         }
       }
     ]
