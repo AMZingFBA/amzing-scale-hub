@@ -192,7 +192,7 @@ const Dashboard = () => {
                 </AccordionTrigger>
                 <AccordionContent>
                   <div className="grid gap-3 pt-2">
-                    <CategoryItem icon={Eye} label="création-société" onClick={() => navigate('/creation-societe')} badge={notifications.outils?.subcategories?.['création-société']} />
+                    <CategoryItem icon={Building2} label="création-société" onClick={() => navigate('/creation-societe')} badge={notifications.outils?.subcategories?.['création-société']} />
                     <CategoryItem icon={FileText} label="facture-autorisation" link="/facture-autorisation" badge={notifications.outils?.subcategories?.['facture-autorisation']} />
                     <CategoryItem icon={DollarSign} label="cashback" link="/cashback" badge={notifications.outils?.subcategories?.cashback} />
                     <CategoryItem icon={Star} label="avis" link="/avis-page" badge={notifications.outils?.subcategories?.avis} />
