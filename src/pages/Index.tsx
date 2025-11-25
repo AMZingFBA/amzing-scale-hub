@@ -21,6 +21,8 @@ import { Capacitor } from "@capacitor/core";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { seoData, schemas } from "@/lib/seo-data";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const ServiceCard = ({ 
   children, 
@@ -72,7 +74,15 @@ const ServiceCard = ({
 };
 
 const Index = () => {
-  const { startFreeTrial, isStarting } = useTrial();
+  const { 
+    startFreeTrial, 
+    isStarting, 
+    showCGVModal, 
+    setShowCGVModal, 
+    acceptedCGV, 
+    setAcceptedCGV, 
+    handleConfirmPayment 
+  } = useTrial();
   const { isVIP, isLoading, user } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -535,6 +545,63 @@ const Index = () => {
       </section>
 
       <Footer />
+
+      {/* CGV Modal */}
+      <Dialog open={showCGVModal} onOpenChange={setShowCGVModal}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Confirmation d'abonnement</DialogTitle>
+            <DialogDescription>
+              Veuillez accepter les conditions avant de continuer
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <div className="bg-primary/5 p-4 rounded-lg border border-primary/20">
+              <p className="text-sm font-semibold mb-2">Abonnement VIP AMZing FBA</p>
+              <p className="text-2xl font-bold text-primary">34,99€<span className="text-sm font-normal text-muted-foreground">/mois</span></p>
+              <p className="text-xs text-muted-foreground mt-2">Sans engagement • Résiliable à tout moment</p>
+            </div>
+
+            <div className="flex items-start space-x-3">
+              <Checkbox 
+                id="cgv-payment" 
+                checked={acceptedCGV}
+                onCheckedChange={(checked) => setAcceptedCGV(checked === true)}
+                className="mt-1"
+              />
+              <label htmlFor="cgv-payment" className="text-sm leading-relaxed cursor-pointer select-none">
+                Je reconnais avoir lu et accepté les{" "}
+                <Link 
+                  to="/cgv" 
+                  target="_blank"
+                  className="text-primary hover:underline font-medium"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  Conditions Générales de Vente
+                </Link>
+                {" "}et je demande l'exécution immédiate du service. Je renonce expressément à mon droit de rétractation conformément à l'article L. 221-28 du Code de la consommation.
+              </label>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button 
+              variant="outline" 
+              onClick={() => setShowCGVModal(false)}
+            >
+              Annuler
+            </Button>
+            <Button 
+              onClick={handleConfirmPayment}
+              disabled={!acceptedCGV || isStarting}
+              className="bg-gradient-to-r from-primary to-secondary"
+            >
+              {isStarting ? 'Traitement...' : 'Confirmer le paiement'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
