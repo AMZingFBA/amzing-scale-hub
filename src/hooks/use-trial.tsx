@@ -61,8 +61,8 @@ export const useTrial = () => {
     console.log('🚀 [startFreeTrial] Button clicked!');
     
     if (!user) {
-      console.log('❌ [startFreeTrial] No user, redirecting to auth');
-      navigate('/auth');
+      console.log('❌ [startFreeTrial] No user, redirecting to signup');
+      navigate('/auth?tab=signup');
       return;
     }
 
