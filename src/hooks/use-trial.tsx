@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from './use-auth';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -22,6 +22,8 @@ const APPLE_SUBSCRIPTION_ID = 'com.amzing.vip.monthly';
 
 export const useTrial = () => {
   const [isStarting, setIsStarting] = useState(false);
+  const [showCGVModal, setShowCGVModal] = useState(false);
+  const [acceptedCGV, setAcceptedCGV] = useState(false);
   const { user, refreshSubscription } = useAuth();
   const navigate = useNavigate();
 
@@ -112,28 +114,11 @@ export const useTrial = () => {
         return;
       }
 
-      console.log('🌐 [startFreeTrial] Web platform, using Stripe...');
-
-      // Sur le web, créer une session de paiement Stripe
-      console.log('Creating Stripe checkout session...');
-      const { data, error } = await supabase.functions.invoke('create-checkout', {
-        headers: {
-          Authorization: `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
-        },
-      });
-
-      if (error) {
-        console.error('Error creating checkout:', error);
-        throw error;
-      }
-
-      if (data?.url) {
-        console.log('Redirecting to Stripe checkout:', data.url);
-        window.open(data.url, '_blank');
-        toast.success('Redirection vers le paiement sécurisé Stripe...');
-      } else {
-        throw new Error('No checkout URL received');
-      }
+      console.log('🌐 [startFreeTrial] Web platform, showing CGV modal...');
+      
+      // Afficher la modale d'acceptation des CGV
+      setShowCGVModal(true);
+      setIsStarting(false);
     } catch (error: any) {
       console.error('Error starting trial:', error);
       toast.error('Erreur lors de la redirection vers le paiement');
@@ -276,6 +261,42 @@ export const useTrial = () => {
     }
   };
 
+  const handleConfirmPayment = useCallback(async () => {
+    if (!acceptedCGV) {
+      return;
+    }
+
+    setShowCGVModal(false);
+    setIsStarting(true);
+
+    try {
+      console.log('Creating Stripe checkout session...');
+      const { data, error } = await supabase.functions.invoke('create-checkout', {
+        headers: {
+          Authorization: `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
+        },
+      });
+
+      if (error) {
+        console.error('Error creating checkout:', error);
+        throw error;
+      }
+
+      if (data?.url) {
+        console.log('Redirecting to Stripe checkout:', data.url);
+        window.open(data.url, '_blank');
+        toast.success('Redirection vers le paiement sécurisé Stripe...');
+      } else {
+        throw new Error('No checkout URL received');
+      }
+    } catch (error: any) {
+      console.error('Error starting payment:', error);
+      toast.error('Erreur lors de la redirection vers le paiement');
+    } finally {
+      setIsStarting(false);
+    }
+  }, [acceptedCGV]);
+
   const handlePurchaseSuccess = async (transaction: any) => {
     try {
       console.log('✅ Paiement validé par Apple, mise à jour de l\'abonnement...');
@@ -359,5 +380,10 @@ export const useTrial = () => {
   return {
     startFreeTrial,
     isStarting,
+    showCGVModal,
+    setShowCGVModal,
+    acceptedCGV,
+    setAcceptedCGV,
+    handleConfirmPayment,
   };
 };
