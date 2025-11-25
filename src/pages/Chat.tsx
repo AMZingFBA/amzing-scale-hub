@@ -376,50 +376,52 @@ const Chat = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background flex flex-col">
       <Navbar />
-      {/* Fixed back button for mobile */}
-      <div className="md:hidden fixed top-20 left-4 z-50">
-        <button
-          onClick={() => navigate('/dashboard')}
-          className="bg-[#FF9900] hover:bg-[#FF9900]/90 p-3 rounded-full shadow-lg transition-all"
-          aria-label="Retour au dashboard"
-        >
-          <ArrowLeft className="w-6 h-6 text-white" />
-        </button>
-      </div>
       
-      <div className="container mx-auto py-8 px-4 pt-20 md:pt-8">
-        {/* Desktop header */}
-        <div className="hidden md:flex items-center gap-3 mb-6">
+      <div className="flex-1 flex flex-col pt-20 md:pt-8">
+        {/* Fixed back button for mobile */}
+        <div className="md:hidden fixed top-20 left-4 z-50">
           <button
             onClick={() => navigate('/dashboard')}
-            className="bg-[#FF9900] hover:bg-[#FF9900]/90 p-2 rounded-full shadow-lg transition-all shrink-0"
+            className="bg-[#FF9900] hover:bg-[#FF9900]/90 p-3 rounded-full shadow-lg transition-all"
             aria-label="Retour au dashboard"
           >
-            <ArrowLeft className="w-5 h-5 text-white" />
+            <ArrowLeft className="w-6 h-6 text-white" />
           </button>
-          <MessageSquare className="w-8 h-8 text-primary" />
-          <div>
-            <h1 className="text-4xl font-bold">Chats</h1>
-            <p className="text-base text-muted-foreground">
-              Discutez avec la communauté
-            </p>
-          </div>
         </div>
-
-        {/* Mobile header */}
-        <div className="md:hidden flex items-center gap-3 mb-6 pl-16">
-          <MessageSquare className="w-8 h-8 text-primary" />
-          <div>
-            <h1 className="text-3xl font-bold">Chats</h1>
-            <p className="text-sm text-muted-foreground">
-              Discutez avec la communauté
-            </p>
+        
+        <div className="container mx-auto px-4 flex flex-col flex-1">
+          {/* Desktop header */}
+          <div className="hidden md:flex items-center gap-3 mb-6">
+            <button
+              onClick={() => navigate('/dashboard')}
+              className="bg-[#FF9900] hover:bg-[#FF9900]/90 p-2 rounded-full shadow-lg transition-all shrink-0"
+              aria-label="Retour au dashboard"
+            >
+              <ArrowLeft className="w-5 h-5 text-white" />
+            </button>
+            <MessageSquare className="w-8 h-8 text-primary" />
+            <div>
+              <h1 className="text-4xl font-bold">Chats</h1>
+              <p className="text-base text-muted-foreground">
+                Discutez avec la communauté
+              </p>
+            </div>
           </div>
-        </div>
 
-        <div className="flex gap-4 h-[calc(100vh-14rem)] md:h-[calc(100vh-12rem)]">
+          {/* Mobile header */}
+          <div className="md:hidden flex items-center gap-3 mb-6 pl-16">
+            <MessageSquare className="w-8 h-8 text-primary" />
+            <div>
+              <h1 className="text-3xl font-bold">Chats</h1>
+              <p className="text-sm text-muted-foreground">
+                Discutez avec la communauté
+              </p>
+            </div>
+          </div>
+
+          <div className="flex gap-4 flex-1 overflow-hidden">
           {/* Sidebar - Room List */}
           <div className={`${(selectedRoom || selectedDirectConversation) ? 'hidden md:flex' : 'flex'} w-full md:w-80 bg-card border rounded-lg p-4 flex-col`}>
             <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'rooms' | 'direct')} className="flex-1 flex flex-col">
@@ -830,6 +832,7 @@ const Chat = () => {
           </div>
         )}
           </div>
+        </div>
         </div>
       </div>
 
