@@ -14,6 +14,7 @@ import { Mail, Lock, User, Phone, Package, TrendingUp, BarChart3, CheckCircle2, 
 import { Capacitor } from "@capacitor/core";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { supabase } from "@/integrations/supabase/client";
+import { Checkbox } from "@/components/ui/checkbox";
 
 export default function Auth() {
   const navigate = useNavigate();
@@ -29,6 +30,7 @@ export default function Auth() {
   });
   const [verificationCode, setVerificationCode] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [acceptedCGU, setAcceptedCGU] = useState(false);
   const isNativeApp = Capacitor.isNativePlatform();
   
   // Check URL params for default tab and referral code
@@ -138,6 +140,12 @@ export default function Auth() {
     e.preventDefault();
     setIsLoading(true);
     setError(null); // Reset error state
+
+    if (!acceptedCGU) {
+      toast.error("Veuillez accepter les Conditions Générales d'Utilisation");
+      setIsLoading(false);
+      return;
+    }
 
     const formData = new FormData(e.currentTarget);
     const email = formData.get("email") as string;
@@ -557,12 +565,32 @@ export default function Auth() {
                       </div>
                     </div>
 
-                    <div className="animate-slide-in-up" style={{ animationDelay: "350ms" }}>
+                    <div className="flex items-start space-x-2 animate-slide-in-up" style={{ animationDelay: "350ms" }}>
+                      <Checkbox 
+                        id="cgu" 
+                        checked={acceptedCGU}
+                        onCheckedChange={(checked) => setAcceptedCGU(checked === true)}
+                        className="mt-1"
+                      />
+                      <label htmlFor="cgu" className="text-sm text-muted-foreground leading-relaxed cursor-pointer select-none">
+                        Je reconnais avoir lu et accepté les{" "}
+                        <Link 
+                          to="/cgu" 
+                          target="_blank"
+                          className="text-primary hover:underline font-medium"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          Conditions Générales d'Utilisation
+                        </Link>
+                      </label>
+                    </div>
+
+                    <div className="animate-slide-in-up" style={{ animationDelay: "400ms" }}>
                       <Button
                         type="submit"
                         variant="hero"
                         className="w-full"
-                        disabled={isLoading}
+                        disabled={isLoading || !acceptedCGU}
                       >
                         {isLoading ? "Envoi du code..." : "Continuer"}
                       </Button>

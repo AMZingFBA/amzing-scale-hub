@@ -32,6 +32,7 @@ const AndroidPayment = lazy(() => import("./pages/AndroidPayment"));
 const Contact = lazy(() => import("./pages/Contact"));
 const FAQ = lazy(() => import("./pages/FAQ"));
 const CGV = lazy(() => import("./pages/CGV"));
+const CGU = lazy(() => import("./pages/CGU"));
 const Privacy = lazy(() => import("./pages/Privacy"));
 const Confidentialite = lazy(() => import("./pages/Confidentialite"));
 const Refund = lazy(() => import("./pages/Refund"));
@@ -110,6 +111,7 @@ const App = () => (
             <Route path="/contact" element={<Contact />} />
             <Route path="/faq" element={<FAQ />} />
             <Route path="/cgv" element={<CGV />} />
+            <Route path="/cgu" element={<CGU />} />
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/confidentialite" element={<Confidentialite />} />
             <Route path="/refund" element={<Refund />} />
