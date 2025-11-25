@@ -421,7 +421,7 @@ const Chat = () => {
             </div>
           </div>
 
-          <div className="flex gap-4 flex-1 overflow-hidden">
+          <div className="flex gap-4 flex-1 min-h-0">
           {/* Sidebar - Room List */}
           <div className={`${(selectedRoom || selectedDirectConversation) ? 'hidden md:flex' : 'flex'} w-full md:w-80 bg-card border rounded-lg p-4 flex-col`}>
             <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'rooms' | 'direct')} className="flex-1 flex flex-col">
@@ -818,7 +818,7 @@ const Chat = () => {
       </div>
 
       {/* Chat Area */}
-      <div className={`${(selectedRoom || selectedDirectConversation) ? 'flex' : 'hidden md:flex'} flex-1 bg-card border rounded-lg overflow-hidden`}>
+      <div className={`${(selectedRoom || selectedDirectConversation) ? 'flex' : 'hidden md:flex'} flex-1 flex-col bg-card border rounded-lg overflow-hidden min-h-0`}>
         {selectedRoom ? (
           <ChatRoom roomId={selectedRoom} onBack={() => setSelectedRoom(null)} />
         ) : selectedDirectConversation ? (
