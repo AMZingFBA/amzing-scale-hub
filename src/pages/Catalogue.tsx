@@ -6,11 +6,22 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Capacitor } from "@capacitor/core";
 import { useScrollReveal } from "@/hooks/use-scroll-reveal";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 const Catalogue = () => {
   const isNativeApp = Capacitor.isNativePlatform();
+
+  useEffect(() => {
+    const metaRobots = document.createElement('meta');
+    metaRobots.name = 'robots';
+    metaRobots.content = 'noindex, nofollow';
+    document.head.appendChild(metaRobots);
+    
+    return () => {
+      document.head.removeChild(metaRobots);
+    };
+  }, []);
   const heroReveal = useScrollReveal({ animation: "fade-up", delay: 100 });
   const statsReveal = useScrollReveal({ animation: "scale", delay: 200 });
   const testimonialsReveal = useScrollReveal({ animation: "fade-up", delay: 100 });
