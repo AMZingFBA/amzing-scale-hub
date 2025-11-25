@@ -27,7 +27,7 @@ serve(async (req) => {
     // Get all profiles with their subscriptions
     const { data: profiles, error: profilesError } = await supabaseAdmin
       .from("profiles")
-      .select("id, email");
+      .select("id, email, full_name");
 
     if (profilesError) throw profilesError;
     
@@ -200,6 +200,37 @@ serve(async (req) => {
             } else {
               console.log(`[SYNC-STRIPE] Updated ${profile.email}: ${newStatus}, ${newPlanType}`);
               results.updated++;
+              
+              // Send email if payment failed and status changed to unpaid
+              if (newStatus === "unpaid" && userSubscription.status !== "unpaid") {
+                console.log(`[SYNC-STRIPE] Sending payment failed email to ${profile.email}`);
+                try {
+                  const emailResponse = await fetch(
+                    `${Deno.env.get("SUPABASE_URL")}/functions/v1/send-payment-failed-email`,
+                    {
+                      method: "POST",
+                      headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${Deno.env.get("SUPABASE_ANON_KEY")}`
+                      },
+                      body: JSON.stringify({
+                        email: profile.email,
+                        full_name: profile.full_name || "utilisateur",
+                        expires_at: updateData.expires_at || new Date().toISOString()
+                      })
+                    }
+                  );
+                  
+                  if (!emailResponse.ok) {
+                    const errorData = await emailResponse.json();
+                    console.error(`[SYNC-STRIPE] Failed to send email to ${profile.email}:`, errorData);
+                  } else {
+                    console.log(`[SYNC-STRIPE] Email sent successfully to ${profile.email}`);
+                  }
+                } catch (emailError) {
+                  console.error(`[SYNC-STRIPE] Error sending email to ${profile.email}:`, emailError);
+                }
+              }
             }
           }
       } catch (error) {
