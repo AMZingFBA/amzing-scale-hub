@@ -11,6 +11,14 @@ const AffiliateLanding = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-secondary/10">
+      {/* SEO H1/H2 - Invisible */}
+      <h1 className="sr-only">
+        Programme d'affiliation AMZing FBA
+      </h1>
+      <h2 className="sr-only">
+        Informations sur le programme d'affiliation, commissions et partenariats pour promouvoir AMZing FBA
+      </h2>
+      
       {/* Hero Section with Gradient Background */}
       <div className="relative overflow-hidden">
         <Button

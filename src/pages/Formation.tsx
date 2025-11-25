@@ -15,6 +15,14 @@ const Formation = () => {
     <div className="min-h-screen">
       <Navbar />
       
+      {/* SEO H1/H2 - Invisible */}
+      <h1 className="sr-only">
+        Formation Amazon FBA – Programme complet AMZing FBA pour vendeurs débutants et avancés
+      </h1>
+      <h2 className="sr-only">
+        Formation Amazon FBA en ligne pour apprendre le sourcing, la logistique, l'optimisation et le scaling sur Amazon
+      </h2>
+      
       <div className="pt-32 pb-20 relative overflow-hidden">
         {/* Animated background elements */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-20">

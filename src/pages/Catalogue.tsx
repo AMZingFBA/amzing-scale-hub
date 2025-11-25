@@ -84,6 +84,14 @@ const Catalogue = () => {
     <div className="min-h-screen relative overflow-hidden">
       <Navbar />
       
+      {/* SEO H1/H2 - Invisible */}
+      <h1 className="sr-only">
+        Catalogue de produits optimisés pour la revente sur Amazon FBA
+      </h1>
+      <h2 className="sr-only">
+        Produits analysés avec rentabilité, ROI et potentiel de vente pour les vendeurs Amazon FBA
+      </h2>
+      
       {/* Animated background - Only for native app */}
       {isNativeApp && (
         <>

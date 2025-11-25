@@ -20,6 +20,15 @@ const Guides = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
+      
+      {/* SEO H1/H2 - Invisible */}
+      <h1 className="sr-only">
+        Guides et tutoriels Amazon FBA par AMZing FBA
+      </h1>
+      <h2 className="sr-only">
+        Ressources pédagogiques, fiches pratiques et tutoriels pour progresser sur Amazon FBA et FBM
+      </h2>
+      
       <main className="flex-grow pt-24 md:pt-20">
         <div className="container mx-auto px-4 py-8">
           <div className="max-w-6xl mx-auto">

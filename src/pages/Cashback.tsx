@@ -17,6 +17,14 @@ const Cashback = () => {
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-background via-background to-accent/20">
       <Navbar />
       
+      {/* SEO H1/H2 - Invisible */}
+      <h1 className="sr-only">
+        Cashback et réductions pour les vendeurs Amazon FBA
+      </h1>
+      <h2 className="sr-only">
+        Outils de cashback et optimisations de marge pour les achats de stock Amazon FBA
+      </h2>
+      
       <main className="flex-1 pt-24 pb-16">
         <div className="container mx-auto px-4">
           {/* Back Button */}

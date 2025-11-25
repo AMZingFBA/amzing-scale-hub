@@ -111,6 +111,14 @@ const Contact = () => {
     <div className="min-h-screen">
       <Navbar />
       
+      {/* SEO H1/H2 - Invisible */}
+      <h1 className="sr-only">
+        Contactez l'équipe AMZing FBA
+      </h1>
+      <h2 className="sr-only">
+        Support, questions et prise de contact pour les vendeurs Amazon FBA
+      </h2>
+      
       <Link
         to="/"
         className="fixed top-[140px] left-4 z-50 bg-primary text-white p-2 rounded-full shadow-lg hover:scale-110 transition-transform"

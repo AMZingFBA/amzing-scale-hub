@@ -33,6 +33,14 @@ const Tarifs = () => {
     <div className="min-h-screen relative overflow-hidden">
       <Navbar />
       
+      {/* SEO H1/H2 - Invisible */}
+      <h1 className="sr-only">
+        Tarifs et abonnements AMZing FBA pour vendeurs Amazon FBA et FBM
+      </h1>
+      <h2 className="sr-only">
+        Comparaison des offres, abonnements et formules AMZing FBA pour accompagner les vendeurs Amazon
+      </h2>
+      
       {isNativeApp && (
         <div className="fixed top-[46px] left-[18px] z-50">
           <Button

@@ -6,6 +6,14 @@ const Confidentialite = () => {
     <div className="min-h-screen">
       <Navbar />
       
+      {/* SEO H1/H2 - Invisible */}
+      <h1 className="sr-only">
+        Politique de confidentialité AMZing FBA
+      </h1>
+      <h2 className="sr-only">
+        Protection des données personnelles, cookies et gestion de la vie privée des utilisateurs
+      </h2>
+      
       <div className="pt-32 pb-20">
         <div className="container mx-auto px-4 max-w-3xl">
           <h1 className="text-4xl md:text-5xl font-bold mb-4 text-center">

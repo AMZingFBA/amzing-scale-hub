@@ -9,6 +9,14 @@ const Refund = () => {
     <div className="min-h-screen">
       <Navbar />
       
+      {/* SEO H1/H2 - Invisible */}
+      <h1 className="sr-only">
+        Politique de remboursement AMZing FBA
+      </h1>
+      <h2 className="sr-only">
+        Conditions de remboursement, annulation et rétractation pour les services AMZing FBA
+      </h2>
+      
       <Link
         to="/"
         className="fixed top-[140px] left-4 z-50 bg-primary text-white p-2 rounded-full shadow-lg hover:scale-110 transition-transform"
