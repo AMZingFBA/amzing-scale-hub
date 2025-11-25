@@ -129,7 +129,7 @@ export const schemas = {
     "@type": "Organization",
     "name": "AMZing FBA",
     "url": "https://amzingfba.com/",
-    "logo": "https://amzingfba.com/amzing-logo-checkout.png",
+    "logo": "https://amzingfba.com/logo-amzing.png",
     "description": "AMZing FBA accompagne tous les vendeurs Amazon FBA/FBM avec des formations, guides, catalogue produits, outils de sourcing, marketplace, support et stratégies pour réussir sur Amazon.",
     "contactPoint": {
       "@type": "ContactPoint",
@@ -156,7 +156,7 @@ export const schemas = {
     "@context": "https://schema.org",
     "@type": "LocalBusiness",
     "name": "AMZing FBA",
-    "image": "https://amzingfba.com/amzing-logo-checkout.png",
+    "image": "https://amzingfba.com/logo-amzing.png",
     "@id": "https://amzingfba.com",
     "url": "https://amzingfba.com",
     "telephone": "+33-1-XX-XX-XX-XX",
@@ -227,7 +227,7 @@ export const schemas = {
     "@type": "Product",
     "name": "AMZing FBA VIP",
     "description": "Abonnement VIP : accès illimité au catalogue produits rentables, outils de sourcing avancés, marketplace exclusive, support prioritaire, mises à jour quotidiennes.",
-    "image": "https://amzingfba.com/amzing-logo-checkout.png",
+    "image": "https://amzingfba.com/logo-amzing.png",
     "brand": {
       "@type": "Brand",
       "name": "AMZing FBA"
@@ -445,7 +445,7 @@ export const schemas = {
       "name": "AMZing FBA",
       "logo": {
         "@type": "ImageObject",
-        "url": "https://amzingfba.com/amzing-logo-checkout.png"
+        "url": "https://amzingfba.com/logo-amzing.png"
       }
     }
   },
