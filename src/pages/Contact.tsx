@@ -10,7 +10,7 @@ import { useState } from "react";
 import { z } from "zod";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Capacitor } from "@capacitor/core";
 
 const contactSchema = z.object({
@@ -110,6 +110,13 @@ const Contact = () => {
   return (
     <div className="min-h-screen">
       <Navbar />
+      
+      <Link
+        to="/"
+        className="fixed top-[140px] left-4 z-50 bg-primary text-white p-2 rounded-full shadow-lg hover:scale-110 transition-transform"
+      >
+        <ArrowLeft className="w-5 h-5" />
+      </Link>
       
       {/* Back button for mobile app */}
       {isNativeApp && (
