@@ -5,6 +5,7 @@ import { Capacitor } from '@capacitor/core';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import SEO from '@/components/SEO';
+import OptimizedImage from '@/components/OptimizedImage';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -92,9 +93,9 @@ const Guides = () => {
                         Une version beaucoup plus professionnelle, stable et scalable de l'achat-revente classique.
                       </p>
                       <div className="bg-background/80 rounded-lg p-6 my-6">
-                        <img 
+                        <OptimizedImage 
                           src={processFlow} 
-                          alt="Schéma du processus Amazon FBA" 
+                          alt="Schéma détaillé du processus logistique Amazon FBA étape par étape" 
                           className="w-full h-auto rounded-lg shadow-lg"
                         />
                       </div>

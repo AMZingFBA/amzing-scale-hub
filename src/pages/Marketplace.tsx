@@ -19,6 +19,7 @@ import { useMarketplaceBuyUnread } from "@/hooks/use-marketplace-buy-unread";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SEO from "@/components/SEO";
+import OptimizedImage from "@/components/OptimizedImage";
 import ScrollToTop from "@/components/ScrollToTop";
 import { seoData } from "@/lib/seo-data";
 
@@ -632,9 +633,9 @@ const Marketplace = () => {
               className="relative cursor-pointer group/image border-2 border-muted rounded-lg overflow-hidden"
               onClick={() => openImageGallery(listing.images, 0)}
             >
-              <img
+              <OptimizedImage
                 src={listing.images[0]}
-                alt={listing.title}
+                alt={`Photo produit - ${listing.title}`}
                 className="w-full h-56 object-cover"
               />
               <div className="absolute inset-0 bg-black/0 group-hover/image:bg-black/30 transition-all flex items-center justify-center">
@@ -737,9 +738,9 @@ const Marketplace = () => {
               className="relative cursor-pointer group/image border-2 border-muted rounded-lg overflow-hidden"
               onClick={() => openImageGallery(request.images, 0)}
             >
-              <img
+              <OptimizedImage
                 src={request.images[0]}
-                alt={request.title}
+                alt={`Demande d'achat - ${request.title}`}
                 className="w-full h-56 object-cover"
               />
               <div className="absolute inset-0 bg-black/0 group-hover/image:bg-black/30 transition-all flex items-center justify-center">
@@ -897,9 +898,9 @@ const Marketplace = () => {
             <div className="relative">
               {selectedImageGallery && selectedImageGallery.length > 0 && (
                 <>
-                  <img
+                  <OptimizedImage
                     src={selectedImageGallery[currentImageIndex]}
-                    alt={`Image ${currentImageIndex + 1}`}
+                    alt={`Galerie image ${currentImageIndex + 1} sur ${selectedImageGallery.length}`}
                     className="w-full h-auto max-h-[80vh] object-contain"
                   />
                   
@@ -1066,7 +1067,7 @@ const Marketplace = () => {
                         <div className="grid grid-cols-4 gap-2 mt-3">
                           {uploadedImages.map((img, idx) => (
                             <div key={idx} className="relative group">
-                              <img src={img} alt={`Photo ${idx + 1}`} className="w-full h-24 object-cover rounded-lg border-2 border-muted" />
+                              <OptimizedImage src={img} alt={`Aperçu photo ${idx + 1}`} className="w-full h-24 object-cover rounded-lg border-2 border-muted" />
                               <button
                                 onClick={() => setUploadedImages(uploadedImages.filter((_, i) => i !== idx))}
                                 className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
@@ -1415,7 +1416,7 @@ const Marketplace = () => {
                         <div className="grid grid-cols-4 gap-2 mt-3">
                           {uploadedImages.map((img, idx) => (
                             <div key={idx} className="relative group">
-                              <img src={img} alt={`Photo ${idx + 1}`} className="w-full h-24 object-cover rounded-lg border-2 border-muted" />
+                              <OptimizedImage src={img} alt={`Aperçu photo ${idx + 1}`} className="w-full h-24 object-cover rounded-lg border-2 border-muted" />
                               <button
                                 onClick={() => setUploadedImages(uploadedImages.filter((_, i) => i !== idx))}
                                 className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
@@ -1667,7 +1668,7 @@ const Marketplace = () => {
           
           {productData && (
             <div className="space-y-4">
-              <img src={productData.images[0]} alt="Product" className="w-full h-64 object-contain rounded-lg" />
+              <OptimizedImage src={productData.images[0]} alt={`Aperçu produit - ${productData.title}`} className="w-full h-64 object-contain rounded-lg" />
               <div>
                 <h3 className="font-semibold">{productData.title}</h3>
                 <p className="text-sm text-muted-foreground mt-2">{productData.description}</p>
