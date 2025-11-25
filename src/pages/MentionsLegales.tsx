@@ -40,9 +40,6 @@ const MentionsLegales = () => {
                 <p>Adresse : 59 Rue de Ponthieu, 75008 Paris, France</p>
                 <p>Email : contact@amzingfba.com</p>
               </div>
-              <p className="text-muted-foreground mt-4">
-                <strong>Directeur de la publication :</strong> Noa Zaghdoun
-              </p>
             </section>
 
             <section>
