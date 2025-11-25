@@ -149,6 +149,38 @@ serve(async (req) => {
           newPlanType
         });
 
+        // TEMPORARY: Send email to all unpaid users for testing
+        if (newStatus === "unpaid") {
+          console.log(`[SYNC-STRIPE] Sending payment failed email to ${profile.email}`);
+          try {
+            const emailResponse = await fetch(
+              `${Deno.env.get("SUPABASE_URL")}/functions/v1/send-payment-failed-email`,
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  "Authorization": `Bearer ${Deno.env.get("SUPABASE_ANON_KEY")}`
+                },
+                body: JSON.stringify({
+                  email: profile.email,
+                  full_name: profile.full_name || "utilisateur",
+                  expires_at: updateData.expires_at || new Date().toISOString()
+                })
+              }
+            );
+            
+            if (!emailResponse.ok) {
+              const errorData = await emailResponse.json();
+              console.error(`[SYNC-STRIPE] Failed to send email to ${profile.email}:`, errorData);
+            } else {
+              const successData = await emailResponse.json();
+              console.log(`[SYNC-STRIPE] Email sent successfully to ${profile.email}:`, successData);
+            }
+          } catch (emailError) {
+            console.error(`[SYNC-STRIPE] Error sending email to ${profile.email}:`, emailError);
+          }
+        }
+
         // Update subscription in database if needed
         const needsUpdate = 
           userSubscription.stripe_customer_id !== customer.id ||
