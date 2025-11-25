@@ -225,7 +225,8 @@ serve(async (req) => {
                     const errorData = await emailResponse.json();
                     console.error(`[SYNC-STRIPE] Failed to send email to ${profile.email}:`, errorData);
                   } else {
-                    console.log(`[SYNC-STRIPE] Email sent successfully to ${profile.email}`);
+                    const successData = await emailResponse.json();
+                    console.log(`[SYNC-STRIPE] Email sent successfully to ${profile.email}:`, successData);
                   }
                 } catch (emailError) {
                   console.error(`[SYNC-STRIPE] Error sending email to ${profile.email}:`, emailError);
