@@ -164,7 +164,7 @@ serve(async (req) => {
                 body: JSON.stringify({
                   email: profile.email,
                   full_name: profile.full_name || "utilisateur",
-                  expires_at: updateData.expires_at || new Date().toISOString()
+                  expires_at: userSubscription.expires_at || new Date().toISOString()
                 })
               }
             );
