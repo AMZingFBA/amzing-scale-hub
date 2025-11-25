@@ -8,15 +8,15 @@ const MentionsLegales = () => {
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
       <Navbar />
       
-      <main className="container mx-auto px-4 pt-24 pb-12 max-w-4xl relative">
-        <Link
-          to="/"
-          className="absolute left-0 top-28 bg-primary text-white p-2 rounded-full shadow-lg hover:scale-110 transition-transform"
-        >
-          <ArrowLeft className="w-5 h-5" />
-        </Link>
-
-        <div className="bg-card rounded-lg shadow-lg p-8 space-y-8">
+      <main className="container mx-auto px-4 pt-24 pb-12 max-w-4xl">
+        <div className="bg-card rounded-lg shadow-lg p-8 space-y-8 relative">
+          <Link
+            to="/"
+            className="absolute -left-16 top-12 bg-primary text-white p-2 rounded-full shadow-lg hover:scale-110 transition-transform"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </Link>
+          
           <div className="text-center mb-8">
             <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
               ✅ MENTIONS LÉGALES
