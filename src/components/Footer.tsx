@@ -1,10 +1,12 @@
 import { Link } from "react-router-dom";
 import logo from "@/assets/logo-amzing.png";
 import { useAuth } from "@/hooks/use-auth";
+import { useAdmin } from "@/hooks/use-admin";
 import { Mail } from "lucide-react";
 
 const Footer = () => {
   const { isVIP } = useAuth();
+  const { isAdmin } = useAdmin();
   
   return (
     <footer className="relative bg-gradient-to-b from-card via-card to-background border-t border-border mt-20 overflow-hidden">
@@ -16,8 +18,8 @@ const Footer = () => {
 
       <div className="container mx-auto px-4 py-12 relative z-10">
         {/* Main Footer Content */}
-        {isVIP ? (
-          // Simplified footer for VIP members
+        {(isVIP || isAdmin) ? (
+          // Simplified footer for VIP members and admins
           <div className="text-center py-6">
             <div className="group inline-block mb-4">
               <img 
