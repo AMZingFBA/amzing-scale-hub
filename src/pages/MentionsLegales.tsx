@@ -38,7 +38,7 @@ const MentionsLegales = () => {
                 <p>Statut : Auto-entrepreneur</p>
                 <p>SIRET : 993 348 929 00015</p>
                 <p>Adresse : 59 Rue de Ponthieu, 75008 Paris, France</p>
-                <p>Email : contact@amzingfba.com</p>
+                <p>Email : <a href="mailto:contact@amzingfba.com" className="text-primary hover:underline">contact@amzingfba.com</a></p>
               </div>
             </section>
 
@@ -86,7 +86,9 @@ const MentionsLegales = () => {
               <p className="text-muted-foreground">
                 Conformément au RGPD et à la loi Informatique et Libertés, l'utilisateur peut exercer ses droits (accès, rectification, suppression…) en écrivant à :
               </p>
-              <p className="text-primary font-semibold">📧 contact@amzingfba.com</p>
+              <p className="text-primary font-semibold">
+                📧 <a href="mailto:contact@amzingfba.com" className="hover:underline">contact@amzingfba.com</a>
+              </p>
             </section>
 
             <section>
@@ -100,7 +102,9 @@ const MentionsLegales = () => {
             <section>
               <h2 className="text-2xl font-semibold text-foreground mb-4">7. Contact</h2>
               <p className="text-muted-foreground">Pour toute question ou demande d'information :</p>
-              <p className="text-primary font-semibold">📧 contact@amzingfba.com</p>
+              <p className="text-primary font-semibold">
+                📧 <a href="mailto:contact@amzingfba.com" className="hover:underline">contact@amzingfba.com</a>
+              </p>
             </section>
           </div>
         </div>
