@@ -147,6 +147,12 @@ const Footer = () => {
           </p>
           <div className="flex gap-6 text-sm">
             <Link 
+              to="/faq" 
+              className="relative text-muted-foreground hover:text-primary transition-all duration-300 hover:scale-110 after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-primary after:transition-all after:duration-300 hover:after:w-full"
+            >
+              FAQ
+            </Link>
+            <Link 
               to="/contact" 
               className="relative text-muted-foreground hover:text-primary transition-all duration-300 hover:scale-110 after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-primary after:transition-all after:duration-300 hover:after:w-full"
             >
@@ -163,6 +169,12 @@ const Footer = () => {
               className="relative text-muted-foreground hover:text-primary transition-all duration-300 hover:scale-110 after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-primary after:transition-all after:duration-300 hover:after:w-full"
             >
               Confidentialité
+            </Link>
+            <Link 
+              to="/refund" 
+              className="relative text-muted-foreground hover:text-primary transition-all duration-300 hover:scale-110 after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-primary after:transition-all after:duration-300 hover:after:w-full"
+            >
+              Remboursement
             </Link>
           </div>
         </div>
