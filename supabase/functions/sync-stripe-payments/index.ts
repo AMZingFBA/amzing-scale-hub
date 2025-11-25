@@ -200,8 +200,7 @@ serve(async (req) => {
             } else {
               console.log(`[SYNC-STRIPE] Updated ${profile.email}: ${newStatus}, ${newPlanType}`);
               results.updated++;
-            }
-          }
+              
               // Send email if payment failed and status changed to unpaid
               if (newStatus === "unpaid" && userSubscription.status !== "unpaid") {
                 console.log(`[SYNC-STRIPE] Sending payment failed email to ${profile.email}`);
@@ -232,6 +231,8 @@ serve(async (req) => {
                   console.error(`[SYNC-STRIPE] Error sending email to ${profile.email}:`, emailError);
                 }
               }
+            }
+          }
       } catch (error) {
         console.error(`[SYNC-STRIPE] Error processing ${profile.email}:`, error);
         results.errors.push({ 
