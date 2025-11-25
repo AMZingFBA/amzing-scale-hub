@@ -379,7 +379,7 @@ const Chat = () => {
     <div className="min-h-screen bg-background flex flex-col">
       <Navbar />
       
-      <div className="flex-1 flex flex-col pt-20 md:pt-8">
+      <div className="flex-1 flex flex-col pt-20">
         {/* Fixed back button for mobile */}
         <div className="md:hidden fixed top-20 left-4 z-50">
           <button
