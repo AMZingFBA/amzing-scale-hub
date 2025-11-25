@@ -244,6 +244,10 @@ const handler = async (req: Request): Promise<Response> => {
             </div>
             <div class="footer">
               <p>© ${new Date().getFullYear()} Amzing FBA - Tous droits réservés</p>
+              <p style="margin-top: 10px; font-size: 11px;">
+                Pour ne plus recevoir ces emails, cliquez<br>
+                <a href="https://www.amzingfba.com/" style="color: #999; text-decoration: underline;">ici</a>
+              </p>
             </div>
           </div>
         </body>

@@ -177,6 +177,14 @@ const handler = async (req: Request): Promise<Response> => {
                         </p>
                       </td>
                     </tr>
+                    <tr>
+                      <td style="padding: 0 40px 40px;">
+                        <p style="margin: 0; color: #999; font-size: 12px; text-align: center; line-height: 20px;">
+                          Pour ne plus recevoir ces emails, cliquez<br>
+                          <a href="https://www.amzingfba.com/" style="color: #999; text-decoration: underline;">ici</a>
+                        </p>
+                      </td>
+                    </tr>
                   </table>
                 </td>
               </tr>
