@@ -496,7 +496,7 @@ const Services = () => {
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button variant="hero" size="xl" asChild>
                   <Link to="/tarifs">
-                    Commencer l'essai gratuit (15 jours)
+                    S'abonner maintenant
                   </Link>
                 </Button>
                 <Button variant="outline" size="xl" className="border-white text-white hover:bg-white/10" asChild>
