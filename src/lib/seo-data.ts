@@ -423,5 +423,80 @@ export const schemas = {
       "name": item.name,
       "item": item.url
     }))
-  })
+  }),
+
+  // Schema WebSite avec SearchAction pour la barre de recherche Google
+  website: {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "AMZing FBA",
+    "url": "https://amzingfba.com",
+    "description": "Formation, sourcing et outils pour réussir sur Amazon FBA",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": {
+        "@type": "EntryPoint",
+        "urlTemplate": "https://amzingfba.com/search?q={search_term_string}"
+      },
+      "query-input": "required name=search_term_string"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "AMZing FBA",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://amzingfba.com/amzing-logo-checkout.png"
+      }
+    }
+  },
+
+  // Schema SiteNavigationElement pour la navigation principale
+  siteNavigation: {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "itemListElement": [
+      {
+        "@type": "SiteNavigationElement",
+        "position": 1,
+        "name": "Formation",
+        "description": "Formation Amazon FBA complète",
+        "url": "https://amzingfba.com/formation"
+      },
+      {
+        "@type": "SiteNavigationElement",
+        "position": 2,
+        "name": "Guides",
+        "description": "Guides et tutoriels gratuits",
+        "url": "https://amzingfba.com/guides"
+      },
+      {
+        "@type": "SiteNavigationElement",
+        "position": 3,
+        "name": "Services",
+        "description": "Services logistique et accompagnement",
+        "url": "https://amzingfba.com/services"
+      },
+      {
+        "@type": "SiteNavigationElement",
+        "position": 4,
+        "name": "Marketplace",
+        "description": "Marketplace produits et fournisseurs",
+        "url": "https://amzingfba.com/marketplace"
+      },
+      {
+        "@type": "SiteNavigationElement",
+        "position": 5,
+        "name": "Tarifs",
+        "description": "Plans et tarifs AMZing FBA",
+        "url": "https://amzingfba.com/tarifs"
+      },
+      {
+        "@type": "SiteNavigationElement",
+        "position": 6,
+        "name": "Contact",
+        "description": "Nous contacter",
+        "url": "https://amzingfba.com/contact"
+      }
+    ]
+  }
 };

@@ -3,68 +3,80 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { lazy, Suspense } from "react";
 import ScrollToTop from "./components/ScrollToTop";
 import { AuthProvider } from "./hooks/use-auth";
 import { PushNotificationsProvider } from "./components/PushNotificationsProvider";
 import { StoreProvider } from "./components/StoreProvider";
+
+// Pages critiques chargées immédiatement
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
-import ForgotPassword from "./pages/ForgotPassword";
-import ResetPassword from "./pages/ResetPassword";
-import Dashboard from "./pages/Dashboard";
-import Debuter from "./pages/Debuter";
-import CreationSociete from "./pages/CreationSociete";
-import GestionProduitsInfo from "./pages/GestionProduitsInfo";
-import FactureAutorisation from "./pages/FactureAutorisation";
-import Cashback from "./pages/Cashback";
-import AvisPage from "./pages/AvisPage";
-import Guides from "./pages/Guides";
-import Services from "./pages/Services";
-import Formation from "./pages/Formation";
-import Catalogue from "./pages/Catalogue";
-import Tarifs from "./pages/Tarifs";
-import AndroidPayment from "./pages/AndroidPayment";
-import Contact from "./pages/Contact";
-import FAQ from "./pages/FAQ";
-import CGV from "./pages/CGV";
-import Privacy from "./pages/Privacy";
-import Confidentialite from "./pages/Confidentialite";
-import Refund from "./pages/Refund";
-import MentionsLegales from "./pages/MentionsLegales";
-import Support from "./pages/Support";
-import Ticket from "./pages/Ticket";
-import AdminTickets from "./pages/AdminTickets";
-import AdminAlerts from "./pages/AdminAlerts";
-import Chat from "./pages/Chat";
-import NotFound from "./pages/NotFound";
-import Success from "./pages/Success";
-import Sales from "./pages/Sales";
-import Suggestions from "./pages/Suggestions";
-import Marketplace from "./pages/Marketplace";
-import WantToSell from "./pages/WantToSell";
-import ProductAlerts from "./pages/ProductAlerts";
-import NotificationAlerts from "./pages/NotificationAlerts";
-import RulesAlerts from "./pages/RulesAlerts";
-import Annonces from "./pages/Annonces";
-import Actualite from "./pages/Actualite";
-import CatalogueProduits from "./pages/CatalogueProduits";
-import Questions from "./pages/Questions";
-import Avis from "./pages/Avis";
-import AdminProfiles from "./pages/AdminProfiles";
-import Profile from "./pages/Profile";
-import TestPushNotifications from "./pages/TestPushNotifications";
-import DebugPushNotifications from "./pages/DebugPushNotifications";
-import AffiliateLanding from "./pages/affiliate/AffiliateLanding";
-import AffiliateSignup from "./pages/affiliate/AffiliateSignup";
-import AffiliateLogin from "./pages/affiliate/AffiliateLogin";
-import AffiliateVerify from "./pages/affiliate/AffiliateVerify";
-import AffiliateDashboard from "./pages/affiliate/AffiliateDashboard";
-import AffiliateAdmin from "./pages/affiliate/AffiliateAdmin";
-import MonitorQogita from "./pages/MonitorQogita";
-import ProduitsQogita from "./pages/ProduitsQogita";
-import ProduitsEany from "./pages/ProduitsEany";
+
+// Lazy loading des pages non critiques pour réduire le bundle initial
+const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword"));
+const Dashboard = lazy(() => import("./pages/Dashboard"));
+const Debuter = lazy(() => import("./pages/Debuter"));
+const CreationSociete = lazy(() => import("./pages/CreationSociete"));
+const GestionProduitsInfo = lazy(() => import("./pages/GestionProduitsInfo"));
+const FactureAutorisation = lazy(() => import("./pages/FactureAutorisation"));
+const Cashback = lazy(() => import("./pages/Cashback"));
+const AvisPage = lazy(() => import("./pages/AvisPage"));
+const Guides = lazy(() => import("./pages/Guides"));
+const Services = lazy(() => import("./pages/Services"));
+const Formation = lazy(() => import("./pages/Formation"));
+const Catalogue = lazy(() => import("./pages/Catalogue"));
+const Tarifs = lazy(() => import("./pages/Tarifs"));
+const AndroidPayment = lazy(() => import("./pages/AndroidPayment"));
+const Contact = lazy(() => import("./pages/Contact"));
+const FAQ = lazy(() => import("./pages/FAQ"));
+const CGV = lazy(() => import("./pages/CGV"));
+const Privacy = lazy(() => import("./pages/Privacy"));
+const Confidentialite = lazy(() => import("./pages/Confidentialite"));
+const Refund = lazy(() => import("./pages/Refund"));
+const MentionsLegales = lazy(() => import("./pages/MentionsLegales"));
+const Support = lazy(() => import("./pages/Support"));
+const Ticket = lazy(() => import("./pages/Ticket"));
+const AdminTickets = lazy(() => import("./pages/AdminTickets"));
+const AdminAlerts = lazy(() => import("./pages/AdminAlerts"));
+const Chat = lazy(() => import("./pages/Chat"));
+const NotFound = lazy(() => import("./pages/NotFound"));
+const Success = lazy(() => import("./pages/Success"));
+const Sales = lazy(() => import("./pages/Sales"));
+const Suggestions = lazy(() => import("./pages/Suggestions"));
+const Marketplace = lazy(() => import("./pages/Marketplace"));
+const WantToSell = lazy(() => import("./pages/WantToSell"));
+const ProductAlerts = lazy(() => import("./pages/ProductAlerts"));
+const NotificationAlerts = lazy(() => import("./pages/NotificationAlerts"));
+const RulesAlerts = lazy(() => import("./pages/RulesAlerts"));
+const Annonces = lazy(() => import("./pages/Annonces"));
+const Actualite = lazy(() => import("./pages/Actualite"));
+const CatalogueProduits = lazy(() => import("./pages/CatalogueProduits"));
+const Questions = lazy(() => import("./pages/Questions"));
+const Avis = lazy(() => import("./pages/Avis"));
+const AdminProfiles = lazy(() => import("./pages/AdminProfiles"));
+const Profile = lazy(() => import("./pages/Profile"));
+const TestPushNotifications = lazy(() => import("./pages/TestPushNotifications"));
+const DebugPushNotifications = lazy(() => import("./pages/DebugPushNotifications"));
+const AffiliateLanding = lazy(() => import("./pages/affiliate/AffiliateLanding"));
+const AffiliateSignup = lazy(() => import("./pages/affiliate/AffiliateSignup"));
+const AffiliateLogin = lazy(() => import("./pages/affiliate/AffiliateLogin"));
+const AffiliateVerify = lazy(() => import("./pages/affiliate/AffiliateVerify"));
+const AffiliateDashboard = lazy(() => import("./pages/affiliate/AffiliateDashboard"));
+const AffiliateAdmin = lazy(() => import("./pages/affiliate/AffiliateAdmin"));
+const MonitorQogita = lazy(() => import("./pages/MonitorQogita"));
+const ProduitsQogita = lazy(() => import("./pages/ProduitsQogita"));
+const ProduitsEany = lazy(() => import("./pages/ProduitsEany"));
 
 const queryClient = new QueryClient();
+
+// Loading fallback minimal pour le lazy loading
+const PageLoader = () => (
+  <div className="min-h-screen flex items-center justify-center">
+    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+  </div>
+);
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -76,6 +88,7 @@ const App = () => (
           <StoreProvider>
             <PushNotificationsProvider>
               <ScrollToTop />
+              <Suspense fallback={<PageLoader />}>
             <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
@@ -142,6 +155,7 @@ const App = () => (
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
+              </Suspense>
             </PushNotificationsProvider>
           </StoreProvider>
         </AuthProvider>
