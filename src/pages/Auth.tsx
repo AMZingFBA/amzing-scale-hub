@@ -136,6 +136,7 @@ export default function Auth() {
   const handleSendVerificationCode = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
+    setError(null); // Reset error state
 
     const formData = new FormData(e.currentTarget);
     const email = formData.get("email") as string;
@@ -163,27 +164,43 @@ export default function Auth() {
     setSignupData({ email, password, fullName, nickname, phone });
 
     try {
-      const { supabase } = await import("@/integrations/supabase/client");
-      const { data, error } = await supabase.functions.invoke('send-verification-code', {
-        body: {
-          type: 'email_signup',
-          email: email.toLowerCase(),
-          phone: phone,
-        },
-      });
+      // Use direct fetch for better error handling
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-verification-code`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+            'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY,
+          },
+          body: JSON.stringify({
+            type: 'email_signup',
+            email: email.toLowerCase(),
+            phone: phone,
+          }),
+        }
+      );
 
-      // Check for errors in both error object and data response
-      if (error || (data && data.error)) {
-        const errorMessage = data?.error || (error as any).context?.body?.error || error?.message || "Erreur lors de l'envoi du code";
-        throw new Error(errorMessage);
+      const data = await response.json();
+
+      // Check for errors in response
+      if (!response.ok || data.error) {
+        const errorMessage = data.error || 'Erreur lors de l\'envoi du code';
+        setError(errorMessage);
+        toast.error(errorMessage);
+        setIsLoading(false);
+        return;
       }
 
       toast.success("Code de vérification envoyé par email");
+      setError(null);
       setVerificationStep('verify');
     } catch (error: any) {
       console.error('Error sending verification code:', error);
-      toast.error(error.message || "Erreur lors de l'envoi du code");
-      setError(error.message);
+      const errorMessage = error.message || "Erreur lors de l'envoi du code";
+      setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
