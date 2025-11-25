@@ -8,14 +8,15 @@ const MentionsLegales = () => {
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
       <Navbar />
       
+      <Link
+        to="/"
+        className="fixed top-24 left-4 z-50 inline-flex items-center gap-2 px-4 py-2 bg-card hover:bg-accent rounded-lg shadow-lg text-muted-foreground hover:text-primary transition-all duration-300 hover:scale-105"
+      >
+        <ArrowLeft className="w-5 h-5" />
+        <span className="hidden sm:inline">Retour</span>
+      </Link>
+      
       <main className="container mx-auto px-4 py-12 max-w-4xl">
-        <Link
-          to="/"
-          className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors mb-8"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          Retour à l'accueil
-        </Link>
 
         <div className="bg-card rounded-lg shadow-lg p-8 space-y-8">
           <div className="text-center mb-8">
