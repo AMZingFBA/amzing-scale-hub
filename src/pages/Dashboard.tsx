@@ -159,6 +159,49 @@ const Dashboard = () => {
 
             <RecentUpdates />
 
+            {/* Section Accès Rapide pour VIP/Admin */}
+            <Card className="mb-6 border-primary/20">
+              <CardContent className="p-6">
+                <div className="grid md:grid-cols-2 gap-8">
+                  {/* Navigation */}
+                  <div>
+                    <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
+                      <Settings className="w-5 h-5 text-primary" />
+                      Navigation
+                    </h3>
+                    <div className="space-y-2">
+                      <Link to="/services" className="block text-muted-foreground hover:text-primary transition-colors">
+                        Nos Services
+                      </Link>
+                      <Link to="/tarifs" className="block text-muted-foreground hover:text-primary transition-colors">
+                        Tarifs
+                      </Link>
+                      <Link to="/formation" className="block text-muted-foreground hover:text-primary transition-colors">
+                        Formation
+                      </Link>
+                      <Link to="/faq" className="block text-muted-foreground hover:text-primary transition-colors">
+                        FAQ
+                      </Link>
+                    </div>
+                  </div>
+
+                  {/* Besoin d'aide */}
+                  <div>
+                    <h3 className="text-lg font-bold mb-4">Besoin d'aide ?</h3>
+                    <p className="text-muted-foreground mb-4">
+                      Notre équipe est là pour répondre à toutes vos questions
+                    </p>
+                    <Link to="/support">
+                      <button className="bg-[hsl(var(--primary))] text-primary-foreground px-6 py-3 rounded-lg hover:bg-[hsl(var(--primary))]/90 transition-colors font-medium flex items-center gap-2">
+                        <MessageCircle className="w-4 h-4" />
+                        Contactez-nous
+                      </button>
+                    </Link>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
             <Accordion type="multiple" className="space-y-4">
               {/* INTRODUCTION */}
               <AccordionItem value="introduction" className="border rounded-lg px-6 bg-card">
