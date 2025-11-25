@@ -141,11 +141,20 @@ const Footer = () => {
         )}
 
         {/* Bottom Bar */}
-        <div className="pt-8 border-t border-border/50 flex flex-col md:flex-row justify-between items-center gap-4 animate-fade-in" style={{ animationDelay: '0.4s' }}>
-          <p className="text-muted-foreground text-sm">
-            © {new Date().getFullYear()} <span className="text-primary font-semibold">AMZing FBA</span>. Tous droits réservés.
-          </p>
-          <div className="flex gap-6 text-sm">
+        <div className="pt-8 border-t border-border/50 space-y-4 animate-fade-in" style={{ animationDelay: '0.4s' }}>
+          {/* Mentions légales entreprise */}
+          <div className="text-center text-xs text-muted-foreground space-y-1">
+            <p className="font-semibold">AMZing FBA</p>
+            <p>SIRET : 123 456 789 00012 | RCS Paris B 123 456 789</p>
+            <p>Capital social : 10 000 € | 123 Avenue des Champs-Élysées, 75008 Paris, France</p>
+          </div>
+          
+          {/* Copyright et liens */}
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+            <p className="text-muted-foreground text-sm">
+              © {new Date().getFullYear()} <span className="text-primary font-semibold">AMZing FBA</span>. Tous droits réservés.
+            </p>
+            <div className="flex gap-6 text-sm flex-wrap justify-center">
             <Link 
               to="/faq" 
               className="relative text-muted-foreground hover:text-primary transition-all duration-300 hover:scale-110 after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-primary after:transition-all after:duration-300 hover:after:w-full"
@@ -176,6 +185,7 @@ const Footer = () => {
             >
               Remboursement
             </Link>
+            </div>
           </div>
         </div>
       </div>
