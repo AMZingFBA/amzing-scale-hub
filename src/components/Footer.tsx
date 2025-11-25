@@ -144,9 +144,9 @@ const Footer = () => {
         <div className="pt-8 border-t border-border/50 space-y-4 animate-fade-in" style={{ animationDelay: '0.4s' }}>
           {/* Mentions légales entreprise */}
           <div className="text-center text-xs text-muted-foreground space-y-1">
-            <p className="font-semibold">AMZing FBA</p>
-            <p>SIRET : 123 456 789 00012 | RCS Paris B 123 456 789</p>
-            <p>Capital social : 10 000 € | 123 Avenue des Champs-Élysées, 75008 Paris, France</p>
+            <p className="font-semibold">AMZing FBA - Noa Zaghdoun</p>
+            <p>Auto-entrepreneur | SIRET : 993 348 929 00015</p>
+            <p>59 Rue de Ponthieu, 75008 Paris, France</p>
           </div>
           
           {/* Copyright et liens */}
@@ -155,6 +155,12 @@ const Footer = () => {
               © {new Date().getFullYear()} <span className="text-primary font-semibold">AMZing FBA</span>. Tous droits réservés.
             </p>
             <div className="flex gap-6 text-sm flex-wrap justify-center">
+            <Link 
+              to="/mentions-legales" 
+              className="relative text-muted-foreground hover:text-primary transition-all duration-300 hover:scale-110 after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-primary after:transition-all after:duration-300 hover:after:w-full"
+            >
+              Mentions Légales
+            </Link>
             <Link 
               to="/faq" 
               className="relative text-muted-foreground hover:text-primary transition-all duration-300 hover:scale-110 after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-primary after:transition-all after:duration-300 hover:after:w-full"
