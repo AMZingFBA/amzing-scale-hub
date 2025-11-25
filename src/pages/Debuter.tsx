@@ -6,12 +6,24 @@ import { cn } from '@/lib/utils';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useEffect } from 'react';
 
 const Debuter = () => {
   const navigate = useNavigate();
 
   // Mark as read when visiting this page
   useMarkAsRead({ category: 'introduction', subcategory: 'débuter' });
+
+  useEffect(() => {
+    const metaRobots = document.createElement('meta');
+    metaRobots.name = 'robots';
+    metaRobots.content = 'noindex, nofollow';
+    document.head.appendChild(metaRobots);
+    
+    return () => {
+      document.head.removeChild(metaRobots);
+    };
+  }, []);
 
   // Animations
   const heroAnim = useScrollReveal({ animation: 'fade-up', delay: 100 });

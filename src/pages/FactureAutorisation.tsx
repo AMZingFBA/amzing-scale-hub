@@ -6,8 +6,19 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { FileText, CheckCircle, AlertCircle, Sparkles, ArrowLeft, Shield, Lock } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useEffect } from 'react';
 
 const FactureAutorisation = () => {
+  useEffect(() => {
+    const metaRobots = document.createElement('meta');
+    metaRobots.name = 'robots';
+    metaRobots.content = 'noindex, nofollow';
+    document.head.appendChild(metaRobots);
+    
+    return () => {
+      document.head.removeChild(metaRobots);
+    };
+  }, []);
   const heroReveal = useScrollReveal({ animation: "fade-up", delay: 0 });
   const card1Reveal = useScrollReveal({ animation: "fade-left", delay: 100 });
   const card2Reveal = useScrollReveal({ animation: "fade-right", delay: 200 });

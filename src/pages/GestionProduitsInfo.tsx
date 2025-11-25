@@ -6,8 +6,19 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Package, CheckCircle, Sparkles, Truck, Settings, MessageCircle, ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useEffect } from 'react';
 
 const GestionProduitsInfo = () => {
+  useEffect(() => {
+    const metaRobots = document.createElement('meta');
+    metaRobots.name = 'robots';
+    metaRobots.content = 'noindex, nofollow';
+    document.head.appendChild(metaRobots);
+    
+    return () => {
+      document.head.removeChild(metaRobots);
+    };
+  }, []);
   const { ref: heroRef, isVisible: heroVisible } = useScrollReveal({ delay: 0.1 });
   const { ref: servicesRef, isVisible: servicesVisible } = useScrollReveal({ delay: 0.2 });
   const { ref: benefitsRef, isVisible: benefitsVisible } = useScrollReveal({ delay: 0.3 });
