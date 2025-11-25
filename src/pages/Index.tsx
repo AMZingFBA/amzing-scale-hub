@@ -473,12 +473,11 @@ const Index = () => {
             <Button 
               variant="secondary" 
               size="xl" 
-              className="bg-white text-primary hover:bg-white/90 hover:scale-105 hover:shadow-2xl transition-all duration-300 animate-pulse hover:animate-none relative overflow-hidden group"
+              className="bg-white text-primary hover:bg-white/95 hover:scale-[1.02] hover:shadow-lg transition-all duration-200"
               onClick={startFreeTrial}
               disabled={isStarting}
             >
-              <span className="relative z-10">{isStarting ? 'Activation...' : 'S\'abonner maintenant'}</span>
-              <span className="absolute inset-0 bg-gradient-to-r from-primary/20 via-primary/10 to-primary/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 animate-pulse"></span>
+              {isStarting ? 'Activation...' : 'S\'abonner maintenant'}
             </Button>
             <Button variant="outline" size="xl" className="border-white text-white hover:bg-white/10" asChild>
               <Link to="/contact">
