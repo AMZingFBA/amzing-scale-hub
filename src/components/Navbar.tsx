@@ -227,7 +227,7 @@ const Navbar = () => {
                   <Link to="/auth">Connexion</Link>
                 </Button>
                 <Button variant="hero" size="lg" asChild>
-                  <Link to="/auth">Commencer</Link>
+                  <Link to="/auth?tab=signup">Commencer</Link>
                 </Button>
               </div>
             )}
@@ -313,7 +313,7 @@ const Navbar = () => {
                   </Link>
                 </Button>
                 <Button variant="hero" size="lg" className="w-full" asChild>
-                  <Link to="/auth" onClick={() => setIsOpen(false)}>
+                  <Link to="/auth?tab=signup" onClick={() => setIsOpen(false)}>
                     Commencer
                   </Link>
                 </Button>
