@@ -10,6 +10,7 @@ import TestimonialsCarousel from "@/components/TestimonialsCarousel";
 import TestimonialsMobile from "@/components/TestimonialsMobile";
 import AppInstallBanner from "@/components/AppInstallBanner";
 import SEO from "@/components/SEO";
+import OptimizedImage from "@/components/OptimizedImage";
 import heroWarehouse from "@/assets/hero-warehouse.jpg";
 import teamWorking from "@/assets/team-working.jpg";
 import logistics from "@/assets/logistics.jpg";
@@ -120,9 +121,10 @@ const Index = () => {
       {/* Hero Section */}
       <section className="relative pt-32 pb-20 overflow-hidden">
         <div className="absolute inset-0 z-0">
-          <img 
+          <OptimizedImage 
             src={heroWarehouse} 
-            alt="Warehouse" 
+            alt="Entrepôt logistique Amazon FBA avec produits stockés" 
+            loading="eager"
             className="w-full h-full object-cover opacity-10"
           />
           <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-background to-secondary/20" />

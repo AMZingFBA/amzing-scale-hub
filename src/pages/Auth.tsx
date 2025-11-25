@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
+import OptimizedImage from "@/components/OptimizedImage";
 import logo from "@/assets/logo.png";
 import { Mail, Lock, User, Phone, Package, TrendingUp, BarChart3, CheckCircle2, AlertCircle } from "lucide-react";
 import { Capacitor } from "@capacitor/core";
@@ -348,7 +349,7 @@ export default function Auth() {
         <div className="w-full max-w-md space-y-8 relative z-10">
           {/* Logo */}
           <Link to="/" className="flex justify-center animate-slide-in-up select-none" style={{ animationDelay: "0ms" }} tabIndex={-1}>
-            <img src={logo} alt="AMZing FBA" className="h-16 w-auto hover:scale-110 transition-all duration-300 select-none" draggable="false" />
+            <OptimizedImage src={logo} alt="Logo AMZing FBA - Formation Amazon FBA" className="h-16 w-auto hover:scale-110 transition-all duration-300 select-none" draggable="false" />
           </Link>
 
           {/* Form Card */}

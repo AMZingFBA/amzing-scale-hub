@@ -16,6 +16,7 @@ import { Badge } from "@/components/ui/badge";
 import { useCatalogueUnread } from "@/hooks/use-catalogue-unread";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import OptimizedImage from "@/components/OptimizedImage";
 
 interface CatalogueProduct {
   id: string;
@@ -812,7 +813,7 @@ Est-il toujours disponible ?`;
                         <div className="grid grid-cols-4 gap-2 mt-3">
                           {uploadedImages.map((img, idx) => (
                             <div key={idx} className="relative group">
-                              <img src={img} alt={`Photo ${idx + 1}`} className="w-full h-24 object-cover rounded-lg border-2 border-muted" />
+                              <OptimizedImage src={img} alt={`Aperçu photo ${idx + 1}`} className="w-full h-24 object-cover rounded-lg border-2 border-muted" />
                               <button
                                 onClick={() => setUploadedImages(uploadedImages.filter((_, i) => i !== idx))}
                                 className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
@@ -944,7 +945,7 @@ Est-il toujours disponible ?`;
                         <div className="grid grid-cols-4 gap-2 mt-3">
                           {uploadedImages.map((img, idx) => (
                             <div key={idx} className="relative group">
-                              <img src={img} alt={`Photo ${idx + 1}`} className="w-full h-24 object-cover rounded-lg border-2 border-muted" />
+                              <OptimizedImage src={img} alt={`Aperçu photo ${idx + 1}`} className="w-full h-24 object-cover rounded-lg border-2 border-muted" />
                               <button
                                 onClick={() => setUploadedImages(uploadedImages.filter((_, i) => i !== idx))}
                                 className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
