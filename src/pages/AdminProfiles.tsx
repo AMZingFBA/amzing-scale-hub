@@ -580,9 +580,9 @@ const AdminProfiles = () => {
                                     )}
                                   </button>
                                 </div>
-                                {profile.phone && (
-                                  <div className="flex items-center gap-2">
-                                    <Phone className="w-3 h-3 text-muted-foreground" />
+                                <div className="flex items-center gap-2">
+                                  <Phone className="w-3 h-3 text-muted-foreground" />
+                                  {profile.phone ? (
                                     <button
                                       onClick={() => copyToClipboard(profile.phone!, 'Téléphone')}
                                       className="hover:text-primary transition-colors flex items-center gap-1 group"
@@ -594,8 +594,10 @@ const AdminProfiles = () => {
                                         <Copy className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
                                       )}
                                     </button>
-                                  </div>
-                                )}
+                                  ) : (
+                                    <span className="text-muted-foreground italic text-xs">Non renseigné</span>
+                                  )}
+                                </div>
                               </div>
                             </TableCell>
                             <TableCell>
