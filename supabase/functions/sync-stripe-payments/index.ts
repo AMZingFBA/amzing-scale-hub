@@ -200,39 +200,43 @@ serve(async (req) => {
             } else {
               console.log(`[SYNC-STRIPE] Updated ${profile.email}: ${newStatus}, ${newPlanType}`);
               results.updated++;
-              
-              // TEMPORARY: Send email to ALL unpaid users (for testing)
-              if (newStatus === "unpaid") {
-                console.log(`[SYNC-STRIPE] Sending payment failed email to ${profile.email}`);
-                try {
-                  const emailResponse = await fetch(
-                    `${Deno.env.get("SUPABASE_URL")}/functions/v1/send-payment-failed-email`,
-                    {
-                      method: "POST",
-                      headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${Deno.env.get("SUPABASE_ANON_KEY")}`
-                      },
-                      body: JSON.stringify({
-                        email: profile.email,
-                        full_name: profile.full_name || "utilisateur",
-                        expires_at: updateData.expires_at || new Date().toISOString()
-                      })
-                    }
-                  );
-                  
-                  if (!emailResponse.ok) {
-                    const errorData = await emailResponse.json();
-                    console.error(`[SYNC-STRIPE] Failed to send email to ${profile.email}:`, errorData);
-                  } else {
-                    console.log(`[SYNC-STRIPE] Email sent successfully to ${profile.email}`);
-                  }
-                } catch (emailError) {
-                  console.error(`[SYNC-STRIPE] Error sending email to ${profile.email}:`, emailError);
-                }
-              }
             }
           }
+        
+        // TEMPORARY: Send email to ALL unpaid users (for testing)
+        if (newStatus === "unpaid") {
+          const expiresAt = subscriptions.data.length > 0 && subscriptions.data[0].current_period_end
+            ? new Date(subscriptions.data[0].current_period_end * 1000).toISOString()
+            : new Date().toISOString();
+            
+          console.log(`[SYNC-STRIPE] Sending payment failed email to ${profile.email}`);
+          try {
+            const emailResponse = await fetch(
+              `${Deno.env.get("SUPABASE_URL")}/functions/v1/send-payment-failed-email`,
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  "Authorization": `Bearer ${Deno.env.get("SUPABASE_ANON_KEY")}`
+                },
+                body: JSON.stringify({
+                  email: profile.email,
+                  full_name: profile.full_name || "utilisateur",
+                  expires_at: expiresAt
+                })
+              }
+            );
+            
+            if (!emailResponse.ok) {
+              const errorData = await emailResponse.json();
+              console.error(`[SYNC-STRIPE] Failed to send email to ${profile.email}:`, errorData);
+            } else {
+              console.log(`[SYNC-STRIPE] Email sent successfully to ${profile.email}`);
+            }
+          } catch (emailError) {
+            console.error(`[SYNC-STRIPE] Error sending email to ${profile.email}:`, emailError);
+          }
+        }
       } catch (error) {
         console.error(`[SYNC-STRIPE] Error processing ${profile.email}:`, error);
         results.errors.push({ 
