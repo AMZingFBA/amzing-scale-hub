@@ -10,13 +10,12 @@ const MentionsLegales = () => {
       
       <Link
         to="/"
-        className="fixed top-24 left-4 z-50 inline-flex items-center gap-2 px-4 py-2 bg-card hover:bg-accent rounded-lg shadow-lg text-muted-foreground hover:text-primary transition-all duration-300 hover:scale-105"
+        className="fixed top-20 left-4 z-50 bg-primary text-white p-2 rounded-full shadow-lg hover:scale-110 transition-transform"
       >
         <ArrowLeft className="w-5 h-5" />
-        <span className="hidden sm:inline">Retour</span>
       </Link>
       
-      <main className="container mx-auto px-4 pt-32 pb-12 max-w-4xl">
+      <main className="container mx-auto px-4 pt-24 pb-12 max-w-4xl">
 
         <div className="bg-card rounded-lg shadow-lg p-8 space-y-8">
           <div className="text-center mb-8">
