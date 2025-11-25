@@ -16,7 +16,7 @@ const MentionsLegales = () => {
         <span className="hidden sm:inline">Retour</span>
       </Link>
       
-      <main className="container mx-auto px-4 py-12 max-w-4xl">
+      <main className="container mx-auto px-4 pt-32 pb-12 max-w-4xl">
 
         <div className="bg-card rounded-lg shadow-lg p-8 space-y-8">
           <div className="text-center mb-8">
