@@ -25,13 +25,6 @@ export const usePushNotifications = () => {
     if (!isNativePlatform()) {
       return;
     }
-    
-    // Désactiver sur Android (Firebase non configuré)
-    const platform = Capacitor.getPlatform();
-    if (platform === 'android') {
-      console.log('⚠️ FCM disabled on Android (Firebase not configured)');
-      return;
-    }
 
     const handleFCMToken = (event: any) => {
       console.log('📨 FCM token event complet:', event);
@@ -69,12 +62,6 @@ export const usePushNotifications = () => {
   useEffect(() => {
     if (!isNativePlatform()) {
       console.log('⚠️ Not native platform, skipping token save');
-      return;
-    }
-    
-    // Désactiver sur Android (Firebase non configuré)
-    const platform = Capacitor.getPlatform();
-    if (platform === 'android') {
       return;
     }
 
@@ -144,13 +131,6 @@ export const usePushNotifications = () => {
     // Ne rien faire sur le web
     if (!isNativePlatform()) {
       console.log('⚠️ Push notifications not available on web - skipping initialization');
-      return;
-    }
-    
-    // Désactiver temporairement sur Android (Firebase non configuré)
-    const platform = Capacitor.getPlatform();
-    if (platform === 'android') {
-      console.log('⚠️ Push notifications disabled on Android (Firebase not configured) - skipping initialization');
       return;
     }
     
