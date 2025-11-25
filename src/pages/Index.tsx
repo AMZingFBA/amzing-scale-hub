@@ -473,7 +473,7 @@ const Index = () => {
             <Button 
               variant="secondary" 
               size="xl" 
-              className="bg-white text-primary hover:bg-white/95 hover:scale-[1.02] hover:shadow-lg transition-all duration-200"
+              className="bg-white text-primary hover:bg-gradient-to-r hover:from-white hover:to-white/95 transform hover:-translate-y-0.5 hover:shadow-xl transition-all duration-300 relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-r before:from-transparent before:via-white/40 before:to-transparent before:-translate-x-full hover:before:translate-x-full before:transition-transform before:duration-700"
               onClick={startFreeTrial}
               disabled={isStarting}
             >
