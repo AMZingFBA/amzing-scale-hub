@@ -1,9 +1,16 @@
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import SEO from "@/components/SEO";
+import { seoData } from "@/lib/seo-data";
 
 const Confidentialite = () => {
   return (
     <div className="min-h-screen">
+      <SEO
+        title={seoData.confidentialite.title}
+        description={seoData.confidentialite.description}
+        keywords={seoData.confidentialite.keywords}
+      />
       <Navbar />
       
       {/* SEO H1/H2 - Invisible */}

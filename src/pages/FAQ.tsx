@@ -1,5 +1,6 @@
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import SEO from "@/components/SEO";
 import {
   Accordion,
   AccordionContent,
@@ -11,6 +12,7 @@ import { MessageCircle, ArrowLeft } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Capacitor } from "@capacitor/core";
+import { seoData, schemas } from "@/lib/seo-data";
 
 const FAQ = () => {
   const faqData = [
@@ -97,6 +99,12 @@ const FAQ = () => {
 
   return (
     <div className="min-h-screen relative overflow-hidden">
+      <SEO
+        title={seoData.faq.title}
+        description={seoData.faq.description}
+        keywords={seoData.faq.keywords}
+        schema={schemas.faq}
+      />
       <Navbar />
       
       {/* SEO H1/H2 - Invisible */}

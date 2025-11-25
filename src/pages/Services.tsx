@@ -4,9 +4,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import SEO from "@/components/SEO";
 import { Link, useNavigate } from "react-router-dom";
 import { useScrollReveal } from "@/hooks/use-scroll-reveal";
 import { Capacitor } from "@capacitor/core";
+import { seoData } from "@/lib/seo-data";
 
 const ServiceCard = ({ children, delay }: { children: React.ReactNode, delay: number }) => {
   const { ref, isVisible } = useScrollReveal({ delay });
@@ -37,6 +39,11 @@ const Services = () => {
   
   return (
     <div className="min-h-screen">
+      <SEO
+        title={seoData.services.title}
+        description={seoData.services.description}
+        keywords={seoData.services.keywords}
+      />
       <Navbar />
       
       {/* SEO H1/H2 - Invisible */}

@@ -1,12 +1,19 @@
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import SEO from "@/components/SEO";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
+import { seoData } from "@/lib/seo-data";
 
 const CGV = () => {
   return (
     <div className="min-h-screen">
+      <SEO
+        title={seoData.cgv.title}
+        description={seoData.cgv.description}
+        keywords={seoData.cgv.keywords}
+      />
       <Navbar />
       
       {/* SEO H1/H2 - Invisible */}

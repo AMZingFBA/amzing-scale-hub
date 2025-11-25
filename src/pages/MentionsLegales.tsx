@@ -1,11 +1,18 @@
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import SEO from "@/components/SEO";
 import { ArrowLeft } from "lucide-react";
+import { seoData } from "@/lib/seo-data";
 
 const MentionsLegales = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
+      <SEO
+        title={seoData.mentionsLegales.title}
+        description={seoData.mentionsLegales.description}
+        keywords={seoData.mentionsLegales.keywords}
+      />
       <Navbar />
       
       {/* SEO H1/H2 - Invisible */}

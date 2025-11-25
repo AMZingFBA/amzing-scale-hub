@@ -4,11 +4,13 @@ import { useMarkAsRead } from '@/hooks/use-mark-as-read';
 import { Capacitor } from '@capacitor/core';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import SEO from '@/components/SEO';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import processFlow from '@/assets/amazon-process-flow.png';
+import { seoData } from '@/lib/seo-data';
 
 const Guides = () => {
   const navigate = useNavigate();
@@ -19,6 +21,11 @@ const Guides = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
+      <SEO
+        title={seoData.guides.title}
+        description={seoData.guides.description}
+        keywords={seoData.guides.keywords}
+      />
       <Navbar />
       
       {/* SEO H1/H2 - Invisible */}
