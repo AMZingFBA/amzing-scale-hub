@@ -104,6 +104,11 @@ const Index = () => {
       <Navbar />
       <AppInstallBanner />
       
+      {/* SEO H1 - Invisible but readable by Google */}
+      <h1 className="sr-only">
+        AMZing FBA – Plateforme complète pour réussir sur Amazon FBA et FBM
+      </h1>
+
       {/* Hero Section */}
       <section className="relative pt-32 pb-20 overflow-hidden">
         <div className="absolute inset-0 z-0">
@@ -155,6 +160,10 @@ const Index = () => {
       {/* 3 Reasons Section */}
       <section className="py-20 bg-muted/30">
         <div className="container mx-auto px-4">
+          {/* SEO H2 - Formation */}
+          <h2 className="sr-only">
+            Formation Amazon FBA professionnelle en ligne pour débutants et vendeurs avancés
+          </h2>
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold mb-4">Tout inclus dans l'abonnement</h2>
             <p className="text-xl text-muted-foreground">34,99€/mois pour un accès complet</p>
@@ -208,6 +217,15 @@ const Index = () => {
       {/* What's Included */}
       <section className="py-20">
         <div className="container mx-auto px-4">
+          {/* SEO H2 - Outils de sourcing */}
+          <h2 className="sr-only">
+            Outils de sourcing produits rentables pour Amazon FBA et arbitrage en ligne
+          </h2>
+          
+          {/* SEO H2 - Catalogue */}
+          <h2 className="sr-only">
+            Catalogue de produits optimisés pour la revente sur Amazon FBA
+          </h2>
           <div className="text-center mb-16">
             <Badge className="mb-4 bg-primary/10 text-primary border-primary/20">
               Accès complet
@@ -343,6 +361,10 @@ const Index = () => {
       {/* AMZing FBA 360 Section */}
       <section className="py-20 bg-muted/30">
         <div className="container mx-auto px-4">
+          {/* SEO H2 - Marketplace et services */}
+          <h2 className="sr-only">
+            Marketplace de services spécialisés pour vendeurs Amazon FBA et FBM
+          </h2>
           <Card className="border-2 border-primary/20 shadow-2xl overflow-hidden max-w-6xl mx-auto hover:shadow-glow transition-all duration-500 hover:scale-102 animate-fade-in">
             <div className="grid md:grid-cols-2 gap-0">
               <div className="bg-gradient-to-br from-primary/10 via-secondary/10 to-primary/5 p-12 flex flex-col justify-center relative overflow-hidden">
@@ -439,6 +461,10 @@ const Index = () => {
 
       {/* Testimonials Section */}
       <section className="py-20 bg-muted/30">
+        {/* SEO H2 - Guides et ressources */}
+        <h2 className="sr-only">
+          Guides, tutoriels et accompagnement pour réussir son business Amazon FBA
+        </h2>
         {isNativeApp ? (
           <TestimonialsMobile />
         ) : (
