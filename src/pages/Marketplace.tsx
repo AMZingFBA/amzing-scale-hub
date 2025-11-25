@@ -18,7 +18,9 @@ import { Badge } from "@/components/ui/badge";
 import { useMarketplaceBuyUnread } from "@/hooks/use-marketplace-buy-unread";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import SEO from "@/components/SEO";
 import ScrollToTop from "@/components/ScrollToTop";
+import { seoData } from "@/lib/seo-data";
 
 interface Listing {
   id: string;
@@ -871,6 +873,11 @@ const Marketplace = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title={seoData.marketplace.title}
+        description={seoData.marketplace.description}
+        keywords={seoData.marketplace.keywords}
+      />
       <ScrollToTop />
       <Navbar />
       

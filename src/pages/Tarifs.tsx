@@ -4,10 +4,12 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Badge } from "@/components/ui/badge";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import SEO from "@/components/SEO";
 import { Link, useNavigate } from "react-router-dom";
 import { Capacitor } from "@capacitor/core";
 import { useTrial } from "@/hooks/use-trial";
 import { useAuth } from "@/hooks/use-auth";
+import { seoData, schemas } from "@/lib/seo-data";
 
 const Tarifs = () => {
   const navigate = useNavigate();
@@ -31,6 +33,12 @@ const Tarifs = () => {
 
   return (
     <div className="min-h-screen relative overflow-hidden">
+      <SEO
+        title={seoData.tarifs.title}
+        description={seoData.tarifs.description}
+        keywords={seoData.tarifs.keywords}
+        schema={schemas.product}
+      />
       <Navbar />
       
       {/* SEO H1/H2 - Invisible */}

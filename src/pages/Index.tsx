@@ -9,6 +9,7 @@ import Footer from "@/components/Footer";
 import TestimonialsCarousel from "@/components/TestimonialsCarousel";
 import TestimonialsMobile from "@/components/TestimonialsMobile";
 import AppInstallBanner from "@/components/AppInstallBanner";
+import SEO from "@/components/SEO";
 import heroWarehouse from "@/assets/hero-warehouse.jpg";
 import teamWorking from "@/assets/team-working.jpg";
 import logistics from "@/assets/logistics.jpg";
@@ -18,6 +19,7 @@ import { useScrollReveal } from "@/hooks/use-scroll-reveal";
 import { Capacitor } from "@capacitor/core";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { seoData, schemas } from "@/lib/seo-data";
 
 const ServiceCard = ({ 
   children, 
@@ -101,6 +103,12 @@ const Index = () => {
 
   return (
     <div className="min-h-screen">
+      <SEO
+        title={seoData.home.title}
+        description={seoData.home.description}
+        keywords={seoData.home.keywords}
+        schema={schemas.organization}
+      />
       <Navbar />
       <AppInstallBanner />
       

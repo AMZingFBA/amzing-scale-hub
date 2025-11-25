@@ -5,7 +5,9 @@ import { Badge } from "@/components/ui/badge";
 import { Link, useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import SEO from "@/components/SEO";
 import { Capacitor } from "@capacitor/core";
+import { seoData, schemas } from "@/lib/seo-data";
 
 const Formation = () => {
   const navigate = useNavigate();
@@ -13,6 +15,12 @@ const Formation = () => {
 
   return (
     <div className="min-h-screen">
+      <SEO
+        title={seoData.formation.title}
+        description={seoData.formation.description}
+        keywords={seoData.formation.keywords}
+        schema={schemas.course}
+      />
       <Navbar />
       
       {/* SEO H1/H2 - Invisible */}
