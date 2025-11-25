@@ -8,6 +8,14 @@ const MentionsLegales = () => {
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
       <Navbar />
       
+      {/* SEO H1/H2 - Invisible */}
+      <h1 className="sr-only">
+        Mentions légales du site AMZing FBA
+      </h1>
+      <h2 className="sr-only">
+        Informations légales, éditeur du site, hébergeur et cadre juridique d'AMZing FBA
+      </h2>
+      
       <Link
         to="/"
         className="fixed top-[140px] left-4 z-50 bg-primary text-white p-2 rounded-full shadow-lg hover:scale-110 transition-transform"

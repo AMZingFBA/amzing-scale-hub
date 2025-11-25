@@ -39,6 +39,14 @@ const Services = () => {
     <div className="min-h-screen">
       <Navbar />
       
+      {/* SEO H1/H2 - Invisible */}
+      <h1 className="sr-only">
+        Services professionnels AMZing FBA pour vendeurs Amazon
+      </h1>
+      <h2 className="sr-only">
+        Accompagnement, prestations, optimisation et services dédiés aux business Amazon FBA et FBM
+      </h2>
+      
       {/* Back button for mobile app */}
       {isNativeApp && (
         <button

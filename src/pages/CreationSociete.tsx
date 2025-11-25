@@ -26,6 +26,15 @@ const CreationSociete = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
+      
+      {/* SEO H1/H2 - Invisible */}
+      <h1 className="sr-only">
+        Créer sa société pour vendre sur Amazon FBA
+      </h1>
+      <h2 className="sr-only">
+        Conseils sur le choix de statut, la fiscalité et la création d'entreprise pour les vendeurs Amazon
+      </h2>
+      
       <main className="flex-grow pt-24 md:pt-20">
         <div className="container mx-auto px-4 py-8">
           <div className="max-w-6xl mx-auto">

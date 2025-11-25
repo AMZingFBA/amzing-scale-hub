@@ -874,6 +874,14 @@ const Marketplace = () => {
       <ScrollToTop />
       <Navbar />
       
+      {/* SEO H1/H2 - Invisible */}
+      <h1 className="sr-only">
+        Marketplace AMZing FBA – Services et produits pour vendeurs Amazon
+      </h1>
+      <h2 className="sr-only">
+        Plateforme de services, outils et ressources dédiés aux vendeurs Amazon FBA et FBM
+      </h2>
+      
       <main className="container mx-auto px-4 pt-28 md:pt-24 pb-12">
         <div className="max-w-7xl mx-auto space-y-6">
           {/* Image Gallery Dialog */}

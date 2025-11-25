@@ -27,6 +27,15 @@ const Debuter = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
+      
+      {/* SEO H1/H2 - Invisible */}
+      <h1 className="sr-only">
+        Débuter sur Amazon FBA avec AMZing FBA
+      </h1>
+      <h2 className="sr-only">
+        Étapes essentielles pour lancer son premier business Amazon FBA en toute sécurité
+      </h2>
+      
       <main className="flex-grow pt-24 md:pt-20">
         <div className="container mx-auto px-4 py-8">
           <div className="max-w-6xl mx-auto">

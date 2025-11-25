@@ -17,6 +17,14 @@ const GestionProduitsInfo = () => {
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-background via-background to-accent/20">
       <Navbar />
       
+      {/* SEO H1/H2 - Invisible */}
+      <h1 className="sr-only">
+        Gestion des produits et informations pour Amazon FBA
+      </h1>
+      <h2 className="sr-only">
+        Organisation, suivi et gestion des fiches produits pour optimiser son catalogue Amazon
+      </h2>
+      
       <main className="flex-1 pt-24 pb-16">
         <div className="container mx-auto px-4">
           {/* Back Button */}

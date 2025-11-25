@@ -99,6 +99,14 @@ const FAQ = () => {
     <div className="min-h-screen relative overflow-hidden">
       <Navbar />
       
+      {/* SEO H1/H2 - Invisible */}
+      <h1 className="sr-only">
+        FAQ AMZing FBA – Questions fréquentes des vendeurs Amazon
+      </h1>
+      <h2 className="sr-only">
+        Réponses aux questions sur la formation, les abonnements, la marketplace et les outils AMZing FBA
+      </h2>
+      
       <Link
         to="/"
         className="fixed top-[140px] left-4 z-50 bg-primary text-white p-2 rounded-full shadow-lg hover:scale-110 transition-transform"

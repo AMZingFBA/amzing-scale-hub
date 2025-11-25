@@ -18,6 +18,14 @@ const FactureAutorisation = () => {
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-background via-background to-accent/20">
       <Navbar />
       
+      {/* SEO H1/H2 - Invisible */}
+      <h1 className="sr-only">
+        Factures et autorisations pour les vendeurs Amazon FBA
+      </h1>
+      <h2 className="sr-only">
+        Informations sur la facturation, les justificatifs et les autorisations nécessaires pour Amazon
+      </h2>
+      
       <main className="flex-1 pt-24 pb-16">
         <div className="container mx-auto px-4">
           {/* Back Button */}
