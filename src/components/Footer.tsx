@@ -19,14 +19,31 @@ const Footer = () => {
       <div className="container mx-auto px-4 py-12 relative z-10">
         {/* Main Footer Content */}
         {(isVIP || isAdmin) ? (
-          // Simplified footer for VIP members and admins
-          <div className="text-center py-6">
-            <div className="group inline-block mb-4">
-              <img 
-                src={logo} 
-                alt="AMZing FBA" 
-                className="h-10 mx-auto transition-all duration-500 group-hover:scale-110 group-hover:drop-shadow-[0_0_15px_rgba(255,153,0,0.5)]" 
-              />
+          // Elegant footer for VIP members and admins
+          <div className="max-w-2xl mx-auto">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-6 py-8">
+              <div className="group">
+                <img 
+                  src={logo} 
+                  alt="AMZing FBA" 
+                  className="h-12 transition-all duration-500 group-hover:scale-110 group-hover:drop-shadow-[0_0_15px_rgba(255,153,0,0.5)]" 
+                />
+              </div>
+              <div className="flex flex-wrap items-center justify-center gap-6">
+                <Link 
+                  to="/support" 
+                  className="text-muted-foreground hover:text-primary transition-all duration-300 hover:scale-105 font-medium"
+                >
+                  Support
+                </Link>
+                <Link 
+                  to="/contact" 
+                  className="inline-flex items-center gap-2 px-5 py-2 bg-primary/10 hover:bg-primary hover:text-white text-primary rounded-lg transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-primary/20"
+                >
+                  <Mail className="w-4 h-4" />
+                  <span className="font-semibold">Contact</span>
+                </Link>
+              </div>
             </div>
           </div>
         ) : (
