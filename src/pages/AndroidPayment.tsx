@@ -4,12 +4,17 @@ import { Capacitor } from "@capacitor/core";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import { Check, CreditCard, Shield, Zap, ArrowLeft } from "lucide-react";
 
 const AndroidPayment = () => {
   const navigate = useNavigate();
   const [isProcessing, setIsProcessing] = useState(false);
+  const [showCGVModal, setShowCGVModal] = useState(false);
+  const [acceptedCGV, setAcceptedCGV] = useState(false);
 
   // Rediriger si pas sur Android
   if (!Capacitor.isNativePlatform() || Capacitor.getPlatform() !== 'android') {
@@ -18,6 +23,15 @@ const AndroidPayment = () => {
   }
 
   const handleSubscribe = async () => {
+    setShowCGVModal(true);
+  };
+
+  const handleConfirmPayment = async () => {
+    if (!acceptedCGV) {
+      return;
+    }
+
+    setShowCGVModal(false);
     setIsProcessing(true);
     try {
       const { data: { session } } = await supabase.auth.getSession();
@@ -190,6 +204,63 @@ const AndroidPayment = () => {
           ))}
         </div>
       </div>
+
+      {/* CGV Modal */}
+      <Dialog open={showCGVModal} onOpenChange={setShowCGVModal}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Confirmation d'abonnement</DialogTitle>
+            <DialogDescription>
+              Veuillez accepter les conditions avant de continuer
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <div className="bg-primary/5 p-4 rounded-lg border border-primary/20">
+              <p className="text-sm font-semibold mb-2">Abonnement VIP AMZing FBA</p>
+              <p className="text-2xl font-bold text-primary">34,99€<span className="text-sm font-normal text-muted-foreground">/mois</span></p>
+              <p className="text-xs text-muted-foreground mt-2">Sans engagement • Résiliable à tout moment</p>
+            </div>
+
+            <div className="flex items-start space-x-3">
+              <Checkbox 
+                id="cgv-payment" 
+                checked={acceptedCGV}
+                onCheckedChange={(checked) => setAcceptedCGV(checked === true)}
+                className="mt-1"
+              />
+              <label htmlFor="cgv-payment" className="text-sm leading-relaxed cursor-pointer select-none">
+                Je reconnais avoir lu et accepté les{" "}
+                <Link 
+                  to="/cgv" 
+                  target="_blank"
+                  className="text-primary hover:underline font-medium"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  Conditions Générales de Vente
+                </Link>
+                {" "}et je demande l'exécution immédiate du service. Je renonce expressément à mon droit de rétractation conformément à l'article L. 221-28 du Code de la consommation.
+              </label>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button 
+              variant="outline" 
+              onClick={() => setShowCGVModal(false)}
+            >
+              Annuler
+            </Button>
+            <Button 
+              onClick={handleConfirmPayment}
+              disabled={!acceptedCGV || isProcessing}
+              className="bg-gradient-to-r from-primary to-secondary"
+            >
+              {isProcessing ? 'Traitement...' : 'Confirmer le paiement'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
