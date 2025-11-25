@@ -107,10 +107,11 @@ export const useTrial = () => {
         return;
       }
 
-      // Si c'est iOS, utiliser Apple IAP
+      // Si c'est iOS, afficher la modale CGV avant Apple IAP
       if (isNativePlatform() && Capacitor.getPlatform() === 'ios') {
-        console.log('🍎 [startFreeTrial] iOS platform, using Apple IAP...');
-        await handleAppleIAP();
+        console.log('🍎 [startFreeTrial] iOS platform, showing CGV modal...');
+        setShowCGVModal(true);
+        setIsStarting(false);
         return;
       }
 
@@ -270,6 +271,14 @@ export const useTrial = () => {
     setIsStarting(true);
 
     try {
+      // Si c'est iOS, utiliser Apple IAP
+      if (isNativePlatform() && Capacitor.getPlatform() === 'ios') {
+        console.log('🍎 [handleConfirmPayment] iOS platform, using Apple IAP...');
+        await handleAppleIAP();
+        return;
+      }
+
+      // Sinon, utiliser Stripe
       console.log('Creating Stripe checkout session...');
       const { data, error } = await supabase.functions.invoke('create-checkout', {
         headers: {
