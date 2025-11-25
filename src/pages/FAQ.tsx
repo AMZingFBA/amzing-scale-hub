@@ -99,6 +99,13 @@ const FAQ = () => {
     <div className="min-h-screen relative overflow-hidden">
       <Navbar />
       
+      <Link
+        to="/"
+        className="fixed top-[140px] left-4 z-50 bg-primary text-white p-2 rounded-full shadow-lg hover:scale-110 transition-transform"
+      >
+        <ArrowLeft className="w-5 h-5" />
+      </Link>
+      
       {isNativeApp && (
         <div className="fixed top-[46px] left-[18px] z-50">
           <Button
