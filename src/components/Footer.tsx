@@ -141,14 +141,7 @@ const Footer = () => {
         )}
 
         {/* Bottom Bar */}
-        <div className="pt-8 border-t border-border/50 space-y-4 animate-fade-in" style={{ animationDelay: '0.4s' }}>
-          {/* Mentions légales entreprise */}
-          <div className="text-center text-xs text-muted-foreground space-y-1">
-            <p className="font-semibold">AMZing FBA - Noa Zaghdoun</p>
-            <p>Auto-entrepreneur | SIRET : 993 348 929 00015</p>
-            <p>59 Rue de Ponthieu, 75008 Paris, France</p>
-          </div>
-          
+        <div className="pt-8 border-t border-border/50 animate-fade-in" style={{ animationDelay: '0.4s' }}>
           {/* Copyright et liens */}
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-muted-foreground text-sm">
