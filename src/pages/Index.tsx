@@ -473,11 +473,18 @@ const Index = () => {
             <Button 
               variant="secondary" 
               size="xl" 
-              className="bg-white text-primary hover:bg-gradient-to-r hover:from-white hover:to-white/95 transform hover:-translate-y-0.5 hover:shadow-xl transition-all duration-300 relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-r before:from-transparent before:via-white/40 before:to-transparent before:-translate-x-full hover:before:translate-x-full before:transition-transform before:duration-700"
+              className="bg-gradient-to-r from-white via-primary/5 to-white bg-[length:200%_100%] animate-[gradient_3s_ease_infinite] text-primary hover:scale-105 hover:shadow-[0_0_40px_rgba(255,153,0,0.4)] transition-all duration-300 relative overflow-hidden group font-semibold border-2 border-primary/10"
               onClick={startFreeTrial}
               disabled={isStarting}
+              style={{
+                animation: 'gradient 3s ease infinite, pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
+              }}
             >
-              {isStarting ? 'Activation...' : 'S\'abonner maintenant'}
+              <span className="relative z-10 flex items-center gap-2">
+                {isStarting ? 'Activation...' : 'S\'abonner maintenant'}
+                <span className="inline-block group-hover:translate-x-1 transition-transform duration-300">→</span>
+              </span>
+              <span className="absolute inset-0 bg-gradient-to-r from-primary/0 via-primary/20 to-primary/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></span>
             </Button>
             <Button variant="outline" size="xl" className="border-white text-white hover:bg-white/10" asChild>
               <Link to="/contact">
