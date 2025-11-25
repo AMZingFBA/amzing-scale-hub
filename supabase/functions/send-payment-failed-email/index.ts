@@ -32,7 +32,7 @@ serve(async (req) => {
     });
 
     const emailResponse = await resend.emails.send({
-      from: "AMZing FBA <onboarding@resend.dev>",
+      from: "AMZing FBA <contact@amzingfba.com>",
       to: [email],
       subject: "⚠️ Échec de paiement - Action requise",
       html: `
