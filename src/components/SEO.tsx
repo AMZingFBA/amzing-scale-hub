@@ -15,7 +15,7 @@ const SEO = ({
   title,
   description,
   keywords,
-  image = 'https://amzingfba.com/amzing-logo-checkout.png',
+  image = 'https://amzingfba.com/logo-amzing.png',
   type = 'website',
   schema,
   noindex = false,
