@@ -31,9 +31,20 @@ export default function Auth() {
   
   // Check URL params for default tab and referral code
   const searchParams = new URLSearchParams(window.location.search);
-  const defaultTab = searchParams.get("tab") === "signup" ? "signup" : "login";
+  const urlTab = searchParams.get("tab");
   const referralCode = searchParams.get("ref");
-  const [activeTab, setActiveTab] = useState(defaultTab);
+  const [activeTab, setActiveTab] = useState(urlTab === "signup" ? "signup" : "login");
+
+  // Update active tab when URL changes
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const tab = params.get("tab");
+    if (tab === "signup") {
+      setActiveTab("signup");
+    } else if (tab === "login") {
+      setActiveTab("login");
+    }
+  }, [window.location.search]);
 
   useEffect(() => {
     if (!user) return;
