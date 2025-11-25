@@ -58,6 +58,8 @@ Cordialement,
 L'équipe AMZing FBA
 
 © ${new Date().getFullYear()} AMZing FBA - Tous droits réservés
+
+Se désabonner des emails : https://www.amzingfba.com/
       `,
       html: `
         <!DOCTYPE html>
@@ -196,6 +198,9 @@ L'équipe AMZing FBA
                 <p>© ${new Date().getFullYear()} AMZing FBA - Tous droits réservés</p>
                 <p style="margin-top: 10px;">
                   <a href="https://amzingfba.com" style="color: #666; text-decoration: none;">amzingfba.com</a>
+                </p>
+                <p style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #e0e0e0;">
+                  <a href="https://www.amzingfba.com/" style="color: #999; text-decoration: underline; font-size: 12px;">Se désabonner des emails</a>
                 </p>
               </div>
             </div>
