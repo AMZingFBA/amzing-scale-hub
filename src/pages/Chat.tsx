@@ -831,12 +831,12 @@ const Chat = () => {
             Sélectionnez une conversation pour commencer
           </div>
         )}
-          </div>
-        </div>
+      </div>
         </div>
       </div>
+    </div>
 
-      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+    <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Supprimer le salon ?</AlertDialogTitle>
