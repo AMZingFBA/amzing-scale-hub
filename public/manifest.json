@@ -1,0 +1,21 @@
+{
+  "name": "AMZing FBA - Formation Amazon FBA",
+  "short_name": "AMZing FBA",
+  "description": "Formation Amazon FBA complète + catalogue produits rentables + stockage & expédition",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#FF9900",
+  "icons": [
+    {
+      "src": "/favicon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/amzing-logo-checkout.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
