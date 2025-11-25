@@ -38,6 +38,16 @@ dependencies {
     implementation project(':capacitor-android')
     implementation project(':capacitor-push-notifications')
     implementation project(':capawesome-capacitor-badge')
+    
+    // Firebase BoM - gère les versions compatibles automatiquement
+    implementation platform('com.google.firebase:firebase-bom:34.6.0')
+    
+    // Firebase Cloud Messaging pour les notifications push
+    implementation 'com.google.firebase:firebase-messaging'
+    
+    // Firebase Analytics (optionnel mais recommandé)
+    implementation 'com.google.firebase:firebase-analytics'
+    
     testImplementation "junit:junit:$junitVersion"
     androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"
     androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"
