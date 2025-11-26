@@ -17,42 +17,57 @@ export const usePushNotifications = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  // Listen for FCM token from native iOS via custom JavaScript event
+  // Listen for FCM token from native iOS via JavaScript injection
   useEffect(() => {
     if (!isNativePlatform()) {
       return;
     }
 
-    console.log('🎧 Setting up FCM token listener...');
+    console.log('🎧 FCM token listener setup');
     
-    // Check if token already injected by native code
-    const existingToken = (window as any).__FCM_TOKEN__;
-    if (existingToken && existingToken.includes(':')) {
-      console.log('✅ FCM Token already available:', existingToken.substring(0, 30) + '...');
-      setPendingToken(existingToken);
+    // Check if token was injected before listener was ready
+    const checkForToken = () => {
+      const existingToken = (window as any).__FCM_TOKEN__;
+      if (existingToken && typeof existingToken === 'string' && existingToken.includes(':')) {
+        console.log('✅ FCM Token found:', existingToken.substring(0, 30) + '...');
+        setPendingToken(existingToken);
+        return true;
+      }
+      return false;
+    };
+
+    // Try immediately
+    if (checkForToken()) {
       return;
     }
 
-    // Listen for custom event from AppDelegate
+    // Listen for custom event
     const handleFCMToken = (event: any) => {
       const token = event?.detail?.token;
-      console.log('🔥 FCM Token received via event:', token?.substring(0, 30) + '...');
+      console.log('🔥 FCM Token event received:', token?.substring(0, 30) + '...');
       
       if (token && typeof token === 'string' && token.includes(':')) {
-        // Valid FCM token format (must contain : separator like "xxx:APA91b...")
-        console.log('✅ Valid FCM token format confirmed');
+        console.log('✅ Valid FCM token format (contains :)');
         setPendingToken(token);
         (window as any).__FCM_TOKEN__ = token;
       } else {
-        console.warn('⚠️ Invalid FCM token format:', token);
+        console.warn('⚠️ Invalid token format (missing :):', token);
       }
     };
 
     window.addEventListener('fcmTokenReceived', handleFCMToken);
-    console.log('✅ FCM token listener registered');
+    console.log('✅ FCM event listener registered');
+
+    // Retry check after delays (in case native code is slow)
+    const retry1 = setTimeout(checkForToken, 500);
+    const retry2 = setTimeout(checkForToken, 1500);
+    const retry3 = setTimeout(checkForToken, 3000);
 
     return () => {
       window.removeEventListener('fcmTokenReceived', handleFCMToken);
+      clearTimeout(retry1);
+      clearTimeout(retry2);
+      clearTimeout(retry3);
     };
   }, []);
 
@@ -147,11 +162,18 @@ export const usePushNotifications = () => {
         if (permStatus.receive === 'granted' || permStatus.receive === 'prompt-with-rationale') {
           console.log('✅ Push notification permission granted');
 
-          // Ajouter les listeners AVANT d'enregistrer
-          // NOTE: This receives APNs token, NOT FCM token - we get FCM via plugin instead
+          // Listen for Capacitor registration event (APNs token - we ignore it)
           await PushNotifications.addListener('registration', async (token: Token) => {
-            console.log('📱 APNs Token received (not FCM):', token.value.substring(0, 20) + '...');
-            // Don't save this - it's the APNs token, not FCM token
+            const tokenValue = token.value;
+            console.log('📱 Registration token received:', tokenValue.substring(0, 20) + '...');
+            
+            // CRITICAL: Only accept tokens with : separator (FCM format)
+            if (tokenValue.includes(':')) {
+              console.log('✅ Valid FCM token format detected');
+              setPendingToken(tokenValue);
+            } else {
+              console.warn('⚠️ APNs token received (ignoring, waiting for FCM)');
+            }
           });
 
           // Écouter les erreurs d'enregistrement
