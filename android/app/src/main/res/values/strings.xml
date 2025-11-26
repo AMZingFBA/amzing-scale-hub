@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">AMZing FBA</string>
+    <string name="title_activity_main">AMZing FBA</string>
+    <string name="package_name">com.amzing.fba</string>
+    <string name="custom_url_scheme">app.lovable.6c002a1cdb754b68b43b8e5c9b112692</string>
+</resources>

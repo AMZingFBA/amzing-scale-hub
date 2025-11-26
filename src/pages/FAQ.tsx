@@ -1,5 +1,6 @@
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import SEO from "@/components/SEO";
 import {
   Accordion,
   AccordionContent,
@@ -11,6 +12,7 @@ import { MessageCircle, ArrowLeft } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Capacitor } from "@capacitor/core";
+import { seoData, schemas } from "@/lib/seo-data";
 
 const FAQ = () => {
   const faqData = [
@@ -97,7 +99,28 @@ const FAQ = () => {
 
   return (
     <div className="min-h-screen relative overflow-hidden">
+      <SEO
+        title={seoData.faq.title}
+        description={seoData.faq.description}
+        keywords={seoData.faq.keywords}
+        schema={schemas.faq}
+      />
       <Navbar />
+      
+      {/* SEO H1/H2 - Invisible */}
+      <h1 className="sr-only">
+        FAQ AMZing FBA – Questions fréquentes des vendeurs Amazon
+      </h1>
+      <h2 className="sr-only">
+        Réponses aux questions sur la formation, les abonnements, la marketplace et les outils AMZing FBA
+      </h2>
+      
+      <Link
+        to="/"
+        className="fixed top-[140px] left-4 z-50 bg-primary text-white p-2 rounded-full shadow-lg hover:scale-110 transition-transform"
+      >
+        <ArrowLeft className="w-5 h-5" />
+      </Link>
       
       {isNativeApp && (
         <div className="fixed top-[46px] left-[18px] z-50">

@@ -1,11 +1,35 @@
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import SEO from "@/components/SEO";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Link } from "react-router-dom";
+import { ArrowLeft } from "lucide-react";
+import { seoData } from "@/lib/seo-data";
 
 const Refund = () => {
   return (
     <div className="min-h-screen">
+      <SEO
+        title={seoData.refund.title}
+        description={seoData.refund.description}
+        keywords={seoData.refund.keywords}
+      />
       <Navbar />
+      
+      {/* SEO H1/H2 - Invisible */}
+      <h1 className="sr-only">
+        Politique de remboursement AMZing FBA
+      </h1>
+      <h2 className="sr-only">
+        Conditions de remboursement, annulation et rétractation pour les services AMZing FBA
+      </h2>
+      
+      <Link
+        to="/"
+        className="fixed top-[140px] left-4 z-50 bg-primary text-white p-2 rounded-full shadow-lg hover:scale-110 transition-transform"
+      >
+        <ArrowLeft className="w-5 h-5" />
+      </Link>
       
       <div className="pt-32 pb-20">
         <div className="container mx-auto px-4 max-w-4xl">

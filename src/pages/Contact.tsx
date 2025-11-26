@@ -10,8 +10,10 @@ import { useState } from "react";
 import { z } from "zod";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { useNavigate } from "react-router-dom";
+import SEO from "@/components/SEO";
+import { useNavigate, Link } from "react-router-dom";
 import { Capacitor } from "@capacitor/core";
+import { seoData } from "@/lib/seo-data";
 
 const contactSchema = z.object({
   name: z.string().trim().min(1, "Le nom est requis").max(100, "Le nom est trop long"),
@@ -109,7 +111,27 @@ const Contact = () => {
 
   return (
     <div className="min-h-screen">
+      <SEO
+        title={seoData.contact.title}
+        description={seoData.contact.description}
+        keywords={seoData.contact.keywords}
+      />
       <Navbar />
+      
+      {/* SEO H1/H2 - Invisible */}
+      <h1 className="sr-only">
+        Contactez l'équipe AMZing FBA
+      </h1>
+      <h2 className="sr-only">
+        Support, questions et prise de contact pour les vendeurs Amazon FBA
+      </h2>
+      
+      <Link
+        to="/"
+        className="fixed top-[140px] left-4 z-50 bg-primary text-white p-2 rounded-full shadow-lg hover:scale-110 transition-transform"
+      >
+        <ArrowLeft className="w-5 h-5" />
+      </Link>
       
       {/* Back button for mobile app */}
       {isNativeApp && (

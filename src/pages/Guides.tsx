@@ -4,11 +4,14 @@ import { useMarkAsRead } from '@/hooks/use-mark-as-read';
 import { Capacitor } from '@capacitor/core';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import SEO from '@/components/SEO';
+import OptimizedImage from '@/components/OptimizedImage';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import processFlow from '@/assets/amazon-process-flow.png';
+import { seoData } from '@/lib/seo-data';
 
 const Guides = () => {
   const navigate = useNavigate();
@@ -19,7 +22,21 @@ const Guides = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
+      <SEO
+        title={seoData.guides.title}
+        description={seoData.guides.description}
+        keywords={seoData.guides.keywords}
+      />
       <Navbar />
+      
+      {/* SEO H1/H2 - Invisible */}
+      <h1 className="sr-only">
+        Guides et tutoriels Amazon FBA par AMZing FBA
+      </h1>
+      <h2 className="sr-only">
+        Ressources pédagogiques, fiches pratiques et tutoriels pour progresser sur Amazon FBA et FBM
+      </h2>
+      
       <main className="flex-grow pt-24 md:pt-20">
         <div className="container mx-auto px-4 py-8">
           <div className="max-w-6xl mx-auto">
@@ -76,9 +93,9 @@ const Guides = () => {
                         Une version beaucoup plus professionnelle, stable et scalable de l'achat-revente classique.
                       </p>
                       <div className="bg-background/80 rounded-lg p-6 my-6">
-                        <img 
+                        <OptimizedImage 
                           src={processFlow} 
-                          alt="Schéma du processus Amazon FBA" 
+                          alt="Schéma détaillé du processus logistique Amazon FBA étape par étape" 
                           className="w-full h-auto rounded-lg shadow-lg"
                         />
                       </div>

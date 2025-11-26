@@ -6,11 +6,22 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Capacitor } from "@capacitor/core";
 import { useScrollReveal } from "@/hooks/use-scroll-reveal";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 const Catalogue = () => {
   const isNativeApp = Capacitor.isNativePlatform();
+
+  useEffect(() => {
+    const metaRobots = document.createElement('meta');
+    metaRobots.name = 'robots';
+    metaRobots.content = 'noindex, nofollow';
+    document.head.appendChild(metaRobots);
+    
+    return () => {
+      document.head.removeChild(metaRobots);
+    };
+  }, []);
   const heroReveal = useScrollReveal({ animation: "fade-up", delay: 100 });
   const statsReveal = useScrollReveal({ animation: "scale", delay: 200 });
   const testimonialsReveal = useScrollReveal({ animation: "fade-up", delay: 100 });
@@ -83,6 +94,14 @@ const Catalogue = () => {
   return (
     <div className="min-h-screen relative overflow-hidden">
       <Navbar />
+      
+      {/* SEO H1/H2 - Invisible */}
+      <h1 className="sr-only">
+        Catalogue de produits optimisés pour la revente sur Amazon FBA
+      </h1>
+      <h2 className="sr-only">
+        Produits analysés avec rentabilité, ROI et potentiel de vente pour les vendeurs Amazon FBA
+      </h2>
       
       {/* Animated background - Only for native app */}
       {isNativeApp && (

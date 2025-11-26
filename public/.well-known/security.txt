@@ -1,0 +1,13 @@
+Contact: contact@amzingfba.com
+Expires: 2026-12-31T23:59:59.000Z
+Preferred-Languages: fr, en
+Canonical: https://amzingfba.com/.well-known/security.txt
+
+# Security Policy
+# Si vous découvrez une faille de sécurité, merci de nous contacter immédiatement
+# If you discover a security vulnerability, please contact us immediately
+
+# Company Information
+# N.Z Consulting (Noa Zaghdoun, Auto-entrepreneur)
+# SIRET: 993 348 929 00015
+# 59 Rue de Ponthieu, 75008 Paris, France

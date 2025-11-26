@@ -205,18 +205,70 @@ serve(async (req) => {
           
           logStep("Referral payment status updated", { referralId: referral.id });
         }
-      } else if (subscription.status === "canceled" || subscription.status === "unpaid") {
+      } else if (subscription.status === "canceled" || subscription.status === "unpaid" || subscription.status === "past_due") {
         await supabaseClient
           .from("subscriptions")
           .update({
             plan_type: "free",
             status: "expired",
             is_trial: false,
+            expires_at: new Date().toISOString(), // Force expiration immédiate
           })
           .eq("user_id", profile.id);
         
-        logStep("Subscription cancelled", { userId: profile.id });
+        logStep("Subscription cancelled/unpaid", { userId: profile.id, status: subscription.status });
       }
+    }
+
+    // Handle invoice payment failed - suspend access immediately
+    if (event.type === "invoice.payment_failed") {
+      const invoice = event.data.object as Stripe.Invoice;
+      logStep("Invoice payment failed", { invoiceId: invoice.id });
+
+      const customer = await stripe.customers.retrieve(invoice.customer as string);
+      if (customer.deleted) {
+        logStep("Customer was deleted");
+        return new Response(JSON.stringify({ received: true }), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
+
+      const customerEmail = customer.email;
+      if (!customerEmail) {
+        logStep("No customer email found");
+        return new Response(JSON.stringify({ received: true }), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
+
+      const { data: profile } = await supabaseClient
+        .from("profiles")
+        .select("id")
+        .eq("email", customerEmail)
+        .single();
+
+      if (!profile) {
+        logStep("User not found for email", { email: customerEmail });
+        return new Response(JSON.stringify({ received: true }), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
+
+      // Immediately suspend VIP access when payment fails
+      await supabaseClient
+        .from("subscriptions")
+        .update({
+          plan_type: "free",
+          status: "unpaid",
+          is_trial: false,
+          expires_at: new Date().toISOString(), // Force expiration immédiate
+        })
+        .eq("user_id", profile.id);
+      
+      logStep("VIP access suspended due to payment failure", { userId: profile.id });
     }
 
     return new Response(JSON.stringify({ received: true }), {

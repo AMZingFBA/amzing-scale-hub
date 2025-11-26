@@ -3,7 +3,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { Loader2, Users, Mail, Phone, UserCircle, ArrowLeft, Search, Calendar, MessageCircle, Crown, Shield, Filter, ChevronLeft, ChevronRight, Clock, AlertCircle, Trash2 } from 'lucide-react';
+import { Loader2, Users, Mail, Phone, UserCircle, ArrowLeft, Search, Calendar, MessageCircle, Crown, Shield, Filter, ChevronLeft, ChevronRight, Clock, AlertCircle, Trash2, Copy, CheckCircle, RefreshCw } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -45,6 +45,8 @@ const AdminProfiles = () => {
   const [filterExpiry, setFilterExpiry] = useState<string>('all');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
+  const [copiedText, setCopiedText] = useState<string>('');
+  const [syncing, setSyncing] = useState(false);
 
   useEffect(() => {
     if (!user) {
@@ -128,6 +130,17 @@ const AdminProfiles = () => {
     }
   };
 
+  const copyToClipboard = async (text: string, label: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopiedText(text);
+      toast.success(`${label} copié !`);
+      setTimeout(() => setCopiedText(''), 2000);
+    } catch (error) {
+      toast.error('Erreur lors de la copie');
+    }
+  };
+
   const handleDeleteUser = async (userId: string, userEmail: string) => {
     if (!confirm(`Êtes-vous sûr de vouloir supprimer définitivement le compte de ${userEmail} ?\n\nCette action est irréversible et supprimera :\n- Le profil utilisateur\n- Tous les messages\n- L'abonnement\n- Toutes les données associées`)) {
       return;
@@ -167,6 +180,37 @@ const AdminProfiles = () => {
     }
   };
 
+  const syncStripePayments = async () => {
+    try {
+      setSyncing(true);
+      toast.info('Synchronisation avec Stripe en cours...');
+
+      const { data, error } = await supabase.functions.invoke('sync-stripe-payments');
+
+      if (error) throw error;
+
+      if (data.success) {
+        toast.success(
+          `Synchronisation terminée : ${data.summary.subscriptions_updated} abonnements mis à jour, ${data.summary.failed_payments_found} paiements échoués trouvés`
+        );
+
+        if (data.failed_payments.length > 0) {
+          console.log('[STRIPE-SYNC] Paiements échoués détectés:', data.failed_payments);
+        }
+
+        // Recharger les profils
+        await loadProfiles();
+      } else {
+        throw new Error('Erreur lors de la synchronisation');
+      }
+    } catch (error: any) {
+      console.error('Error syncing Stripe:', error);
+      toast.error(error.message || 'Erreur lors de la synchronisation avec Stripe');
+    } finally {
+      setSyncing(false);
+    }
+  };
+
   const filteredProfiles = profiles.filter(profile => {
     const search = searchTerm.toLowerCase();
     const matchesSearch = (
@@ -178,7 +222,8 @@ const AdminProfiles = () => {
     );
 
     const matchesRole = filterRole === 'all' || profile.role === filterRole;
-    const matchesPlan = filterPlan === 'all' || profile.subscription?.plan_type === filterPlan;
+    const matchesPlan = filterPlan === 'all' || 
+      (filterPlan === 'unpaid' ? profile.subscription?.status === 'unpaid' : profile.subscription?.plan_type === filterPlan);
 
     // Filter by expiry status
     let matchesExpiry = true;
@@ -231,22 +276,58 @@ const AdminProfiles = () => {
       <main className="flex-grow pt-20 bg-gradient-to-b from-background to-muted/20 p-4 md:p-8">
         <div className="max-w-7xl mx-auto">
           {/* Header avec flèche retour */}
-          <div className="mb-6 flex items-start gap-3">
-            <button
-              onClick={() => navigate('/dashboard')}
-              className="bg-[#FF9900] hover:bg-[#FF9900]/90 p-2 rounded-full shadow-lg transition-all shrink-0 mt-1"
-              aria-label="Retour"
-            >
-              <ArrowLeft className="w-5 h-5 text-white" />
-            </button>
-            
-            <div className="flex-1">
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent mb-2">
-                Gestion des Profils
-              </h1>
-              <p className="text-muted-foreground">
-                Vue d'ensemble de tous les profils utilisateurs
-              </p>
+          <div className="mb-6">
+            <div className="flex items-start gap-3 mb-4">
+              <button
+                onClick={() => navigate('/dashboard')}
+                className="bg-[#FF9900] hover:bg-[#FF9900]/90 p-2 rounded-full shadow-lg transition-all shrink-0 mt-1"
+                aria-label="Retour"
+              >
+                <ArrowLeft className="w-5 h-5 text-white" />
+              </button>
+              
+              <div className="flex-1">
+                <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent mb-2">
+                  Gestion des Profils
+                </h1>
+                <p className="text-muted-foreground">
+                  Vue d'ensemble de tous les profils utilisateurs
+                </p>
+              </div>
+            </div>
+
+            <div className="flex gap-2">
+              {filterPlan === 'unpaid' && (
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setFilterPlan('all');
+                    setCurrentPage(1);
+                  }}
+                  className="gap-2 w-full sm:w-auto"
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                  Retour
+                </Button>
+              )}
+              <Button
+                onClick={syncStripePayments}
+                disabled={syncing}
+                variant="outline"
+                className="gap-2 w-full sm:w-auto"
+              >
+                {syncing ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Synchronisation en cours...
+                  </>
+                ) : (
+                  <>
+                    <RefreshCw className="w-4 h-4" />
+                    Synchroniser avec Stripe
+                  </>
+                )}
+              </Button>
             </div>
           </div>
 
@@ -298,6 +379,7 @@ const AdminProfiles = () => {
                       <SelectItem value="all">Tous les plans</SelectItem>
                       <SelectItem value="vip">VIP</SelectItem>
                       <SelectItem value="free">Gratuit</SelectItem>
+                      <SelectItem value="unpaid">Paiements échoués</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -322,7 +404,7 @@ const AdminProfiles = () => {
           </Card>
 
           {/* Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-6 gap-4 mb-6">
             <Card>
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-medium flex items-center gap-2">
@@ -347,6 +429,23 @@ const AdminProfiles = () => {
                 <div className="text-2xl font-bold">
                   {profiles.filter(p => p.subscription?.plan_type === 'vip' && p.subscription?.status === 'active').length}
                 </div>
+              </CardContent>
+            </Card>
+
+            <Card className="border-orange-200 dark:border-orange-800">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm font-medium flex items-center gap-2">
+                  <Clock className="w-4 h-4 text-orange-500" />
+                  Anciens VIP
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-orange-500">
+                  {profiles.filter(p => {
+                    return p.subscription?.plan_type === 'free' && p.subscription?.expires_at;
+                  }).length}
+                </div>
+                <p className="text-xs text-muted-foreground">ont résilié</p>
               </CardContent>
             </Card>
 
@@ -391,17 +490,24 @@ const AdminProfiles = () => {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card 
+              className="border-red-200 dark:border-red-800 cursor-pointer hover:shadow-md transition-shadow"
+              onClick={() => {
+                setFilterPlan('unpaid');
+                setCurrentPage(1);
+              }}
+            >
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-medium flex items-center gap-2">
-                  <Shield className="w-4 h-4 text-primary" />
-                  Admins
+                  <AlertCircle className="w-4 h-4 text-red-500" />
+                  Paiements échoués
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">
-                  {profiles.filter(p => p.role === 'admin').length}
+                <div className="text-2xl font-bold text-red-500">
+                  {profiles.filter(p => p.subscription?.status === 'unpaid').length}
                 </div>
+                <p className="text-xs text-muted-foreground">cliquez pour filtrer</p>
               </CardContent>
             </Card>
           </div>
@@ -426,8 +532,7 @@ const AdminProfiles = () => {
                         <TableRow>
                           <TableHead>Utilisateur</TableHead>
                           <TableHead>Contact</TableHead>
-                          <TableHead>Statut</TableHead>
-                          <TableHead>Plan</TableHead>
+                          <TableHead>Abonnement</TableHead>
                           <TableHead>Expiration</TableHead>
                           <TableHead>Inscrit</TableHead>
                           <TableHead className="text-right">Actions</TableHead>
@@ -463,37 +568,74 @@ const AdminProfiles = () => {
                               <div className="space-y-1 text-sm">
                                 <div className="flex items-center gap-2">
                                   <Mail className="w-3 h-3 text-muted-foreground" />
-                                  <span className="truncate max-w-[200px]">{profile.email}</span>
+                                  <button
+                                    onClick={() => copyToClipboard(profile.email, 'Email')}
+                                    className="truncate max-w-[200px] hover:text-primary transition-colors flex items-center gap-1 group"
+                                  >
+                                    <span>{profile.email}</span>
+                                    {copiedText === profile.email ? (
+                                      <CheckCircle className="w-3 h-3 text-green-500" />
+                                    ) : (
+                                      <Copy className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                                    )}
+                                  </button>
                                 </div>
-                                {profile.phone && (
-                                  <div className="flex items-center gap-2">
-                                    <Phone className="w-3 h-3 text-muted-foreground" />
-                                    <span>{profile.phone}</span>
-                                  </div>
-                                )}
+                                <div className="flex items-center gap-2">
+                                  <Phone className="w-3 h-3 text-muted-foreground" />
+                                  {profile.phone ? (
+                                    <button
+                                      onClick={() => copyToClipboard(profile.phone!, 'Téléphone')}
+                                      className="hover:text-primary transition-colors flex items-center gap-1 group"
+                                    >
+                                      <span>{profile.phone}</span>
+                                      {copiedText === profile.phone ? (
+                                        <CheckCircle className="w-3 h-3 text-green-500" />
+                                      ) : (
+                                        <Copy className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                                      )}
+                                    </button>
+                                  ) : (
+                                    <span className="text-muted-foreground italic text-xs">Non renseigné</span>
+                                  )}
+                                </div>
                               </div>
                             </TableCell>
                             <TableCell>
-                              {profile.subscription?.status === 'active' ? (
-                                <Badge variant="default" className="bg-green-500">Actif</Badge>
-                              ) : profile.subscription?.status === 'canceled' ? (
-                                <Badge variant="secondary">Annulé</Badge>
-                              ) : (
-                                <Badge variant="outline">Expiré</Badge>
-                              )}
-                            </TableCell>
-                            <TableCell>
-                              {profile.subscription?.plan_type === 'vip' ? (
-                                <Badge className="bg-[#FF9900] hover:bg-[#FF9900]/90">
-                                  <Crown className="w-3 h-3 mr-1" />
-                                  VIP
-                                </Badge>
-                              ) : (
-                                <Badge variant="outline">Gratuit</Badge>
-                              )}
-                              {profile.subscription?.is_trial && (
-                                <Badge variant="secondary" className="ml-1 text-xs">Essai</Badge>
-                              )}
+                              <div className="flex flex-col gap-1">
+                                {profile.subscription?.plan_type === 'vip' ? (
+                                  profile.subscription?.status === 'active' ? (
+                                    <Badge className="bg-green-500 hover:bg-green-600">
+                                      <Crown className="w-3 h-3 mr-1" />
+                                      VIP Actif
+                                    </Badge>
+                                  ) : profile.subscription?.status === 'canceled' ? (
+                                    <Badge variant="secondary">
+                                      <Crown className="w-3 h-3 mr-1" />
+                                      VIP Annulé
+                                    </Badge>
+                                   ) : profile.subscription?.status === 'unpaid' ? (
+                                    <Badge variant="destructive">
+                                      <AlertCircle className="w-3 h-3 mr-1" />
+                                      Paiement échoué
+                                    </Badge>
+                                  ) : (
+                                    <Badge variant="outline" className="text-red-500 border-red-500">
+                                      <Crown className="w-3 h-3 mr-1" />
+                                      VIP Expiré
+                                    </Badge>
+                                  )
+                                ) : profile.subscription?.expires_at ? (
+                                  <div className="flex flex-col gap-1">
+                                    <Badge variant="outline">Gratuit</Badge>
+                                    <Badge variant="outline" className="text-orange-500 border-orange-500">
+                                      <Clock className="w-3 h-3 mr-1" />
+                                      Ancien VIP
+                                    </Badge>
+                                  </div>
+                                ) : (
+                                  <Badge variant="outline">Gratuit</Badge>
+                                )}
+                              </div>
                             </TableCell>
                             <TableCell>
                               {profile.subscription?.expires_at ? (
@@ -501,13 +643,36 @@ const AdminProfiles = () => {
                                   const expiresAt = new Date(profile.subscription.expires_at);
                                   const now = new Date();
                                   const daysUntilExpiry = Math.ceil((expiresAt.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+                                  const daysSinceExpiry = Math.abs(daysUntilExpiry);
+                                  
+                                  // Affichage spécifique pour paiements échoués
+                                  if (profile.subscription?.status === 'unpaid') {
+                                    return (
+                                      <div className="flex items-center gap-2">
+                                        <AlertCircle className="w-4 h-4 text-red-500" />
+                                        <div>
+                                          <div className="text-sm font-medium text-red-500">
+                                            Paiement refusé
+                                          </div>
+                                          <div className="text-xs text-muted-foreground">
+                                            Le {expiresAt.toLocaleDateString('fr-FR')}
+                                          </div>
+                                        </div>
+                                      </div>
+                                    );
+                                  }
                                   
                                   if (daysUntilExpiry < 0) {
                                     return (
                                       <div className="flex items-center gap-2">
                                         <AlertCircle className="w-4 h-4 text-red-500" />
                                         <div>
-                                          <div className="text-sm font-medium text-red-500">Expiré</div>
+                                          <div className="text-sm font-medium text-red-500">
+                                            {profile.subscription?.status === 'canceled' || profile.subscription?.status === 'expired' ? 'Résilié' : 'Expiré'}
+                                          </div>
+                                          <div className="text-xs text-muted-foreground">
+                                            Il y a {daysSinceExpiry} jour{daysSinceExpiry > 1 ? 's' : ''}
+                                          </div>
                                           <div className="text-xs text-muted-foreground">
                                             {expiresAt.toLocaleDateString('fr-FR')}
                                           </div>

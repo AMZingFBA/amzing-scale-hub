@@ -6,13 +6,30 @@ import { useAuth } from '@/hooks/use-auth';
 
 const AppInstallBanner = () => {
   const [isVisible, setIsVisible] = useState(false);
+  const [platform, setPlatform] = useState<'ios' | 'android' | 'desktop'>('desktop');
   const { isVIP } = useAuth();
 
   useEffect(() => {
-    // Only show banner on web (not in Capacitor app) and not to VIP users
+    // Detect platform
+    const userAgent = navigator.userAgent || navigator.vendor || (window as any).opera;
+    
+    let detectedPlatform: 'ios' | 'android' | 'desktop' = 'desktop';
+    
+    // Check if iOS
+    if (/iPad|iPhone|iPod/.test(userAgent) && !(window as any).MSStream) {
+      detectedPlatform = 'ios';
+    } 
+    // Check if Android
+    else if (/android/i.test(userAgent)) {
+      detectedPlatform = 'android';
+    }
+    
+    setPlatform(detectedPlatform);
+    
+    // Only show banner on mobile platforms (not desktop) and not to VIP users
     const isNativePlatform = Capacitor.isNativePlatform();
     
-    if (!isNativePlatform && !isVIP) {
+    if (!isNativePlatform && !isVIP && detectedPlatform !== 'desktop') {
       // Check if user has dismissed the banner in the last 24 hours
       const dismissedUntil = localStorage.getItem('app-install-banner-dismissed-until');
       
@@ -53,34 +70,38 @@ const AppInstallBanner = () => {
             </p>
           </div>
           <div className="flex items-center gap-2">
-            <Button
-              variant="secondary"
-              size="sm"
-              className="bg-white text-primary hover:bg-white/90 hidden sm:inline-flex"
-              asChild
-            >
-              <a
-                href="https://apps.apple.com/app/amzing-fba"
-                target="_blank"
-                rel="noopener noreferrer"
+            {platform === 'ios' && (
+              <Button
+                variant="secondary"
+                size="sm"
+                className="bg-white text-primary hover:bg-white/90"
+                asChild
               >
-                App Store
-              </a>
-            </Button>
-            <Button
-              variant="secondary"
-              size="sm"
-              className="bg-white text-primary hover:bg-white/90 hidden sm:inline-flex"
-              asChild
-            >
-              <a
-                href="https://play.google.com/store/apps/details?id=app.lovable.amzing"
-                target="_blank"
-                rel="noopener noreferrer"
+                <a
+                  href="https://apps.apple.com/app/amzing-fba"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  App Store
+                </a>
+              </Button>
+            )}
+            {platform === 'android' && (
+              <Button
+                variant="secondary"
+                size="sm"
+                className="bg-white text-primary hover:bg-white/90"
+                asChild
               >
-                Google Play
-              </a>
-            </Button>
+                <a
+                  href="https://play.google.com/store/apps/details?id=app.lovable.amzing"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Google Play
+                </a>
+              </Button>
+            )}
             <button
               onClick={handleDismiss}
               className="text-white hover:text-white/80 transition-colors p-1"

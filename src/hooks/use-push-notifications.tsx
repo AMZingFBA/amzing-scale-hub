@@ -89,8 +89,8 @@ export const usePushNotifications = () => {
     console.log('👤 User ID:', user.id);
     console.log('🎫 Token:', pendingToken.substring(0, 20) + '...');
     
-    const platform = (window as any).Capacitor?.getPlatform?.() || 'unknown';
-    console.log('📱 Platform:', platform);
+    const devicePlatform = (window as any).Capacitor?.getPlatform?.() || 'unknown';
+    console.log('📱 Platform:', devicePlatform);
 
     const saveToken = async () => {
       try {
@@ -99,7 +99,7 @@ export const usePushNotifications = () => {
           .upsert({
             user_id: user.id,
             token: pendingToken,
-            platform: platform,
+            platform: devicePlatform,
             updated_at: new Date().toISOString()
           }, {
             onConflict: 'user_id,token'
@@ -150,9 +150,10 @@ export const usePushNotifications = () => {
           console.log('✅ Push notification permission granted');
 
           // Ajouter les listeners AVANT d'enregistrer
-          // Écouter l'enregistrement réussi - on reçoit le token APNs (DEBUG ONLY)
+          // Écouter l'enregistrement réussi et sauvegarder le token
           await PushNotifications.addListener('registration', async (token: Token) => {
-            console.log('📱 APNs Token received (DEBUG ONLY, NOT SAVED):', token.value);
+            console.log('📱 FCM Token received:', token.value);
+            setPendingToken(token.value);
           });
 
           // Écouter les erreurs d'enregistrement

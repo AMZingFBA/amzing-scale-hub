@@ -2,30 +2,65 @@ import { Check, Star, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Checkbox } from "@/components/ui/checkbox";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import SEO from "@/components/SEO";
 import { Link, useNavigate } from "react-router-dom";
 import { Capacitor } from "@capacitor/core";
 import { useTrial } from "@/hooks/use-trial";
 import { useAuth } from "@/hooks/use-auth";
+import { seoData, schemas } from "@/lib/seo-data";
+import { useState } from "react";
 
 const Tarifs = () => {
   const navigate = useNavigate();
   const isNativeApp = Capacitor.isNativePlatform();
   const { startFreeTrial, isStarting } = useTrial();
   const { user } = useAuth();
+  const [showCGVModal, setShowCGVModal] = useState(false);
+  const [acceptedCGV, setAcceptedCGV] = useState(false);
+
+  // Rediriger vers la page Android si sur Android
+  if (Capacitor.isNativePlatform() && Capacitor.getPlatform() === 'android') {
+    navigate('/android-payment');
+    return null;
+  }
 
   const handleStartTrial = async () => {
     if (!user) {
       navigate('/auth?tab=signup');
       return;
     }
+    setShowCGVModal(true);
+  };
+
+  const handleConfirmPayment = async () => {
+    if (!acceptedCGV) {
+      return;
+    }
+    setShowCGVModal(false);
     await startFreeTrial();
   };
 
   return (
     <div className="min-h-screen relative overflow-hidden">
+      <SEO
+        title={seoData.tarifs.title}
+        description={seoData.tarifs.description}
+        keywords={seoData.tarifs.keywords}
+        schema={schemas.product}
+      />
       <Navbar />
+      
+      {/* SEO H1/H2 - Invisible */}
+      <h1 className="sr-only">
+        Tarifs et abonnements AMZing FBA pour vendeurs Amazon FBA et FBM
+      </h1>
+      <h2 className="sr-only">
+        Comparaison des offres, abonnements et formules AMZing FBA pour accompagner les vendeurs Amazon
+      </h2>
       
       {isNativeApp && (
         <div className="fixed top-[46px] left-[18px] z-50">
@@ -228,6 +263,63 @@ const Tarifs = () => {
           </Card>
         </div>
       </div>
+
+      {/* CGV Modal */}
+      <Dialog open={showCGVModal} onOpenChange={setShowCGVModal}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Confirmation d'abonnement</DialogTitle>
+            <DialogDescription>
+              Veuillez accepter les conditions avant de continuer
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <div className="bg-primary/5 p-4 rounded-lg border border-primary/20">
+              <p className="text-sm font-semibold mb-2">Abonnement VIP AMZing FBA</p>
+              <p className="text-2xl font-bold text-primary">34,99€<span className="text-sm font-normal text-muted-foreground">/mois</span></p>
+              <p className="text-xs text-muted-foreground mt-2">Sans engagement • Résiliable à tout moment</p>
+            </div>
+
+            <div className="flex items-start space-x-3">
+              <Checkbox 
+                id="cgv-payment" 
+                checked={acceptedCGV}
+                onCheckedChange={(checked) => setAcceptedCGV(checked === true)}
+                className="mt-1"
+              />
+              <label htmlFor="cgv-payment" className="text-sm leading-relaxed cursor-pointer select-none">
+                Je reconnais avoir lu et accepté les{" "}
+                <Link 
+                  to="/cgv" 
+                  target="_blank"
+                  className="text-primary hover:underline font-medium"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  Conditions Générales de Vente
+                </Link>
+                {" "}et je demande l'exécution immédiate du service.
+              </label>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button 
+              variant="outline" 
+              onClick={() => setShowCGVModal(false)}
+            >
+              Annuler
+            </Button>
+            <Button 
+              onClick={handleConfirmPayment}
+              disabled={!acceptedCGV || isStarting}
+              className="bg-gradient-to-r from-primary to-secondary"
+            >
+              {isStarting ? 'Traitement...' : 'Confirmer le paiement'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <Footer />
     </div>

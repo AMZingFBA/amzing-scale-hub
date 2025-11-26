@@ -14,6 +14,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Loader2, Plus, Trash2, Link2, Image, Video, Mic, FileText, AlertCircle, Edit2, MapPin } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import OptimizedImage from '@/components/OptimizedImage';
 
 const AdminAlerts = () => {
   const { user } = useAuth();
@@ -556,7 +557,7 @@ const AdminAlerts = () => {
                   {filePreview && (
                     <div className="mt-4">
                       {file?.type.startsWith('image/') && (
-                        <img src={filePreview} alt="Preview" className="max-w-xs rounded-lg" />
+                        <OptimizedImage src={filePreview} alt="Aperçu fichier uploadé" className="max-w-xs rounded-lg" />
                       )}
                       {file?.type.startsWith('video/') && (
                         <video src={filePreview} controls className="max-w-xs rounded-lg" />

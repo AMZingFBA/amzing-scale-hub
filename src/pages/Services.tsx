@@ -4,9 +4,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import SEO from "@/components/SEO";
 import { Link, useNavigate } from "react-router-dom";
 import { useScrollReveal } from "@/hooks/use-scroll-reveal";
 import { Capacitor } from "@capacitor/core";
+import { seoData } from "@/lib/seo-data";
 
 const ServiceCard = ({ children, delay }: { children: React.ReactNode, delay: number }) => {
   const { ref, isVisible } = useScrollReveal({ delay });
@@ -37,7 +39,20 @@ const Services = () => {
   
   return (
     <div className="min-h-screen">
+      <SEO
+        title={seoData.services.title}
+        description={seoData.services.description}
+        keywords={seoData.services.keywords}
+      />
       <Navbar />
+      
+      {/* SEO H1/H2 - Invisible */}
+      <h1 className="sr-only">
+        Services professionnels AMZing FBA pour vendeurs Amazon
+      </h1>
+      <h2 className="sr-only">
+        Accompagnement, prestations, optimisation et services dédiés aux business Amazon FBA et FBM
+      </h2>
       
       {/* Back button for mobile app */}
       {isNativeApp && (
@@ -496,7 +511,7 @@ const Services = () => {
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button variant="hero" size="xl" asChild>
                   <Link to="/tarifs">
-                    Commencer l'essai gratuit (15 jours)
+                    S'abonner maintenant
                   </Link>
                 </Button>
                 <Button variant="outline" size="xl" className="border-white text-white hover:bg-white/10" asChild>

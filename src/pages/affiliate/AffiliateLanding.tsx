@@ -4,6 +4,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { useNavigate } from "react-router-dom";
 import { Users, TrendingUp, Euro, Gift, Award, Zap, CheckCircle, AlertCircle, Handshake, ArrowLeft } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
+import SEO from "@/components/SEO";
+import { seoData } from "@/lib/seo-data";
 
 const AffiliateLanding = () => {
   const navigate = useNavigate();
@@ -11,6 +13,19 @@ const AffiliateLanding = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-secondary/10">
+      <SEO
+        title={seoData.affiliate.title}
+        description={seoData.affiliate.description}
+        keywords={seoData.affiliate.keywords}
+      />
+      {/* SEO H1/H2 - Invisible */}
+      <h1 className="sr-only">
+        Programme d'affiliation AMZing FBA
+      </h1>
+      <h2 className="sr-only">
+        Informations sur le programme d'affiliation, commissions et partenariats pour promouvoir AMZing FBA
+      </h2>
+      
       {/* Hero Section with Gradient Background */}
       <div className="relative overflow-hidden">
         <Button

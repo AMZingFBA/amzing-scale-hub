@@ -6,8 +6,20 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Star, CheckCircle, Sparkles, ArrowLeft, MessageSquare, TrendingUp, Award } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useEffect } from 'react';
 
 const AvisPage = () => {
+  useEffect(() => {
+    const metaRobots = document.createElement('meta');
+    metaRobots.name = 'robots';
+    metaRobots.content = 'noindex, nofollow';
+    document.head.appendChild(metaRobots);
+    
+    return () => {
+      document.head.removeChild(metaRobots);
+    };
+  }, []);
+
   const heroReveal = useScrollReveal({ animation: "fade-up", delay: 0 });
   const benefitsReveal = useScrollReveal({ animation: "scale", delay: 100 });
   const strategiesReveal = useScrollReveal({ animation: "fade-up", delay: 200 });
@@ -16,6 +28,14 @@ const AvisPage = () => {
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-background via-background to-accent/20">
       <Navbar />
+      
+      {/* SEO H1/H2 - Invisible */}
+      <h1 className="sr-only">
+        Avis clients et retours d'expérience AMZing FBA
+      </h1>
+      <h2 className="sr-only">
+        Témoignages et avis des vendeurs accompagnés par AMZing FBA
+      </h2>
       
       <main className="flex-1 pt-24 pb-16">
         <div className="container mx-auto px-4">

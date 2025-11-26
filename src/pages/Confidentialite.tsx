@@ -1,10 +1,25 @@
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import SEO from "@/components/SEO";
+import { seoData } from "@/lib/seo-data";
 
 const Confidentialite = () => {
   return (
     <div className="min-h-screen">
+      <SEO
+        title={seoData.confidentialite.title}
+        description={seoData.confidentialite.description}
+        keywords={seoData.confidentialite.keywords}
+      />
       <Navbar />
+      
+      {/* SEO H1/H2 - Invisible */}
+      <h1 className="sr-only">
+        Politique de confidentialité AMZing FBA
+      </h1>
+      <h2 className="sr-only">
+        Protection des données personnelles, cookies et gestion de la vie privée des utilisateurs
+      </h2>
       
       <div className="pt-32 pb-20">
         <div className="container mx-auto px-4 max-w-3xl">

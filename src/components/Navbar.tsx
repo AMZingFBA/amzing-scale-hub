@@ -13,6 +13,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Capacitor } from "@capacitor/core";
+import OptimizedImage from "@/components/OptimizedImage";
 import logo from "@/assets/logo-amzing.png";
 
 const Navbar = () => {
@@ -143,7 +144,7 @@ const Navbar = () => {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-20">
           <Link to={isVIP || isAdmin ? "/dashboard" : "/"} className="flex items-center group select-none">
-            <img src={logo} alt="AMZing FBA" className="h-12 transition-transform group-hover:scale-105 select-none pointer-events-none" draggable="false" />
+            <OptimizedImage src={logo} alt="Logo AMZing FBA" className="h-12 transition-transform group-hover:scale-105 select-none pointer-events-none" draggable="false" />
           </Link>
 
           {/* Desktop Navigation */}
@@ -227,7 +228,7 @@ const Navbar = () => {
                   <Link to="/auth">Connexion</Link>
                 </Button>
                 <Button variant="hero" size="lg" asChild>
-                  <Link to="/auth">Commencer</Link>
+                  <Link to="/auth?tab=signup">Commencer</Link>
                 </Button>
               </div>
             )}
@@ -313,7 +314,7 @@ const Navbar = () => {
                   </Link>
                 </Button>
                 <Button variant="hero" size="lg" className="w-full" asChild>
-                  <Link to="/auth" onClick={() => setIsOpen(false)}>
+                  <Link to="/auth?tab=signup" onClick={() => setIsOpen(false)}>
                     Commencer
                   </Link>
                 </Button>

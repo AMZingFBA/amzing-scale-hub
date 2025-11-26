@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "917935715998",
+    "project_id": "amzingfba",
+    "storage_bucket": "amzingfba.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:917935715998:android:1b43f52c890201ed11ed8f",
+        "android_client_info": {
+          "package_name": "com.amzing.fba"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAnhMla-mF1fr252Yn7L61xRA45YLhanTo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

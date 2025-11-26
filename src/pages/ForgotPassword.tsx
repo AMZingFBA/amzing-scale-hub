@@ -7,6 +7,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import OptimizedImage from '@/components/OptimizedImage';
 import logo from '@/assets/logo.png';
 
 const ForgotPassword = () => {
@@ -90,7 +91,7 @@ const ForgotPassword = () => {
     <div className="min-h-screen bg-gradient-to-br from-primary/10 via-background to-secondary/10 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <Link to="/auth" className="flex items-center justify-center mb-8">
-          <img src={logo} alt="AMZing FBA" className="w-full max-w-md" />
+          <OptimizedImage src={logo} alt="Logo AMZing FBA - Réinitialisation mot de passe" className="w-full max-w-md" />
         </Link>
 
         <Card className="border-2">

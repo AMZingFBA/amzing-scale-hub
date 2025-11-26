@@ -16,6 +16,25 @@ interface VerificationRequest {
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
+// Normalize phone number for consistent comparison
+const normalizePhone = (phone: string): string => {
+  if (!phone) return '';
+  // Remove all non-numeric characters except +
+  let normalized = phone.replace(/[\s\-\(\)\.]/g, '');
+  // If starts with +33, convert to 0
+  if (normalized.startsWith('+33')) {
+    normalized = '0' + normalized.substring(3);
+  }
+  // If starts with 0033, convert to 0
+  if (normalized.startsWith('0033')) {
+    normalized = '0' + normalized.substring(4);
+  }
+  // Remove any remaining + at the start
+  normalized = normalized.replace(/^\+/, '');
+  return normalized;
+};
+
+
 const handler = async (req: Request): Promise<Response> => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -54,24 +73,35 @@ const handler = async (req: Request): Promise<Response> => {
           throw new Error("Un compte existe déjà avec cet email");
         }
         
-        // Check if phone already exists
+        // Check if phone already exists (with normalization)
         if (phone) {
-          const phoneExists = users.users.some(u => 
-            u.user_metadata?.phone === phone
-          );
+          const normalizedPhone = normalizePhone(phone);
+          console.log('Checking phone:', phone, '-> normalized:', normalizedPhone);
+          
+          const phoneExists = users.users.some(u => {
+            const userPhone = u.user_metadata?.phone;
+            if (!userPhone) return false;
+            const normalizedUserPhone = normalizePhone(userPhone);
+            console.log('Comparing with user phone:', userPhone, '-> normalized:', normalizedUserPhone);
+            return normalizedUserPhone === normalizedPhone;
+          });
           
           if (phoneExists) {
             throw new Error("Ce numéro de téléphone est déjà utilisé");
           }
           
-          // Also check in profiles table
-          const { data: existingProfiles } = await supabaseAdmin
+          // Also check in profiles table (with normalization)
+          const { data: allProfiles } = await supabaseAdmin
             .from('profiles')
-            .select('phone')
-            .eq('phone', phone)
-            .maybeSingle();
+            .select('phone');
           
-          if (existingProfiles) {
+          const phoneExistsInProfiles = allProfiles?.some(profile => {
+            if (!profile.phone) return false;
+            const normalizedProfilePhone = normalizePhone(profile.phone);
+            return normalizedProfilePhone === normalizedPhone;
+          });
+          
+          if (phoneExistsInProfiles) {
             throw new Error("Ce numéro de téléphone est déjà utilisé");
           }
         }
@@ -214,6 +244,10 @@ const handler = async (req: Request): Promise<Response> => {
             </div>
             <div class="footer">
               <p>© ${new Date().getFullYear()} Amzing FBA - Tous droits réservés</p>
+              <p style="margin-top: 10px; font-size: 11px;">
+                Pour ne plus recevoir ces emails, cliquez<br>
+                <a href="https://www.amzingfba.com/" style="color: #999; text-decoration: underline;">ici</a>
+              </p>
             </div>
           </div>
         </body>
@@ -252,10 +286,16 @@ const handler = async (req: Request): Promise<Response> => {
     );
   } catch (error: any) {
     console.error("Error in send-verification-code:", error);
+    
+    // Determine if this is a user error (400) or server error (500)
+    const isUserError = error.message?.includes("existe déjà") ||
+                        error.message?.includes("déjà utilisé") ||
+                        error.message?.includes("Email is required");
+    
     return new Response(
       JSON.stringify({ error: error.message }),
       {
-        status: 500,
+        status: isUserError ? 400 : 500,
         headers: { "Content-Type": "application/json", ...corsHeaders },
       }
     );

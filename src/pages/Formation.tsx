@@ -5,7 +5,9 @@ import { Badge } from "@/components/ui/badge";
 import { Link, useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import SEO from "@/components/SEO";
 import { Capacitor } from "@capacitor/core";
+import { seoData, schemas } from "@/lib/seo-data";
 
 const Formation = () => {
   const navigate = useNavigate();
@@ -13,7 +15,21 @@ const Formation = () => {
 
   return (
     <div className="min-h-screen">
+      <SEO
+        title={seoData.formation.title}
+        description={seoData.formation.description}
+        keywords={seoData.formation.keywords}
+        schema={schemas.course}
+      />
       <Navbar />
+      
+      {/* SEO H1/H2 - Invisible */}
+      <h1 className="sr-only">
+        Formation Amazon FBA – Programme complet AMZing FBA pour vendeurs débutants et avancés
+      </h1>
+      <h2 className="sr-only">
+        Formation Amazon FBA en ligne pour apprendre le sourcing, la logistique, l'optimisation et le scaling sur Amazon
+      </h2>
       
       <div className="pt-32 pb-20 relative overflow-hidden">
         {/* Animated background elements */}

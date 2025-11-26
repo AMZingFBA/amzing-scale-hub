@@ -1,47 +1,103 @@
 <!doctype html>
-<html lang="en">
+<html lang="fr">
   <head>
     <meta charset="UTF-8" />
+    
+    <!-- DNS Prefetch & Preconnect pour optimiser les connexions externes -->
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+    <link rel="dns-prefetch" href="https://www.googletagmanager.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <!-- Preload des ressources critiques -->
+    <link rel="preload" href="/hero-warehouse.jpg" as="image" type="image/jpeg">
+    <link rel="preload" href="/src/main.tsx" as="script">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#FF9900">
+    
+    <!-- Meta tags pour webmaster tools -->
+    <meta name="google-site-verification" content="your-google-verification-code">
+    <meta name="msvalidate.01" content="your-bing-verification-code">
+    
+    <!-- Humans.txt et Security.txt -->
+    <link type="text/plain" rel="author" href="/humans.txt">
+    
+    <!-- Favicons -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <link rel="icon" type="image/png" href="/favicon.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AMZing FBA - Formation, Sourcing &amp;amp;amp;amp;amp; Logistique Amazon FBA France</title>
+    <title>AMZing FBA - Formation, Sourcing & Logistique Amazon FBA France</title>
     <meta name="description" content="Formation Amazon FBA complète + catalogue produits rentables + stockage & expédition. Tout pour lancer et scaler votre business e-commerce sur Amazon.">
     <meta name="keywords" content="amazon fba france, formation amazon fba, achat revente amazon, fournisseurs grossistes france, stockage et expédition amazon, produits gagnants amazon">
     <meta name="author" content="AMZing FBA" />
 
     <!-- Open Graph / Facebook -->
-    
-    
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://amzingfba.com" />
-    <meta property="og:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
+    <meta property="og:image" content="https://amzingfba.com/logo-amzing.png" />
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
-    
-    
-    <meta name="twitter:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
+    <meta name="twitter:image" content="https://amzingfba.com/logo-amzing.png" />
     
     <!-- Canonical URL -->
     <link rel="canonical" href="https://amzingfba.com" />
     
+    <!-- JSON-LD Schema.org pour Rich Snippets Google -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "AMZing FBA",
+      "url": "https://amzingfba.com/",
+      "logo": "https://amzingfba.com/logo-amzing.png",
+      "description": "AMZing FBA accompagne tous les vendeurs Amazon FBA/FBM avec des formations, guides, catalogue produits, outils de sourcing, marketplace, support et stratégies pour réussir sur Amazon.",
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "telephone": "+33-1-XX-XX-XX-XX",
+        "contactType": "Customer Service",
+        "email": "contact@amzingfba.com",
+        "availableLanguage": ["French"]
+      },
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "59 Rue de Ponthieu",
+        "addressLocality": "Paris",
+        "postalCode": "75008",
+        "addressCountry": "FR"
+      }
+    }
+    </script>
+    
+    <!-- WebSite Schema avec SearchAction -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "AMZing FBA",
+      "url": "https://amzingfba.com",
+      "description": "Formation, sourcing et outils pour réussir sur Amazon FBA",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": {
+          "@type": "EntryPoint",
+          "urlTemplate": "https://amzingfba.com/search?q={search_term_string}"
+        },
+        "query-input": "required name=search_term_string"
+      }
+    }
+    </script>
+    
+    <!-- Resource hints pour prefetch des pages suivantes probables -->
+    <link rel="prefetch" href="/formation" as="document">
+    <link rel="prefetch" href="/tarifs" as="document">
+    <link rel="prefetch" href="/guides" as="document">
   
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  <meta property="og:title" content="AMZing FBA - Formation, Sourcing &amp;amp;amp;amp;amp; Logistique Amazon FBA France">
-  <meta name="twitter:title" content="AMZing FBA - Formation, Sourcing &amp;amp;amp;amp;amp; Logistique Amazon FBA France">
+  <meta property="og:title" content="AMZing FBA - Formation, Sourcing & Logistique Amazon FBA France">
+  <meta name="twitter:title" content="AMZing FBA - Formation, Sourcing & Logistique Amazon FBA France">
   <meta property="og:description" content="Formation Amazon FBA complète + catalogue produits rentables + stockage &amp; expédition. Tout pour lancer et scaler votre business e-commerce sur Amazon.">
   <meta name="twitter:description" content="Formation Amazon FBA complète + catalogue produits rentables + stockage &amp; expédition. Tout pour lancer et scaler votre business e-commerce sur Amazon.">
 </head>

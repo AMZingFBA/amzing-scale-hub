@@ -6,6 +6,9 @@ enabled = true
 [functions.send-contact-email]
 verify_jwt = false
 
+[functions.send-verification-code]
+verify_jwt = false
+
 [functions.sync-qogita-to-gist]
 verify_jwt = false
 
@@ -25,4 +28,25 @@ verify_jwt = false
 verify_jwt = false
 
 [functions.sync-eany-gist-to-db]
+verify_jwt = false
+
+[functions.sync-stripe-payments]
+verify_jwt = false
+
+[functions.send-payment-failed-email]
+verify_jwt = false
+
+[functions.affiliate-signup]
+verify_jwt = false
+
+[functions.affiliate-verify-code]
+verify_jwt = false
+
+[functions.affiliate-login]
+verify_jwt = false
+
+[functions.affiliate-resend-code]
+verify_jwt = false
+
+[functions.affiliate-track-click]
 verify_jwt = false

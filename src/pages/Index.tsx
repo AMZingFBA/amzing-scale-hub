@@ -9,6 +9,8 @@ import Footer from "@/components/Footer";
 import TestimonialsCarousel from "@/components/TestimonialsCarousel";
 import TestimonialsMobile from "@/components/TestimonialsMobile";
 import AppInstallBanner from "@/components/AppInstallBanner";
+import SEO from "@/components/SEO";
+import OptimizedImage from "@/components/OptimizedImage";
 import heroWarehouse from "@/assets/hero-warehouse.jpg";
 import teamWorking from "@/assets/team-working.jpg";
 import logistics from "@/assets/logistics.jpg";
@@ -18,6 +20,9 @@ import { useScrollReveal } from "@/hooks/use-scroll-reveal";
 import { Capacitor } from "@capacitor/core";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { seoData, schemas } from "@/lib/seo-data";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const ServiceCard = ({ 
   children, 
@@ -69,7 +74,15 @@ const ServiceCard = ({
 };
 
 const Index = () => {
-  const { startFreeTrial, isStarting } = useTrial();
+  const { 
+    startFreeTrial, 
+    isStarting, 
+    showCGVModal, 
+    setShowCGVModal, 
+    acceptedCGV, 
+    setAcceptedCGV, 
+    handleConfirmPayment 
+  } = useTrial();
   const { isVIP, isLoading, user } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -101,15 +114,27 @@ const Index = () => {
 
   return (
     <div className="min-h-screen">
+      <SEO
+        title={seoData.home.title}
+        description={seoData.home.description}
+        keywords={seoData.home.keywords}
+        schema={schemas.organization}
+      />
       <Navbar />
       <AppInstallBanner />
       
+      {/* SEO H1 - Invisible but readable by Google */}
+      <h1 className="sr-only">
+        AMZing FBA – Plateforme complète pour réussir sur Amazon FBA et FBM
+      </h1>
+
       {/* Hero Section */}
       <section className="relative pt-32 pb-20 overflow-hidden">
         <div className="absolute inset-0 z-0">
-          <img 
+          <OptimizedImage 
             src={heroWarehouse} 
-            alt="Warehouse" 
+            alt="Entrepôt logistique Amazon FBA avec produits stockés" 
+            loading="eager"
             className="w-full h-full object-cover opacity-10"
           />
           <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-background to-secondary/20" />
@@ -155,6 +180,10 @@ const Index = () => {
       {/* 3 Reasons Section */}
       <section className="py-20 bg-muted/30">
         <div className="container mx-auto px-4">
+          {/* SEO H2 - Formation */}
+          <h2 className="sr-only">
+            Formation Amazon FBA professionnelle en ligne pour débutants et vendeurs avancés
+          </h2>
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold mb-4">Tout inclus dans l'abonnement</h2>
             <p className="text-xl text-muted-foreground">34,99€/mois pour un accès complet</p>
@@ -208,6 +237,15 @@ const Index = () => {
       {/* What's Included */}
       <section className="py-20">
         <div className="container mx-auto px-4">
+          {/* SEO H2 - Outils de sourcing */}
+          <h2 className="sr-only">
+            Outils de sourcing produits rentables pour Amazon FBA et arbitrage en ligne
+          </h2>
+          
+          {/* SEO H2 - Catalogue */}
+          <h2 className="sr-only">
+            Catalogue de produits optimisés pour la revente sur Amazon FBA
+          </h2>
           <div className="text-center mb-16">
             <Badge className="mb-4 bg-primary/10 text-primary border-primary/20">
               Accès complet
@@ -343,6 +381,10 @@ const Index = () => {
       {/* AMZing FBA 360 Section */}
       <section className="py-20 bg-muted/30">
         <div className="container mx-auto px-4">
+          {/* SEO H2 - Marketplace et services */}
+          <h2 className="sr-only">
+            Marketplace de services spécialisés pour vendeurs Amazon FBA et FBM
+          </h2>
           <Card className="border-2 border-primary/20 shadow-2xl overflow-hidden max-w-6xl mx-auto hover:shadow-glow transition-all duration-500 hover:scale-102 animate-fade-in">
             <div className="grid md:grid-cols-2 gap-0">
               <div className="bg-gradient-to-br from-primary/10 via-secondary/10 to-primary/5 p-12 flex flex-col justify-center relative overflow-hidden">
@@ -439,6 +481,10 @@ const Index = () => {
 
       {/* Testimonials Section */}
       <section className="py-20 bg-muted/30">
+        {/* SEO H2 - Guides et ressources */}
+        <h2 className="sr-only">
+          Guides, tutoriels et accompagnement pour réussir son business Amazon FBA
+        </h2>
         {isNativeApp ? (
           <TestimonialsMobile />
         ) : (
@@ -473,11 +519,18 @@ const Index = () => {
             <Button 
               variant="secondary" 
               size="xl" 
-              className="bg-white text-primary hover:bg-white/90"
+              className="bg-gradient-to-r from-white via-primary/5 to-white bg-[length:200%_100%] animate-[gradient_3s_ease_infinite] text-primary hover:scale-105 hover:shadow-[0_0_40px_rgba(255,153,0,0.4)] transition-all duration-300 relative overflow-hidden group font-semibold border-2 border-primary/10"
               onClick={startFreeTrial}
               disabled={isStarting}
+              style={{
+                animation: 'gradient 3s ease infinite, pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
+              }}
             >
-              {isStarting ? 'Activation...' : 'S\'abonner maintenant'}
+              <span className="relative z-10 flex items-center gap-2">
+                {isStarting ? 'Activation...' : 'S\'abonner maintenant'}
+                <span className="inline-block group-hover:translate-x-1 transition-transform duration-300">→</span>
+              </span>
+              <span className="absolute inset-0 bg-gradient-to-r from-primary/0 via-primary/20 to-primary/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></span>
             </Button>
             <Button variant="outline" size="xl" className="border-white text-white hover:bg-white/10" asChild>
               <Link to="/contact">
@@ -492,6 +545,63 @@ const Index = () => {
       </section>
 
       <Footer />
+
+      {/* CGV Modal */}
+      <Dialog open={showCGVModal} onOpenChange={setShowCGVModal}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Confirmation d'abonnement</DialogTitle>
+            <DialogDescription>
+              Veuillez accepter les conditions avant de continuer
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <div className="bg-primary/5 p-4 rounded-lg border border-primary/20">
+              <p className="text-sm font-semibold mb-2">Abonnement VIP AMZing FBA</p>
+              <p className="text-2xl font-bold text-primary">34,99€<span className="text-sm font-normal text-muted-foreground">/mois</span></p>
+              <p className="text-xs text-muted-foreground mt-2">Sans engagement • Résiliable à tout moment</p>
+            </div>
+
+            <div className="flex items-start space-x-3">
+              <Checkbox 
+                id="cgv-payment" 
+                checked={acceptedCGV}
+                onCheckedChange={(checked) => setAcceptedCGV(checked === true)}
+                className="mt-1"
+              />
+              <label htmlFor="cgv-payment" className="text-sm leading-relaxed cursor-pointer select-none">
+                Je reconnais avoir lu et accepté les{" "}
+                <Link 
+                  to="/cgv" 
+                  target="_blank"
+                  className="text-primary hover:underline font-medium"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  Conditions Générales de Vente
+                </Link>
+                {" "}et je demande l'exécution immédiate du service.
+              </label>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button 
+              variant="outline" 
+              onClick={() => setShowCGVModal(false)}
+            >
+              Annuler
+            </Button>
+            <Button 
+              onClick={handleConfirmPayment}
+              disabled={!acceptedCGV || isStarting}
+              className="bg-gradient-to-r from-primary to-secondary"
+            >
+              {isStarting ? 'Traitement...' : 'Confirmer le paiement'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

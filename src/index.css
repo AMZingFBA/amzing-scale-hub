@@ -105,10 +105,18 @@
 
   body {
     @apply bg-background text-foreground;
+    font-display: swap; /* Optimise le chargement des polices */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
   
   h1, h2, h3, h4, h5, h6 {
     @apply font-bold;
+  }
+  
+  /* Optimisation du rendu des images */
+  img {
+    content-visibility: auto;
   }
 }
 
@@ -148,10 +156,10 @@
 
 @keyframes float {
   0%, 100% { 
-    transform: translateY(0px); 
+    transform: translateY(0px) translateZ(0); /* GPU acceleration */
   }
   50% { 
-    transform: translateY(-20px); 
+    transform: translateY(-20px) translateZ(0);
   }
 }
 
@@ -175,10 +183,12 @@
 
 .animate-scroll-fast {
   animation: scroll-left 25s linear infinite;
+  will-change: transform; /* Optimisation GPU */
 }
 
 .animate-scroll-reverse {
   animation: scroll-right 25s linear infinite;
+  will-change: transform;
 }
 
 .animate-scroll-fast:hover,
@@ -188,26 +198,60 @@
 
 .animate-float {
   animation: float 3s ease-in-out infinite;
+  will-change: transform;
 }
 
 .animate-gradient-shift {
   background-size: 200% 200%;
   animation: gradient-shift 3s ease infinite;
+  will-change: background-position;
 }
 
 .animate-border-glow {
   animation: border-glow 2s ease-in-out infinite;
+  will-change: box-shadow;
 }
 
 .shadow-elegant {
   box-shadow: 0 20px 25px -5px hsl(var(--primary) / 0.1), 0 10px 10px -5px hsl(var(--primary) / 0.04);
 }
 
-/* Scale utilities for subtle animations */
+/* Scale utilities pour subtle animations - GPU optimized */
 .hover\:scale-102:hover {
-  transform: scale(1.02);
+  transform: scale(1.02) translateZ(0);
 }
 
 .active\:scale-95:active {
-  transform: scale(0.95);
+  transform: scale(0.95) translateZ(0);
+}
+
+/* Optimisations accessibilité */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Focus visible pour accessibilité clavier */
+*:focus-visible {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 2px;
+}
+
+/* Réduire les animations pour les utilisateurs qui préfèrent moins de mouvement */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

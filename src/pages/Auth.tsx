@@ -5,13 +5,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
+import OptimizedImage from "@/components/OptimizedImage";
 import logo from "@/assets/logo.png";
-import { Mail, Lock, User, Phone, Package, TrendingUp, BarChart3, CheckCircle2 } from "lucide-react";
+import { Mail, Lock, User, Phone, Package, TrendingUp, BarChart3, CheckCircle2, AlertCircle } from "lucide-react";
 import { Capacitor } from "@capacitor/core";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { supabase } from "@/integrations/supabase/client";
+import { Checkbox } from "@/components/ui/checkbox";
 
 export default function Auth() {
   const navigate = useNavigate();
@@ -27,43 +30,64 @@ export default function Auth() {
   });
   const [verificationCode, setVerificationCode] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [acceptedCGU, setAcceptedCGU] = useState(false);
   const isNativeApp = Capacitor.isNativePlatform();
   
   // Check URL params for default tab and referral code
   const searchParams = new URLSearchParams(window.location.search);
-  const defaultTab = searchParams.get("tab") === "signup" ? "signup" : "login";
+  const urlTab = searchParams.get("tab");
   const referralCode = searchParams.get("ref");
-  const [activeTab, setActiveTab] = useState(defaultTab);
+  const [activeTab, setActiveTab] = useState(urlTab === "signup" ? "signup" : "login");
+
+  // Update active tab when URL changes
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const tab = params.get("tab");
+    if (tab === "signup") {
+      setActiveTab("signup");
+    } else if (tab === "login") {
+      setActiveTab("login");
+    }
+  }, [window.location.search]);
 
   useEffect(() => {
     if (!user) return;
     
     const checkAndRedirect = async () => {
-      // Vérifier le rôle admin
-      const { data: roleData } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', user.id)
-        .eq('role', 'admin')
-        .maybeSingle();
+      // Attendre un peu pour laisser la session s'établir correctement sur mobile
+      await new Promise(resolve => setTimeout(resolve, 500));
       
-      // Vérifier le statut VIP
-      const { data: subData } = await supabase
-        .from('subscriptions')
-        .select('plan_type, status, expires_at')
-        .eq('user_id', user.id)
-        .maybeSingle();
+      try {
+        // Vérifier le rôle admin
+        const { data: roleData } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', user.id)
+          .eq('role', 'admin')
+          .maybeSingle();
+        
+        // Vérifier le statut VIP
+        const { data: subData } = await supabase
+          .from('subscriptions')
+          .select('plan_type, status, expires_at')
+          .eq('user_id', user.id)
+          .maybeSingle();
 
-      const isUserVIP = subData?.plan_type === 'vip' && 
-        (subData?.status === 'active' || subData?.status === 'canceled') &&
-        (!subData?.expires_at || new Date(subData.expires_at) > new Date());
+        const isUserVIP = subData?.plan_type === 'vip' && 
+          (subData?.status === 'active' || subData?.status === 'canceled') &&
+          (!subData?.expires_at || new Date(subData.expires_at) > new Date());
 
-      const isUserAdmin = roleData?.role === 'admin';
+        const isUserAdmin = roleData?.role === 'admin';
 
-      // Rediriger selon le statut
-      if (isUserAdmin || isUserVIP) {
-        navigate("/dashboard", { replace: true });
-      } else {
+        // Rediriger selon le statut
+        if (isUserAdmin || isUserVIP) {
+          navigate("/dashboard", { replace: true });
+        } else {
+          navigate("/", { replace: true });
+        }
+      } catch (error) {
+        console.error('Error checking user status:', error);
+        // En cas d'erreur, rediriger vers la page d'accueil
         navigate("/", { replace: true });
       }
     };
@@ -115,6 +139,13 @@ export default function Auth() {
   const handleSendVerificationCode = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
+    setError(null); // Reset error state
+
+    if (!acceptedCGU) {
+      toast.error("Veuillez accepter les Conditions Générales d'Utilisation");
+      setIsLoading(false);
+      return;
+    }
 
     const formData = new FormData(e.currentTarget);
     const email = formData.get("email") as string;
@@ -122,7 +153,15 @@ export default function Auth() {
     const confirmPassword = formData.get("confirmPassword") as string;
     const fullName = formData.get("fullName") as string;
     const nickname = formData.get("nickname") as string;
-    const phone = formData.get("phone") as string;
+    let phone = formData.get("phone") as string;
+
+    // Normalize phone number
+    phone = phone.replace(/[\s\-\(\)\.]/g, '');
+    if (phone.startsWith('+33')) {
+      phone = '0' + phone.substring(3);
+    } else if (phone.startsWith('0033')) {
+      phone = '0' + phone.substring(4);
+    }
 
     if (password !== confirmPassword) {
       toast.error("Les mots de passe ne correspondent pas");
@@ -134,24 +173,42 @@ export default function Auth() {
     setSignupData({ email, password, fullName, nickname, phone });
 
     try {
-      const { supabase } = await import("@/integrations/supabase/client");
-      const { data, error } = await supabase.functions.invoke('send-verification-code', {
-        body: {
-          type: 'email_signup',
-          email: email.toLowerCase(),
-          phone: phone,
-        },
-      });
+      // Use direct fetch for better error handling
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-verification-code`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY,
+          },
+          body: JSON.stringify({
+            type: 'email_signup',
+            email: email.toLowerCase(),
+            phone: phone,
+          }),
+        }
+      );
 
-      if (error) {
-        throw error;
+      const data = await response.json();
+
+      // Check for errors in response
+      if (!response.ok || data.error) {
+        const errorMessage = data.error || 'Erreur lors de l\'envoi du code';
+        setError(errorMessage);
+        toast.error(errorMessage);
+        setIsLoading(false);
+        return;
       }
 
       toast.success("Code de vérification envoyé par email");
+      setError(null);
       setVerificationStep('verify');
     } catch (error: any) {
       console.error('Error sending verification code:', error);
-      toast.error(error.message || "Erreur lors de l'envoi du code");
+      const errorMessage = error.message || "Erreur lors de l'envoi du code";
+      setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -299,8 +356,8 @@ export default function Auth() {
         
         <div className="w-full max-w-md space-y-8 relative z-10">
           {/* Logo */}
-          <Link to="/" className="flex justify-center animate-slide-in-up" style={{ animationDelay: "0ms" }}>
-            <img src={logo} alt="AMZing FBA" className="h-16 w-auto hover:scale-110 transition-all duration-300" />
+          <Link to="/" className="flex justify-center animate-slide-in-up select-none" style={{ animationDelay: "0ms" }} tabIndex={-1}>
+            <OptimizedImage src={logo} alt="Logo AMZing FBA - Formation Amazon FBA" className="h-16 w-auto hover:scale-110 transition-all duration-300 select-none" draggable="false" />
           </Link>
 
           {/* Form Card */}
@@ -320,6 +377,7 @@ export default function Auth() {
                 value={activeTab} 
                 onValueChange={(value) => {
                   setActiveTab(value);
+                  setError(null); // Reset error when switching tabs
                 }} 
                 className="w-full"
               >
@@ -400,6 +458,15 @@ export default function Auth() {
                 >
                   {verificationStep === 'form' ? (
                     <form onSubmit={handleSendVerificationCode} className="space-y-4">
+                    {error && (
+                      <Alert variant="destructive" className="border-2 animate-slide-in-up">
+                        <AlertCircle className="h-4 w-4" />
+                        <AlertDescription className="font-medium">
+                          {error}
+                        </AlertDescription>
+                      </Alert>
+                    )}
+                    
                     <div className="space-y-2 animate-slide-in-up" style={{ animationDelay: "50ms" }}>
                       <Label htmlFor="signup-fullname">Nom complet</Label>
                       <div className="relative group">
@@ -498,12 +565,32 @@ export default function Auth() {
                       </div>
                     </div>
 
-                    <div className="animate-slide-in-up" style={{ animationDelay: "350ms" }}>
+                    <div className="flex items-start space-x-2 animate-slide-in-up" style={{ animationDelay: "350ms" }}>
+                      <Checkbox 
+                        id="cgu" 
+                        checked={acceptedCGU}
+                        onCheckedChange={(checked) => setAcceptedCGU(checked === true)}
+                        className="mt-1"
+                      />
+                      <label htmlFor="cgu" className="text-sm text-muted-foreground leading-relaxed cursor-pointer select-none">
+                        Je reconnais avoir lu et accepté les{" "}
+                        <Link 
+                          to="/cgu" 
+                          target="_blank"
+                          className="text-primary hover:underline font-medium"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          Conditions Générales d'Utilisation
+                        </Link>
+                      </label>
+                    </div>
+
+                    <div className="animate-slide-in-up" style={{ animationDelay: "400ms" }}>
                       <Button
                         type="submit"
                         variant="hero"
                         className="w-full"
-                        disabled={isLoading}
+                        disabled={isLoading || !acceptedCGU}
                       >
                         {isLoading ? "Envoi du code..." : "Continuer"}
                       </Button>

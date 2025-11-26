@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from './use-auth';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -22,6 +22,8 @@ const APPLE_SUBSCRIPTION_ID = 'com.amzing.vip.monthly';
 
 export const useTrial = () => {
   const [isStarting, setIsStarting] = useState(false);
+  const [showCGVModal, setShowCGVModal] = useState(false);
+  const [acceptedCGV, setAcceptedCGV] = useState(false);
   const { user, refreshSubscription } = useAuth();
   const navigate = useNavigate();
 
@@ -61,8 +63,8 @@ export const useTrial = () => {
     console.log('🚀 [startFreeTrial] Button clicked!');
     
     if (!user) {
-      console.log('❌ [startFreeTrial] No user, redirecting to auth');
-      navigate('/auth');
+      console.log('❌ [startFreeTrial] No user, redirecting to signup');
+      navigate('/auth?tab=signup');
       return;
     }
 
@@ -70,56 +72,54 @@ export const useTrial = () => {
     setIsStarting(true);
     
     try {
-      console.log('🔍 [startFreeTrial] Checking if trial already used...');
+      console.log('🔍 [startFreeTrial] Checking subscription status...');
       
-      // Check if user has already used their trial
+      // Vérifier si l'utilisateur a déjà un abonnement ACTIF
       const { data: subscription } = await supabase
         .from('subscriptions')
-        .select('trial_used')
+        .select('plan_type, status, expires_at')
         .eq('user_id', user.id)
         .single();
 
       console.log('📋 [startFreeTrial] Subscription data:', subscription);
 
-      if (subscription?.trial_used) {
-        console.log('⚠️ [startFreeTrial] Trial already used');
-        toast.error('Vous avez déjà utilisé votre période d\'essai');
+      // Vérifier si abonnement actif ET non expiré
+      const hasActiveSubscription = subscription?.plan_type === 'vip' && 
+        subscription?.status === 'active' &&
+        (!subscription?.expires_at || new Date(subscription.expires_at) > new Date());
+
+      if (hasActiveSubscription) {
+        console.log('⚠️ [startFreeTrial] User already has active subscription');
+        toast.error('Vous avez déjà un abonnement actif');
         setIsStarting(false);
         return;
       }
 
-      console.log('✅ [startFreeTrial] Trial not used, proceeding...');
+      console.log('✅ [startFreeTrial] No active subscription, proceeding to payment...');
       console.log('📱 [startFreeTrial] Is native platform?', isNativePlatform());
+      console.log('📱 [startFreeTrial] Platform:', Capacitor.getPlatform());
 
-      // Si c'est l'app mobile, utiliser Apple IAP
-      if (isNativePlatform()) {
-        console.log('📱 [startFreeTrial] Calling handleAppleIAP...');
-        await handleAppleIAP();
+      // Si c'est Android, rediriger vers la page de paiement Android
+      if (isNativePlatform() && Capacitor.getPlatform() === 'android') {
+        console.log('🤖 [startFreeTrial] Android platform, redirecting to payment page...');
+        navigate('/android-payment');
+        setIsStarting(false);
         return;
       }
 
-      console.log('🌐 [startFreeTrial] Web platform, using Stripe...');
-
-      // Sur le web, créer une session de paiement Stripe
-      console.log('Creating Stripe checkout session...');
-      const { data, error } = await supabase.functions.invoke('create-checkout', {
-        headers: {
-          Authorization: `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
-        },
-      });
-
-      if (error) {
-        console.error('Error creating checkout:', error);
-        throw error;
+      // Si c'est iOS, afficher la modale CGV avant Apple IAP
+      if (isNativePlatform() && Capacitor.getPlatform() === 'ios') {
+        console.log('🍎 [startFreeTrial] iOS platform, showing CGV modal...');
+        setShowCGVModal(true);
+        setIsStarting(false);
+        return;
       }
 
-      if (data?.url) {
-        console.log('Redirecting to Stripe checkout:', data.url);
-        window.open(data.url, '_blank');
-        toast.success('Redirection vers le paiement sécurisé Stripe...');
-      } else {
-        throw new Error('No checkout URL received');
-      }
+      console.log('🌐 [startFreeTrial] Web platform, showing CGV modal...');
+      
+      // Afficher la modale d'acceptation des CGV
+      setShowCGVModal(true);
+      setIsStarting(false);
     } catch (error: any) {
       console.error('Error starting trial:', error);
       toast.error('Erreur lors de la redirection vers le paiement');
@@ -262,6 +262,50 @@ export const useTrial = () => {
     }
   };
 
+  const handleConfirmPayment = useCallback(async () => {
+    if (!acceptedCGV) {
+      return;
+    }
+
+    setShowCGVModal(false);
+    setIsStarting(true);
+
+    try {
+      // Si c'est iOS, utiliser Apple IAP
+      if (isNativePlatform() && Capacitor.getPlatform() === 'ios') {
+        console.log('🍎 [handleConfirmPayment] iOS platform, using Apple IAP...');
+        await handleAppleIAP();
+        return;
+      }
+
+      // Sinon, utiliser Stripe
+      console.log('Creating Stripe checkout session...');
+      const { data, error } = await supabase.functions.invoke('create-checkout', {
+        headers: {
+          Authorization: `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
+        },
+      });
+
+      if (error) {
+        console.error('Error creating checkout:', error);
+        throw error;
+      }
+
+      if (data?.url) {
+        console.log('Redirecting to Stripe checkout:', data.url);
+        window.open(data.url, '_blank');
+        toast.success('Redirection vers le paiement sécurisé Stripe...');
+      } else {
+        throw new Error('No checkout URL received');
+      }
+    } catch (error: any) {
+      console.error('Error starting payment:', error);
+      toast.error('Erreur lors de la redirection vers le paiement');
+    } finally {
+      setIsStarting(false);
+    }
+  }, [acceptedCGV]);
+
   const handlePurchaseSuccess = async (transaction: any) => {
     try {
       console.log('✅ Paiement validé par Apple, mise à jour de l\'abonnement...');
@@ -345,5 +389,10 @@ export const useTrial = () => {
   return {
     startFreeTrial,
     isStarting,
+    showCGVModal,
+    setShowCGVModal,
+    acceptedCGV,
+    setAcceptedCGV,
+    handleConfirmPayment,
   };
 };
