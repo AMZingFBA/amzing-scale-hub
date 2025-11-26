@@ -108,16 +108,37 @@ extension AppDelegate: MessagingDelegate {
         }
         print("🔥 Firebase FCM Token generated: \(token)")
         
-        // CRITICAL: Inject FCM token into JavaScript window object
+        // Store token temporarily - will be injected when WebView is ready
+        UserDefaults.standard.set(token, forKey: "PENDING_FCM_TOKEN")
+        UserDefaults.standard.synchronize()
+        print("✅ FCM Token stored temporarily, waiting for WebView...")
+        
+        // Try to inject immediately if WebView is already loaded
+        injectFCMToken(token)
+    }
+    
+    private func injectFCMToken(_ token: String) {
         DispatchQueue.main.async {
-            if let bridge = self.window?.rootViewController as? CAPBridgeViewController {
-                let script = "window.__FCM_TOKEN__ = '\(token)'; window.dispatchEvent(new CustomEvent('fcmTokenReceived', { detail: { token: '\(token)' } }));"
-                bridge.webView?.evaluateJavaScript(script) { (result, error) in
-                    if let error = error {
-                        print("❌ Error injecting FCM token: \(error)")
-                    } else {
-                        print("✅ FCM Token injected into JavaScript")
-                    }
+            guard let bridge = self.window?.rootViewController as? CAPBridgeViewController,
+                  let webView = bridge.webView else {
+                print("⚠️ WebView not ready yet")
+                return
+            }
+            
+            let script = """
+            (function() {
+                console.log('🔥 Native: Injecting FCM token...');
+                window.__FCM_TOKEN__ = '\(token)';
+                window.dispatchEvent(new CustomEvent('fcmTokenReceived', { detail: { token: '\(token)' } }));
+                console.log('✅ Native: FCM token injected:', '\(token)'.substring(0, 30) + '...');
+            })();
+            """
+            
+            webView.evaluateJavaScript(script) { (result, error) in
+                if let error = error {
+                    print("❌ Error injecting FCM token: \(error)")
+                } else {
+                    print("✅ FCM Token injection successful")
                 }
             }
         }
@@ -133,6 +154,11 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
     
     // This method will be called when user taps on notification
     func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
+        // Inject FCM token again if WebView is now ready
+        if let token = UserDefaults.standard.string(forKey: "PENDING_FCM_TOKEN") {
+            print("🔄 Re-injecting FCM token after notification interaction")
+            injectFCMToken(token)
+        }
         completionHandler()
     }
 }
