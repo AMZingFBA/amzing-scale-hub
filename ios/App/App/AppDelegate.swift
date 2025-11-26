@@ -81,13 +81,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         Messaging.messaging().apnsToken = deviceToken
         print("✅ APNs token passed to Firebase Messaging")
         print("⏳ Waiting for FCM token generation...")
-        // NOTE: Do NOT post APNs token to Capacitor - only FCM token should be posted
+        // CRITICAL: Do NOT post APNs token - it would override FCM token
     }
     
     func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
         print("❌ Failed to register for remote notifications: \(error.localizedDescription)")
-        
-        // CRITICAL: Notify Capacitor PushNotifications plugin of failure
         NotificationCenter.default.post(name: .capacitorDidFailToRegisterForRemoteNotifications, object: error)
     }
     
@@ -108,12 +106,18 @@ extension AppDelegate: MessagingDelegate {
         }
         print("🔥 Firebase FCM Token generated: \(token)")
         
-        // Store token temporarily - will be injected when WebView is ready
-        UserDefaults.standard.set(token, forKey: "PENDING_FCM_TOKEN")
-        UserDefaults.standard.synchronize()
-        print("✅ FCM Token stored temporarily, waiting for WebView...")
+        // Vérifier que c'est bien un FCM token (contient ':')
+        guard token.contains(":") else {
+            print("⚠️ Token invalide (pas de ':'), ignoré")
+            return
+        }
         
-        // Try to inject immediately if WebView is already loaded
+        // Sauvegarder dans UserDefaults
+        UserDefaults.standard.set(token, forKey: "FCM_TOKEN")
+        UserDefaults.standard.synchronize()
+        print("✅ FCM Token sauvegardé dans UserDefaults")
+        
+        // Injecter dans le WebView si prêt
         injectFCMToken(token)
     }
     
@@ -121,24 +125,24 @@ extension AppDelegate: MessagingDelegate {
         DispatchQueue.main.async {
             guard let bridge = self.window?.rootViewController as? CAPBridgeViewController,
                   let webView = bridge.webView else {
-                print("⚠️ WebView not ready yet")
+                print("⚠️ WebView pas encore prêt, token en attente")
                 return
             }
             
             let script = """
             (function() {
-                console.log('🔥 Native: Injecting FCM token...');
+                console.log('🔥 Native: Injection FCM token...');
                 window.__FCM_TOKEN__ = '\(token)';
                 window.dispatchEvent(new CustomEvent('fcmTokenReceived', { detail: { token: '\(token)' } }));
-                console.log('✅ Native: FCM token injected:', '\(token)'.substring(0, 30) + '...');
+                console.log('✅ Native: Token injecté:', '\(token)'.substring(0, 30) + '...');
             })();
             """
             
             webView.evaluateJavaScript(script) { (result, error) in
                 if let error = error {
-                    print("❌ Error injecting FCM token: \(error)")
+                    print("❌ Erreur injection FCM token: \(error)")
                 } else {
-                    print("✅ FCM Token injection successful")
+                    print("✅ FCM Token injecté avec succès")
                 }
             }
         }
@@ -154,9 +158,9 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
     
     // This method will be called when user taps on notification
     func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
-        // Inject FCM token again if WebView is now ready
-        if let token = UserDefaults.standard.string(forKey: "PENDING_FCM_TOKEN") {
-            print("🔄 Re-injecting FCM token after notification interaction")
+        // Réinjecter le FCM token si WebView est maintenant prêt
+        if let token = UserDefaults.standard.string(forKey: "FCM_TOKEN") {
+            print("🔄 Ré-injection FCM token après interaction notification")
             injectFCMToken(token)
         }
         completionHandler()
