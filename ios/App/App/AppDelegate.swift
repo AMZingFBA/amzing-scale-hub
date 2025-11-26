@@ -77,13 +77,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let token = tokenParts.joined()
         print("📱 APNs Token (hex): \(token)")
         
-        // CRITICAL: Pass the token to Firebase Messaging
+        // CRITICAL: Pass the token to Firebase Messaging (will generate FCM token)
         Messaging.messaging().apnsToken = deviceToken
         print("✅ APNs token passed to Firebase Messaging")
-        
-        // CRITICAL: Notify Capacitor PushNotifications plugin
-        NotificationCenter.default.post(name: .capacitorDidRegisterForRemoteNotifications, object: deviceToken)
-        print("✅ Token posted to Capacitor NotificationCenter")
+        print("⏳ Waiting for FCM token generation...")
+        // NOTE: Do NOT post APNs token to Capacitor - only FCM token should be posted (done in MessagingDelegate)
     }
     
     func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
