@@ -81,7 +81,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         Messaging.messaging().apnsToken = deviceToken
         print("✅ APNs token passed to Firebase Messaging")
         print("⏳ Waiting for FCM token generation...")
-        // NOTE: Do NOT post APNs token to Capacitor - only FCM token should be posted (done in MessagingDelegate)
+        // NOTE: Do NOT post APNs token to Capacitor - only FCM token should be posted
     }
     
     func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
@@ -108,18 +108,19 @@ extension AppDelegate: MessagingDelegate {
         }
         print("🔥 Firebase FCM Token generated: \(token)")
         
-        // CRITICAL: Store FCM token in UserDefaults so JavaScript can read it
-        UserDefaults.standard.set(token, forKey: "FCM_TOKEN")
-        UserDefaults.standard.synchronize()
-        print("✅ FCM Token saved to UserDefaults")
-        
-        // ALSO post notification for immediate handling if app is already loaded
-        NotificationCenter.default.post(
-            name: NSNotification.Name("FCMTokenReceived"),
-            object: nil,
-            userInfo: ["token": token]
-        )
-        print("✅ FCM Token notification posted")
+        // CRITICAL: Inject FCM token into JavaScript window object
+        DispatchQueue.main.async {
+            if let bridge = self.window?.rootViewController as? CAPBridgeViewController {
+                let script = "window.__FCM_TOKEN__ = '\(token)'; window.dispatchEvent(new CustomEvent('fcmTokenReceived', { detail: { token: '\(token)' } }));"
+                bridge.webView?.evaluateJavaScript(script) { (result, error) in
+                    if let error = error {
+                        print("❌ Error injecting FCM token: \(error)")
+                    } else {
+                        print("✅ FCM Token injected into JavaScript")
+                    }
+                }
+            }
+        }
     }
 }
 
