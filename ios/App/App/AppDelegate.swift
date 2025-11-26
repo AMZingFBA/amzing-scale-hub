@@ -7,24 +7,28 @@ import FirebaseMessaging
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
-    private var fcmToken: String?
-    private var retryCount = 0
-    private let maxRetries = 15  // 15 tentatives = 30 secondes maximum
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Configure Firebase
         FirebaseApp.configure()
+        print("✅ Firebase configured")
         
         // Set Firebase Messaging delegate
         Messaging.messaging().delegate = self
         
-        // Register for remote notifications
+        // Set UNUserNotificationCenter delegate
         UNUserNotificationCenter.current().delegate = self
+        
+        // Request notification authorization
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { granted, error in
             if granted {
+                print("✅ Notification permission granted")
                 DispatchQueue.main.async {
                     application.registerForRemoteNotifications()
+                    print("📱 Registering for remote notifications...")
                 }
+            } else {
+                print("❌ Notification permission denied: \(String(describing: error))")
             }
         }
         
@@ -66,87 +70,49 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         return ApplicationDelegateProxy.shared.application(application, continue: userActivity, restorationHandler: restorationHandler)
     }
 
-    // MARK: - APNs Token
+    // MARK: - APNs Token Registration
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
-        print("📱 APNs Device Token received")
+        print("✅ APNs Device Token received")
         let tokenParts = deviceToken.map { data in String(format: "%02.2hhx", data) }
         let token = tokenParts.joined()
-        print("📱 APNs Token: \(token)")
+        print("📱 APNs Token (hex): \(token)")
         
-        // Pass the token to Firebase Messaging
+        // CRITICAL: Pass the token to Firebase Messaging
         Messaging.messaging().apnsToken = deviceToken
+        print("✅ APNs token passed to Firebase Messaging")
+        
+        // CRITICAL: Notify Capacitor PushNotifications plugin
+        NotificationCenter.default.post(name: .capacitorDidRegisterForRemoteNotifications, object: deviceToken)
+        print("✅ Token posted to Capacitor NotificationCenter")
     }
     
     func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
-        print("❌ Failed to register for remote notifications: \(error)")
+        print("❌ Failed to register for remote notifications: \(error.localizedDescription)")
+        
+        // CRITICAL: Notify Capacitor PushNotifications plugin of failure
+        NotificationCenter.default.post(name: .capacitorDidFailToRegisterForRemoteNotifications, object: error)
     }
     
-    // Function to send FCM token to JavaScript with retry mechanism
-    private func sendFCMTokenToJS(token: String, attempt: Int = 1) {
-        guard let bridge = (UIApplication.shared.delegate as? AppDelegate)?.window?.rootViewController as? CAPBridgeViewController else {
-            if attempt <= maxRetries {
-                print("⏳ Attempt \(attempt)/\(maxRetries): WebView not ready yet, retrying in 2 seconds...")
-                DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) { [weak self] in
-                    self?.sendFCMTokenToJS(token: token, attempt: attempt + 1)
-                }
-            } else {
-                print("❌ Failed to send FCM token after \(maxRetries) attempts")
-            }
-            return
-        }
+    func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
+        print("📬 Remote notification received")
         
-        guard let webView = bridge.webView else {
-            if attempt <= maxRetries {
-                print("⏳ Attempt \(attempt)/\(maxRetries): WebView not available yet, retrying in 2 seconds...")
-                DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) { [weak self] in
-                    self?.sendFCMTokenToJS(token: token, attempt: attempt + 1)
-                }
-            } else {
-                print("❌ Failed to send FCM token after \(maxRetries) attempts")
-            }
-            return
-        }
-        
-        // WebView is ready, store token globally and dispatch event
-        let js = """
-        window.__FCM_TOKEN__ = '\(token)';
-        window.dispatchEvent(new CustomEvent('fcmTokenReceived', { detail: { token: '\(token)' }}));
-        """
-        webView.evaluateJavaScript(js) { result, error in
-            if let error = error {
-                print("❌ Error sending FCM token to JavaScript: \(error)")
-                if attempt <= self.maxRetries {
-                    print("⏳ Retrying in 2 seconds...")
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) { [weak self] in
-                        self?.sendFCMTokenToJS(token: token, attempt: attempt + 1)
-                    }
-                }
-            } else {
-                print("✅ FCM Token sent to JavaScript successfully on attempt \(attempt)")
-                
-                // Renvoyer le token après 5 secondes pour s'assurer que React est prêt
-                if attempt == 1 {
-                    print("⏳ Re-sending token in 5 seconds to ensure React is ready...")
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) { [weak self] in
-                        self?.sendFCMTokenToJS(token: token, attempt: 99)
-                    }
-                }
-            }
-        }
+        // CRITICAL: Notify Capacitor of remote notification
+        NotificationCenter.default.post(name: Notification.Name.init("didReceiveRemoteNotification"), object: completionHandler, userInfo: userInfo)
     }
 }
 
 // MARK: - MessagingDelegate
 extension AppDelegate: MessagingDelegate {
     func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?) {
-        guard let token = fcmToken else { return }
-        print("🔥 Firebase FCM Token: \(token)")
+        guard let token = fcmToken else { 
+            print("⚠️ FCM token is nil")
+            return 
+        }
+        print("🔥 Firebase FCM Token generated: \(token)")
         
-        // Store the token
-        self.fcmToken = token
-        
-        // Try to send immediately with retry mechanism
-        self.sendFCMTokenToJS(token: token)
+        // CRITICAL: Notify Capacitor PushNotifications plugin with FCM token
+        NotificationCenter.default.post(name: .capacitorDidRegisterForRemoteNotifications, object: token)
+        print("✅ FCM Token posted to Capacitor NotificationCenter")
     }
 }
 
