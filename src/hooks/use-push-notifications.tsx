@@ -23,51 +23,69 @@ export const usePushNotifications = () => {
       return;
     }
 
-    console.log('🎧 FCM token listener setup');
+    console.log('🎧 FCM listener setup...');
     
-    // Check if token was injected before listener was ready
+    // Vérifier si le token a été injecté AVANT que le listener soit prêt
     const checkForToken = () => {
       const existingToken = (window as any).__FCM_TOKEN__;
+      console.log('🔍 window.__FCM_TOKEN__ au démarrage:', existingToken);
+      
       if (existingToken && typeof existingToken === 'string' && existingToken.includes(':')) {
-        console.log('✅ FCM Token found:', existingToken.substring(0, 30) + '...');
+        console.log('✅ Token FCM trouvé:', existingToken.substring(0, 30) + '...');
         setPendingToken(existingToken);
         return true;
       }
       return false;
     };
 
-    // Try immediately
+    // Essayer immédiatement
     if (checkForToken()) {
+      console.log('✅ Token FCM récupéré au démarrage');
       return;
     }
 
-    // Listen for custom event
+    // Écouter l'événement custom depuis Swift
     const handleFCMToken = (event: any) => {
       const token = event?.detail?.token;
-      console.log('🔥 FCM Token event received:', token?.substring(0, 30) + '...');
+      console.log('🔥 Événement fcmTokenReceived reçu');
       
       if (token && typeof token === 'string' && token.includes(':')) {
-        console.log('✅ Valid FCM token format (contains :)');
+        console.log('✅ Format FCM valide (contient :)');
         setPendingToken(token);
         (window as any).__FCM_TOKEN__ = token;
       } else {
-        console.warn('⚠️ Invalid token format (missing :):', token);
+        console.warn('⚠️ Token invalide (pas de :):', token);
       }
     };
 
     window.addEventListener('fcmTokenReceived', handleFCMToken);
-    console.log('✅ FCM event listener registered');
+    console.log('✅ Event listener ajouté');
 
-    // Retry check after delays (in case native code is slow)
-    const retry1 = setTimeout(checkForToken, 500);
-    const retry2 = setTimeout(checkForToken, 1500);
-    const retry3 = setTimeout(checkForToken, 3000);
+    // Retries pour gérer le timing d'injection
+    console.log('⏳ Aucun token pré-existant, attente de l\'événement...');
+    const retry1 = setTimeout(() => {
+      console.log('🔄 Retry 1 (500ms)');
+      checkForToken();
+    }, 500);
+    const retry2 = setTimeout(() => {
+      console.log('🔄 Retry 2 (1500ms)');
+      checkForToken();
+    }, 1500);
+    const retry3 = setTimeout(() => {
+      console.log('🔄 Retry 3 (3000ms)');
+      checkForToken();
+    }, 3000);
+    const retry4 = setTimeout(() => {
+      console.log('🔄 Retry 4 (5000ms)');
+      checkForToken();
+    }, 5000);
 
     return () => {
       window.removeEventListener('fcmTokenReceived', handleFCMToken);
       clearTimeout(retry1);
       clearTimeout(retry2);
       clearTimeout(retry3);
+      clearTimeout(retry4);
     };
   }, []);
 
@@ -162,18 +180,20 @@ export const usePushNotifications = () => {
         if (permStatus.receive === 'granted' || permStatus.receive === 'prompt-with-rationale') {
           console.log('✅ Push notification permission granted');
 
-          // Listen for Capacitor registration event (APNs token - we ignore it)
+          // Écouter l'événement Capacitor (APNs token - ON L'IGNORE COMPLÈTEMENT)
           await PushNotifications.addListener('registration', async (token: Token) => {
             const tokenValue = token.value;
-            console.log('📱 Registration token received:', tokenValue.substring(0, 20) + '...');
+            console.log('📱 Capacitor registration event reçu:', tokenValue.substring(0, 20) + '...');
             
-            // CRITICAL: Only accept tokens with : separator (FCM format)
-            if (tokenValue.includes(':')) {
-              console.log('✅ Valid FCM token format detected');
-              setPendingToken(tokenValue);
-            } else {
-              console.warn('⚠️ APNs token received (ignoring, waiting for FCM)');
+            // CRITIQUE: Ignorer complètement l'APNs token (pas de ':')
+            if (!tokenValue.includes(':')) {
+              console.warn('⚠️ APNs token détecté (IGNORÉ - pas FCM)');
+              return;
             }
+            
+            // Si par miracle Capacitor envoie un FCM token, on le garde
+            console.log('✅ Format FCM détecté via Capacitor');
+            setPendingToken(tokenValue);
           });
 
           // Écouter les erreurs d'enregistrement
