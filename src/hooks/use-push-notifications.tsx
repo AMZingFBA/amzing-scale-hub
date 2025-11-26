@@ -17,47 +17,42 @@ export const usePushNotifications = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  // Get FCM token from native code via Capacitor plugin
+  // Listen for FCM token from native iOS via custom JavaScript event
   useEffect(() => {
     if (!isNativePlatform()) {
       return;
     }
 
-    const getFCMToken = async () => {
-      try {
-        console.log('🔍 Trying to get FCM token from native...');
-        
-        // @ts-ignore - Custom Capacitor plugin
-        const { token } = await Capacitor.Plugins.FCMTokenPlugin.getToken();
-        
-        if (token && token.includes(':')) {
-          // Valid FCM token format (contains colon separator)
-          console.log('✅ FCM Token retrieved:', token.substring(0, 30) + '...');
-          setPendingToken(token);
-          (window as any).__FCM_TOKEN__ = token;
-        } else {
-          console.warn('⚠️ Invalid FCM token format:', token);
-        }
-      } catch (error: any) {
-        console.log('⏳ FCM token not yet available, will retry...', error?.message || error);
-        
-        // Retry after a short delay
-        setTimeout(() => {
-          getFCMToken();
-        }, 500);
+    console.log('🎧 Setting up FCM token listener...');
+    
+    // Check if token already injected by native code
+    const existingToken = (window as any).__FCM_TOKEN__;
+    if (existingToken && existingToken.includes(':')) {
+      console.log('✅ FCM Token already available:', existingToken.substring(0, 30) + '...');
+      setPendingToken(existingToken);
+      return;
+    }
+
+    // Listen for custom event from AppDelegate
+    const handleFCMToken = (event: any) => {
+      const token = event?.detail?.token;
+      console.log('🔥 FCM Token received via event:', token?.substring(0, 30) + '...');
+      
+      if (token && typeof token === 'string' && token.includes(':')) {
+        // Valid FCM token format (must contain : separator like "xxx:APA91b...")
+        console.log('✅ Valid FCM token format confirmed');
+        setPendingToken(token);
+        (window as any).__FCM_TOKEN__ = token;
+      } else {
+        console.warn('⚠️ Invalid FCM token format:', token);
       }
     };
 
-    // Try immediately
-    getFCMToken();
-    
-    // Also try after a delay in case Firebase hasn't generated the token yet
-    const retryTimeout = setTimeout(() => {
-      getFCMToken();
-    }, 2000);
+    window.addEventListener('fcmTokenReceived', handleFCMToken);
+    console.log('✅ FCM token listener registered');
 
     return () => {
-      clearTimeout(retryTimeout);
+      window.removeEventListener('fcmTokenReceived', handleFCMToken);
     };
   }, []);
 
