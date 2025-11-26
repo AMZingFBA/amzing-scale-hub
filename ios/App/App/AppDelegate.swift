@@ -108,9 +108,18 @@ extension AppDelegate: MessagingDelegate {
         }
         print("🔥 Firebase FCM Token generated: \(token)")
         
-        // CRITICAL: Notify Capacitor PushNotifications plugin with FCM token
-        NotificationCenter.default.post(name: .capacitorDidRegisterForRemoteNotifications, object: token)
-        print("✅ FCM Token posted to Capacitor NotificationCenter")
+        // CRITICAL: Store FCM token in UserDefaults so JavaScript can read it
+        UserDefaults.standard.set(token, forKey: "FCM_TOKEN")
+        UserDefaults.standard.synchronize()
+        print("✅ FCM Token saved to UserDefaults")
+        
+        // ALSO post notification for immediate handling if app is already loaded
+        NotificationCenter.default.post(
+            name: NSNotification.Name("FCMTokenReceived"),
+            object: nil,
+            userInfo: ["token": token]
+        )
+        print("✅ FCM Token notification posted")
     }
 }
 

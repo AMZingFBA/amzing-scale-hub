@@ -17,44 +17,47 @@ export const usePushNotifications = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  // Listen for FCM token - AVEC DEBUG
+  // Get FCM token from native code via Capacitor plugin
   useEffect(() => {
-    console.log('🎧 FCM listener setup...');
-    console.log('🔍 window.__FCM_TOKEN__ au démarrage:', (window as any).__FCM_TOKEN__);
-    
     if (!isNativePlatform()) {
       return;
     }
 
-    const handleFCMToken = (event: any) => {
-      console.log('📨 FCM token event complet:', event);
-      const fcmToken = event.detail?.token || event.detail;
-      console.log('📨 FCM token extrait:', fcmToken);
-      
-      if (fcmToken && typeof fcmToken === 'string') {
-        console.log('✅ Token valide, sauvegarde...:', fcmToken.substring(0, 30) + '...');
-        setPendingToken(fcmToken);
-      } else {
-        console.error('❌ Token invalide ou manquant');
+    const getFCMToken = async () => {
+      try {
+        console.log('🔍 Trying to get FCM token from native...');
+        
+        // @ts-ignore - Custom Capacitor plugin
+        const { token } = await Capacitor.Plugins.FCMTokenPlugin.getToken();
+        
+        if (token && token.includes(':')) {
+          // Valid FCM token format (contains colon separator)
+          console.log('✅ FCM Token retrieved:', token.substring(0, 30) + '...');
+          setPendingToken(token);
+          (window as any).__FCM_TOKEN__ = token;
+        } else {
+          console.warn('⚠️ Invalid FCM token format:', token);
+        }
+      } catch (error: any) {
+        console.log('⏳ FCM token not yet available, will retry...', error?.message || error);
+        
+        // Retry after a short delay
+        setTimeout(() => {
+          getFCMToken();
+        }, 500);
       }
     };
 
-    // Écouter l'événement custom
-    window.addEventListener('fcmTokenReceived', handleFCMToken);
-    console.log('✅ Event listener ajouté');
+    // Try immediately
+    getFCMToken();
     
-    // Vérifier si token déjà disponible (NE PAS supprimer pour permettre les retry)
-    const existingToken = (window as any).__FCM_TOKEN__;
-    if (existingToken) {
-      console.log('🔥 Token déjà présent dans window:', existingToken.substring(0, 30) + '...');
-      setPendingToken(existingToken);
-    } else {
-      console.log('⏳ Aucun token pré-existant, attente de l\'événement...');
-    }
+    // Also try after a delay in case Firebase hasn't generated the token yet
+    const retryTimeout = setTimeout(() => {
+      getFCMToken();
+    }, 2000);
 
     return () => {
-      window.removeEventListener('fcmTokenReceived', handleFCMToken);
-      console.log('🧹 Listener nettoyé');
+      clearTimeout(retryTimeout);
     };
   }, []);
 
@@ -150,10 +153,10 @@ export const usePushNotifications = () => {
           console.log('✅ Push notification permission granted');
 
           // Ajouter les listeners AVANT d'enregistrer
-          // Écouter l'enregistrement réussi et sauvegarder le token
+          // NOTE: This receives APNs token, NOT FCM token - we get FCM via plugin instead
           await PushNotifications.addListener('registration', async (token: Token) => {
-            console.log('📱 FCM Token received:', token.value);
-            setPendingToken(token.value);
+            console.log('📱 APNs Token received (not FCM):', token.value.substring(0, 20) + '...');
+            // Don't save this - it's the APNs token, not FCM token
           });
 
           // Écouter les erreurs d'enregistrement
