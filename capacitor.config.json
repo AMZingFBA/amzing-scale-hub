@@ -1,8 +1,0 @@
-{
-  "appId": "com.amzing.fba",
-  "appName": "AMZing FBA",
-  "webDir": "dist",
-  "server": {
-    "androidScheme": "https"
-  }
-}
