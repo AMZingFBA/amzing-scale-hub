@@ -37,12 +37,11 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log('✅ Badge DB → 0');
 
-    // 2. Récupérer les tokens iOS
+    // 2. Récupérer TOUS les tokens (iOS ET Android) pour cet utilisateur
     const { data: tokens, error: tokensError } = await supabaseAdmin
       .from('push_notification_tokens')
       .select('token, platform')
-      .eq('user_id', user_id)
-      .eq('platform', 'ios');
+      .eq('user_id', user_id);
 
     if (tokensError) {
       console.error('❌ Erreur tokens:', tokensError);
@@ -50,14 +49,14 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     if (!tokens || tokens.length === 0) {
-      console.log('⚠️ Pas de tokens iOS');
+      console.log('⚠️ Pas de tokens pour user:', user_id);
       return new Response(
-        JSON.stringify({ message: 'Badge DB reset, pas de tokens iOS' }),
+        JSON.stringify({ message: 'Badge DB reset, pas de tokens' }),
         { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    console.log(`📱 ${tokens.length} token(s) iOS trouvé(s)`);
+    console.log(`📱 ${tokens.length} token(s) trouvé(s) pour user ${user_id} (${tokens.filter(t => t.platform === 'ios').length} iOS, ${tokens.filter(t => t.platform === 'android').length} Android)`);
 
     // 3. Générer access token OAuth2 pour FCM
     const serviceAccountJson = Deno.env.get("FIREBASE_SERVICE_ACCOUNT_JSON");
@@ -75,30 +74,41 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log('✅ Access token FCM généré');
 
-    // 4. Envoyer notification SILENCIEUSE avec badge=0 pour CHAQUE token
+    // 4. Envoyer notification SILENCIEUSE avec badge=0 pour CHAQUE token (iOS ET Android)
     const results = await Promise.all(
-      tokens.map(async ({ token }) => {
+      tokens.map(async ({ token, platform }) => {
         try {
           const fcmUrl = `https://fcm.googleapis.com/v1/projects/${serviceAccount.project_id}/messages:send`;
           
-          const payload = {
+          // Payload différent selon la plateforme
+          let payload: any = {
             message: {
               token: token,
-              apns: {
-                headers: {
-                  'apns-priority': '5',
-                },
-                payload: {
-                  aps: {
-                    'content-available': 1,
-                    badge: 0,
-                  },
-                },
-              },
             },
           };
+
+          if (platform === 'ios') {
+            // iOS: utiliser APNS avec content-available et badge
+            payload.message.apns = {
+              headers: {
+                'apns-priority': '5',
+              },
+              payload: {
+                aps: {
+                  'content-available': 1,
+                  badge: 0,
+                },
+              },
+            };
+          } else if (platform === 'android') {
+            // Android: utiliser data message pour mettre à jour le badge
+            payload.message.data = {
+              type: 'badge_reset',
+              badge: '0',
+            };
+          }
           
-          console.log('📤 Envoi notification silencieuse badge=0...');
+          console.log(`📤 Envoi notification silencieuse badge=0 vers ${platform}...`);
           
           const response = await fetch(fcmUrl, {
             method: 'POST',
@@ -112,26 +122,30 @@ const handler = async (req: Request): Promise<Response> => {
           const result = await response.json();
           
           if (!response.ok) {
-            console.error('❌ Échec envoi:', result);
-            return { success: false, error: result };
+            console.error(`❌ Échec envoi ${platform}:`, result);
+            return { success: false, error: result, platform };
           }
           
-          console.log('✅ Notification silencieuse envoyée');
-          return { success: true };
+          console.log(`✅ Notification silencieuse envoyée vers ${platform}`);
+          return { success: true, platform };
         } catch (error) {
-          console.error('❌ Erreur:', error);
-          return { success: false, error };
+          console.error(`❌ Erreur ${platform}:`, error);
+          return { success: false, error, platform };
         }
       })
     );
 
     const successCount = results.filter(r => r.success).length;
+    const iosCount = results.filter(r => r.success && r.platform === 'ios').length;
+    const androidCount = results.filter(r => r.success && r.platform === 'android').length;
 
     return new Response(
       JSON.stringify({ 
-        message: 'Badge reset effectué',
+        message: 'Badge reset effectué pour user ' + user_id,
         db_reset: true,
         silent_notifications_sent: successCount,
+        ios_notified: iosCount,
+        android_notified: androidCount,
         total_tokens: tokens.length
       }),
       {
