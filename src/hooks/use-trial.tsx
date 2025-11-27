@@ -99,17 +99,8 @@ export const useTrial = () => {
       console.log('📱 [startFreeTrial] Is native platform?', isNativePlatform());
       console.log('📱 [startFreeTrial] Platform:', Capacitor.getPlatform());
 
-      // Si c'est une plateforme native (Android ou iOS), rediriger vers la page de paiement
-      if (isNativePlatform()) {
-        console.log('📱 [startFreeTrial] Native platform, redirecting to payment page...');
-        navigate('/android-payment');
-        setIsStarting(false);
-        return;
-      }
-
-      console.log('🌐 [startFreeTrial] Web platform, showing CGV modal...');
-      
-      // Afficher la modale d'acceptation des CGV
+      // Afficher directement le modal CGV sur toutes les plateformes
+      console.log('✅ [startFreeTrial] Showing CGV modal...');
       setShowCGVModal(true);
       setIsStarting(false);
     } catch (error: any) {
@@ -256,6 +247,7 @@ export const useTrial = () => {
 
   const handleConfirmPayment = useCallback(async () => {
     if (!acceptedCGV) {
+      toast.error("Veuillez accepter les CGV");
       return;
     }
 
@@ -278,7 +270,8 @@ export const useTrial = () => {
 
       if (data?.url) {
         console.log('Redirecting to Stripe checkout:', data.url);
-        // Redirection directe (pas de popup qui peut être bloqué)
+        toast.success("Redirection vers le paiement sécurisé...");
+        // Redirection directe vers Stripe
         window.location.href = data.url;
       } else {
         throw new Error('No checkout URL received');
@@ -286,7 +279,6 @@ export const useTrial = () => {
     } catch (error: any) {
       console.error('Error starting payment:', error);
       toast.error('Erreur lors de la redirection vers le paiement');
-    } finally {
       setIsStarting(false);
     }
   }, [acceptedCGV]);
