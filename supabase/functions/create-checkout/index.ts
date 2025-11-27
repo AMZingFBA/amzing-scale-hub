@@ -31,9 +31,18 @@ serve(async (req) => {
     logStep("Authorization header found");
 
     const token = authHeader.replace("Bearer ", "");
-    const { data } = await supabaseClient.auth.getUser(token);
-    const user = data.user;
-    if (!user?.email) throw new Error("User not authenticated or email not available");
+    const { data: { user }, error: authError } = await supabaseClient.auth.getUser(token);
+    
+    if (authError) {
+      logStep("Auth error", { error: authError.message });
+      throw new Error(`Authentication failed: ${authError.message}`);
+    }
+    
+    if (!user?.email) {
+      logStep("No user or email found");
+      throw new Error("User not authenticated or email not available");
+    }
+    
     logStep("User authenticated", { userId: user.id, email: user.email });
 
     const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
