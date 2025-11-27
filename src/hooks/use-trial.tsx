@@ -257,11 +257,8 @@ export const useTrial = () => {
     try {
       // Utiliser Stripe pour toutes les plateformes (web, iOS, Android)
       console.log('💳 [handleConfirmPayment] Using Stripe checkout...');
-      const { data, error } = await supabase.functions.invoke('create-checkout', {
-        headers: {
-          Authorization: `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
-        },
-      });
+      // supabase.functions.invoke envoie automatiquement le JWT
+      const { data, error } = await supabase.functions.invoke('create-checkout');
 
       if (error) {
         console.error('Error creating checkout:', error);
