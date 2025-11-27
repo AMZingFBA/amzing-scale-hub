@@ -17,10 +17,9 @@ import { useState } from "react";
 const Tarifs = () => {
   const navigate = useNavigate();
   const isNativeApp = Capacitor.isNativePlatform();
-  const { startFreeTrial, isStarting } = useTrial();
+  const { startFreeTrial, isStarting, handleConfirmPayment: confirmPayment, acceptedCGV, setAcceptedCGV } = useTrial();
   const { user } = useAuth();
   const [showCGVModal, setShowCGVModal] = useState(false);
-  const [acceptedCGV, setAcceptedCGV] = useState(false);
 
 
   const handleStartTrial = async () => {
@@ -28,6 +27,14 @@ const Tarifs = () => {
       navigate('/auth?tab=signup');
       return;
     }
+    
+    // Sur mobile, rediriger vers la page de paiement dédiée
+    if (isNativeApp) {
+      navigate('/android-payment');
+      return;
+    }
+    
+    // Sur web, afficher le modal CGV
     setShowCGVModal(true);
   };
 
@@ -36,7 +43,7 @@ const Tarifs = () => {
       return;
     }
     setShowCGVModal(false);
-    await startFreeTrial();
+    await confirmPayment();
   };
 
   return (
