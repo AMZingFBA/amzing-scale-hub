@@ -99,18 +99,10 @@ export const useTrial = () => {
       console.log('📱 [startFreeTrial] Is native platform?', isNativePlatform());
       console.log('📱 [startFreeTrial] Platform:', Capacitor.getPlatform());
 
-      // Si c'est Android, rediriger vers la page de paiement Android
-      if (isNativePlatform() && Capacitor.getPlatform() === 'android') {
-        console.log('🤖 [startFreeTrial] Android platform, redirecting to payment page...');
+      // Si c'est une plateforme native (Android ou iOS), rediriger vers la page de paiement
+      if (isNativePlatform()) {
+        console.log('📱 [startFreeTrial] Native platform, redirecting to payment page...');
         navigate('/android-payment');
-        setIsStarting(false);
-        return;
-      }
-
-      // Si c'est iOS, afficher la modale CGV avant Apple IAP
-      if (isNativePlatform() && Capacitor.getPlatform() === 'ios') {
-        console.log('🍎 [startFreeTrial] iOS platform, showing CGV modal...');
-        setShowCGVModal(true);
         setIsStarting(false);
         return;
       }
@@ -271,15 +263,8 @@ export const useTrial = () => {
     setIsStarting(true);
 
     try {
-      // Si c'est iOS, utiliser Apple IAP
-      if (isNativePlatform() && Capacitor.getPlatform() === 'ios') {
-        console.log('🍎 [handleConfirmPayment] iOS platform, using Apple IAP...');
-        await handleAppleIAP();
-        return;
-      }
-
-      // Sinon, utiliser Stripe
-      console.log('Creating Stripe checkout session...');
+      // Utiliser Stripe pour toutes les plateformes (web, iOS, Android)
+      console.log('💳 [handleConfirmPayment] Using Stripe checkout...');
       const { data, error } = await supabase.functions.invoke('create-checkout', {
         headers: {
           Authorization: `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
