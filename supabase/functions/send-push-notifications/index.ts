@@ -147,17 +147,18 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    // ✅ DÉDUPLICATION: Ne garder que le token le plus récent par user_id
-    // Cela évite d'envoyer plusieurs fois à un même user qui a plusieurs tokens
-    const tokensByUser = new Map();
+    // ✅ DÉDUPLICATION: Garder tous les tokens mais éliminer les vrais doublons (même token + même platform)
+    // Un utilisateur peut avoir iOS + Android et doit recevoir sur les deux
+    const tokenSet = new Map();
     allTokens.forEach(t => {
-      if (!tokensByUser.has(t.user_id)) {
-        tokensByUser.set(t.user_id, t);
+      const key = `${t.token}-${t.platform}`;
+      if (!tokenSet.has(key)) {
+        tokenSet.set(key, t);
       }
     });
-    const tokens = Array.from(tokensByUser.values());
+    const tokens = Array.from(tokenSet.values());
 
-    console.log(`🔵 [${callId}] Found ${tokens.length} unique users with tokens (${allTokens.length} total tokens, ${allTokens.length - tokens.length} duplicates removed)`);
+    console.log(`🔵 [${callId}] Found ${tokens.length} tokens after deduplication (${allTokens.length} total tokens, ${allTokens.length - tokens.length} duplicates removed)`);
 
     // 4. Générer un access token OAuth2 pour FCM v1 API
     const serviceAccountJson = Deno.env.get("FIREBASE_SERVICE_ACCOUNT_JSON");
