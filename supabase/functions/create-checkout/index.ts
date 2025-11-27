@@ -35,12 +35,24 @@ serve(async (req) => {
     
     if (authError) {
       logStep("Auth error", { error: authError.message });
-      throw new Error(`Authentication failed: ${authError.message}`);
+      return new Response(JSON.stringify({ 
+        error: "Session expirée ou invalide. Veuillez vous reconnecter.",
+        code: "AUTH_SESSION_INVALID" 
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 401,
+      });
     }
     
     if (!user?.email) {
       logStep("No user or email found");
-      throw new Error("User not authenticated or email not available");
+      return new Response(JSON.stringify({ 
+        error: "Session expirée. Veuillez vous reconnecter.",
+        code: "AUTH_SESSION_MISSING" 
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 401,
+      });
     }
     
     logStep("User authenticated", { userId: user.id, email: user.email });

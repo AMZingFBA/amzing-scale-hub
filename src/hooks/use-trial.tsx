@@ -262,6 +262,15 @@ export const useTrial = () => {
 
       if (error) {
         console.error('Error creating checkout:', error);
+        
+        // Si session expirée, forcer la déconnexion et rediriger vers login
+        if (error.message?.includes('Session expirée') || error.message?.includes('invalide')) {
+          toast.error('Votre session a expiré. Veuillez vous reconnecter.');
+          await supabase.auth.signOut();
+          navigate('/auth');
+          return;
+        }
+        
         throw error;
       }
 
