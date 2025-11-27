@@ -5,7 +5,13 @@ const config: CapacitorConfig = {
   appName: 'AMZing FBA',
   webDir: 'dist',
   server: {
-    androidScheme: 'https'
+    androidScheme: 'https',
+    allowNavigation: [
+      'localhost',
+      '*.lovableproject.com',
+      'amzingfba.com',
+      '*.amzingfba.com'
+    ]
   }
 };
 
