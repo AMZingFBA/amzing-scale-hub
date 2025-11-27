@@ -3,7 +3,6 @@ import logo from "@/assets/logo-amzing.png";
 import { useAuth } from "@/hooks/use-auth";
 import { useAdmin } from "@/hooks/use-admin";
 import { Mail } from "lucide-react";
-import { Capacitor } from "@capacitor/core";
 
 const Footer = () => {
   const { isVIP } = useAuth();
@@ -107,10 +106,7 @@ const Footer = () => {
                   </Link>
                 </li>
                 <li>
-                  <Link 
-                    to={Capacitor.isNativePlatform() ? "/tarifs-webview" : "/tarifs"} 
-                    className="text-muted-foreground hover:text-primary transition-all duration-300 hover:translate-x-1 inline-block"
-                  >
+                  <Link to="/tarifs" className="text-muted-foreground hover:text-primary transition-all duration-300 hover:translate-x-1 inline-block">
                     Tarifs
                   </Link>
                 </li>
