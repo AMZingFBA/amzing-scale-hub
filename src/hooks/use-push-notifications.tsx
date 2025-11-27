@@ -17,48 +17,55 @@ export const usePushNotifications = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  // Récupérer le FCM token via le plugin natif
+  // Récupérer le FCM token via le plugin natif (iOS uniquement)
   useEffect(() => {
     if (!isNativePlatform()) {
       return;
     }
 
-    console.log('🎧 Récupération FCM token via plugin natif...');
+    const platform = Capacitor.getPlatform();
     
-    const fetchTokenFromNative = async () => {
-      try {
-        // Attendre un peu que Firebase génère le token
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        console.log('🔍 Appel FCMTokenBridge.getToken()...');
-        const { FCMTokenBridge } = (window as any).Capacitor.Plugins;
-        
-        if (!FCMTokenBridge) {
-          console.error('❌ Plugin FCMTokenBridge introuvable');
-          return;
-        }
-        
-        const result = await FCMTokenBridge.getToken();
-        const token = result?.token;
-        
-        console.log('📱 Token reçu du plugin:', token?.substring(0, 30) + '...');
-        
-        if (token && typeof token === 'string' && token.includes(':')) {
-          console.log('✅ Format FCM valide (contient :)');
-          setPendingToken(token);
-        } else {
-          console.warn('⚠️ Token invalide (pas de :):', token);
+    // iOS uniquement - utilise FCMTokenBridge
+    if (platform === 'ios') {
+      console.log('🎧 iOS: Récupération FCM token via FCMTokenBridge...');
+      
+      const fetchTokenFromNative = async () => {
+        try {
+          // Attendre un peu que Firebase génère le token
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          
+          console.log('🔍 Appel FCMTokenBridge.getToken()...');
+          const { FCMTokenBridge } = (window as any).Capacitor.Plugins;
+          
+          if (!FCMTokenBridge) {
+            console.error('❌ Plugin FCMTokenBridge introuvable');
+            return;
+          }
+          
+          const result = await FCMTokenBridge.getToken();
+          const token = result?.token;
+          
+          console.log('📱 Token iOS reçu du plugin:', token?.substring(0, 30) + '...');
+          
+          if (token && typeof token === 'string' && token.includes(':')) {
+            console.log('✅ Format FCM valide (contient :)');
+            setPendingToken(token);
+          } else {
+            console.warn('⚠️ Token invalide (pas de :):', token);
+            // Retry après délai
+            setTimeout(fetchTokenFromNative, 2000);
+          }
+        } catch (error) {
+          console.error('❌ Erreur récupération token iOS:', error);
           // Retry après délai
           setTimeout(fetchTokenFromNative, 2000);
         }
-      } catch (error) {
-        console.error('❌ Erreur récupération token:', error);
-        // Retry après délai
-        setTimeout(fetchTokenFromNative, 2000);
-      }
-    };
+      };
 
-    fetchTokenFromNative();
+      fetchTokenFromNative();
+    } else {
+      console.log('📱 Android: Le token FCM sera capturé via le listener registration');
+    }
   }, []);
 
   // Save token to database when we have both user and token - AVEC RETRY ET DEDUPLICATION
@@ -152,11 +159,24 @@ export const usePushNotifications = () => {
         if (permStatus.receive === 'granted' || permStatus.receive === 'prompt-with-rationale') {
           console.log('✅ Push notification permission granted');
 
-          // IGNORER COMPLÈTEMENT le listener Capacitor registration
-          // Il ne reçoit que l'APNs token, jamais le FCM token
+          // Android: utiliser le listener registration pour capturer le FCM token
+          // iOS: ignorer (utilise FCMTokenBridge à la place)
           await PushNotifications.addListener('registration', async (token: Token) => {
-            console.log('⚠️ Event Capacitor registration IGNORÉ (APNs token)');
-            // Ne rien faire - on utilise le plugin FCMTokenBridge à la place
+            const platform = Capacitor.getPlatform();
+            
+            if (platform === 'android') {
+              console.log('📱 Android: Token FCM reçu via registration:', token.value?.substring(0, 30) + '...');
+              
+              // Valider le format FCM (doit contenir :)
+              if (token.value && typeof token.value === 'string' && token.value.includes(':')) {
+                console.log('✅ Android: Format FCM valide (contient :)');
+                setPendingToken(token.value);
+              } else {
+                console.warn('⚠️ Android: Token invalide (pas de :):', token.value);
+              }
+            } else {
+              console.log('⚠️ iOS: Event Capacitor registration IGNORÉ (utilise FCMTokenBridge)');
+            }
           });
 
           // Écouter les erreurs d'enregistrement
