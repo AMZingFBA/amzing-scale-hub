@@ -28,7 +28,6 @@ const Services = lazy(() => import("./pages/Services"));
 const Formation = lazy(() => import("./pages/Formation"));
 const Catalogue = lazy(() => import("./pages/Catalogue"));
 const Tarifs = lazy(() => import("./pages/Tarifs"));
-const TarifsWebView = lazy(() => import("./pages/TarifsWebView"));
 const AndroidPayment = lazy(() => import("./pages/AndroidPayment"));
 const Contact = lazy(() => import("./pages/Contact"));
 const FAQ = lazy(() => import("./pages/FAQ"));
@@ -108,7 +107,6 @@ const App = () => (
             <Route path="/formation" element={<Formation />} />
             <Route path="/catalogue" element={<Catalogue />} />
             <Route path="/tarifs" element={<Tarifs />} />
-            <Route path="/tarifs-webview" element={<TarifsWebView />} />
             <Route path="/android-payment" element={<AndroidPayment />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/faq" element={<FAQ />} />
