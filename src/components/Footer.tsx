@@ -4,7 +4,6 @@ import { useAuth } from "@/hooks/use-auth";
 import { useAdmin } from "@/hooks/use-admin";
 import { Mail } from "lucide-react";
 import { Capacitor } from "@capacitor/core";
-import { Browser } from "@capacitor/browser";
 
 const Footer = () => {
   const { isVIP } = useAuth();
@@ -108,18 +107,12 @@ const Footer = () => {
                   </Link>
                 </li>
                 <li>
-                  {Capacitor.isNativePlatform() ? (
-                    <button 
-                      onClick={() => Browser.open({ url: 'https://amzingfba.com/tarifs' })}
-                      className="text-muted-foreground hover:text-primary transition-all duration-300 hover:translate-x-1 inline-block"
-                    >
-                      Tarifs
-                    </button>
-                  ) : (
-                    <Link to="/tarifs" className="text-muted-foreground hover:text-primary transition-all duration-300 hover:translate-x-1 inline-block">
-                      Tarifs
-                    </Link>
-                  )}
+                  <Link 
+                    to={Capacitor.isNativePlatform() ? "/tarifs-webview" : "/tarifs"} 
+                    className="text-muted-foreground hover:text-primary transition-all duration-300 hover:translate-x-1 inline-block"
+                  >
+                    Tarifs
+                  </Link>
                 </li>
                 <li>
                   <Link to="/formation" className="text-muted-foreground hover:text-primary transition-all duration-300 hover:translate-x-1 inline-block">
