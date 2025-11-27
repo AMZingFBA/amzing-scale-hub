@@ -194,10 +194,14 @@ export const usePushNotifications = () => {
 
           // Écouter les actions sur les notifications
           await PushNotifications.addListener('pushNotificationActionPerformed', async (notification: ActionPerformed) => {
-            console.log('👆 Notification tapée - RESET COMPLET du badge');
+            console.log('👆 Notification tapée par user:', user.id, '- RESET COMPLET');
             
             try {
-              // 1. RESET en base AVANT tout
+              // 1. Reset badge local IMMÉDIATEMENT
+              await Badge.set({ count: 0 });
+              console.log('✅ Badge local → 0');
+
+              // 2. Reset DB
               const { error: dbError } = await supabase.rpc('reset_user_badge', {
                 user_id_param: user.id
               });
@@ -205,14 +209,21 @@ export const usePushNotifications = () => {
               if (dbError) {
                 console.error('❌ Erreur reset DB:', dbError);
               } else {
-                console.log('✅ Compteur DB remis à 0');
+                console.log('✅ Compteur DB → 0');
               }
 
-              // 2. Reset badge iOS
-              await Badge.set({ count: 0 });
-              console.log('✅ Badge iOS remis à 0');
+              // 3. Appeler edge function pour envoyer notification silencieuse à TOUS les appareils de CET utilisateur
+              const { data, error } = await supabase.functions.invoke('reset-badge', {
+                body: { user_id: user.id }
+              });
+
+              if (error) {
+                console.error('❌ Erreur edge function reset-badge:', error);
+              } else {
+                console.log('✅ Edge function reset-badge:', data);
+              }
               
-              console.log('✅ RESET COMPLET - Prochaine notification = 1');
+              console.log('✅ RESET COMPLET pour user', user.id, '- Badge → 0 sur tous ses appareils');
             } catch (error) {
               console.error('❌ Erreur reset:', error);
             }
