@@ -276,50 +276,43 @@ export default function Auth() {
       // Attendre que la session soit établie
       await new Promise(resolve => setTimeout(resolve, 1000));
 
-      // Rediriger vers le paiement selon la plateforme
-      if (!isNativeApp) {
-        // Sur le site web, rediriger vers Stripe
-        try {
-          toast.info("Préparation du paiement...");
+      // Rediriger vers le paiement Stripe pour toutes les plateformes (Web, iOS, Android)
+      try {
+        toast.info("Préparation du paiement...");
+        
+        const { data: sessionData } = await supabase.auth.getSession();
+        if (!sessionData.session?.access_token) {
+          throw new Error("Session non établie");
+        }
+
+        const { data: checkoutData, error: checkoutError } = await supabase.functions.invoke('create-checkout', {
+          headers: {
+            Authorization: `Bearer ${sessionData.session.access_token}`,
+          },
+        });
+
+        if (checkoutError) {
+          console.error('Error creating checkout:', checkoutError);
+          toast.error('Erreur lors de la redirection vers le paiement');
+          setIsLoading(false);
+          return;
+        }
+
+        if (checkoutData?.url) {
+          toast.success("Redirection vers le paiement sécurisé...");
           
-          const { data: sessionData } = await supabase.auth.getSession();
-          if (!sessionData.session?.access_token) {
-            throw new Error("Session non établie");
-          }
-
-          const { data: checkoutData, error: checkoutError } = await supabase.functions.invoke('create-checkout', {
-            headers: {
-              Authorization: `Bearer ${sessionData.session.access_token}`,
-            },
-          });
-
-          if (checkoutError) {
-            console.error('Error creating checkout:', checkoutError);
-            toast.error('Erreur lors de la redirection vers le paiement');
-            setIsLoading(false);
-            return;
-          }
-
-          if (checkoutData?.url) {
-            toast.success("Redirection vers le paiement sécurisé...");
-            // Rediriger dans le même onglet au lieu d'ouvrir un nouvel onglet
+          // Sur iOS/Android natif, rediriger vers la page de paiement avec CGV
+          if (isNativeApp) {
+            navigate('/android-payment');
+          } else {
+            // Sur le web, redirection directe vers Stripe
             window.location.href = checkoutData.url;
           }
-        } catch (error: any) {
-          console.error('Error starting checkout:', error);
-          toast.error('Erreur lors de la redirection vers le paiement: ' + error.message);
-          setIsLoading(false);
         }
-      } else {
-        // Sur l'app native iOS, lancer le processus d'achat Apple
-        try {
-          toast.info('Préparation du paiement Apple...');
-          // Rediriger vers la page d'abonnement pour gérer le paiement Apple
-          navigate('/tarifs');
-        } catch (error: any) {
-          console.error('Error starting Apple IAP:', error);
-          toast.error('Erreur lors de la préparation du paiement');
-        }
+      } catch (error: any) {
+        console.error('Error starting checkout:', error);
+        toast.error('Erreur lors de la redirection vers le paiement: ' + error.message);
+        setIsLoading(false);
       }
     } catch (error: any) {
       console.error('Caught error in handleVerifyAndSignUp:', error);
