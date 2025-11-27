@@ -22,8 +22,8 @@ const Tarifs = () => {
   const [showCGVModal, setShowCGVModal] = useState(false);
   const [acceptedCGV, setAcceptedCGV] = useState(false);
 
-  // Rediriger vers la page Android si sur Android
-  if (Capacitor.isNativePlatform() && Capacitor.getPlatform() === 'android') {
+  // Rediriger vers la page de paiement mobile si sur iOS ou Android
+  if (Capacitor.isNativePlatform()) {
     navigate('/android-payment');
     return null;
   }
