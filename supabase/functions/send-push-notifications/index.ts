@@ -174,39 +174,52 @@ const handler = async (req: Request): Promise<Response> => {
     const serviceAccount = JSON.parse(serviceAccountJson);
     const accessToken = await getAccessToken(serviceAccount);
 
-    // 5. Envoyer les notifications avec incrémentation du badge
+    // 5. Envoyer les notifications à TOUS les appareils de TOUS les utilisateurs VIP
+    // Garder une trace des utilisateurs déjà traités pour le badge
+    const badgeCounts = new Map();
+    
     const notificationPromises = tokens.map(async ({ token, platform, user_id }) => {
       try {
-        console.log(`🔵 [${callId}] Tentative envoi à user ${user_id} pour alert ${alert_id}`);
+        console.log(`🔵 [${callId}] Tentative envoi à user ${user_id} (${platform}) pour alert ${alert_id}`);
         
-        // Tenter d'insérer dans l'historique pour déduplication
+        // Tenter d'insérer dans l'historique pour déduplication PAR APPAREIL
         const { data: inserted, error: historyError } = await supabaseAdmin
           .from('push_notification_history')
-          .insert({ user_id, alert_id })
+          .insert({ user_id, alert_id, platform })
           .select();
         
-        // Si erreur de contrainte unique = déjà envoyé
+        // Si erreur de contrainte unique = déjà envoyé sur CET appareil
         if (historyError) {
           if (historyError.code === '23505') {
-            console.log(`⏭️ [${callId}] DUPLICATE détecté pour user ${user_id} alert ${alert_id}`);
+            console.log(`⏭️ [${callId}] DUPLICATE détecté pour user ${user_id} alert ${alert_id} sur ${platform}`);
             return { skipped: true };
           }
           console.error(`❌ [${callId}] Erreur insertion history:`, historyError);
           return { error: historyError };
         }
         
-        console.log(`✅ [${callId}] Historique inséré pour user ${user_id}, incrémentation badge...`);
+        console.log(`✅ [${callId}] Historique inséré pour user ${user_id} (${platform})`);
         
-        // Incrémenter le badge (+1 par notification)
-        const { data: newBadgeCount, error: badgeError } = await supabaseAdmin.rpc('increment_user_badge', {
-          user_id_param: user_id
-        });
+        // Incrémenter le badge UNE SEULE FOIS par utilisateur (pas par appareil)
+        let badgeCount = badgeCounts.get(user_id);
         
-        if (badgeError) {
-          console.error(`❌ [${callId}] Error incrementing badge:`, badgeError);
+        if (!badgeCount) {
+          console.log(`📱 [${callId}] Incrémentation badge pour user ${user_id} (première fois)...`);
+          const { data: newBadgeCount, error: badgeError } = await supabaseAdmin.rpc('increment_user_badge', {
+            user_id_param: user_id
+          });
+          
+          if (badgeError) {
+            console.error(`❌ [${callId}] Error incrementing badge:`, badgeError);
+            badgeCount = 1;
+          } else {
+            badgeCount = newBadgeCount || 1;
+          }
+          
+          badgeCounts.set(user_id, badgeCount);
+        } else {
+          console.log(`📱 [${callId}] Badge déjà incrémenté pour user ${user_id}, réutilisation: ${badgeCount}`);
         }
-        
-        const badgeCount = newBadgeCount || 1;
         console.log(`📱 [${callId}] User ${user_id}: badge = ${badgeCount}`);
         
         const fcmUrl = `https://fcm.googleapis.com/v1/projects/${serviceAccount.project_id}/messages:send`;
