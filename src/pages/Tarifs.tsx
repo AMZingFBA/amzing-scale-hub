@@ -16,35 +16,8 @@ import { useState } from "react";
 
 const Tarifs = () => {
   const navigate = useNavigate();
-  const isNativeApp = Capacitor.isNativePlatform();
-  const { startFreeTrial, isStarting, handleConfirmPayment: confirmPayment, acceptedCGV, setAcceptedCGV } = useTrial();
+  const { startFreeTrial, isStarting, showCGVModal, setShowCGVModal, acceptedCGV, setAcceptedCGV, handleConfirmPayment } = useTrial();
   const { user } = useAuth();
-  const [showCGVModal, setShowCGVModal] = useState(false);
-
-
-  const handleStartTrial = async () => {
-    if (!user) {
-      navigate('/auth?tab=signup');
-      return;
-    }
-    
-    // Sur mobile, rediriger vers la page de paiement dédiée
-    if (isNativeApp) {
-      navigate('/android-payment');
-      return;
-    }
-    
-    // Sur web, afficher le modal CGV
-    setShowCGVModal(true);
-  };
-
-  const handleConfirmPayment = async () => {
-    if (!acceptedCGV) {
-      return;
-    }
-    setShowCGVModal(false);
-    await confirmPayment();
-  };
 
   return (
     <div className="min-h-screen relative overflow-hidden">
@@ -64,7 +37,7 @@ const Tarifs = () => {
         Comparaison des offres, abonnements et formules AMZing FBA pour accompagner les vendeurs Amazon
       </h2>
       
-      {isNativeApp && (
+      {Capacitor.isNativePlatform() && (
         <div className="fixed top-[46px] left-[18px] z-50">
           <Button
             variant="outline"
@@ -175,7 +148,7 @@ const Tarifs = () => {
                   variant="hero" 
                   className="w-full text-lg py-6 hover:scale-105 transition-transform" 
                   size="lg"
-                  onClick={handleStartTrial}
+                  onClick={startFreeTrial}
                   disabled={isStarting}
                 >
                   {isStarting ? 'Chargement...' : 'S\'abonner maintenant'}
