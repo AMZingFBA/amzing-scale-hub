@@ -278,8 +278,8 @@ export const useTrial = () => {
 
       if (data?.url) {
         console.log('Redirecting to Stripe checkout:', data.url);
-        window.open(data.url, '_blank');
-        toast.success('Redirection vers le paiement sécurisé Stripe...');
+        // Redirection directe (pas de popup qui peut être bloqué)
+        window.location.href = data.url;
       } else {
         throw new Error('No checkout URL received');
       }

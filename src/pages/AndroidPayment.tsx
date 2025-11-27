@@ -51,9 +51,8 @@ const AndroidPayment = () => {
       if (error) throw error;
 
       if (data?.url) {
-        // Ouvrir Stripe Checkout dans le navigateur externe
-        window.open(data.url, '_blank');
-        toast.success("Redirection vers le paiement...");
+        // Redirection directe vers Stripe (pas de popup sur mobile)
+        window.location.href = data.url;
       }
     } catch (error: any) {
       console.error('Erreur paiement:', error);
