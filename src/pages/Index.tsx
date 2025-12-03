@@ -17,6 +17,7 @@ import logistics from "@/assets/logistics.jpg";
 import { useTrial } from "@/hooks/use-trial";
 import { useAuth } from "@/hooks/use-auth";
 import { useScrollReveal } from "@/hooks/use-scroll-reveal";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { Capacitor } from "@capacitor/core";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -87,6 +88,7 @@ const Index = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const isNativeApp = Capacitor.isNativePlatform();
+  const isMobile = useIsMobile();
 
   // Redirect VIP users and admins to dashboard immediately when they land on homepage
   useEffect(() => {
@@ -485,7 +487,7 @@ const Index = () => {
         <h2 className="sr-only">
           Guides, tutoriels et accompagnement pour réussir son business Amazon FBA
         </h2>
-        {isNativeApp ? (
+        {(isNativeApp || isMobile) ? (
           <TestimonialsMobile />
         ) : (
           <div className="container mx-auto px-4">
