@@ -195,15 +195,9 @@ const TestimonialsMobile = () => {
   const isNativeApp = Capacitor.isNativePlatform();
   const isMobile = useIsMobile();
   
-  // Render on native app OR mobile web (phone format)
-  if (!isNativeApp && !isMobile) {
-    return null;
-  }
-
-  // Select 2 random testimonials with at least one 5-star review
+  // All hooks must be called before any conditional return
   const selectedTestimonials = React.useMemo(() => {
     const fiveStars = testimonials.filter(t => t.rating === 5);
-    const others = testimonials.filter(t => t.rating !== 5);
     
     // Always pick one 5-star review
     const selected = [fiveStars[Math.floor(Math.random() * fiveStars.length)]];
@@ -216,6 +210,11 @@ const TestimonialsMobile = () => {
   }, []);
 
   const [showAllTestimonials, setShowAllTestimonials] = React.useState(false);
+  
+  // Render on native app OR mobile web (phone format)
+  if (!isNativeApp && !isMobile) {
+    return null;
+  }
 
   return (
     <div className="px-4">
