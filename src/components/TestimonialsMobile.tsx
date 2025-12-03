@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import { Star, CheckCircle } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -245,13 +246,13 @@ const TestimonialsMobile = () => {
       {/* Show More Button */}
       {!showAllTestimonials && (
         <div className="flex justify-center mt-6">
-          <a href="/avis">
+          <Link to="/avis">
             <button
               className="px-6 py-3 bg-gradient-to-r from-primary to-secondary text-white rounded-lg font-semibold shadow-lg hover:shadow-glow transition-all duration-300 active:scale-95"
             >
               Voir plus d'avis ({testimonials.length - 2})
             </button>
-          </a>
+          </Link>
         </div>
       )}
     </div>
