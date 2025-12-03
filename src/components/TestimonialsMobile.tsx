@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Star, CheckCircle } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -193,6 +193,7 @@ const TestimonialCard = ({ testimonial, delay }: { testimonial: typeof testimoni
 };
 
 const TestimonialsMobile = () => {
+  const navigate = useNavigate();
   const isNativeApp = Capacitor.isNativePlatform();
   const isMobile = useIsMobile();
   
@@ -246,13 +247,12 @@ const TestimonialsMobile = () => {
       {/* Show More Button */}
       {!showAllTestimonials && (
         <div className="flex justify-center mt-6">
-          <Link to="/avis">
-            <button
-              className="px-6 py-3 bg-gradient-to-r from-primary to-secondary text-white rounded-lg font-semibold shadow-lg hover:shadow-glow transition-all duration-300 active:scale-95"
-            >
-              Voir plus d'avis ({testimonials.length - 2})
-            </button>
-          </Link>
+          <button
+            onClick={() => navigate('/avis')}
+            className="px-6 py-3 bg-gradient-to-r from-primary to-secondary text-white rounded-lg font-semibold shadow-lg hover:shadow-glow transition-all duration-300 active:scale-95"
+          >
+            Voir plus d'avis ({testimonials.length - 2})
+          </button>
         </div>
       )}
     </div>
