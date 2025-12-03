@@ -2,7 +2,7 @@ import { Star, ArrowLeft, Filter } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Capacitor } from "@capacitor/core";
 import { useNavigate } from "react-router-dom";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,6 +13,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const testimonials = [
   {
@@ -155,6 +156,7 @@ const testimonials = [
 const Avis = () => {
   const navigate = useNavigate();
   const isNativeApp = Capacitor.isNativePlatform();
+  const isMobile = useIsMobile();
   const [filterRating, setFilterRating] = useState<string>("all");
 
   // Randomize testimonials order
@@ -168,9 +170,15 @@ const Avis = () => {
     return randomizedTestimonials.filter(t => t.rating.toString() === filterRating);
   }, [randomizedTestimonials, filterRating]);
 
-  // Redirect to home if not native app
-  if (!isNativeApp) {
-    navigate('/');
+  // Redirect to home if not native app and not mobile web
+  useEffect(() => {
+    if (!isNativeApp && !isMobile) {
+      navigate('/');
+    }
+  }, [isNativeApp, isMobile, navigate]);
+
+  // Don't render if redirecting
+  if (!isNativeApp && !isMobile) {
     return null;
   }
 
