@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useScrollReveal } from "@/hooks/use-scroll-reveal";
 import { Capacitor } from "@capacitor/core";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const testimonials = [
   {
@@ -192,9 +193,10 @@ const TestimonialCard = ({ testimonial, delay }: { testimonial: typeof testimoni
 
 const TestimonialsMobile = () => {
   const isNativeApp = Capacitor.isNativePlatform();
+  const isMobile = useIsMobile();
   
-  // Only render mobile version on native app
-  if (!isNativeApp) {
+  // Render on native app OR mobile web (phone format)
+  if (!isNativeApp && !isMobile) {
     return null;
   }
 
