@@ -63,9 +63,9 @@ serve(async (req) => {
       "Dernière connexion": new Date().toISOString().split('T')[0],
     };
 
-    // Add Date activation only if available
+    // Add date activation only if available
     if (dateActivation) {
-      fields["Date activation"] = dateActivation;
+      fields["date activation"] = dateActivation;
     }
 
     // Remove undefined values
