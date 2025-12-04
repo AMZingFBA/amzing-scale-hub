@@ -65,7 +65,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     // Set up auth state listener
     const { data: { subscription: authSubscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
+      async (event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
         
@@ -74,6 +74,43 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           setTimeout(() => {
             fetchSubscription(session.user.id);
           }, 0);
+          
+          // Sync to Airtable on SIGNED_IN event
+          if (event === 'SIGNED_IN') {
+            setTimeout(async () => {
+              try {
+                const { data: profile } = await supabase
+                  .from('profiles')
+                  .select('full_name, nickname')
+                  .eq('id', session.user.id)
+                  .single();
+                
+                const { data: sub } = await supabase
+                  .from('subscriptions')
+                  .select('plan_type, status, started_at, stripe_customer_id, stripe_subscription_id')
+                  .eq('user_id', session.user.id)
+                  .single();
+                
+                await supabase.functions.invoke('sync-user-to-airtable', {
+                  body: {
+                    user: {
+                      email: session.user.email,
+                      full_name: profile?.full_name,
+                      nickname: profile?.nickname,
+                      plan_type: sub?.plan_type || 'free',
+                      status: sub?.status || 'active',
+                      started_at: sub?.started_at,
+                      stripe_customer_id: sub?.stripe_customer_id,
+                      stripe_subscription_id: sub?.stripe_subscription_id,
+                    },
+                  },
+                });
+                console.log('[Auth] User synced to Airtable on SIGNED_IN');
+              } catch (error) {
+                console.error('[Auth] Failed to sync to Airtable:', error);
+              }
+            }, 100);
+          }
         } else {
           setSubscription(null);
         }
