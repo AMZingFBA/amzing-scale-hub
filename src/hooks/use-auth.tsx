@@ -72,7 +72,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       
       const { data: sub } = await supabase
         .from('subscriptions')
-        .select('plan_type, status, started_at, stripe_customer_id, stripe_subscription_id')
+        .select('plan_type, status, started_at, expires_at, stripe_customer_id, stripe_subscription_id')
         .eq('user_id', userId)
         .single();
       
@@ -85,6 +85,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             plan_type: sub?.plan_type || 'free',
             status: sub?.status || 'active',
             started_at: sub?.started_at,
+            expires_at: sub?.expires_at,
             stripe_customer_id: sub?.stripe_customer_id,
             stripe_subscription_id: sub?.stripe_subscription_id,
           },

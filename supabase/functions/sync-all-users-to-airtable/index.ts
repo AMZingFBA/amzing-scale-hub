@@ -34,7 +34,7 @@ serve(async (req) => {
 
     const { data: subscriptions, error: subsError } = await supabaseClient
       .from('subscriptions')
-      .select('user_id, plan_type, status, started_at, stripe_customer_id');
+      .select('user_id, plan_type, status, started_at, expires_at, stripe_customer_id');
 
     if (subsError) {
       throw new Error(`Failed to fetch subscriptions: ${subsError.message}`);
@@ -62,6 +62,7 @@ serve(async (req) => {
         // Check if user was previously VIP
         let wasVip = false;
         let existingDateActivation = null;
+        let existingResiliationDate = null;
         if (searchData.records && searchData.records.length > 0) {
           const existingRecord = searchData.records[0].fields;
           // Check both apostrophe variants (Unicode U+2019 and ASCII)
@@ -70,6 +71,7 @@ serve(async (req) => {
                    existingRecord["Type d\u2019abonnement"] === "Mensuel" || 
                    existingRecord["Type d\u2019abonnement"] === "Ancien VIP";
           existingDateActivation = existingRecord["date activation"];
+          existingResiliationDate = existingRecord["Dernière résiliation vip"];
           console.log(`[Sync] ${profile.email} - existing type: ${existingRecord["Type d'abonnement"] || existingRecord["Type d\u2019abonnement"]}`);
         }
 
@@ -82,6 +84,20 @@ serve(async (req) => {
           typeAbonnement = 'Mensuel';
         } else if (wasVip || existingDateActivation || hadStripeCustomer) {
           typeAbonnement = 'Ancien VIP';
+        }
+
+        // Determine resiliation date for Ancien VIP users
+        let resiliationDate = existingResiliationDate;
+        if (!isVip && (wasVip || hadStripeCustomer || existingDateActivation) && !existingResiliationDate) {
+          // Use expires_at as resiliation date if available
+          if (subscription?.expires_at) {
+            resiliationDate = new Date(subscription.expires_at).toISOString().split('T')[0];
+          } else if (subscription?.started_at) {
+            // Fallback: use started_at + 30 days as estimated resiliation
+            const startDate = new Date(subscription.started_at);
+            startDate.setDate(startDate.getDate() + 30);
+            resiliationDate = startDate.toISOString().split('T')[0];
+          }
         }
 
         // Prepare fields - use Unicode apostrophe (U+2019) for Airtable field name
@@ -100,6 +116,11 @@ serve(async (req) => {
         // Add date activation only if VIP and has started_at
         if (isVip && subscription?.started_at) {
           fields["date activation vip"] = new Date(subscription.started_at).toISOString().split('T')[0];
+        }
+
+        // Add resiliation date for Ancien VIP users
+        if (resiliationDate && typeAbonnement === 'Ancien VIP') {
+          fields["Dernière résiliation vip"] = resiliationDate;
         }
 
         if (searchData.records && searchData.records.length > 0) {
