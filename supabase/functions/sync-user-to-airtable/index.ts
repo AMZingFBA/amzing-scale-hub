@@ -47,10 +47,11 @@ serve(async (req) => {
     let hadDateActivation = false;
     if (searchData.records && searchData.records.length > 0) {
       const existingRecord = searchData.records[0].fields;
-      // User was VIP if they had "Mensuel" or "Ancien VIP" type, or have an activation date
+      // Check both apostrophe variants (Unicode U+2019 and ASCII)
       wasVip = existingRecord["Type d'abonnement"] === "Mensuel" || 
                existingRecord["Type d'abonnement"] === "Ancien VIP" ||
-               existingRecord["date activation"] != null;
+               existingRecord["Type d\u2019abonnement"] === "Mensuel" || 
+               existingRecord["Type d\u2019abonnement"] === "Ancien VIP";
       hadDateActivation = existingRecord["date activation"] != null;
     }
 
@@ -78,7 +79,7 @@ serve(async (req) => {
       "Email (principal)": user.email,
       "Nom": user.full_name || user.nickname || '',
       "Abonnement actif": user.plan_type === 'vip' && user.status === 'active',
-      "Type d'abonnement": typeAbonnement,
+      "Type d\u2019abonnement": typeAbonnement,
       "ID Stripe / RevenueCat": user.stripe_customer_id || user.stripe_subscription_id || '',
       "Dernière connexion": new Date().toISOString().split('T')[0],
     };
