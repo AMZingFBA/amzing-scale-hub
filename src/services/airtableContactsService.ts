@@ -1,4 +1,4 @@
-import { supabase } from "@/integrations/supabase/client";
+const AIRTABLE_CONTACTS_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/airtable-contacts`;
 
 export interface AirtableContact {
   id: string;
@@ -38,88 +38,92 @@ const mapRecordToContact = (record: AirtableRecord): AirtableContact => ({
   idMake: record.fields.IDMake,
 });
 
-export const airtableContactsService = {
-  /**
-   * Fetch all contacts or filtered by view
-   */
-  async fetchContacts(view?: string): Promise<AirtableContact[]> {
-    const { data, error } = await supabase.functions.invoke('airtable-contacts', {
-      body: { action: 'fetch', view },
-    });
+export async function fetchContacts(view?: string): Promise<AirtableContact[]> {
+  const response = await fetch(AIRTABLE_CONTACTS_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ action: "fetch", view }),
+  });
 
-    if (error) throw new Error(error.message);
-    return (data.records || []).map(mapRecordToContact);
-  },
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.error || 'Failed to fetch contacts');
+  return (data.records || []).map(mapRecordToContact);
+}
 
-  /**
-   * Create a new contact
-   */
-  async createContact(contact: Omit<AirtableContact, 'id'>): Promise<AirtableContact> {
-    const { data, error } = await supabase.functions.invoke('airtable-contacts', {
-      body: {
-        action: 'create',
-        data: {
-          Email: contact.email,
-          Prenom: contact.prenom,
-          Tag: contact.tag,
-          Source: contact.source,
-          TypeEmail: contact.typeEmail,
-          StatutEnvoi: contact.statutEnvoi || 'À envoyer',
-        },
+export async function createContact(contact: Omit<AirtableContact, 'id'>): Promise<AirtableContact> {
+  const response = await fetch(AIRTABLE_CONTACTS_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      action: "create",
+      data: {
+        Email: contact.email,
+        Prenom: contact.prenom,
+        Tag: contact.tag,
+        Source: contact.source,
+        TypeEmail: contact.typeEmail,
+        StatutEnvoi: contact.statutEnvoi || 'À envoyer',
       },
-    });
+    }),
+  });
 
-    if (error) throw new Error(error.message);
-    return mapRecordToContact(data.records[0]);
-  },
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.error || 'Failed to create contact');
+  return mapRecordToContact(data.records[0]);
+}
 
-  /**
-   * Update an existing contact
-   */
-  async updateContact(recordId: string, updates: Partial<AirtableContact>): Promise<AirtableContact> {
-    const fields: Record<string, unknown> = {};
-    if (updates.email) fields.Email = updates.email;
-    if (updates.prenom) fields.Prenom = updates.prenom;
-    if (updates.tag) fields.Tag = updates.tag;
-    if (updates.source) fields.Source = updates.source;
-    if (updates.typeEmail) fields.TypeEmail = updates.typeEmail;
-    if (updates.statutEnvoi) fields.StatutEnvoi = updates.statutEnvoi;
-    if (updates.dernierEnvoi) fields.DernierEnvoi = updates.dernierEnvoi;
-    if (updates.idMake) fields.IDMake = updates.idMake;
+export async function updateContact(recordId: string, updates: Partial<AirtableContact>): Promise<AirtableContact> {
+  const fields: Record<string, unknown> = {};
+  if (updates.email) fields.Email = updates.email;
+  if (updates.prenom) fields.Prenom = updates.prenom;
+  if (updates.tag) fields.Tag = updates.tag;
+  if (updates.source) fields.Source = updates.source;
+  if (updates.typeEmail) fields.TypeEmail = updates.typeEmail;
+  if (updates.statutEnvoi) fields.StatutEnvoi = updates.statutEnvoi;
+  if (updates.dernierEnvoi) fields.DernierEnvoi = updates.dernierEnvoi;
+  if (updates.idMake) fields.IDMake = updates.idMake;
 
-    const { data, error } = await supabase.functions.invoke('airtable-contacts', {
-      body: { action: 'update', recordId, data: fields },
-    });
+  const response = await fetch(AIRTABLE_CONTACTS_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ action: "update", recordId, data: fields }),
+  });
 
-    if (error) throw new Error(error.message);
-    return mapRecordToContact(data);
-  },
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.error || 'Failed to update contact');
+  return mapRecordToContact(data);
+}
 
-  /**
-   * Delete a contact
-   */
-  async deleteContact(recordId: string): Promise<void> {
-    const { error } = await supabase.functions.invoke('airtable-contacts', {
-      body: { action: 'delete', recordId },
-    });
+export async function deleteContact(recordId: string): Promise<void> {
+  const response = await fetch(AIRTABLE_CONTACTS_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ action: "delete", recordId }),
+  });
 
-    if (error) throw new Error(error.message);
-  },
+  if (!response.ok) {
+    const data = await response.json();
+    throw new Error(data.error || 'Failed to delete contact');
+  }
+}
 
-  /**
-   * Fetch contacts ready to send (for Make automation)
-   */
-  async fetchContactsToSend(): Promise<AirtableContact[]> {
-    return this.fetchContacts('MAKE – À envoyer');
-  },
+export async function fetchContactsToSend(): Promise<AirtableContact[]> {
+  return fetchContacts('MAKE – À envoyer');
+}
 
-  /**
-   * Mark contact as sent
-   */
-  async markAsSent(recordId: string): Promise<AirtableContact> {
-    return this.updateContact(recordId, {
-      statutEnvoi: 'Envoyé',
-      dernierEnvoi: new Date().toISOString(),
-    });
-  },
+export async function markAsSent(recordId: string): Promise<AirtableContact> {
+  return updateContact(recordId, {
+    statutEnvoi: 'Envoyé',
+    dernierEnvoi: new Date().toISOString(),
+  });
+}
+
+// Export as service object for backward compatibility
+export const airtableContactsService = {
+  fetchContacts,
+  createContact,
+  updateContact,
+  deleteContact,
+  fetchContactsToSend,
+  markAsSent,
 };
