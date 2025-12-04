@@ -85,13 +85,13 @@ serve(async (req) => {
         }
 
         // Prepare fields - use Unicode apostrophe (U+2019) for Airtable field name
+        // DON'T update "Dernière connexion" during bulk sync - only update when user actually logs in
         const fields: Record<string, unknown> = {
           "Email (principal)": profile.email,
           "Nom": profile.full_name || profile.nickname || '',
           "Abonnement actif": isVip,
           "Type d\u2019abonnement": typeAbonnement,
           "ID Stripe / RevenueCat": subscription?.stripe_customer_id || '',
-          "Dernière connexion": new Date().toISOString().split('T')[0],
         };
 
         console.log(`[Sync] ${profile.email} - hadStripeCustomer: ${hadStripeCustomer}, wasVip: ${wasVip}, typeAbonnement: ${typeAbonnement}`);
