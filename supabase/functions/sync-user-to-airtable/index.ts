@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import Stripe from "https://esm.sh/stripe@18.5.0";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -17,7 +18,9 @@ interface UserData {
   user_id?: string;
   subscription_status?: string;
   plan_type?: string;
+  status?: string;
   started_at?: string;
+  expires_at?: string;
   stripe_customer_id?: string;
   stripe_subscription_id?: string;
 }
@@ -28,8 +31,13 @@ serve(async (req) => {
   }
 
   try {
-    const { user } = await req.json();
+    const { user } = await req.json() as { user: UserData };
     console.log(`[Sync User to Airtable] Syncing user:`, user.email);
+
+    // Initialize Stripe
+    const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
+      apiVersion: "2025-08-27.basil",
+    });
 
     // Check if user already exists in Airtable by email
     const searchUrl = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${USERS_TABLE}?filterByFormula={Email (principal)}="${user.email}"`;
@@ -59,6 +67,30 @@ serve(async (req) => {
 
     // Check if user has stripe_customer_id (was a paying customer at some point)
     const hadStripeCustomer = user.stripe_customer_id != null && user.stripe_customer_id !== '';
+
+    // Count successful payments from Stripe
+    let successfulPayments = 0;
+    let totalRevenue = 0;
+    
+    if (hadStripeCustomer && user.stripe_customer_id) {
+      try {
+        const paymentIntents = await stripe.paymentIntents.list({
+          customer: user.stripe_customer_id,
+          limit: 100,
+        });
+        
+        for (const pi of paymentIntents.data) {
+          if (pi.status === 'succeeded') {
+            successfulPayments++;
+            totalRevenue += pi.amount / 100;
+          }
+        }
+        
+        console.log(`[Sync User to Airtable] ${user.email} - Stripe payments: ${successfulPayments} succeeded, total: ${totalRevenue}€`);
+      } catch (stripeErr) {
+        console.error(`[Sync User to Airtable] ${user.email} - Stripe error:`, stripeErr);
+      }
+    }
 
     // Determine if user is currently VIP
     const isCurrentlyVip = user.plan_type === 'vip' && user.status === 'active';
@@ -108,6 +140,8 @@ serve(async (req) => {
       "Type d\u2019abonnement": typeAbonnement,
       "ID Stripe / RevenueCat": user.stripe_customer_id || user.stripe_subscription_id || '',
       "Dernière connexion": new Date().toISOString().split('T')[0],
+      "Nombre paiements réussis": successfulPayments,
+      "Revenu total généré": totalRevenue,
     };
 
     // Add date activation only if available
