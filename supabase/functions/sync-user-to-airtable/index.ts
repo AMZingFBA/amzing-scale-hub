@@ -42,11 +42,28 @@ serve(async (req) => {
     const searchData = await searchResponse.json();
     console.log(`[Sync User to Airtable] Search result:`, searchData);
 
+    // Check if user was previously VIP (from existing Airtable record)
+    let wasVip = false;
+    let hadDateActivation = false;
+    if (searchData.records && searchData.records.length > 0) {
+      const existingRecord = searchData.records[0].fields;
+      // User was VIP if they had "Mensuel" or "Ancien VIP" type, or have an activation date
+      wasVip = existingRecord["Type d'abonnement"] === "Mensuel" || 
+               existingRecord["Type d'abonnement"] === "Ancien VIP" ||
+               existingRecord["date activation"] != null;
+      hadDateActivation = existingRecord["date activation"] != null;
+    }
+
     // Determine subscription type
     let typeAbonnement = 'Gratuit';
-    if (user.plan_type === 'vip') {
-      typeAbonnement = 'Mensuel'; // Default to Mensuel for VIP
+    if (user.plan_type === 'vip' && user.status === 'active') {
+      typeAbonnement = 'Mensuel';
+    } else if (wasVip || hadDateActivation) {
+      // User was VIP before but not anymore -> Ancien VIP
+      typeAbonnement = 'Ancien VIP';
     }
+
+    console.log(`[Sync User to Airtable] Type abonnement: ${typeAbonnement}, wasVip: ${wasVip}, plan_type: ${user.plan_type}, status: ${user.status}`);
 
     // Format activation date if available
     let dateActivation = null;
@@ -57,8 +74,8 @@ serve(async (req) => {
     const fields: Record<string, unknown> = {
       "Email (principal)": user.email,
       "Nom": user.full_name || user.nickname || '',
-      "Abonnement actif": user.plan_type === 'vip',
-      "Type d\u2019abonnement": typeAbonnement,
+      "Abonnement actif": user.plan_type === 'vip' && user.status === 'active',
+      "Type d'abonnement": typeAbonnement,
       "ID Stripe / RevenueCat": user.stripe_customer_id || user.stripe_subscription_id || '',
       "Dernière connexion": new Date().toISOString().split('T')[0],
     };
