@@ -95,7 +95,7 @@ serve(async (req) => {
           "Création compte": profile.created_at ? new Date(profile.created_at).toISOString().split('T')[0] : '',
         };
 
-        console.log(`[Sync] ${profile.email} - hadStripeCustomer: ${hadStripeCustomer}, wasVip: ${wasVip}, typeAbonnement: ${typeAbonnement}`);
+        console.log(`[Sync] ${profile.email} - hadStripeCustomer: ${hadStripeCustomer}, wasVip: ${wasVip}, typeAbonnement: ${typeAbonnement}, created_at: ${profile.created_at}`);
 
         // Add date activation only if VIP and has started_at
         if (isVip && subscription?.started_at) {
@@ -105,7 +105,7 @@ serve(async (req) => {
         if (searchData.records && searchData.records.length > 0) {
           // Update existing record
           const recordId = searchData.records[0].id;
-          await fetch(`https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${USERS_TABLE}/${recordId}`, {
+          const updateResponse = await fetch(`https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${USERS_TABLE}/${recordId}`, {
             method: 'PATCH',
             headers: {
               'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
@@ -113,6 +113,10 @@ serve(async (req) => {
             },
             body: JSON.stringify({ fields }),
           });
+          const updateResult = await updateResponse.json();
+          if (updateResult.error) {
+            console.error(`[Sync] ${profile.email} - Airtable error:`, updateResult.error);
+          }
         } else {
           // Create new record
           await fetch(`https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${USERS_TABLE}`, {
