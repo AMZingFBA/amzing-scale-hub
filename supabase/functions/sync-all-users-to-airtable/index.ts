@@ -64,9 +64,13 @@ serve(async (req) => {
         let existingDateActivation = null;
         if (searchData.records && searchData.records.length > 0) {
           const existingRecord = searchData.records[0].fields;
+          // Check both apostrophe variants (Unicode U+2019 and ASCII)
           wasVip = existingRecord["Type d'abonnement"] === "Mensuel" || 
-                   existingRecord["Type d'abonnement"] === "Ancien VIP";
+                   existingRecord["Type d'abonnement"] === "Ancien VIP" ||
+                   existingRecord["Type d\u2019abonnement"] === "Mensuel" || 
+                   existingRecord["Type d\u2019abonnement"] === "Ancien VIP";
           existingDateActivation = existingRecord["date activation"];
+          console.log(`[Sync] ${profile.email} - existing type: ${existingRecord["Type d'abonnement"] || existingRecord["Type d\u2019abonnement"]}`);
         }
 
         // Check if user has stripe_customer_id (was a paying customer)
@@ -80,15 +84,17 @@ serve(async (req) => {
           typeAbonnement = 'Ancien VIP';
         }
 
-        // Prepare fields
+        // Prepare fields - use Unicode apostrophe (U+2019) for Airtable field name
         const fields: Record<string, unknown> = {
           "Email (principal)": profile.email,
           "Nom": profile.full_name || profile.nickname || '',
           "Abonnement actif": isVip,
-          "Type d'abonnement": typeAbonnement,
+          "Type d\u2019abonnement": typeAbonnement,
           "ID Stripe / RevenueCat": subscription?.stripe_customer_id || '',
           "Dernière connexion": new Date().toISOString().split('T')[0],
         };
+
+        console.log(`[Sync] ${profile.email} - hadStripeCustomer: ${hadStripeCustomer}, wasVip: ${wasVip}, typeAbonnement: ${typeAbonnement}`);
 
         // Add date activation only if VIP and has started_at
         if (isVip && subscription?.started_at) {
