@@ -71,6 +71,8 @@ const AffiliateAdmin = lazy(() => import("./pages/affiliate/AffiliateAdmin"));
 const MonitorQogita = lazy(() => import("./pages/MonitorQogita"));
 const ProduitsQogita = lazy(() => import("./pages/ProduitsQogita"));
 const ProduitsEany = lazy(() => import("./pages/ProduitsEany"));
+const AdminAirtableContacts = lazy(() => import("./pages/AdminAirtableContacts"));
+const AdminAirtableUsers = lazy(() => import("./pages/AdminAirtableUsers"));
 
 const queryClient = new QueryClient();
 
@@ -158,6 +160,8 @@ const App = () => (
             <Route path="/produits-gagnants/produits-qogita" element={<ProduitsQogita />} />
             <Route path="/products/qogita" element={<ProduitsQogita />} />
             <Route path="/products/eany" element={<ProduitsEany />} />
+            <Route path="/admin/airtable-contacts" element={<AdminAirtableContacts />} />
+            <Route path="/admin/airtable-users" element={<AdminAirtableUsers />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
