@@ -52,7 +52,7 @@ verify_jwt = false
 verify_jwt = false
 
 [functions.airtable-contacts]
-verify_jwt = true
+verify_jwt = false
 
 [functions.airtable-users]
-verify_jwt = true
+verify_jwt = false
