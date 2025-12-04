@@ -52,7 +52,7 @@ serve(async (req) => {
                existingRecord["Type d'abonnement"] === "Ancien VIP" ||
                existingRecord["Type d\u2019abonnement"] === "Mensuel" || 
                existingRecord["Type d\u2019abonnement"] === "Ancien VIP";
-      hadDateActivation = existingRecord["date activation"] != null;
+      hadDateActivation = existingRecord["date activation vip"] != null;
     }
 
     // Check if user has stripe_customer_id (was a paying customer at some point)
@@ -86,7 +86,7 @@ serve(async (req) => {
 
     // Add date activation only if available
     if (dateActivation) {
-      fields["date activation"] = dateActivation;
+      fields["date activation vip"] = dateActivation;
     }
 
     // Remove undefined values

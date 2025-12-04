@@ -99,7 +99,7 @@ serve(async (req) => {
 
         // Add date activation only if VIP and has started_at
         if (isVip && subscription?.started_at) {
-          fields["date activation"] = new Date(subscription.started_at).toISOString().split('T')[0];
+          fields["date activation vip"] = new Date(subscription.started_at).toISOString().split('T')[0];
         }
 
         if (searchData.records && searchData.records.length > 0) {
