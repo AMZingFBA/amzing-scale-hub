@@ -48,6 +48,12 @@ serve(async (req) => {
       typeAbonnement = 'Mensuel'; // Default to Mensuel for VIP
     }
 
+    // Format activation date if available
+    let dateActivation = null;
+    if (user.started_at && user.plan_type === 'vip') {
+      dateActivation = new Date(user.started_at).toISOString().split('T')[0];
+    }
+
     const fields: Record<string, unknown> = {
       "Email (principal)": user.email,
       "Nom": user.full_name || user.nickname || '',
@@ -56,6 +62,11 @@ serve(async (req) => {
       "ID Stripe / RevenueCat": user.stripe_customer_id || user.stripe_subscription_id || '',
       "Dernière connexion": new Date().toISOString().split('T')[0],
     };
+
+    // Add Date activation only if available
+    if (dateActivation) {
+      fields["Date activation"] = dateActivation;
+    }
 
     // Remove undefined values
     Object.keys(fields).forEach(key => {
