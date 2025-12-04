@@ -76,8 +76,19 @@ serve(async (req) => {
 
     // Format activation date if available
     let dateActivation = null;
-    if (user.started_at && user.plan_type === 'vip') {
+    if (user.started_at && isCurrentlyVip) {
+      // Current VIP: use started_at
       dateActivation = new Date(user.started_at).toISOString().split('T')[0];
+    } else if (typeAbonnement === 'Ancien VIP' && !hadDateActivation) {
+      // Ancien VIP without activation date: estimate from expires_at - 30 days
+      if (user.expires_at) {
+        const activationDate = new Date(user.expires_at);
+        activationDate.setDate(activationDate.getDate() - 30);
+        dateActivation = activationDate.toISOString().split('T')[0];
+      } else if (user.started_at) {
+        // Fallback to started_at
+        dateActivation = new Date(user.started_at).toISOString().split('T')[0];
+      }
     }
 
     // Determine resiliation date: if user WAS VIP but is NOT anymore, set today's date
