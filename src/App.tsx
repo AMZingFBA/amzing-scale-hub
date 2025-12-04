@@ -37,6 +37,7 @@ const Privacy = lazy(() => import("./pages/Privacy"));
 const Confidentialite = lazy(() => import("./pages/Confidentialite"));
 const Refund = lazy(() => import("./pages/Refund"));
 const SuppressionCompte = lazy(() => import("./pages/SuppressionCompte"));
+const Unsubscribe = lazy(() => import("./pages/Unsubscribe"));
 const MentionsLegales = lazy(() => import("./pages/MentionsLegales"));
 const Support = lazy(() => import("./pages/Support"));
 const Ticket = lazy(() => import("./pages/Ticket"));
@@ -117,6 +118,7 @@ const App = () => (
             <Route path="/confidentialite" element={<Confidentialite />} />
             <Route path="/refund" element={<Refund />} />
             <Route path="/suppression-compte" element={<SuppressionCompte />} />
+            <Route path="/unsubscribe" element={<Unsubscribe />} />
             <Route path="/mentions-legales" element={<MentionsLegales />} />
             <Route path="/support" element={<Support />} />
             <Route path="/ticket/:id" element={<Ticket />} />
