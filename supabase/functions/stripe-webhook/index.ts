@@ -7,6 +7,73 @@ const logStep = (step: string, details?: any) => {
   console.log(`[STRIPE-WEBHOOK] ${step}${detailsStr}`);
 };
 
+// Function to sync user to Airtable
+async function syncUserToAirtable(userData: {
+  email: string;
+  full_name?: string;
+  plan_type: string;
+  started_at?: string;
+  stripe_customer_id?: string;
+}) {
+  const AIRTABLE_API_KEY = Deno.env.get('AIRTABLE_API_KEY');
+  const AIRTABLE_BASE_ID = Deno.env.get('AIRTABLE_BASE_ID');
+  
+  if (!AIRTABLE_API_KEY || !AIRTABLE_BASE_ID) {
+    logStep("Airtable not configured, skipping sync");
+    return;
+  }
+
+  try {
+    // Search for existing record
+    const searchUrl = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/Users?filterByFormula={Email (principal)}="${userData.email}"`;
+    const searchResponse = await fetch(searchUrl, {
+      headers: { 'Authorization': `Bearer ${AIRTABLE_API_KEY}` },
+    });
+    const searchData = await searchResponse.json();
+
+    // Prepare fields
+    const fields: Record<string, unknown> = {
+      "Email (principal)": userData.email,
+      "Nom": userData.full_name || '',
+      "Abonnement actif": userData.plan_type === 'vip',
+      "Type d\u2019abonnement": userData.plan_type === 'vip' ? 'Mensuel' : 'Gratuit',
+      "ID Stripe / RevenueCat": userData.stripe_customer_id || '',
+      "Dernière connexion": new Date().toISOString().split('T')[0],
+    };
+
+    if (userData.started_at && userData.plan_type === 'vip') {
+      fields["date activation"] = new Date(userData.started_at).toISOString().split('T')[0];
+    }
+
+    if (searchData.records && searchData.records.length > 0) {
+      // Update existing record
+      const recordId = searchData.records[0].id;
+      await fetch(`https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/Users/${recordId}`, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ fields }),
+      });
+      logStep("Airtable user updated", { email: userData.email });
+    } else {
+      // Create new record
+      await fetch(`https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/Users`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ records: [{ fields }] }),
+      });
+      logStep("Airtable user created", { email: userData.email });
+    }
+  } catch (error) {
+    logStep("Airtable sync error", { error: error instanceof Error ? error.message : 'Unknown' });
+  }
+}
+
 serve(async (req) => {
   try {
     logStep("Webhook received");
@@ -74,7 +141,7 @@ serve(async (req) => {
       // Find user by email
       const { data: profile, error: profileError } = await supabaseClient
         .from("profiles")
-        .select("id")
+        .select("id, full_name")
         .eq("email", customerEmail)
         .single();
 
@@ -91,6 +158,7 @@ serve(async (req) => {
       // Calculate expiry date (30 days subscription, no trial)
       const expiresAt = new Date();
       expiresAt.setMonth(expiresAt.getMonth() + 1); // 30 days subscription
+      const startedAt = new Date().toISOString();
 
       // Update subscription to VIP
       const { error: updateError } = await supabaseClient
@@ -101,6 +169,9 @@ serve(async (req) => {
           is_trial: false,
           trial_used: true,
           expires_at: expiresAt.toISOString(),
+          started_at: startedAt,
+          stripe_customer_id: session.customer as string,
+          payment_provider: "stripe",
         })
         .eq("user_id", profile.id);
 
@@ -113,6 +184,15 @@ serve(async (req) => {
       }
 
       logStep("Subscription updated successfully", { userId: profile.id, expiresAt });
+
+      // Sync to Airtable
+      await syncUserToAirtable({
+        email: customerEmail,
+        full_name: profile.full_name || '',
+        plan_type: "vip",
+        started_at: startedAt,
+        stripe_customer_id: session.customer as string,
+      });
 
       // Update referral payment status if this user was referred
       const { data: referral } = await supabaseClient
@@ -160,7 +240,7 @@ serve(async (req) => {
 
       const { data: profile } = await supabaseClient
         .from("profiles")
-        .select("id")
+        .select("id, full_name")
         .eq("email", customerEmail)
         .single();
 
@@ -181,10 +261,20 @@ serve(async (req) => {
             plan_type: "vip",
             status: "active",
             expires_at: expiresAt.toISOString(),
+            stripe_customer_id: subscription.customer as string,
+            payment_provider: "stripe",
           })
           .eq("user_id", profile.id);
         
         logStep("Subscription activated", { userId: profile.id });
+
+        // Sync to Airtable
+        await syncUserToAirtable({
+          email: customerEmail,
+          full_name: profile.full_name || '',
+          plan_type: "vip",
+          stripe_customer_id: subscription.customer as string,
+        });
 
         // Update referral payment status if this user was referred
         const { data: referral } = await supabaseClient
@@ -212,11 +302,18 @@ serve(async (req) => {
             plan_type: "free",
             status: "expired",
             is_trial: false,
-            expires_at: new Date().toISOString(), // Force expiration immédiate
+            expires_at: new Date().toISOString(),
           })
           .eq("user_id", profile.id);
         
         logStep("Subscription cancelled/unpaid", { userId: profile.id, status: subscription.status });
+
+        // Sync to Airtable
+        await syncUserToAirtable({
+          email: customerEmail,
+          full_name: profile.full_name || '',
+          plan_type: "free",
+        });
       }
     }
 
@@ -245,7 +342,7 @@ serve(async (req) => {
 
       const { data: profile } = await supabaseClient
         .from("profiles")
-        .select("id")
+        .select("id, full_name")
         .eq("email", customerEmail)
         .single();
 
@@ -264,11 +361,18 @@ serve(async (req) => {
           plan_type: "free",
           status: "unpaid",
           is_trial: false,
-          expires_at: new Date().toISOString(), // Force expiration immédiate
+          expires_at: new Date().toISOString(),
         })
         .eq("user_id", profile.id);
       
       logStep("VIP access suspended due to payment failure", { userId: profile.id });
+
+      // Sync to Airtable
+      await syncUserToAirtable({
+        email: customerEmail,
+        full_name: profile.full_name || '',
+        plan_type: "free",
+      });
     }
 
     return new Response(JSON.stringify({ received: true }), {
