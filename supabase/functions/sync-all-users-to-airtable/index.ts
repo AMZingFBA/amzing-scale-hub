@@ -113,9 +113,23 @@ serve(async (req) => {
 
         console.log(`[Sync] ${profile.email} - hadStripeCustomer: ${hadStripeCustomer}, wasVip: ${wasVip}, typeAbonnement: ${typeAbonnement}, created_at: ${profile.created_at}`);
 
-        // Add date activation only if VIP and has started_at
-        if (isVip && subscription?.started_at) {
-          fields["date activation vip"] = new Date(subscription.started_at).toISOString().split('T')[0];
+        // Add date activation vip for VIP and Ancien VIP users
+        // For Ancien VIP: calculate from expires_at - 30 days if no existing date
+        if (subscription?.started_at) {
+          if (isVip) {
+            // Current VIP: use started_at
+            fields["date activation vip"] = new Date(subscription.started_at).toISOString().split('T')[0];
+          } else if (typeAbonnement === 'Ancien VIP' && !existingDateActivation) {
+            // Ancien VIP without activation date: estimate from expires_at - 30 days
+            if (subscription?.expires_at) {
+              const activationDate = new Date(subscription.expires_at);
+              activationDate.setDate(activationDate.getDate() - 30);
+              fields["date activation vip"] = activationDate.toISOString().split('T')[0];
+            } else {
+              // Fallback to started_at
+              fields["date activation vip"] = new Date(subscription.started_at).toISOString().split('T')[0];
+            }
+          }
         }
 
         // Add resiliation date for Ancien VIP users
