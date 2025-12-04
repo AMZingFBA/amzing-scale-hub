@@ -59,17 +59,38 @@ serve(async (req) => {
         });
         const searchData = await searchResponse.json();
 
+        // Check if user was previously VIP
+        let wasVip = false;
+        let existingDateActivation = null;
+        if (searchData.records && searchData.records.length > 0) {
+          const existingRecord = searchData.records[0].fields;
+          wasVip = existingRecord["Type d'abonnement"] === "Mensuel" || 
+                   existingRecord["Type d'abonnement"] === "Ancien VIP";
+          existingDateActivation = existingRecord["date activation"];
+        }
+
+        // Check if user has stripe_customer_id (was a paying customer)
+        const hadStripeCustomer = subscription?.stripe_customer_id != null && subscription?.stripe_customer_id !== '';
+
+        // Determine subscription type with "Ancien VIP" logic
+        let typeAbonnement = 'Gratuit';
+        if (isVip) {
+          typeAbonnement = 'Mensuel';
+        } else if (wasVip || existingDateActivation || hadStripeCustomer) {
+          typeAbonnement = 'Ancien VIP';
+        }
+
         // Prepare fields
         const fields: Record<string, unknown> = {
           "Email (principal)": profile.email,
           "Nom": profile.full_name || profile.nickname || '',
           "Abonnement actif": isVip,
-          "Type d\u2019abonnement": isVip ? 'Mensuel' : 'Gratuit',
+          "Type d'abonnement": typeAbonnement,
           "ID Stripe / RevenueCat": subscription?.stripe_customer_id || '',
           "Dernière connexion": new Date().toISOString().split('T')[0],
         };
 
-        // Add date activation only if VIP
+        // Add date activation only if VIP and has started_at
         if (isVip && subscription?.started_at) {
           fields["date activation"] = new Date(subscription.started_at).toISOString().split('T')[0];
         }
