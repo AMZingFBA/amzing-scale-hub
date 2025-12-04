@@ -42,10 +42,17 @@ serve(async (req) => {
     const searchData = await searchResponse.json();
     console.log(`[Sync User to Airtable] Search result:`, searchData);
 
+    // Determine subscription type
+    let typeAbonnement = 'Gratuit';
+    if (user.plan_type === 'vip') {
+      typeAbonnement = 'Mensuel'; // Default to Mensuel for VIP
+    }
+
     const fields: Record<string, unknown> = {
       "Email (principal)": user.email,
       "Nom": user.full_name || user.nickname || '',
       "Abonnement actif": user.plan_type === 'vip',
+      "Type d\u2019abonnement": typeAbonnement,
       "ID Stripe / RevenueCat": user.stripe_customer_id || user.stripe_subscription_id || '',
       "Dernière connexion": new Date().toISOString().split('T')[0],
     };
