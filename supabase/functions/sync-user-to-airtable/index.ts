@@ -109,6 +109,16 @@ serve(async (req) => {
       fields["Dernière résiliation vip"] = resiliationDate;
     }
 
+    // Add motif résiliation for Ancien VIP users
+    if (typeAbonnement === 'Ancien VIP') {
+      // Determine reason: payment failure or voluntary cancellation
+      if (user.status === 'unpaid') {
+        fields["Motif résiliation"] = "Échec de paiement";
+      } else {
+        fields["Motif résiliation"] = "Résiliation volontaire";
+      }
+    }
+
     // Remove undefined values
     Object.keys(fields).forEach(key => {
       if (fields[key] === undefined) delete fields[key];

@@ -123,6 +123,16 @@ serve(async (req) => {
           fields["Dernière résiliation vip"] = resiliationDate;
         }
 
+        // Add motif résiliation for Ancien VIP users
+        if (typeAbonnement === 'Ancien VIP') {
+          // Determine reason: payment failure or voluntary cancellation
+          if (subscription?.status === 'unpaid') {
+            fields["Motif résiliation"] = "Échec de paiement";
+          } else {
+            fields["Motif résiliation"] = "Résiliation volontaire";
+          }
+        }
+
         if (searchData.records && searchData.records.length > 0) {
           // Update existing record
           const recordId = searchData.records[0].id;
