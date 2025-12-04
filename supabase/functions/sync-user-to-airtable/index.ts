@@ -43,7 +43,6 @@ serve(async (req) => {
       "Email (principal)": user.email,
       "Nom": user.full_name || user.nickname || '',
       "Abonnement actif": user.plan_type === 'vip',
-      "Type d'abonnement": user.plan_type === 'vip' ? 'Mensuel' : undefined,
       "Dernière connexion": new Date().toISOString().split('T')[0],
     };
 
