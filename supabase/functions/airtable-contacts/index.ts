@@ -13,13 +13,13 @@ interface AirtableContact {
   id?: string;
   fields: {
     Email: string;
-    Prenom?: string;
+    Prénom?: string;
     Tag?: string;
     Source?: string;
-    TypeEmail?: string;
-    StatutEnvoi?: string;
-    DernierEnvoi?: string;
-    IDMake?: string;
+    "Type d'email"?: string;
+    "Statut d'envoi"?: string;
+    "Dernier envoi"?: string;
+    "ID Make"?: string;
   };
 }
 
