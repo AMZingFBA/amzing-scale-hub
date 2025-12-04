@@ -29,7 +29,7 @@ serve(async (req) => {
     console.log(`[Sync User to Airtable] Syncing user:`, user.email);
 
     // Check if user already exists in Airtable by email
-    const searchUrl = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${USERS_TABLE}?filterByFormula={Email}="${user.email}"`;
+    const searchUrl = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${USERS_TABLE}?filterByFormula={Email (principal)}="${user.email}"`;
     const searchResponse = await fetch(searchUrl, {
       headers: {
         'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
@@ -40,8 +40,8 @@ serve(async (req) => {
     console.log(`[Sync User to Airtable] Search result:`, searchData);
 
     const fields: Record<string, unknown> = {
-      Email: user.email,
-      Nom: user.full_name || user.nickname || '',
+      "Email (principal)": user.email,
+      "Nom": user.full_name || user.nickname || '',
       "Abonnement actif": user.plan_type === 'vip',
       "Type d'abonnement": user.plan_type === 'vip' ? 'Mensuel' : undefined,
       "Dernière connexion": new Date().toISOString().split('T')[0],

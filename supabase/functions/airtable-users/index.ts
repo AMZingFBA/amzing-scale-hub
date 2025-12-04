@@ -7,19 +7,19 @@ const corsHeaders = {
 
 const AIRTABLE_API_KEY = Deno.env.get('AIRTABLE_API_KEY');
 const AIRTABLE_BASE_ID = Deno.env.get('AIRTABLE_BASE_ID');
-const USERS_TABLE = 'Utilisateurs';
+const USERS_TABLE = 'Users';
 
 interface AirtableUser {
   id?: string;
   fields: {
-    Email: string;
-    Nom?: string;
-    AbonnementActif?: boolean;
-    TypeAbonnement?: string;
-    DateActivation?: string;
-    IDStripe?: string;
-    IDRevenueCat?: string;
-    Permissions?: string;
+    "Email (principal)": string;
+    "Nom"?: string;
+    "Abonnement actif"?: boolean;
+    "Type d'abonnement"?: string;
+    "Date d'activation"?: string;
+    "ID Stripe /..."?: string;
+    "Permissions"?: string[];
+    "Dernière connexion"?: string;
   };
 }
 
@@ -57,7 +57,7 @@ serve(async (req) => {
         if (!email) {
           throw new Error('email is required for fetchByEmail');
         }
-        const filterUrl = `${url}?filterByFormula=${encodeURIComponent(`{Email}="${email}"`)}`;
+        const filterUrl = `${url}?filterByFormula=${encodeURIComponent(`{Email (principal)}="${email}"`)}`;
         response = await fetch(filterUrl, { headers });
         const filtered = await response.json();
         console.log(`[Airtable Users] Found user by email:`, filtered.records?.length > 0);
@@ -106,7 +106,7 @@ serve(async (req) => {
         }
         
         // First find the user by email
-        const filterUrl = `${url}?filterByFormula=${encodeURIComponent(`{Email}="${email}"`)}`;
+        const filterUrl = `${url}?filterByFormula=${encodeURIComponent(`{Email (principal)}="${email}"`)}`;
         response = await fetch(filterUrl, { headers });
         const found = await response.json();
         
