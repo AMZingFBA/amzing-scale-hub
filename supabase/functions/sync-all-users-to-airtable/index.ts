@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import Stripe from "https://esm.sh/stripe@18.5.0";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -22,6 +23,11 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
     );
+
+    // Initialize Stripe
+    const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
+      apiVersion: "2025-08-27.basil",
+    });
 
     // Get all profiles with their subscriptions
     const { data: profiles, error: profilesError } = await supabaseClient
@@ -78,6 +84,32 @@ serve(async (req) => {
         // Check if user has stripe_customer_id (was a paying customer)
         const hadStripeCustomer = subscription?.stripe_customer_id != null && subscription?.stripe_customer_id !== '';
 
+        // Count successful payments from Stripe
+        let successfulPayments = 0;
+        let totalRevenue = 0;
+        
+        if (hadStripeCustomer && subscription?.stripe_customer_id) {
+          try {
+            // Get all payment intents for this customer
+            const paymentIntents = await stripe.paymentIntents.list({
+              customer: subscription.stripe_customer_id,
+              limit: 100,
+            });
+            
+            // Count only succeeded payments
+            for (const pi of paymentIntents.data) {
+              if (pi.status === 'succeeded') {
+                successfulPayments++;
+                totalRevenue += pi.amount / 100;
+              }
+            }
+            
+            console.log(`[Sync] ${profile.email} - Stripe payments: ${successfulPayments} succeeded, total: ${totalRevenue}€`);
+          } catch (stripeErr) {
+            console.error(`[Sync] ${profile.email} - Stripe error:`, stripeErr);
+          }
+        }
+
         // Determine subscription type with "Ancien VIP" logic
         let typeAbonnement = 'Gratuit';
         if (isVip) {
@@ -109,9 +141,11 @@ serve(async (req) => {
           "Type d\u2019abonnement": typeAbonnement,
           "ID Stripe / RevenueCat": subscription?.stripe_customer_id || '',
           "Création compte": profile.created_at ? new Date(profile.created_at).toISOString().split('T')[0] : '',
+          "Nombre paiements réussis": successfulPayments,
+          "Revenu total généré": totalRevenue,
         };
 
-        console.log(`[Sync] ${profile.email} - hadStripeCustomer: ${hadStripeCustomer}, wasVip: ${wasVip}, typeAbonnement: ${typeAbonnement}, created_at: ${profile.created_at}`);
+        console.log(`[Sync] ${profile.email} - hadStripeCustomer: ${hadStripeCustomer}, wasVip: ${wasVip}, typeAbonnement: ${typeAbonnement}, payments: ${successfulPayments}, revenue: ${totalRevenue}€`);
 
         // Add date activation vip for VIP and Ancien VIP users
         // For Ancien VIP: calculate from expires_at - 30 days if no existing date
