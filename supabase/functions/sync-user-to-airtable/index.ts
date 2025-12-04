@@ -46,6 +46,7 @@ serve(async (req) => {
       "Email (principal)": user.email,
       "Nom": user.full_name || user.nickname || '',
       "Abonnement actif": user.plan_type === 'vip',
+      "ID Stripe / RevenueCat": user.stripe_customer_id || user.stripe_subscription_id || '',
       "Dernière connexion": new Date().toISOString().split('T')[0],
     };
 
