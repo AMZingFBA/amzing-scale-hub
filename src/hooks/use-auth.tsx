@@ -109,28 +109,32 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     fullName?: string, 
     nickname?: string, 
     planType?: string,
+    status?: string,
     startedAt?: string,
     stripeCustomerId?: string,
     stripeSubscriptionId?: string
   ) => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/sync-user-to-airtable`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+      const { data, error } = await supabase.functions.invoke('sync-user-to-airtable', {
+        body: {
           user: {
             email,
             full_name: fullName,
             nickname,
             plan_type: planType || 'free',
+            status: status || 'active',
             started_at: startedAt,
             stripe_customer_id: stripeCustomerId,
             stripe_subscription_id: stripeSubscriptionId,
           },
-        }),
+        },
       });
-      const result = await response.json();
-      console.log('[Auth] User synced to Airtable:', result);
+      
+      if (error) {
+        console.error('[Auth] Airtable sync error:', error);
+      } else {
+        console.log('[Auth] User synced to Airtable:', data);
+      }
     } catch (error) {
       console.error('[Auth] Failed to sync user to Airtable:', error);
     }
@@ -163,7 +167,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           .eq('id', data.user.id);
         
         // Sync user to Airtable
-        await syncUserToAirtable(email, fullName, nickname, 'free');
+        await syncUserToAirtable(email, fullName, nickname, 'free', 'active');
       }
 
       toast.success('Compte créé avec succès ! Veuillez vérifier votre email pour confirmer votre inscription.');
@@ -194,7 +198,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         
         const { data: sub } = await supabase
           .from('subscriptions')
-          .select('plan_type, started_at, stripe_customer_id, stripe_subscription_id')
+          .select('plan_type, status, started_at, stripe_customer_id, stripe_subscription_id')
           .eq('user_id', data.user.id)
           .single();
         
@@ -203,6 +207,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           profile?.full_name || undefined,
           profile?.nickname || undefined,
           sub?.plan_type || 'free',
+          sub?.status || 'active',
           sub?.started_at || undefined,
           sub?.stripe_customer_id || undefined,
           sub?.stripe_subscription_id || undefined
