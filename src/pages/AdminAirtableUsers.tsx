@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Users, RefreshCw, Search, Crown, XCircle } from "lucide-react";
+import { ArrowLeft, Users, RefreshCw, Search, Crown, XCircle, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { useAdmin } from "@/hooks/use-admin";
 import { airtableUsersService, AirtableUser } from "@/services/airtableUsersService";
+import { supabase } from "@/integrations/supabase/client";
 
 const AdminAirtableUsers = () => {
   const navigate = useNavigate();
@@ -19,6 +20,8 @@ const AdminAirtableUsers = () => {
   const [searchEmail, setSearchEmail] = useState('');
   const [searchResult, setSearchResult] = useState<AirtableUser | null>(null);
   const [isSearching, setIsSearching] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [syncProgress, setSyncProgress] = useState({ current: 0, total: 0 });
 
   useEffect(() => {
     if (!adminLoading && !isAdmin) {
@@ -47,6 +50,66 @@ const AdminAirtableUsers = () => {
       fetchUsers();
     }
   }, [isAdmin]);
+
+  const syncAllUsers = async () => {
+    setIsSyncing(true);
+    setSyncProgress({ current: 0, total: 0 });
+    
+    try {
+      // Fetch all profiles from Supabase
+      const { data: profiles, error } = await supabase
+        .from('profiles')
+        .select('id, email, full_name, nickname');
+      
+      if (error) throw error;
+      
+      // Also get subscription data
+      const { data: subscriptions } = await supabase
+        .from('subscriptions')
+        .select('user_id, plan_type, status');
+      
+      const subscriptionMap = new Map(
+        subscriptions?.map(s => [s.user_id, s]) || []
+      );
+      
+      setSyncProgress({ current: 0, total: profiles?.length || 0 });
+      
+      let synced = 0;
+      for (const profile of profiles || []) {
+        const sub = subscriptionMap.get(profile.id);
+        
+        await supabase.functions.invoke('sync-user-to-airtable', {
+          body: {
+            user: {
+              email: profile.email,
+              full_name: profile.full_name,
+              nickname: profile.nickname,
+              plan_type: sub?.plan_type || 'free',
+            }
+          }
+        });
+        
+        synced++;
+        setSyncProgress({ current: synced, total: profiles?.length || 0 });
+      }
+      
+      toast({
+        title: "Synchronisation terminée",
+        description: `${synced} utilisateurs synchronisés vers Airtable`,
+      });
+      
+      fetchUsers();
+    } catch (error) {
+      console.error('Sync error:', error);
+      toast({
+        variant: "destructive",
+        title: "Erreur de synchronisation",
+        description: "Une erreur est survenue lors de la synchronisation",
+      });
+    } finally {
+      setIsSyncing(false);
+    }
+  };
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -160,10 +223,23 @@ const AdminAirtableUsers = () => {
             <Users className="h-8 w-8 text-primary" />
             <h1 className="text-3xl font-bold">Utilisateurs Airtable</h1>
           </div>
-          <Button variant="outline" onClick={fetchUsers}>
-            <RefreshCw className="h-4 w-4 mr-2" />
-            Actualiser
-          </Button>
+          <div className="flex gap-2">
+            <Button 
+              variant="default" 
+              onClick={syncAllUsers}
+              disabled={isSyncing}
+            >
+              <Upload className="h-4 w-4 mr-2" />
+              {isSyncing 
+                ? `Sync ${syncProgress.current}/${syncProgress.total}...` 
+                : 'Sync tous les utilisateurs'
+              }
+            </Button>
+            <Button variant="outline" onClick={fetchUsers}>
+              <RefreshCw className="h-4 w-4 mr-2" />
+              Actualiser
+            </Button>
+          </div>
         </div>
 
         {/* Search by email */}
