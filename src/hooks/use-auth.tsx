@@ -104,6 +104,27 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return () => authSubscription.unsubscribe();
   }, []);
 
+  const syncUserToAirtable = async (email: string, fullName?: string, nickname?: string, planType?: string) => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/sync-user-to-airtable`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          user: {
+            email,
+            full_name: fullName,
+            nickname,
+            plan_type: planType || 'free',
+          },
+        }),
+      });
+      const result = await response.json();
+      console.log('[Auth] User synced to Airtable:', result);
+    } catch (error) {
+      console.error('[Auth] Failed to sync user to Airtable:', error);
+    }
+  };
+
   const signUp = async (email: string, password: string, fullName: string, nickname: string, phone: string) => {
     try {
       const redirectUrl = `${window.location.origin}/`;
@@ -129,6 +150,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           .from('profiles')
           .update({ phone: phone })
           .eq('id', data.user.id);
+        
+        // Sync user to Airtable
+        await syncUserToAirtable(email, fullName, nickname, 'free');
       }
 
       toast.success('Compte créé avec succès ! Veuillez vérifier votre email pour confirmer votre inscription.');
@@ -142,15 +166,36 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const signIn = async (email: string, password: string) => {
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
       if (error) throw error;
 
+      // Sync user to Airtable (update last login)
+      if (data.user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('full_name, nickname')
+          .eq('id', data.user.id)
+          .single();
+        
+        const { data: sub } = await supabase
+          .from('subscriptions')
+          .select('plan_type')
+          .eq('user_id', data.user.id)
+          .single();
+        
+        await syncUserToAirtable(
+          email,
+          profile?.full_name || undefined,
+          profile?.nickname || undefined,
+          sub?.plan_type || 'free'
+        );
+      }
+
       toast.success('Connexion réussie !');
-      // Ne pas rediriger ici - laissez le useEffect dans Auth.tsx s'en charger
       return { error: null };
     } catch (error: any) {
       toast.error(error.message || 'Erreur lors de la connexion');

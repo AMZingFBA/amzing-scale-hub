@@ -56,3 +56,6 @@ verify_jwt = false
 
 [functions.airtable-users]
 verify_jwt = false
+
+[functions.sync-user-to-airtable]
+verify_jwt = false
