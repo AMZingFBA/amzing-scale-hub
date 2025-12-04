@@ -17,6 +17,9 @@ interface UserData {
   user_id?: string;
   subscription_status?: string;
   plan_type?: string;
+  started_at?: string;
+  stripe_customer_id?: string;
+  stripe_subscription_id?: string;
 }
 
 serve(async (req) => {

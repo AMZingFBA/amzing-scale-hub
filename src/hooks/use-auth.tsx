@@ -104,7 +104,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return () => authSubscription.unsubscribe();
   }, []);
 
-  const syncUserToAirtable = async (email: string, fullName?: string, nickname?: string, planType?: string) => {
+  const syncUserToAirtable = async (
+    email: string, 
+    fullName?: string, 
+    nickname?: string, 
+    planType?: string,
+    startedAt?: string,
+    stripeCustomerId?: string,
+    stripeSubscriptionId?: string
+  ) => {
     try {
       const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/sync-user-to-airtable`, {
         method: 'POST',
@@ -115,6 +123,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             full_name: fullName,
             nickname,
             plan_type: planType || 'free',
+            started_at: startedAt,
+            stripe_customer_id: stripeCustomerId,
+            stripe_subscription_id: stripeSubscriptionId,
           },
         }),
       });
@@ -183,7 +194,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         
         const { data: sub } = await supabase
           .from('subscriptions')
-          .select('plan_type')
+          .select('plan_type, started_at, stripe_customer_id, stripe_subscription_id')
           .eq('user_id', data.user.id)
           .single();
         
@@ -191,7 +202,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           email,
           profile?.full_name || undefined,
           profile?.nickname || undefined,
-          sub?.plan_type || 'free'
+          sub?.plan_type || 'free',
+          sub?.started_at || undefined,
+          sub?.stripe_customer_id || undefined,
+          sub?.stripe_subscription_id || undefined
         );
       }
 
