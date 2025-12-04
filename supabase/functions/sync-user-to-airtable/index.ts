@@ -54,16 +54,19 @@ serve(async (req) => {
       hadDateActivation = existingRecord["date activation"] != null;
     }
 
+    // Check if user has stripe_customer_id (was a paying customer at some point)
+    const hadStripeCustomer = user.stripe_customer_id != null && user.stripe_customer_id !== '';
+
     // Determine subscription type
     let typeAbonnement = 'Gratuit';
     if (user.plan_type === 'vip' && user.status === 'active') {
       typeAbonnement = 'Mensuel';
-    } else if (wasVip || hadDateActivation) {
+    } else if (wasVip || hadDateActivation || hadStripeCustomer) {
       // User was VIP before but not anymore -> Ancien VIP
       typeAbonnement = 'Ancien VIP';
     }
 
-    console.log(`[Sync User to Airtable] Type abonnement: ${typeAbonnement}, wasVip: ${wasVip}, plan_type: ${user.plan_type}, status: ${user.status}`);
+    console.log(`[Sync User to Airtable] Type abonnement: ${typeAbonnement}, wasVip: ${wasVip}, hadStripeCustomer: ${hadStripeCustomer}, plan_type: ${user.plan_type}, status: ${user.status}`);
 
     // Format activation date if available
     let dateActivation = null;
