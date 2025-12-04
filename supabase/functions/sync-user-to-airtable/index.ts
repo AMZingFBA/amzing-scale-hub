@@ -45,6 +45,7 @@ serve(async (req) => {
     // Check if user was previously VIP (from existing Airtable record)
     let wasVip = false;
     let hadDateActivation = false;
+    let existingResiliationDate = null;
     if (searchData.records && searchData.records.length > 0) {
       const existingRecord = searchData.records[0].fields;
       // Check both apostrophe variants (Unicode U+2019 and ASCII)
@@ -53,14 +54,18 @@ serve(async (req) => {
                existingRecord["Type d\u2019abonnement"] === "Mensuel" || 
                existingRecord["Type d\u2019abonnement"] === "Ancien VIP";
       hadDateActivation = existingRecord["date activation vip"] != null;
+      existingResiliationDate = existingRecord["Dernière résiliation vip"];
     }
 
     // Check if user has stripe_customer_id (was a paying customer at some point)
     const hadStripeCustomer = user.stripe_customer_id != null && user.stripe_customer_id !== '';
 
+    // Determine if user is currently VIP
+    const isCurrentlyVip = user.plan_type === 'vip' && user.status === 'active';
+
     // Determine subscription type
     let typeAbonnement = 'Gratuit';
-    if (user.plan_type === 'vip' && user.status === 'active') {
+    if (isCurrentlyVip) {
       typeAbonnement = 'Mensuel';
     } else if (wasVip || hadDateActivation || hadStripeCustomer) {
       // User was VIP before but not anymore -> Ancien VIP
@@ -75,10 +80,20 @@ serve(async (req) => {
       dateActivation = new Date(user.started_at).toISOString().split('T')[0];
     }
 
+    // Determine resiliation date: if user WAS VIP but is NOT anymore, set today's date
+    let resiliationDate = existingResiliationDate;
+    if (wasVip && !isCurrentlyVip && !existingResiliationDate) {
+      // User just cancelled - set today as resiliation date
+      resiliationDate = new Date().toISOString().split('T')[0];
+    } else if (user.expires_at && !isCurrentlyVip && (wasVip || hadStripeCustomer)) {
+      // Use expires_at if available for cancelled subscriptions
+      resiliationDate = new Date(user.expires_at).toISOString().split('T')[0];
+    }
+
     const fields: Record<string, unknown> = {
       "Email (principal)": user.email,
       "Nom": user.full_name || user.nickname || '',
-      "Abonnement actif": user.plan_type === 'vip' && user.status === 'active',
+      "Abonnement actif": isCurrentlyVip,
       "Type d\u2019abonnement": typeAbonnement,
       "ID Stripe / RevenueCat": user.stripe_customer_id || user.stripe_subscription_id || '',
       "Dernière connexion": new Date().toISOString().split('T')[0],
@@ -87,6 +102,11 @@ serve(async (req) => {
     // Add date activation only if available
     if (dateActivation) {
       fields["date activation vip"] = dateActivation;
+    }
+
+    // Add resiliation date if user is Ancien VIP
+    if (resiliationDate && typeAbonnement === 'Ancien VIP') {
+      fields["Dernière résiliation vip"] = resiliationDate;
     }
 
     // Remove undefined values
