@@ -16,26 +16,26 @@ interface AirtableRecord {
   id: string;
   fields: {
     Email?: string;
-    Prenom?: string;
+    Prénom?: string;
     Tag?: string;
     Source?: string;
-    TypeEmail?: string;
-    StatutEnvoi?: string;
-    DernierEnvoi?: string;
-    IDMake?: string;
+    "Type d'email"?: string;
+    "Statut d'envoi"?: string;
+    "Dernier envoi"?: string;
+    "ID Make"?: string;
   };
 }
 
 const mapRecordToContact = (record: AirtableRecord): AirtableContact => ({
   id: record.id,
   email: record.fields.Email || '',
-  prenom: record.fields.Prenom,
+  prenom: record.fields.Prénom,
   tag: record.fields.Tag,
   source: record.fields.Source,
-  typeEmail: record.fields.TypeEmail,
-  statutEnvoi: record.fields.StatutEnvoi,
-  dernierEnvoi: record.fields.DernierEnvoi,
-  idMake: record.fields.IDMake,
+  typeEmail: record.fields["Type d'email"],
+  statutEnvoi: record.fields["Statut d'envoi"],
+  dernierEnvoi: record.fields["Dernier envoi"],
+  idMake: record.fields["ID Make"],
 });
 
 export async function fetchContacts(view?: string): Promise<AirtableContact[]> {
@@ -58,11 +58,11 @@ export async function createContact(contact: Omit<AirtableContact, 'id'>): Promi
       action: "create",
       data: {
         Email: contact.email,
-        Prenom: contact.prenom,
+        Prénom: contact.prenom,
         Tag: contact.tag,
         Source: contact.source,
-        TypeEmail: contact.typeEmail,
-        StatutEnvoi: contact.statutEnvoi || 'À envoyer',
+        "Type d'email": contact.typeEmail,
+        "Statut d'envoi": contact.statutEnvoi || 'À envoyer',
       },
     }),
   });
@@ -75,13 +75,13 @@ export async function createContact(contact: Omit<AirtableContact, 'id'>): Promi
 export async function updateContact(recordId: string, updates: Partial<AirtableContact>): Promise<AirtableContact> {
   const fields: Record<string, unknown> = {};
   if (updates.email) fields.Email = updates.email;
-  if (updates.prenom) fields.Prenom = updates.prenom;
+  if (updates.prenom) fields.Prénom = updates.prenom;
   if (updates.tag) fields.Tag = updates.tag;
   if (updates.source) fields.Source = updates.source;
-  if (updates.typeEmail) fields.TypeEmail = updates.typeEmail;
-  if (updates.statutEnvoi) fields.StatutEnvoi = updates.statutEnvoi;
-  if (updates.dernierEnvoi) fields.DernierEnvoi = updates.dernierEnvoi;
-  if (updates.idMake) fields.IDMake = updates.idMake;
+  if (updates.typeEmail) fields["Type d'email"] = updates.typeEmail;
+  if (updates.statutEnvoi) fields["Statut d'envoi"] = updates.statutEnvoi;
+  if (updates.dernierEnvoi) fields["Dernier envoi"] = updates.dernierEnvoi;
+  if (updates.idMake) fields["ID Make"] = updates.idMake;
 
   const response = await fetch(AIRTABLE_CONTACTS_URL, {
     method: "POST",
