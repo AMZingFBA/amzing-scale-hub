@@ -142,7 +142,6 @@ serve(async (req) => {
           "ID Stripe / RevenueCat": subscription?.stripe_customer_id || '',
           "Création compte": profile.created_at ? new Date(profile.created_at).toISOString().split('T')[0] : '',
           "Nombre paiements réussis": successfulPayments,
-          "Revenu total généré": totalRevenue,
         };
 
         console.log(`[Sync] ${profile.email} - hadStripeCustomer: ${hadStripeCustomer}, wasVip: ${wasVip}, typeAbonnement: ${typeAbonnement}, payments: ${successfulPayments}, revenue: ${totalRevenue}€`);

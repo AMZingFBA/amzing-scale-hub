@@ -141,7 +141,6 @@ serve(async (req) => {
       "ID Stripe / RevenueCat": user.stripe_customer_id || user.stripe_subscription_id || '',
       "Dernière connexion": new Date().toISOString().split('T')[0],
       "Nombre paiements réussis": successfulPayments,
-      "Revenu total généré": totalRevenue,
     };
 
     // Add date activation only if available
