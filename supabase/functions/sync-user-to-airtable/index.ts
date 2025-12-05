@@ -23,6 +23,7 @@ interface UserData {
   expires_at?: string;
   stripe_customer_id?: string;
   stripe_subscription_id?: string;
+  platform?: string; // iOS, Android, or Web
 }
 
 serve(async (req) => {
@@ -133,6 +134,9 @@ serve(async (req) => {
       resiliationDate = new Date(user.expires_at).toISOString().split('T')[0];
     }
 
+    // Determine platform - prioritize passed platform, fallback to Web
+    const outilPrincipal = user.platform === 'ios' ? 'iOS' : user.platform === 'android' ? 'Android' : 'Web';
+
     const fields: Record<string, unknown> = {
       "Email (principal)": user.email,
       "Nom": user.full_name || user.nickname || '',
@@ -141,6 +145,7 @@ serve(async (req) => {
       "ID Stripe / RevenueCat": user.stripe_customer_id || user.stripe_subscription_id || '',
       "Dernière connexion": new Date().toISOString().split('T')[0],
       "Nombre paiements réussis": successfulPayments,
+      "Outil principal": outilPrincipal,
     };
 
     // Add date activation only if available
