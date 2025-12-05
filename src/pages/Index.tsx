@@ -24,6 +24,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { seoData, schemas } from "@/lib/seo-data";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Checkbox } from "@/components/ui/checkbox";
+import { useRegistrationSource } from "@/hooks/use-registration-source";
 
 const ServiceCard = ({ 
   children, 
@@ -89,6 +90,9 @@ const Index = () => {
   const navigate = useNavigate();
   const isNativeApp = Capacitor.isNativePlatform();
   const isMobile = useIsMobile();
+  
+  // Capture UTM parameters when user lands on page
+  useRegistrationSource();
 
   // Redirect VIP users and admins to dashboard immediately when they land on homepage
   useEffect(() => {

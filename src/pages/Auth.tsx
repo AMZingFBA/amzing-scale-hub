@@ -15,6 +15,7 @@ import { Capacitor } from "@capacitor/core";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { supabase } from "@/integrations/supabase/client";
 import { Checkbox } from "@/components/ui/checkbox";
+import { getRegistrationSource, useRegistrationSource, clearRegistrationSource } from "@/hooks/use-registration-source";
 
 export default function Auth() {
   const navigate = useNavigate();
@@ -32,6 +33,9 @@ export default function Auth() {
   const [error, setError] = useState<string | null>(null);
   const [acceptedCGU, setAcceptedCGU] = useState(false);
   const isNativeApp = Capacitor.isNativePlatform();
+  
+  // Capture registration source (UTM params or native app)
+  const registrationSource = useRegistrationSource();
   
   // Check URL params for default tab and referral code
   const searchParams = new URLSearchParams(window.location.search);
@@ -244,6 +248,7 @@ export default function Auth() {
             nickname: signupData.nickname,
             phone: signupData.phone,
             referralCode: referralCode || null,
+            registrationSource: getRegistrationSource(),
           }),
         }
       );
