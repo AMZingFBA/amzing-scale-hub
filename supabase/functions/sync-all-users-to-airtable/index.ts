@@ -46,6 +46,28 @@ serve(async (req) => {
       throw new Error(`Failed to fetch subscriptions: ${subsError.message}`);
     }
 
+    // Get all push notification tokens to determine platform
+    const { data: pushTokens, error: tokensError } = await supabaseClient
+      .from('push_notification_tokens')
+      .select('user_id, platform');
+
+    if (tokensError) {
+      console.error(`[Sync] Failed to fetch push tokens: ${tokensError.message}`);
+    }
+
+    // Create token platform map - prefer iOS > Android > Web
+    const platformMap = new Map<string, string>();
+    for (const token of pushTokens || []) {
+      const current = platformMap.get(token.user_id);
+      if (!current) {
+        platformMap.set(token.user_id, token.platform === 'ios' ? 'iOS' : token.platform === 'android' ? 'Android' : 'Web');
+      } else if (token.platform === 'ios' && current !== 'iOS') {
+        platformMap.set(token.user_id, 'iOS');
+      } else if (token.platform === 'android' && current === 'Web') {
+        platformMap.set(token.user_id, 'Android');
+      }
+    }
+
     // Create subscription map
     const subsMap = new Map(subscriptions?.map(s => [s.user_id, s]) || []);
 
@@ -132,6 +154,9 @@ serve(async (req) => {
           }
         }
 
+        // Determine user's main platform
+        const outilPrincipal = platformMap.get(profile.id) || 'Web';
+
         // Prepare fields - use Unicode apostrophe (U+2019) for Airtable field name
         // DON'T update "Dernière connexion" during bulk sync - only update when user actually logs in
         const fields: Record<string, unknown> = {
@@ -142,9 +167,10 @@ serve(async (req) => {
           "ID Stripe / RevenueCat": subscription?.stripe_customer_id || '',
           "Création compte": profile.created_at ? new Date(profile.created_at).toISOString().split('T')[0] : '',
           "Nombre paiements réussis": successfulPayments,
+          "Outil principal": outilPrincipal,
         };
 
-        console.log(`[Sync] ${profile.email} - hadStripeCustomer: ${hadStripeCustomer}, wasVip: ${wasVip}, typeAbonnement: ${typeAbonnement}, payments: ${successfulPayments}, revenue: ${totalRevenue}€`);
+        console.log(`[Sync] ${profile.email} - platform: ${outilPrincipal}, hadStripeCustomer: ${hadStripeCustomer}, wasVip: ${wasVip}, typeAbonnement: ${typeAbonnement}, payments: ${successfulPayments}`);
 
         // Add date activation vip for VIP and Ancien VIP users
         // For Ancien VIP: calculate from expires_at - 30 days if no existing date
