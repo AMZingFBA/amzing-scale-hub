@@ -24,6 +24,7 @@ interface UserData {
   stripe_customer_id?: string;
   stripe_subscription_id?: string;
   platform?: string; // iOS, Android, or Web
+  registration_source?: string; // site, App, Referral, Instagram, TikTok
 }
 
 serve(async (req) => {
@@ -137,6 +138,12 @@ serve(async (req) => {
     // Determine platform - prioritize passed platform, fallback to Web
     const outilPrincipal = user.platform === 'ios' ? 'iOS' : user.platform === 'android' ? 'Android' : 'Web';
 
+    // Determine registration source - prioritize passed source, or detect from platform
+    let sourceInscription = user.registration_source || 'site';
+    if (!user.registration_source && user.platform) {
+      sourceInscription = 'App';
+    }
+
     const fields: Record<string, unknown> = {
       "Email (principal)": user.email,
       "Nom": user.full_name || user.nickname || '',
@@ -146,6 +153,7 @@ serve(async (req) => {
       "Dernière connexion": new Date().toISOString().split('T')[0],
       "Nombre paiements réussis": successfulPayments,
       "Outil principal": outilPrincipal,
+      "Source d\u2019inscription": sourceInscription,
     };
 
     // Add date activation only if available

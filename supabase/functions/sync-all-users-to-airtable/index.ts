@@ -55,6 +55,18 @@ serve(async (req) => {
       console.error(`[Sync] Failed to fetch push tokens: ${tokensError.message}`);
     }
 
+    // Get all affiliate referrals to determine registration source
+    const { data: referrals, error: referralsError } = await supabaseClient
+      .from('affiliate_referrals')
+      .select('referred_user_id');
+
+    if (referralsError) {
+      console.error(`[Sync] Failed to fetch referrals: ${referralsError.message}`);
+    }
+
+    // Create referral set for quick lookup
+    const referredUsers = new Set((referrals || []).map(r => r.referred_user_id).filter(Boolean));
+
     // Create token platform map - prefer iOS > Android > Web
     const platformMap = new Map<string, string>();
     for (const token of pushTokens || []) {
@@ -157,6 +169,14 @@ serve(async (req) => {
         // Determine user's main platform
         const outilPrincipal = platformMap.get(profile.id) || 'Web';
 
+        // Determine registration source
+        let sourceInscription = 'site'; // default
+        if (referredUsers.has(profile.id)) {
+          sourceInscription = 'Referral';
+        } else if (platformMap.has(profile.id)) {
+          sourceInscription = 'App';
+        }
+
         // Prepare fields - use Unicode apostrophe (U+2019) for Airtable field name
         // DON'T update "Dernière connexion" during bulk sync - only update when user actually logs in
         const fields: Record<string, unknown> = {
@@ -168,9 +188,10 @@ serve(async (req) => {
           "Création compte": profile.created_at ? new Date(profile.created_at).toISOString().split('T')[0] : '',
           "Nombre paiements réussis": successfulPayments,
           "Outil principal": outilPrincipal,
+          "Source d\u2019inscription": sourceInscription,
         };
 
-        console.log(`[Sync] ${profile.email} - platform: ${outilPrincipal}, hadStripeCustomer: ${hadStripeCustomer}, wasVip: ${wasVip}, typeAbonnement: ${typeAbonnement}, payments: ${successfulPayments}`);
+        console.log(`[Sync] ${profile.email} - platform: ${outilPrincipal}, source: ${sourceInscription}, hadStripeCustomer: ${hadStripeCustomer}, wasVip: ${wasVip}, typeAbonnement: ${typeAbonnement}`);
 
         // Add date activation vip for VIP and Ancien VIP users
         // For Ancien VIP: calculate from expires_at - 30 days if no existing date
