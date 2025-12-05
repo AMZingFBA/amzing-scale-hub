@@ -14,6 +14,7 @@ interface SignupRequest {
   nickname: string;
   phone: string;
   referralCode?: string;
+  registrationSource?: string;
 }
 
 const handler = async (req: Request): Promise<Response> => {
@@ -22,12 +23,13 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { code, email, password, fullName, nickname, phone, referralCode }: SignupRequest = await req.json();
+    const { code, email, password, fullName, nickname, phone, referralCode, registrationSource }: SignupRequest = await req.json();
 
     console.log("=== SIGNUP VERIFICATION REQUEST ===");
     console.log("Email:", email);
     console.log("Code reçu:", code);
     console.log("Referral Code:", referralCode);
+    console.log("Registration Source:", registrationSource);
 
     // Use service role key for database operations
     const supabaseAdmin = createClient(
@@ -67,6 +69,12 @@ const handler = async (req: Request): Promise<Response> => {
       throw new Error("Code invalide ou expiré");
     }
 
+    // Determine registration source - prioritize referral code
+    let finalSource = registrationSource || 'site';
+    if (referralCode) {
+      finalSource = 'Referral';
+    }
+
     // Create user account with referral code in metadata
     const { data: authData, error: signupError } = await supabaseAdmin.auth.admin.createUser({
       email: email.toLowerCase(),
@@ -77,6 +85,7 @@ const handler = async (req: Request): Promise<Response> => {
         nickname,
         phone,
         referral_code: referralCode || null,
+        registration_source: finalSource,
       },
     });
 

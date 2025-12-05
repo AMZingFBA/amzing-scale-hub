@@ -32,7 +32,7 @@ serve(async (req) => {
     // Get all profiles with their subscriptions
     const { data: profiles, error: profilesError } = await supabaseClient
       .from('profiles')
-      .select('id, email, full_name, nickname, created_at');
+      .select('id, email, full_name, nickname, created_at, registration_source');
 
     if (profilesError) {
       throw new Error(`Failed to fetch profiles: ${profilesError.message}`);
@@ -169,11 +169,12 @@ serve(async (req) => {
         // Determine user's main platform
         const outilPrincipal = platformMap.get(profile.id) || 'Web';
 
-        // Determine registration source
-        let sourceInscription = 'site'; // default
+        // Determine registration source - prioritize database value, then referral, then platform
+        let sourceInscription = profile.registration_source || 'site';
         if (referredUsers.has(profile.id)) {
           sourceInscription = 'Referral';
-        } else if (platformMap.has(profile.id)) {
+        } else if (sourceInscription === 'site' && platformMap.has(profile.id)) {
+          // Only use App if no explicit source was stored
           sourceInscription = 'App';
         }
 
@@ -191,7 +192,7 @@ serve(async (req) => {
           "Source d\u2019inscription": sourceInscription,
         };
 
-        console.log(`[Sync] ${profile.email} - platform: ${outilPrincipal}, source: ${sourceInscription}, hadStripeCustomer: ${hadStripeCustomer}, wasVip: ${wasVip}, typeAbonnement: ${typeAbonnement}`);
+        console.log(`[Sync] ${profile.email} - platform: ${outilPrincipal}, source: ${sourceInscription}, dbSource: ${profile.registration_source}`);
 
         // Add date activation vip for VIP and Ancien VIP users
         // For Ancien VIP: calculate from expires_at - 30 days if no existing date
