@@ -34,7 +34,7 @@ serve(async (req) => {
 
   try {
     const { user } = await req.json() as { user: UserData };
-    console.log(`[Sync User to Airtable] Syncing user:`, user.email);
+    console.log(`[Sync User to Airtable] Syncing user:`, user.email, `plan_type: ${user.plan_type}, status: ${user.status}`);
 
     // Initialize Stripe
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
@@ -56,6 +56,7 @@ serve(async (req) => {
     let wasVip = false;
     let hadDateActivation = false;
     let existingResiliationDate = null;
+    let existingMotifResiliation = null;
     if (searchData.records && searchData.records.length > 0) {
       const existingRecord = searchData.records[0].fields;
       // Check both apostrophe variants (Unicode U+2019 and ASCII)
@@ -65,6 +66,7 @@ serve(async (req) => {
                existingRecord["Type d\u2019abonnement"] === "Ancien VIP";
       hadDateActivation = existingRecord["date activation vip"] != null;
       existingResiliationDate = existingRecord["Dernière résiliation vip"];
+      existingMotifResiliation = existingRecord["Motif résiliation"];
     }
 
     // Check if user has stripe_customer_id (was a paying customer at some point)
@@ -94,24 +96,31 @@ serve(async (req) => {
       }
     }
 
-    // Determine if user is currently VIP
+    // Determine if user is currently VIP (active subscription, not canceled)
+    // VIP is ONLY when plan_type is vip AND status is active (not canceled, not expired, not unpaid)
     const isCurrentlyVip = user.plan_type === 'vip' && user.status === 'active';
+    
+    // User has canceled VIP subscription (still VIP but subscription will end)
+    const isCanceledVip = user.plan_type === 'vip' && user.status === 'canceled';
 
     // Determine subscription type
     let typeAbonnement = 'Gratuit';
     if (isCurrentlyVip) {
       typeAbonnement = 'Mensuel';
+    } else if (isCanceledVip) {
+      // User just canceled - they're now "Ancien VIP"
+      typeAbonnement = 'Ancien VIP';
     } else if (wasVip || hadDateActivation || hadStripeCustomer) {
       // User was VIP before but not anymore -> Ancien VIP
       typeAbonnement = 'Ancien VIP';
     }
 
-    console.log(`[Sync User to Airtable] Type abonnement: ${typeAbonnement}, wasVip: ${wasVip}, hadStripeCustomer: ${hadStripeCustomer}, plan_type: ${user.plan_type}, status: ${user.status}`);
+    console.log(`[Sync User to Airtable] Type abonnement: ${typeAbonnement}, wasVip: ${wasVip}, isCanceledVip: ${isCanceledVip}, hadStripeCustomer: ${hadStripeCustomer}, plan_type: ${user.plan_type}, status: ${user.status}`);
 
     // Format activation date if available
     let dateActivation = null;
-    if (user.started_at && isCurrentlyVip) {
-      // Current VIP: use started_at
+    if (user.started_at && (isCurrentlyVip || isCanceledVip)) {
+      // Current or canceled VIP: use started_at
       dateActivation = new Date(user.started_at).toISOString().split('T')[0];
     } else if (typeAbonnement === 'Ancien VIP' && !hadDateActivation) {
       // Ancien VIP without activation date: estimate from expires_at - 30 days
@@ -125,14 +134,29 @@ serve(async (req) => {
       }
     }
 
-    // Determine resiliation date: if user WAS VIP but is NOT anymore, set today's date
+    // Determine resiliation date
     let resiliationDate = existingResiliationDate;
-    if (wasVip && !isCurrentlyVip && !existingResiliationDate) {
+    if (isCanceledVip && !existingResiliationDate) {
       // User just cancelled - set today as resiliation date
       resiliationDate = new Date().toISOString().split('T')[0];
-    } else if (user.expires_at && !isCurrentlyVip && (wasVip || hadStripeCustomer)) {
+      console.log(`[Sync User to Airtable] Setting resiliation date to today: ${resiliationDate}`);
+    } else if (user.expires_at && typeAbonnement === 'Ancien VIP' && !existingResiliationDate) {
       // Use expires_at if available for cancelled subscriptions
       resiliationDate = new Date(user.expires_at).toISOString().split('T')[0];
+    }
+
+    // Determine motif résiliation
+    let motifResiliation = existingMotifResiliation;
+    if (typeAbonnement === 'Ancien VIP' && !existingMotifResiliation) {
+      // Determine reason: payment failure or voluntary cancellation
+      if (user.status === 'unpaid') {
+        motifResiliation = "Échec de paiement";
+      } else if (isCanceledVip || user.status === 'canceled') {
+        motifResiliation = "Résiliation volontaire";
+      } else {
+        motifResiliation = "Résiliation volontaire";
+      }
+      console.log(`[Sync User to Airtable] Setting motif résiliation: ${motifResiliation}`);
     }
 
     // Determine platform - prioritize passed platform, fallback to Web
@@ -147,7 +171,7 @@ serve(async (req) => {
     const fields: Record<string, unknown> = {
       "Email (principal)": user.email,
       "Nom": user.full_name || user.nickname || '',
-      "Abonnement actif": isCurrentlyVip,
+      "Abonnement actif": isCurrentlyVip, // false when canceled
       "Type d\u2019abonnement": typeAbonnement,
       "ID Stripe / RevenueCat": user.stripe_customer_id || user.stripe_subscription_id || '',
       "Dernière connexion": new Date().toISOString().split('T')[0],
@@ -167,19 +191,16 @@ serve(async (req) => {
     }
 
     // Add motif résiliation for Ancien VIP users
-    if (typeAbonnement === 'Ancien VIP') {
-      // Determine reason: payment failure or voluntary cancellation
-      if (user.status === 'unpaid') {
-        fields["Motif résiliation"] = "Échec de paiement";
-      } else {
-        fields["Motif résiliation"] = "Résiliation volontaire";
-      }
+    if (motifResiliation && typeAbonnement === 'Ancien VIP') {
+      fields["Motif résiliation"] = motifResiliation;
     }
 
     // Remove undefined values
     Object.keys(fields).forEach(key => {
       if (fields[key] === undefined) delete fields[key];
     });
+
+    console.log(`[Sync User to Airtable] Fields to sync:`, JSON.stringify(fields));
 
     let response;
     
