@@ -40,6 +40,19 @@ serve(async (req) => {
     const { code } = await req.json();
     
     // Vérifier le code de vérification
+    logStep("Searching for verification code", { userId: user.id, code, type: 'cancel_subscription' });
+    
+    // First, get all codes for this user to debug
+    const { data: allCodes } = await supabaseClient
+      .from('verification_codes')
+      .select('*')
+      .eq('user_id', user.id)
+      .eq('type', 'cancel_subscription')
+      .order('created_at', { ascending: false })
+      .limit(5);
+    
+    logStep("All cancel_subscription codes for user", { codes: allCodes?.map(c => ({ code: c.code, used: c.used, expires_at: c.expires_at })) });
+    
     const { data: verificationData, error: verificationError } = await supabaseClient
       .from('verification_codes')
       .select('*')
@@ -48,7 +61,9 @@ serve(async (req) => {
       .eq('type', 'cancel_subscription')
       .eq('used', false)
       .gte('expires_at', new Date().toISOString())
-      .single();
+      .maybeSingle();
+    
+    logStep("Verification query result", { found: !!verificationData, error: verificationError?.message });
 
     if (verificationError || !verificationData) {
       logStep("Invalid verification code", { error: verificationError });
