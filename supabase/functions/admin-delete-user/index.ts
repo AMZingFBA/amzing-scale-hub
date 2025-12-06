@@ -205,26 +205,14 @@ serve(async (req) => {
       .eq('user_id', userId);
     logStep("Deleted tickets");
 
-    // Supprimer l'abonnement
-    await supabaseAdmin
-      .from('subscriptions')
-      .delete()
-      .eq('user_id', userId);
-    logStep("Deleted subscription");
-
-    // Supprimer les rôles utilisateur
+    // Supprimer les rôles utilisateur (mais pas le profil ni l'abonnement pour garder l'historique)
     await supabaseAdmin
       .from('user_roles')
       .delete()
       .eq('user_id', userId);
     logStep("Deleted user roles");
 
-    // Supprimer le profil
-    await supabaseAdmin
-      .from('profiles')
-      .delete()
-      .eq('id', userId);
-    logStep("Deleted profile");
+    // Note: On garde le profil et l'abonnement dans la base pour l'historique admin
 
     // Supprimer tous les codes de vérification
     await supabaseAdmin
