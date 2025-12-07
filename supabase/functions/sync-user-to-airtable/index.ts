@@ -241,60 +241,65 @@ serve(async (req) => {
       throw new Error(result.error.message || 'Airtable error');
     }
 
-    // === SYNC TO "Amazon to airable" TABLE FOR NEW NON-VIP USERS ONLY ===
-    // Only sync users who:
-    // - Are a NEW user (first time being created in Users table)
-    // - Are NOT currently VIP
-    // - Have NEVER been VIP (no stripe customer id, never was VIP)
-    // - Are truly "Gratuit" (not Ancien VIP, not canceled, not unpaid)
+    // === HANDLE "Amazon to airable" TABLE ===
+    
+    // If user becomes VIP, REMOVE them from "Amazon to airable" table
+    if (isCurrentlyVip) {
+      console.log(`[Sync User to Airtable] User is now VIP, checking if they need to be removed from Amazon to airable`);
+      
+      const amazonSearchUrl = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${encodeURIComponent(AMAZON_TO_AIRTABLE_TABLE)}?filterByFormula={Email}="${user.email}"`;
+      const amazonSearchResponse = await fetch(amazonSearchUrl, {
+        headers: { 'Authorization': `Bearer ${AIRTABLE_API_KEY}` },
+      });
+      const amazonSearchData = await amazonSearchResponse.json();
+      
+      if (amazonSearchData.records && amazonSearchData.records.length > 0) {
+        // User exists in Amazon to airable - DELETE them
+        const recordId = amazonSearchData.records[0].id;
+        console.log(`[Sync User to Airtable] Deleting VIP user from Amazon to airable, record ID: ${recordId}`);
+        
+        const deleteResponse = await fetch(`https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${encodeURIComponent(AMAZON_TO_AIRTABLE_TABLE)}/${recordId}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${AIRTABLE_API_KEY}` },
+        });
+        
+        if (deleteResponse.ok) {
+          console.log(`[Sync User to Airtable] Successfully removed VIP user from Amazon to airable`);
+        } else {
+          console.error(`[Sync User to Airtable] Failed to delete from Amazon to airable:`, await deleteResponse.text());
+        }
+      }
+    }
+    
+    // Only ADD to "Amazon to airable" for NEW users who have NEVER been VIP
     const neverBeenVip = !wasVip && !hadStripeCustomer && !hadDateActivation;
     const isTrulyNewFreeUser = isNewUserInAirtable && !isCurrentlyVip && !isCanceledVip && typeAbonnement === 'Gratuit' && neverBeenVip;
     
     if (isTrulyNewFreeUser) {
       console.log(`[Sync User to Airtable] User is NEW and never been VIP, syncing to Amazon to airable table`);
       
-      // Check if user already exists in Amazon to airable table
+      // Check if user already exists in Amazon to airable table (shouldn't, but double check)
       const amazonSearchUrl = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${encodeURIComponent(AMAZON_TO_AIRTABLE_TABLE)}?filterByFormula={Email}="${user.email}"`;
       const amazonSearchResponse = await fetch(amazonSearchUrl, {
-        headers: {
-          'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
-        },
+        headers: { 'Authorization': `Bearer ${AIRTABLE_API_KEY}` },
       });
-      
       const amazonSearchData = await amazonSearchResponse.json();
-      console.log(`[Sync User to Airtable] Amazon to airable search result:`, amazonSearchData);
-
-      // Prepare fields for Amazon to airable table
-      const amazonFields: Record<string, unknown> = {
-        "Email": user.email,
-        "Nom": user.full_name || user.nickname || '',
-        "Numéro de téléphone": user.phone || '',
-        "Pays": "France", // Default to France as we don't have country data
-        "inscrit mais non VIP": true,
-      };
-
-      console.log(`[Sync User to Airtable] Amazon to airable fields:`, JSON.stringify(amazonFields));
-
-      let amazonResponse;
       
       if (amazonSearchData.records && amazonSearchData.records.length > 0) {
-        // Update existing record
-        const amazonRecordId = amazonSearchData.records[0].id;
-        console.log(`[Sync User to Airtable] Updating existing Amazon to airable record:`, amazonRecordId);
-        
-        amazonResponse = await fetch(`https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${encodeURIComponent(AMAZON_TO_AIRTABLE_TABLE)}/${amazonRecordId}`, {
-          method: 'PATCH',
-          headers: {
-            'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ fields: amazonFields }),
-        });
+        console.log(`[Sync User to Airtable] User already exists in Amazon to airable, skipping`);
       } else {
         // Create new record
-        console.log(`[Sync User to Airtable] Creating new Amazon to airable record`);
+        const amazonFields: Record<string, unknown> = {
+          "Email": user.email,
+          "Nom": user.full_name || user.nickname || '',
+          "Numéro de téléphone": user.phone || '',
+          "Pays": "France",
+          "inscrit mais non VIP": true,
+        };
         
-        amazonResponse = await fetch(`https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${encodeURIComponent(AMAZON_TO_AIRTABLE_TABLE)}`, {
+        console.log(`[Sync User to Airtable] Creating new Amazon to airable record:`, JSON.stringify(amazonFields));
+        
+        const amazonResponse = await fetch(`https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${encodeURIComponent(AMAZON_TO_AIRTABLE_TABLE)}`, {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
@@ -302,14 +307,13 @@ serve(async (req) => {
           },
           body: JSON.stringify({ records: [{ fields: amazonFields }] }),
         });
-      }
-
-      const amazonResult = await amazonResponse.json();
-      console.log(`[Sync User to Airtable] Amazon to airable result:`, amazonResult);
-
-      if (amazonResult.error) {
-        console.error(`[Sync User to Airtable] Amazon to airable error:`, amazonResult.error);
-        // Don't throw, just log - we still synced to Users table successfully
+        
+        const amazonResult = await amazonResponse.json();
+        console.log(`[Sync User to Airtable] Amazon to airable result:`, amazonResult);
+        
+        if (amazonResult.error) {
+          console.error(`[Sync User to Airtable] Amazon to airable error:`, amazonResult.error);
+        }
       }
     }
 
