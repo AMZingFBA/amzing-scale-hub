@@ -239,10 +239,16 @@ serve(async (req) => {
       throw new Error(result.error.message || 'Airtable error');
     }
 
-    // === SYNC TO "Amazon to airable" TABLE FOR NON-VIP USERS ===
-    // Only sync users who are NOT VIP (free users who signed up but didn't pay)
-    if (!isCurrentlyVip && !isCanceledVip && typeAbonnement === 'Gratuit') {
-      console.log(`[Sync User to Airtable] User is not VIP, syncing to Amazon to airable table`);
+    // === SYNC TO "Amazon to airable" TABLE FOR NEW NON-VIP USERS ONLY ===
+    // Only sync users who:
+    // - Are NOT currently VIP
+    // - Have NEVER been VIP (no stripe customer id, never was VIP)
+    // - Are truly "Gratuit" (not Ancien VIP, not canceled, not unpaid)
+    const neverBeenVip = !wasVip && !hadStripeCustomer && !hadDateActivation;
+    const isTrulyNewFreeUser = !isCurrentlyVip && !isCanceledVip && typeAbonnement === 'Gratuit' && neverBeenVip;
+    
+    if (isTrulyNewFreeUser) {
+      console.log(`[Sync User to Airtable] User is new and never been VIP, syncing to Amazon to airable table`);
       
       // Check if user already exists in Amazon to airable table
       const amazonSearchUrl = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${encodeURIComponent(AMAZON_TO_AIRTABLE_TABLE)}?filterByFormula={Email}="${user.email}"`;
