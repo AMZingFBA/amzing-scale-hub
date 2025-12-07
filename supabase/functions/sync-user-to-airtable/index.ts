@@ -264,6 +264,65 @@ serve(async (req) => {
       throw new Error(result.error.message || 'Airtable error');
     }
 
+    // Airtable headers for reuse
+    const airtableHeaders = {
+      'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
+      'Content-Type': 'application/json',
+    };
+
+    // === HANDLE "VIP" TABLE ===
+    const isVipUser = user.plan_type === 'vip' && (user.status === 'active' || user.status === 'canceled');
+    
+    if (isVipUser) {
+      console.log(`[Sync User to Airtable] User is VIP, syncing to "VIP" table`);
+      
+      // Check if user already exists in "VIP" table
+      const vipSearchUrl = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/VIP?filterByFormula={Email}="${user.email}"`;
+      const vipSearchResponse = await fetch(vipSearchUrl, {
+        method: 'GET',
+        headers: { 'Authorization': `Bearer ${AIRTABLE_API_KEY}` },
+      });
+      
+      const vipSearchData = await vipSearchResponse.json();
+      const existingVipRecord = vipSearchData.records?.[0];
+      
+      const vipFields: Record<string, unknown> = {
+        "Email": user.email,
+      };
+      
+      if (existingVipRecord) {
+        // Update existing record
+        const updateVipUrl = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/VIP/${existingVipRecord.id}`;
+        const updateVipResponse = await fetch(updateVipUrl, {
+          method: 'PATCH',
+          headers: airtableHeaders,
+          body: JSON.stringify({ fields: vipFields }),
+        });
+        
+        if (!updateVipResponse.ok) {
+          const errorText = await updateVipResponse.text();
+          console.error(`[Sync User to Airtable] Failed to update VIP table:`, errorText);
+        } else {
+          console.log(`[Sync User to Airtable] Updated user in VIP table`);
+        }
+      } else {
+        // Create new record
+        const createVipUrl = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/VIP`;
+        const createVipResponse = await fetch(createVipUrl, {
+          method: 'POST',
+          headers: airtableHeaders,
+          body: JSON.stringify({ fields: vipFields }),
+        });
+        
+        if (!createVipResponse.ok) {
+          const errorText = await createVipResponse.text();
+          console.error(`[Sync User to Airtable] Failed to create in VIP table:`, errorText);
+        } else {
+          console.log(`[Sync User to Airtable] Created user in VIP table`);
+        }
+      }
+    }
+
     // === HANDLE "Amazon to airable" TABLE ===
     
     // If user becomes VIP, REMOVE them from "Amazon to airable" table
