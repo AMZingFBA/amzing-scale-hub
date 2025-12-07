@@ -155,6 +155,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     email: string, 
     fullName?: string, 
     nickname?: string, 
+    phone?: string,
     planType?: string,
     status?: string,
     startedAt?: string,
@@ -168,6 +169,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             email,
             full_name: fullName,
             nickname,
+            phone,
             plan_type: planType || 'free',
             status: status || 'active',
             started_at: startedAt,
@@ -180,7 +182,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       if (error) {
         console.error('[Auth] Airtable sync error:', error);
       } else {
-        console.log('[Auth] User synced to Airtable:', data);
+        console.log('[Auth] User synced to Airtable on login');
       }
     } catch (error) {
       console.error('[Auth] Failed to sync user to Airtable:', error);
@@ -214,7 +216,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           .eq('id', data.user.id);
         
         // Sync user to Airtable
-        await syncUserToAirtable(email, fullName, nickname, 'free', 'active');
+        await syncUserToAirtable(email, fullName, nickname, phone, 'free', 'active');
       }
 
       toast.success('Compte créé avec succès ! Veuillez vérifier votre email pour confirmer votre inscription.');
@@ -239,7 +241,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       if (data.user) {
         const { data: profile } = await supabase
           .from('profiles')
-          .select('full_name, nickname')
+          .select('full_name, nickname, phone')
           .eq('id', data.user.id)
           .single();
         
@@ -253,6 +255,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           email,
           profile?.full_name || undefined,
           profile?.nickname || undefined,
+          profile?.phone || undefined,
           sub?.plan_type || 'free',
           sub?.status || 'active',
           sub?.started_at || undefined,

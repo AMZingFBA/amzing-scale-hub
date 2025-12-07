@@ -28,6 +28,26 @@ interface UserData {
   registration_source?: string; // site, App, Referral, Instagram, TikTok
 }
 
+// Format phone number to international format (+33 for French numbers)
+function formatPhoneNumber(phone: string | undefined): string {
+  if (!phone || phone.trim() === '') return '';
+  
+  // Remove spaces, dashes, parentheses
+  let formatted = phone.replace(/[\s\-\(\)\.]/g, '');
+  
+  // Convert French local format to international
+  if (formatted.startsWith('0') && formatted.length === 10) {
+    formatted = '+33' + formatted.substring(1);
+  } else if (formatted.startsWith('33') && !formatted.startsWith('+')) {
+    formatted = '+' + formatted;
+  } else if (!formatted.startsWith('+')) {
+    // Assume French if no prefix
+    formatted = '+33' + formatted;
+  }
+  
+  return formatted;
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -35,7 +55,10 @@ serve(async (req) => {
 
   try {
     const { user } = await req.json() as { user: UserData };
-    console.log(`[Sync User to Airtable] Syncing user:`, user.email, `plan_type: ${user.plan_type}, status: ${user.status}`);
+    
+    // Format phone number
+    const formattedPhone = formatPhoneNumber(user.phone);
+    console.log(`[Sync User to Airtable] Syncing user:`, user.email, `phone: ${formattedPhone}, plan_type: ${user.plan_type}, status: ${user.status}`);
 
     // Initialize Stripe
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
@@ -289,7 +312,7 @@ serve(async (req) => {
       const amazonFields: Record<string, unknown> = {
         "Email": user.email,
         "Nom": user.full_name || user.nickname || '',
-        "Numéro de téléphone": user.phone || '',
+        "Numéro de téléphone": formattedPhone,
         "Pays": "France",
         "inscrit mais non VIP": true,
       };
