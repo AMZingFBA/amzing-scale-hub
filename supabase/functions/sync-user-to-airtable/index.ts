@@ -286,40 +286,33 @@ serve(async (req) => {
       const vipSearchData = await vipSearchResponse.json();
       const existingVipRecord = vipSearchData.records?.[0];
       
+      // If record exists, DELETE it first so we can CREATE a new one (to trigger automation)
+      if (existingVipRecord) {
+        console.log(`[Sync User to Airtable] Deleting existing VIP record to re-create`);
+        const deleteVipUrl = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/VIP/${existingVipRecord.id}`;
+        await fetch(deleteVipUrl, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${AIRTABLE_API_KEY}` },
+        });
+      }
+      
+      // Always CREATE new record (triggers "Lorsqu'une entrée est créée" automation)
       const vipFields: Record<string, unknown> = {
         "Email": user.email,
       };
       
-      if (existingVipRecord) {
-        // Update existing record
-        const updateVipUrl = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/VIP/${existingVipRecord.id}`;
-        const updateVipResponse = await fetch(updateVipUrl, {
-          method: 'PATCH',
-          headers: airtableHeaders,
-          body: JSON.stringify({ fields: vipFields }),
-        });
-        
-        if (!updateVipResponse.ok) {
-          const errorText = await updateVipResponse.text();
-          console.error(`[Sync User to Airtable] Failed to update VIP table:`, errorText);
-        } else {
-          console.log(`[Sync User to Airtable] Updated user in VIP table`);
-        }
+      const createVipUrl = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/VIP`;
+      const createVipResponse = await fetch(createVipUrl, {
+        method: 'POST',
+        headers: airtableHeaders,
+        body: JSON.stringify({ fields: vipFields }),
+      });
+      
+      if (!createVipResponse.ok) {
+        const errorText = await createVipResponse.text();
+        console.error(`[Sync User to Airtable] Failed to create in VIP table:`, errorText);
       } else {
-        // Create new record
-        const createVipUrl = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/VIP`;
-        const createVipResponse = await fetch(createVipUrl, {
-          method: 'POST',
-          headers: airtableHeaders,
-          body: JSON.stringify({ fields: vipFields }),
-        });
-        
-        if (!createVipResponse.ok) {
-          const errorText = await createVipResponse.text();
-          console.error(`[Sync User to Airtable] Failed to create in VIP table:`, errorText);
-        } else {
-          console.log(`[Sync User to Airtable] Created user in VIP table`);
-        }
+        console.log(`[Sync User to Airtable] Created user in VIP table (triggers automation)`);
       }
     }
 
