@@ -9,6 +9,7 @@ const corsHeaders = {
 const AIRTABLE_API_KEY = Deno.env.get('AIRTABLE_API_KEY');
 const AIRTABLE_BASE_ID = Deno.env.get('AIRTABLE_BASE_ID');
 const USERS_TABLE = 'Users';
+const AMAZON_TO_AIRTABLE_TABLE = 'Amazon to airable';
 
 interface UserData {
   email: string;
@@ -236,6 +237,71 @@ serve(async (req) => {
 
     if (result.error) {
       throw new Error(result.error.message || 'Airtable error');
+    }
+
+    // === SYNC TO "Amazon to airable" TABLE FOR NON-VIP USERS ===
+    // Only sync users who are NOT VIP (free users who signed up but didn't pay)
+    if (!isCurrentlyVip && !isCanceledVip && typeAbonnement === 'Gratuit') {
+      console.log(`[Sync User to Airtable] User is not VIP, syncing to Amazon to airable table`);
+      
+      // Check if user already exists in Amazon to airable table
+      const amazonSearchUrl = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${encodeURIComponent(AMAZON_TO_AIRTABLE_TABLE)}?filterByFormula={Email}="${user.email}"`;
+      const amazonSearchResponse = await fetch(amazonSearchUrl, {
+        headers: {
+          'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
+        },
+      });
+      
+      const amazonSearchData = await amazonSearchResponse.json();
+      console.log(`[Sync User to Airtable] Amazon to airable search result:`, amazonSearchData);
+
+      // Prepare fields for Amazon to airable table
+      const amazonFields: Record<string, unknown> = {
+        "Email": user.email,
+        "Nom": user.full_name || user.nickname || '',
+        "Numéro de téléphone": user.phone || '',
+        "Pays": "France", // Default to France as we don't have country data
+        "inscrit mais non VIP": true,
+      };
+
+      console.log(`[Sync User to Airtable] Amazon to airable fields:`, JSON.stringify(amazonFields));
+
+      let amazonResponse;
+      
+      if (amazonSearchData.records && amazonSearchData.records.length > 0) {
+        // Update existing record
+        const amazonRecordId = amazonSearchData.records[0].id;
+        console.log(`[Sync User to Airtable] Updating existing Amazon to airable record:`, amazonRecordId);
+        
+        amazonResponse = await fetch(`https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${encodeURIComponent(AMAZON_TO_AIRTABLE_TABLE)}/${amazonRecordId}`, {
+          method: 'PATCH',
+          headers: {
+            'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ fields: amazonFields }),
+        });
+      } else {
+        // Create new record
+        console.log(`[Sync User to Airtable] Creating new Amazon to airable record`);
+        
+        amazonResponse = await fetch(`https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${encodeURIComponent(AMAZON_TO_AIRTABLE_TABLE)}`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ records: [{ fields: amazonFields }] }),
+        });
+      }
+
+      const amazonResult = await amazonResponse.json();
+      console.log(`[Sync User to Airtable] Amazon to airable result:`, amazonResult);
+
+      if (amazonResult.error) {
+        console.error(`[Sync User to Airtable] Amazon to airable error:`, amazonResult.error);
+        // Don't throw, just log - we still synced to Users table successfully
+      }
     }
 
     return new Response(JSON.stringify({ success: true, result }), {
