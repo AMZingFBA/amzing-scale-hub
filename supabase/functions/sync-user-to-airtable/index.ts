@@ -204,6 +204,7 @@ serve(async (req) => {
     console.log(`[Sync User to Airtable] Fields to sync:`, JSON.stringify(fields));
 
     let response;
+    let isNewUserInAirtable = false;
     
     if (searchData.records && searchData.records.length > 0) {
       // Update existing record
@@ -219,8 +220,9 @@ serve(async (req) => {
         body: JSON.stringify({ fields }),
       });
     } else {
-      // Create new record
+      // Create new record - this is a truly new user
       console.log(`[Sync User to Airtable] Creating new record`);
+      isNewUserInAirtable = true;
       
       response = await fetch(`https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${USERS_TABLE}`, {
         method: 'POST',
@@ -241,14 +243,15 @@ serve(async (req) => {
 
     // === SYNC TO "Amazon to airable" TABLE FOR NEW NON-VIP USERS ONLY ===
     // Only sync users who:
+    // - Are a NEW user (first time being created in Users table)
     // - Are NOT currently VIP
     // - Have NEVER been VIP (no stripe customer id, never was VIP)
     // - Are truly "Gratuit" (not Ancien VIP, not canceled, not unpaid)
     const neverBeenVip = !wasVip && !hadStripeCustomer && !hadDateActivation;
-    const isTrulyNewFreeUser = !isCurrentlyVip && !isCanceledVip && typeAbonnement === 'Gratuit' && neverBeenVip;
+    const isTrulyNewFreeUser = isNewUserInAirtable && !isCurrentlyVip && !isCanceledVip && typeAbonnement === 'Gratuit' && neverBeenVip;
     
     if (isTrulyNewFreeUser) {
-      console.log(`[Sync User to Airtable] User is new and never been VIP, syncing to Amazon to airable table`);
+      console.log(`[Sync User to Airtable] User is NEW and never been VIP, syncing to Amazon to airable table`);
       
       // Check if user already exists in Amazon to airable table
       const amazonSearchUrl = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${encodeURIComponent(AMAZON_TO_AIRTABLE_TABLE)}?filterByFormula={Email}="${user.email}"`;
