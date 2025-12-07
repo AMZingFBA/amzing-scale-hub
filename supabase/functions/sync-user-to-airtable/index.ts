@@ -273,30 +273,49 @@ serve(async (req) => {
     
     // Only ADD to "Amazon to airable" for NEW users who have NEVER been VIP
     const neverBeenVip = !wasVip && !hadStripeCustomer && !hadDateActivation;
-    const isTrulyNewFreeUser = isNewUserInAirtable && !isCurrentlyVip && !isCanceledVip && typeAbonnement === 'Gratuit' && neverBeenVip;
+    const isFreeUser = !isCurrentlyVip && !isCanceledVip && typeAbonnement === 'Gratuit' && neverBeenVip;
     
-    if (isTrulyNewFreeUser) {
-      console.log(`[Sync User to Airtable] User is NEW and never been VIP, syncing to Amazon to airable table`);
+    // Handle "Amazon to airable" table for free users (create or update)
+    if (isFreeUser) {
+      console.log(`[Sync User to Airtable] User is free and never been VIP, syncing to Amazon to airable table`);
       
-      // Check if user already exists in Amazon to airable table (shouldn't, but double check)
+      // Check if user already exists in Amazon to airable table
       const amazonSearchUrl = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${encodeURIComponent(AMAZON_TO_AIRTABLE_TABLE)}?filterByFormula={Email}="${user.email}"`;
       const amazonSearchResponse = await fetch(amazonSearchUrl, {
         headers: { 'Authorization': `Bearer ${AIRTABLE_API_KEY}` },
       });
       const amazonSearchData = await amazonSearchResponse.json();
       
+      const amazonFields: Record<string, unknown> = {
+        "Email": user.email,
+        "Nom": user.full_name || user.nickname || '',
+        "Numéro de téléphone": user.phone || '',
+        "Pays": "France",
+        "inscrit mais non VIP": true,
+      };
+      
       if (amazonSearchData.records && amazonSearchData.records.length > 0) {
-        console.log(`[Sync User to Airtable] User already exists in Amazon to airable, skipping`);
-      } else {
-        // Create new record
-        const amazonFields: Record<string, unknown> = {
-          "Email": user.email,
-          "Nom": user.full_name || user.nickname || '',
-          "Numéro de téléphone": user.phone || '',
-          "Pays": "France",
-          "inscrit mais non VIP": true,
-        };
+        // User exists - UPDATE their record (including phone)
+        const amazonRecordId = amazonSearchData.records[0].id;
+        console.log(`[Sync User to Airtable] Updating existing Amazon to airable record:`, amazonRecordId, JSON.stringify(amazonFields));
         
+        const amazonResponse = await fetch(`https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${encodeURIComponent(AMAZON_TO_AIRTABLE_TABLE)}/${amazonRecordId}`, {
+          method: 'PATCH',
+          headers: {
+            'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ fields: amazonFields }),
+        });
+        
+        const amazonResult = await amazonResponse.json();
+        console.log(`[Sync User to Airtable] Amazon to airable update result:`, amazonResult);
+        
+        if (amazonResult.error) {
+          console.error(`[Sync User to Airtable] Amazon to airable update error:`, amazonResult.error);
+        }
+      } else if (isNewUserInAirtable) {
+        // Only create for truly new users
         console.log(`[Sync User to Airtable] Creating new Amazon to airable record:`, JSON.stringify(amazonFields));
         
         const amazonResponse = await fetch(`https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${encodeURIComponent(AMAZON_TO_AIRTABLE_TABLE)}`, {
