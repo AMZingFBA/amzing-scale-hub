@@ -54,16 +54,14 @@ const Services = () => {
         Accompagnement, prestations, optimisation et services dédiés aux business Amazon FBA et FBM
       </h2>
       
-      {/* Back button for mobile app */}
-      {isNativeApp && (
-        <button
-          onClick={() => navigate(-1)}
-          className="fixed top-[46px] left-[18px] z-50 bg-primary/10 backdrop-blur-sm p-2 rounded-full shadow-lg hover:bg-primary/20 transition-colors border border-primary/20"
-          aria-label="Retour"
-        >
-          <ArrowLeft className="h-5 w-5 text-primary" />
-        </button>
-      )}
+      {/* Back button */}
+      <button
+        onClick={() => navigate('/')}
+        className="fixed top-[140px] left-4 z-50 bg-primary p-2 rounded-full shadow-lg hover:scale-110 transition-transform"
+        aria-label="Retour à l'accueil"
+      >
+        <ArrowLeft className="h-5 w-5 text-primary-foreground" />
+      </button>
       
       <div className="pt-32 pb-20">
         <div className="container mx-auto px-4">
