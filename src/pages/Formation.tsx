@@ -14,6 +14,7 @@ import {
   Smartphone,
   ChevronDown,
   ArrowRight,
+  ArrowLeft,
   BookOpen,
   Zap,
   Award,
@@ -25,7 +26,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SEO from "@/components/SEO";
@@ -38,6 +39,8 @@ import {
 } from "@/components/ui/accordion";
 
 const Formation = () => {
+  const navigate = useNavigate();
+  
   const personas = [
     {
       icon: Target,
@@ -260,6 +263,16 @@ const Formation = () => {
         robots={seoData.formation.robots}
       />
       <Navbar />
+
+      {/* Back Arrow */}
+      <Button
+        variant="default"
+        size="icon"
+        className="fixed top-[140px] left-4 z-50 bg-primary hover:bg-primary/90 text-primary-foreground rounded-full shadow-lg transition-transform hover:scale-110"
+        onClick={() => navigate(-1)}
+      >
+        <ArrowLeft className="h-5 w-5" />
+      </Button>
       
       {/* Hero Section */}
       <section className="pt-28 pb-20 relative overflow-hidden">
