@@ -8,7 +8,7 @@ interface SEOProps {
   image?: string;
   type?: 'website' | 'article' | 'product';
   schema?: object;
-  noindex?: boolean;
+  robots?: 'index,follow' | 'noindex,follow' | 'noindex,nofollow';
 }
 
 const SEO = ({
@@ -18,7 +18,7 @@ const SEO = ({
   image = 'https://amzingfba.com/logo-amzing.png',
   type = 'website',
   schema,
-  noindex = false,
+  robots = 'index,follow',
 }: SEOProps) => {
   const location = useLocation();
   const url = `https://amzingfba.com${location.pathname}`;
@@ -45,15 +45,8 @@ const SEO = ({
     updateMeta('description', description);
     if (keywords) updateMeta('keywords', keywords);
 
-    // Robots meta
-    if (noindex) {
-      updateMeta('robots', 'noindex, nofollow');
-    } else {
-      const robotsMeta = document.querySelector('meta[name="robots"]');
-      if (robotsMeta) {
-        robotsMeta.remove();
-      }
-    }
+    // Robots meta - always set based on robots prop
+    updateMeta('robots', robots);
 
     // Open Graph
     updateMeta('og:title', title, true);
@@ -98,7 +91,7 @@ const SEO = ({
         dynamicSchema.remove();
       }
     };
-  }, [title, description, keywords, image, type, url, schema, noindex]);
+  }, [title, description, keywords, image, type, url, schema, robots]);
 
   return null;
 };
