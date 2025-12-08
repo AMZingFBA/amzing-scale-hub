@@ -328,7 +328,7 @@ const Formation = () => {
                 </Link>
               </Button>
               <Button variant="outline" size="xl" asChild>
-                <Link to="/tarifs">Voir les tarifs</Link>
+                <Link to="/services">Voir les services</Link>
               </Button>
             </div>
 
