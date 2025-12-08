@@ -1,12 +1,19 @@
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import SEO from "@/components/SEO";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
+import { seoData } from "@/lib/seo-data";
 
 const Privacy = () => {
   return (
     <div className="min-h-screen">
+      <SEO
+        title={seoData.confidentialite.title}
+        description={seoData.confidentialite.description}
+        keywords={seoData.confidentialite.keywords}
+      />
       <Navbar />
       
       <Link

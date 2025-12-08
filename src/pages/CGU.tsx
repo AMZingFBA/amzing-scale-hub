@@ -5,14 +5,15 @@ import { Card, CardContent } from "@/components/ui/card";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SEO from "@/components/SEO";
+import { seoData } from "@/lib/seo-data";
 
 const CGU = () => {
   return (
     <>
       <SEO 
-        title="Conditions Générales d'Utilisation - AMZing FBA"
-        description="Consultez les conditions générales d'utilisation du site et de l'application AMZing FBA. Acceptation obligatoire lors de la création de compte."
-        noindex={true}
+        title={seoData.cgu.title}
+        description={seoData.cgu.description}
+        keywords={seoData.cgu.keywords}
       />
       <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-primary/5">
         <Navbar />
