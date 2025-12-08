@@ -78,7 +78,7 @@ const AppInstallBanner = () => {
                 asChild
               >
                 <a
-                  href="https://apps.apple.com/app/amzing-fba"
+                  href="https://apps.apple.com/fr/app/amzing-fba/id6754807429"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
