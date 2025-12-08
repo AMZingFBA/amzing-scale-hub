@@ -276,8 +276,8 @@ const Formation = () => {
             </Badge>
             
             <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
-              Formation Amazon FBA + plateforme AMZing FBA : construis un{" "}
-              <span className="text-primary">vrai business e-commerce rentable</span>
+              AMZing FBA : l'outil clé pour bâtir{" "}
+              <span className="text-primary">un business e-commerce vraiment rentable</span>
             </h1>
             
             <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-3xl mx-auto">
