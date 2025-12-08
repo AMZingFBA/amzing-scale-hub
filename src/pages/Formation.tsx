@@ -517,16 +517,6 @@ const Formation = () => {
             ))}
           </div>
 
-          {/* Placeholder for screenshot */}
-          <div className="max-w-4xl mx-auto">
-            <div className="aspect-video bg-gradient-to-br from-primary/5 to-secondary/5 rounded-2xl border-2 border-dashed border-muted-foreground/20 flex items-center justify-center">
-              <div className="text-center text-muted-foreground">
-                <BarChart3 className="w-16 h-16 mx-auto mb-4 opacity-50" />
-                <p className="text-lg font-medium">Aperçu de la plateforme</p>
-                <p className="text-sm">Capture d'écran du tableau de bord</p>
-              </div>
-            </div>
-          </div>
         </div>
       </section>
 
