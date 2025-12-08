@@ -2,123 +2,129 @@
 
 export const seoData = {
   home: {
-    title: "AMZing FBA - Formation, Sourcing & Logistique Amazon FBA France",
-    description: "Formation Amazon FBA complète + catalogue de produits rentables + stockage & expédition. Moniteurs automatiques, guides complets et outils professionnels pour réussir sur Amazon.",
-    keywords: "amazon fba france, formation amazon fba, achat revente amazon, fournisseurs grossistes france, stockage expédition amazon, produits gagnants amazon",
+    title: "AMZing FBA – Formation Amazon FBA + Moniteurs de Produits Rentables",
+    description: "AMZing FBA, c'est plus qu'une formation Amazon FBA : une plateforme complète pour construire un business e-commerce rentable avec guide pas à pas, moniteurs de produits rentables, stockage, expédition et cashback fournisseurs.",
+    keywords: "formation amazon fba, guide amazon fba, business e-commerce rentable, produits rentables amazon, moniteurs produits rentables",
   },
   
   formation: {
-    title: "Formation Amazon FBA Complète - De 0 aux Premières Ventes | AMZing FBA",
-    description: "Formation Amazon FBA professionnelle : sourcing produits, négociation fournisseurs, création listing optimisé, lancement et scaling. Modules vidéo + templates Excel inclus.",
-    keywords: "formation amazon fba, cours amazon fba, apprendre amazon fba, tutoriel amazon fba, formation vendeur amazon",
+    title: "Formation Amazon FBA AMZing – Guide complet business e-commerce rentable",
+    description: "Programme Amazon FBA clé en main : formation vidéo, guide structuré, data produits, moniteurs d'opportunités rentables et accompagnement pour lancer et scaler un business Amazon vraiment rentable.",
+    keywords: "formation amazon fba, guide amazon fba, business e-commerce rentable, cours amazon fba, tutoriel amazon fba",
   },
   
   tarifs: {
-    title: "Tarifs AMZing FBA - Abonnement VIP 34,99€/mois Sans Engagement",
-    description: "Accès VIP complet : moniteurs automatiques, guides FBA, fournisseurs privés, stock checker et service logistique. 34,99€/mois sans engagement. Annulation à tout moment.",
-    keywords: "tarifs amazon fba, abonnement amazon fba, prix formation amazon, outil amazon fba",
+    title: "Tarifs AMZing FBA – Abonnement VIP Formation + Moniteurs 34,99€/mois",
+    description: "Accès complet à la formation Amazon FBA, moniteurs de produits rentables, guides et outils de sourcing. 34,99€/mois sans engagement pour un business e-commerce rentable.",
+    keywords: "tarifs formation amazon fba, abonnement amazon fba, prix moniteurs produits, outils business e-commerce",
   },
   
   catalogue: {
-    title: "Catalogue Produits Rentables Amazon FBA - ROI et Marges Analysés",
-    description: "Découvrez notre catalogue exclusif de produits analysés pour Amazon FBA : ROI, marges, BSR, nombre de vendeurs. Sourcing optimisé depuis Qogita, Auchan et plus.",
-    keywords: "produits rentables amazon, catalogue amazon fba, sourcing amazon, produits gagnants fba",
+    title: "Moniteurs Produits Rentables Amazon FBA – ROI et Marges Analysés",
+    description: "Accédez à nos moniteurs de produits rentables Amazon : ROI calculé, marges analysées, BSR et concurrence. Sourcing data pour un business e-commerce rentable.",
+    keywords: "produits rentables amazon, moniteurs produits fba, sourcing amazon fba, data produits rentables",
   },
   
   guides: {
-    title: "Guides Amazon FBA Gratuits - Tutoriels et Ressources | AMZing FBA",
-    description: "Guides complets pour maîtriser Amazon FBA : création compte vendeur, sourcing produits, gestion stock, optimisation listings, PPC et scaling. Ressources gratuites.",
-    keywords: "guide amazon fba, tutoriel amazon fba, ressources amazon, conseil vendeur amazon",
+    title: "Guides Amazon FBA Gratuits – Ressources Business E-commerce | AMZing",
+    description: "Guides complets pour maîtriser Amazon FBA : création compte vendeur, sourcing produits rentables, gestion stock, optimisation listings et scaling de votre business e-commerce.",
+    keywords: "guide amazon fba, tutoriel amazon fba, ressources business e-commerce, conseil vendeur amazon",
   },
   
   creationSociete: {
-    title: "Créer sa Société pour Amazon FBA - Guide Complet SASU/EURL | AMZing FBA",
-    description: "Guide complet pour créer votre société (SASU, EURL, micro-entreprise) pour vendre sur Amazon FBA. Partenariat LegalPlace avec code promo exclusif AMZINGFBA15.",
-    keywords: "créer société amazon fba, statut juridique amazon, sasu eurl amazon, micro-entreprise amazon",
+    title: "Créer sa Société pour Amazon FBA – Guide Pratique | AMZing FBA",
+    description: "Accompagnement pour créer ta structure juridique adaptée à ton business Amazon FBA : choix du statut, démarches et bonnes pratiques pour lancer un business e-commerce pérenne.",
+    keywords: "créer société amazon fba, statut juridique amazon, sasu eurl amazon fba, micro-entreprise e-commerce",
   },
   
   services: {
-    title: "Services AMZing FBA - Logistique, Stockage et Accompagnement Amazon",
-    description: "Services professionnels pour vendeurs Amazon : stockage et expédition sous 24h, préparation commandes, accompagnement personnalisé et conseils stratégiques. AMZing FBA 360.",
-    keywords: "service logistique amazon, stockage fba, préparation commande amazon, accompagnement vendeur amazon",
+    title: "Services Logistique Amazon FBA – Stockage & Expédition | AMZing FBA",
+    description: "Services professionnels pour vendeurs Amazon : stockage et expédition sous 24h, préparation commandes et accompagnement pour développer votre business e-commerce rentable.",
+    keywords: "service logistique amazon fba, stockage fba, expédition amazon, business e-commerce rentable",
   },
   
   debuter: {
-    title: "Débuter sur Amazon FBA - Guide pour Débutants | AMZing FBA",
-    description: "Premiers pas sur Amazon FBA : création compte vendeur, choix des produits, sourcing fournisseurs, gestion logistique. Guide complet pour débutants.",
-    keywords: "débuter amazon fba, commencer amazon fba, premier pas amazon",
+    title: "Débuter Amazon FBA – Guide Débutant Business E-commerce | AMZing",
+    description: "Premiers pas sur Amazon FBA : création compte vendeur, choix des produits rentables, sourcing fournisseurs. Guide complet pour lancer votre business e-commerce rentable.",
+    keywords: "débuter amazon fba, commencer business e-commerce, guide débutant amazon fba",
   },
   
   gestionProduits: {
-    title: "Gestion Produits Amazon FBA - Organisation et Optimisation",
-    description: "Outils et méthodes pour gérer efficacement votre catalogue Amazon : suivi stock, optimisation fiches produits, gestion commandes et reporting.",
-    keywords: "gestion produits amazon, optimisation catalogue amazon, suivi stock fba",
+    title: "Gestion Produits Amazon FBA – Moniteurs & Optimisation | AMZing",
+    description: "Outils et moniteurs pour gérer efficacement votre catalogue Amazon FBA : suivi stock, produits rentables, optimisation fiches et reporting pour un business e-commerce performant.",
+    keywords: "gestion produits amazon fba, moniteurs produits rentables, optimisation catalogue amazon",
   },
   
   factureAutorisation: {
-    title: "Factures et Autorisations Amazon - Documents Requis | AMZing FBA",
-    description: "Tout savoir sur les factures et autorisations requises par Amazon : factures fournisseurs, autorisations de marque, documents douaniers et conformité.",
-    keywords: "facture amazon fba, autorisation marque amazon, documents amazon",
+    title: "Factures et Autorisations Amazon FBA – Documents Requis | AMZing",
+    description: "Guide complet sur les factures et autorisations requises par Amazon FBA : documents fournisseurs, autorisations de marque et conformité pour votre business e-commerce.",
+    keywords: "facture amazon fba, autorisation marque amazon, documents vendeur amazon fba",
   },
   
   cashback: {
-    title: "Cashback Amazon FBA - Optimisez vos Marges | AMZing FBA",
-    description: "Maximisez vos profits avec nos solutions cashback et réductions exclusives. Optimisez vos achats de stock et augmentez votre rentabilité sur Amazon.",
-    keywords: "cashback amazon, réductions fba, optimiser marge amazon",
+    title: "Cashback Fournisseurs Amazon FBA – Augmente ta Marge | AMZing FBA",
+    description: "Récupère une partie de tes achats fournisseurs Amazon FBA grâce au cashback AMZing FBA. Optimise la rentabilité de chaque produit de ton business e-commerce.",
+    keywords: "cashback amazon fba, cashback fournisseurs, optimiser marge amazon, business e-commerce rentable",
   },
   
   avisPage: {
-    title: "Avis Clients AMZing FBA - Témoignages de Vendeurs Amazon",
-    description: "Découvrez les avis et témoignages de nos membres : réussites, résultats et retours d'expérience sur la formation et les outils AMZing FBA.",
-    keywords: "avis amzing fba, témoignage vendeur amazon, retour expérience fba",
+    title: "Avis AMZing FBA – Résultats et Témoignages Vendeurs Amazon",
+    description: "Découvre les avis et témoignages de vendeurs Amazon qui utilisent la formation AMZing FBA, les moniteurs de produits rentables et la plateforme pour développer un business e-commerce rentable.",
+    keywords: "avis amzing fba, témoignage formation amazon fba, résultats vendeur amazon, business e-commerce rentable",
   },
   
   marketplace: {
-    title: "Marketplace AMZing FBA - Services et Produits entre Vendeurs",
-    description: "Plateforme d'échange entre vendeurs Amazon : achat/vente de stock, services spécialisés, opportunités business et collaboration communautaire.",
-    keywords: "marketplace amazon fba, vente stock amazon, achat lot amazon",
+    title: "Marketplace Vendeurs Amazon FBA – Achat Vente Stock | AMZing",
+    description: "Plateforme d'échange entre vendeurs Amazon FBA : achat/vente de stock, services spécialisés et opportunités pour développer votre business e-commerce rentable.",
+    keywords: "marketplace amazon fba, vente stock amazon, achat lot amazon fba, business e-commerce",
   },
   
   contact: {
-    title: "Contact AMZing FBA - Support et Questions | Nous Contacter",
-    description: "Contactez l'équipe AMZing FBA pour toute question sur la formation, les abonnements ou nos services. Support réactif par email et téléphone.",
-    keywords: "contact amzing fba, support amazon fba, aide vendeur amazon",
+    title: "Contact AMZing FBA – Parler à l'Équipe Formation Amazon FBA",
+    description: "Une question sur la formation Amazon FBA, la plateforme ou les moniteurs de produits rentables ? Contacte directement l'équipe AMZing FBA.",
+    keywords: "contact amzing fba, support formation amazon fba, aide moniteurs produits",
   },
   
   faq: {
-    title: "FAQ AMZing FBA - Questions Fréquentes sur Amazon FBA",
-    description: "Réponses aux questions fréquentes sur Amazon FBA, la formation AMZing, les abonnements, les outils de sourcing et nos services logistiques.",
-    keywords: "faq amazon fba, questions amazon fba, aide amazon vendeur",
+    title: "FAQ AMZing FBA – Questions Formation Amazon & Produits Rentables",
+    description: "Réponses aux questions fréquentes sur la formation Amazon FBA, les moniteurs de produits rentables, les abonnements et les outils pour un business e-commerce rentable.",
+    keywords: "faq formation amazon fba, questions produits rentables, aide business e-commerce",
   },
   
   mentionsLegales: {
-    title: "Mentions Légales - AMZing FBA | N.Z Consulting",
-    description: "Mentions légales du site AMZing FBA édité par N.Z Consulting (SIRET 993 348 929 00015). Informations légales, hébergeur et conditions d'utilisation.",
-    keywords: "mentions légales amzing fba, informations légales",
+    title: "Mentions Légales AMZing FBA – Informations Légales",
+    description: "Mentions légales du site et de la plateforme AMZing FBA édité par N.Z Consulting. Informations légales, hébergeur et conditions d'utilisation.",
+    keywords: "mentions légales amzing fba, informations légales plateforme amazon fba",
   },
   
   cgv: {
-    title: "Conditions Générales de Vente - AMZing FBA",
-    description: "Conditions générales de vente des services et abonnements AMZing FBA. Modalités d'achat, de paiement, d'annulation et garanties.",
-    keywords: "cgv amzing fba, conditions vente, conditions générales",
+    title: "Conditions Générales de Vente – AMZing FBA",
+    description: "Conditions générales de vente de la formation Amazon FBA et des abonnements AMZing FBA. Modalités d'achat, paiement et garanties.",
+    keywords: "cgv amzing fba, conditions vente formation amazon fba, conditions générales",
+  },
+  
+  cgu: {
+    title: "Conditions Générales d'Utilisation – AMZing FBA",
+    description: "Conditions générales d'utilisation de la plateforme AMZing FBA. Règles d'accès, obligations des utilisateurs et fonctionnement des services.",
+    keywords: "cgu amzing fba, conditions utilisation, règles plateforme amazon fba",
   },
   
   confidentialite: {
-    title: "Politique de Confidentialité - Protection des Données | AMZing FBA",
-    description: "Politique de confidentialité et protection des données personnelles AMZing FBA. Gestion des cookies, RGPD et respect de la vie privée.",
-    keywords: "confidentialité amzing fba, protection données, rgpd",
+    title: "Politique de Confidentialité – AMZing FBA",
+    description: "Politique de confidentialité et gestion des données personnelles des utilisateurs AMZing FBA. Protection des données et respect du RGPD.",
+    keywords: "confidentialité amzing fba, protection données, rgpd formation amazon fba",
   },
   
   refund: {
-    title: "Politique de Remboursement - Conditions de Rétractation | AMZing FBA",
-    description: "Politique de remboursement AMZing FBA : conditions d'annulation, délais de rétractation et modalités de remboursement pour nos services.",
-    keywords: "remboursement amzing fba, politique retour, annulation abonnement",
+    title: "Politique de Remboursement – AMZing FBA",
+    description: "Politique de remboursement AMZing FBA : conditions d'annulation, délais de rétractation et modalités pour la formation Amazon FBA et abonnements.",
+    keywords: "remboursement amzing fba, politique retour formation amazon fba, annulation abonnement",
   },
   
   affiliate: {
-    title: "Programme d'Affiliation AMZing FBA - Gagnez des Commissions",
-    description: "Rejoignez notre programme d'affiliation : recommandez AMZing FBA et gagnez des commissions récurrentes. Outils de promotion et suivi en temps réel.",
-    keywords: "affiliation amzing fba, programme partenaire, commission amazon fba",
+    title: "Programme Affiliation AMZing FBA – Commissions Récurrentes",
+    description: "Rejoins le programme d'affiliation AMZing FBA : recommande la formation Amazon FBA et les moniteurs de produits rentables et gagne des commissions récurrentes.",
+    keywords: "affiliation amzing fba, programme partenaire amazon fba, commission formation amazon",
   },
 };
 
