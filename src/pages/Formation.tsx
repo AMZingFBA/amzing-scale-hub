@@ -269,7 +269,13 @@ const Formation = () => {
         variant="default"
         size="icon"
         className="fixed top-[140px] left-4 z-50 bg-primary hover:bg-primary/90 text-primary-foreground rounded-full shadow-lg transition-transform hover:scale-110"
-        onClick={() => navigate(-1)}
+        onClick={() => {
+          if (window.history.length > 1) {
+            navigate(-1);
+          } else {
+            navigate('/');
+          }
+        }}
       >
         <ArrowLeft className="h-5 w-5" />
       </Button>
