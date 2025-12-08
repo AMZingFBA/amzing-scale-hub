@@ -171,7 +171,7 @@ const Index = () => {
                 {isStarting ? 'Activation...' : 'S\'abonner maintenant'} <ArrowRight className="ml-2" />
               </Button>
               <Button variant="outline" size="xl" asChild>
-                <Link to="/services">
+                <Link to="/formation">
                   Découvrir les avantages
                 </Link>
               </Button>
