@@ -1,0 +1,19 @@
+# Liste des URLs à prérendériser pour Prerender.io
+# Ces URLs seront crawlées et mises en cache par le service
+
+https://amzingfba.com/
+https://amzingfba.com/formation
+https://amzingfba.com/services
+https://amzingfba.com/tarifs
+https://amzingfba.com/guides
+https://amzingfba.com/creation-societe
+https://amzingfba.com/marketplace
+https://amzingfba.com/contact
+https://amzingfba.com/faq
+https://amzingfba.com/mentions-legales
+https://amzingfba.com/cgv
+https://amzingfba.com/cgu
+https://amzingfba.com/confidentialite
+https://amzingfba.com/privacy
+https://amzingfba.com/refund
+https://amzingfba.com/affiliate

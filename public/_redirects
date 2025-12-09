@@ -1,0 +1,62 @@
+# Prerender.io Configuration pour Netlify/Lovable
+# Redirige les crawlers vers le service de prerendering
+
+# Crawlers pattern - ces user-agents seront servis par Prerender.io
+# Configuration à activer une fois le compte Prerender.io créé
+
+# Pour Netlify Edge Functions ou Cloudflare Workers:
+# Les bots suivants doivent être redirigés vers https://service.prerender.io/
+# - googlebot
+# - bingbot
+# - yandex
+# - baiduspider
+# - facebookexternalhit
+# - twitterbot
+# - rogerbot
+# - linkedinbot
+# - embedly
+# - quora link preview
+# - showyoubot
+# - outbrain
+# - pinterest/0.
+# - developers.google.com/+/web/snippet
+# - slackbot
+# - vkShare
+# - W3C_Validator
+# - redditbot
+# - Applebot
+# - WhatsApp
+# - flipboard
+# - tumblr
+# - bitlybot
+# - SkypeUriPreview
+# - nuzzel
+# - Discordbot
+# - Google Page Speed
+# - Qwantify
+# - pinterestbot
+# - Bitrix link preview
+# - XING-contenttabreceiver
+# - Chrome-Lighthouse
+# - TelegramBot
+
+# Routes à prérendériser (pages SEO principales)
+# /                     -> Page d'accueil
+# /formation            -> Page formation
+# /services             -> Page services  
+# /tarifs               -> Page tarifs
+# /guides               -> Page guides
+# /creation-societe     -> Page création société
+# /marketplace          -> Page marketplace
+# /contact              -> Page contact
+# /faq                  -> Page FAQ
+# /mentions-legales     -> Mentions légales
+# /cgv                  -> CGV
+# /cgu                  -> CGU
+# /confidentialite      -> Politique de confidentialité
+# /privacy              -> Privacy policy
+# /refund               -> Politique de remboursement
+# /affiliate            -> Programme d'affiliation
+
+# SPA fallback - toutes les autres routes vers index.html
+/*    /index.html   200
