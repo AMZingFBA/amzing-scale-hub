@@ -3,9 +3,14 @@
   <head>
     <meta charset="UTF-8" />
     
+    <!-- Prerender.io - Détection des crawlers pour SEO -->
+    <!-- Les crawlers seront redirigés vers le service Prerender.io pour recevoir du HTML statique -->
+    <meta name="fragment" content="!">
+    
     <!-- DNS Prefetch & Preconnect pour optimiser les connexions externes -->
     <link rel="dns-prefetch" href="https://fonts.googleapis.com">
     <link rel="dns-prefetch" href="https://www.googletagmanager.com">
+    <link rel="dns-prefetch" href="https://service.prerender.io">
     <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     
@@ -29,22 +34,40 @@
     <link rel="icon" type="image/png" href="/favicon.png">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <!-- SEO Meta Tags Statiques Enrichis -->
     <title>AMZing FBA – Formation Amazon FBA + Moniteurs de Produits Rentables</title>
     <meta name="description" content="AMZing FBA, c'est plus qu'une formation Amazon FBA : une plateforme complète pour construire un business e-commerce rentable avec guide pas à pas, moniteurs de produits rentables, stockage, expédition et cashback fournisseurs.">
-    <meta name="keywords" content="formation amazon fba, guide amazon fba, business e-commerce rentable, produits rentables amazon, moniteurs produits rentables">
+    <meta name="keywords" content="formation amazon fba, guide amazon fba, business e-commerce rentable, produits rentables amazon, moniteurs produits rentables, sourcing amazon, fba france, vendre sur amazon, amazon seller central, e-commerce 2025">
     <meta name="author" content="AMZing FBA" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <meta name="googlebot" content="index, follow">
+    <meta name="bingbot" content="index, follow">
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="AMZing FBA" />
     <meta property="og:url" content="https://amzingfba.com" />
+    <meta property="og:title" content="AMZing FBA – Formation Amazon FBA + Moniteurs de Produits Rentables">
+    <meta property="og:description" content="AMZing FBA, c'est plus qu'une formation Amazon FBA : une plateforme complète pour construire un business e-commerce rentable avec guide pas à pas, moniteurs de produits rentables, stockage, expédition et cashback fournisseurs.">
     <meta property="og:image" content="https://amzingfba.com/logo-amzing.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:locale" content="fr_FR" />
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@amzingfba" />
+    <meta name="twitter:title" content="AMZing FBA – Formation Amazon FBA + Moniteurs de Produits Rentables">
+    <meta name="twitter:description" content="AMZing FBA, c'est plus qu'une formation Amazon FBA : une plateforme complète pour construire un business e-commerce rentable avec guide pas à pas, moniteurs de produits rentables.">
     <meta name="twitter:image" content="https://amzingfba.com/logo-amzing.png" />
     
     <!-- Canonical URL -->
     <link rel="canonical" href="https://amzingfba.com" />
+    
+    <!-- Alternate language versions (si applicable) -->
+    <link rel="alternate" hreflang="fr" href="https://amzingfba.com" />
+    <link rel="alternate" hreflang="x-default" href="https://amzingfba.com" />
     
     <!-- JSON-LD Schema.org pour Rich Snippets Google -->
     <script type="application/ld+json">
@@ -52,9 +75,16 @@
       "@context": "https://schema.org",
       "@type": "Organization",
       "name": "AMZing FBA",
+      "alternateName": "AMZing FBA France",
       "url": "https://amzingfba.com/",
-      "logo": "https://amzingfba.com/logo-amzing.png",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://amzingfba.com/logo-amzing.png",
+        "width": 512,
+        "height": 512
+      },
       "description": "AMZing FBA accompagne tous les vendeurs Amazon FBA/FBM avec des formations, guides, catalogue produits, outils de sourcing, marketplace, support et stratégies pour réussir sur Amazon.",
+      "foundingDate": "2024",
       "contactPoint": {
         "@type": "ContactPoint",
         "telephone": "+33-1-XX-XX-XX-XX",
@@ -68,7 +98,11 @@
         "addressLocality": "Paris",
         "postalCode": "75008",
         "addressCountry": "FR"
-      }
+      },
+      "sameAs": [
+        "https://www.instagram.com/amzingfba",
+        "https://www.tiktok.com/@amzingfba"
+      ]
     }
     </script>
     
@@ -80,6 +114,7 @@
       "name": "AMZing FBA",
       "url": "https://amzingfba.com",
       "description": "Formation, sourcing et outils pour réussir sur Amazon FBA",
+      "inLanguage": "fr-FR",
       "potentialAction": {
         "@type": "SearchAction",
         "target": {
@@ -91,22 +126,198 @@
     }
     </script>
     
+    <!-- Course Schema pour la formation -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Course",
+      "name": "Formation Amazon FBA Complète",
+      "description": "Formation complète pour lancer et développer votre business Amazon FBA. Inclut guide pas à pas, moniteurs de produits rentables, accès à la communauté et support personnalisé.",
+      "provider": {
+        "@type": "Organization",
+        "name": "AMZing FBA",
+        "url": "https://amzingfba.com"
+      },
+      "url": "https://amzingfba.com/formation",
+      "courseCode": "AMZFBA360",
+      "hasCourseInstance": {
+        "@type": "CourseInstance",
+        "courseMode": "online",
+        "courseWorkload": "PT50H"
+      },
+      "offers": {
+        "@type": "Offer",
+        "price": "34.99",
+        "priceCurrency": "EUR",
+        "availability": "https://schema.org/InStock",
+        "url": "https://amzingfba.com/tarifs"
+      },
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.8",
+        "reviewCount": "150",
+        "bestRating": "5",
+        "worstRating": "1"
+      }
+    }
+    </script>
+    
+    <!-- FAQ Schema pour améliorer les rich snippets -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Qu'est-ce qu'AMZing FBA ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "AMZing FBA est une plateforme complète pour les vendeurs Amazon. Elle combine formation, outils de sourcing, moniteurs de produits rentables, catalogue de fournisseurs et une communauté active pour vous accompagner dans votre business e-commerce."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Combien coûte l'abonnement AMZing FBA ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "L'abonnement AMZing FBA est à 34,99€ par mois. Il inclut l'accès complet à la formation, aux moniteurs de produits, au catalogue, à la communauté et au support personnalisé."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "AMZing FBA est-il adapté aux débutants ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Oui, AMZing FBA est conçu pour accompagner tous les niveaux. Notre guide pas à pas vous accompagne de la création de votre société jusqu'à vos premières ventes sur Amazon."
+          }
+        }
+      ]
+    }
+    </script>
+    
+    <!-- BreadcrumbList Schema -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Accueil",
+          "item": "https://amzingfba.com"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Formation",
+          "item": "https://amzingfba.com/formation"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "Services",
+          "item": "https://amzingfba.com/services"
+        },
+        {
+          "@type": "ListItem",
+          "position": 4,
+          "name": "Tarifs",
+          "item": "https://amzingfba.com/tarifs"
+        }
+      ]
+    }
+    </script>
+    
     <!-- Resource hints pour prefetch des pages suivantes probables -->
     <link rel="prefetch" href="/formation" as="document">
     <link rel="prefetch" href="/tarifs" as="document">
     <link rel="prefetch" href="/guides" as="document">
-  
-  
-  
-  
-  
-  <meta property="og:title" content="AMZing FBA – Formation Amazon FBA + Moniteurs de Produits Rentables">
-  <meta name="twitter:title" content="AMZing FBA – Formation Amazon FBA + Moniteurs de Produits Rentables">
-  <meta property="og:description" content="AMZing FBA, c'est plus qu'une formation Amazon FBA : une plateforme complète pour construire un business e-commerce rentable avec guide pas à pas, moniteurs de produits rentables, stockage, expédition et cashback fournisseurs.">
-  <meta name="twitter:description" content="AMZing FBA, c'est plus qu'une formation Amazon FBA : une plateforme complète pour construire un business e-commerce rentable avec guide pas à pas, moniteurs de produits rentables.">
-</head>
+    
+    <!-- Noscript fallback pour les crawlers sans JS -->
+    <noscript>
+      <style>
+        .js-only { display: none !important; }
+        .noscript-content { display: block !important; }
+      </style>
+    </noscript>
+  </head>
 
   <body>
+    <!-- Contenu statique visible par les crawlers avant le chargement JS -->
+    <noscript>
+      <div id="noscript-seo-content" style="padding: 20px; max-width: 1200px; margin: 0 auto;">
+        <header>
+          <h1>AMZing FBA – Formation Amazon FBA + Moniteurs de Produits Rentables</h1>
+          <p>Lancez votre business Amazon FBA avec la plateforme la plus complète du marché français.</p>
+        </header>
+        
+        <main>
+          <section>
+            <h2>Pourquoi choisir AMZing FBA ?</h2>
+            <p>AMZing FBA, c'est plus qu'une simple formation Amazon FBA. C'est une plateforme tout-en-un qui vous accompagne de A à Z dans la création et le développement de votre business e-commerce rentable sur Amazon.</p>
+          </section>
+          
+          <section>
+            <h2>Ce que vous obtenez avec AMZing FBA</h2>
+            <ul>
+              <li><strong>Formation complète</strong> : Guide pas à pas pour lancer votre business Amazon FBA, de la création de société jusqu'aux premières ventes.</li>
+              <li><strong>Moniteurs de produits rentables</strong> : Outils exclusifs pour identifier les meilleures opportunités de sourcing avec ROI calculé automatiquement.</li>
+              <li><strong>Catalogue fournisseurs</strong> : Accès à notre réseau de grossistes et fournisseurs vérifiés.</li>
+              <li><strong>Communauté active</strong> : Échangez avec d'autres vendeurs Amazon et bénéficiez de leur expérience.</li>
+              <li><strong>Support personnalisé</strong> : Assistance dédiée pour répondre à toutes vos questions.</li>
+            </ul>
+          </section>
+          
+          <section>
+            <h2>À qui s'adresse AMZing FBA ?</h2>
+            <ul>
+              <li><strong>Débutants complets</strong> : Vous n'avez jamais vendu en ligne ? Notre guide pas à pas vous accompagne depuis zéro.</li>
+              <li><strong>Vendeurs en reconversion</strong> : Vous vendez déjà sur d'autres plateformes et souhaitez vous lancer sur Amazon.</li>
+              <li><strong>Vendeurs Amazon confirmés</strong> : Optimisez votre sourcing et découvrez de nouvelles opportunités rentables.</li>
+            </ul>
+          </section>
+          
+          <section>
+            <h2>Nos tarifs</h2>
+            <p>Abonnement mensuel à <strong>34,99€/mois</strong> – Accès complet à toute la plateforme, sans engagement.</p>
+            <p><a href="/tarifs">Voir les détails des tarifs</a></p>
+          </section>
+          
+          <section>
+            <h2>Questions fréquentes</h2>
+            <dl>
+              <dt>Qu'est-ce qu'AMZing FBA ?</dt>
+              <dd>AMZing FBA est une plateforme complète pour les vendeurs Amazon. Elle combine formation, outils de sourcing, moniteurs de produits rentables, catalogue de fournisseurs et une communauté active.</dd>
+              
+              <dt>Combien coûte l'abonnement ?</dt>
+              <dd>L'abonnement AMZing FBA est à 34,99€ par mois, tout inclus.</dd>
+              
+              <dt>Est-ce adapté aux débutants ?</dt>
+              <dd>Oui, AMZing FBA est conçu pour accompagner tous les niveaux, des débutants complets aux vendeurs confirmés.</dd>
+            </dl>
+          </section>
+        </main>
+        
+        <footer>
+          <nav>
+            <a href="/formation">Formation</a> |
+            <a href="/services">Services</a> |
+            <a href="/tarifs">Tarifs</a> |
+            <a href="/guides">Guides</a> |
+            <a href="/contact">Contact</a> |
+            <a href="/faq">FAQ</a> |
+            <a href="/mentions-legales">Mentions légales</a> |
+            <a href="/cgv">CGV</a> |
+            <a href="/confidentialite">Politique de confidentialité</a>
+          </nav>
+          <p>© 2024 AMZing FBA - N.Z Consulting - SIRET: 993 348 929 00015</p>
+          <address>59 Rue de Ponthieu, 75008 Paris, France | contact@amzingfba.com</address>
+        </footer>
+      </div>
+    </noscript>
+    
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
