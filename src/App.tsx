@@ -73,6 +73,7 @@ const ProduitsQogita = lazy(() => import("./pages/ProduitsQogita"));
 const ProduitsEany = lazy(() => import("./pages/ProduitsEany"));
 const AdminAirtableContacts = lazy(() => import("./pages/AdminAirtableContacts"));
 const AdminAirtableUsers = lazy(() => import("./pages/AdminAirtableUsers"));
+const Partenaires = lazy(() => import("./pages/Partenaires"));
 
 const queryClient = new QueryClient();
 
@@ -162,6 +163,7 @@ const App = () => (
             <Route path="/products/eany" element={<ProduitsEany />} />
             <Route path="/admin/airtable-contacts" element={<AdminAirtableContacts />} />
             <Route path="/admin/airtable-users" element={<AdminAirtableUsers />} />
+            <Route path="/partenaires" element={<Partenaires />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
