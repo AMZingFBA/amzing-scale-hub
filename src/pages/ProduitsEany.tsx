@@ -600,9 +600,9 @@ export default function ProduitsEany() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                  {/* Qogita Prices */}
+                  {/* Eany Prices */}
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-muted-foreground">Prix Qogita HT/TTC</span>
+                    <span className="text-sm text-muted-foreground">Prix Eany HT/TTC</span>
                     <span className="font-semibold">{product.qogita_price_ht}€ / {product.qogita_price_ttc}€</span>
                   </div>
                   <div className="flex justify-between items-center">
