@@ -691,7 +691,7 @@ export default function ProduitsEany() {
                           }}
                         >
                           <Store className="h-4 w-4 text-blue-600 group-hover:scale-110 transition-transform" />
-                          <span className="text-xs font-semibold text-blue-700">Qogita</span>
+                          <span className="text-xs font-semibold text-blue-700">Eany</span>
                         </a>
                       )}
                       {product.selleramp_url && (
