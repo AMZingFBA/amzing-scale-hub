@@ -211,19 +211,13 @@ const Footer = () => {
             <Button 
               variant="outline" 
               size="lg"
-              className="gap-2 border-border/50 hover:border-primary hover:bg-primary/10 transition-all duration-300 w-full relative"
+              className="gap-2 border-border/50 hover:border-primary hover:bg-primary/10 transition-all duration-300 w-full"
               onClick={() => setShowAndroidModal(true)}
             >
               <Smartphone className="w-5 h-5" />
               Android
-              <span className="absolute -top-2 -right-2 bg-primary text-primary-foreground text-[10px] font-bold px-1.5 py-0.5 rounded-full">
-                BÊTA
-              </span>
             </Button>
           </div>
-          <p className="text-xs text-muted-foreground text-center max-w-md">
-            Android est actuellement en version test : laisse ton email pour recevoir l'accès.
-          </p>
         </div>
 
         {/* Bottom Bar */}
@@ -287,10 +281,10 @@ const Footer = () => {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Smartphone className="w-5 h-5 text-primary" />
-              Accès Android
+              Télécharger sur Android
             </DialogTitle>
             <DialogDescription>
-              L'application Android est en version test. Laisse ton email pour recevoir le lien d'installation.
+              Laisse ton email pour recevoir le lien de téléchargement.
             </DialogDescription>
           </DialogHeader>
           
