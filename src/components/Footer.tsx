@@ -189,12 +189,12 @@ const Footer = () => {
 
         {/* App Download Buttons */}
         <div className="flex flex-col items-center gap-4 mb-8 pt-6 border-t border-border/50 animate-fade-in" style={{ animationDelay: '0.35s' }}>
-          <div className="flex flex-wrap justify-center gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-w-lg">
             {/* iOS Button */}
             <Button 
               variant="outline" 
               size="lg"
-              className="gap-2 border-border/50 hover:border-primary hover:bg-primary/10 transition-all duration-300"
+              className="gap-2 border-border/50 hover:border-primary hover:bg-primary/10 transition-all duration-300 w-full"
               asChild
             >
               <a
@@ -211,11 +211,14 @@ const Footer = () => {
             <Button 
               variant="outline" 
               size="lg"
-              className="gap-2 border-border/50 hover:border-primary hover:bg-primary/10 transition-all duration-300"
+              className="gap-2 border-border/50 hover:border-primary hover:bg-primary/10 transition-all duration-300 w-full relative"
               onClick={() => setShowAndroidModal(true)}
             >
               <Smartphone className="w-5 h-5" />
               Android
+              <span className="absolute -top-2 -right-2 bg-primary text-primary-foreground text-[10px] font-bold px-1.5 py-0.5 rounded-full">
+                BÊTA
+              </span>
             </Button>
           </div>
           <p className="text-xs text-muted-foreground text-center max-w-md">
