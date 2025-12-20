@@ -234,6 +234,33 @@ export type Database = {
           },
         ]
       }
+      android_test_requests: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          page: string | null
+          prenom: string | null
+          source: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          page?: string | null
+          prenom?: string | null
+          source?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          page?: string | null
+          prenom?: string | null
+          source?: string | null
+        }
+        Relationships: []
+      }
       catalogue_products: {
         Row: {
           admin_id: string

@@ -1,12 +1,59 @@
 import { Link } from "react-router-dom";
+import { useState } from "react";
 import logo from "@/assets/logo-amzing.png";
 import { useAuth } from "@/hooks/use-auth";
 import { useAdmin } from "@/hooks/use-admin";
-import { Mail } from "lucide-react";
+import { Mail, Apple, Smartphone } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 const Footer = () => {
   const { isVIP } = useAuth();
   const { isAdmin } = useAdmin();
+  const { toast } = useToast();
+  const [showAndroidModal, setShowAndroidModal] = useState(false);
+  const [email, setEmail] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
+
+  const handleAndroidSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email.trim()) return;
+
+    setIsSubmitting(true);
+    try {
+      const { error } = await supabase
+        .from('android_test_requests' as any)
+        .insert({
+          email: email.trim(),
+          page: 'home',
+          source: 'footer_android_button'
+        });
+
+      if (error) throw error;
+
+      setIsSubmitted(true);
+      setEmail("");
+    } catch (error) {
+      console.error('Error submitting android request:', error);
+      toast({
+        title: "Erreur",
+        description: "Une erreur est survenue. Réessayez plus tard.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleCloseModal = () => {
+    setShowAndroidModal(false);
+    setIsSubmitted(false);
+    setEmail("");
+  };
   
   return (
     <footer className="relative bg-gradient-to-b from-card via-card to-background border-t border-border mt-20 overflow-hidden">
@@ -140,6 +187,42 @@ const Footer = () => {
           </div>
         )}
 
+        {/* App Download Buttons */}
+        <div className="flex flex-col items-center gap-4 mb-8 pt-6 border-t border-border/50 animate-fade-in" style={{ animationDelay: '0.35s' }}>
+          <div className="flex flex-wrap justify-center gap-4">
+            {/* iOS Button */}
+            <Button 
+              variant="outline" 
+              size="lg"
+              className="gap-2 border-border/50 hover:border-primary hover:bg-primary/10 transition-all duration-300"
+              asChild
+            >
+              <a
+                href="https://apps.apple.com/fr/app/amzing-fba/id6754807429"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Apple className="w-5 h-5" />
+                App Store
+              </a>
+            </Button>
+
+            {/* Android Button - Opens Modal */}
+            <Button 
+              variant="outline" 
+              size="lg"
+              className="gap-2 border-border/50 hover:border-primary hover:bg-primary/10 transition-all duration-300"
+              onClick={() => setShowAndroidModal(true)}
+            >
+              <Smartphone className="w-5 h-5" />
+              Android
+            </Button>
+          </div>
+          <p className="text-xs text-muted-foreground text-center max-w-md">
+            Android est actuellement en version test : laisse ton email pour recevoir l'accès.
+          </p>
+        </div>
+
         {/* Bottom Bar */}
         <div className="pt-8 border-t border-border/50 animate-fade-in" style={{ animationDelay: '0.4s' }}>
           {/* Copyright et liens */}
@@ -194,6 +277,47 @@ const Footer = () => {
           </div>
         </div>
       </div>
+
+      {/* Android Email Modal */}
+      <Dialog open={showAndroidModal} onOpenChange={handleCloseModal}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Smartphone className="w-5 h-5 text-primary" />
+              Accès Android
+            </DialogTitle>
+            <DialogDescription>
+              L'application Android est en version test. Laisse ton email pour recevoir le lien d'installation.
+            </DialogDescription>
+          </DialogHeader>
+          
+          {isSubmitted ? (
+            <div className="py-6 text-center">
+              <p className="text-lg font-medium text-primary">
+                ✅ Merci ! On t'enverra l'accès Android par email.
+              </p>
+            </div>
+          ) : (
+            <form onSubmit={handleAndroidSubmit} className="space-y-4 pt-4">
+              <Input
+                type="email"
+                placeholder="Ton adresse email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="w-full"
+              />
+              <Button 
+                type="submit" 
+                className="w-full bg-gradient-to-r from-primary to-secondary"
+                disabled={isSubmitting || !email.trim()}
+              >
+                {isSubmitting ? 'Envoi...' : 'Envoyer le lien'}
+              </Button>
+            </form>
+          )}
+        </DialogContent>
+      </Dialog>
     </footer>
   );
 };
