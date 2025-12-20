@@ -280,24 +280,30 @@ const Footer = () => {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Smartphone className="w-5 h-5 text-primary" />
-              Télécharger sur Android
+              Application Android
             </DialogTitle>
             <DialogDescription>
-              Laisse ton email pour recevoir le lien de téléchargement.
+              Renseignez votre email pour recevoir le lien de téléchargement.
             </DialogDescription>
           </DialogHeader>
           
           {isSubmitted ? (
-            <div className="py-6 text-center">
-              <p className="text-lg font-medium text-primary">
-                ✅ Merci ! On t'enverra l'accès Android par email.
+            <div className="py-8 text-center space-y-2">
+              <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Mail className="w-6 h-6 text-primary" />
+              </div>
+              <p className="text-base font-medium text-foreground">
+                Demande enregistrée
+              </p>
+              <p className="text-sm text-muted-foreground">
+                Vous recevrez le lien de téléchargement par email.
               </p>
             </div>
           ) : (
             <form onSubmit={handleAndroidSubmit} className="space-y-4 pt-4">
               <Input
                 type="email"
-                placeholder="Ton adresse email"
+                placeholder="Votre adresse email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -305,7 +311,7 @@ const Footer = () => {
               />
               <Button 
                 type="submit" 
-                className="w-full bg-gradient-to-r from-primary to-secondary"
+                className="w-full"
                 disabled={isSubmitting || !email.trim()}
               >
                 {isSubmitting ? 'Envoi...' : 'Envoyer le lien'}
