@@ -25,13 +25,10 @@ const Footer = () => {
 
     setIsSubmitting(true);
     try {
-      const { error } = await supabase
-        .from('android_test_requests' as any)
-        .insert({
-          email: email.trim(),
-          page: 'home',
-          source: 'footer_android_button'
-        });
+      // Envoyer vers Airtable "app android"
+      const { error } = await supabase.functions.invoke('airtable-android', {
+        body: { email: email.trim() }
+      });
 
       if (error) throw error;
 
