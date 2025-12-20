@@ -188,37 +188,36 @@ const Footer = () => {
         )}
 
         {/* App Download Buttons */}
-        <div className="flex flex-col items-center gap-3 mb-8 pt-6 border-t border-border/50 animate-fade-in" style={{ animationDelay: '0.35s' }}>
-          <div className="grid grid-cols-2 gap-3 w-full">
-            {/* iOS Button */}
-            <Button 
-              variant="outline" 
-              size="sm"
-              className="gap-2 border-border/50 hover:border-primary hover:bg-primary/10 transition-all duration-300 w-full text-sm"
-              asChild
+        <div className="flex justify-center gap-4 mb-6 pt-6 border-t border-border/50 animate-fade-in" style={{ animationDelay: '0.35s' }}>
+          {/* iOS Button */}
+          <Button 
+            variant="ghost" 
+            size="sm"
+            className="gap-2 text-muted-foreground hover:text-primary transition-all duration-300 text-xs"
+            asChild
+          >
+            <a
+              href="https://apps.apple.com/fr/app/amzing-fba/id6754807429"
+              target="_blank"
+              rel="noopener noreferrer"
             >
-              <a
-                href="https://apps.apple.com/fr/app/amzing-fba/id6754807429"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <Apple className="w-4 h-4" />
-                App Store
-              </a>
-            </Button>
+              <Apple className="w-4 h-4" />
+              App Store
+            </a>
+          </Button>
 
-            {/* Android Button - Opens Modal */}
-            <Button 
-              variant="outline" 
-              size="sm"
-              className="gap-2 border-border/50 hover:border-primary hover:bg-primary/10 transition-all duration-300 w-full text-sm"
-              onClick={() => setShowAndroidModal(true)}
-            >
-              <Smartphone className="w-4 h-4" />
-              Android
-            </Button>
-          </div>
+          {/* Android Button - Opens Modal */}
+          <Button 
+            variant="ghost" 
+            size="sm"
+            className="gap-2 text-muted-foreground hover:text-primary transition-all duration-300 text-xs"
+            onClick={() => setShowAndroidModal(true)}
+          >
+            <Smartphone className="w-4 h-4" />
+            Android
+          </Button>
         </div>
+
 
         {/* Bottom Bar */}
         <div className="pt-8 border-t border-border/50 animate-fade-in" style={{ animationDelay: '0.4s' }}>
