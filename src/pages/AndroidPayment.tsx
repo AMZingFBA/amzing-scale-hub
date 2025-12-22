@@ -34,26 +34,9 @@ const AndroidPayment = () => {
     setShowCGVModal(false);
     setIsProcessing(true);
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (!session) {
-        toast.error("Vous devez être connecté");
-        navigate('/auth');
-        return;
-      }
-
-      const { data, error } = await supabase.functions.invoke('create-checkout', {
-        headers: {
-          Authorization: `Bearer ${session.access_token}`
-        }
-      });
-
-      if (error) throw error;
-
-      if (data?.url) {
-        // Redirection directe vers Stripe (pas de popup sur mobile)
-        window.location.href = data.url;
-      }
+      toast.success("Redirection vers le paiement sécurisé...");
+      // Redirection directe vers le lien Stripe
+      window.location.href = 'https://pay.amzingfba.com/b/4gMbJ15LD3zO1oT3vx00000';
     } catch (error: any) {
       console.error('Erreur paiement:', error);
       toast.error("Erreur lors du paiement");

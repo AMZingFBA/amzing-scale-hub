@@ -283,36 +283,14 @@ export default function Auth() {
 
       // Rediriger vers le paiement Stripe pour toutes les plateformes (Web, iOS, Android)
       try {
-        toast.info("Préparation du paiement...");
+        toast.success("Redirection vers le paiement sécurisé...");
         
-        const { data: sessionData } = await supabase.auth.getSession();
-        if (!sessionData.session?.access_token) {
-          throw new Error("Session non établie");
-        }
-
-        const { data: checkoutData, error: checkoutError } = await supabase.functions.invoke('create-checkout', {
-          headers: {
-            Authorization: `Bearer ${sessionData.session.access_token}`,
-          },
-        });
-
-        if (checkoutError) {
-          console.error('Error creating checkout:', checkoutError);
-          toast.error('Erreur lors de la redirection vers le paiement');
-          setIsLoading(false);
-          return;
-        }
-
-        if (checkoutData?.url) {
-          toast.success("Redirection vers le paiement sécurisé...");
-          
-          // Sur iOS/Android natif, rediriger vers la page de paiement avec CGV
-          if (isNativeApp) {
-            navigate('/android-payment');
-          } else {
-            // Sur le web, redirection directe vers Stripe
-            window.location.href = checkoutData.url;
-          }
+        // Sur iOS/Android natif, rediriger vers la page de paiement avec CGV
+        if (isNativeApp) {
+          navigate('/android-payment');
+        } else {
+          // Sur le web, redirection directe vers Stripe
+          window.location.href = 'https://pay.amzingfba.com/b/4gMbJ15LD3zO1oT3vx00000';
         }
       } catch (error: any) {
         console.error('Error starting checkout:', error);
