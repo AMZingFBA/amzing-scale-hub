@@ -255,33 +255,10 @@ export const useTrial = () => {
     setIsStarting(true);
 
     try {
-      // Utiliser Stripe pour toutes les plateformes (web, iOS, Android)
-      console.log('💳 [handleConfirmPayment] Using Stripe checkout...');
-      // supabase.functions.invoke envoie automatiquement le JWT
-      const { data, error } = await supabase.functions.invoke('create-checkout');
-
-      if (error) {
-        console.error('Error creating checkout:', error);
-        
-        // Si session expirée, forcer la déconnexion et rediriger vers login
-        if (error.message?.includes('Session expirée') || error.message?.includes('invalide')) {
-          toast.error('Votre session a expiré. Veuillez vous reconnecter.');
-          await supabase.auth.signOut();
-          navigate('/auth');
-          return;
-        }
-        
-        throw error;
-      }
-
-      if (data?.url) {
-        console.log('Redirecting to Stripe checkout:', data.url);
-        toast.success("Redirection vers le paiement sécurisé...");
-        // Redirection directe vers Stripe
-        window.location.href = data.url;
-      } else {
-        throw new Error('No checkout URL received');
-      }
+      console.log('💳 [handleConfirmPayment] Redirecting to Stripe checkout...');
+      toast.success("Redirection vers le paiement sécurisé...");
+      // Redirection directe vers le lien Stripe
+      window.location.href = 'https://pay.amzingfba.com/b/4gMbJ15LD3zO1oT3vx00000';
     } catch (error: any) {
       console.error('Error starting payment:', error);
       toast.error('Erreur lors de la redirection vers le paiement');
