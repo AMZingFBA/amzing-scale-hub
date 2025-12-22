@@ -220,33 +220,33 @@ const Services = () => {
             </Card>
             </ServiceCard>
 
-            {/* Stock Checker */}
+            {/* Analyses de marché */}
             <ServiceCard delay={320}>
             <Card className={`border-2 hover:border-primary transition-all ${isNativeApp ? 'hover:shadow-[0_0_20px_rgba(255,153,0,0.3)]' : ''}`}>
               <CardHeader>
                 <div className="w-16 h-16 bg-gradient-to-br from-secondary to-primary rounded-lg flex items-center justify-center mb-4">
                   <TrendingUp className="w-8 h-8 text-white" />
                 </div>
-                <CardTitle className="text-3xl">Stock Checker</CardTitle>
-                <CardDescription className="text-lg">Disponibilité temps réel</CardDescription>
+                <CardTitle className="text-3xl">Analyses de marché</CardTitle>
+                <CardDescription className="text-lg">Tendances et opportunités</CardDescription>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground mb-6">
-                  Vérifie instantanément la disponibilité des produits en magasin avant de te déplacer. 
-                  Économise du temps et maximise tes opportunités de sourcing.
+                  Accède à des analyses détaillées des tendances du marché Amazon pour identifier 
+                  les meilleures opportunités et optimiser tes décisions d'achat.
                 </p>
                 <ul className="space-y-3">
                   <li className="flex items-start gap-2">
                     <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                    <span>Vérification stock magasin temps réel</span>
+                    <span>Tendances produits et catégories</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                    <span>Multi-enseignes</span>
+                    <span>Opportunités saisonnières</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                    <span>Interface simple et rapide</span>
+                    <span>Données actualisées régulièrement</span>
                   </li>
                 </ul>
               </CardContent>

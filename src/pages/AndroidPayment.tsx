@@ -101,7 +101,7 @@ const AndroidPayment = () => {
               { icon: Zap, text: "Moniteurs automatiques Qogita, Auchan & plus", subtext: "Notifications instantanées sur produits rentables", delay: '0.2s' },
               { icon: Shield, text: "Guides Amazon FBA complets", subtext: "De zéro aux premières ventes", delay: '0.3s' },
               { icon: Check, text: "Fournisseurs privés exclusifs", subtext: "Produits sourcés et testés", delay: '0.4s' },
-              { icon: Check, text: "Outils pro inclus", subtext: "Stock Checker, alertes, conseils niches", delay: '0.5s' },
+              { icon: Check, text: "Outils pro inclus", subtext: "Analyses de marché, alertes, conseils niches", delay: '0.5s' },
             ].map((feature, index) => (
               <div
                 key={index}
