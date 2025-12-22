@@ -48,6 +48,23 @@ function formatPhoneNumber(phone: string | undefined): string {
   return formatted;
 }
 
+// Helper function to add a small random delay to prevent race conditions
+function randomDelay(min: number, max: number): Promise<void> {
+  const delay = Math.floor(Math.random() * (max - min + 1)) + min;
+  return new Promise(resolve => setTimeout(resolve, delay));
+}
+
+// Helper function to search for user in Airtable
+async function searchUserInAirtable(email: string): Promise<{ records: Array<{ id: string; fields: Record<string, unknown> }> }> {
+  const searchUrl = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${USERS_TABLE}?filterByFormula={Email (principal)}="${email}"`;
+  const searchResponse = await fetch(searchUrl, {
+    headers: {
+      'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
+    },
+  });
+  return searchResponse.json();
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -65,16 +82,13 @@ serve(async (req) => {
       apiVersion: "2025-08-27.basil",
     });
 
+    // Add a small random delay (100-500ms) to reduce race conditions when 
+    // multiple sync calls happen at the same time (e.g., trigger + frontend)
+    await randomDelay(100, 500);
+
     // Check if user already exists in Airtable by email
-    const searchUrl = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${USERS_TABLE}?filterByFormula={Email (principal)}="${user.email}"`;
-    const searchResponse = await fetch(searchUrl, {
-      headers: {
-        'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
-      },
-    });
-    
-    const searchData = await searchResponse.json();
-    console.log(`[Sync User to Airtable] Search result:`, searchData);
+    let searchData = await searchUserInAirtable(user.email);
+    console.log(`[Sync User to Airtable] First search result:`, searchData);
 
     // Check if user was previously VIP (from existing Airtable record)
     let wasVip = false;
@@ -243,18 +257,38 @@ serve(async (req) => {
         body: JSON.stringify({ fields }),
       });
     } else {
-      // Create new record - this is a truly new user
-      console.log(`[Sync User to Airtable] Creating new record`);
-      isNewUserInAirtable = true;
+      // DOUBLE CHECK before creating - to prevent race conditions
+      // Wait a bit and check again to make sure another request didn't create it
+      await randomDelay(200, 400);
+      searchData = await searchUserInAirtable(user.email);
       
-      response = await fetch(`https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${USERS_TABLE}`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ records: [{ fields }] }),
-      });
+      if (searchData.records && searchData.records.length > 0) {
+        // Another request created the record while we were waiting - UPDATE instead
+        const recordId = searchData.records[0].id;
+        console.log(`[Sync User to Airtable] Race condition detected! Record was just created by another request. Updating record:`, recordId);
+        
+        response = await fetch(`https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${USERS_TABLE}/${recordId}`, {
+          method: 'PATCH',
+          headers: {
+            'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ fields }),
+        });
+      } else {
+        // Create new record - this is a truly new user
+        console.log(`[Sync User to Airtable] Creating new record`);
+        isNewUserInAirtable = true;
+        
+        response = await fetch(`https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${USERS_TABLE}`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ records: [{ fields }] }),
+        });
+      }
     }
 
     const result = await response.json();
