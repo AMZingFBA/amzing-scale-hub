@@ -109,8 +109,8 @@ const Tarifs = () => {
                   <div className="flex items-start gap-3 group/item hover:translate-x-2 transition-transform duration-300 animate-fade-in" style={{ animationDelay: '0.7s' }}>
                     <Check className="w-6 h-6 text-primary flex-shrink-0 mt-1 group-hover/item:scale-110 transition-transform" />
                     <div>
-                      <span className="font-semibold text-lg">Stock Checker</span>
-                      <p className="text-muted-foreground text-sm">Vérifie le stock en magasin en temps réel</p>
+                      <span className="font-semibold text-lg">Analyses de marché</span>
+                      <p className="text-muted-foreground text-sm">Tendances et opportunités du marché Amazon</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3 group/item hover:translate-x-2 transition-transform duration-300 animate-fade-in" style={{ animationDelay: '0.8s' }}>

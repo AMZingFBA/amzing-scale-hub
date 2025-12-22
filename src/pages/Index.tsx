@@ -158,7 +158,7 @@ const Index = () => {
             
             <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-3xl mx-auto">
               Rejoins l'espace VIP et accède aux moniteurs de produits rentables, 
-              guides Amazon FBA, fournisseurs privés, stock checker et bien plus.
+              guides Amazon FBA, fournisseurs privés, analyses de marché et bien plus.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -327,9 +327,9 @@ const Index = () => {
                     <CheckCircle2 className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold mb-2">Stock Checker</h3>
+                    <h3 className="text-xl font-bold mb-2">Analyses de marché</h3>
                     <p className="text-muted-foreground text-sm">
-                      Vérifie la disponibilité en magasin en temps réel
+                      Tendances et opportunités du marché Amazon
                     </p>
                   </div>
                 </div>
