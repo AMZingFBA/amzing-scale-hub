@@ -351,6 +351,42 @@ const AdminAlerts = () => {
     }
   };
 
+  const deleteAllAlerts = async () => {
+    if (!confirm(`Êtes-vous sûr de vouloir supprimer TOUTES les ${alerts.length} alertes ? Cette action est irréversible !`)) return;
+    if (!confirm('Confirmation finale : Voulez-vous vraiment tout supprimer ?')) return;
+
+    try {
+      console.log('🗑️ Attempting to delete all alerts...');
+      
+      const { error } = await supabase
+        .from('admin_alerts')
+        .delete()
+        .neq('id', '00000000-0000-0000-0000-000000000000'); // Delete all by matching all rows
+
+      if (error) {
+        console.error('❌ Delete all error:', error);
+        throw error;
+      }
+
+      console.log('✅ All alerts deleted successfully');
+      
+      toast({
+        title: "Toutes les alertes supprimées",
+        description: `${alerts.length} alertes ont été supprimées`,
+      });
+
+      // Recharger la liste des alertes
+      await loadAlerts();
+    } catch (error) {
+      console.error('Error deleting all alerts:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de supprimer les alertes",
+        variant: "destructive",
+      });
+    }
+  };
+
   const openEditDialog = (alert: any) => {
     setEditingAlert(alert);
     setEditTitle(alert.title);
@@ -592,9 +628,21 @@ const AdminAlerts = () => {
           <div className="space-y-6">
             <div className="flex items-center justify-between">
               <h2 className="text-2xl font-bold">Alertes publiées</h2>
-              <Badge variant="secondary" className="text-lg px-4 py-1">
-                {alerts.length} {alerts.length > 1 ? 'alertes' : 'alerte'}
-              </Badge>
+              <div className="flex items-center gap-3">
+                {alerts.length > 0 && (
+                  <Button 
+                    variant="destructive" 
+                    size="sm"
+                    onClick={deleteAllAlerts}
+                  >
+                    <Trash2 className="w-4 h-4 mr-2" />
+                    Supprimer tout
+                  </Button>
+                )}
+                <Badge variant="secondary" className="text-lg px-4 py-1">
+                  {alerts.length} {alerts.length > 1 ? 'alertes' : 'alerte'}
+                </Badge>
+              </div>
             </div>
             
             {alerts.length === 0 ? (
