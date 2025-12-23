@@ -6,19 +6,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Package, CheckCircle, Sparkles, Truck, Settings, MessageCircle, ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { useEffect } from 'react';
+import SEO from '@/components/SEO';
+import { seoData, schemas } from '@/lib/seo-data';
 
 const GestionProduitsInfo = () => {
-  useEffect(() => {
-    const metaRobots = document.createElement('meta');
-    metaRobots.name = 'robots';
-    metaRobots.content = 'noindex, nofollow';
-    document.head.appendChild(metaRobots);
-    
-    return () => {
-      document.head.removeChild(metaRobots);
-    };
-  }, []);
   const { ref: heroRef, isVisible: heroVisible } = useScrollReveal({ delay: 0.1 });
   const { ref: servicesRef, isVisible: servicesVisible } = useScrollReveal({ delay: 0.2 });
   const { ref: benefitsRef, isVisible: benefitsVisible } = useScrollReveal({ delay: 0.3 });
@@ -26,6 +17,12 @@ const GestionProduitsInfo = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-background via-background to-accent/20">
+      <SEO 
+        title={seoData.gestionProduitsInfo.title}
+        description={seoData.gestionProduitsInfo.description}
+        keywords={seoData.gestionProduitsInfo.keywords}
+        robots={seoData.gestionProduitsInfo.robots}
+      />
       <Navbar />
       
       {/* SEO H1/H2 - Invisible */}

@@ -6,22 +6,13 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Capacitor } from "@capacitor/core";
 import { useScrollReveal } from "@/hooks/use-scroll-reveal";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import SEO from '@/components/SEO';
+import { seoData, schemas } from '@/lib/seo-data';
 
 const Catalogue = () => {
   const isNativeApp = Capacitor.isNativePlatform();
-
-  useEffect(() => {
-    const metaRobots = document.createElement('meta');
-    metaRobots.name = 'robots';
-    metaRobots.content = 'noindex, nofollow';
-    document.head.appendChild(metaRobots);
-    
-    return () => {
-      document.head.removeChild(metaRobots);
-    };
-  }, []);
   const heroReveal = useScrollReveal({ animation: "fade-up", delay: 100 });
   const statsReveal = useScrollReveal({ animation: "scale", delay: 200 });
   const testimonialsReveal = useScrollReveal({ animation: "fade-up", delay: 100 });
@@ -93,6 +84,12 @@ const Catalogue = () => {
   
   return (
     <div className="min-h-screen relative overflow-hidden">
+      <SEO 
+        title={seoData.catalogue.title}
+        description={seoData.catalogue.description}
+        keywords={seoData.catalogue.keywords}
+        robots={seoData.catalogue.robots}
+      />
       <Navbar />
       
       {/* SEO H1/H2 - Invisible */}
