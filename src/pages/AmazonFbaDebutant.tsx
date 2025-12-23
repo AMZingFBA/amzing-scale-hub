@@ -209,23 +209,43 @@ const AmazonFbaDebutant = () => {
                 Beaucoup pensent qu'Amazon FBA est compliqué. Avec AMZing FBA, on te simplifie tout :
               </p>
               
-              <div className="grid md:grid-cols-2 gap-6">
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {[
                   {
-                    title: "On trouve les produits pour toi",
-                    description: "Plus besoin de chercher pendant des heures. On te livre des produits rentables prêts à vendre chaque semaine."
+                    title: "Produits rentables livrés",
+                    description: "Chaque semaine, on te livre des produits analysés et validés, prêts à vendre."
                   },
                   {
-                    title: "On te connecte aux fournisseurs",
-                    description: "Accès direct à nos fournisseurs partenaires. Tu commandes en quelques clics."
+                    title: "Accès fournisseurs",
+                    description: "Connexion directe avec nos fournisseurs partenaires. Tu commandes en quelques clics."
                   },
                   {
-                    title: "On calcule tout à ta place",
-                    description: "ROI, marge, frais Amazon... Tous les calculs sont faits. Tu sais exactement combien tu vas gagner."
+                    title: "Listings exclusifs",
+                    description: "Accès à des opportunités que tu ne trouveras nulle part ailleurs."
                   },
                   {
-                    title: "On gère la logistique si tu veux",
-                    description: "Avec AMZing FBA 360, on stocke et on expédie pour toi. Zéro prise de tête."
+                    title: "Calculs automatiques",
+                    description: "ROI, marge, frais Amazon... Tout est calculé pour toi."
+                  },
+                  {
+                    title: "Service logistique",
+                    description: "AMZing FBA 360 stocke et expédie tes produits. Tu ne touches à rien."
+                  },
+                  {
+                    title: "Marketplace membres",
+                    description: "Achète et revends des stocks entre membres de la communauté."
+                  },
+                  {
+                    title: "Formation complète",
+                    description: "Guides, tutoriels et ressources pour maîtriser Amazon de A à Z."
+                  },
+                  {
+                    title: "Communauté active",
+                    description: "Échange avec des vendeurs expérimentés, pose tes questions 7j/7."
+                  },
+                  {
+                    title: "Support prioritaire",
+                    description: "Une équipe dédiée pour t'accompagner à chaque étape."
                   }
                 ].map((item, index) => (
                   <Card key={index} className="border-green-500/20 bg-green-500/5">
