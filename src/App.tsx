@@ -73,7 +73,7 @@ const ProduitsQogita = lazy(() => import("./pages/ProduitsQogita"));
 const ProduitsEany = lazy(() => import("./pages/ProduitsEany"));
 const AdminAirtableContacts = lazy(() => import("./pages/AdminAirtableContacts"));
 const AdminAirtableUsers = lazy(() => import("./pages/AdminAirtableUsers"));
-const Partenaires = lazy(() => import("./pages/Partenaires"));
+
 const AndroidApp = lazy(() => import("./pages/AndroidApp"));
 const AmazonFbaDebutant = lazy(() => import("./pages/AmazonFbaDebutant"));
 const OutilAmazonFba = lazy(() => import("./pages/OutilAmazonFba"));
@@ -166,7 +166,7 @@ const App = () => (
             <Route path="/products/eany" element={<ProduitsEany />} />
             <Route path="/admin/airtable-contacts" element={<AdminAirtableContacts />} />
             <Route path="/admin/airtable-users" element={<AdminAirtableUsers />} />
-            <Route path="/partenaires" element={<Partenaires />} />
+            
             <Route path="/android" element={<AndroidApp />} />
             <Route path="/amazon-fba-debutant" element={<AmazonFbaDebutant />} />
             <Route path="/outil-amazon-fba" element={<OutilAmazonFba />} />
