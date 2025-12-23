@@ -112,7 +112,7 @@ const AmazonFbaDebutant = () => {
                 </Card>
                 
                 <p className="text-lg text-muted-foreground">
-                  En résumé, Amazon FBA te permet de te concentrer sur l'essentiel : <strong>trouver des produits rentables et développer ton business</strong>, pendant qu'Amazon gère la partie logistique.
+                  Avec <strong>AMZing FBA</strong>, tu bénéficies d'une solution tout-en-un : nous trouvons les produits rentables pour toi, te mettons en contact avec des fournisseurs fiables, te donnons accès à des listings exclusifs, et proposons des services de livraison et une marketplace dédiée.
                 </p>
               </div>
             </div>
