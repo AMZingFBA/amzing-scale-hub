@@ -20,9 +20,9 @@ export const seoData: Record<string, SeoPageData> = {
   },
   
   formation: {
-    title: "Formation Amazon FBA AMZing FBA – Business e-commerce rentable",
-    description: "Formation Amazon FBA complète : méthode pas à pas, étude de cas, outils et moniteurs de produits rentables pour lancer et scaler un business e-commerce rentable sur Amazon.",
-    keywords: "formation amazon fba, guide amazon fba, business e-commerce rentable, cours amazon fba, tutoriel amazon fba",
+    title: "Formation Amazon FBA (2025) : méthode claire + outil tout-en-un",
+    description: "Formation Amazon FBA : étapes, méthodes, outils et erreurs à éviter. Accède à une méthode claire + ressources pour vendre sur Amazon efficacement.",
+    keywords: "formation amazon fba, amazon fba formation, meilleure formation amazon fba, formation amazon fba avis, formation amazon ads, formation vendeur amazon, vendre sur amazon, business amazon fba",
     robots: "index,follow",
   },
   
@@ -537,8 +537,8 @@ export const schemas = {
   course: {
     "@context": "https://schema.org",
     "@type": "Course",
-    "name": "Formation Amazon FBA Complète",
-    "description": "Formation Amazon FBA complète : méthode pas à pas, étude de cas, outils et moniteurs de produits rentables pour lancer et scaler un business e-commerce rentable sur Amazon.",
+    "name": "Formation Amazon FBA (2025) : méthode claire + outil tout-en-un",
+    "description": "Formation Amazon FBA : étapes, méthodes, outils et erreurs à éviter. Accède à une méthode claire + ressources pour vendre sur Amazon efficacement.",
     "provider": {
       "@type": "Organization",
       "name": "AMZing FBA",
@@ -554,13 +554,110 @@ export const schemas = {
     "hasCourseInstance": {
       "@type": "CourseInstance",
       "courseMode": "online",
-      "courseWorkload": "PT10H"
+      "courseWorkload": "PT15H"
     },
     "aggregateRating": {
       "@type": "AggregateRating",
       "ratingValue": "4.8",
-      "reviewCount": "89"
-    }
+      "reviewCount": "127"
+    },
+    "syllabusSections": [
+      "Comprendre Amazon FBA et les modèles possibles",
+      "Mettre en place ton compte et ton cadre légal",
+      "Les bases de la recherche de produits rentables",
+      "Utiliser les moniteurs et les alertes produits",
+      "Passer commande, négocier et sécuriser la logistique",
+      "Suivre tes ventes, ajuster et scaler",
+      "Amazon Ads : bases et erreurs fréquentes",
+      "Gestion du risque et erreurs à éviter"
+    ]
+  },
+
+  formationFAQ: {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Quelle est la meilleure formation Amazon FBA en 2025 ?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "AMZing FBA est considérée comme une des meilleures formations Amazon FBA car elle combine une méthode structurée, des outils de recherche de produits (moniteurs), un catalogue fournisseurs et une communauté active. Contrairement aux formations classiques, elle offre un écosystème complet pour passer de la théorie à la pratique."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Combien coûte la formation Amazon FBA AMZing FBA ?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "L'abonnement AMZing FBA est à partir de 34,99€/mois. Il inclut l'accès à la formation complète, aux moniteurs de produits rentables, au catalogue fournisseurs, au cashback et à la communauté. Il n'y a pas de frais cachés."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Puis-je commencer sans expérience sur Amazon ?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Oui, la formation Amazon FBA AMZing FBA est conçue pour les débutants. Elle part des bases : comprendre le modèle FBA, créer son compte vendeur, choisir sa stratégie, et avancer étape par étape jusqu'aux premières ventes."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Combien de temps faut-il pour devenir rentable sur Amazon FBA ?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Cela dépend du temps investi, du budget et des décisions prises. Certains membres réalisent leurs premières ventes rentables en 2-4 mois. AMZing FBA t'aide à réduire le temps de recherche et à prendre de meilleures décisions pour accélérer ce processus."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "La formation inclut-elle Amazon Ads ?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Oui, AMZing FBA aborde les bases d'Amazon Ads (PPC) : comment créer des campagnes, quelles erreurs éviter, comment analyser les résultats et optimiser le budget publicitaire pour maximiser le ROI."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Quel budget minimum pour commencer sur Amazon FBA ?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Il est possible de démarrer avec 500-1000€ pour tester quelques produits. L'important n'est pas d'avoir un gros budget, mais de bien choisir ses produits. AMZing FBA t'aide à optimiser chaque euro investi grâce aux outils d'analyse et aux retours de la communauté."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Quelle est la différence entre FBA et FBM ?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "FBA (Fulfillment by Amazon) : Amazon stocke, emballe et expédie tes produits. Tu bénéficies du badge Prime. FBM (Fulfillment by Merchant) : tu gères toi-même le stockage et l'expédition. La formation explique les avantages de chaque modèle pour choisir celui adapté à ta situation."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Est-ce que les moniteurs choisissent les produits à ma place ?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Non. Les moniteurs et alertes te proposent des idées basées sur des données (prix, demande, concurrence, marge), mais la décision finale t'appartient. La formation t'apprend à analyser ces informations et à décider en fonction de ta stratégie et de ton budget."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Puis-je annuler mon abonnement à tout moment ?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Oui, l'abonnement AMZing FBA est flexible. Tu peux l'annuler à tout moment depuis ton espace membre. Tant que ton abonnement est actif, tu gardes l'accès complet à la formation, aux outils et à la communauté."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Y a-t-il un support et une communauté ?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Oui. AMZing FBA inclut un chat communautaire, des salons thématiques (succès, ventes, questions), un support client réactif et des échanges réguliers avec les autres membres. Tu n'es jamais seul face à tes décisions."
+        }
+      }
+    ]
   },
 
   product: {
