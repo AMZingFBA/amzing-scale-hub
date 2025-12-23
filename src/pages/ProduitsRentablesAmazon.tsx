@@ -1,4 +1,4 @@
-import { ArrowRight, CheckCircle2, Search, TrendingUp, BarChart3, Lightbulb, DollarSign, Package } from 'lucide-react';
+import { ArrowRight, CheckCircle2, Search, TrendingUp, BarChart3, Lightbulb, DollarSign, Package, Zap, Clock, Eye, ShoppingCart } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -8,7 +8,6 @@ import SEO from '@/components/SEO';
 import { seoData } from '@/lib/seo-data';
 import { useScrollReveal } from '@/hooks/use-scroll-reveal';
 import { cn } from '@/lib/utils';
-import produitsRentablesHero from '@/assets/produits-rentables-hero.jpg';
 
 const ProduitsRentablesAmazon = () => {
   const heroAnim = useScrollReveal({ animation: 'fade-up', delay: 100 });
@@ -39,27 +38,42 @@ const ProduitsRentablesAmazon = () => {
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto text-center">
               <span className="inline-block px-4 py-2 bg-green-500/20 text-green-600 dark:text-green-400 rounded-full text-sm font-medium mb-6">
-                Guide pratique
+                Produits analysés tous les jours
               </span>
               <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-green-500 via-primary to-green-500 bg-clip-text text-transparent">
-                Comment trouver des produits rentables sur Amazon
+                Des produits rentables livrés dans ta boîte mail
               </h1>
               <p className="text-xl text-muted-foreground mb-8 max-w-3xl mx-auto">
-                Trouver des produits rentables, c'est simple quand on a les bons outils. Avec AMZing FBA, on te livre des opportunités analysées tous les jours.
+                Pourquoi passer des heures à chercher ? Chaque jour, on t'envoie des produits analysés avec ROI, marge et fournisseur. Tu n'as plus qu'à choisir et commander.
               </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button size="lg" asChild className="text-lg px-8 bg-green-600 hover:bg-green-700">
-                  <Link to="/tarifs">
-                    <ArrowRight className="w-5 h-5 mr-2" />
-                    Accéder aux opportunités AMZing FBA
-                  </Link>
-                </Button>
+              
+              {/* Stats rapides */}
+              <div className="grid grid-cols-3 gap-4 max-w-2xl mx-auto mb-10">
+                <div className="text-center">
+                  <div className="text-3xl md:text-4xl font-bold text-green-500">+50</div>
+                  <div className="text-sm text-muted-foreground">produits/jour</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-3xl md:text-4xl font-bold text-primary">30%+</div>
+                  <div className="text-sm text-muted-foreground">ROI minimum</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-3xl md:text-4xl font-bold text-green-500">5min</div>
+                  <div className="text-sm text-muted-foreground">pour commander</div>
+                </div>
               </div>
+              
+              <Button size="lg" asChild className="text-lg px-8 bg-green-600 hover:bg-green-700">
+                <Link to="/tarifs">
+                  <ArrowRight className="w-5 h-5 mr-2" />
+                  Recevoir les produits du jour
+                </Link>
+              </Button>
             </div>
           </div>
         </section>
 
-        {/* Section 1: Qu'est-ce qu'un produit rentable */}
+        {/* Section 1: Ce que tu reçois chaque jour */}
         <section 
           ref={section1Anim.ref}
           className={cn(
@@ -68,68 +82,60 @@ const ProduitsRentablesAmazon = () => {
           )}
         >
           <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto">
-              <div className="flex items-center gap-3 mb-8">
-                <div className="p-3 bg-green-500/20 rounded-xl">
-                  <DollarSign className="w-8 h-8 text-green-500" />
-                </div>
-                <h2 className="text-3xl md:text-4xl font-bold">Qu'est-ce qu'un produit rentable sur Amazon</h2>
+            <div className="max-w-5xl mx-auto">
+              <div className="text-center mb-12">
+                <h2 className="text-3xl md:text-4xl font-bold mb-4">Ce que tu reçois chaque jour</h2>
+                <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                  Pas juste une liste de produits. On te donne tout ce qu'il faut pour décider en 2 minutes.
+                </p>
               </div>
               
-              <p className="text-lg text-muted-foreground mb-8">
-                Un produit rentable, ce n'est pas juste un produit qui "se vend bien". C'est un produit qui te laisse <strong>une marge suffisante</strong> après avoir payé tous les frais : achat, transport, frais Amazon, TVA...
-              </p>
-              
-              <div className="grid md:grid-cols-2 gap-6 mb-8">
-                <Card className="border-green-500/30">
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-lg flex items-center gap-2">
-                      <CheckCircle2 className="w-5 h-5 text-green-500" />
-                      Critères d'un bon produit
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <ul className="space-y-2 text-muted-foreground">
-                      <li>• ROI minimum de 30% (idéalement 50%+)</li>
-                      <li>• Marge nette d'au moins 5€ par unité</li>
-                      <li>• Demande régulière (ventes stables)</li>
-                      <li>• Concurrence raisonnable</li>
-                      <li>• Pas de restrictions de vente</li>
-                    </ul>
+              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <Card className="border-green-500/30 text-center group hover:shadow-lg transition-all">
+                  <CardContent className="pt-8 pb-6">
+                    <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-green-500/10 flex items-center justify-center group-hover:bg-green-500/20 transition-colors">
+                      <DollarSign className="w-8 h-8 text-green-500" />
+                    </div>
+                    <h3 className="font-bold text-lg mb-2">ROI calculé</h3>
+                    <p className="text-muted-foreground text-sm">Marge nette, ROI FBA et FBM. Tu sais exactement combien tu gagnes.</p>
                   </CardContent>
                 </Card>
                 
-                <Card className="border-primary/30">
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-lg flex items-center gap-2">
-                      <BarChart3 className="w-5 h-5 text-primary" />
-                      Indicateurs à surveiller
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <ul className="space-y-2 text-muted-foreground">
-                      <li>• BSR (Best Sellers Rank)</li>
-                      <li>• Nombre de vendeurs sur la fiche</li>
-                      <li>• Historique des prix</li>
-                      <li>• Estimation des ventes mensuelles</li>
-                      <li>• Frais FBA associés</li>
-                    </ul>
+                <Card className="border-primary/30 text-center group hover:shadow-lg transition-all">
+                  <CardContent className="pt-8 pb-6">
+                    <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                      <ShoppingCart className="w-8 h-8 text-primary" />
+                    </div>
+                    <h3 className="font-bold text-lg mb-2">Lien fournisseur</h3>
+                    <p className="text-muted-foreground text-sm">Le produit te plaît ? Clique et commande directement.</p>
+                  </CardContent>
+                </Card>
+                
+                <Card className="border-green-500/30 text-center group hover:shadow-lg transition-all">
+                  <CardContent className="pt-8 pb-6">
+                    <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-green-500/10 flex items-center justify-center group-hover:bg-green-500/20 transition-colors">
+                      <BarChart3 className="w-8 h-8 text-green-500" />
+                    </div>
+                    <h3 className="font-bold text-lg mb-2">Données SellerAmp</h3>
+                    <p className="text-muted-foreground text-sm">BSR, ventes estimées, nombre de vendeurs. Tout est là.</p>
+                  </CardContent>
+                </Card>
+                
+                <Card className="border-primary/30 text-center group hover:shadow-lg transition-all">
+                  <CardContent className="pt-8 pb-6">
+                    <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                      <TrendingUp className="w-8 h-8 text-primary" />
+                    </div>
+                    <h3 className="font-bold text-lg mb-2">Tendances</h3>
+                    <p className="text-muted-foreground text-sm">On surveille le marché pour toi et on détecte les opportunités.</p>
                   </CardContent>
                 </Card>
               </div>
-              
-              <Card className="border-primary/30 bg-gradient-to-r from-green-500/5 to-primary/5">
-                <CardContent className="pt-6">
-                  <p className="text-lg text-center">
-                    <strong>À retenir :</strong> Un produit rentable = bonne marge + demande suffisante + concurrence gérable
-                  </p>
-                </CardContent>
-              </Card>
             </div>
           </div>
         </section>
 
-        {/* Section 2: Pourquoi c'est simple avec AMZing FBA */}
+        {/* Section 2: Comment ça marche */}
         <section 
           ref={section2Anim.ref}
           className={cn(
@@ -139,62 +145,49 @@ const ProduitsRentablesAmazon = () => {
         >
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto">
-              <div className="flex items-center gap-3 mb-8">
-                <div className="p-3 bg-green-500/20 rounded-xl">
-                  <CheckCircle2 className="w-8 h-8 text-green-500" />
-                </div>
-                <h2 className="text-3xl md:text-4xl font-bold">Pourquoi c'est simple avec AMZing FBA</h2>
+              <div className="text-center mb-12">
+                <h2 className="text-3xl md:text-4xl font-bold mb-4">Du produit à la vente en 3 étapes</h2>
+                <p className="text-lg text-muted-foreground">
+                  On simplifie tout. Tu te concentres sur ce qui compte : vendre.
+                </p>
               </div>
               
-              <p className="text-lg text-muted-foreground mb-8">
-                Plus besoin de passer des heures à chercher. On fait le travail pour toi :
-              </p>
-              
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {[
-                  {
-                    title: "Produits livrés tous les jours",
-                    description: "Chaque jour, on t'envoie des produits analysés et validés, prêts à acheter."
-                  },
-                  {
-                    title: "Analyse des tendances",
-                    description: "On surveille le marché et les tendances pour toi. Tu reçois les meilleures opportunités au bon moment."
-                  },
-                  {
-                    title: "Calculs déjà faits",
-                    description: "ROI, marge, frais Amazon... Tout est calculé. Tu sais exactement combien tu vas gagner."
-                  },
-                  {
-                    title: "Listings exclusifs",
-                    description: "Accès à des opportunités que tu ne trouveras nulle part ailleurs."
-                  },
-                  {
-                    title: "Fournisseurs vérifiés",
-                    description: "On te connecte directement avec nos fournisseurs partenaires. Tu commandes en quelques clics."
-                  },
-                  {
-                    title: "Zéro prise de tête",
-                    description: "Pas besoin d'être expert. On te guide à chaque étape."
-                  }
-                ].map((item, index) => (
-                  <Card key={index} className="border-green-500/20 bg-green-500/5">
-                    <CardContent className="pt-6">
-                      <div className="flex items-start gap-3">
-                        <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0 mt-1" />
-                        <div>
-                          <h3 className="font-bold mb-2">{item.title}</h3>
-                          <p className="text-muted-foreground text-sm">{item.description}</p>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
+              <div className="space-y-8">
+                <div className="flex items-start gap-6">
+                  <div className="flex-shrink-0 w-16 h-16 rounded-2xl bg-gradient-to-br from-green-500 to-green-600 text-white flex items-center justify-center text-2xl font-bold shadow-lg">
+                    1
+                  </div>
+                  <div className="flex-1 pt-2">
+                    <h3 className="text-xl font-bold mb-2">Tu reçois les produits du jour</h3>
+                    <p className="text-muted-foreground">Chaque matin, les meilleures opportunités arrivent dans ton espace membre. Filtre par ROI, catégorie ou prix.</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-start gap-6">
+                  <div className="flex-shrink-0 w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-secondary text-white flex items-center justify-center text-2xl font-bold shadow-lg">
+                    2
+                  </div>
+                  <div className="flex-1 pt-2">
+                    <h3 className="text-xl font-bold mb-2">Tu choisis et tu commandes</h3>
+                    <p className="text-muted-foreground">Un produit te plaît ? Clique sur le lien fournisseur et passe commande. C'est direct, pas d'intermédiaire.</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-start gap-6">
+                  <div className="flex-shrink-0 w-16 h-16 rounded-2xl bg-gradient-to-br from-green-500 to-primary text-white flex items-center justify-center text-2xl font-bold shadow-lg">
+                    3
+                  </div>
+                  <div className="flex-1 pt-2">
+                    <h3 className="text-xl font-bold mb-2">Tu envoies sur Amazon et tu vends</h3>
+                    <p className="text-muted-foreground">Envoie tes produits en FBA, FBM, ou utilise AMZing FBA 360 pour qu'on gère la logistique à ta place.</p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Section 3: Méthode professionnelle */}
+        {/* Section 3: Types de produits */}
         <section 
           ref={section3Anim.ref}
           className={cn(
@@ -203,71 +196,101 @@ const ProduitsRentablesAmazon = () => {
           )}
         >
           <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto">
-              <div className="flex items-center gap-3 mb-8">
-                <div className="p-3 bg-primary/20 rounded-xl">
-                  <Search className="w-8 h-8 text-primary" />
-                </div>
-                <h2 className="text-3xl md:text-4xl font-bold">Méthode professionnelle pour analyser un produit</h2>
+            <div className="max-w-5xl mx-auto">
+              <div className="text-center mb-12">
+                <h2 className="text-3xl md:text-4xl font-bold mb-4">Plusieurs sources, plus d'opportunités</h2>
+                <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                  On analyse plusieurs fournisseurs et marketplaces pour te trouver les meilleures marges.
+                </p>
               </div>
               
-              <p className="text-lg text-muted-foreground mb-8">
-                Voici la méthode utilisée par les vendeurs professionnels pour valider un produit avant de l'acheter :
-              </p>
-              
-              <div className="space-y-6">
-                {[
-                  {
-                    step: 1,
-                    title: "Identifier une opportunité",
-                    description: "Utilise un outil comme SellerAmp pour scanner des produits en magasin ou en ligne. Recherche des produits avec un bon différentiel de prix."
-                  },
-                  {
-                    step: 2,
-                    title: "Analyser la demande",
-                    description: "Vérifie le BSR (Best Sellers Rank) et l'historique des ventes. Un BSR stable et bas indique une demande régulière."
-                  },
-                  {
-                    step: 3,
-                    title: "Calculer la rentabilité",
-                    description: "Utilise le calculateur FBA pour obtenir la marge exacte. Inclus tous les frais : achat, transport, FBA fees, TVA."
-                  },
-                  {
-                    step: 4,
-                    title: "Évaluer la concurrence",
-                    description: "Compte le nombre de vendeurs FBA sur la fiche. Évite les fiches avec Amazon en vendeur principal."
-                  },
-                  {
-                    step: 5,
-                    title: "Vérifier les restrictions",
-                    description: "Confirme que tu peux vendre ce produit dans cette catégorie sans autorisation spéciale."
-                  },
-                  {
-                    step: 6,
-                    title: "Valider avec un test",
-                    description: "Achète une petite quantité pour tester la demande réelle avant d'investir davantage."
-                  }
-                ].map((item) => (
-                  <Card key={item.step} className="border-primary/20 hover:border-primary/40 transition-all hover:shadow-lg">
-                    <CardContent className="pt-6">
-                      <div className="flex items-start gap-4">
-                        <div className="p-3 rounded-xl bg-gradient-to-br from-primary to-secondary text-white text-xl font-bold min-w-[50px] text-center">
-                          {item.step}
-                        </div>
-                        <div>
-                          <h3 className="font-bold text-xl mb-2">{item.title}</h3>
-                          <p className="text-muted-foreground">{item.description}</p>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
+              <div className="grid md:grid-cols-3 gap-6">
+                <Card className="border-green-500/30 overflow-hidden">
+                  <div className="h-2 bg-gradient-to-r from-green-500 to-green-600" />
+                  <CardContent className="pt-6">
+                    <div className="flex items-center gap-3 mb-4">
+                      <Package className="w-8 h-8 text-green-500" />
+                      <h3 className="font-bold text-lg">Produits Qogita</h3>
+                    </div>
+                    <p className="text-muted-foreground text-sm mb-4">
+                      Grossiste européen avec des milliers de références. Idéal pour le wholesale.
+                    </p>
+                    <ul className="space-y-2 text-sm">
+                      <li className="flex items-center gap-2">
+                        <CheckCircle2 className="w-4 h-4 text-green-500" />
+                        Prix HT compétitifs
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <CheckCircle2 className="w-4 h-4 text-green-500" />
+                        Stock en temps réel
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <CheckCircle2 className="w-4 h-4 text-green-500" />
+                        Livraison rapide
+                      </li>
+                    </ul>
+                  </CardContent>
+                </Card>
+                
+                <Card className="border-primary/30 overflow-hidden">
+                  <div className="h-2 bg-gradient-to-r from-primary to-secondary" />
+                  <CardContent className="pt-6">
+                    <div className="flex items-center gap-3 mb-4">
+                      <Search className="w-8 h-8 text-primary" />
+                      <h3 className="font-bold text-lg">Produits eAny</h3>
+                    </div>
+                    <p className="text-muted-foreground text-sm mb-4">
+                      Opportunités détectées sur d'autres sources. Des pépites à fort ROI.
+                    </p>
+                    <ul className="space-y-2 text-sm">
+                      <li className="flex items-center gap-2">
+                        <CheckCircle2 className="w-4 h-4 text-primary" />
+                        ROI élevés
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <CheckCircle2 className="w-4 h-4 text-primary" />
+                        Produits exclusifs
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <CheckCircle2 className="w-4 h-4 text-primary" />
+                        Analyse complète
+                      </li>
+                    </ul>
+                  </CardContent>
+                </Card>
+                
+                <Card className="border-green-500/30 overflow-hidden">
+                  <div className="h-2 bg-gradient-to-r from-green-500 to-primary" />
+                  <CardContent className="pt-6">
+                    <div className="flex items-center gap-3 mb-4">
+                      <Zap className="w-8 h-8 text-green-500" />
+                      <h3 className="font-bold text-lg">Alertes temps réel</h3>
+                    </div>
+                    <p className="text-muted-foreground text-sm mb-4">
+                      Promotions flash, destockages, opportunités limitées. Tu es le premier informé.
+                    </p>
+                    <ul className="space-y-2 text-sm">
+                      <li className="flex items-center gap-2">
+                        <CheckCircle2 className="w-4 h-4 text-green-500" />
+                        Notifications push
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <CheckCircle2 className="w-4 h-4 text-green-500" />
+                        Durée limitée
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <CheckCircle2 className="w-4 h-4 text-green-500" />
+                        Fort potentiel
+                      </li>
+                    </ul>
+                  </CardContent>
+                </Card>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Section 4: Comment AMZing FBA facilite */}
+        {/* Section 4: CTA Final */}
         <section 
           ref={section4Anim.ref}
           className={cn(
@@ -277,83 +300,42 @@ const ProduitsRentablesAmazon = () => {
         >
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto">
-              <div className="flex items-center gap-3 mb-8">
-                <div className="p-3 bg-green-500/20 rounded-xl">
-                  <Lightbulb className="w-8 h-8 text-green-500" />
-                </div>
-                <h2 className="text-3xl md:text-4xl font-bold">Comment AMZing FBA facilite la recherche</h2>
-              </div>
-              
-              <p className="text-lg text-muted-foreground mb-8">
-                On analyse des centaines de produits chaque jour pour te proposer uniquement les <strong>meilleures opportunités</strong>.
-              </p>
-              
-              <div className="grid md:grid-cols-2 gap-6 mb-10">
-                <Card className="border-green-500/30">
-                  <CardContent className="pt-6">
-                    <div className="flex items-center gap-3 mb-4">
-                      <Package className="w-8 h-8 text-green-500" />
-                      <h3 className="font-bold text-lg">Produits livrés tous les jours</h3>
+              <Card className="bg-gradient-to-r from-green-600 to-primary text-white border-none overflow-hidden">
+                <CardContent className="py-12 px-8 md:px-12">
+                  <div className="grid md:grid-cols-2 gap-8 items-center">
+                    <div>
+                      <h3 className="text-2xl md:text-3xl font-bold mb-4">Commence à recevoir des produits rentables dès demain</h3>
+                      <p className="text-white/90 mb-6">
+                        Rejoins AMZing FBA et accède aux produits analysés, aux fournisseurs et à la communauté de vendeurs.
+                      </p>
+                      <Button size="lg" variant="secondary" asChild className="text-lg px-8">
+                        <Link to="/tarifs">
+                          Voir les offres
+                          <ArrowRight className="w-5 h-5 ml-2" />
+                        </Link>
+                      </Button>
                     </div>
-                    <p className="text-muted-foreground mb-4">
-                      Chaque jour, reçois des produits rentables analysés et validés par notre équipe.
-                    </p>
-                    <ul className="space-y-2 text-sm">
-                      <li className="flex items-center gap-2">
-                        <CheckCircle2 className="w-4 h-4 text-green-500" />
-                        ROI calculé et vérifié
-                      </li>
-                      <li className="flex items-center gap-2">
-                        <CheckCircle2 className="w-4 h-4 text-green-500" />
-                        Sources d'approvisionnement
-                      </li>
-                      <li className="flex items-center gap-2">
-                        <CheckCircle2 className="w-4 h-4 text-green-500" />
-                        Envoi quotidien
-                      </li>
-                    </ul>
-                  </CardContent>
-                </Card>
-                
-                <Card className="border-primary/30">
-                  <CardContent className="pt-6">
-                    <div className="flex items-center gap-3 mb-4">
-                      <TrendingUp className="w-8 h-8 text-primary" />
-                      <h3 className="font-bold text-lg">Alertes opportunités</h3>
+                    <div className="hidden md:block">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="bg-white/10 rounded-xl p-4 text-center backdrop-blur-sm">
+                          <Clock className="w-8 h-8 mx-auto mb-2" />
+                          <div className="text-sm">Gagne du temps</div>
+                        </div>
+                        <div className="bg-white/10 rounded-xl p-4 text-center backdrop-blur-sm">
+                          <Eye className="w-8 h-8 mx-auto mb-2" />
+                          <div className="text-sm">Zéro recherche</div>
+                        </div>
+                        <div className="bg-white/10 rounded-xl p-4 text-center backdrop-blur-sm">
+                          <DollarSign className="w-8 h-8 mx-auto mb-2" />
+                          <div className="text-sm">Marges garanties</div>
+                        </div>
+                        <div className="bg-white/10 rounded-xl p-4 text-center backdrop-blur-sm">
+                          <TrendingUp className="w-8 h-8 mx-auto mb-2" />
+                          <div className="text-sm">Tendances suivies</div>
+                        </div>
+                      </div>
                     </div>
-                    <p className="text-muted-foreground mb-4">
-                      Reçois des alertes en temps réel sur les nouvelles opportunités détectées par nos outils.
-                    </p>
-                    <ul className="space-y-2 text-sm">
-                      <li className="flex items-center gap-2">
-                        <CheckCircle2 className="w-4 h-4 text-primary" />
-                        Notifications push
-                      </li>
-                      <li className="flex items-center gap-2">
-                        <CheckCircle2 className="w-4 h-4 text-primary" />
-                        Analyse automatique
-                      </li>
-                      <li className="flex items-center gap-2">
-                        <CheckCircle2 className="w-4 h-4 text-primary" />
-                        Filtres personnalisés
-                      </li>
-                    </ul>
-                  </CardContent>
-                </Card>
-              </div>
-              
-              <Card className="bg-gradient-to-r from-green-600 to-primary text-white border-none">
-                <CardContent className="py-10 text-center">
-                  <h3 className="text-2xl font-bold mb-4">Prêt à trouver des produits rentables ?</h3>
-                  <p className="text-white/90 mb-6 max-w-2xl mx-auto">
-                    Rejoins AMZing FBA et accède à notre catalogue de produits analysés, nos outils de recherche et notre communauté de vendeurs.
-                  </p>
-                  <Button size="lg" variant="secondary" asChild className="text-lg px-8">
-                    <Link to="/tarifs">
-                      Accéder aux opportunités AMZing FBA
-                      <ArrowRight className="w-5 h-5 ml-2" />
-                    </Link>
-                  </Button>
+                  </div>
                 </CardContent>
               </Card>
             </div>
