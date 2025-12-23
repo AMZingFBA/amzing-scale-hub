@@ -160,8 +160,8 @@ const AmazonFbaDebutant = () => {
                   },
                   {
                     step: 5,
-                    title: "Envoyer à Amazon",
-                    description: "Prépare et expédie tes produits vers les entrepôts Amazon (ou utilise notre service AMZing FBA 360 pour tout déléguer)."
+                    title: "Stocker et expédier",
+                    description: "Envoie tes produits dans les entrepôts Amazon (FBA), stocke-les chez toi et expédie à chaque vente (FBM), ou délègue tout à notre service AMZing FBA 360. À toi de choisir !"
                   },
                   {
                     step: 6,
