@@ -199,48 +199,44 @@ const AmazonFbaDebutant = () => {
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto">
               <div className="flex items-center gap-3 mb-8">
-                <div className="p-3 bg-destructive/20 rounded-xl">
-                  <AlertTriangle className="w-8 h-8 text-destructive" />
+                <div className="p-3 bg-green-500/20 rounded-xl">
+                  <CheckCircle2 className="w-8 h-8 text-green-500" />
                 </div>
-                <h2 className="text-3xl md:text-4xl font-bold">Les erreurs des débutants sur Amazon FBA</h2>
+                <h2 className="text-3xl md:text-4xl font-bold">Pourquoi c'est simple avec AMZing FBA</h2>
               </div>
+              
+              <p className="text-lg text-muted-foreground mb-8">
+                Beaucoup pensent qu'Amazon FBA est compliqué. Avec AMZing FBA, on te simplifie tout :
+              </p>
               
               <div className="grid md:grid-cols-2 gap-6">
                 {[
                   {
-                    title: "Se lancer sans formation",
-                    description: "Amazon FBA a ses règles et ses subtilités. Sans connaissances, tu risques de perdre temps et argent."
+                    title: "On trouve les produits pour toi",
+                    description: "Plus besoin de chercher pendant des heures. On te livre des produits rentables prêts à vendre chaque semaine."
                   },
                   {
-                    title: "Choisir des produits au hasard",
-                    description: "Un produit qui te plaît n'est pas forcément rentable. L'analyse des données est essentielle."
+                    title: "On te connecte aux fournisseurs",
+                    description: "Accès direct à nos fournisseurs partenaires. Tu commandes en quelques clics."
                   },
                   {
-                    title: "Sous-estimer les frais",
-                    description: "Frais Amazon, frais de port, TVA... Il faut tout calculer avant d'acheter pour éviter les mauvaises surprises."
+                    title: "On calcule tout à ta place",
+                    description: "ROI, marge, frais Amazon... Tous les calculs sont faits. Tu sais exactement combien tu vas gagner."
                   },
                   {
-                    title: "Ignorer les restrictions",
-                    description: "Certaines catégories nécessitent des autorisations. Vérifie toujours avant d'investir dans un produit."
-                  },
-                  {
-                    title: "Négliger la trésorerie",
-                    description: "Amazon te paie tous les 15 jours. Prévois une trésorerie suffisante pour tes premiers mois."
-                  },
-                  {
-                    title: "Vouloir aller trop vite",
-                    description: "Commence petit, apprends, puis scale. C'est la méthode la plus sûre pour réussir."
+                    title: "On gère la logistique si tu veux",
+                    description: "Avec AMZing FBA 360, on stocke et on expédie pour toi. Zéro prise de tête."
                   }
-                ].map((error, index) => (
-                  <Card key={index} className="border-destructive/20 bg-destructive/5">
+                ].map((item, index) => (
+                  <Card key={index} className="border-green-500/20 bg-green-500/5">
                     <CardHeader className="pb-2">
                       <CardTitle className="text-lg flex items-center gap-2">
-                        <span className="text-destructive">✗</span>
-                        {error.title}
+                        <span className="text-green-500">✓</span>
+                        {item.title}
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <p className="text-muted-foreground">{error.description}</p>
+                      <p className="text-muted-foreground">{item.description}</p>
                     </CardContent>
                   </Card>
                 ))}
