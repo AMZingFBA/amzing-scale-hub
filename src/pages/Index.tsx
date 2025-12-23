@@ -651,15 +651,15 @@ const Index = () => {
         </div>
       </section>
 
-      {/* FAQ Section */}
+      {/* FAQ Section - Orientée Plateforme/Outils */}
       <section className="py-20 bg-muted/30">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <Badge className="mb-4 bg-primary/10 text-primary border-primary/20">
               Questions fréquentes
             </Badge>
-            <h2 className="text-4xl font-bold mb-4">FAQ</h2>
-            <p className="text-xl text-muted-foreground">Les réponses aux questions les plus courantes</p>
+            <h2 className="text-4xl font-bold mb-4">FAQ Plateforme</h2>
+            <p className="text-xl text-muted-foreground">Tout savoir sur AMZing FBA</p>
           </div>
           
           <div className="max-w-3xl mx-auto">
@@ -668,11 +668,11 @@ const Index = () => {
                 <AccordionTrigger className="text-left font-semibold hover:no-underline">
                   <span className="flex items-center gap-3">
                     <HelpCircle className="w-5 h-5 text-primary flex-shrink-0" />
-                    C'est quoi Amazon FBA exactement ?
+                    Qu'est-ce qu'AMZing FBA concrètement ?
                   </span>
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground pl-8">
-                  FBA signifie "Fulfillment by Amazon". Concrètement, vous envoyez vos produits dans les entrepôts Amazon, et c'est Amazon qui s'occupe du stockage, de l'emballage et de l'expédition aux clients. Vous bénéficiez du badge Prime et vous vous concentrez uniquement sur le sourcing et les ventes.
+                  AMZing FBA est une plateforme tout-en-un pour vendre sur Amazon FBA. Elle combine des moniteurs automatiques qui détectent des produits rentables, un catalogue de fournisseurs, une méthode structurée et une communauté active. C'est un écosystème complet, pas juste un outil isolé.
                 </AccordionContent>
               </AccordionItem>
               
@@ -680,11 +680,11 @@ const Index = () => {
                 <AccordionTrigger className="text-left font-semibold hover:no-underline">
                   <span className="flex items-center gap-3">
                     <HelpCircle className="w-5 h-5 text-primary flex-shrink-0" />
-                    Qu'est-ce qu'AMZing FBA propose concrètement ?
+                    Comment fonctionnent les moniteurs de produits ?
                   </span>
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground pl-8">
-                  AMZing FBA combine une méthode structurée pour comprendre Amazon FBA, des moniteurs automatiques qui détectent des produits rentables, un catalogue de fournisseurs vérifiés, et une communauté active pour échanger et progresser. C'est un écosystème complet, pas juste une formation.
+                  Les moniteurs scannent automatiquement des grossistes et sites e-commerce pour identifier des produits avec un bon potentiel de revente sur Amazon. Tu reçois des alertes avec les données clés : prix d'achat, prix de vente estimé, marge, ROI et historique de ventes. La décision finale t'appartient toujours.
                 </AccordionContent>
               </AccordionItem>
               
@@ -692,11 +692,11 @@ const Index = () => {
                 <AccordionTrigger className="text-left font-semibold hover:no-underline">
                   <span className="flex items-center gap-3">
                     <HelpCircle className="w-5 h-5 text-primary flex-shrink-0" />
-                    Quel budget pour démarrer sur Amazon FBA ?
+                    Quels fournisseurs sont disponibles dans le catalogue ?
                   </span>
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground pl-8">
-                  Comptez 500 à 1000€ minimum pour vos premiers achats de stock. L'abonnement AMZing FBA est à 34,99€/mois. Il n'y a pas de miracle : le budget initial dépend de votre stratégie (arbitrage, wholesale, private label). On vous aide à optimiser chaque euro investi.
+                  Le catalogue inclut des grossistes européens vérifiés : Qogita, Eany, ainsi que des alertes sur des sites comme Auchan, King Jouet et d'autres. Les sources sont régulièrement mises à jour pour maximiser les opportunités.
                 </AccordionContent>
               </AccordionItem>
               
@@ -704,11 +704,11 @@ const Index = () => {
                 <AccordionTrigger className="text-left font-semibold hover:no-underline">
                   <span className="flex items-center gap-3">
                     <HelpCircle className="w-5 h-5 text-primary flex-shrink-0" />
-                    Faut-il créer une société pour vendre sur Amazon ?
+                    Combien coûte l'abonnement ?
                   </span>
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground pl-8">
-                  Oui, pour facturer légalement vous avez besoin d'une structure : micro-entreprise, SASU, EURL... La micro-entreprise est souvent le choix des débutants car elle est simple à créer. AMZing FBA inclut des ressources sur la création de société et les obligations légales.
+                  L'abonnement AMZing FBA est à 34,99€/mois, sans engagement. Tu peux annuler à tout moment depuis ton espace membre. Il n'y a pas de frais cachés : le prix inclut l'accès à tous les outils, moniteurs, ressources et à la communauté.
                 </AccordionContent>
               </AccordionItem>
               
@@ -716,12 +716,14 @@ const Index = () => {
                 <AccordionTrigger className="text-left font-semibold hover:no-underline">
                   <span className="flex items-center gap-3">
                     <HelpCircle className="w-5 h-5 text-primary flex-shrink-0" />
-                    C'est quoi la différence entre FBA et FBM ?
+                    C'est adapté aux débutants ?
                   </span>
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground pl-8">
-                  <strong>FBA</strong> : Amazon gère tout (stockage, expédition, SAV). Vous avez le badge Prime. Frais Amazon plus élevés mais moins de travail.<br/>
-                  <strong>FBM</strong> : Vous gérez vous-même l'expédition. Plus de contrôle, frais réduits, mais plus de travail logistique. AMZing FBA couvre les deux modèles et propose même un service logistique (AMZing FBA 360) pour ceux qui veulent le meilleur des deux mondes.
+                  Oui. AMZing FBA est conçu pour accompagner les débutants comme les vendeurs expérimentés. Pour ceux qui partent de zéro, une formation complète est disponible.{" "}
+                  <Link to="/formation" className="text-primary hover:underline font-medium">
+                    Voir la formation Amazon FBA →
+                  </Link>
                 </AccordionContent>
               </AccordionItem>
               
@@ -729,19 +731,53 @@ const Index = () => {
                 <AccordionTrigger className="text-left font-semibold hover:no-underline">
                   <span className="flex items-center gap-3">
                     <HelpCircle className="w-5 h-5 text-primary flex-shrink-0" />
-                    Puis-je annuler mon abonnement à tout moment ?
+                    C'est quoi la différence entre FBA et FBM ?
                   </span>
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground pl-8">
-                  Oui, AMZing FBA fonctionne sans engagement. Vous pouvez annuler directement depuis votre espace membre en 2 clics. Pas de période minimum, pas de frais cachés.
+                  <strong>FBA</strong> : Amazon gère le stockage, l'expédition et le SAV. Tu bénéficies du badge Prime. Frais Amazon plus élevés mais moins de travail.<br/>
+                  <strong>FBM</strong> : Tu gères toi-même l'expédition. Plus de contrôle, frais réduits, mais plus de travail logistique. AMZing FBA couvre les deux modèles.
+                </AccordionContent>
+              </AccordionItem>
+              
+              <AccordionItem value="item-7" className="bg-background rounded-lg border px-6">
+                <AccordionTrigger className="text-left font-semibold hover:no-underline">
+                  <span className="flex items-center gap-3">
+                    <HelpCircle className="w-5 h-5 text-primary flex-shrink-0" />
+                    Faut-il créer une société pour commencer ?
+                  </span>
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground pl-8">
+                  Oui, pour vendre légalement sur Amazon tu as besoin d'une structure : micro-entreprise, SASU, EURL... La micro-entreprise est souvent le choix des débutants.{" "}
+                  <Link to="/creation-societe" className="text-primary hover:underline font-medium">
+                    Voir le guide création de société →
+                  </Link>
+                </AccordionContent>
+              </AccordionItem>
+              
+              <AccordionItem value="item-8" className="bg-background rounded-lg border px-6">
+                <AccordionTrigger className="text-left font-semibold hover:no-underline">
+                  <span className="flex items-center gap-3">
+                    <HelpCircle className="w-5 h-5 text-primary flex-shrink-0" />
+                    L'application est disponible sur mobile ?
+                  </span>
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground pl-8">
+                  Oui, AMZing FBA est disponible en application iOS native (App Store) et Android. Tu peux consulter les alertes, accéder à la communauté et suivre tes opportunités depuis ton smartphone.
                 </AccordionContent>
               </AccordionItem>
             </Accordion>
             
-            <div className="text-center mt-8">
+            <div className="text-center mt-8 space-y-3">
               <Link to="/faq" className="text-primary hover:underline font-medium inline-flex items-center gap-2">
                 Voir toutes les questions <ArrowRight className="w-4 h-4" />
               </Link>
+              <p className="text-sm text-muted-foreground">
+                Tu cherches des infos sur la formation ?{" "}
+                <Link to="/formation#faq" className="text-primary hover:underline">
+                  Voir la FAQ Formation
+                </Link>
+              </p>
             </div>
           </div>
         </div>

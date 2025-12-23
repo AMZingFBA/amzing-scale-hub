@@ -1006,25 +1006,41 @@ export const schemas = {
     }
   ],
 
-  // FAQ étendue pour la home (10 questions)
+  // FAQ pour la home - orientée Plateforme/Outils (différente de formationFAQ)
   homeFAQ: {
     "@context": "https://schema.org",
     "@type": "FAQPage",
     "mainEntity": [
       {
         "@type": "Question",
-        "name": "C'est quoi Amazon FBA ?",
+        "name": "Qu'est-ce qu'AMZing FBA concrètement ?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Amazon FBA (Fulfillment by Amazon) est un service où Amazon stocke, emballe et expédie vos produits. Vous vous concentrez sur le sourcing et les ventes, Amazon gère la logistique. Vous bénéficiez du badge Prime et d'une visibilité accrue sur la marketplace."
+          "text": "AMZing FBA est une plateforme tout-en-un pour vendre sur Amazon FBA. Elle combine des moniteurs automatiques qui détectent des produits rentables, un catalogue de fournisseurs, une méthode structurée et une communauté active. C'est un écosystème complet, pas juste un outil isolé."
         }
       },
       {
         "@type": "Question",
-        "name": "AMZing FBA est une formation ou un outil ?",
+        "name": "Comment fonctionnent les moniteurs de produits ?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "AMZing FBA est une plateforme tout-en-un qui combine les deux : une méthode structurée (formation) + des outils concrets (moniteurs de produits rentables, catalogue fournisseurs) + une communauté active. Ce n'est pas juste une formation théorique."
+          "text": "Les moniteurs scannent automatiquement des grossistes et sites e-commerce pour identifier des produits avec un bon potentiel de revente sur Amazon. Tu reçois des alertes avec les données clés : prix d'achat, prix de vente estimé, marge, ROI et historique de ventes. La décision finale t'appartient toujours."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Quels fournisseurs sont disponibles dans le catalogue ?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Le catalogue inclut des grossistes européens vérifiés : Qogita, Eany, ainsi que des alertes sur des sites comme Auchan, King Jouet et d'autres. Les sources sont régulièrement mises à jour pour maximiser les opportunités."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Combien coûte l'abonnement AMZing FBA ?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "L'abonnement AMZing FBA est à 34,99€/mois, sans engagement. Tu peux annuler à tout moment depuis ton espace membre. Il n'y a pas de frais cachés : le prix inclut l'accès à tous les outils, moniteurs, ressources et à la communauté."
         }
       },
       {
@@ -1032,63 +1048,31 @@ export const schemas = {
         "name": "Est-ce adapté aux débutants ?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Oui, AMZing FBA est conçu pour accompagner les débutants étape par étape : de la création de compte vendeur à la première vente. La méthode est progressive et les outils simplifient la recherche de produits."
+          "text": "Oui. AMZing FBA est conçu pour accompagner les débutants comme les vendeurs expérimentés. Pour ceux qui partent de zéro, une formation complète est disponible sur la page Formation."
         }
       },
       {
         "@type": "Question",
-        "name": "Combien coûte l'abonnement ?",
+        "name": "Quelle est la différence entre FBA et FBM ?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "L'abonnement AMZing FBA est à 34,99€/mois. Il inclut l'accès complet à la plateforme : méthode, moniteurs, catalogue fournisseurs, communauté et support. Sans engagement, résiliable à tout moment."
+          "text": "FBA (Fulfillment by Amazon) : Amazon gère le stockage, l'expédition et le SAV. Tu bénéficies du badge Prime. Frais Amazon plus élevés mais moins de travail. FBM (Fulfillment by Merchant) : Tu gères toi-même l'expédition. Plus de contrôle, frais réduits, mais plus de travail logistique. AMZing FBA couvre les deux modèles."
         }
       },
       {
         "@type": "Question",
-        "name": "En combien de temps on peut se lancer ?",
+        "name": "Faut-il créer une société pour vendre sur Amazon ?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Avec AMZing FBA, vous pouvez créer votre compte vendeur et identifier vos premiers produits en quelques jours. Les premières ventes rentables arrivent généralement entre 2 et 4 mois selon le temps investi."
+          "text": "Oui, pour vendre légalement sur Amazon tu as besoin d'une structure : micro-entreprise, SASU, EURL... La micro-entreprise est souvent le choix des débutants. AMZing FBA propose un guide création de société."
         }
       },
       {
         "@type": "Question",
-        "name": "Comment trouver un produit rentable ?",
+        "name": "L'application est disponible sur mobile ?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "AMZing FBA propose des moniteurs automatiques qui analysent les prix, la demande et la concurrence pour identifier des opportunités. La méthode vous apprend ensuite à valider ces idées avant d'investir."
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "Est-ce que vous aidez sur Amazon Ads ?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "Oui, la formation inclut les bases d'Amazon Ads (PPC) : création de campagnes, analyse des résultats et optimisation du budget publicitaire pour maximiser votre ROI."
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "Quelle différence entre FBA et FBM ?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "FBA (Fulfillment by Amazon) : Amazon gère stockage et expédition, vous avez le badge Prime. FBM (Fulfillment by Merchant) : vous gérez vous-même la logistique. AMZing FBA couvre les deux modèles et propose même un service logistique (AMZing FBA 360)."
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "Est-ce légal ? Faut-il créer une société ?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "Oui, vendre sur Amazon est 100% légal. Vous devez créer une structure (micro-entreprise, SASU, EURL...) pour facturer. AMZing FBA inclut des guides sur la création de société et les obligations légales."
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "Peut-on arrêter quand on veut ?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "Oui, l'abonnement AMZing FBA est sans engagement. Vous pouvez l'annuler à tout moment depuis votre espace membre. Pas de frais cachés ni de période d'engagement."
+          "text": "Oui, AMZing FBA est disponible en application iOS native (App Store) et Android. Tu peux consulter les alertes, accéder à la communauté et suivre tes opportunités depuis ton smartphone."
         }
       }
     ]
