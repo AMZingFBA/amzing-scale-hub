@@ -1,9 +1,10 @@
-import { ArrowRight, Package, GraduationCap, Warehouse, Users, CheckCircle2, TrendingUp, BookOpen, Wrench, Target } from "lucide-react";
+import { ArrowRight, Package, GraduationCap, Warehouse, Users, CheckCircle2, TrendingUp, BookOpen, Wrench, Target, Smartphone, Shield, Headphones, RefreshCw, Building2, Mail, HelpCircle } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import TestimonialsCarousel from "@/components/TestimonialsCarousel";
@@ -118,20 +119,23 @@ const Index = () => {
     checkAndRedirect();
   }, [isVIP, isLoading, user, navigate]);
 
+  // Schéma combiné pour la home
+  const homeSchema = [...schemas.homePageSchemas, schemas.homeFAQ];
+
   return (
     <div className="min-h-screen">
       <SEO
         title={seoData.home.title}
         description={seoData.home.description}
         keywords={seoData.home.keywords}
-        schema={schemas.organization}
+        schema={homeSchema}
       />
       <Navbar />
       <AppInstallBanner />
       
-      {/* SEO H1 - Invisible but readable by Google */}
+      {/* H1 SEO - Visible */}
       <h1 className="sr-only">
-        AMZing FBA – Plateforme complète pour réussir sur Amazon FBA et FBM
+        Plateforme tout-en-un pour réussir sur Amazon FBA
       </h1>
 
       {/* Hero Section */}
@@ -149,16 +153,16 @@ const Index = () => {
         <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-4xl mx-auto text-center">
             <Badge className="mb-6 bg-primary/10 text-primary border-primary/20">
-              Sans engagement | Moniteurs automatiques | Outils professionnels
+              Sans engagement | Outils + Méthode + Communauté
             </Badge>
             
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
-              AMZing FBA — De 0 à 100k €
-            </h1>
+            <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
+              Plateforme tout-en-un pour réussir sur Amazon FBA
+            </h2>
             
             <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-3xl mx-auto">
-              Rejoins l'espace VIP et accède aux moniteurs de produits rentables, 
-              guides Amazon FBA, fournisseurs privés, analyses de marché et bien plus.
+              Moniteurs de produits rentables, méthode structurée, sourcing et communauté active. 
+              Tout ce qu'il faut pour lancer ton business Amazon FBA.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -168,27 +172,106 @@ const Index = () => {
                 onClick={startFreeTrial}
                 disabled={isStarting}
               >
-                {isStarting ? 'Activation...' : 'S\'abonner maintenant'} <ArrowRight className="ml-2" />
+                {isStarting ? 'Activation...' : 'Accéder à AMZing FBA'} <ArrowRight className="ml-2" />
               </Button>
               <Button variant="outline" size="xl" asChild>
                 <Link to="/formation">
-                  Découvrir la formation
+                  Voir la formation Amazon FBA
                 </Link>
               </Button>
             </div>
             <p className="mt-6 text-muted-foreground text-lg">
-              34,99€/mois
+              34,99€/mois • Sans engagement
             </p>
           </div>
         </div>
       </section>
 
-      {/* 3 Reasons Section */}
+      {/* Micro-bloc Formation CTA */}
+      <section className="py-6 bg-primary/5 border-y border-primary/10">
+        <div className="container mx-auto px-4 text-center">
+          <p className="text-lg">
+            Tu cherches une <strong>formation Amazon FBA</strong> complète ?{" "}
+            <Link to="/formation" className="text-primary font-semibold hover:underline inline-flex items-center gap-1">
+              Voir la formation complète <ArrowRight className="w-4 h-4" />
+            </Link>
+          </p>
+        </div>
+      </section>
+
+      {/* Comment ça marche - 3 étapes */}
       <section className="py-20 bg-muted/30">
         <div className="container mx-auto px-4">
-          {/* SEO H2 - Formation */}
+          <div className="text-center mb-12">
+            <Badge className="mb-4 bg-secondary/10 text-secondary border-secondary/20">
+              En 3 étapes simples
+            </Badge>
+            <h2 className="text-4xl font-bold mb-4">Comment ça marche ?</h2>
+            <p className="text-xl text-muted-foreground">De la méthode à l'action en quelques clics</p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            <ServiceCard delay={0} animation="scale">
+              <Card className="border-2 hover:border-primary transition-colors text-center relative overflow-hidden group">
+                <div className="absolute top-4 left-4 w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-lg">1</div>
+                <CardContent className="pt-16 pb-8">
+                  <div className="w-16 h-16 bg-gradient-to-br from-primary to-primary-glow rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform">
+                    <GraduationCap className="w-8 h-8 text-white" />
+                  </div>
+                  <h3 className="text-2xl font-bold mb-4">Apprends la méthode</h3>
+                  <p className="text-muted-foreground mb-4">
+                    Suis la formation Amazon FBA et maîtrise les fondamentaux pour éviter les erreurs courantes.
+                  </p>
+                  <Link to="/formation" className="text-primary font-medium hover:underline inline-flex items-center gap-1">
+                    Voir la formation <ArrowRight className="w-4 h-4" />
+                  </Link>
+                </CardContent>
+              </Card>
+            </ServiceCard>
+
+            <ServiceCard delay={100} animation="fade-up">
+              <Card className="border-2 hover:border-secondary transition-colors text-center relative overflow-hidden group">
+                <div className="absolute top-4 left-4 w-10 h-10 rounded-full bg-secondary text-secondary-foreground flex items-center justify-center font-bold text-lg">2</div>
+                <CardContent className="pt-16 pb-8">
+                  <div className="w-16 h-16 bg-gradient-to-br from-secondary to-accent rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform">
+                    <Target className="w-8 h-8 text-white" />
+                  </div>
+                  <h3 className="text-2xl font-bold mb-4">Trouve des opportunités</h3>
+                  <p className="text-muted-foreground mb-4">
+                    Utilise les moniteurs et le catalogue pour identifier des produits rentables rapidement.
+                  </p>
+                  <Link to="/produits-rentables-amazon" className="text-secondary font-medium hover:underline inline-flex items-center gap-1">
+                    Trouver des produits <ArrowRight className="w-4 h-4" />
+                  </Link>
+                </CardContent>
+              </Card>
+            </ServiceCard>
+
+            <ServiceCard delay={200} animation="rotate">
+              <Card className="border-2 hover:border-green-500 transition-colors text-center relative overflow-hidden group">
+                <div className="absolute top-4 left-4 w-10 h-10 rounded-full bg-green-500 text-white flex items-center justify-center font-bold text-lg">3</div>
+                <CardContent className="pt-16 pb-8">
+                  <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform">
+                    <TrendingUp className="w-8 h-8 text-white" />
+                  </div>
+                  <h3 className="text-2xl font-bold mb-4">Passe à l'action</h3>
+                  <p className="text-muted-foreground mb-4">
+                    Lance tes premières commandes et développe ton business avec le soutien de la communauté.
+                  </p>
+                  <Link to="/tarifs" className="text-green-600 font-medium hover:underline inline-flex items-center gap-1">
+                    Voir les tarifs <ArrowRight className="w-4 h-4" />
+                  </Link>
+                </CardContent>
+              </Card>
+            </ServiceCard>
+          </div>
+        </div>
+      </section>
+
+      {/* Tout inclus dans l'abonnement */}
+      <section className="py-20">
+        <div className="container mx-auto px-4">
           <h2 className="sr-only">
-            Formation Amazon FBA professionnelle en ligne pour débutants et vendeurs avancés
+            Outils et ressources inclus dans l'abonnement AMZing FBA
           </h2>
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold mb-4">Tout inclus dans l'abonnement</h2>
@@ -576,6 +659,217 @@ const Index = () => {
         )}
       </section>
 
+      {/* Preuves & Confiance */}
+      <section className="py-16">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <Badge className="mb-4 bg-green-500/10 text-green-600 border-green-500/20">
+              Pourquoi nous faire confiance
+            </Badge>
+            <h2 className="text-4xl font-bold mb-4">AMZing FBA en quelques mots</h2>
+          </div>
+          
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto mb-12">
+            <div className="text-center p-6 rounded-2xl bg-muted/50 border">
+              <Users className="w-10 h-10 text-primary mx-auto mb-3" />
+              <div className="text-2xl font-bold">500+</div>
+              <div className="text-sm text-muted-foreground">Membres actifs</div>
+            </div>
+            <div className="text-center p-6 rounded-2xl bg-muted/50 border">
+              <Smartphone className="w-10 h-10 text-secondary mx-auto mb-3" />
+              <div className="text-2xl font-bold">iOS & Android</div>
+              <div className="text-sm text-muted-foreground">Apps disponibles</div>
+            </div>
+            <div className="text-center p-6 rounded-2xl bg-muted/50 border">
+              <Headphones className="w-10 h-10 text-primary mx-auto mb-3" />
+              <div className="text-2xl font-bold">Support</div>
+              <div className="text-sm text-muted-foreground">Réactif 7j/7</div>
+            </div>
+            <div className="text-center p-6 rounded-2xl bg-muted/50 border">
+              <RefreshCw className="w-10 h-10 text-secondary mx-auto mb-3" />
+              <div className="text-2xl font-bold">Sans engagement</div>
+              <div className="text-sm text-muted-foreground">Résiliable à tout moment</div>
+            </div>
+          </div>
+
+          {/* Qui est derrière AMZing FBA */}
+          <Card className="max-w-3xl mx-auto border-2 border-primary/10">
+            <CardContent className="p-8">
+              <div className="flex items-start gap-6 flex-col md:flex-row">
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center flex-shrink-0">
+                  <Building2 className="w-8 h-8 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold mb-2">Qui est derrière AMZing FBA ?</h3>
+                  <p className="text-muted-foreground mb-4">
+                    AMZing FBA est édité par <strong className="text-foreground">N.Z Consulting</strong>, société française basée à Paris. 
+                    Notre mission : rendre le business Amazon FBA accessible à tous grâce à des outils concrets et une méthode claire.
+                  </p>
+                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                    <span className="flex items-center gap-1">
+                      <Mail className="w-4 h-4" /> contact@amzingfba.com
+                    </span>
+                    <span>Paris, France</span>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section className="py-20 bg-muted/30">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <Badge className="mb-4 bg-primary/10 text-primary border-primary/20">
+              Questions fréquentes
+            </Badge>
+            <h2 className="text-4xl font-bold mb-4">FAQ</h2>
+            <p className="text-xl text-muted-foreground">Tout ce que tu dois savoir avant de te lancer</p>
+          </div>
+          
+          <div className="max-w-3xl mx-auto">
+            <Accordion type="single" collapsible className="space-y-4">
+              <AccordionItem value="item-1" className="bg-background rounded-lg border px-6">
+                <AccordionTrigger className="text-left font-semibold hover:no-underline">
+                  <span className="flex items-center gap-3">
+                    <HelpCircle className="w-5 h-5 text-primary flex-shrink-0" />
+                    C'est quoi Amazon FBA ?
+                  </span>
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground pl-8">
+                  Amazon FBA (Fulfillment by Amazon) est un service où Amazon stocke, emballe et expédie vos produits. Vous vous concentrez sur le sourcing et les ventes, Amazon gère la logistique. Vous bénéficiez du badge Prime et d'une visibilité accrue sur la marketplace.
+                </AccordionContent>
+              </AccordionItem>
+              
+              <AccordionItem value="item-2" className="bg-background rounded-lg border px-6">
+                <AccordionTrigger className="text-left font-semibold hover:no-underline">
+                  <span className="flex items-center gap-3">
+                    <HelpCircle className="w-5 h-5 text-primary flex-shrink-0" />
+                    AMZing FBA est une formation ou un outil ?
+                  </span>
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground pl-8">
+                  AMZing FBA est une plateforme tout-en-un qui combine les deux : une méthode structurée (formation) + des outils concrets (moniteurs de produits rentables, catalogue fournisseurs) + une communauté active. Ce n'est pas juste une formation théorique.
+                  <Link to="/formation" className="block mt-2 text-primary hover:underline">
+                    → Voir la formation complète
+                  </Link>
+                </AccordionContent>
+              </AccordionItem>
+              
+              <AccordionItem value="item-3" className="bg-background rounded-lg border px-6">
+                <AccordionTrigger className="text-left font-semibold hover:no-underline">
+                  <span className="flex items-center gap-3">
+                    <HelpCircle className="w-5 h-5 text-primary flex-shrink-0" />
+                    Est-ce adapté aux débutants ?
+                  </span>
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground pl-8">
+                  Oui, AMZing FBA est conçu pour accompagner les débutants étape par étape : de la création de compte vendeur à la première vente. La méthode est progressive et les outils simplifient la recherche de produits.
+                  <Link to="/amazon-fba-debutant" className="block mt-2 text-primary hover:underline">
+                    → Lire le guide débutant
+                  </Link>
+                </AccordionContent>
+              </AccordionItem>
+              
+              <AccordionItem value="item-4" className="bg-background rounded-lg border px-6">
+                <AccordionTrigger className="text-left font-semibold hover:no-underline">
+                  <span className="flex items-center gap-3">
+                    <HelpCircle className="w-5 h-5 text-primary flex-shrink-0" />
+                    Combien coûte l'abonnement ?
+                  </span>
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground pl-8">
+                  L'abonnement AMZing FBA est à 34,99€/mois. Il inclut l'accès complet à la plateforme : méthode, moniteurs, catalogue fournisseurs, communauté et support. Sans engagement, résiliable à tout moment.
+                  <Link to="/tarifs" className="block mt-2 text-primary hover:underline">
+                    → Voir les tarifs
+                  </Link>
+                </AccordionContent>
+              </AccordionItem>
+              
+              <AccordionItem value="item-5" className="bg-background rounded-lg border px-6">
+                <AccordionTrigger className="text-left font-semibold hover:no-underline">
+                  <span className="flex items-center gap-3">
+                    <HelpCircle className="w-5 h-5 text-primary flex-shrink-0" />
+                    Comment trouver un produit rentable ?
+                  </span>
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground pl-8">
+                  AMZing FBA propose des moniteurs automatiques qui analysent les prix, la demande et la concurrence pour identifier des opportunités. La méthode vous apprend ensuite à valider ces idées avant d'investir.
+                  <Link to="/produits-rentables-amazon" className="block mt-2 text-primary hover:underline">
+                    → Comment trouver des produits rentables
+                  </Link>
+                </AccordionContent>
+              </AccordionItem>
+              
+              <AccordionItem value="item-6" className="bg-background rounded-lg border px-6">
+                <AccordionTrigger className="text-left font-semibold hover:no-underline">
+                  <span className="flex items-center gap-3">
+                    <HelpCircle className="w-5 h-5 text-primary flex-shrink-0" />
+                    Est-ce que vous aidez sur Amazon Ads ?
+                  </span>
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground pl-8">
+                  Oui, la formation inclut les bases d'Amazon Ads (PPC) : création de campagnes, analyse des résultats et optimisation du budget publicitaire pour maximiser votre ROI.
+                </AccordionContent>
+              </AccordionItem>
+              
+              <AccordionItem value="item-7" className="bg-background rounded-lg border px-6">
+                <AccordionTrigger className="text-left font-semibold hover:no-underline">
+                  <span className="flex items-center gap-3">
+                    <HelpCircle className="w-5 h-5 text-primary flex-shrink-0" />
+                    Quelle différence entre FBA et FBM ?
+                  </span>
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground pl-8">
+                  FBA (Fulfillment by Amazon) : Amazon gère stockage et expédition, vous avez le badge Prime. FBM (Fulfillment by Merchant) : vous gérez vous-même la logistique. AMZing FBA couvre les deux modèles et propose même un service logistique (AMZing FBA 360).
+                </AccordionContent>
+              </AccordionItem>
+              
+              <AccordionItem value="item-8" className="bg-background rounded-lg border px-6">
+                <AccordionTrigger className="text-left font-semibold hover:no-underline">
+                  <span className="flex items-center gap-3">
+                    <HelpCircle className="w-5 h-5 text-primary flex-shrink-0" />
+                    Est-ce légal ? Faut-il créer une société ?
+                  </span>
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground pl-8">
+                  Oui, vendre sur Amazon est 100% légal. Vous devez créer une structure (micro-entreprise, SASU, EURL...) pour facturer. AMZing FBA inclut des guides sur la création de société et les obligations légales.
+                  <Link to="/creation-societe" className="block mt-2 text-primary hover:underline">
+                    → Guide création de société
+                  </Link>
+                </AccordionContent>
+              </AccordionItem>
+              
+              <AccordionItem value="item-9" className="bg-background rounded-lg border px-6">
+                <AccordionTrigger className="text-left font-semibold hover:no-underline">
+                  <span className="flex items-center gap-3">
+                    <HelpCircle className="w-5 h-5 text-primary flex-shrink-0" />
+                    En combien de temps on peut se lancer ?
+                  </span>
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground pl-8">
+                  Avec AMZing FBA, vous pouvez créer votre compte vendeur et identifier vos premiers produits en quelques jours. Les premières ventes rentables arrivent généralement entre 2 et 4 mois selon le temps investi.
+                </AccordionContent>
+              </AccordionItem>
+              
+              <AccordionItem value="item-10" className="bg-background rounded-lg border px-6">
+                <AccordionTrigger className="text-left font-semibold hover:no-underline">
+                  <span className="flex items-center gap-3">
+                    <HelpCircle className="w-5 h-5 text-primary flex-shrink-0" />
+                    Peut-on arrêter quand on veut ?
+                  </span>
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground pl-8">
+                  Oui, l'abonnement AMZing FBA est sans engagement. Vous pouvez l'annuler à tout moment depuis votre espace membre. Pas de frais cachés ni de période d'engagement.
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+          </div>
+        </div>
+      </section>
+
       {/* CTA Section */}
       <section className="py-20 bg-gradient-to-r from-primary to-secondary">
         <div className="container mx-auto px-4 text-center">
@@ -583,7 +877,7 @@ const Index = () => {
             Prêt à démarrer sur Amazon ?
           </h2>
           <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
-            Commence dès aujourd'hui, sans engagement
+            Accède à la plateforme complète : outils, méthode et communauté
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button 
@@ -597,19 +891,19 @@ const Index = () => {
               }}
             >
               <span className="relative z-10 flex items-center gap-2">
-                {isStarting ? 'Activation...' : 'S\'abonner maintenant'}
+                {isStarting ? 'Activation...' : 'Accéder à AMZing FBA'}
                 <span className="inline-block group-hover:translate-x-1 transition-transform duration-300">→</span>
               </span>
               <span className="absolute inset-0 bg-gradient-to-r from-primary/0 via-primary/20 to-primary/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></span>
             </Button>
             <Button variant="outline" size="xl" className="border-white text-white hover:bg-white/10" asChild>
-              <Link to="/contact">
-                Nous contacter
+              <Link to="/formation">
+                Voir la formation
               </Link>
             </Button>
           </div>
           <p className="mt-6 text-white/90 text-lg">
-            34,99€/mois
+            34,99€/mois • Sans engagement
           </p>
         </div>
       </section>
