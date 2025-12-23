@@ -1,4 +1,4 @@
-import { ArrowRight, CheckCircle2, AlertTriangle, Search, TrendingUp, BarChart3, Target, Lightbulb, DollarSign, Package } from 'lucide-react';
+import { ArrowRight, CheckCircle2, Search, TrendingUp, BarChart3, Lightbulb, DollarSign, Package } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -45,7 +45,7 @@ const ProduitsRentablesAmazon = () => {
                 Comment trouver des produits rentables sur Amazon
               </h1>
               <p className="text-xl text-muted-foreground mb-8 max-w-3xl mx-auto">
-                La recherche de produits est la clé du succès sur Amazon FBA. Découvre la méthode pour identifier des produits gagnants et éviter les erreurs coûteuses.
+                Trouver des produits rentables, c'est simple quand on a les bons outils. Avec AMZing FBA, on te livre des opportunités analysées tous les jours.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button size="lg" asChild className="text-lg px-8 bg-green-600 hover:bg-green-700">
@@ -129,7 +129,7 @@ const ProduitsRentablesAmazon = () => {
           </div>
         </section>
 
-        {/* Section 2: Les erreurs dans la recherche */}
+        {/* Section 2: Pourquoi c'est simple avec AMZing FBA */}
         <section 
           ref={section2Anim.ref}
           className={cn(
@@ -140,55 +140,50 @@ const ProduitsRentablesAmazon = () => {
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto">
               <div className="flex items-center gap-3 mb-8">
-                <div className="p-3 bg-destructive/20 rounded-xl">
-                  <AlertTriangle className="w-8 h-8 text-destructive" />
+                <div className="p-3 bg-green-500/20 rounded-xl">
+                  <CheckCircle2 className="w-8 h-8 text-green-500" />
                 </div>
-                <h2 className="text-3xl md:text-4xl font-bold">Les erreurs dans la recherche de produits</h2>
+                <h2 className="text-3xl md:text-4xl font-bold">Pourquoi c'est simple avec AMZing FBA</h2>
               </div>
               
               <p className="text-lg text-muted-foreground mb-8">
-                La majorité des échecs sur Amazon viennent d'une <strong>mauvaise sélection de produits</strong>. Voici les erreurs les plus fréquentes à éviter absolument :
+                Plus besoin de passer des heures à chercher. On fait le travail pour toi :
               </p>
               
-              <div className="space-y-4">
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {[
                   {
-                    error: "Se fier uniquement au prix de vente",
-                    solution: "Analyse tous les coûts : achat, transport, frais Amazon, TVA. C'est la marge nette qui compte !"
+                    title: "Produits livrés tous les jours",
+                    description: "Chaque jour, on t'envoie des produits analysés et validés, prêts à acheter."
                   },
                   {
-                    error: "Ignorer la concurrence",
-                    solution: "Vérifie le nombre de vendeurs, la présence d'Amazon en tant que vendeur, et la qualité des offres concurrentes."
+                    title: "Analyse des tendances",
+                    description: "On surveille le marché et les tendances pour toi. Tu reçois les meilleures opportunités au bon moment."
                   },
                   {
-                    error: "Ne pas vérifier les restrictions",
-                    solution: "Certaines catégories sont bloquées. Vérifie AVANT d'acheter si tu peux vendre le produit."
+                    title: "Calculs déjà faits",
+                    description: "ROI, marge, frais Amazon... Tout est calculé. Tu sais exactement combien tu vas gagner."
                   },
                   {
-                    error: "Sous-estimer les frais Amazon",
-                    solution: "Les frais FBA varient selon la taille et le poids. Utilise le calculateur Amazon pour être précis."
+                    title: "Listings exclusifs",
+                    description: "Accès à des opportunités que tu ne trouveras nulle part ailleurs."
                   },
                   {
-                    error: "Se baser sur une seule source de données",
-                    solution: "Croise plusieurs indicateurs : BSR, historique des prix, avis, variations saisonnières..."
+                    title: "Fournisseurs vérifiés",
+                    description: "On te connecte directement avec nos fournisseurs partenaires. Tu commandes en quelques clics."
                   },
                   {
-                    error: "Acheter en trop grande quantité au départ",
-                    solution: "Teste avec une petite quantité avant de scaler. Valide la demande réelle avant d'investir gros."
+                    title: "Zéro prise de tête",
+                    description: "Pas besoin d'être expert. On te guide à chaque étape."
                   }
                 ].map((item, index) => (
-                  <Card key={index} className="border-destructive/20">
+                  <Card key={index} className="border-green-500/20 bg-green-500/5">
                     <CardContent className="pt-6">
-                      <div className="flex items-start gap-4">
-                        <div className="p-2 bg-destructive/10 rounded-lg">
-                          <span className="text-destructive font-bold">✗</span>
-                        </div>
-                        <div className="flex-1">
-                          <h3 className="font-bold text-lg mb-2 text-destructive">{item.error}</h3>
-                          <p className="text-muted-foreground flex items-start gap-2">
-                            <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                            {item.solution}
-                          </p>
+                      <div className="flex items-start gap-3">
+                        <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0 mt-1" />
+                        <div>
+                          <h3 className="font-bold mb-2">{item.title}</h3>
+                          <p className="text-muted-foreground text-sm">{item.description}</p>
                         </div>
                       </div>
                     </CardContent>
@@ -290,7 +285,7 @@ const ProduitsRentablesAmazon = () => {
               </div>
               
               <p className="text-lg text-muted-foreground mb-8">
-                Chez AMZing FBA, nous faisons le travail de recherche pour toi. Notre équipe analyse des centaines de produits chaque semaine pour te proposer uniquement les <strong>meilleures opportunités</strong>.
+                On analyse des centaines de produits chaque jour pour te proposer uniquement les <strong>meilleures opportunités</strong>.
               </p>
               
               <div className="grid md:grid-cols-2 gap-6 mb-10">
@@ -298,10 +293,10 @@ const ProduitsRentablesAmazon = () => {
                   <CardContent className="pt-6">
                     <div className="flex items-center gap-3 mb-4">
                       <Package className="w-8 h-8 text-green-500" />
-                      <h3 className="font-bold text-lg">Catalogue de produits validés</h3>
+                      <h3 className="font-bold text-lg">Produits livrés tous les jours</h3>
                     </div>
                     <p className="text-muted-foreground mb-4">
-                      Accède à notre catalogue de produits rentables, analysés et validés par notre équipe d'experts.
+                      Chaque jour, reçois des produits rentables analysés et validés par notre équipe.
                     </p>
                     <ul className="space-y-2 text-sm">
                       <li className="flex items-center gap-2">
@@ -314,7 +309,7 @@ const ProduitsRentablesAmazon = () => {
                       </li>
                       <li className="flex items-center gap-2">
                         <CheckCircle2 className="w-4 h-4 text-green-500" />
-                        Mise à jour régulière
+                        Envoi quotidien
                       </li>
                     </ul>
                   </CardContent>
