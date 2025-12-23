@@ -198,9 +198,9 @@ const ProduitsRentablesAmazon = () => {
           <div className="container mx-auto px-4">
             <div className="max-w-5xl mx-auto">
               <div className="text-center mb-12">
-                <h2 className="text-3xl md:text-4xl font-bold mb-4">Plusieurs sources, plus d'opportunités</h2>
+                <h2 className="text-3xl md:text-4xl font-bold mb-4">Ce qu'on analyse pour toi</h2>
                 <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                  On analyse plusieurs fournisseurs et marketplaces pour te trouver les meilleures marges.
+                  On fait le travail de recherche. Tu récupères les résultats.
                 </p>
               </div>
               
@@ -210,10 +210,10 @@ const ProduitsRentablesAmazon = () => {
                   <CardContent className="pt-6">
                     <div className="flex items-center gap-3 mb-4">
                       <Package className="w-8 h-8 text-green-500" />
-                      <h3 className="font-bold text-lg">Produits Qogita</h3>
+                      <h3 className="font-bold text-lg">Produits wholesale</h3>
                     </div>
                     <p className="text-muted-foreground text-sm mb-4">
-                      Grossiste européen avec des milliers de références. Idéal pour le wholesale.
+                      Des produits de grossistes avec de bonnes marges pour faire du volume.
                     </p>
                     <ul className="space-y-2 text-sm">
                       <li className="flex items-center gap-2">
@@ -222,11 +222,11 @@ const ProduitsRentablesAmazon = () => {
                       </li>
                       <li className="flex items-center gap-2">
                         <CheckCircle2 className="w-4 h-4 text-green-500" />
-                        Stock en temps réel
+                        Stock disponible
                       </li>
                       <li className="flex items-center gap-2">
                         <CheckCircle2 className="w-4 h-4 text-green-500" />
-                        Livraison rapide
+                        Fournisseurs vérifiés
                       </li>
                     </ul>
                   </CardContent>
@@ -236,24 +236,24 @@ const ProduitsRentablesAmazon = () => {
                   <div className="h-2 bg-gradient-to-r from-primary to-secondary" />
                   <CardContent className="pt-6">
                     <div className="flex items-center gap-3 mb-4">
-                      <Search className="w-8 h-8 text-primary" />
-                      <h3 className="font-bold text-lg">Produits eAny</h3>
+                      <TrendingUp className="w-8 h-8 text-primary" />
+                      <h3 className="font-bold text-lg">Tendances du marché</h3>
                     </div>
                     <p className="text-muted-foreground text-sm mb-4">
-                      Opportunités détectées sur d'autres sources. Des pépites à fort ROI.
+                      On surveille les tendances et les variations de prix pour détecter les opportunités.
                     </p>
                     <ul className="space-y-2 text-sm">
                       <li className="flex items-center gap-2">
                         <CheckCircle2 className="w-4 h-4 text-primary" />
-                        ROI élevés
+                        Suivi des prix
                       </li>
                       <li className="flex items-center gap-2">
                         <CheckCircle2 className="w-4 h-4 text-primary" />
-                        Produits exclusifs
+                        Produits en hausse
                       </li>
                       <li className="flex items-center gap-2">
                         <CheckCircle2 className="w-4 h-4 text-primary" />
-                        Analyse complète
+                        Saisonnalité
                       </li>
                     </ul>
                   </CardContent>
