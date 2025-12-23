@@ -38,13 +38,13 @@ const ProduitsRentablesAmazon = () => {
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto text-center">
               <span className="inline-block px-4 py-2 bg-green-500/20 text-green-600 dark:text-green-400 rounded-full text-sm font-medium mb-6">
-                Produits analysés tous les jours
+                Nouveaux produits tous les jours
               </span>
               <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-green-500 via-primary to-green-500 bg-clip-text text-transparent">
-                Des produits rentables livrés dans ta boîte mail
+                Des produits rentables analysés pour toi
               </h1>
               <p className="text-xl text-muted-foreground mb-8 max-w-3xl mx-auto">
-                Pourquoi passer des heures à chercher ? Chaque jour, on t'envoie des produits analysés avec ROI, marge et fournisseur. Tu n'as plus qu'à choisir et commander.
+                Chaque jour, on ajoute de nouveaux produits dans l'app avec le ROI, la marge et le lien fournisseur. Tu choisis ce qui t'intéresse et tu passes à l'action.
               </p>
               
               {/* Stats rapides */}
@@ -58,15 +58,15 @@ const ProduitsRentablesAmazon = () => {
                   <div className="text-sm text-muted-foreground">ROI minimum</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl md:text-4xl font-bold text-green-500">5min</div>
-                  <div className="text-sm text-muted-foreground">pour commander</div>
+                  <div className="text-3xl md:text-4xl font-bold text-green-500">0h</div>
+                  <div className="text-sm text-muted-foreground">de recherche</div>
                 </div>
               </div>
               
               <Button size="lg" asChild className="text-lg px-8 bg-green-600 hover:bg-green-700">
                 <Link to="/tarifs">
                   <ArrowRight className="w-5 h-5 mr-2" />
-                  Recevoir les produits du jour
+                  Accéder aux produits
                 </Link>
               </Button>
             </div>
@@ -84,9 +84,9 @@ const ProduitsRentablesAmazon = () => {
           <div className="container mx-auto px-4">
             <div className="max-w-5xl mx-auto">
               <div className="text-center mb-12">
-                <h2 className="text-3xl md:text-4xl font-bold mb-4">Ce que tu reçois chaque jour</h2>
+                <h2 className="text-3xl md:text-4xl font-bold mb-4">Ce que tu trouves dans l'app</h2>
                 <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                  Pas juste une liste de produits. On te donne tout ce qu'il faut pour décider en 2 minutes.
+                  Chaque produit est analysé. Tu vois tout ce qu'il faut pour décider si ça vaut le coup.
                 </p>
               </div>
               
@@ -107,7 +107,7 @@ const ProduitsRentablesAmazon = () => {
                       <ShoppingCart className="w-8 h-8 text-primary" />
                     </div>
                     <h3 className="font-bold text-lg mb-2">Lien fournisseur</h3>
-                    <p className="text-muted-foreground text-sm">Le produit te plaît ? Clique et commande directement.</p>
+                    <p className="text-muted-foreground text-sm">Tu veux acheter ? Le lien direct vers le fournisseur est inclus.</p>
                   </CardContent>
                 </Card>
                 
@@ -146,9 +146,9 @@ const ProduitsRentablesAmazon = () => {
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto">
               <div className="text-center mb-12">
-                <h2 className="text-3xl md:text-4xl font-bold mb-4">Du produit à la vente en 3 étapes</h2>
+                <h2 className="text-3xl md:text-4xl font-bold mb-4">Comment ça marche</h2>
                 <p className="text-lg text-muted-foreground">
-                  On simplifie tout. Tu te concentres sur ce qui compte : vendre.
+                  Simple. Tu ouvres l'app, tu regardes les produits, tu décides.
                 </p>
               </div>
               
@@ -158,8 +158,8 @@ const ProduitsRentablesAmazon = () => {
                     1
                   </div>
                   <div className="flex-1 pt-2">
-                    <h3 className="text-xl font-bold mb-2">Tu reçois les produits du jour</h3>
-                    <p className="text-muted-foreground">Chaque matin, les meilleures opportunités arrivent dans ton espace membre. Filtre par ROI, catégorie ou prix.</p>
+                    <h3 className="text-xl font-bold mb-2">Consulte les produits dans l'app</h3>
+                    <p className="text-muted-foreground">Chaque jour, de nouveaux produits rentables apparaissent. Tu peux filtrer par ROI, catégorie ou marge.</p>
                   </div>
                 </div>
                 
@@ -168,8 +168,8 @@ const ProduitsRentablesAmazon = () => {
                     2
                   </div>
                   <div className="flex-1 pt-2">
-                    <h3 className="text-xl font-bold mb-2">Tu choisis et tu commandes</h3>
-                    <p className="text-muted-foreground">Un produit te plaît ? Clique sur le lien fournisseur et passe commande. C'est direct, pas d'intermédiaire.</p>
+                    <h3 className="text-xl font-bold mb-2">Analyse et décide</h3>
+                    <p className="text-muted-foreground">Tu vois le ROI, la marge, le BSR, les ventes estimées. Tu sais exactement si le produit vaut le coup.</p>
                   </div>
                 </div>
                 
@@ -178,8 +178,8 @@ const ProduitsRentablesAmazon = () => {
                     3
                   </div>
                   <div className="flex-1 pt-2">
-                    <h3 className="text-xl font-bold mb-2">Tu envoies sur Amazon et tu vends</h3>
-                    <p className="text-muted-foreground">Envoie tes produits en FBA, FBM, ou utilise AMZing FBA 360 pour qu'on gère la logistique à ta place.</p>
+                    <h3 className="text-xl font-bold mb-2">Achète et revends sur Amazon</h3>
+                    <p className="text-muted-foreground">Le produit t'intéresse ? Va sur le site du fournisseur, achète, et revends sur Amazon en FBA, FBM ou via AMZing FBA 360.</p>
                   </div>
                 </div>
               </div>
@@ -304,9 +304,9 @@ const ProduitsRentablesAmazon = () => {
                 <CardContent className="py-12 px-8 md:px-12">
                   <div className="grid md:grid-cols-2 gap-8 items-center">
                     <div>
-                      <h3 className="text-2xl md:text-3xl font-bold mb-4">Commence à recevoir des produits rentables dès demain</h3>
+                      <h3 className="text-2xl md:text-3xl font-bold mb-4">Accède aux produits rentables dès maintenant</h3>
                       <p className="text-white/90 mb-6">
-                        Rejoins AMZing FBA et accède aux produits analysés, aux fournisseurs et à la communauté de vendeurs.
+                        Deviens membre AMZing FBA et consulte les produits analysés, les fournisseurs et échange avec la communauté.
                       </p>
                       <Button size="lg" variant="secondary" asChild className="text-lg px-8">
                         <Link to="/tarifs">
