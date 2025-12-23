@@ -240,67 +240,51 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Guides Amazon FBA - Section SEO */}
-      <section className="py-20 bg-gradient-to-b from-primary/5 via-secondary/5 to-transparent">
+      {/* Guides Amazon FBA - Section SEO - Compact horizontal style */}
+      <section className="py-12 border-y border-border/50 bg-gradient-to-r from-primary/5 via-transparent to-secondary/5">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Guides Amazon FBA</h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Comprendre Amazon FBA, les outils et les méthodes utilisées par les vendeurs professionnels
-            </p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-            <Link to="/amazon-fba-debutant" className="group">
-              <Card className="h-full border-2 border-transparent hover:border-primary/50 transition-all duration-300 hover:shadow-lg group-hover:scale-[1.02]">
-                <CardContent className="pt-8 pb-6 text-center">
-                  <div className="w-14 h-14 mx-auto mb-5 rounded-2xl bg-gradient-to-br from-primary to-primary-glow flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <BookOpen className="w-7 h-7 text-white" />
-                  </div>
-                  <h3 className="text-xl font-bold mb-3">Amazon FBA Débutant</h3>
-                  <p className="text-muted-foreground text-sm mb-5">
-                    Comprendre Amazon FBA et se lancer étape par étape, même en partant de zéro.
-                  </p>
-                  <span className="inline-flex items-center text-primary font-medium text-sm group-hover:gap-2 transition-all">
-                    Lire le guide <ArrowRight className="w-4 h-4 ml-1" />
-                  </span>
-                </CardContent>
-              </Card>
-            </Link>
+          <div className="flex flex-col lg:flex-row items-center gap-8 lg:gap-12">
+            <div className="text-center lg:text-left lg:flex-shrink-0">
+              <h2 className="text-2xl md:text-3xl font-bold mb-2">Guides Amazon FBA</h2>
+              <p className="text-muted-foreground text-sm max-w-xs">
+                Maîtrise les fondamentaux
+              </p>
+            </div>
             
-            <Link to="/outil-amazon-fba" className="group">
-              <Card className="h-full border-2 border-transparent hover:border-secondary/50 transition-all duration-300 hover:shadow-lg group-hover:scale-[1.02]">
-                <CardContent className="pt-8 pb-6 text-center">
-                  <div className="w-14 h-14 mx-auto mb-5 rounded-2xl bg-gradient-to-br from-secondary to-accent flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <Wrench className="w-7 h-7 text-white" />
-                  </div>
-                  <h3 className="text-xl font-bold mb-3">Outil Amazon FBA</h3>
-                  <p className="text-muted-foreground text-sm mb-5">
-                    La solution tout-en-un pour analyser des produits et vendre plus efficacement.
-                  </p>
-                  <span className="inline-flex items-center text-secondary font-medium text-sm group-hover:gap-2 transition-all">
-                    Découvrir <ArrowRight className="w-4 h-4 ml-1" />
-                  </span>
-                </CardContent>
-              </Card>
-            </Link>
-            
-            <Link to="/produits-rentables-amazon" className="group">
-              <Card className="h-full border-2 border-transparent hover:border-primary/50 transition-all duration-300 hover:shadow-lg group-hover:scale-[1.02]">
-                <CardContent className="pt-8 pb-6 text-center">
-                  <div className="w-14 h-14 mx-auto mb-5 rounded-2xl bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <Target className="w-7 h-7 text-white" />
-                  </div>
-                  <h3 className="text-xl font-bold mb-3">Produits rentables Amazon</h3>
-                  <p className="text-muted-foreground text-sm mb-5">
-                    Méthode professionnelle pour identifier des opportunités réellement rentables.
-                  </p>
-                  <span className="inline-flex items-center text-green-600 dark:text-green-500 font-medium text-sm group-hover:gap-2 transition-all">
-                    Voir la méthode <ArrowRight className="w-4 h-4 ml-1" />
-                  </span>
-                </CardContent>
-              </Card>
-            </Link>
+            <div className="flex flex-wrap justify-center lg:justify-start gap-4 flex-1">
+              <Link to="/amazon-fba-debutant" className="group flex items-center gap-3 px-5 py-3 rounded-full border-2 border-primary/20 bg-background hover:border-primary hover:bg-primary/5 transition-all duration-300">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-primary-glow flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <BookOpen className="w-5 h-5 text-white" />
+                </div>
+                <div className="text-left">
+                  <span className="font-semibold text-sm block">FBA Débutant</span>
+                  <span className="text-xs text-muted-foreground">Se lancer de zéro</span>
+                </div>
+                <ArrowRight className="w-4 h-4 text-primary opacity-0 group-hover:opacity-100 transition-opacity" />
+              </Link>
+              
+              <Link to="/outil-amazon-fba" className="group flex items-center gap-3 px-5 py-3 rounded-full border-2 border-secondary/20 bg-background hover:border-secondary hover:bg-secondary/5 transition-all duration-300">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-secondary to-accent flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <Wrench className="w-5 h-5 text-white" />
+                </div>
+                <div className="text-left">
+                  <span className="font-semibold text-sm block">Outils FBA</span>
+                  <span className="text-xs text-muted-foreground">Analyser efficacement</span>
+                </div>
+                <ArrowRight className="w-4 h-4 text-secondary opacity-0 group-hover:opacity-100 transition-opacity" />
+              </Link>
+              
+              <Link to="/produits-rentables-amazon" className="group flex items-center gap-3 px-5 py-3 rounded-full border-2 border-green-500/20 bg-background hover:border-green-500 hover:bg-green-500/5 transition-all duration-300">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <Target className="w-5 h-5 text-white" />
+                </div>
+                <div className="text-left">
+                  <span className="font-semibold text-sm block">Produits rentables</span>
+                  <span className="text-xs text-muted-foreground">Trouver les pépites</span>
+                </div>
+                <ArrowRight className="w-4 h-4 text-green-500 opacity-0 group-hover:opacity-100 transition-opacity" />
+              </Link>
+            </div>
           </div>
         </div>
       </section>
