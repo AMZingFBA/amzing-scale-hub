@@ -240,51 +240,66 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Guides Amazon FBA - Section SEO - Compact horizontal style */}
-      <section className="py-12 border-y border-border/50 bg-gradient-to-r from-primary/5 via-transparent to-secondary/5">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col lg:flex-row items-center gap-8 lg:gap-12">
-            <div className="text-center lg:text-left lg:flex-shrink-0">
-              <h2 className="text-2xl md:text-3xl font-bold mb-2">Guides Amazon FBA</h2>
-              <p className="text-muted-foreground text-sm max-w-xs">
-                Maîtrise les fondamentaux
-              </p>
-            </div>
+      {/* Guides Amazon FBA - Section SEO - Bold banner style */}
+      <section className="py-16 relative overflow-hidden">
+        {/* Animated background */}
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-secondary/10 to-primary/20" />
+        <div className="absolute top-0 left-1/4 w-64 h-64 bg-primary/20 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-0 right-1/4 w-48 h-48 bg-secondary/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+        
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="text-center mb-10">
+            <Badge className="mb-4 bg-primary/20 text-primary border-primary/30 animate-fade-in">
+              📚 Ressources gratuites
+            </Badge>
+            <h2 className="text-3xl md:text-4xl font-bold mb-3">Guides Amazon FBA</h2>
+            <p className="text-muted-foreground max-w-md mx-auto">
+              Maîtrise les fondamentaux avant de te lancer
+            </p>
+          </div>
+          
+          <div className="flex flex-wrap justify-center gap-6 max-w-4xl mx-auto">
+            <Link to="/amazon-fba-debutant" className="group relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-primary to-primary-glow rounded-2xl blur-lg opacity-50 group-hover:opacity-80 transition-opacity" />
+              <div className="relative flex items-center gap-4 px-6 py-4 rounded-2xl bg-background/90 backdrop-blur border-2 border-primary/30 hover:border-primary hover:scale-105 transition-all duration-300 shadow-lg">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-primary-glow flex items-center justify-center group-hover:rotate-6 transition-transform">
+                  <BookOpen className="w-6 h-6 text-white" />
+                </div>
+                <div className="text-left">
+                  <span className="font-bold block">FBA Débutant</span>
+                  <span className="text-sm text-muted-foreground">Se lancer de zéro</span>
+                </div>
+                <ArrowRight className="w-5 h-5 text-primary group-hover:translate-x-1 transition-transform" />
+              </div>
+            </Link>
             
-            <div className="flex flex-wrap justify-center lg:justify-start gap-4 flex-1">
-              <Link to="/amazon-fba-debutant" className="group flex items-center gap-3 px-5 py-3 rounded-full border-2 border-primary/20 bg-background hover:border-primary hover:bg-primary/5 transition-all duration-300">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-primary-glow flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <BookOpen className="w-5 h-5 text-white" />
+            <Link to="/outil-amazon-fba" className="group relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-secondary to-accent rounded-2xl blur-lg opacity-50 group-hover:opacity-80 transition-opacity" />
+              <div className="relative flex items-center gap-4 px-6 py-4 rounded-2xl bg-background/90 backdrop-blur border-2 border-secondary/30 hover:border-secondary hover:scale-105 transition-all duration-300 shadow-lg">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-secondary to-accent flex items-center justify-center group-hover:rotate-6 transition-transform">
+                  <Wrench className="w-6 h-6 text-white" />
                 </div>
                 <div className="text-left">
-                  <span className="font-semibold text-sm block">FBA Débutant</span>
-                  <span className="text-xs text-muted-foreground">Se lancer de zéro</span>
+                  <span className="font-bold block">Outils FBA</span>
+                  <span className="text-sm text-muted-foreground">Analyser efficacement</span>
                 </div>
-                <ArrowRight className="w-4 h-4 text-primary opacity-0 group-hover:opacity-100 transition-opacity" />
-              </Link>
-              
-              <Link to="/outil-amazon-fba" className="group flex items-center gap-3 px-5 py-3 rounded-full border-2 border-secondary/20 bg-background hover:border-secondary hover:bg-secondary/5 transition-all duration-300">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-secondary to-accent flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <Wrench className="w-5 h-5 text-white" />
-                </div>
-                <div className="text-left">
-                  <span className="font-semibold text-sm block">Outils FBA</span>
-                  <span className="text-xs text-muted-foreground">Analyser efficacement</span>
-                </div>
-                <ArrowRight className="w-4 h-4 text-secondary opacity-0 group-hover:opacity-100 transition-opacity" />
-              </Link>
-              
-              <Link to="/produits-rentables-amazon" className="group flex items-center gap-3 px-5 py-3 rounded-full border-2 border-green-500/20 bg-background hover:border-green-500 hover:bg-green-500/5 transition-all duration-300">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <Target className="w-5 h-5 text-white" />
+                <ArrowRight className="w-5 h-5 text-secondary group-hover:translate-x-1 transition-transform" />
+              </div>
+            </Link>
+            
+            <Link to="/produits-rentables-amazon" className="group relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-green-500 to-green-600 rounded-2xl blur-lg opacity-50 group-hover:opacity-80 transition-opacity" />
+              <div className="relative flex items-center gap-4 px-6 py-4 rounded-2xl bg-background/90 backdrop-blur border-2 border-green-500/30 hover:border-green-500 hover:scale-105 transition-all duration-300 shadow-lg">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center group-hover:rotate-6 transition-transform">
+                  <Target className="w-6 h-6 text-white" />
                 </div>
                 <div className="text-left">
-                  <span className="font-semibold text-sm block">Produits rentables</span>
-                  <span className="text-xs text-muted-foreground">Trouver les pépites</span>
+                  <span className="font-bold block">Produits rentables</span>
+                  <span className="text-sm text-muted-foreground">Trouver les pépites</span>
                 </div>
-                <ArrowRight className="w-4 h-4 text-green-500 opacity-0 group-hover:opacity-100 transition-opacity" />
-              </Link>
-            </div>
+                <ArrowRight className="w-5 h-5 text-green-500 group-hover:translate-x-1 transition-transform" />
+              </div>
+            </Link>
           </div>
         </div>
       </section>
