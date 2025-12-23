@@ -5,7 +5,7 @@ import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import SEO from '@/components/SEO';
-import { seoData } from '@/lib/seo-data';
+import { seoData, schemas } from '@/lib/seo-data';
 import { useScrollReveal } from '@/hooks/use-scroll-reveal';
 import { cn } from '@/lib/utils';
 
@@ -23,6 +23,7 @@ const OutilAmazonFba = () => {
         description={seoData.outilAmazonFba.description}
         keywords={seoData.outilAmazonFba.keywords}
         robots={seoData.outilAmazonFba.robots}
+        schema={schemas.outilAmazonFbaArticle}
       />
       <Navbar />
       
