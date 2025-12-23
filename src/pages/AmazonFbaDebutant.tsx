@@ -161,7 +161,7 @@ const AmazonFbaDebutant = () => {
                   {
                     step: 5,
                     title: "Stocker et expédier",
-                    description: "Envoie tes produits dans les entrepôts Amazon (FBA), stocke-les chez toi et expédie à chaque vente (FBM), ou délègue tout à notre service AMZing FBA 360. À toi de choisir !"
+                    description: "Envoie tes produits dans les entrepôts Amazon (FBA), ou stocke-les chez toi et expédie à chaque vente (FBM), ou délègue tout à notre service AMZing FBA 360. À toi de choisir !"
                   },
                   {
                     step: 6,
