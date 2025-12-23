@@ -139,7 +139,7 @@ const ProduitsRentablesAmazon = () => {
         <section 
           ref={section2Anim.ref}
           className={cn(
-            "py-20 bg-accent/30 transition-all duration-700",
+            "py-20 bg-muted/30 transition-all duration-700",
             section2Anim.isVisible ? "opacity-100 translate-x-0" : "opacity-0 translate-x-10"
           )}
         >
