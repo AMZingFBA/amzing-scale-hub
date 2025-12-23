@@ -13,9 +13,9 @@ export const seoData: Record<string, SeoPageData> = {
   // ============================================
   
   home: {
-    title: "AMZing FBA – Formation Amazon FBA & Produits rentables",
-    description: "AMZing FBA est une formation Amazon FBA couplée à une plateforme complète : guides, moniteurs de produits rentables, catalogue fournisseurs, cashback et logistique pour construire un business e-commerce rentable.",
-    keywords: "formation amazon fba, guide amazon fba, business e-commerce rentable, produits rentables amazon, moniteurs produits rentables",
+    title: "AMZing FBA – Plateforme tout-en-un pour réussir sur Amazon FBA",
+    description: "AMZing FBA : outils, méthode, sourcing et communauté pour vendre sur Amazon. Accède à une plateforme complète pour lancer ton business Amazon FBA.",
+    keywords: "outil amazon fba, plateforme amazon fba, vendre sur amazon, solution amazon fba, business amazon fba, moniteurs produits rentables",
     robots: "index,follow",
   },
   
@@ -940,5 +940,157 @@ export const schemas = {
       "@id": "https://amzingfba.com/produits-rentables-amazon"
     },
     "image": "https://amzingfba.com/logo-amzing.png"
+  },
+
+  // Schema combiné pour la home page
+  homePageSchemas: [
+    // Organization
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "AMZing FBA",
+      "legalName": "N.Z Consulting",
+      "url": "https://amzingfba.com/",
+      "logo": "https://amzingfba.com/logo-amzing.png",
+      "description": "AMZing FBA est une plateforme tout-en-un pour réussir sur Amazon FBA : outils, méthode, sourcing et communauté.",
+      "email": "contact@amzingfba.com",
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "contactType": "Customer Service",
+        "email": "contact@amzingfba.com",
+        "availableLanguage": ["French"]
+      },
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "59 Rue de Ponthieu",
+        "addressLocality": "Paris",
+        "postalCode": "75008",
+        "addressCountry": "FR"
+      },
+      "sameAs": [
+        "https://www.instagram.com/amzingfba"
+      ]
+    },
+    // WebSite + SearchAction
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "AMZing FBA",
+      "url": "https://amzingfba.com/",
+      "description": "Plateforme tout-en-un pour réussir sur Amazon FBA",
+      "publisher": {
+        "@type": "Organization",
+        "name": "AMZing FBA"
+      }
+    },
+    // SoftwareApplication
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "AMZing FBA",
+      "applicationCategory": "BusinessApplication",
+      "operatingSystem": "iOS, Android, Web",
+      "offers": {
+        "@type": "Offer",
+        "price": "34.99",
+        "priceCurrency": "EUR",
+        "priceValidUntil": "2025-12-31"
+      },
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.8",
+        "reviewCount": "127"
+      },
+      "downloadUrl": "https://apps.apple.com/app/amzing-fba",
+      "screenshot": "https://amzingfba.com/logo-amzing.png"
+    }
+  ],
+
+  // FAQ étendue pour la home (10 questions)
+  homeFAQ: {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "C'est quoi Amazon FBA ?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Amazon FBA (Fulfillment by Amazon) est un service où Amazon stocke, emballe et expédie vos produits. Vous vous concentrez sur le sourcing et les ventes, Amazon gère la logistique. Vous bénéficiez du badge Prime et d'une visibilité accrue sur la marketplace."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "AMZing FBA est une formation ou un outil ?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "AMZing FBA est une plateforme tout-en-un qui combine les deux : une méthode structurée (formation) + des outils concrets (moniteurs de produits rentables, catalogue fournisseurs) + une communauté active. Ce n'est pas juste une formation théorique."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Est-ce adapté aux débutants ?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Oui, AMZing FBA est conçu pour accompagner les débutants étape par étape : de la création de compte vendeur à la première vente. La méthode est progressive et les outils simplifient la recherche de produits."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Combien coûte l'abonnement ?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "L'abonnement AMZing FBA est à 34,99€/mois. Il inclut l'accès complet à la plateforme : méthode, moniteurs, catalogue fournisseurs, communauté et support. Sans engagement, résiliable à tout moment."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "En combien de temps on peut se lancer ?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Avec AMZing FBA, vous pouvez créer votre compte vendeur et identifier vos premiers produits en quelques jours. Les premières ventes rentables arrivent généralement entre 2 et 4 mois selon le temps investi."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Comment trouver un produit rentable ?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "AMZing FBA propose des moniteurs automatiques qui analysent les prix, la demande et la concurrence pour identifier des opportunités. La méthode vous apprend ensuite à valider ces idées avant d'investir."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Est-ce que vous aidez sur Amazon Ads ?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Oui, la formation inclut les bases d'Amazon Ads (PPC) : création de campagnes, analyse des résultats et optimisation du budget publicitaire pour maximiser votre ROI."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Quelle différence entre FBA et FBM ?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "FBA (Fulfillment by Amazon) : Amazon gère stockage et expédition, vous avez le badge Prime. FBM (Fulfillment by Merchant) : vous gérez vous-même la logistique. AMZing FBA couvre les deux modèles et propose même un service logistique (AMZing FBA 360)."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Est-ce légal ? Faut-il créer une société ?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Oui, vendre sur Amazon est 100% légal. Vous devez créer une structure (micro-entreprise, SASU, EURL...) pour facturer. AMZing FBA inclut des guides sur la création de société et les obligations légales."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Peut-on arrêter quand on veut ?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Oui, l'abonnement AMZing FBA est sans engagement. Vous pouvez l'annuler à tout moment depuis votre espace membre. Pas de frais cachés ni de période d'engagement."
+        }
+      }
+    ]
   }
 };
