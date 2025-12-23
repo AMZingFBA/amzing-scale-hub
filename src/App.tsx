@@ -75,7 +75,9 @@ const AdminAirtableContacts = lazy(() => import("./pages/AdminAirtableContacts")
 const AdminAirtableUsers = lazy(() => import("./pages/AdminAirtableUsers"));
 const Partenaires = lazy(() => import("./pages/Partenaires"));
 const AndroidApp = lazy(() => import("./pages/AndroidApp"));
-
+const AmazonFbaDebutant = lazy(() => import("./pages/AmazonFbaDebutant"));
+const OutilAmazonFba = lazy(() => import("./pages/OutilAmazonFba"));
+const ProduitsRentablesAmazon = lazy(() => import("./pages/ProduitsRentablesAmazon"));
 const queryClient = new QueryClient();
 
 // Loading fallback minimal pour le lazy loading
@@ -166,6 +168,9 @@ const App = () => (
             <Route path="/admin/airtable-users" element={<AdminAirtableUsers />} />
             <Route path="/partenaires" element={<Partenaires />} />
             <Route path="/android" element={<AndroidApp />} />
+            <Route path="/amazon-fba-debutant" element={<AmazonFbaDebutant />} />
+            <Route path="/outil-amazon-fba" element={<OutilAmazonFba />} />
+            <Route path="/produits-rentables-amazon" element={<ProduitsRentablesAmazon />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

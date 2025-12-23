@@ -223,41 +223,45 @@ export const seoData: Record<string, SeoPageData> = {
   },
   
   debuter: {
-    title: "Débuter sur Amazon FBA – Guide Complet pour Débutants | AMZing FBA",
-    description: "Découvre le parcours complet pour bien débuter sur Amazon FBA : création de société, compte vendeur, outils et méthode AMZing FBA pour réussir ton premier business e-commerce.",
-    keywords: "débuter amazon fba, commencer amazon fba, guide débutant amazon fba, lancer business amazon, premiers pas amazon fba",
-    robots: "index,follow",
+    title: "Débuter sur Amazon FBA – Espace Membre VIP | AMZing FBA",
+    description: "Espace membre VIP pour débuter sur Amazon FBA : création de société, compte vendeur, outils et méthode AMZing FBA.",
+    robots: "noindex,nofollow",
   },
   
   gestionProduitsInfo: {
-    title: "Gestion de Produits & Logistique Amazon FBA | AMZing FBA 360",
-    description: "Service de gestion logistique complète pour vendeurs Amazon FBA : stockage, préparation, expédition et SAV. Confiez-nous votre logistique et concentrez-vous sur vos ventes.",
-    keywords: "gestion produits amazon fba, logistique amazon fba, service prep center, stockage fba, expédition amazon",
-    robots: "index,follow",
-  },
-  
-  factureAutorisation: {
-    title: "Factures & autorisations – AMZing FBA",
-    description: "Gère tes factures, autorisations et justificatifs liés à ton activité Amazon FBA.",
-    robots: "noindex,follow",
-  },
-  
-  cashback: {
-    title: "Cashback fournisseurs – Espace membre AMZing FBA",
-    description: "Accède à ton espace cashback fournisseurs et suis les montants récupérés sur tes achats pour Amazon FBA.",
-    robots: "noindex,follow",
-  },
-  
-  avisPage: {
-    title: "Guide avis clients Amazon – AMZing FBA",
-    description: "Guide pratique pour obtenir davantage d'avis clients sur Amazon et améliorer la crédibilité de tes fiches produits.",
-    robots: "noindex,follow",
+    title: "Gestion de Produits & Logistique – Espace Membre VIP | AMZing FBA 360",
+    description: "Service de gestion logistique complète pour vendeurs Amazon FBA. Espace réservé aux membres.",
+    robots: "noindex,nofollow",
   },
   
   catalogue: {
-    title: "Catalogue Produits Rentables Amazon FBA & Communauté VIP | AMZing FBA",
-    description: "Rejoins la communauté #1 des vendeurs Amazon FBA : formation complète, catalogue de produits rentables mis à jour, analyses de marché et support prioritaire 7j/7.",
-    keywords: "catalogue produits amazon fba, communauté vendeurs amazon, produits rentables fba, formation amazon fba",
+    title: "Catalogue Produits Rentables – Espace Membre VIP | AMZing FBA",
+    description: "Catalogue exclusif de produits rentables pour les membres VIP AMZing FBA.",
+    robots: "noindex,nofollow",
+  },
+  
+  // ============================================
+  // PAGES SEO PUBLIQUES
+  // ============================================
+  
+  amazonFbaDebutant: {
+    title: "Amazon FBA Débutant : Guide simple pour se lancer en 2025",
+    description: "Découvrez Amazon FBA, comment vendre sur Amazon et se lancer facilement grâce à une méthode claire et des outils professionnels.",
+    keywords: "amazon fba, amazon fba débutant, comment vendre sur amazon, business amazon, gagner de l'argent sur amazon, se lancer sur amazon fba",
+    robots: "index,follow",
+  },
+  
+  outilAmazonFba: {
+    title: "Outil Amazon FBA : la solution tout-en-un pour vendeurs",
+    description: "Découvrez un outil Amazon FBA complet pour analyser les produits, trouver des opportunités et vendre efficacement.",
+    keywords: "outil amazon fba, logiciel amazon fba, analyse produit amazon, trouver des produits rentables amazon, outil vendeur amazon",
+    robots: "index,follow",
+  },
+  
+  produitsRentablesAmazon: {
+    title: "Produits rentables Amazon : comment les trouver efficacement",
+    description: "Apprenez à identifier des produits rentables sur Amazon grâce à une méthode fiable et des outils professionnels.",
+    keywords: "produits rentables amazon, produit gagnant amazon, idée produit amazon, trouver produit amazon, business amazon rentable",
     robots: "index,follow",
   },
   
