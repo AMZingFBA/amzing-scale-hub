@@ -18,7 +18,7 @@ const Partenaires = () => {
             <a 
               href="https://www.formationmax.com" 
               target="_blank" 
-              rel="noopener"
+              rel="noopener nofollow sponsored"
               className="text-primary hover:underline"
             >
               FormationMax.com - Annuaire de formations
