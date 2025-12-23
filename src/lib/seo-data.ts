@@ -761,5 +761,87 @@ export const schemas = {
       "https://amzingfba.com/tarifs",
       "https://amzingfba.com/contact"
     ]
+  },
+
+  // Schemas pour pages SEO publiques
+  amazonFbaDebutantArticle: {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "Amazon FBA Débutant : Guide simple pour se lancer en 2025",
+    "description": "Découvrez Amazon FBA, comment vendre sur Amazon et se lancer facilement grâce à une méthode claire et des outils professionnels.",
+    "author": {
+      "@type": "Organization",
+      "name": "AMZing FBA",
+      "url": "https://amzingfba.com"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "AMZing FBA",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://amzingfba.com/logo-amzing.png"
+      }
+    },
+    "datePublished": "2025-01-01",
+    "dateModified": "2025-12-23",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "https://amzingfba.com/amazon-fba-debutant"
+    },
+    "image": "https://amzingfba.com/logo-amzing.png"
+  },
+
+  outilAmazonFbaArticle: {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "Outil Amazon FBA : la solution tout-en-un pour vendeurs",
+    "description": "Découvrez un outil Amazon FBA complet pour analyser les produits, trouver des opportunités et vendre efficacement.",
+    "author": {
+      "@type": "Organization",
+      "name": "AMZing FBA",
+      "url": "https://amzingfba.com"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "AMZing FBA",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://amzingfba.com/logo-amzing.png"
+      }
+    },
+    "datePublished": "2025-01-01",
+    "dateModified": "2025-12-23",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "https://amzingfba.com/outil-amazon-fba"
+    },
+    "image": "https://amzingfba.com/logo-amzing.png"
+  },
+
+  produitsRentablesAmazonArticle: {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "Produits rentables Amazon : comment les trouver efficacement",
+    "description": "Apprenez à identifier des produits rentables sur Amazon grâce à une méthode fiable et des outils professionnels.",
+    "author": {
+      "@type": "Organization",
+      "name": "AMZing FBA",
+      "url": "https://amzingfba.com"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "AMZing FBA",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://amzingfba.com/logo-amzing.png"
+      }
+    },
+    "datePublished": "2025-01-01",
+    "dateModified": "2025-12-23",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "https://amzingfba.com/produits-rentables-amazon"
+    },
+    "image": "https://amzingfba.com/logo-amzing.png"
   }
 };
