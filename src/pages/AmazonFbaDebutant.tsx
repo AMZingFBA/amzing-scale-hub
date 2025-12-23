@@ -313,7 +313,7 @@ const AmazonFbaDebutant = () => {
                   <CardContent className="pt-6">
                     <Target className="w-12 h-12 text-primary mx-auto mb-4" />
                     <h3 className="font-bold text-lg mb-2">Produits analysés</h3>
-                    <p className="text-muted-foreground text-sm">Catalogue de produits rentables mis à jour régulièrement</p>
+                    <p className="text-muted-foreground text-sm">Produits rentables envoyés tous les jours</p>
                   </CardContent>
                 </Card>
                 
