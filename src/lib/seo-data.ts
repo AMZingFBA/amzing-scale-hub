@@ -223,15 +223,17 @@ export const seoData: Record<string, SeoPageData> = {
   },
   
   debuter: {
-    title: "Débuter sur Amazon FBA – Parcours guidé | AMZing FBA",
-    description: "Suis le parcours guidé pour bien débuter sur Amazon FBA avec la méthode AMZing FBA.",
-    robots: "noindex,follow",
+    title: "Débuter sur Amazon FBA – Guide Complet pour Débutants | AMZing FBA",
+    description: "Découvre le parcours complet pour bien débuter sur Amazon FBA : création de société, compte vendeur, outils et méthode AMZing FBA pour réussir ton premier business e-commerce.",
+    keywords: "débuter amazon fba, commencer amazon fba, guide débutant amazon fba, lancer business amazon, premiers pas amazon fba",
+    robots: "index,follow",
   },
   
-  gestionProduits: {
-    title: "Gestion de tes produits Amazon FBA – AMZing FBA",
-    description: "Centralise les informations sur tes produits Amazon FBA et suis leur performance depuis ton espace AMZing FBA.",
-    robots: "noindex,follow",
+  gestionProduitsInfo: {
+    title: "Gestion de Produits & Logistique Amazon FBA | AMZing FBA 360",
+    description: "Service de gestion logistique complète pour vendeurs Amazon FBA : stockage, préparation, expédition et SAV. Confiez-nous votre logistique et concentrez-vous sur vos ventes.",
+    keywords: "gestion produits amazon fba, logistique amazon fba, service prep center, stockage fba, expédition amazon",
+    robots: "index,follow",
   },
   
   factureAutorisation: {
@@ -253,9 +255,10 @@ export const seoData: Record<string, SeoPageData> = {
   },
   
   catalogue: {
-    title: "Catalogue fournisseurs & produits – AMZing FBA",
-    description: "Explore le catalogue de fournisseurs et de produits proposés aux membres AMZing FBA.",
-    robots: "noindex,follow",
+    title: "Catalogue Produits Rentables Amazon FBA & Communauté VIP | AMZing FBA",
+    description: "Rejoins la communauté #1 des vendeurs Amazon FBA : formation complète, catalogue de produits rentables mis à jour, analyses de marché et support prioritaire 7j/7.",
+    keywords: "catalogue produits amazon fba, communauté vendeurs amazon, produits rentables fba, formation amazon fba",
+    robots: "index,follow",
   },
   
   catalogueProduits: {
