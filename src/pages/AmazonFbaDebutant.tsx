@@ -150,23 +150,23 @@ const AmazonFbaDebutant = () => {
                   },
                   {
                     step: 3,
-                    title: "Trouver des produits rentables",
-                    description: "C'est l'étape clé ! Il faut identifier des produits avec une bonne marge, une demande suffisante et peu de concurrence."
+                    title: "Rejoindre AMZing FBA",
+                    description: "Abonne-toi à AMZing FBA et reçois chaque semaine des produits rentables prêts à vendre. Tu n'as plus qu'à copier-coller nos opportunités validées."
                   },
                   {
                     step: 4,
-                    title: "Sourcer tes produits",
-                    description: "Acheter tes produits auprès de fournisseurs, grossistes ou fabricants. Négocier les prix pour maximiser ta marge."
+                    title: "Acheter, lister et encaisser",
+                    description: "Commande les produits chez nos fournisseurs partenaires, mets-les en vente sur ton compte Amazon Seller, et encaisse tes bénéfices. Simple, efficace, rentable."
                   },
                   {
                     step: 5,
                     title: "Envoyer à Amazon",
-                    description: "Préparer et expédier tes produits vers les entrepôts Amazon (ou utiliser un prep center comme AMZing FBA 360)."
+                    description: "Prépare et expédie tes produits vers les entrepôts Amazon (ou utilise notre service AMZing FBA 360 pour tout déléguer)."
                   },
                   {
                     step: 6,
-                    title: "Vendre et scaler",
-                    description: "Une fois tes produits en ligne, optimiser tes fiches, gérer ton stock et développer ton catalogue."
+                    title: "Scaler ton business",
+                    description: "Réinvestis tes gains, développe ton catalogue et fais grandir ton business Amazon mois après mois."
                   }
                 ].map((item) => (
                   <Card key={item.step} className="border-primary/20 hover:border-primary/40 transition-all hover:shadow-lg">
