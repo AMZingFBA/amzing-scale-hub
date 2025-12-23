@@ -211,38 +211,52 @@ const AmazonFbaDebutant = () => {
               
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {[
+                  // 1. Hook - Ce qu'ils veulent le plus
                   {
-                    title: "Produits rentables livrés",
-                    description: "Chaque semaine, on te livre des produits analysés et validés, prêts à vendre."
+                    title: "Produits rentables chaque jour",
+                    description: "Chaque jour, on t'envoie des produits analysés et validés, prêts à vendre."
                   },
+                  // 2. Intelligence - On fait le travail pour eux
                   {
-                    title: "Accès fournisseurs",
-                    description: "Connexion directe avec nos fournisseurs partenaires. Tu commandes en quelques clics."
+                    title: "Analyse des tendances",
+                    description: "On surveille le marché et les tendances pour toi. Tu reçois les meilleures opportunités au bon moment."
                   },
+                  // 3. Calculs - Ils savent exactement combien gagner
+                  {
+                    title: "Calculs automatiques",
+                    description: "ROI, marge, frais Amazon... Tout est calculé. Tu sais exactement combien tu vas gagner."
+                  },
+                  // 4. Accès exclusif - FOMO
                   {
                     title: "Listings exclusifs",
                     description: "Accès à des opportunités que tu ne trouveras nulle part ailleurs."
                   },
+                  // 5. Fournisseurs - Connexion directe
                   {
-                    title: "Calculs automatiques",
-                    description: "ROI, marge, frais Amazon... Tout est calculé pour toi."
+                    title: "Accès fournisseurs",
+                    description: "Connexion directe avec nos fournisseurs partenaires. Tu commandes en quelques clics."
                   },
+                  // 6. Logistique - Zéro effort
                   {
-                    title: "Service logistique",
+                    title: "Service logistique complet",
                     description: "AMZing FBA 360 stocke et expédie tes produits. Tu ne touches à rien."
                   },
+                  // 7. Marketplace - Opportunités entre membres
                   {
                     title: "Marketplace membres",
                     description: "Achète et revends des stocks entre membres de la communauté."
                   },
+                  // 8. Formation - Savoir-faire
                   {
                     title: "Formation complète",
                     description: "Guides, tutoriels et ressources pour maîtriser Amazon de A à Z."
                   },
+                  // 9. Communauté - Preuve sociale
                   {
                     title: "Communauté active",
                     description: "Échange avec des vendeurs expérimentés, pose tes questions 7j/7."
                   },
+                  // 10. Support - Sécurité
                   {
                     title: "Support prioritaire",
                     description: "Une équipe dédiée pour t'accompagner à chaque étape."
