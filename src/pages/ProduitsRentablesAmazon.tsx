@@ -1,4 +1,4 @@
-import { ArrowRight, CheckCircle2, Search, TrendingUp, BarChart3, Lightbulb, DollarSign, Package, Zap, Clock, Eye, ShoppingCart } from 'lucide-react';
+import { ArrowRight, ArrowLeft, CheckCircle2, Search, TrendingUp, BarChart3, Lightbulb, DollarSign, Package, Zap, Clock, Eye, ShoppingCart } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -27,6 +27,16 @@ const ProduitsRentablesAmazon = () => {
       />
       <Navbar />
       
+      {/* Back Button */}
+      <div className="fixed top-24 left-4 z-40">
+        <Link 
+          to="/" 
+          className="flex items-center justify-center w-10 h-10 rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 hover:scale-110 transition-all duration-200"
+        >
+          <ArrowLeft className="w-5 h-5" />
+        </Link>
+      </div>
+
       <main className="flex-grow">
         {/* Hero Section */}
         <section 
