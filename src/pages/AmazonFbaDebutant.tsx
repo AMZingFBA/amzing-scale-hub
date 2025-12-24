@@ -123,14 +123,6 @@ const AmazonFbaDebutant = () => {
                 <ChevronRight className="h-4 w-4" />
               </BreadcrumbSeparator>
               <BreadcrumbItem>
-                <BreadcrumbLink asChild>
-                  <Link to="/guides">Guides</Link>
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator>
-                <ChevronRight className="h-4 w-4" />
-              </BreadcrumbSeparator>
-              <BreadcrumbItem>
                 <BreadcrumbPage>Amazon FBA : c'est quoi ?</BreadcrumbPage>
               </BreadcrumbItem>
             </BreadcrumbList>
