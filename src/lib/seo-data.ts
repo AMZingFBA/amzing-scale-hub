@@ -245,9 +245,9 @@ export const seoData: Record<string, SeoPageData> = {
   // ============================================
   
   amazonFbaDebutant: {
-    title: "Amazon FBA Débutant : Guide simple pour se lancer en 2025",
-    description: "Découvrez Amazon FBA, comment vendre sur Amazon et se lancer facilement grâce à une méthode claire et des outils professionnels.",
-    keywords: "amazon fba, amazon fba débutant, comment vendre sur amazon, business amazon, gagner de l'argent sur amazon, se lancer sur amazon fba",
+    title: "Amazon FBA : c'est quoi ? Définition, fonctionnement, coûts et différences avec FBM",
+    description: "Amazon FBA, c'est quoi ? Définition claire, fonctionnement étape par étape, coûts, avantages/inconvénients et différences avec FBM. Guide complet 2025.",
+    keywords: "amazon fba c'est quoi, amazon fba définition, amazon fba fonctionnement, c'est quoi fba amazon, amazon fba vs fbm, amazon fba avantages inconvénients, combien ça coûte amazon fba, comment commencer amazon fba",
     robots: "index,follow",
   },
   
@@ -864,8 +864,8 @@ export const schemas = {
   amazonFbaDebutantArticle: {
     "@context": "https://schema.org",
     "@type": "Article",
-    "headline": "Amazon FBA Débutant : Guide simple pour se lancer en 2025",
-    "description": "Découvrez Amazon FBA, comment vendre sur Amazon et se lancer facilement grâce à une méthode claire et des outils professionnels.",
+    "headline": "Amazon FBA : c'est quoi ? Définition, fonctionnement, coûts et différences avec FBM",
+    "description": "Amazon FBA, c'est quoi ? Définition claire, fonctionnement étape par étape, coûts, avantages/inconvénients et différences avec FBM. Guide complet 2025.",
     "author": {
       "@type": "Organization",
       "name": "AMZing FBA",
@@ -880,12 +880,108 @@ export const schemas = {
       }
     },
     "datePublished": "2025-01-01",
-    "dateModified": "2025-12-23",
+    "dateModified": "2025-12-24",
     "mainEntityOfPage": {
       "@type": "WebPage",
       "@id": "https://amzingfba.com/amazon-fba-debutant"
     },
     "image": "https://amzingfba.com/logo-amzing.png"
+  },
+
+  amazonFbaDebutantFAQ: {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "C'est quoi Amazon FBA exactement ?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Amazon FBA (Fulfillment By Amazon) signifie 'Expédié par Amazon'. C'est un service où tu envoies tes produits dans les entrepôts Amazon, et Amazon gère tout : stockage, emballage, livraison, service client et retours. Tu te concentres sur la vente, Amazon s'occupe de la logistique."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Quelle est la différence entre FBA et FBM ?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "En FBA, Amazon gère la logistique (stockage, expédition, SAV). En FBM (Fulfilled By Merchant), tu gères tout toi-même depuis chez toi. FBA offre l'accès Prime et une meilleure visibilité, mais avec des frais Amazon. FBM donne plus de contrôle et des marges potentiellement plus élevées sur certains produits."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Combien ça coûte de vendre en Amazon FBA ?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Les coûts incluent : l'abonnement vendeur pro (39€/mois HT), les frais de fulfillment (2-5€ par unité selon taille/poids), les frais de stockage (25-40€/m³/mois) et la commission Amazon (7-15% selon catégorie). Prévois un budget initial de 500-2000€ pour ton premier stock."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Est-ce que Amazon FBA est rentable en 2025 ?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Oui, Amazon FBA reste rentable en 2025, mais la réussite dépend de plusieurs facteurs : choix des produits (marge suffisante), gestion des coûts, qualité du sourcing et stratégie marketing. Avec une bonne méthode et des outils adaptés, des marges de 15-30% sont réalistes."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Quel budget pour commencer Amazon FBA ?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Pour débuter sérieusement, prévois 1000-3000€ : 500-2000€ pour ton premier stock, 39€/mois pour le compte vendeur Amazon, et un budget optionnel pour les outils et la formation. Tu peux démarrer avec moins, mais tes premiers résultats seront limités."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Comment trouver des produits rentables pour Amazon FBA ?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Plusieurs méthodes : l'arbitrage (achat en promo et revente), le wholesale (achat en gros chez des grossistes) ou le private label (création de ta marque). Des outils comme AMZing FBA analysent automatiquement les opportunités et t'envoient des produits rentables validés chaque jour."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Faut-il une entreprise pour vendre sur Amazon FBA ?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Oui, un statut professionnel est obligatoire : micro-entreprise (le plus simple pour débuter), SASU, EURL ou SAS. La micro-entreprise suffit pour commencer, mais attention au plafond de chiffre d'affaires (77 700€/an en prestations, 188 700€ en vente)."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Combien de temps pour être rentable avec Amazon FBA ?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Avec une bonne formation et les bons outils, la plupart des vendeurs sérieux deviennent rentables en 2-4 mois. Le premier mois sert à apprendre et tester, les mois suivants à optimiser. La clé : bien choisir ses produits dès le départ."
+        }
+      }
+    ]
+  },
+
+  amazonFbaDebutantBreadcrumb: {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Accueil",
+        "item": "https://amzingfba.com/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Guides",
+        "item": "https://amzingfba.com/guides"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Amazon FBA : c'est quoi ?",
+        "item": "https://amzingfba.com/amazon-fba-debutant"
+      }
+    ]
   },
 
   outilAmazonFbaArticle: {
