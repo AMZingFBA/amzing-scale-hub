@@ -864,13 +864,13 @@ const AmazonFbaDebutant = () => {
                     </li>
                     <li>
                       <Link 
-                        to="/guides" 
+                        to="/tarifs" 
                         className="text-primary hover:underline font-medium inline-flex items-center gap-2"
                       >
                         <ArrowRight className="w-4 h-4" />
-                        Consulter tous les guides Amazon FBA
+                        Découvrir les offres AMZing FBA
                       </Link>
-                      <p className="text-sm text-muted-foreground ml-6">Ressources gratuites pour vendeurs</p>
+                      <p className="text-sm text-muted-foreground ml-6">Abonnements et tarifs</p>
                     </li>
                   </ul>
                 </CardContent>

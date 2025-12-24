@@ -124,7 +124,7 @@ const Footer = () => {
           </div>
         ) : (
           // Full footer for non-VIP users
-          <div className="grid gap-8 mb-12 grid-cols-1 md:grid-cols-3">
+          <div className="grid gap-8 mb-12 grid-cols-1 md:grid-cols-4">
             {/* Logo & Description */}
             <div className="group animate-fade-in" style={{ animationDelay: '0.1s' }}>
               <div className="relative inline-block mb-4">
@@ -162,6 +162,28 @@ const Footer = () => {
                 <li>
                   <Link to="/faq" className="text-muted-foreground hover:text-primary transition-all duration-300 hover:translate-x-1 inline-block">
                     FAQ
+                  </Link>
+                </li>
+              </ul>
+            </div>
+
+            {/* Guides - Site-wide SEO links */}
+            <div className="animate-fade-in" style={{ animationDelay: '0.25s' }}>
+              <h3 className="text-lg font-semibold mb-4 text-foreground">Guides</h3>
+              <ul className="space-y-2">
+                <li>
+                  <Link to="/amazon-fba-debutant" className="text-muted-foreground hover:text-primary transition-all duration-300 hover:translate-x-1 inline-block">
+                    Amazon FBA : c'est quoi ?
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/outil-amazon-fba" className="text-muted-foreground hover:text-primary transition-all duration-300 hover:translate-x-1 inline-block">
+                    Outils Amazon FBA
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/produits-rentables-amazon" className="text-muted-foreground hover:text-primary transition-all duration-300 hover:translate-x-1 inline-block">
+                    Produits rentables
                   </Link>
                 </li>
               </ul>
