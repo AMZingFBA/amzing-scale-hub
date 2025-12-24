@@ -20,9 +20,9 @@ export const seoData: Record<string, SeoPageData> = {
   },
   
   formation: {
-    title: "Formation Amazon FBA (2025) : méthode claire + outil tout-en-un",
-    description: "Formation Amazon FBA : étapes, méthodes, outils et erreurs à éviter. Accède à une méthode claire + ressources pour vendre sur Amazon efficacement.",
-    keywords: "formation amazon fba, amazon fba formation, meilleure formation amazon fba, formation amazon fba avis, formation amazon ads, formation vendeur amazon, vendre sur amazon, business amazon fba",
+    title: "Formation Amazon FBA (2026) : Méthode + Outils | AMZing FBA",
+    description: "Formation Amazon FBA complète : méthode pas à pas + moniteurs produits rentables + fournisseurs + communauté. Lance et scale sur Amazon. Sans engagement.",
+    keywords: "formation amazon fba, amazon fba formation, meilleure formation amazon fba, formation amazon fba avis, formation amazon ads, formation vendeur amazon, vendre sur amazon, business amazon fba, cours amazon fba, apprendre amazon fba",
     robots: "index,follow",
   },
   
@@ -537,39 +537,40 @@ export const schemas = {
   course: {
     "@context": "https://schema.org",
     "@type": "Course",
-    "name": "Formation Amazon FBA (2025) : méthode claire + outil tout-en-un",
-    "description": "Formation Amazon FBA : étapes, méthodes, outils et erreurs à éviter. Accède à une méthode claire + ressources pour vendre sur Amazon efficacement.",
+    "name": "Formation Amazon FBA (2026) : Méthode + Outils | AMZing FBA",
+    "description": "Formation Amazon FBA complète : méthode pas à pas + moniteurs produits rentables + fournisseurs + communauté. Lance et scale sur Amazon. Sans engagement.",
     "provider": {
       "@type": "Organization",
-      "name": "AMZing FBA",
-      "sameAs": "https://amzingfba.com"
+      "name": "N.Z Consulting (AMZing FBA)",
+      "sameAs": "https://amzingfba.com",
+      "url": "https://amzingfba.com"
     },
     "offers": {
       "@type": "Offer",
       "category": "Paid",
       "priceCurrency": "EUR",
       "price": "34.99",
-      "availability": "https://schema.org/InStock"
+      "availability": "https://schema.org/InStock",
+      "url": "https://amzingfba.com/tarifs"
     },
     "hasCourseInstance": {
       "@type": "CourseInstance",
       "courseMode": "online",
-      "courseWorkload": "PT15H"
+      "courseWorkload": "PT20H"
     },
-    "aggregateRating": {
-      "@type": "AggregateRating",
-      "ratingValue": "4.8",
-      "reviewCount": "127"
-    },
+    "inLanguage": "fr",
+    "url": "https://amzingfba.com/formation",
     "syllabusSections": [
-      "Comprendre Amazon FBA et les modèles possibles",
-      "Mettre en place ton compte et ton cadre légal",
-      "Les bases de la recherche de produits rentables",
-      "Utiliser les moniteurs et les alertes produits",
-      "Passer commande, négocier et sécuriser la logistique",
-      "Suivre tes ventes, ajuster et scaler",
-      "Amazon Ads : bases et erreurs fréquentes",
-      "Gestion du risque et erreurs à éviter"
+      "Comprendre Amazon FBA, FBM, règles et budget",
+      "Choisir son modèle : wholesale, retail, private label",
+      "Recherche de produits rentables : critères, concurrence, demande",
+      "Sourcing et fournisseurs : approche, négociation, documents",
+      "Calculs : ROI, frais Amazon, marges, TVA",
+      "Création et optimisation de listings (SEO Amazon)",
+      "Logistique FBA : préparation, expédition, étiquetage",
+      "Lancement et premières ventes",
+      "Publicité Amazon (bases PPC)",
+      "Process et scaling : tableaux de bord, réassort"
     ]
   },
 
