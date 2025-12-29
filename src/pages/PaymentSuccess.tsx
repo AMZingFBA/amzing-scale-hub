@@ -71,8 +71,10 @@ const PaymentSuccess = () => {
                 transactionId: sessionId,
                 ordervalue: Number(data.amount),
                 voucher: data.voucher ?? "",
-                currency: data.currency ?? "EUR",
-                event: 469662
+                currency: "EUR",
+                event: 469662,
+                organization: 2458850,
+                conversionType: "sale"
               });
               
               // Mark as tracked
