@@ -18,6 +18,60 @@ declare global {
   }
 }
 
+const TD_GROW_SCRIPT_SRC = 'https://a.teletrax.io/c/e67c3a28-d0cf-5f7a-a8ff-3a2f09b4c5e1.js';
+const TD_ORG_ID = '2458850';
+const TD_PROGRAM_ID = '394307';
+
+const ensureTdConvReady = (timeoutMs = 4000) => {
+  if (typeof window !== "undefined" && typeof window.tdconv === "function") return Promise.resolve(true);
+  if (typeof document === "undefined") return Promise.resolve(false);
+
+  return new Promise<boolean>((resolve) => {
+    const existing = document.getElementById("TDConf") as HTMLScriptElement | null;
+    const finish = () => resolve(typeof window.tdconv === "function");
+
+    const timer = window.setTimeout(finish, timeoutMs);
+    const cleanup = () => window.clearTimeout(timer);
+
+    if (existing) {
+      existing.addEventListener(
+        "load",
+        () => {
+          cleanup();
+          finish();
+        },
+        { once: true }
+      );
+      existing.addEventListener(
+        "error",
+        () => {
+          cleanup();
+          resolve(false);
+        },
+        { once: true }
+      );
+      return;
+    }
+
+    const s = document.createElement("script");
+    s.id = "TDConf";
+    s.src = TD_GROW_SCRIPT_SRC;
+    s.async = true;
+    s.dataset.orgId = TD_ORG_ID;
+    s.dataset.programId = TD_PROGRAM_ID;
+    s.onload = () => {
+      cleanup();
+      finish();
+    };
+    s.onerror = () => {
+      cleanup();
+      resolve(false);
+    };
+
+    document.head.appendChild(s);
+  });
+};
+
 const PaymentSuccess = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -63,25 +117,31 @@ const PaymentSuccess = () => {
           }
 
           // Tradedoubler conversion tracking (only once)
-          if (!alreadyTracked && !trackingAttempted.current && window.tdconv) {
-            trackingAttempted.current = true;
-            
-            try {
-              window.tdconv('track', 'sale', {
-                transactionId: sessionId,
-                ordervalue: Number(data.amount),
-                voucher: data.voucher ?? "",
-                currency: "EUR",
-                event: 469662,
-                organization: 2458850,
-                conversionType: "sale"
-              });
-              
-              // Mark as tracked
-              localStorage.setItem(trackingKey, "1");
-              console.log('[TD] Conversion tracked successfully');
-            } catch (tdError) {
-              console.error('[TD] Tracking error:', tdError);
+          if (!alreadyTracked && !trackingAttempted.current) {
+            const tdReady = await ensureTdConvReady();
+
+            if (!tdReady || !window.tdconv) {
+              console.warn('[TD] tdconv indisponible (script bloqué ou non chargé)');
+            } else {
+              trackingAttempted.current = true;
+
+              try {
+                window.tdconv('track', 'sale', {
+                  transactionId: sessionId,
+                  ordervalue: Number(data.amount),
+                  voucher: data.voucher ?? "",
+                  currency: "EUR",
+                  event: 469662,
+                  organization: 2458850,
+                  conversionType: "sale"
+                });
+
+                // Mark as tracked
+                localStorage.setItem(trackingKey, "1");
+                console.log('[TD] Conversion tracked successfully');
+              } catch (tdError) {
+                console.error('[TD] Tracking error:', tdError);
+              }
             }
           }
 
