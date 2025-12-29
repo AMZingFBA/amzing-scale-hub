@@ -62,3 +62,6 @@ verify_jwt = false
 
 [functions.sync-all-users-to-airtable]
 verify_jwt = false
+
+[functions.verify-stripe-session]
+verify_jwt = false

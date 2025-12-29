@@ -78,6 +78,15 @@ const AndroidApp = lazy(() => import("./pages/AndroidApp"));
 const AmazonFbaDebutant = lazy(() => import("./pages/AmazonFbaDebutant"));
 const OutilAmazonFba = lazy(() => import("./pages/OutilAmazonFba"));
 const ProduitsRentablesAmazon = lazy(() => import("./pages/ProduitsRentablesAmazon"));
+const PaymentSuccess = lazy(() => import("./pages/PaymentSuccess"));
+
+// Guide pages
+const AmazonFbaCestQuoi = lazy(() => import("./pages/guide/AmazonFbaCestQuoi"));
+const AmazonFbaVsFbm = lazy(() => import("./pages/guide/AmazonFbaVsFbm"));
+const CommentDebuterAmazonFba = lazy(() => import("./pages/guide/CommentDebuterAmazonFba"));
+const CombienCouteAmazonFba = lazy(() => import("./pages/guide/CombienCouteAmazonFba"));
+const FormationAmazonFbaDebutant = lazy(() => import("./pages/guide/FormationAmazonFbaDebutant"));
+
 const queryClient = new QueryClient();
 
 // Loading fallback minimal pour le lazy loading
@@ -171,6 +180,15 @@ const App = () => (
             <Route path="/amazon-fba-debutant" element={<AmazonFbaDebutant />} />
             <Route path="/outil-amazon-fba" element={<OutilAmazonFba />} />
             <Route path="/produits-rentables-amazon" element={<ProduitsRentablesAmazon />} />
+            <Route path="/payment-success" element={<PaymentSuccess />} />
+            
+            {/* Guide pages */}
+            <Route path="/guide/amazon-fba-cest-quoi" element={<AmazonFbaCestQuoi />} />
+            <Route path="/guide/amazon-fba-vs-fbm" element={<AmazonFbaVsFbm />} />
+            <Route path="/guide/comment-debuter-amazon-fba" element={<CommentDebuterAmazonFba />} />
+            <Route path="/guide/combien-coute-amazon-fba" element={<CombienCouteAmazonFba />} />
+            <Route path="/guide/formation-amazon-fba-debutant" element={<FormationAmazonFbaDebutant />} />
+            
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
