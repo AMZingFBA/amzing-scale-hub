@@ -7,7 +7,7 @@ const logStep = (step: string, details?: any) => {
   console.log(`[STRIPE-WEBHOOK] ${step}${detailsStr}`);
 };
 
-// Tradedoubler server-side tracking
+// Tradedoubler server-side tracking using official pixel format
 // Organization: 2458850, Program: 394307, Event: 469662
 async function trackTradedoublerConversion(data: {
   transactionId: string;
@@ -16,33 +16,45 @@ async function trackTradedoublerConversion(data: {
   currency?: string;
 }) {
   try {
-    // Tradedoubler Grow tracking pixel URL
-    const params = new URLSearchParams({
-      organization: '2458850',
-      event: '469662',
-      program: '394307',
-      orderNumber: data.transactionId,
-      orderValue: data.orderValue.toString(),
-      currency: data.currency || 'EUR',
-    });
+    // Use the official Tradedoubler tracking pixel format
+    // Format: o(org)event(eventId)ordnum(orderNumber)curr(currency)voucher(code)type(iframe)enc(3)
+    const org = '2458850';
+    const eventId = '469662';
+    const orderNumber = encodeURIComponent(data.transactionId);
+    const orderValue = data.orderValue.toString();
+    const currency = data.currency || 'EUR';
+    const voucher = data.voucher ? encodeURIComponent(data.voucher) : '';
     
-    if (data.voucher) {
-      params.append('voucher', data.voucher);
+    // Build URL with Tradedoubler's parenthesis format
+    let trackingUrl = `https://tbs.tradedoubler.com/report?o(${org})event(${eventId})ordnum(${orderNumber})ordval(${orderValue})curr(${currency})type(iframe)enc(3)`;
+    
+    if (voucher) {
+      trackingUrl += `voucher(${voucher})`;
     }
-
-    const trackingUrl = `https://tbs.tradedoubler.com/report?${params.toString()}`;
     
     logStep("Sending Tradedoubler conversion", { 
       transactionId: data.transactionId, 
       orderValue: data.orderValue,
+      voucher: data.voucher || 'none',
       url: trackingUrl 
     });
 
     const response = await fetch(trackingUrl, {
       method: 'GET',
       headers: {
-        'User-Agent': 'AmzingFBA-Webhook/1.0',
+        'User-Agent': 'Mozilla/5.0 (compatible; AmzingFBA-Server/1.0)',
+        'Accept': 'image/gif, image/png, */*',
       },
+    });
+
+    const responseText = await response.text();
+    
+    logStep("Tradedoubler response", { 
+      transactionId: data.transactionId,
+      status: response.status,
+      statusText: response.statusText,
+      contentType: response.headers.get('content-type'),
+      bodyLength: responseText.length
     });
 
     if (response.ok) {
@@ -51,9 +63,10 @@ async function trackTradedoublerConversion(data: {
         status: response.status 
       });
     } else {
-      logStep("Tradedoubler tracking response", { 
+      logStep("Tradedoubler tracking failed", { 
         status: response.status,
-        statusText: response.statusText 
+        statusText: response.statusText,
+        body: responseText.substring(0, 500)
       });
     }
   } catch (error) {
