@@ -8,6 +8,7 @@ const logStep = (step: string, details?: any) => {
 };
 
 // Tradedoubler server-side tracking
+// Organization: 2458850, Program: 394307, Event: 469662
 async function trackTradedoublerConversion(data: {
   transactionId: string;
   orderValue: number;
@@ -16,10 +17,10 @@ async function trackTradedoublerConversion(data: {
 }) {
   try {
     // Tradedoubler Grow tracking pixel URL
-    // event=469662, organization=2458850
     const params = new URLSearchParams({
       organization: '2458850',
       event: '469662',
+      program: '394307',
       orderNumber: data.transactionId,
       orderValue: data.orderValue.toString(),
       currency: data.currency || 'EUR',
