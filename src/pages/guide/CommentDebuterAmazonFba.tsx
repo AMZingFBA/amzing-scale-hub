@@ -255,7 +255,7 @@ const CommentDebuterAmazonFba = () => {
                   <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold shrink-0">5</div>
                   <div>
                     <strong>Recherche des produits rentables</strong>
-                    <p className="text-sm text-muted-foreground">Critères : demande (BSR), concurrence, marge >20%, pas de restrictions</p>
+                    <p className="text-sm text-muted-foreground">Critères : demande (BSR), concurrence, marge supérieure à 20%, pas de restrictions</p>
                   </div>
                 </li>
                 <li className="flex items-start gap-4">
@@ -301,7 +301,7 @@ const CommentDebuterAmazonFba = () => {
                     <li>• BSR correct (signe de demande)</li>
                     <li>• Moins de 10-15 vendeurs FBA</li>
                     <li>• Marge nette supérieure à 20%</li>
-                    <li>• Prix de vente > 15€</li>
+                    <li>• Prix de vente supérieur à 15€</li>
                     <li>• Pas de restrictions Amazon</li>
                     <li>• Stock disponible chez fournisseur</li>
                   </ul>
@@ -323,9 +323,6 @@ const CommentDebuterAmazonFba = () => {
             </div>
             
             <p className="mt-4">
-              Utilise des outils comme SellerAmp, Keepa ou les moniteurs AMZing FBA pour analyser rapidement 
-              les produits et identifier les opportunités.
-            </p>
               Utilise des outils comme SellerAmp, Keepa ou les moniteurs AMZing FBA pour analyser rapidement 
               les produits et identifier les opportunités.
             </p>

@@ -434,7 +434,7 @@ const CombienCouteAmazonFba = () => {
               </div>
               <div className="flex items-start gap-3">
                 <CheckCircle2 className="w-5 h-5 text-green-500 shrink-0 mt-0.5" />
-                <span><strong>Vise des produits >15€ :</strong> les frais fixes (FBA) pèsent moins sur la marge</span>
+                <span><strong>Vise des produits supérieurs à 15€ :</strong> les frais fixes (FBA) pèsent moins sur la marge</span>
               </div>
             </div>
           </section>

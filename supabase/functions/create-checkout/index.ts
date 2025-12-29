@@ -73,7 +73,7 @@ serve(async (req) => {
     }
 
     // Create checkout session
-    const origin = req.headers.get("origin") || "https://6c002a1c-db75-4b68-b43b-8e5c9b112692.lovableproject.com";
+    const origin = req.headers.get("origin") || "https://amzingfba.com";
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       customer_email: customerId ? undefined : user.email,
@@ -84,7 +84,7 @@ serve(async (req) => {
         },
       ],
       mode: "subscription",
-      success_url: `${origin}/dashboard?payment=success`,
+      success_url: `${origin}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/#tarifs`,
       metadata: {
         user_id: user.id,

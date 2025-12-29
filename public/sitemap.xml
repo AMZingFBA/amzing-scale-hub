@@ -67,6 +67,42 @@
     <priority>0.9</priority>
   </url>
   
+  <!-- Pages guides SEO cluster -->
+  <url>
+    <loc>https://amzingfba.com/guide/amazon-fba-cest-quoi</loc>
+    <lastmod>2025-12-29</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  
+  <url>
+    <loc>https://amzingfba.com/guide/amazon-fba-vs-fbm</loc>
+    <lastmod>2025-12-29</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  
+  <url>
+    <loc>https://amzingfba.com/guide/comment-debuter-amazon-fba</loc>
+    <lastmod>2025-12-29</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  
+  <url>
+    <loc>https://amzingfba.com/guide/combien-coute-amazon-fba</loc>
+    <lastmod>2025-12-29</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  
+  <url>
+    <loc>https://amzingfba.com/guide/formation-amazon-fba-debutant</loc>
+    <lastmod>2025-12-29</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  
   <!-- Pages marketplace -->
   <url>
     <loc>https://amzingfba.com/marketplace</loc>
