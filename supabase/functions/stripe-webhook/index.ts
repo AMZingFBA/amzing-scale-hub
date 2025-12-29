@@ -7,6 +7,62 @@ const logStep = (step: string, details?: any) => {
   console.log(`[STRIPE-WEBHOOK] ${step}${detailsStr}`);
 };
 
+// Tradedoubler server-side tracking
+async function trackTradedoublerConversion(data: {
+  transactionId: string;
+  orderValue: number;
+  voucher?: string;
+  currency?: string;
+}) {
+  try {
+    // Tradedoubler Grow tracking pixel URL
+    // event=469662, organization=2458850
+    const params = new URLSearchParams({
+      organization: '2458850',
+      event: '469662',
+      orderNumber: data.transactionId,
+      orderValue: data.orderValue.toString(),
+      currency: data.currency || 'EUR',
+    });
+    
+    if (data.voucher) {
+      params.append('voucher', data.voucher);
+    }
+
+    const trackingUrl = `https://tbs.tradedoubler.com/report?${params.toString()}`;
+    
+    logStep("Sending Tradedoubler conversion", { 
+      transactionId: data.transactionId, 
+      orderValue: data.orderValue,
+      url: trackingUrl 
+    });
+
+    const response = await fetch(trackingUrl, {
+      method: 'GET',
+      headers: {
+        'User-Agent': 'AmzingFBA-Webhook/1.0',
+      },
+    });
+
+    if (response.ok) {
+      logStep("Tradedoubler conversion tracked successfully", { 
+        transactionId: data.transactionId,
+        status: response.status 
+      });
+    } else {
+      logStep("Tradedoubler tracking response", { 
+        status: response.status,
+        statusText: response.statusText 
+      });
+    }
+  } catch (error) {
+    logStep("Tradedoubler tracking error", { 
+      error: error instanceof Error ? error.message : 'Unknown',
+      transactionId: data.transactionId 
+    });
+  }
+}
+
 // Function to sync user to Airtable
 async function syncUserToAirtable(userData: {
   email: string;
@@ -184,6 +240,25 @@ serve(async (req) => {
       }
 
       logStep("Subscription updated successfully", { userId: profile.id, expiresAt });
+
+      // Track conversion with Tradedoubler (server-side)
+      const orderValue = session.amount_total ? session.amount_total / 100 : 0;
+      
+      // Get voucher code if any discount was applied
+      let voucher = "";
+      if (session.total_details?.breakdown?.discounts && session.total_details.breakdown.discounts.length > 0) {
+        const discount = session.total_details.breakdown.discounts[0];
+        if (discount.discount?.coupon?.name) {
+          voucher = discount.discount.coupon.name;
+        }
+      }
+
+      await trackTradedoublerConversion({
+        transactionId: session.id,
+        orderValue: orderValue,
+        voucher: voucher || undefined,
+        currency: session.currency?.toUpperCase() || 'EUR',
+      });
 
       // Sync to Airtable
       await syncUserToAirtable({
