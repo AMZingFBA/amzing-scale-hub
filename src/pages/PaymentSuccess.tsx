@@ -14,61 +14,39 @@ import SEO from '@/components/SEO';
 // Declare global tdconv function for Tradedoubler
 declare global {
   interface Window {
-    tdconv?: (action: string, type: string, data?: object) => void;
+    tdconv?: (action: string, type?: string, data?: object) => void;
   }
 }
 
-const TD_GROW_SCRIPT_SRC = 'https://a.teletrax.io/c/e67c3a28-d0cf-5f7a-a8ff-3a2f09b4c5e1.js';
+// Tradedoubler Grow SDK URL with org and program IDs
+const TD_SDK_URL = 'https://svht.tradedoubler.com/tr_sdk.js?org=2458850&prog=394307&dr=true';
 const TD_ORG_ID = '2458850';
-const TD_PROGRAM_ID = '394307';
+const TD_EVENT_ID = 469662;
 
-const ensureTdConvReady = (timeoutMs = 4000) => {
-  if (typeof window !== "undefined" && typeof window.tdconv === "function") return Promise.resolve(true);
-  if (typeof document === "undefined") return Promise.resolve(false);
-
-  return new Promise<boolean>((resolve) => {
-    const existing = document.getElementById("TDConf") as HTMLScriptElement | null;
-    const finish = () => resolve(typeof window.tdconv === "function");
-
-    const timer = window.setTimeout(finish, timeoutMs);
-    const cleanup = () => window.clearTimeout(timer);
-
-    if (existing) {
-      existing.addEventListener(
-        "load",
-        () => {
-          cleanup();
-          finish();
-        },
-        { once: true }
-      );
-      existing.addEventListener(
-        "error",
-        () => {
-          cleanup();
-          resolve(false);
-        },
-        { once: true }
-      );
+// Ensure Tradedoubler SDK is loaded and ready
+const ensureTdConvReady = (timeoutMs = 5000): Promise<boolean> => {
+  return new Promise((resolve) => {
+    // Check if already available
+    if (typeof window !== 'undefined' && typeof window.tdconv === 'function') {
+      console.log('[TD] tdconv already available');
+      resolve(true);
       return;
     }
 
-    const s = document.createElement("script");
-    s.id = "TDConf";
-    s.src = TD_GROW_SCRIPT_SRC;
-    s.async = true;
-    s.dataset.orgId = TD_ORG_ID;
-    s.dataset.programId = TD_PROGRAM_ID;
-    s.onload = () => {
-      cleanup();
-      finish();
-    };
-    s.onerror = () => {
-      cleanup();
-      resolve(false);
-    };
+    const timer = setTimeout(() => {
+      console.warn('[TD] Timeout waiting for tdconv');
+      resolve(typeof window.tdconv === 'function');
+    }, timeoutMs);
 
-    document.head.appendChild(s);
+    // Check periodically if tdconv becomes available
+    const interval = setInterval(() => {
+      if (typeof window.tdconv === 'function') {
+        clearTimeout(timer);
+        clearInterval(interval);
+        console.log('[TD] tdconv now available');
+        resolve(true);
+      }
+    }, 100);
   });
 };
 
@@ -116,29 +94,36 @@ const PaymentSuccess = () => {
             await refreshSubscription();
           }
 
-          // Tradedoubler conversion tracking (only once)
+          // Tradedoubler conversion tracking (only once per session)
           if (!alreadyTracked && !trackingAttempted.current) {
+            trackingAttempted.current = true;
+            
             const tdReady = await ensureTdConvReady();
 
-            if (!tdReady || !window.tdconv) {
-              console.warn('[TD] tdconv indisponible (script bloqué ou non chargé)');
+            if (!tdReady || typeof window.tdconv !== 'function') {
+              console.warn('[TD] tdconv not available (script blocked or not loaded)');
             } else {
-              trackingAttempted.current = true;
-
               try {
+                // Step 1: Initialize Tradedoubler (as per official documentation)
+                window.tdconv('init', TD_ORG_ID, { element: 'iframe' });
+                
+                // Step 2: Track the sale conversion (exact format from Tradedoubler docs)
                 window.tdconv('track', 'sale', {
                   transactionId: sessionId,
-                  ordervalue: Number(data.amount),
-                  voucher: data.voucher ?? "",
-                  currency: "EUR",
-                  event: 469662,
-                  organization: 2458850,
-                  conversionType: "sale"
+                  ordervalue: Number(data.amount) || 0,
+                  voucher: data.voucher || '',
+                  currency: 'EUR',
+                  event: TD_EVENT_ID
                 });
 
-                // Mark as tracked
-                localStorage.setItem(trackingKey, "1");
-                console.log('[TD] Conversion tracked successfully');
+                // Mark as tracked to prevent duplicates
+                localStorage.setItem(trackingKey, '1');
+                console.log('[TD] Conversion tracked successfully', {
+                  sessionId,
+                  amount: data.amount,
+                  voucher: data.voucher,
+                  event: TD_EVENT_ID
+                });
               } catch (tdError) {
                 console.error('[TD] Tracking error:', tdError);
               }
