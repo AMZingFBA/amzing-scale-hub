@@ -7,35 +7,51 @@ const logStep = (step: string, details?: any) => {
   console.log(`[STRIPE-WEBHOOK] ${step}${detailsStr}`);
 };
 
-// Tradedoubler server-side tracking using official pixel format
+// Tradedoubler server-side tracking (Server to Server)
 // Organization: 2458850, Program: 394307, Event: 469662
+// Doc: https://dev.tradedoubler.com/tracking/advertiser/#Pixel_S2S
 async function trackTradedoublerConversion(data: {
   transactionId: string;
   orderValue: number;
   voucher?: string;
   currency?: string;
+  email?: string;
 }) {
   try {
-    // Use the official Tradedoubler tracking pixel format
-    // Format: o(org)event(eventId)ordnum(orderNumber)curr(currency)voucher(code)type(iframe)enc(3)
-    const org = '2458850';
-    const eventId = '469662';
-    const orderNumber = encodeURIComponent(data.transactionId);
-    const orderValue = data.orderValue.toString();
-    const currency = data.currency || 'EUR';
-    const voucher = data.voucher ? encodeURIComponent(data.voucher) : '';
+    // Build params according to official Tradedoubler documentation
+    // For S2S: same format as pixel but WITHOUT type=iframe
+    const params = new URLSearchParams({
+      organization: '2458850',
+      event: '469662',
+      orderNumber: data.transactionId,
+      orderValue: data.orderValue.toFixed(2),
+      currency: data.currency || 'EUR',
+    });
     
-    // Build URL with Tradedoubler's parenthesis format
-    let trackingUrl = `https://tbs.tradedoubler.com/report?o(${org})event(${eventId})ordnum(${orderNumber})ordval(${orderValue})curr(${currency})type(iframe)enc(3)`;
-    
-    if (voucher) {
-      trackingUrl += `voucher(${voucher})`;
+    // Add voucher if present
+    if (data.voucher) {
+      params.append('voucher', data.voucher);
     }
     
-    logStep("Sending Tradedoubler conversion", { 
+    // Add hashed email for cross-device tracking if available
+    if (data.email) {
+      // Hash email with SHA-256 for privacy (as required by TD)
+      const encoder = new TextEncoder();
+      const emailData = encoder.encode(data.email.toLowerCase().trim());
+      const hashBuffer = await crypto.subtle.digest('SHA-256', emailData);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+      params.append('extid', hashHex);
+      params.append('exttype', '1'); // 1 = email
+    }
+
+    const trackingUrl = `https://tbs.tradedoubler.com/report?${params.toString()}`;
+    
+    logStep("Sending Tradedoubler S2S conversion", { 
       transactionId: data.transactionId, 
       orderValue: data.orderValue,
       voucher: data.voucher || 'none',
+      hasEmail: !!data.email,
       url: trackingUrl 
     });
 
@@ -43,18 +59,19 @@ async function trackTradedoublerConversion(data: {
       method: 'GET',
       headers: {
         'User-Agent': 'Mozilla/5.0 (compatible; AmzingFBA-Server/1.0)',
-        'Accept': 'image/gif, image/png, */*',
+        'Accept': '*/*',
       },
     });
 
     const responseText = await response.text();
     
-    logStep("Tradedoubler response", { 
+    logStep("Tradedoubler S2S response", { 
       transactionId: data.transactionId,
       status: response.status,
       statusText: response.statusText,
       contentType: response.headers.get('content-type'),
-      bodyLength: responseText.length
+      bodyLength: responseText.length,
+      bodyPreview: responseText.substring(0, 200)
     });
 
     if (response.ok) {
@@ -62,18 +79,21 @@ async function trackTradedoublerConversion(data: {
         transactionId: data.transactionId,
         status: response.status 
       });
+      return true;
     } else {
       logStep("Tradedoubler tracking failed", { 
         status: response.status,
         statusText: response.statusText,
         body: responseText.substring(0, 500)
       });
+      return false;
     }
   } catch (error) {
     logStep("Tradedoubler tracking error", { 
       error: error instanceof Error ? error.message : 'Unknown',
       transactionId: data.transactionId 
     });
+    return false;
   }
 }
 
@@ -272,6 +292,7 @@ serve(async (req) => {
         orderValue: orderValue,
         voucher: voucher || undefined,
         currency: session.currency?.toUpperCase() || 'EUR',
+        email: customerEmail, // For cross-device tracking
       });
 
       // Sync to Airtable
