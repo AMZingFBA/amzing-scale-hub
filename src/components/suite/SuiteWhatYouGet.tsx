@@ -8,7 +8,7 @@ const SuiteWhatYouGet = () => {
     "Templates listings Amazon optimisés",
     "Calculateurs de coûts et marges",
     "Checklists produit et lancement",
-    "Forma en ligne : modules et guides pas à pas",
+    "Formation en ligne : modules et guides pas à pas",
     "Process complets pour chaque étape FBA",
     "Mises à jour et nouveaux produits inclus"
   ];
@@ -17,7 +17,7 @@ const SuiteWhatYouGet = () => {
     { icon: Infinity, text: "Accès logiciel à vie" },
     { icon: Users, text: "Communauté privée" },
     { icon: Headphones, text: "Support 9h–19h" },
-    { icon: Calendar, text: "Appel hebdo (30-60 min)" },
+    { icon: Calendar, text: "Appel hebdomadaire (30-60 min)" },
     { icon: RefreshCcw, text: "Mises à jour incluses" }
   ];
 

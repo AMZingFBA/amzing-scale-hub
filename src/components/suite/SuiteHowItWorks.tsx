@@ -18,7 +18,7 @@ const SuiteHowItWorks = () => {
       number: "03",
       icon: TrendingUp,
       title: "Tu avances avec le support",
-      description: "Progresse chaque semaine avec l'appel hebdo et le support réactif."
+      description: "Progresse chaque semaine avec l'appel hebdomadaire et le support réactif."
     }
   ];
 

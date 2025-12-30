@@ -11,7 +11,7 @@ const SuiteTestimonials = () => {
     {
       name: "Sophie M.",
       role: "Ex-salariée en reconversion",
-      content: "Le support est vraiment réactif. L'appel hebdo m'a permis de débloquer plusieurs situations.",
+      content: "Le support est vraiment réactif. L'appel hebdomadaire m'a permis de débloquer plusieurs situations.",
       rating: 5
     },
     {
@@ -23,7 +23,7 @@ const SuiteTestimonials = () => {
     {
       name: "Marie L.",
       role: "Débutante FBA",
-      content: "La Forma en ligne est super bien structurée. Parfait pour quelqu'un qui part de zéro.",
+      content: "La Formation en ligne est super bien structurée. Parfait pour quelqu'un qui part de zéro.",
       rating: 5
     },
     {

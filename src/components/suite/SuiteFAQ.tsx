@@ -7,7 +7,7 @@ const SuiteFAQ = () => {
   const faqs = [
     {
       question: "C'est une formation ?",
-      answer: "Non, c'est un logiciel tout-en-un + bibliothèque de process (Forma en ligne) + accompagnement. Tu as accès à des outils concrets, pas juste des vidéos."
+      answer: "Non, c'est un logiciel tout-en-un + bibliothèque de process (Formation en ligne) + accompagnement. Tu as accès à des outils concrets, pas juste des vidéos."
     },
     {
       question: "À qui ça s'adresse ?",
@@ -19,14 +19,14 @@ const SuiteFAQ = () => {
     },
     {
       question: "Y a-t-il des mises à jour ?",
-      answer: "Oui, toutes les mises à jour sont incluses à vie. Nouvelles fonctionnalités, améliorations, nouveaux modules de la Forma en ligne... tout est inclus."
+      answer: "Oui, toutes les mises à jour sont incluses à vie. Nouvelles fonctionnalités, améliorations, nouveaux modules de la Formation en ligne... tout est inclus."
     },
     {
       question: "Comment fonctionne le support 9h–19h ?",
       answer: "Tu peux nous contacter par chat ou email pendant les jours ouvrés, de 9h à 19h (heure de Paris). On répond généralement sous quelques heures."
     },
     {
-      question: "L'appel hebdo, c'est comment ?",
+      question: "L'appel hebdomadaire, c'est comment ?",
       answer: "Chaque semaine, tu peux réserver un créneau de 30 à 60 minutes pour discuter de ton avancement, poser tes questions et débloquer tes situations."
     },
     {
