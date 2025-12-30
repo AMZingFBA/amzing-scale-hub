@@ -42,15 +42,15 @@ const SuiteHero = () => {
             </div>
             
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6">
-              Reçois des{' '}
+              Le logiciel tout-en-un pour{' '}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-suite-orange to-suite-blue">
-                produits rentables
+                lancer et scaler Amazon FBA
               </span>
-              {' '}chaque semaine — à vie.
+              {' '}— à vie.
             </h1>
             
             <p className="text-lg md:text-xl text-suite-gray mb-8 max-w-xl mx-auto lg:mx-0">
-              AMZing FBA t'envoie directement des opportunités validées avec ROI calculé, fournisseurs et accompagnement pour scaler vite.
+              AMZing FBA regroupe les outils, les produits rentables et l'accompagnement pour avancer vite, sans te disperser.
             </p>
             
             {/* Benefits list */}
