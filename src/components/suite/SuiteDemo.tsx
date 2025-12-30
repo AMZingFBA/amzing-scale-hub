@@ -1,6 +1,9 @@
-import { Play, Monitor, BarChart3, ShoppingBag, Crown, Package, TrendingUp, Users, Sparkles, BookOpen, MessageCircle, Bell, Settings, ExternalLink  } from 'lucide-react';
+import { useState } from 'react';
+import { Play, Monitor, BarChart3, ShoppingBag, Crown, Package, TrendingUp, Users, Sparkles, BookOpen, MessageCircle, Bell, Settings, ExternalLink, X } from 'lucide-react';
+import demoVideo from '@/assets/suite-demo-video.mp4';
 
 const SuiteDemo = () => {
+  const [isVideoPlaying, setIsVideoPlaying] = useState(false);
   const screenshots = [
     {
       icon: Monitor,
@@ -169,83 +172,106 @@ const SuiteDemo = () => {
         {/* Video demo block */}
         <div className="bg-suite-card border border-white/10 rounded-2xl overflow-hidden">
           <div className="aspect-video relative bg-gradient-to-br from-[#0d0d15] to-[#0a0a12] overflow-hidden">
-            {/* Background UI mockup */}
-            <div className="absolute inset-0 p-6 opacity-40">
-              {/* Fake dashboard layout */}
-              <div className="h-full flex gap-4">
-                {/* Sidebar */}
-                <div className="w-48 bg-white/5 rounded-xl p-3 space-y-2">
-                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-suite-orange to-amber-500 mb-4" />
-                  {[...Array(6)].map((_, i) => (
-                    <div key={i} className="flex items-center gap-2">
-                      <div className="w-4 h-4 rounded bg-white/10" />
-                      <div className="h-3 bg-white/10 rounded flex-1" />
-                    </div>
-                  ))}
-                </div>
-                {/* Main content */}
-                <div className="flex-1 space-y-4">
-                  {/* Header */}
-                  <div className="flex items-center justify-between">
-                    <div className="h-6 bg-white/10 rounded w-48" />
-                    <div className="flex gap-2">
-                      <div className="w-8 h-8 rounded-full bg-white/10" />
-                      <div className="w-8 h-8 rounded-full bg-white/10" />
-                    </div>
-                  </div>
-                  {/* Stats row */}
-                  <div className="grid grid-cols-4 gap-3">
-                    {[...Array(4)].map((_, i) => (
-                      <div key={i} className="bg-white/5 rounded-xl p-4">
-                        <div className="w-6 h-6 rounded bg-suite-orange/20 mb-2" />
-                        <div className="h-5 bg-white/10 rounded w-16 mb-1" />
-                        <div className="h-3 bg-white/5 rounded w-12" />
-                      </div>
-                    ))}
-                  </div>
-                  {/* Chart area */}
-                  <div className="bg-white/5 rounded-xl p-4 flex-1">
-                    <div className="h-4 bg-white/10 rounded w-32 mb-4" />
-                    <div className="flex items-end gap-2 h-32">
-                      {[40, 65, 45, 80, 55, 70, 90, 60, 75, 50, 85, 65].map((h, i) => (
-                        <div key={i} className="flex-1 bg-gradient-to-t from-suite-orange/30 to-suite-orange/10 rounded-t" style={{ height: `${h}%` }} />
-                      ))}
-                    </div>
-                  </div>
-                  {/* Table */}
-                  <div className="bg-white/5 rounded-xl p-4">
-                    <div className="space-y-2">
-                      {[...Array(3)].map((_, i) => (
-                        <div key={i} className="flex items-center gap-4">
-                          <div className="w-12 h-3 bg-white/10 rounded" />
-                          <div className="flex-1 h-3 bg-white/5 rounded" />
-                          <div className="w-16 h-3 bg-green-500/20 rounded" />
-                          <div className="w-12 h-3 bg-white/10 rounded" />
+            {isVideoPlaying ? (
+              <>
+                <video
+                  src={demoVideo}
+                  autoPlay
+                  controls
+                  className="w-full h-full object-cover"
+                  onEnded={() => setIsVideoPlaying(false)}
+                />
+                <button 
+                  onClick={() => setIsVideoPlaying(false)}
+                  className="absolute top-4 right-4 w-10 h-10 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center hover:bg-black/70 transition-colors z-20"
+                >
+                  <X className="w-5 h-5 text-white" />
+                </button>
+              </>
+            ) : (
+              <>
+                {/* Background UI mockup */}
+                <div className="absolute inset-0 p-6 opacity-40">
+                  {/* Fake dashboard layout */}
+                  <div className="h-full flex gap-4">
+                    {/* Sidebar */}
+                    <div className="w-48 bg-white/5 rounded-xl p-3 space-y-2">
+                      <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-suite-orange to-amber-500 mb-4" />
+                      {[...Array(6)].map((_, i) => (
+                        <div key={i} className="flex items-center gap-2">
+                          <div className="w-4 h-4 rounded bg-white/10" />
+                          <div className="h-3 bg-white/10 rounded flex-1" />
                         </div>
                       ))}
                     </div>
+                    {/* Main content */}
+                    <div className="flex-1 space-y-4">
+                      {/* Header */}
+                      <div className="flex items-center justify-between">
+                        <div className="h-6 bg-white/10 rounded w-48" />
+                        <div className="flex gap-2">
+                          <div className="w-8 h-8 rounded-full bg-white/10" />
+                          <div className="w-8 h-8 rounded-full bg-white/10" />
+                        </div>
+                      </div>
+                      {/* Stats row */}
+                      <div className="grid grid-cols-4 gap-3">
+                        {[...Array(4)].map((_, i) => (
+                          <div key={i} className="bg-white/5 rounded-xl p-4">
+                            <div className="w-6 h-6 rounded bg-suite-orange/20 mb-2" />
+                            <div className="h-5 bg-white/10 rounded w-16 mb-1" />
+                            <div className="h-3 bg-white/5 rounded w-12" />
+                          </div>
+                        ))}
+                      </div>
+                      {/* Chart area */}
+                      <div className="bg-white/5 rounded-xl p-4 flex-1">
+                        <div className="h-4 bg-white/10 rounded w-32 mb-4" />
+                        <div className="flex items-end gap-2 h-32">
+                          {[40, 65, 45, 80, 55, 70, 90, 60, 75, 50, 85, 65].map((h, i) => (
+                            <div key={i} className="flex-1 bg-gradient-to-t from-suite-orange/30 to-suite-orange/10 rounded-t" style={{ height: `${h}%` }} />
+                          ))}
+                        </div>
+                      </div>
+                      {/* Table */}
+                      <div className="bg-white/5 rounded-xl p-4">
+                        <div className="space-y-2">
+                          {[...Array(3)].map((_, i) => (
+                            <div key={i} className="flex items-center gap-4">
+                              <div className="w-12 h-3 bg-white/10 rounded" />
+                              <div className="flex-1 h-3 bg-white/5 rounded" />
+                              <div className="w-16 h-3 bg-green-500/20 rounded" />
+                              <div className="w-12 h-3 bg-white/10 rounded" />
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </div>
 
-            {/* Gradient overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a12] via-transparent to-transparent" />
-            <div className="absolute inset-0 bg-gradient-to-r from-suite-orange/5 via-transparent to-suite-blue/5" />
-            
-            {/* Play button */}
-            <button className="absolute inset-0 flex items-center justify-center group z-10">
-              <div className="w-20 h-20 rounded-full bg-suite-orange flex items-center justify-center shadow-2xl shadow-suite-orange/40 group-hover:scale-110 transition-transform duration-300">
-                <Play className="w-8 h-8 text-white ml-1" fill="white" />
-              </div>
-            </button>
-            
-            {/* Overlay text */}
-            <div className="absolute bottom-6 left-6 z-10">
-              <span className="bg-black/60 backdrop-blur-sm text-white text-sm font-medium px-4 py-2 rounded-full border border-white/10">
-                Démo en 60 secondes
-              </span>
-            </div>
+                {/* Gradient overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a12] via-transparent to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-r from-suite-orange/5 via-transparent to-suite-blue/5" />
+                
+                {/* Play button */}
+                <button 
+                  onClick={() => setIsVideoPlaying(true)}
+                  className="absolute inset-0 flex items-center justify-center group z-10"
+                >
+                  <div className="w-20 h-20 rounded-full bg-suite-orange flex items-center justify-center shadow-2xl shadow-suite-orange/40 group-hover:scale-110 transition-transform duration-300">
+                    <Play className="w-8 h-8 text-white ml-1" fill="white" />
+                  </div>
+                </button>
+                
+                {/* Overlay text */}
+                <div className="absolute bottom-6 left-6 z-10">
+                  <span className="bg-black/60 backdrop-blur-sm text-white text-sm font-medium px-4 py-2 rounded-full border border-white/10">
+                    Démo en 60 secondes
+                  </span>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>
