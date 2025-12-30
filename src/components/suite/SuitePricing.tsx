@@ -2,15 +2,15 @@ import { Check, Shield, Zap, CreditCard } from 'lucide-react';
 
 const SuitePricing = () => {
   const includedFeatures = [
-    "Logiciel AMZing FBA Suite complet",
-    "Moniteur opportunités + ROI",
-    "Catalogue fournisseurs & deals",
+    "Produits rentables envoyés chaque semaine",
+    "ROI et marges calculés automatiquement",
+    "Catalogue fournisseurs & deals exclusifs",
     "Templates & checklists",
     "Forma en ligne (modules & guides)",
     "Communauté privée",
     "Support 9h–19h (jours ouvrés)",
     "Appel hebdo (30–60 min)",
-    "Mises à jour à vie incluses"
+    "Nouveaux produits + mises à jour à vie"
   ];
 
   const scrollToCheckout = () => {

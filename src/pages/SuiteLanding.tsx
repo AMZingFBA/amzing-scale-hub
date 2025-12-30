@@ -17,22 +17,22 @@ import SuiteMobileSticky from '@/components/suite/SuiteMobileSticky';
 const SuiteLanding = () => {
   useEffect(() => {
     // SEO Meta tags
-    document.title = "AMZing FBA Suite — Le logiciel tout-en-un pour Amazon FBA | Accès à vie";
+    document.title = "AMZing FBA — Reçois des produits rentables chaque semaine | Accès à vie";
     
     const metaDescription = document.querySelector('meta[name="description"]');
     if (metaDescription) {
-      metaDescription.setAttribute('content', 'AMZing FBA Suite : logiciel tout-en-un pour lancer et scaler Amazon FBA. Outils de sourcing, opportunités ROI, communauté et support. Accès à vie à 1499,99€.');
+      metaDescription.setAttribute('content', 'AMZing FBA : reçois des produits rentables chaque semaine avec ROI calculé. Fournisseurs, communauté et support inclus. Accès à vie à 1499,99€.');
     } else {
       const meta = document.createElement('meta');
       meta.name = 'description';
-      meta.content = 'AMZing FBA Suite : logiciel tout-en-un pour lancer et scaler Amazon FBA. Outils de sourcing, opportunités ROI, communauté et support. Accès à vie à 1499,99€.';
+      meta.content = 'AMZing FBA : reçois des produits rentables chaque semaine avec ROI calculé. Fournisseurs, communauté et support inclus. Accès à vie à 1499,99€.';
       document.head.appendChild(meta);
     }
 
     // OpenGraph
     const ogTags = [
-      { property: 'og:title', content: 'AMZing FBA Suite — Le logiciel tout-en-un pour Amazon FBA' },
-      { property: 'og:description', content: 'Outils de sourcing, opportunités ROI, communauté et support. Accès à vie.' },
+      { property: 'og:title', content: 'AMZing FBA — Reçois des produits rentables chaque semaine' },
+      { property: 'og:description', content: 'Produits rentables avec ROI calculé, fournisseurs et support. Accès à vie.' },
       { property: 'og:type', content: 'website' },
       { property: 'og:url', content: 'https://amzingfba.fr/suite' },
     ];

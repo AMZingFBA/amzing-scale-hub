@@ -48,7 +48,7 @@ const SuiteTestimonials = () => {
             Ce qu'en disent les membres
           </h2>
           <p className="text-suite-gray text-lg max-w-2xl mx-auto">
-            Des vendeurs comme toi qui utilisent AMZing FBA Suite au quotidien.
+            Des vendeurs comme toi qui utilisent AMZing FBA au quotidien.
           </p>
         </div>
 

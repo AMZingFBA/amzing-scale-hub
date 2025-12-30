@@ -2,15 +2,15 @@ import { Check, Infinity, Headphones, Users, Calendar, RefreshCcw } from 'lucide
 
 const SuiteWhatYouGet = () => {
   const mainFeatures = [
-    "Accès complet au logiciel AMZing FBA Suite",
-    "Moniteur de produits rentables avec calcul ROI automatique",
+    "Produits rentables envoyés chaque semaine",
+    "ROI et marges calculés pour chaque produit",
     "Catalogue fournisseurs et deals exclusifs",
     "Templates listings Amazon optimisés",
     "Calculateurs de coûts et marges",
     "Checklists produit et lancement",
     "Forma en ligne : modules et guides pas à pas",
     "Process complets pour chaque étape FBA",
-    "Mises à jour et nouvelles fonctionnalités incluses"
+    "Mises à jour et nouveaux produits inclus"
   ];
 
   const includedItems = [
@@ -41,8 +41,8 @@ const SuiteWhatYouGet = () => {
                 <Check className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-white">AMZing FBA Suite — Accès Complet</h3>
-                <p className="text-suite-gray text-sm">Tout ce dont tu as besoin pour réussir</p>
+                <h3 className="text-xl font-bold text-white">AMZing FBA — Accès Complet</h3>
+                <p className="text-suite-gray text-sm">Produits rentables + outils + accompagnement</p>
               </div>
             </div>
           </div>

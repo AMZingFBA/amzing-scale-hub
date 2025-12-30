@@ -8,7 +8,6 @@ const SuiteFooter = () => {
             <span className="text-xl font-bold">
               <span className="text-suite-orange">AMZing</span>
               <span className="text-white"> FBA</span>
-              <span className="text-suite-blue ml-1 text-sm font-medium">Suite</span>
             </span>
           </div>
 
@@ -27,7 +26,7 @@ const SuiteFooter = () => {
 
           {/* Copyright */}
           <div className="text-sm text-suite-gray">
-            © {new Date().getFullYear()} AMZing FBA Suite
+            © {new Date().getFullYear()} AMZing FBA
           </div>
         </div>
       </div>
