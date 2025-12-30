@@ -1,43 +1,16 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/hooks/use-auth';
-import { toast } from 'sonner';
+
+// Lien de paiement Stripe direct pour AMZing FBA Suite (1499,99€)
+const SUITE_PAYMENT_LINK = "https://pay.amzingfba.com/b/28E7sLa1TdaoebF1np00001";
 
 export const useSuiteCheckout = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const { user } = useAuth();
-  const navigate = useNavigate();
 
   const startCheckout = async () => {
-    if (!user) {
-      toast.error("Veuillez vous connecter pour continuer");
-      navigate('/auth?redirect=/suite');
-      return;
-    }
-
     setIsLoading(true);
     
-    try {
-      const { data, error } = await supabase.functions.invoke('create-suite-checkout');
-      
-      if (error) {
-        console.error('Checkout error:', error);
-        toast.error("Erreur lors de la création du checkout");
-        return;
-      }
-
-      if (data?.url) {
-        window.location.href = data.url;
-      } else {
-        toast.error("Erreur: URL de paiement non reçue");
-      }
-    } catch (error) {
-      console.error('Checkout error:', error);
-      toast.error("Erreur lors de la création du checkout");
-    } finally {
-      setIsLoading(false);
-    }
+    // Redirection directe vers le lien de paiement Stripe
+    window.location.href = SUITE_PAYMENT_LINK;
   };
 
   return {
