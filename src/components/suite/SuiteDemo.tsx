@@ -1,5 +1,4 @@
 import { Monitor, BarChart3, ShoppingBag, Crown, Package, TrendingUp, Users, Sparkles, BookOpen, MessageCircle, ExternalLink } from 'lucide-react';
-import demoVideo from '@/assets/suite-demo-video.mp4';
 
 const SuiteDemo = () => {
   const screenshots = [
@@ -145,7 +144,7 @@ const SuiteDemo = () => {
         </div>
 
         {/* Screenshots grid */}
-        <div className="grid md:grid-cols-3 gap-6 mb-12">
+        <div className="grid md:grid-cols-3 gap-6">
           {screenshots.map((item, index) => (
             <div
               key={index}
@@ -165,20 +164,6 @@ const SuiteDemo = () => {
               </div>
             </div>
           ))}
-        </div>
-
-        {/* Video demo block */}
-        <div className="bg-suite-card border border-white/10 rounded-2xl overflow-hidden">
-          <div className="aspect-video relative bg-gradient-to-br from-[#0d0d15] to-[#0a0a12] overflow-hidden">
-            <video
-              src={demoVideo}
-              autoPlay
-              loop
-              muted
-              playsInline
-              className="w-full h-full object-cover"
-            />
-          </div>
         </div>
       </div>
     </section>
