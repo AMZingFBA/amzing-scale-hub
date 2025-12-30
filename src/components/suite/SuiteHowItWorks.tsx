@@ -5,7 +5,7 @@ const SuiteHowItWorks = () => {
     {
       number: "01",
       icon: LogIn,
-      title: "Tu accèdes à la Suite",
+      title: "Tu accèdes à AMZing FBA",
       description: "Connexion immédiate à tous les outils, la communauté et le support dès ton achat."
     },
     {

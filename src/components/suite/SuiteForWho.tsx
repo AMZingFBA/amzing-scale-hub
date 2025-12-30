@@ -28,11 +28,11 @@ const SuiteForWho = () => {
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
             <span className="text-white">Pour qui est </span>
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-suite-orange to-suite-blue">AMZing FBA Suite</span>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-suite-orange to-suite-blue">AMZing FBA</span>
             <span className="text-white"> ?</span>
           </h2>
           <p className="text-suite-gray text-lg max-w-2xl mx-auto">
-            Que tu démarres ou que tu cherches à passer au niveau supérieur, la Suite s'adapte à ton profil.
+            Que tu démarres ou que tu cherches à passer au niveau supérieur, AMZing FBA s'adapte à ton profil.
           </p>
         </div>
 
