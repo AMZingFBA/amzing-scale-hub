@@ -29,7 +29,6 @@ const SuiteNavbar = () => {
             <span className="text-xl md:text-2xl font-bold">
               <span className="text-suite-orange">AMZing</span>
               <span className="text-white"> FBA</span>
-              <span className="text-suite-blue ml-1 text-sm font-medium">Suite</span>
             </span>
           </div>
 

@@ -4,8 +4,8 @@ const SuiteSolution = () => {
   const features = [
     {
       icon: Target,
-      title: "Moniteur opportunités",
-      description: "Identifie les produits rentables avec calcul automatique du ROI et des marges.",
+      title: "Produits rentables livrés",
+      description: "Reçois chaque semaine des produits validés avec ROI calculé, prêts à sourcer.",
       color: "suite-orange"
     },
     {
@@ -61,10 +61,10 @@ const SuiteSolution = () => {
           </div>
           
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-suite-orange to-suite-blue">AMZing FBA Suite</span>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-suite-orange to-suite-blue">AMZing FBA</span>
           </h2>
           <p className="text-suite-gray text-lg max-w-2xl mx-auto">
-            Tout ce dont tu as besoin pour réussir sur Amazon FBA, réuni dans une seule plateforme.
+            Des produits rentables livrés + les outils et l'accompagnement pour réussir sur Amazon FBA.
           </p>
         </div>
 

@@ -16,9 +16,9 @@ const SuiteHero = () => {
   };
 
   const benefits = [
-    "Moniteurs de produits rentables + ROI",
-    "Accès fournisseurs & catalogues",
-    "Process & templates intégrés (Forma en ligne)",
+    "Produits rentables envoyés chaque semaine",
+    "Calcul ROI et marges automatique",
+    "Accès fournisseurs & catalogues exclusifs",
     "Communauté privée + support 9h–19h",
     "Appel hebdo (30–60 min)"
   ];
@@ -42,15 +42,15 @@ const SuiteHero = () => {
             </div>
             
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6">
-              Le logiciel tout-en-un pour{' '}
+              Reçois des{' '}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-suite-orange to-suite-blue">
-                lancer et scaler Amazon FBA
+                produits rentables
               </span>
-              {' '}— à vie.
+              {' '}chaque semaine — à vie.
             </h1>
             
             <p className="text-lg md:text-xl text-suite-gray mb-8 max-w-xl mx-auto lg:mx-0">
-              AMZing FBA Suite regroupe les outils, les opportunités et l'accompagnement pour avancer vite, sans te disperser.
+              AMZing FBA t'envoie directement des opportunités validées avec ROI calculé, fournisseurs et accompagnement pour scaler vite.
             </p>
             
             {/* Benefits list */}
@@ -91,7 +91,7 @@ const SuiteHero = () => {
                 <div className="w-3 h-3 rounded-full bg-red-500" />
                 <div className="w-3 h-3 rounded-full bg-yellow-500" />
                 <div className="w-3 h-3 rounded-full bg-green-500" />
-                <span className="ml-4 text-sm text-suite-gray">Dashboard AMZing FBA Suite</span>
+                <span className="ml-4 text-sm text-suite-gray">Dashboard AMZing FBA</span>
               </div>
               
               {/* Mockup content placeholder */}

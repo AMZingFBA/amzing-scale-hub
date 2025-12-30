@@ -2,10 +2,10 @@ import { ArrowRight, Check } from 'lucide-react';
 
 const SuiteFinalCTA = () => {
   const benefits = [
-    "Outils de sourcing et moniteur ROI",
+    "Produits rentables chaque semaine",
     "Catalogue fournisseurs exclusif",
     "Support + appel hebdo",
-    "Accès à vie, mises à jour incluses"
+    "Accès à vie, nouveaux produits inclus"
   ];
 
   const scrollToPricing = () => {
@@ -26,7 +26,7 @@ const SuiteFinalCTA = () => {
         </h2>
         
         <p className="text-xl text-suite-gray mb-8 max-w-2xl mx-auto">
-          Rejoins les vendeurs qui utilisent AMZing FBA Suite pour structurer leur business et scaler plus vite.
+          Rejoins les vendeurs qui reçoivent des produits rentables chaque semaine et scalent plus vite avec AMZing FBA.
         </p>
 
         {/* Benefits recap */}
