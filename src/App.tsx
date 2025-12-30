@@ -86,6 +86,7 @@ const AmazonFbaVsFbm = lazy(() => import("./pages/guide/AmazonFbaVsFbm"));
 const CommentDebuterAmazonFba = lazy(() => import("./pages/guide/CommentDebuterAmazonFba"));
 const CombienCouteAmazonFba = lazy(() => import("./pages/guide/CombienCouteAmazonFba"));
 const FormationAmazonFbaDebutant = lazy(() => import("./pages/guide/FormationAmazonFbaDebutant"));
+const SuiteLanding = lazy(() => import("./pages/SuiteLanding"));
 
 const queryClient = new QueryClient();
 
@@ -188,6 +189,9 @@ const App = () => (
             <Route path="/guide/comment-debuter-amazon-fba" element={<CommentDebuterAmazonFba />} />
             <Route path="/guide/combien-coute-amazon-fba" element={<CombienCouteAmazonFba />} />
             <Route path="/guide/formation-amazon-fba-debutant" element={<FormationAmazonFbaDebutant />} />
+            
+            {/* Landing page AMZing FBA Suite pour amzingfba.fr */}
+            <Route path="/suite" element={<SuiteLanding />} />
             
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
