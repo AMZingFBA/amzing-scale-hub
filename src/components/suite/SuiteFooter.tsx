@@ -13,13 +13,13 @@ const SuiteFooter = () => {
 
           {/* Links */}
           <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-suite-gray">
-            <a href="/suite/mentions-legales" className="hover:text-white transition-colors">
+            <a href="/mentions-legales" className="hover:text-white transition-colors">
               Mentions légales
             </a>
-            <a href="/suite/confidentialite" className="hover:text-white transition-colors">
+            <a href="/confidentialite" className="hover:text-white transition-colors">
               Politique de confidentialité
             </a>
-            <a href="/suite/cgv" className="hover:text-white transition-colors">
+            <a href="/cgv" className="hover:text-white transition-colors">
               CGV
             </a>
           </div>
