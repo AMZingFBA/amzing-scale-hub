@@ -60,6 +60,18 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        // AMZing FBA Suite colors
+        suite: {
+          bg: "#0B0F19",
+          card: "#141922",
+          text: "#FFFFFF",
+          gray: "#9CA3AF",
+          orange: "#FF6A00",
+          blue: "#1E4CFF",
+        },
+      },
+      fontFamily: {
+        inter: ['Inter', 'system-ui', 'sans-serif'],
       },
       borderRadius: {
         lg: "var(--radius)",
