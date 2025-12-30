@@ -88,7 +88,7 @@ serve(async (req) => {
       ],
       mode: "payment",
       payment_method_types: ["card", "klarna"],
-      success_url: `${origin}/suite?success=true`,
+      success_url: `${origin}/suite-success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/suite#pricing`,
       metadata: {
         user_id: user.id,
