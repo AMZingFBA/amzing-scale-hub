@@ -1,6 +1,9 @@
-import { Check, Shield, Zap, CreditCard } from 'lucide-react';
+import { Check, Shield, Zap, CreditCard, Loader2 } from 'lucide-react';
+import { useSuiteCheckout } from '@/hooks/use-suite-checkout';
 
 const SuitePricing = () => {
+  const { startCheckout, isLoading } = useSuiteCheckout();
+
   const includedFeatures = [
     "Produits rentables envoyés chaque semaine",
     "ROI et marges calculés automatiquement",
@@ -12,11 +15,6 @@ const SuitePricing = () => {
     "Appel hebdo (30–60 min)",
     "Nouveaux produits + mises à jour à vie"
   ];
-
-  const scrollToCheckout = () => {
-    // Placeholder - replace with actual checkout URL
-    window.open('https://VOTRE_LIEN_STRIPE_CHECKOUT', '_blank');
-  };
 
   return (
     <section id="pricing" className="py-20 lg:py-28 relative">
@@ -98,10 +96,18 @@ const SuitePricing = () => {
 
               {/* CTA Button */}
               <button
-                onClick={scrollToCheckout}
-                className="w-full bg-gradient-to-r from-suite-orange to-suite-orange/80 hover:from-suite-orange/90 hover:to-suite-orange text-white font-bold py-4 px-6 rounded-xl transition-all duration-300 hover:shadow-xl hover:shadow-suite-orange/30 text-lg mb-6"
+                onClick={startCheckout}
+                disabled={isLoading}
+                className="w-full bg-gradient-to-r from-suite-orange to-suite-orange/80 hover:from-suite-orange/90 hover:to-suite-orange text-white font-bold py-4 px-6 rounded-xl transition-all duration-300 hover:shadow-xl hover:shadow-suite-orange/30 text-lg mb-6 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
-                Je prends l'accès à vie
+                {isLoading ? (
+                  <>
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    Chargement...
+                  </>
+                ) : (
+                  "Je prends l'accès à vie"
+                )}
               </button>
 
               {/* Trust badges */}
