@@ -22,7 +22,7 @@ const SuiteSolution = () => {
     },
     {
       icon: BookOpen,
-      title: "Forma en ligne",
+      title: "Formation en ligne",
       description: "Bibliothèque de modules et process pas à pas pour chaque étape.",
       color: "purple-500"
     },
@@ -34,7 +34,7 @@ const SuiteSolution = () => {
     },
     {
       icon: Headphones,
-      title: "Support + appel hebdo",
+      title: "Support + appel hebdomadaire",
       description: "Support 9h-19h jours ouvrés + 1 appel par semaine (30-60 min).",
       color: "cyan-500"
     }

@@ -9,10 +9,10 @@ const SuitePricing = () => {
     "ROI et marges calculés automatiquement",
     "Catalogue fournisseurs & deals exclusifs",
     "Templates & checklists",
-    "Forma en ligne (modules & guides)",
+    "Formation en ligne (modules & guides)",
     "Communauté privée",
     "Support 9h–19h (jours ouvrés)",
-    "Appel hebdo (30–60 min)",
+    "Appel hebdomadaire (30–60 min)",
     "Nouveaux produits + mises à jour à vie"
   ];
 
