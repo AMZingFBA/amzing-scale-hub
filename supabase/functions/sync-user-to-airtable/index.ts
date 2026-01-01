@@ -54,9 +54,17 @@ function randomDelay(min: number, max: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, delay));
 }
 
-// Helper function to search for user in Airtable
+// Normalize emails to prevent duplicates caused by casing/spacing differences
+function normalizeEmail(email: string): string {
+  return (email || '').trim().toLowerCase();
+}
+
+// Helper function to search for user in Airtable (case-insensitive)
 async function searchUserInAirtable(email: string): Promise<{ records: Array<{ id: string; fields: Record<string, unknown> }> }> {
-  const searchUrl = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${USERS_TABLE}?filterByFormula={Email (principal)}="${email}"`;
+  const normalized = normalizeEmail(email);
+  const formula = `LOWER({Email (principal)})="${normalized}"`;
+  const searchUrl = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${USERS_TABLE}?filterByFormula=${encodeURIComponent(formula)}`;
+
   const searchResponse = await fetch(searchUrl, {
     headers: {
       'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
