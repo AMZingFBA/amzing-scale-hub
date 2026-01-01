@@ -7,6 +7,7 @@ import SuiteHowItWorks from '@/components/suite/SuiteHowItWorks';
 import SuiteWhatYouGet from '@/components/suite/SuiteWhatYouGet';
 import SuiteDemo from '@/components/suite/SuiteDemo';
 import SuiteDashboard from '@/components/suite/SuiteDashboard';
+import SuiteMockups from '@/components/suite/SuiteMockups';
 import SuiteTestimonials from '@/components/suite/SuiteTestimonials';
 import SuitePricing from '@/components/suite/SuitePricing';
 import SuiteFAQ from '@/components/suite/SuiteFAQ';
@@ -108,6 +109,7 @@ const SuiteLanding = () => {
         <SuiteHowItWorks />
         <SuiteWhatYouGet />
         <SuiteDemo />
+        <SuiteMockups />
         <SuiteTestimonials />
         <SuitePricing />
         <SuiteFAQ />
