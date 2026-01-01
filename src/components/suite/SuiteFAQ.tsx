@@ -30,10 +30,6 @@ const SuiteFAQ = () => {
       answer: "Chaque semaine, tu peux réserver un créneau de 30 à 60 minutes pour discuter de ton avancement, poser tes questions et débloquer tes situations."
     },
     {
-      question: "Paiement en plusieurs fois ?",
-      answer: "Oui, tu peux payer en 3, 4 ou 5 fois. Les montants exacts sont calculés automatiquement au checkout pour totaliser 1 499,99 €."
-    },
-    {
       question: "Comment fonctionne l'accès à la communauté ?",
       answer: "Dès ton achat, tu accèdes à notre communauté privée où tu peux échanger avec d'autres membres, partager des opportunités et obtenir de l'entraide."
     },
