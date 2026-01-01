@@ -106,7 +106,7 @@ const SuitePricing = () => {
                     Chargement...
                   </>
                 ) : (
-                  "Je prends l'accès à vie"
+                  "Nous rejoindre maintenant"
                 )}
               </button>
 
