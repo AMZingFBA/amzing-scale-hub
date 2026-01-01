@@ -44,7 +44,7 @@ const SuiteFinalCTA = () => {
           onClick={scrollToPricing}
           className="group inline-flex items-center gap-3 bg-gradient-to-r from-suite-orange to-suite-orange/80 hover:from-suite-orange/90 hover:to-suite-orange text-white font-bold py-5 px-10 rounded-xl transition-all duration-300 hover:shadow-xl hover:shadow-suite-orange/30 text-xl"
         >
-          Débloquer mon accès à vie
+          Réserver un appel
           <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
         </button>
 
