@@ -20,7 +20,7 @@ const SuiteHero = () => {
     "Calcul ROI et marges automatique",
     "Accès fournisseurs & catalogues exclusifs",
     "Communauté privée + support 9h–19h",
-    "Appel hebdomadaire (30–60 min)"
+    "Coaching hebdomadaire (30–60 min)"
   ];
 
   return (

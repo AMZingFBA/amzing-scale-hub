@@ -4,7 +4,7 @@ const SuiteFinalCTA = () => {
   const benefits = [
     "Produits rentables chaque semaine",
     "Catalogue fournisseurs exclusif",
-    "Support + appel hebdomadaire",
+    "Support + Coaching hebdomadaire",
     "Accès à vie, nouveaux produits inclus"
   ];
 

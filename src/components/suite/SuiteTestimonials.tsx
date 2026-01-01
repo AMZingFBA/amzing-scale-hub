@@ -11,7 +11,7 @@ const SuiteTestimonials = () => {
     {
       name: "Sophie M.",
       role: "Ex-salariée en reconversion",
-      content: "Le support est vraiment réactif. L'appel hebdomadaire m'a permis de débloquer plusieurs situations.",
+      content: "Le support est vraiment réactif. Le Coaching hebdomadaire m'a permis de débloquer plusieurs situations.",
       rating: 5
     },
     {

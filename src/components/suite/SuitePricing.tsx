@@ -12,7 +12,7 @@ const SuitePricing = () => {
     "Formation en ligne (modules & guides)",
     "Communauté privée",
     "Support 9h–19h (jours ouvrés)",
-    "Appel hebdomadaire (30–60 min)",
+    "Coaching hebdomadaire (30–60 min)",
     "Nouveaux produits + mises à jour à vie"
   ];
 

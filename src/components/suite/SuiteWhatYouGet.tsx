@@ -17,7 +17,7 @@ const SuiteWhatYouGet = () => {
     { icon: Infinity, text: "Accès logiciel à vie" },
     { icon: Users, text: "Communauté privée" },
     { icon: Headphones, text: "Support 9h–19h" },
-    { icon: Calendar, text: "Appel hebdomadaire (30-60 min)" },
+    { icon: Calendar, text: "Coaching hebdomadaire (30-60 min)" },
     { icon: RefreshCcw, text: "Mises à jour incluses" }
   ];
 
