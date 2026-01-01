@@ -26,6 +26,9 @@ import { seoData, schemas } from "@/lib/seo-data";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useRegistrationSource } from "@/hooks/use-registration-source";
+import HomeDashboardPreview from "@/components/home/HomeDashboardPreview";
+import HomePreviewSection from "@/components/home/HomePreviewSection";
+import HomeMockups from "@/components/home/HomeMockups";
 
 const ServiceCard = ({ 
   children, 
@@ -263,6 +266,15 @@ const Index = () => {
           </div>
         </div>
       </section>
+
+      {/* Dashboard Preview - "Ton espace membre" */}
+      <HomeDashboardPreview />
+
+      {/* Platform Preview - "Aperçu de la plateforme" */}
+      <HomePreviewSection />
+
+      {/* Mockups - Tous les appareils */}
+      <HomeMockups />
 
       {/* Guides Amazon FBA - Section SEO - Bold banner style */}
       <section className="py-16 relative overflow-hidden">
