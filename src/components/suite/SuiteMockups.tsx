@@ -19,68 +19,111 @@ const SuiteMockups = () => {
         {/* Mockups Container - Mobile: stack vertically, Desktop: absolute positioning */}
         <div className="relative md:flex md:justify-center md:items-end md:h-[420px] lg:h-[480px]">
           
-          {/* Mobile Layout: Single centered laptop mockup */}
-          <div className="md:hidden flex flex-col items-center">
+          {/* Mobile Layout: All 3 devices stacked */}
+          <div className="md:hidden flex flex-col items-center gap-8">
+            
             {/* Laptop Mockup - Mobile */}
             <div className="relative">
-              {/* Screen */}
-              <div className="w-[300px] bg-gray-900 rounded-t-lg p-2 border-t border-x border-gray-700">
+              <div className="w-[280px] bg-gray-900 rounded-t-lg p-1.5 border-t border-x border-gray-700">
                 <div className="bg-suite-bg rounded-md overflow-hidden aspect-[16/10]">
-                  {/* Browser chrome */}
-                  <div className="bg-gray-800 px-3 py-1.5 flex items-center gap-2">
+                  <div className="bg-gray-800 px-2 py-1 flex items-center gap-2">
                     <div className="flex gap-1">
-                      <div className="w-2 h-2 rounded-full bg-red-500" />
-                      <div className="w-2 h-2 rounded-full bg-yellow-500" />
-                      <div className="w-2 h-2 rounded-full bg-green-500" />
+                      <div className="w-1.5 h-1.5 rounded-full bg-red-500" />
+                      <div className="w-1.5 h-1.5 rounded-full bg-yellow-500" />
+                      <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
                     </div>
-                    <div className="flex-1 bg-gray-700 rounded text-[7px] text-gray-400 px-2 py-0.5 text-center">
+                    <div className="flex-1 bg-gray-700 rounded text-[6px] text-gray-400 px-2 py-0.5 text-center">
                       app.amzingfba.com
                     </div>
                   </div>
-                  {/* Dashboard Content */}
-                  <div className="p-3">
-                    <div className="space-y-2">
-                      <div className="text-[9px] font-bold text-white">Bienvenue sur AMZing FBA</div>
-                      {/* Stats cards */}
-                      <div className="grid grid-cols-3 gap-1.5">
-                        <div className="bg-suite-orange/20 rounded p-1.5 text-center">
-                          <div className="text-[11px] font-bold text-suite-orange">127</div>
-                          <div className="text-[5px] text-suite-gray">Produits</div>
-                        </div>
-                        <div className="bg-suite-blue/20 rounded p-1.5 text-center">
-                          <div className="text-[11px] font-bold text-suite-blue">45%</div>
-                          <div className="text-[5px] text-suite-gray">ROI Moyen</div>
-                        </div>
-                        <div className="bg-green-500/20 rounded p-1.5 text-center">
-                          <div className="text-[11px] font-bold text-green-400">24</div>
-                          <div className="text-[5px] text-suite-gray">Fournisseurs</div>
-                        </div>
+                  <div className="p-2">
+                    <div className="text-[8px] font-bold text-white mb-2">Bienvenue sur AMZing FBA</div>
+                    <div className="grid grid-cols-3 gap-1">
+                      <div className="bg-suite-orange/20 rounded p-1 text-center">
+                        <div className="text-[10px] font-bold text-suite-orange">127</div>
+                        <div className="text-[5px] text-suite-gray">Produits</div>
                       </div>
-                      {/* Recent products */}
-                      <div className="bg-white/5 rounded p-2">
-                        <div className="text-[7px] text-white mb-1.5">Derniers produits ajoutés</div>
-                        <div className="space-y-1">
-                          <div className="flex justify-between text-[6px]">
-                            <span className="text-suite-gray">Produit électronique</span>
-                            <span className="text-green-400">+52% ROI</span>
-                          </div>
-                          <div className="flex justify-between text-[6px]">
-                            <span className="text-suite-gray">Accessoire maison</span>
-                            <span className="text-green-400">+38% ROI</span>
-                          </div>
-                        </div>
+                      <div className="bg-suite-blue/20 rounded p-1 text-center">
+                        <div className="text-[10px] font-bold text-suite-blue">45%</div>
+                        <div className="text-[5px] text-suite-gray">ROI</div>
+                      </div>
+                      <div className="bg-green-500/20 rounded p-1 text-center">
+                        <div className="text-[10px] font-bold text-green-400">24</div>
+                        <div className="text-[5px] text-suite-gray">Fournisseurs</div>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
-              {/* Laptop base */}
-              <div className="w-[340px] h-3 bg-gray-800 rounded-b-xl mx-auto border-b border-x border-gray-700" />
-              <div className="w-[100px] h-1 bg-gray-700 rounded-b mx-auto" />
-              {/* Laptop label */}
-              <div className="mt-4 flex items-center justify-center gap-1.5 text-suite-gray text-sm">
-                <Monitor className="w-4 h-4" />
-                <span>Tous appareils</span>
+              <div className="w-[310px] h-2 bg-gray-800 rounded-b-xl mx-auto border-b border-x border-gray-700" />
+              <div className="w-[80px] h-1 bg-gray-700 rounded-b mx-auto" />
+              <div className="mt-3 flex items-center justify-center gap-1 text-suite-gray text-xs">
+                <Monitor className="w-3 h-3" />
+                <span>Desktop</span>
+              </div>
+            </div>
+
+            {/* Phone & Tablet side by side on mobile */}
+            <div className="flex gap-4 items-end">
+              {/* Phone Mockup - Mobile */}
+              <div className="relative">
+                <div className="w-[100px] bg-gray-900 rounded-[16px] p-1.5 shadow-lg border border-gray-700">
+                  <div className="absolute top-2.5 left-1/2 -translate-x-1/2 w-10 h-3 bg-black rounded-full z-10" />
+                  <div className="bg-suite-bg rounded-[12px] overflow-hidden aspect-[9/19]">
+                    <div className="p-2 h-full flex flex-col">
+                      <div className="flex items-center justify-between mb-2 pt-3">
+                        <div className="text-[6px] font-bold text-suite-orange">AMZing FBA</div>
+                        <div className="w-3 h-3 rounded-full bg-suite-orange/20" />
+                      </div>
+                      <div className="space-y-1.5 flex-1">
+                        <div className="bg-suite-blue/20 rounded p-1.5">
+                          <div className="text-[5px] text-white font-medium">Module 1</div>
+                        </div>
+                        <div className="bg-white/5 rounded p-1.5">
+                          <div className="text-[5px] text-white font-medium">Module 2</div>
+                        </div>
+                        <div className="bg-white/5 rounded p-1.5">
+                          <div className="text-[5px] text-white font-medium">Module 3</div>
+                        </div>
+                        <div className="bg-white/5 rounded p-1.5">
+                          <div className="text-[5px] text-white font-medium">Module 4</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="mt-2 flex items-center justify-center gap-1 text-suite-gray text-[10px]">
+                  <Smartphone className="w-2.5 h-2.5" />
+                  <span>Mobile</span>
+                </div>
+              </div>
+
+              {/* Tablet Mockup - Mobile */}
+              <div className="relative">
+                <div className="w-[120px] bg-gray-900 rounded-[12px] p-1.5 shadow-lg border border-gray-700">
+                  <div className="absolute top-2 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-gray-700 rounded-full" />
+                  <div className="bg-suite-bg rounded-[8px] overflow-hidden aspect-[3/4]">
+                    <div className="p-2 h-full">
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="text-[6px] font-bold text-suite-orange">Formation</div>
+                      </div>
+                      <div className="bg-gradient-to-br from-suite-blue/30 to-suite-orange/30 rounded aspect-video mb-2 flex items-center justify-center">
+                        <div className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center">
+                          <div className="w-0 h-0 border-t-[4px] border-t-transparent border-l-[6px] border-l-white border-b-[4px] border-b-transparent ml-0.5" />
+                        </div>
+                      </div>
+                      <div className="text-[6px] font-bold text-white mb-1">Introduction FBA</div>
+                      <div className="bg-white/10 rounded-full h-1 mb-1">
+                        <div className="bg-suite-orange h-full rounded-full w-1/3" />
+                      </div>
+                      <div className="text-[5px] text-suite-gray">33%</div>
+                    </div>
+                  </div>
+                </div>
+                <div className="mt-2 flex items-center justify-center gap-1 text-suite-gray text-[10px]">
+                  <Tablet className="w-2.5 h-2.5" />
+                  <span>Tablette</span>
+                </div>
               </div>
             </div>
           </div>
