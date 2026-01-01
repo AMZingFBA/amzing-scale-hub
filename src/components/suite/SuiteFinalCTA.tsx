@@ -49,7 +49,7 @@ const SuiteFinalCTA = () => {
         </button>
 
         <p className="mt-6 text-suite-gray">
-          1 499,99 € — Paiement unique ou en plusieurs fois
+          1 499,99 € — Paiement unique
         </p>
       </div>
     </section>

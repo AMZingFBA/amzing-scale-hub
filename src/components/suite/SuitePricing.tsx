@@ -27,7 +27,7 @@ const SuitePricing = () => {
             Accès à vie — <span className="text-suite-orange">1 499,99 €</span>
           </h2>
           <p className="text-suite-gray text-lg">
-            Paiement en 1x ou en 3 à 5 fois (montants calculés automatiquement au checkout).
+            Paiement unique sécurisé.
           </p>
         </div>
 
