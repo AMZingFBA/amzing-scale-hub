@@ -41,7 +41,7 @@ const SuiteFinalCTA = () => {
 
         {/* CTA Button */}
         <a
-          href="https://calendly.com/amzingfba"
+          href="https://calendly.com/amzingfba26/30min"
           target="_blank"
           rel="noopener noreferrer"
           className="group inline-flex items-center gap-3 bg-gradient-to-r from-suite-orange to-suite-orange/80 hover:from-suite-orange/90 hover:to-suite-orange text-white font-bold py-5 px-10 rounded-xl transition-all duration-300 hover:shadow-xl hover:shadow-suite-orange/30 text-xl"

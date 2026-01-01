@@ -34,7 +34,7 @@ const SuiteNavbar = () => {
 
           {/* CTA Button */}
           <a
-            href="https://calendly.com/amzingfba"
+            href="https://calendly.com/amzingfba26/30min"
             target="_blank"
             rel="noopener noreferrer"
             className="hidden md:block bg-suite-orange hover:bg-suite-orange/90 text-white font-semibold px-6 py-2.5 rounded-lg transition-all duration-300 hover:shadow-lg hover:shadow-suite-orange/20"
