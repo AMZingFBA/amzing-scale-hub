@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, Calendar } from 'lucide-react';
 
 const SuiteFAQ = () => {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
@@ -82,6 +82,21 @@ const SuiteFAQ = () => {
               </div>
             </div>
           ))}
+        </div>
+
+        {/* D'autres questions */}
+        <div className="mt-12 text-center bg-suite-card border border-white/10 rounded-2xl p-8">
+          <h3 className="text-xl font-bold text-white mb-3">D'autres questions ?</h3>
+          <p className="text-suite-gray mb-6">Réserve un appel gratuit pour en discuter avec nous.</p>
+          <a
+            href="https://calendly.com/amzingfba"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 bg-gradient-to-r from-suite-orange to-suite-orange/80 hover:from-suite-orange/90 hover:to-suite-orange text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 hover:shadow-lg hover:shadow-suite-orange/30"
+          >
+            <Calendar className="w-5 h-5" />
+            Réserver un appel
+          </a>
         </div>
       </div>
     </section>
