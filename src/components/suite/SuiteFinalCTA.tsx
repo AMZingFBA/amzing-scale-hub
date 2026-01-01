@@ -40,13 +40,15 @@ const SuiteFinalCTA = () => {
         </div>
 
         {/* CTA Button */}
-        <button
-          onClick={scrollToPricing}
+        <a
+          href="https://calendly.com/amzingfba"
+          target="_blank"
+          rel="noopener noreferrer"
           className="group inline-flex items-center gap-3 bg-gradient-to-r from-suite-orange to-suite-orange/80 hover:from-suite-orange/90 hover:to-suite-orange text-white font-bold py-5 px-10 rounded-xl transition-all duration-300 hover:shadow-xl hover:shadow-suite-orange/30 text-xl"
         >
           Réserver un appel
           <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-        </button>
+        </a>
 
         <p className="mt-6 text-suite-gray">
           1 499,99 € — Paiement unique

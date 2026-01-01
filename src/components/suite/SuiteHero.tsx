@@ -65,12 +65,14 @@ const SuiteHero = () => {
           
           {/* CTAs */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button
-              onClick={scrollToPricing}
+            <a
+              href="https://calendly.com/amzingfba"
+              target="_blank"
+              rel="noopener noreferrer"
               className="group bg-gradient-to-r from-suite-orange to-suite-orange/80 hover:from-suite-orange/90 hover:to-suite-orange text-white font-semibold px-8 py-4 rounded-xl transition-all duration-300 hover:shadow-xl hover:shadow-suite-orange/30 text-lg"
             >
               Réserver un appel
-            </button>
+            </a>
             <button
               onClick={scrollToFeatures}
               className="flex items-center justify-center gap-2 border border-suite-gray/30 hover:border-suite-gray/50 text-white font-medium px-8 py-4 rounded-xl transition-all duration-300 hover:bg-white/5"
