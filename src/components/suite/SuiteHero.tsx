@@ -66,7 +66,7 @@ const SuiteHero = () => {
           {/* CTAs */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
-              href="https://calendly.com/amzingfba"
+              href="https://calendly.com/amzingfba26/30min"
               target="_blank"
               rel="noopener noreferrer"
               className="group bg-gradient-to-r from-suite-orange to-suite-orange/80 hover:from-suite-orange/90 hover:to-suite-orange text-white font-semibold px-8 py-4 rounded-xl transition-all duration-300 hover:shadow-xl hover:shadow-suite-orange/30 text-lg"
