@@ -7,7 +7,7 @@ const SuiteMockups = () => {
       <div className="absolute inset-0 bg-gradient-to-b from-suite-orange/10 via-suite-blue/5 to-transparent" />
       
       <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-4">
+        <div className="text-center mb-2">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
             Accessible sur <span className="text-suite-orange">tous tes appareils</span>
           </h2>
@@ -17,7 +17,7 @@ const SuiteMockups = () => {
         </div>
 
         {/* Mockups Container */}
-        <div className="relative flex justify-center items-end h-[500px] md:h-[550px] lg:h-[600px]">
+        <div className="relative flex justify-center items-end h-[360px] md:h-[420px] lg:h-[480px]">
           
           {/* Phone Mockup - Left */}
           <div className="absolute left-0 md:left-[5%] lg:left-[10%] bottom-0 z-30 transform -rotate-3 hover:rotate-0 transition-transform duration-500">
