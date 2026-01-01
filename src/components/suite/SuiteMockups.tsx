@@ -16,14 +16,81 @@ const SuiteMockups = () => {
           </p>
         </div>
 
-        {/* Mockups Container */}
-        <div className="relative flex justify-center items-end h-[360px] md:h-[420px] lg:h-[480px]">
+        {/* Mockups Container - Mobile: stack vertically, Desktop: absolute positioning */}
+        <div className="relative md:flex md:justify-center md:items-end md:h-[420px] lg:h-[480px]">
           
+          {/* Mobile Layout: Single centered laptop mockup */}
+          <div className="md:hidden flex flex-col items-center">
+            {/* Laptop Mockup - Mobile */}
+            <div className="relative">
+              {/* Screen */}
+              <div className="w-[300px] bg-gray-900 rounded-t-lg p-2 border-t border-x border-gray-700">
+                <div className="bg-suite-bg rounded-md overflow-hidden aspect-[16/10]">
+                  {/* Browser chrome */}
+                  <div className="bg-gray-800 px-3 py-1.5 flex items-center gap-2">
+                    <div className="flex gap-1">
+                      <div className="w-2 h-2 rounded-full bg-red-500" />
+                      <div className="w-2 h-2 rounded-full bg-yellow-500" />
+                      <div className="w-2 h-2 rounded-full bg-green-500" />
+                    </div>
+                    <div className="flex-1 bg-gray-700 rounded text-[7px] text-gray-400 px-2 py-0.5 text-center">
+                      app.amzingfba.com
+                    </div>
+                  </div>
+                  {/* Dashboard Content */}
+                  <div className="p-3">
+                    <div className="space-y-2">
+                      <div className="text-[9px] font-bold text-white">Bienvenue sur AMZing FBA</div>
+                      {/* Stats cards */}
+                      <div className="grid grid-cols-3 gap-1.5">
+                        <div className="bg-suite-orange/20 rounded p-1.5 text-center">
+                          <div className="text-[11px] font-bold text-suite-orange">127</div>
+                          <div className="text-[5px] text-suite-gray">Produits</div>
+                        </div>
+                        <div className="bg-suite-blue/20 rounded p-1.5 text-center">
+                          <div className="text-[11px] font-bold text-suite-blue">45%</div>
+                          <div className="text-[5px] text-suite-gray">ROI Moyen</div>
+                        </div>
+                        <div className="bg-green-500/20 rounded p-1.5 text-center">
+                          <div className="text-[11px] font-bold text-green-400">24</div>
+                          <div className="text-[5px] text-suite-gray">Fournisseurs</div>
+                        </div>
+                      </div>
+                      {/* Recent products */}
+                      <div className="bg-white/5 rounded p-2">
+                        <div className="text-[7px] text-white mb-1.5">Derniers produits ajoutés</div>
+                        <div className="space-y-1">
+                          <div className="flex justify-between text-[6px]">
+                            <span className="text-suite-gray">Produit électronique</span>
+                            <span className="text-green-400">+52% ROI</span>
+                          </div>
+                          <div className="flex justify-between text-[6px]">
+                            <span className="text-suite-gray">Accessoire maison</span>
+                            <span className="text-green-400">+38% ROI</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              {/* Laptop base */}
+              <div className="w-[340px] h-3 bg-gray-800 rounded-b-xl mx-auto border-b border-x border-gray-700" />
+              <div className="w-[100px] h-1 bg-gray-700 rounded-b mx-auto" />
+              {/* Laptop label */}
+              <div className="mt-4 flex items-center justify-center gap-1.5 text-suite-gray text-sm">
+                <Monitor className="w-4 h-4" />
+                <span>Tous appareils</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Desktop Layout: Three devices with absolute positioning */}
           {/* Phone Mockup - Left */}
-          <div className="absolute left-0 md:left-[5%] lg:left-[10%] bottom-0 z-30 transform -rotate-3 hover:rotate-0 transition-transform duration-500">
+          <div className="hidden md:block absolute left-[5%] lg:left-[10%] bottom-0 z-30 transform -rotate-3 hover:rotate-0 transition-transform duration-500">
             <div className="relative">
               {/* Phone Frame */}
-              <div className="w-[140px] md:w-[180px] lg:w-[200px] bg-gray-900 rounded-[24px] p-2 shadow-2xl shadow-black/50 border border-gray-700">
+              <div className="w-[180px] lg:w-[200px] bg-gray-900 rounded-[24px] p-2 shadow-2xl shadow-black/50 border border-gray-700">
                 {/* Notch */}
                 <div className="absolute top-4 left-1/2 -translate-x-1/2 w-16 h-5 bg-black rounded-full z-10" />
                 {/* Screen */}
@@ -70,10 +137,10 @@ const SuiteMockups = () => {
           </div>
 
           {/* Laptop Mockup - Center */}
-          <div className="relative z-20 transform hover:scale-105 transition-transform duration-500">
+          <div className="hidden md:block relative z-20 transform hover:scale-105 transition-transform duration-500">
             <div className="relative">
               {/* Screen */}
-              <div className="w-[280px] md:w-[400px] lg:w-[500px] bg-gray-900 rounded-t-lg p-2 border-t border-x border-gray-700">
+              <div className="w-[400px] lg:w-[500px] bg-gray-900 rounded-t-lg p-2 border-t border-x border-gray-700">
                 <div className="bg-suite-bg rounded-md overflow-hidden aspect-[16/10]">
                   {/* Browser chrome */}
                   <div className="bg-gray-800 px-3 py-1.5 flex items-center gap-2">
@@ -82,15 +149,15 @@ const SuiteMockups = () => {
                       <div className="w-2 h-2 rounded-full bg-yellow-500" />
                       <div className="w-2 h-2 rounded-full bg-green-500" />
                     </div>
-                    <div className="flex-1 bg-gray-700 rounded text-[6px] md:text-[8px] text-gray-400 px-2 py-0.5 text-center">
+                    <div className="flex-1 bg-gray-700 rounded text-[8px] text-gray-400 px-2 py-0.5 text-center">
                       app.amzingfba.com
                     </div>
                   </div>
                   {/* Dashboard Content */}
-                  <div className="p-3 md:p-4">
+                  <div className="p-4">
                     <div className="flex gap-3">
                       {/* Sidebar */}
-                      <div className="w-1/4 space-y-2 hidden md:block">
+                      <div className="w-1/4 space-y-2">
                         <div className="bg-suite-orange/20 rounded p-2 text-[7px] text-white">Dashboard</div>
                         <div className="bg-white/5 rounded p-2 text-[7px] text-suite-gray">Produits</div>
                         <div className="bg-white/5 rounded p-2 text-[7px] text-suite-gray">Formation</div>
@@ -98,36 +165,36 @@ const SuiteMockups = () => {
                         <div className="bg-white/5 rounded p-2 text-[7px] text-suite-gray">Communauté</div>
                       </div>
                       {/* Main content */}
-                      <div className="flex-1 space-y-2 md:space-y-3">
-                        <div className="text-[8px] md:text-[10px] font-bold text-white">Bienvenue sur AMZing FBA</div>
+                      <div className="flex-1 space-y-3">
+                        <div className="text-[10px] font-bold text-white">Bienvenue sur AMZing FBA</div>
                         {/* Stats cards */}
                         <div className="grid grid-cols-3 gap-2">
                           <div className="bg-suite-orange/20 rounded p-2 text-center">
-                            <div className="text-[10px] md:text-sm font-bold text-suite-orange">127</div>
-                            <div className="text-[5px] md:text-[7px] text-suite-gray">Produits</div>
+                            <div className="text-sm font-bold text-suite-orange">127</div>
+                            <div className="text-[7px] text-suite-gray">Produits</div>
                           </div>
                           <div className="bg-suite-blue/20 rounded p-2 text-center">
-                            <div className="text-[10px] md:text-sm font-bold text-suite-blue">45%</div>
-                            <div className="text-[5px] md:text-[7px] text-suite-gray">ROI Moyen</div>
+                            <div className="text-sm font-bold text-suite-blue">45%</div>
+                            <div className="text-[7px] text-suite-gray">ROI Moyen</div>
                           </div>
                           <div className="bg-green-500/20 rounded p-2 text-center">
-                            <div className="text-[10px] md:text-sm font-bold text-green-400">24</div>
-                            <div className="text-[5px] md:text-[7px] text-suite-gray">Fournisseurs</div>
+                            <div className="text-sm font-bold text-green-400">24</div>
+                            <div className="text-[7px] text-suite-gray">Fournisseurs</div>
                           </div>
                         </div>
                         {/* Recent products */}
                         <div className="bg-white/5 rounded p-2">
-                          <div className="text-[6px] md:text-[8px] text-white mb-2">Derniers produits ajoutés</div>
+                          <div className="text-[8px] text-white mb-2">Derniers produits ajoutés</div>
                           <div className="space-y-1">
-                            <div className="flex justify-between text-[5px] md:text-[6px]">
+                            <div className="flex justify-between text-[6px]">
                               <span className="text-suite-gray">Produit électronique</span>
                               <span className="text-green-400">+52% ROI</span>
                             </div>
-                            <div className="flex justify-between text-[5px] md:text-[6px]">
+                            <div className="flex justify-between text-[6px]">
                               <span className="text-suite-gray">Accessoire maison</span>
                               <span className="text-green-400">+38% ROI</span>
                             </div>
-                            <div className="flex justify-between text-[5px] md:text-[6px]">
+                            <div className="flex justify-between text-[6px]">
                               <span className="text-suite-gray">Article sport</span>
                               <span className="text-green-400">+45% ROI</span>
                             </div>
@@ -139,8 +206,8 @@ const SuiteMockups = () => {
                 </div>
               </div>
               {/* Laptop base */}
-              <div className="w-[320px] md:w-[460px] lg:w-[560px] h-3 md:h-4 bg-gray-800 rounded-b-xl mx-auto border-b border-x border-gray-700" />
-              <div className="w-[100px] md:w-[140px] lg:w-[160px] h-1 bg-gray-700 rounded-b mx-auto" />
+              <div className="w-[460px] lg:w-[560px] h-4 bg-gray-800 rounded-b-xl mx-auto border-b border-x border-gray-700" />
+              <div className="w-[140px] lg:w-[160px] h-1 bg-gray-700 rounded-b mx-auto" />
               {/* Laptop label */}
               <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 flex items-center gap-1.5 text-suite-gray text-sm">
                 <Monitor className="w-4 h-4" />
@@ -150,10 +217,10 @@ const SuiteMockups = () => {
           </div>
 
           {/* Tablet Mockup - Right */}
-          <div className="absolute right-0 md:right-[5%] lg:right-[10%] bottom-0 z-10 transform rotate-3 hover:rotate-0 transition-transform duration-500">
+          <div className="hidden md:block absolute right-[5%] lg:right-[10%] bottom-0 z-10 transform rotate-3 hover:rotate-0 transition-transform duration-500">
             <div className="relative">
               {/* Tablet Frame */}
-              <div className="w-[160px] md:w-[200px] lg:w-[240px] bg-gray-900 rounded-[16px] p-2 shadow-2xl shadow-black/50 border border-gray-700">
+              <div className="w-[200px] lg:w-[240px] bg-gray-900 rounded-[16px] p-2 shadow-2xl shadow-black/50 border border-gray-700">
                 {/* Camera */}
                 <div className="absolute top-3 left-1/2 -translate-x-1/2 w-2 h-2 bg-gray-700 rounded-full" />
                 {/* Screen */}
@@ -167,21 +234,21 @@ const SuiteMockups = () => {
                     </div>
                     {/* Video placeholder */}
                     <div className="bg-gradient-to-br from-suite-blue/30 to-suite-orange/30 rounded-lg aspect-video mb-3 flex items-center justify-center">
-                      <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-white/20 flex items-center justify-center">
+                      <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
                         <div className="w-0 h-0 border-t-[6px] border-t-transparent border-l-[10px] border-l-white border-b-[6px] border-b-transparent ml-1" />
                       </div>
                     </div>
                     {/* Title */}
-                    <div className="text-[8px] md:text-[10px] font-bold text-white mb-2">Introduction à Amazon FBA</div>
-                    <div className="text-[6px] md:text-[7px] text-suite-gray mb-3">Durée : 15 min</div>
+                    <div className="text-[10px] font-bold text-white mb-2">Introduction à Amazon FBA</div>
+                    <div className="text-[7px] text-suite-gray mb-3">Durée : 15 min</div>
                     {/* Progress */}
                     <div className="bg-white/10 rounded-full h-1.5 mb-2">
                       <div className="bg-suite-orange h-full rounded-full w-1/3" />
                     </div>
-                    <div className="text-[5px] md:text-[6px] text-suite-gray">33% complété</div>
+                    <div className="text-[6px] text-suite-gray">33% complété</div>
                     {/* CTA */}
                     <div className="mt-3">
-                      <div className="bg-suite-orange text-white text-[6px] md:text-[7px] font-medium py-1.5 px-3 rounded text-center">
+                      <div className="bg-suite-orange text-white text-[7px] font-medium py-1.5 px-3 rounded text-center">
                         Continuer
                       </div>
                     </div>
