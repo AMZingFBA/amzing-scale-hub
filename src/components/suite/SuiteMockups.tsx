@@ -7,7 +7,7 @@ const SuiteMockups = () => {
       <div className="absolute inset-0 bg-gradient-to-b from-suite-orange/10 via-suite-blue/5 to-transparent" />
       
       <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
+        <div className="text-center mb-8">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
             Accessible sur <span className="text-suite-orange">tous tes appareils</span>
           </h2>
