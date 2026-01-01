@@ -102,7 +102,6 @@ const SuiteLanding = () => {
       <SuiteNavbar />
       <main>
         <SuiteHero />
-        <SuiteMockups />
         <SuiteDashboard />
         <SuiteForWho />
         <SuiteProblem />
@@ -110,6 +109,7 @@ const SuiteLanding = () => {
         <SuiteHowItWorks />
         <SuiteWhatYouGet />
         <SuiteDemo />
+        <SuiteMockups />
         <SuiteTestimonials />
         <SuitePricing />
         <SuiteFAQ />
