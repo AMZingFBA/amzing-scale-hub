@@ -115,10 +115,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             fetchSubscription(session.user.id);
           }, 0);
           
-          // Sync to Airtable on SIGNED_IN event
+          // Sync to Airtable on SIGNED_IN event (une seule fois)
           if (event === 'SIGNED_IN') {
             setTimeout(() => {
-              syncToAirtable(session.user.id, session.user.email || '');
+              syncToAirtable(session.user.id, (session.user.email || '').toLowerCase());
             }, 100);
           }
         } else {
@@ -237,32 +237,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
       if (error) throw error;
 
-      // Sync user to Airtable (update last login)
-      if (data.user) {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('full_name, nickname, phone')
-          .eq('id', data.user.id)
-          .single();
-        
-        const { data: sub } = await supabase
-          .from('subscriptions')
-          .select('plan_type, status, started_at, stripe_customer_id, stripe_subscription_id')
-          .eq('user_id', data.user.id)
-          .single();
-        
-        await syncUserToAirtable(
-          email,
-          profile?.full_name || undefined,
-          profile?.nickname || undefined,
-          profile?.phone || undefined,
-          sub?.plan_type || 'free',
-          sub?.status || 'active',
-          sub?.started_at || undefined,
-          sub?.stripe_customer_id || undefined,
-          sub?.stripe_subscription_id || undefined
-        );
-      }
+      // NOTE: Ne pas synchroniser ici : l’événement SIGNED_IN dans onAuthStateChange
+      // déclenche déjà la synchro vers Airtable (évite doublons / appels multiples).
 
       toast.success('Connexion réussie !');
       return { error: null };
