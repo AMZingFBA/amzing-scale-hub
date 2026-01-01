@@ -34,8 +34,8 @@ const SuiteSolution = () => {
     },
     {
       icon: Headphones,
-      title: "Support + appel hebdomadaire",
-      description: "Support 9h-19h jours ouvrés + 1 appel par semaine (30-60 min).",
+      title: "Support + Coaching hebdomadaire",
+      description: "Support 9h-19h jours ouvrés + 1 Coaching par semaine (30-60 min).",
       color: "cyan-500"
     }
   ];

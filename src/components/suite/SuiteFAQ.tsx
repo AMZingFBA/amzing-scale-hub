@@ -26,7 +26,7 @@ const SuiteFAQ = () => {
       answer: "Tu peux nous contacter par chat ou email pendant les jours ouvrés, de 9h à 19h (heure de Paris). On répond généralement sous quelques heures."
     },
     {
-      question: "L'appel hebdomadaire, c'est comment ?",
+      question: "Le Coaching hebdomadaire, c'est comment ?",
       answer: "Chaque semaine, tu peux réserver un créneau de 30 à 60 minutes pour discuter de ton avancement, poser tes questions et débloquer tes situations."
     },
     {
