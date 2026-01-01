@@ -215,8 +215,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           .update({ phone: phone })
           .eq('id', data.user.id);
         
-        // Sync user to Airtable
-        await syncUserToAirtable(email, fullName, nickname, phone, 'free', 'active');
+        // NOTE: Ne pas appeler syncUserToAirtable ici car l'événement SIGNED_IN
+        // dans onAuthStateChange le fait déjà automatiquement
       }
 
       toast.success('Compte créé avec succès ! Veuillez vérifier votre email pour confirmer votre inscription.');
