@@ -65,34 +65,6 @@ const SuitePricing = () => {
                 <p className="text-suite-gray">Paiement unique • Accès illimité</p>
               </div>
 
-              {/* Payment options */}
-              <div className="bg-white/5 rounded-xl p-4 mb-8">
-                <div className="flex items-center gap-2 mb-3">
-                  <CreditCard className="w-5 h-5 text-suite-gray" />
-                  <span className="text-sm font-medium text-white">Options de paiement</span>
-                </div>
-                <div className="grid grid-cols-4 gap-2 text-center">
-                  <div className="bg-white/5 rounded-lg py-2 px-1">
-                    <span className="text-xs text-suite-gray block">1x</span>
-                    <span className="text-sm font-semibold text-white">1499,99€</span>
-                  </div>
-                  <div className="bg-white/5 rounded-lg py-2 px-1">
-                    <span className="text-xs text-suite-gray block">3x</span>
-                    <span className="text-sm font-semibold text-white">~500€</span>
-                  </div>
-                  <div className="bg-white/5 rounded-lg py-2 px-1">
-                    <span className="text-xs text-suite-gray block">4x</span>
-                    <span className="text-sm font-semibold text-white">~375€</span>
-                  </div>
-                  <div className="bg-white/5 rounded-lg py-2 px-1">
-                    <span className="text-xs text-suite-gray block">5x</span>
-                    <span className="text-sm font-semibold text-white">~300€</span>
-                  </div>
-                </div>
-                <p className="text-xs text-suite-gray/60 mt-2 text-center">
-                  Montants exacts calculés au checkout
-                </p>
-              </div>
 
               {/* CTA Button */}
               <button
