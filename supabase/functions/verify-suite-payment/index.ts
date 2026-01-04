@@ -20,79 +20,100 @@ async function updateAirtableForma(email: string) {
   const airtableApiKey = Deno.env.get("AIRTABLE_API_KEY");
   // Use the specific Forma base ID (different from main base)
   const airtableBaseId = Deno.env.get("AIRTABLE_FORMA_BASE_ID");
-  
+
   if (!airtableApiKey || !airtableBaseId) {
     logStep("Airtable Forma credentials missing, skipping VIP update");
     return;
   }
-  
+
+  // The VIP field name can differ slightly (spaces/emoji). We try a few safe candidates.
+  const vipFieldCandidates = ["VIP", "Vip", "vip", "VIP ", "Vip "];
+  const dateValue = new Date().toISOString().split("T")[0];
+
   try {
     const tableNameEncoded = encodeURIComponent(AIRTABLE_FORMA_TABLE);
     const url = `https://api.airtable.com/v0/${airtableBaseId}/${tableNameEncoded}`;
-    
+
+    const headers = {
+      "Authorization": `Bearer ${airtableApiKey}`,
+      "Content-Type": "application/json",
+    };
+
+    const trySetVip = async (recordId: string) => {
+      for (const fieldName of vipFieldCandidates) {
+        const updateResponse = await fetch(`${url}/${recordId}`, {
+          method: "PATCH",
+          headers,
+          body: JSON.stringify({
+            fields: {
+              [fieldName]: true,
+            },
+            typecast: true,
+          }),
+        });
+
+        if (updateResponse.ok) {
+          logStep("Successfully updated VIP=true in Forma Airtable", { email, recordId, field: fieldName });
+          return;
+        }
+
+        const errorText = await updateResponse.text();
+        const isUnknownField = errorText.includes("UNKNOWN_FIELD_NAME");
+
+        if (isUnknownField) {
+          logStep("Forma Airtable VIP field mismatch, trying alternative", { email, triedField: fieldName, error: errorText });
+          continue;
+        }
+
+        logStep("Failed to update VIP in Forma Airtable", { email, recordId, error: errorText });
+        return;
+      }
+
+      logStep("Failed to update VIP in Forma Airtable (no matching VIP field name)", { email, recordId });
+    };
+
     // Find record by email
     const searchUrl = `${url}?filterByFormula={E-mail}="${email}"`;
-    const searchResponse = await fetch(searchUrl, {
-      headers: {
-        "Authorization": `Bearer ${airtableApiKey}`,
-        "Content-Type": "application/json",
-      },
-    });
-    
+    const searchResponse = await fetch(searchUrl, { headers });
     const searchData = await searchResponse.json();
-    
+
     if (searchData.records && searchData.records.length > 0) {
       const recordId = searchData.records[0].id;
-      
-      // Update VIP to true
-      const updateResponse = await fetch(`${url}/${recordId}`, {
-        method: "PATCH",
-        headers: {
-          "Authorization": `Bearer ${airtableApiKey}`,
-          "Content-Type": "application/json",
+      await trySetVip(recordId);
+      return;
+    }
+
+    // Record doesn't exist, create it (without VIP first to avoid hard failures)
+    logStep("Record not found in Forma, creating new record", { email });
+
+    const createResponse = await fetch(url, {
+      method: "POST",
+      headers,
+      body: JSON.stringify({
+        fields: {
+          "E-mail": email,
+          "Date du paiement": dateValue,
         },
-        body: JSON.stringify({
-          fields: {
-            "VIP": true,
-          },
-        }),
-      });
-      
-      if (updateResponse.ok) {
-        logStep("Successfully updated VIP=true in Forma Airtable", { email, recordId });
-      } else {
-        const errorData = await updateResponse.text();
-        logStep("Failed to update VIP in Forma Airtable", { error: errorData });
-      }
-    } else {
-      // Record doesn't exist, create it with VIP = true
-      logStep("Record not found in Forma, creating new record with VIP=true", { email });
-      
-      const createResponse = await fetch(url, {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${airtableApiKey}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          fields: {
-            "E-mail": email,
-            "Date du paiement": new Date().toISOString().split('T')[0],
-            "VIP": true,
-          },
-          typecast: true,
-        }),
-      });
-      
-      if (createResponse.ok) {
-        logStep("Successfully created record with VIP=true in Forma Airtable", { email });
-      } else {
-        const errorData = await createResponse.text();
-        logStep("Failed to create record in Forma Airtable", { error: errorData });
-      }
+        typecast: true,
+      }),
+    });
+
+    if (!createResponse.ok) {
+      const errorText = await createResponse.text();
+      logStep("Failed to create record in Forma Airtable", { email, error: errorText });
+      return;
+    }
+
+    const created = await createResponse.json();
+    const recordId = created?.id;
+
+    logStep("Successfully created record in Forma Airtable", { email, recordId });
+
+    if (recordId) {
+      await trySetVip(recordId);
     }
   } catch (error) {
-    logStep("Error updating VIP in Forma Airtable", { error: String(error) });
+    logStep("Error updating VIP in Forma Airtable", { email, error: String(error) });
   }
 }
 
