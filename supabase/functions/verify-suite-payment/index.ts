@@ -13,7 +13,7 @@ const logStep = (step: string, details?: any) => {
 };
 
 // Airtable configuration
-const AIRTABLE_FORMA_TABLE = "Forma AMZing FBA Noah - Cyprien";
+const AIRTABLE_FORMA_TABLE = "Inscrits"; // Table in "Forma AMZing FBA Noah - Cyprien" base
 const AIRTABLE_USERS_TABLE = "Users";
 
 async function updateAirtableForma(email: string) {
@@ -77,7 +77,7 @@ async function updateAirtableForma(email: string) {
         body: JSON.stringify({
           fields: {
             "E-mail": email,
-            "Date": new Date().toISOString().split('T')[0],
+            "Date du paiement": new Date().toISOString().split('T')[0],
             "VIP": true,
           },
           typecast: true,
