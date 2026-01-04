@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
-import { Search, Filter, BookOpen, TrendingUp, ArrowRight } from 'lucide-react';
+import { Search, Filter, BookOpen, TrendingUp, ArrowRight, ArrowLeft } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import SEO from '@/components/SEO';
@@ -95,6 +95,17 @@ const Blog = () => {
       <Navbar />
       
       <main className="pt-20">
+        {/* Back Arrow */}
+        <div className="container mx-auto px-4 pt-4">
+          <Link 
+            to="/" 
+            className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors group"
+          >
+            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+            <span className="text-sm">Retour à l'accueil</span>
+          </Link>
+        </div>
+
         {/* Hero Section */}
         <section className="relative py-16 md:py-24 overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-secondary/5" />
