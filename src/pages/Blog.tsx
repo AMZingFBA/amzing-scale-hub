@@ -95,20 +95,18 @@ const Blog = () => {
       <Navbar />
       
       <main className="pt-20">
-        {/* Back Arrow */}
-        <div className="container mx-auto px-4 pt-6">
-          <Link 
-            to="/" 
-            className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-muted/50 hover:bg-primary/10 text-muted-foreground hover:text-primary transition-all"
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </Link>
-        </div>
-
         {/* Hero Section */}
         <section className="relative py-16 md:py-24 overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-secondary/5" />
           <div className="container mx-auto px-4 relative">
+            {/* Back Arrow */}
+            <Link 
+              to="/" 
+              className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-muted/50 hover:bg-primary/10 text-muted-foreground hover:text-primary transition-all mb-6"
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </Link>
+            
             <div className="max-w-3xl mx-auto text-center">
               <Badge className="mb-4 bg-primary/10 text-primary border-0">
                 <BookOpen className="w-3 h-3 mr-1" />
