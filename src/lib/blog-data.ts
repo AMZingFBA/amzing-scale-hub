@@ -2,6 +2,8 @@
 // DONNÉES DU BLOG SEO - ARCHITECTURE EN SILOS
 // ============================================
 
+import { blogImages } from './blog-images';
+
 export interface BlogFAQ {
   question: string;
   answer: string;
@@ -43,7 +45,7 @@ const pilierGuideFba: BlogArticle = {
   publishedAt: '2025-01-04',
   updatedAt: '2025-01-04',
   author: 'AMZing FBA',
-  image: '/hero-warehouse.jpg',
+  image: blogImages.guideFba,
   relatedSlugs: ['amazon-fba-vs-fbm', 'combien-coute-amazon-fba', 'comment-debuter-amazon-fba'],
   faqs: [
     {
@@ -263,7 +265,7 @@ const pilierProduitsRentables: BlogArticle = {
   publishedAt: '2025-01-04',
   updatedAt: '2025-01-04',
   author: 'AMZing FBA',
-  image: '/produits-rentables-hero.jpg',
+  image: blogImages.produitsRentables,
   relatedSlugs: ['amazon-fba-cest-quoi-guide-complet', 'arbitrage-online-amazon', 'wholesale-amazon-fba'],
   faqs: [
     {
@@ -440,7 +442,7 @@ const pilierLogistique: BlogArticle = {
   publishedAt: '2025-01-04',
   updatedAt: '2025-01-04',
   author: 'AMZing FBA',
-  image: '/fba-warehouse.jpg',
+  image: blogImages.logistique,
   relatedSlugs: ['amazon-fba-cest-quoi-guide-complet', 'prep-center-france', 'etiquetage-fba-regles'],
   faqs: [
     {
@@ -618,7 +620,7 @@ const pilierVendreAmazon: BlogArticle = {
   publishedAt: '2025-01-04',
   updatedAt: '2025-01-04',
   author: 'AMZing FBA',
-  image: '/compte-vendeur-amazon.jpg',
+  image: blogImages.vendreAmazon,
   relatedSlugs: ['amazon-fba-cest-quoi-guide-complet', 'creer-fiche-produit-amazon', 'amazon-seo-referencement'],
   faqs: [
     {
@@ -827,7 +829,7 @@ const articleFbaVsFbm: BlogArticle = {
   publishedAt: '2025-01-04',
   updatedAt: '2025-01-04',
   author: 'AMZing FBA',
-  image: '/fbm-packages.jpg',
+  image: blogImages.fbaVsFbm,
   relatedSlugs: ['amazon-fba-cest-quoi-guide-complet', 'combien-coute-amazon-fba', 'logistique-amazon-fba-guide-complet'],
   faqs: [
     {
@@ -933,7 +935,7 @@ const articleCombienCouteFba: BlogArticle = {
   publishedAt: '2025-01-04',
   updatedAt: '2025-01-04',
   author: 'AMZing FBA',
-  image: '/logistics.jpg',
+  image: blogImages.coutsFba,
   relatedSlugs: ['amazon-fba-cest-quoi-guide-complet', 'amazon-fba-vs-fbm', 'comment-debuter-amazon-fba'],
   faqs: [
     {
