@@ -1697,23 +1697,27 @@ Utilisez des outils de calcul comme SellerAmp qui intègrent automatiquement tou
 
 import { newArticles } from './blog-articles-new';
 import { additionalArticles } from './blog-articles-additional';
+import { finalArticles } from './blog-articles-final';
 
 // ============================================
 // EXPORT DES DONNÉES
 // ============================================
 
 export const blogArticles: BlogArticle[] = [
-  // Piliers
+  // Piliers (4)
   pilierGuideFba,
   pilierProduitsRentables,
   pilierLogistique,
   pilierVendreAmazon,
-  // Satellites Guide FBA
+  // Satellites originaux (2)
   articleFbaVsFbm,
   articleCombienCouteFba,
-  // Nouveaux articles satellites
+  // Nouveaux articles satellites (7)
   ...newArticles,
+  // Articles additionnels (6)
   ...additionalArticles,
+  // Articles finaux (8)
+  ...finalArticles,
 ];
 
 export const blogCategories = {
