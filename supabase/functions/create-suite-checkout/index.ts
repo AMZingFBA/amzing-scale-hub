@@ -20,7 +20,8 @@ const AIRTABLE_FORMA_TABLE = "Forma AMZing FBA Noah - Cyprien";
 
 async function addToAirtableForma(email: string, name: string | null, phone: string | null) {
   const airtableApiKey = Deno.env.get("AIRTABLE_API_KEY");
-  const airtableBaseId = Deno.env.get("AIRTABLE_BASE_ID");
+  // Use the specific Forma base ID (different from main base)
+  const airtableBaseId = Deno.env.get("AIRTABLE_FORMA_BASE_ID");
   
   if (!airtableApiKey || !airtableBaseId) {
     logStep("Airtable credentials missing, skipping sync");
