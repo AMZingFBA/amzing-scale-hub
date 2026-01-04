@@ -3,7 +3,7 @@
   <!-- Page d'accueil -->
   <url>
     <loc>https://amzingfba.com/</loc>
-    <lastmod>2025-12-23</lastmod>
+    <lastmod>2026-01-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
@@ -11,21 +11,28 @@
   <!-- Pages principales -->
   <url>
     <loc>https://amzingfba.com/tarifs</loc>
-    <lastmod>2025-12-09</lastmod>
+    <lastmod>2026-01-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   
   <url>
     <loc>https://amzingfba.com/formation</loc>
-    <lastmod>2025-12-23</lastmod>
+    <lastmod>2026-01-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   
   <url>
     <loc>https://amzingfba.com/services</loc>
-    <lastmod>2025-12-09</lastmod>
+    <lastmod>2026-01-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  
+  <url>
+    <loc>https://amzingfba.com/suite</loc>
+    <lastmod>2026-01-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
@@ -33,72 +40,100 @@
   <!-- Pages guides et ressources -->
   <url>
     <loc>https://amzingfba.com/guides</loc>
-    <lastmod>2025-12-09</lastmod>
+    <lastmod>2026-01-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  
+  <url>
+    <loc>https://amzingfba.com/debuter</loc>
+    <lastmod>2026-01-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   
   <url>
     <loc>https://amzingfba.com/creation-societe</loc>
-    <lastmod>2025-12-09</lastmod>
+    <lastmod>2026-01-04</lastmod>
     <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <url>
+    <loc>https://amzingfba.com/cashback</loc>
+    <lastmod>2026-01-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <url>
+    <loc>https://amzingfba.com/avis-page</loc>
+    <lastmod>2026-01-04</lastmod>
+    <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   
   <!-- Pages SEO publiques -->
   <url>
     <loc>https://amzingfba.com/amazon-fba-debutant</loc>
-    <lastmod>2025-12-23</lastmod>
+    <lastmod>2026-01-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   
   <url>
     <loc>https://amzingfba.com/outil-amazon-fba</loc>
-    <lastmod>2025-12-23</lastmod>
+    <lastmod>2026-01-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   
   <url>
     <loc>https://amzingfba.com/produits-rentables-amazon</loc>
-    <lastmod>2025-12-23</lastmod>
+    <lastmod>2026-01-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
+  </url>
+  
+  <url>
+    <loc>https://amzingfba.com/android</loc>
+    <lastmod>2026-01-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
   </url>
   
   <!-- Pages guides SEO cluster -->
   <url>
     <loc>https://amzingfba.com/guide/amazon-fba-cest-quoi</loc>
-    <lastmod>2025-12-29</lastmod>
+    <lastmod>2026-01-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   
   <url>
     <loc>https://amzingfba.com/guide/amazon-fba-vs-fbm</loc>
-    <lastmod>2025-12-29</lastmod>
+    <lastmod>2026-01-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   
   <url>
     <loc>https://amzingfba.com/guide/comment-debuter-amazon-fba</loc>
-    <lastmod>2025-12-29</lastmod>
+    <lastmod>2026-01-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   
   <url>
     <loc>https://amzingfba.com/guide/combien-coute-amazon-fba</loc>
-    <lastmod>2025-12-29</lastmod>
+    <lastmod>2026-01-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   
   <url>
     <loc>https://amzingfba.com/guide/formation-amazon-fba-debutant</loc>
-    <lastmod>2025-12-29</lastmod>
+    <lastmod>2026-01-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
@@ -305,21 +340,21 @@
   <!-- Pages marketplace -->
   <url>
     <loc>https://amzingfba.com/marketplace</loc>
-    <lastmod>2025-12-09</lastmod>
+    <lastmod>2026-01-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   
   <url>
     <loc>https://amzingfba.com/acheter</loc>
-    <lastmod>2025-12-09</lastmod>
+    <lastmod>2026-01-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   
   <url>
     <loc>https://amzingfba.com/vendre</loc>
-    <lastmod>2025-12-09</lastmod>
+    <lastmod>2026-01-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
@@ -327,14 +362,14 @@
   <!-- Pages support -->
   <url>
     <loc>https://amzingfba.com/contact</loc>
-    <lastmod>2025-12-09</lastmod>
+    <lastmod>2026-01-04</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://amzingfba.com/faq</loc>
-    <lastmod>2025-12-09</lastmod>
+    <lastmod>2026-01-04</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -342,42 +377,49 @@
   <!-- Pages légales -->
   <url>
     <loc>https://amzingfba.com/mentions-legales</loc>
-    <lastmod>2025-12-09</lastmod>
+    <lastmod>2026-01-04</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   
   <url>
     <loc>https://amzingfba.com/cgv</loc>
-    <lastmod>2025-12-09</lastmod>
+    <lastmod>2026-01-04</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   
   <url>
     <loc>https://amzingfba.com/cgu</loc>
-    <lastmod>2025-12-09</lastmod>
+    <lastmod>2026-01-04</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   
   <url>
     <loc>https://amzingfba.com/confidentialite</loc>
-    <lastmod>2025-12-09</lastmod>
+    <lastmod>2026-01-04</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   
   <url>
     <loc>https://amzingfba.com/privacy</loc>
-    <lastmod>2025-12-09</lastmod>
+    <lastmod>2026-01-04</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   
   <url>
     <loc>https://amzingfba.com/refund</loc>
-    <lastmod>2025-12-09</lastmod>
+    <lastmod>2026-01-04</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  
+  <url>
+    <loc>https://amzingfba.com/suppression-compte</loc>
+    <lastmod>2026-01-04</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
@@ -385,8 +427,22 @@
   <!-- Pages affiliation -->
   <url>
     <loc>https://amzingfba.com/affiliate</loc>
-    <lastmod>2025-12-09</lastmod>
+    <lastmod>2026-01-04</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://amzingfba.com/affiliate/signup</loc>
+    <lastmod>2026-01-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://amzingfba.com/affiliate/login</loc>
+    <lastmod>2026-01-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.4</priority>
   </url>
 </urlset>
