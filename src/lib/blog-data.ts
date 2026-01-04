@@ -1692,6 +1692,13 @@ Utilisez des outils de calcul comme SellerAmp qui intègrent automatiquement tou
 };
 
 // ============================================
+// IMPORT DES NOUVEAUX ARTICLES
+// ============================================
+
+import { newArticles } from './blog-articles-new';
+import { additionalArticles } from './blog-articles-additional';
+
+// ============================================
 // EXPORT DES DONNÉES
 // ============================================
 
@@ -1704,6 +1711,9 @@ export const blogArticles: BlogArticle[] = [
   // Satellites Guide FBA
   articleFbaVsFbm,
   articleCombienCouteFba,
+  // Nouveaux articles satellites
+  ...newArticles,
+  ...additionalArticles,
 ];
 
 export const blogCategories = {
