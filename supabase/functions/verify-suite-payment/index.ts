@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -94,10 +95,67 @@ async function updateAirtableVIP(email: string) {
   }
 }
 
+async function grantLifetimeVIP(supabaseClient: any, email: string, sessionId: string, amount: number) {
+  try {
+    // 1. Record the suite purchase
+    const { error: insertError } = await supabaseClient
+      .from('suite_purchases')
+      .upsert({
+        email: email,
+        amount: amount,
+        stripe_session_id: sessionId,
+      }, { onConflict: 'email' });
+    
+    if (insertError) {
+      logStep("Error recording suite purchase", { error: insertError.message });
+    } else {
+      logStep("Suite purchase recorded", { email });
+    }
+    
+    // 2. Check if user already has an account and give lifetime VIP
+    const { data: profile } = await supabaseClient
+      .from('profiles')
+      .select('id')
+      .eq('email', email)
+      .single();
+    
+    if (profile) {
+      // User exists, update their subscription to lifetime VIP
+      const { error: subError } = await supabaseClient
+        .from('subscriptions')
+        .update({
+          plan_type: 'vip',
+          status: 'active',
+          expires_at: null, // No expiration = lifetime
+          payment_provider: 'stripe_suite',
+          is_trial: false,
+        })
+        .eq('user_id', profile.id);
+      
+      if (subError) {
+        logStep("Error updating subscription to lifetime VIP", { error: subError.message });
+      } else {
+        logStep("Subscription updated to lifetime VIP", { userId: profile.id, email });
+      }
+    } else {
+      logStep("User not found in profiles, VIP will be granted on account creation", { email });
+    }
+  } catch (error) {
+    logStep("Error in grantLifetimeVIP", { error: String(error) });
+  }
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
+
+  // Create Supabase client with service role for database operations
+  const supabaseClient = createClient(
+    Deno.env.get("SUPABASE_URL") ?? "",
+    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+    { auth: { persistSession: false } }
+  );
 
   try {
     logStep("Function started");
@@ -136,14 +194,18 @@ serve(async (req) => {
       logStep("Payment confirmed");
       
       const customerEmail = session.customer_details?.email || session.customer_email || "";
+      const amount = session.amount_total ? session.amount_total / 100 : 1499.99;
       
-      // Update VIP = true in "Forma AMZing FBA Noah - Cyprien" Airtable table
+      // 1. Update VIP = true in "Forma AMZing FBA Noah - Cyprien" Airtable table
       await updateAirtableVIP(customerEmail);
+      
+      // 2. Grant lifetime VIP in Supabase (record purchase + update subscription if user exists)
+      await grantLifetimeVIP(supabaseClient, customerEmail, session_id, amount);
       
       return new Response(JSON.stringify({ 
         paid: true,
         email: customerEmail,
-        amount: session.amount_total ? session.amount_total / 100 : 0,
+        amount: amount,
         product: session.metadata?.product || "suite"
       }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
