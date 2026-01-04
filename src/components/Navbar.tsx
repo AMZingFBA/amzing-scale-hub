@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Menu, X, User, LogOut, Crown, Shield, LayoutDashboard, MessageSquare, ShoppingBag, Store, Handshake } from "lucide-react";
+import { Menu, X, User, LogOut, Crown, Shield, LayoutDashboard, MessageSquare, ShoppingBag, Store, Handshake, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/use-auth";
@@ -149,6 +149,10 @@ const Navbar = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
+            <Link to="/blog" className="text-foreground/80 hover:text-primary transition-colors font-medium flex items-center gap-1.5">
+              <BookOpen className="w-4 h-4" />
+              Blog
+            </Link>
             {user ? (
               <>
                 <Button variant="outline" size="lg" asChild className="hover-scale transition-all duration-300">
