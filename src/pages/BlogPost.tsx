@@ -244,7 +244,19 @@ const BlogPost = () => {
                 alt={article.title}
                 className="w-full h-full object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-background/40 to-transparent" />
+              {/* Overlay sombre pour meilleure lisibilité */}
+              <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent" />
+              {/* Badge catégorie sur l'image */}
+              <div className="absolute bottom-4 left-4 right-4">
+                <div className="flex items-center gap-2">
+                  <Badge className="bg-primary/90 text-primary-foreground shadow-lg backdrop-blur-sm">
+                    {category.name}
+                  </Badge>
+                  <span className="text-white/90 text-sm font-medium drop-shadow-lg">
+                    {article.readTime} min de lecture
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
