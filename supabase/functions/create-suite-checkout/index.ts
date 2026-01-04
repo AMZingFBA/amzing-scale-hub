@@ -15,6 +15,76 @@ const logStep = (step: string, details?: any) => {
 // Prix ID pour le logiciel AMZing FBA à 1499,99€ (one-time)
 const SUITE_PRICE_ID = "price_1SkC0hFkU3SeqY00nzOi55xI";
 
+// Airtable configuration for "Forma AMZing FBA Noah - Cyprien" table
+const AIRTABLE_FORMA_TABLE = "Forma AMZing FBA Noah - Cyprien";
+
+async function addToAirtableForma(email: string, name: string | null, phone: string | null) {
+  const airtableApiKey = Deno.env.get("AIRTABLE_API_KEY");
+  const airtableBaseId = Deno.env.get("AIRTABLE_BASE_ID");
+  
+  if (!airtableApiKey || !airtableBaseId) {
+    logStep("Airtable credentials missing, skipping sync");
+    return;
+  }
+  
+  try {
+    const tableNameEncoded = encodeURIComponent(AIRTABLE_FORMA_TABLE);
+    const url = `https://api.airtable.com/v0/${airtableBaseId}/${tableNameEncoded}`;
+    
+    // Check if email already exists
+    const searchUrl = `${url}?filterByFormula={E-mail}="${email}"`;
+    const searchResponse = await fetch(searchUrl, {
+      headers: {
+        "Authorization": `Bearer ${airtableApiKey}`,
+        "Content-Type": "application/json",
+      },
+    });
+    
+    const searchData = await searchResponse.json();
+    
+    if (searchData.records && searchData.records.length > 0) {
+      logStep("User already exists in Forma table", { email });
+      return;
+    }
+    
+    // Create new record with VIP = false (not paid yet)
+    const fields: Record<string, any> = {
+      "E-mail": email,
+      "Date": new Date().toISOString().split('T')[0],
+      "VIP": false, // Not paid yet
+    };
+    
+    if (phone) {
+      fields["Numéro de téléphone"] = phone;
+    }
+    
+    if (name) {
+      fields["Nom"] = name;
+    }
+    
+    const createResponse = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${airtableApiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        fields,
+        typecast: true,
+      }),
+    });
+    
+    if (createResponse.ok) {
+      logStep("Successfully added to Forma Airtable table with VIP=false", { email });
+    } else {
+      const errorData = await createResponse.text();
+      logStep("Failed to add to Forma Airtable", { error: errorData });
+    }
+  } catch (error) {
+    logStep("Error adding to Forma Airtable", { error: String(error) });
+  }
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -59,6 +129,16 @@ serve(async (req) => {
     }
     
     logStep("User authenticated", { userId: user.id, email: user.email });
+
+    // Get user profile for name and phone
+    const { data: profile } = await supabaseClient
+      .from("profiles")
+      .select("full_name, phone")
+      .eq("id", user.id)
+      .single();
+
+    // Add to Airtable Forma table with VIP = false (before payment)
+    await addToAirtableForma(user.email, profile?.full_name || null, profile?.phone || null);
 
     const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
     if (!stripeKey) throw new Error("STRIPE_SECRET_KEY is not set");
