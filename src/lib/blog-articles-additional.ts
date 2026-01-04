@@ -447,8 +447,8 @@ L'optimisation de listing n'est jamais terminée. C'est un processus itératif b
 // Article 10: Amazon PPC
 export const articleAmazonPpc: BlogArticle = {
   slug: 'amazon-ppc-publicite-guide',
-  title: "Amazon PPC : Guide Publicité Sponsored Products [2025]",
-  metaTitle: "Amazon PPC 2025 : Guide Complet Publicité Sponsored Products",
+  title: "Amazon PPC : Guide Publicité Sponsored Products [2026]",
+  metaTitle: "Amazon PPC 2026 : Guide Complet Publicité Sponsored Products",
   metaDescription: "Maîtrisez Amazon PPC : Sponsored Products, campagnes auto/manuelles, ACoS, enchères. Guide complet pour rentabiliser votre publicité Amazon.",
   keywords: ['amazon ppc', 'sponsored products', 'publicité amazon', 'acos amazon', 'campagne amazon', 'amazon advertising', 'enchères amazon', 'ppc amazon fba', 'amazon ads', 'coût publicité amazon'],
   excerpt: "La publicité Amazon PPC est essentielle pour la visibilité. Apprenez à créer des campagnes rentables, optimiser votre ACoS et scaler votre budget efficacement.",
