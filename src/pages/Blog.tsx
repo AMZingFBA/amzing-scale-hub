@@ -94,7 +94,7 @@ const Blog = () => {
       
       <Navbar />
       
-      <main>
+      <main className="pt-20">
         {/* Hero Section */}
         <section className="relative py-16 md:py-24 overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-secondary/5" />
