@@ -16,7 +16,7 @@ const logStep = (step: string, details?: any) => {
 const AIRTABLE_FORMA_TABLE = "Inscrits"; // Table in "Forma AMZing FBA Noah - Cyprien" base
 const AIRTABLE_USERS_TABLE = "Users";
 
-async function updateAirtableForma(email: string) {
+async function updateAirtableForma(email: string, name: string | null, phone: string | null) {
   const airtableApiKey = Deno.env.get("AIRTABLE_API_KEY");
   // Use the specific Forma base ID (different from main base)
   const airtableBaseId = Deno.env.get("AIRTABLE_FORMA_BASE_ID");
@@ -79,21 +79,39 @@ async function updateAirtableForma(email: string) {
 
     if (searchData.records && searchData.records.length > 0) {
       const recordId = searchData.records[0].id;
+      
+      // Update existing record with name/phone if provided
+      if (name || phone) {
+        const updateFields: Record<string, any> = {};
+        if (name) updateFields["Nom"] = name;
+        if (phone) updateFields["Numéro de téléphone"] = phone;
+        
+        await fetch(`${url}/${recordId}`, {
+          method: "PATCH",
+          headers,
+          body: JSON.stringify({ fields: updateFields, typecast: true }),
+        });
+      }
+      
       await trySetVip(recordId);
       return;
     }
 
-    // Record doesn't exist, create it (without VIP first to avoid hard failures)
-    logStep("Record not found in Forma, creating new record", { email });
+    // Record doesn't exist, create it with all available data
+    logStep("Record not found in Forma, creating new record", { email, name, phone });
+
+    const createFields: Record<string, any> = {
+      "E-mail": email,
+      "Date du paiement": dateValue,
+    };
+    if (name) createFields["Nom"] = name;
+    if (phone) createFields["Numéro de téléphone"] = phone;
 
     const createResponse = await fetch(url, {
       method: "POST",
       headers,
       body: JSON.stringify({
-        fields: {
-          "E-mail": email,
-          "Date du paiement": dateValue,
-        },
+        fields: createFields,
         typecast: true,
       }),
     });
@@ -358,15 +376,17 @@ serve(async (req) => {
       logStep("Payment confirmed");
       
       const customerEmail = session.customer_details?.email || session.customer_email || "";
+      const customerName = session.customer_details?.name || null;
+      const customerPhone = session.customer_details?.phone || null;
       const amount = session.amount_total ? session.amount_total / 100 : 1499.99;
       
       // 1. Update VIP = true in "Forma AMZing FBA Noah - Cyprien" Airtable table
-      await updateAirtableForma(customerEmail);
+      await updateAirtableForma(customerEmail, customerName, customerPhone);
       
       // 2. Update "Type d'abonnement" = "1499,99" in "AMZing FBA – Général" Airtable table
       await updateAirtableGeneral(customerEmail);
       
-      // 2. Grant lifetime VIP in Supabase (record purchase + update subscription if user exists)
+      // 3. Grant lifetime VIP in Supabase (record purchase + update subscription if user exists)
       await grantLifetimeVIP(supabaseClient, customerEmail, session_id, amount);
       
       return new Response(JSON.stringify({ 
