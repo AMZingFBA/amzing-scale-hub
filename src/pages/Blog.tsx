@@ -96,13 +96,12 @@ const Blog = () => {
       
       <main className="pt-20">
         {/* Back Arrow */}
-        <div className="container mx-auto px-4 pt-4">
+        <div className="container mx-auto px-4 pt-6">
           <Link 
             to="/" 
-            className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors group"
+            className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-muted/50 hover:bg-primary/10 text-muted-foreground hover:text-primary transition-all"
           >
-            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-            <span className="text-sm">Retour à l'accueil</span>
+            <ArrowLeft className="w-5 h-5" />
           </Link>
         </div>
 
