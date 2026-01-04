@@ -40,17 +40,29 @@ export default function Auth() {
   // Check URL params for default tab and referral code
   const searchParams = new URLSearchParams(window.location.search);
   const urlTab = searchParams.get("tab");
+  const urlMode = searchParams.get("mode");
   const referralCode = searchParams.get("ref");
-  const [activeTab, setActiveTab] = useState(urlTab === "signup" ? "signup" : "login");
+  const redirectAfterAuth = searchParams.get("redirect");
+  const [activeTab, setActiveTab] = useState(urlTab === "signup" || urlMode === "signup" ? "signup" : "login");
+  
+  // Check for Suite payment email (from /suite-success page)
+  const [suitePaymentEmail, setSuitePaymentEmail] = useState<string | null>(null);
 
-  // Update active tab when URL changes
+  // Update active tab when URL changes and check for suite payment email
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const tab = params.get("tab");
-    if (tab === "signup") {
+    const mode = params.get("mode");
+    if (tab === "signup" || mode === "signup") {
       setActiveTab("signup");
-    } else if (tab === "login") {
+    } else if (tab === "login" || mode === "login") {
       setActiveTab("login");
+    }
+    
+    // Check for suite payment email in sessionStorage
+    const storedEmail = sessionStorage.getItem('suite_payment_email');
+    if (storedEmail) {
+      setSuitePaymentEmail(storedEmail);
     }
   }, [window.location.search]);
 
@@ -281,6 +293,16 @@ export default function Auth() {
       // Attendre que la session soit établie
       await new Promise(resolve => setTimeout(resolve, 1000));
 
+      // Clear suite payment email from sessionStorage after successful signup
+      sessionStorage.removeItem('suite_payment_email');
+
+      // If user came from Suite payment, redirect to dashboard (already paid)
+      if (suitePaymentEmail || redirectAfterAuth === '/dashboard') {
+        toast.success("Compte créé ! Redirection vers votre espace...");
+        navigate('/dashboard', { replace: true });
+        return;
+      }
+
       // Rediriger vers le paiement Stripe pour toutes les plateformes (Web, iOS, Android)
       try {
         toast.success("Redirection vers le paiement sécurisé...");
@@ -493,6 +515,12 @@ export default function Auth() {
 
                     <div className="space-y-2 animate-slide-in-up" style={{ animationDelay: "200ms" }}>
                       <Label htmlFor="signup-email">Email</Label>
+                      {suitePaymentEmail && (
+                        <p className="text-xs text-green-600 flex items-center gap-1">
+                          <CheckCircle2 className="w-3 h-3" />
+                          Utilisez le même email que pour votre paiement Suite
+                        </p>
+                      )}
                       <div className="relative group">
                         <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-all duration-300 group-focus-within:scale-110" />
                         <Input
@@ -500,6 +528,7 @@ export default function Auth() {
                           name="email"
                           type="email"
                           placeholder="votre@email.com"
+                          defaultValue={suitePaymentEmail || ''}
                           required
                           disabled={isLoading}
                           className="pl-10 transition-all duration-300 focus:ring-2 focus:ring-primary/20 focus:shadow-[0_0_12px_rgba(255,186,73,0.5)] hover:border-primary/50"

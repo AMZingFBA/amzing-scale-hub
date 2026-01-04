@@ -119,38 +119,44 @@ const SuiteSuccess = () => {
                 </div>
               ) : (
                 <div className="space-y-6">
-                  <div className="bg-white/5 border border-white/10 rounded-xl p-6">
-                    <p className="text-white font-medium mb-4">
-                      Connecte-toi ou crée ton compte pour accéder à la Suite
+                  <div className="bg-gradient-to-r from-suite-orange/20 to-transparent border border-suite-orange/30 rounded-xl p-6">
+                    <h3 className="text-white font-bold text-lg mb-2">
+                      🎓 Dernière étape : Crée ton compte
+                    </h3>
+                    <p className="text-suite-gray mb-4">
+                      Pour accéder à ta formation et à tous tes avantages, crée ton compte avec le même email que ton paiement.
                     </p>
                     
                     {paymentEmail && (
-                      <p className="text-suite-gray text-sm mb-4">
-                        Email de paiement : <span className="text-white">{paymentEmail}</span>
-                      </p>
+                      <div className="bg-white/10 rounded-lg p-3 mb-4">
+                        <p className="text-sm text-suite-gray">
+                          Email de paiement :
+                        </p>
+                        <p className="text-white font-medium">{paymentEmail}</p>
+                      </div>
                     )}
                     
-                    <div className="flex flex-col sm:flex-row gap-3">
+                    <div className="flex flex-col gap-3">
+                      <Button 
+                        onClick={() => handleAuth('signup')}
+                        className="w-full bg-suite-orange hover:bg-suite-orange/90 text-white font-bold py-3"
+                      >
+                        <UserPlus className="w-5 h-5 mr-2" />
+                        Créer mon compte maintenant
+                      </Button>
                       <Button 
                         onClick={() => handleAuth('login')}
                         variant="outline"
-                        className="flex-1 border-white/20 text-white hover:bg-white/10"
+                        className="w-full border-white/20 text-white hover:bg-white/10"
                       >
                         <LogIn className="w-4 h-4 mr-2" />
-                        Se connecter
-                      </Button>
-                      <Button 
-                        onClick={() => handleAuth('signup')}
-                        className="flex-1 bg-suite-orange hover:bg-suite-orange/90 text-white"
-                      >
-                        <UserPlus className="w-4 h-4 mr-2" />
-                        Créer un compte
+                        J'ai déjà un compte
                       </Button>
                     </div>
                   </div>
                   
                   <p className="text-suite-gray/60 text-sm">
-                    Utilise le même email que pour le paiement pour lier ton achat.
+                    ⚠️ Utilise le même email que pour le paiement pour lier automatiquement ton achat.
                   </p>
                 </div>
               )}
