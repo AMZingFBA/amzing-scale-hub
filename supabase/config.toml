@@ -65,3 +65,9 @@ verify_jwt = false
 
 [functions.verify-stripe-session]
 verify_jwt = false
+
+[functions.verify-suite-payment]
+verify_jwt = false
+
+[functions.create-suite-checkout]
+verify_jwt = false
