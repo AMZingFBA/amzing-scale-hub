@@ -15,8 +15,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     
     <!-- Preload des ressources critiques -->
-    <link rel="preload" href="/hero-warehouse.jpg" as="image" type="image/jpeg">
-    <link rel="preload" href="/src/main.tsx" as="script">
+    <!-- Note: hero image is bundled by Vite, preload via modulepreload instead -->
+    <link rel="modulepreload" href="/src/main.tsx">
     
     <!-- PWA Manifest -->
     <link rel="manifest" href="/manifest.json">

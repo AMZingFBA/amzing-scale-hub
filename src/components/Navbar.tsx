@@ -144,7 +144,7 @@ const Navbar = () => {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-20">
           <Link to={isVIP || isAdmin ? "/dashboard" : "/"} className="flex items-center group select-none">
-            <OptimizedImage src={logo} alt="Logo AMZing FBA" className="h-12 transition-transform group-hover:scale-105 select-none pointer-events-none" draggable="false" />
+            <OptimizedImage src={logo} alt="Logo AMZing FBA" width={72} height={48} className="h-12 transition-transform group-hover:scale-105 select-none pointer-events-none" draggable="false" />
           </Link>
 
           {/* Desktop Navigation */}

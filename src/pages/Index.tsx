@@ -148,6 +148,9 @@ const Index = () => {
             src={heroWarehouse} 
             alt="Entrepôt logistique Amazon FBA avec produits stockés" 
             loading="eager"
+            fetchPriority="high"
+            width={1920}
+            height={1054}
             className="w-full h-full object-cover opacity-10"
           />
           <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-background to-secondary/20" />
