@@ -18,6 +18,14 @@ import amazonPpcHero from '@/assets/blog/amazon-ppc-hero.jpg';
 import statutJuridiqueHero from '@/assets/blog/statut-juridique-hero.jpg';
 import keepaAnalyseHero from '@/assets/blog/keepa-analyse-hero.jpg';
 import ventesQ4Hero from '@/assets/blog/ventes-q4-hero.jpg';
+import negocierFournisseursHero from '@/assets/blog/negocier-fournisseurs-hero.jpg';
+import obtenirAvisHero from '@/assets/blog/obtenir-avis-hero.jpg';
+import gagnerBuyBoxHero from '@/assets/blog/gagner-buy-box-hero.jpg';
+import brandRegistryHero from '@/assets/blog/brand-registry-hero.jpg';
+import arbitrageOnlineHero from '@/assets/blog/arbitrage-online-hero.jpg';
+import comptabiliteFbaHero from '@/assets/blog/comptabilite-fba-hero.jpg';
+import erreursDebutantsHero from '@/assets/blog/erreurs-debutants-hero.jpg';
+import scalerBusinessHero from '@/assets/blog/scaler-business-hero.jpg';
 
 export const blogImages = {
   guideFba: guideFbaHero,
@@ -39,6 +47,14 @@ export const blogImages = {
   statutJuridique: statutJuridiqueHero,
   keepaAnalyse: keepaAnalyseHero,
   ventesQ4: ventesQ4Hero,
+  negocierFournisseurs: negocierFournisseursHero,
+  obtenirAvis: obtenirAvisHero,
+  gagnerBuyBox: gagnerBuyBoxHero,
+  brandRegistry: brandRegistryHero,
+  arbitrageOnline: arbitrageOnlineHero,
+  comptabiliteFba: comptabiliteFbaHero,
+  erreursDebutants: erreursDebutantsHero,
+  scalerBusiness: scalerBusinessHero,
 } as const;
 
 export type BlogImageKey = keyof typeof blogImages;
