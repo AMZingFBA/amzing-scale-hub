@@ -96,7 +96,7 @@ const Blog = () => {
       
       <main className="pt-20">
         {/* Hero Section */}
-        <section className="relative py-16 md:py-24 overflow-hidden">
+        <section className="relative pt-6 pb-16 md:pt-8 md:pb-24 overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-secondary/5" />
           <div className="container mx-auto px-4 relative">
             {/* Back Arrow */}
