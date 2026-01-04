@@ -100,16 +100,22 @@ async function updateAirtableGeneral(email: string) {
   const airtableApiKey = Deno.env.get("AIRTABLE_API_KEY");
   // Use the main base ID for "AMZing FBA – Général"
   const airtableBaseId = Deno.env.get("AIRTABLE_BASE_ID");
-  
+
   if (!airtableApiKey || !airtableBaseId) {
     logStep("Airtable General credentials missing, skipping update");
     return;
   }
-  
+
+  // Some Airtable fields use typographic apostrophes (’). We try both to avoid silent failures.
+  const subscriptionFieldCandidates = ["Type d’abonnement", "Type d'abonnement"];
+  const createdAtFieldCandidates = ["Date de création", "date de création"];
+  const subscriptionValue = "1499,99";
+  const dateValue = new Date().toISOString().split('T')[0];
+
   try {
     const tableNameEncoded = encodeURIComponent(AIRTABLE_USERS_TABLE);
     const url = `https://api.airtable.com/v0/${airtableBaseId}/${tableNameEncoded}`;
-    
+
     // Find record by email
     const searchUrl = `${url}?filterByFormula={Email (principal)}="${email}"`;
     const searchResponse = await fetch(searchUrl, {
@@ -118,14 +124,11 @@ async function updateAirtableGeneral(email: string) {
         "Content-Type": "application/json",
       },
     });
-    
+
     const searchData = await searchResponse.json();
-    
-    if (searchData.records && searchData.records.length > 0) {
-      const recordId = searchData.records[0].id;
-      
-      // Update "Type d'abonnement" to "1499,99"
-      const updateResponse = await fetch(`${url}/${recordId}`, {
+
+    const patchSubscription = async (recordId: string, subscriptionField: string) => {
+      return await fetch(`${url}/${recordId}`, {
         method: "PATCH",
         headers: {
           "Authorization": `Bearer ${airtableApiKey}`,
@@ -133,22 +136,15 @@ async function updateAirtableGeneral(email: string) {
         },
         body: JSON.stringify({
           fields: {
-            "Type d'abonnement": "1499,99",
+            [subscriptionField]: subscriptionValue,
           },
+          typecast: true,
         }),
       });
-      
-      if (updateResponse.ok) {
-        logStep("Successfully updated Type d'abonnement=1499,99 in General Airtable", { email, recordId });
-      } else {
-        const errorData = await updateResponse.text();
-        logStep("Failed to update Type d'abonnement in General Airtable", { error: errorData });
-      }
-    } else {
-      // Record doesn't exist, create it with Type d'abonnement = "1499,99"
-      logStep("Record not found in General, creating new record with Type d'abonnement=1499,99", { email });
-      
-      const createResponse = await fetch(url, {
+    };
+
+    const createRecord = async (subscriptionField: string, createdAtField: string) => {
+      return await fetch(url, {
         method: "POST",
         headers: {
           "Authorization": `Bearer ${airtableApiKey}`,
@@ -157,22 +153,88 @@ async function updateAirtableGeneral(email: string) {
         body: JSON.stringify({
           fields: {
             "Email (principal)": email,
-            "Type d'abonnement": "1499,99",
-            "date de création": new Date().toISOString().split('T')[0],
+            [subscriptionField]: subscriptionValue,
+            [createdAtField]: dateValue,
           },
           typecast: true,
         }),
       });
-      
-      if (createResponse.ok) {
-        logStep("Successfully created record with Type d'abonnement=1499,99 in General Airtable", { email });
-      } else {
-        const errorData = await createResponse.text();
-        logStep("Failed to create record in General Airtable", { error: errorData });
+    };
+
+    if (searchData.records && searchData.records.length > 0) {
+      const recordId = searchData.records[0].id;
+
+      for (const fieldName of subscriptionFieldCandidates) {
+        const updateResponse = await patchSubscription(recordId, fieldName);
+
+        if (updateResponse.ok) {
+          logStep("Successfully updated General Airtable subscription", {
+            email,
+            recordId,
+            field: fieldName,
+            value: subscriptionValue,
+          });
+          return;
+        }
+
+        const errorText = await updateResponse.text();
+        const isUnknownField = errorText.includes("UNKNOWN_FIELD_NAME");
+
+        if (isUnknownField) {
+          logStep("General Airtable field mismatch, trying alternative", {
+            email,
+            triedField: fieldName,
+            error: errorText,
+          });
+          continue;
+        }
+
+        logStep("Failed to update subscription in General Airtable", { email, error: errorText });
+        return;
+      }
+
+      logStep("Failed to update subscription in General Airtable (no matching field name)", { email });
+      return;
+    }
+
+    // Record doesn't exist, create it
+    logStep("Record not found in General, creating new record", { email });
+
+    for (const subscriptionField of subscriptionFieldCandidates) {
+      for (const createdAtField of createdAtFieldCandidates) {
+        const createResponse = await createRecord(subscriptionField, createdAtField);
+
+        if (createResponse.ok) {
+          logStep("Successfully created record in General Airtable", {
+            email,
+            subscriptionField,
+            createdAtField,
+            value: subscriptionValue,
+          });
+          return;
+        }
+
+        const errorText = await createResponse.text();
+        const isUnknownField = errorText.includes("UNKNOWN_FIELD_NAME");
+
+        if (isUnknownField) {
+          logStep("General Airtable create field mismatch, trying alternative", {
+            email,
+            subscriptionField,
+            createdAtField,
+            error: errorText,
+          });
+          continue;
+        }
+
+        logStep("Failed to create record in General Airtable", { email, error: errorText });
+        return;
       }
     }
+
+    logStep("Failed to create record in General Airtable (no matching field names)", { email });
   } catch (error) {
-    logStep("Error updating Type d'abonnement in General Airtable", { error: String(error) });
+    logStep("Error updating subscription in General Airtable", { email, error: String(error) });
   }
 }
 
