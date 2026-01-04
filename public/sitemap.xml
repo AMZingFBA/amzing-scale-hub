@@ -111,6 +111,7 @@
     <priority>0.9</priority>
   </url>
   
+  <!-- Articles Piliers -->
   <url>
     <loc>https://amzingfba.com/blog/amazon-fba-cest-quoi-guide-complet</loc>
     <lastmod>2026-01-04</lastmod>
@@ -119,45 +120,186 @@
   </url>
   
   <url>
-    <loc>https://amzingfba.com/blog/produits-rentables-amazon-guide</loc>
+    <loc>https://amzingfba.com/blog/trouver-produits-rentables-amazon-fba</loc>
     <lastmod>2026-01-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   
   <url>
-    <loc>https://amzingfba.com/blog/amazon-fba-vs-fbm</loc>
+    <loc>https://amzingfba.com/blog/logistique-amazon-fba-guide-complet</loc>
     <lastmod>2026-01-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+  </url>
+  
+  <url>
+    <loc>https://amzingfba.com/blog/comment-vendre-sur-amazon-guide-debutant</loc>
+    <lastmod>2026-01-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  
+  <!-- Articles Satellites -->
+  <url>
+    <loc>https://amzingfba.com/blog/amazon-fba-vs-fbm</loc>
+    <lastmod>2026-01-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
   </url>
   
   <url>
     <loc>https://amzingfba.com/blog/combien-coute-amazon-fba</loc>
     <lastmod>2026-01-04</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.7</priority>
   </url>
   
   <url>
-    <loc>https://amzingfba.com/blog/comment-debuter-amazon-fba</loc>
+    <loc>https://amzingfba.com/blog/categories-produits-rentables-amazon-fba</loc>
     <lastmod>2026-01-04</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.7</priority>
   </url>
   
   <url>
-    <loc>https://amzingfba.com/blog/logistique-amazon-fba-guide</loc>
+    <loc>https://amzingfba.com/blog/creer-compte-vendeur-amazon-seller-central</loc>
     <lastmod>2026-01-04</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.7</priority>
   </url>
   
   <url>
-    <loc>https://amzingfba.com/blog/vendre-amazon-france-guide</loc>
+    <loc>https://amzingfba.com/blog/preparer-envoi-fba-amazon-etiquetage</loc>
     <lastmod>2026-01-04</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.7</priority>
+  </url>
+  
+  <url>
+    <loc>https://amzingfba.com/blog/wholesale-amazon-fba-guide</loc>
+    <lastmod>2026-01-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <url>
+    <loc>https://amzingfba.com/blog/outils-sourcing-amazon-fba-selleramp-keepa</loc>
+    <lastmod>2026-01-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <url>
+    <loc>https://amzingfba.com/blog/private-label-amazon-fba-creer-marque</loc>
+    <lastmod>2026-01-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <url>
+    <loc>https://amzingfba.com/blog/gerer-retours-amazon-fba</loc>
+    <lastmod>2026-01-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <url>
+    <loc>https://amzingfba.com/blog/vendre-amazon-europe-pan-europeen</loc>
+    <lastmod>2026-01-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <url>
+    <loc>https://amzingfba.com/blog/optimiser-listing-amazon-fba</loc>
+    <lastmod>2026-01-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <url>
+    <loc>https://amzingfba.com/blog/amazon-ppc-publicite-guide</loc>
+    <lastmod>2026-01-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <url>
+    <loc>https://amzingfba.com/blog/quel-statut-juridique-amazon-fba</loc>
+    <lastmod>2026-01-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <url>
+    <loc>https://amzingfba.com/blog/keepa-analyser-historique-prix-amazon</loc>
+    <lastmod>2026-01-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <url>
+    <loc>https://amzingfba.com/blog/ventes-q4-amazon-black-friday-noel</loc>
+    <lastmod>2026-01-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <url>
+    <loc>https://amzingfba.com/blog/negocier-fournisseurs-amazon-fba</loc>
+    <lastmod>2026-01-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <url>
+    <loc>https://amzingfba.com/blog/obtenir-avis-amazon-fba</loc>
+    <lastmod>2026-01-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <url>
+    <loc>https://amzingfba.com/blog/gagner-buy-box-amazon</loc>
+    <lastmod>2026-01-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <url>
+    <loc>https://amzingfba.com/blog/amazon-brand-registry-protection-marque</loc>
+    <lastmod>2026-01-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <url>
+    <loc>https://amzingfba.com/blog/arbitrage-online-amazon-fba-guide</loc>
+    <lastmod>2026-01-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <url>
+    <loc>https://amzingfba.com/blog/comptabilite-amazon-fba-gestion</loc>
+    <lastmod>2026-01-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <url>
+    <loc>https://amzingfba.com/blog/erreurs-debutant-amazon-fba</loc>
+    <lastmod>2026-01-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <url>
+    <loc>https://amzingfba.com/blog/scaler-business-amazon-fba</loc>
+    <lastmod>2026-01-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
   </url>
   
   <!-- Pages marketplace -->
