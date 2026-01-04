@@ -149,6 +149,11 @@ const Footer = () => {
               <h3 className="text-lg font-semibold mb-4 text-foreground">Navigation</h3>
               <ul className="space-y-2">
                 <li>
+                  <Link to="/blog" className="text-muted-foreground hover:text-primary transition-all duration-300 hover:translate-x-1 inline-block">
+                    Blog
+                  </Link>
+                </li>
+                <li>
                   <Link to="/services" className="text-muted-foreground hover:text-primary transition-all duration-300 hover:translate-x-1 inline-block">
                     Nos Services
                   </Link>
