@@ -12,16 +12,17 @@ const logStep = (step: string, details?: any) => {
   console.log(`[VERIFY-SUITE-PAYMENT] ${step}${detailsStr}`);
 };
 
-// Airtable configuration for "Forma AMZing FBA Noah - Cyprien" table
+// Airtable configuration
 const AIRTABLE_FORMA_TABLE = "Forma AMZing FBA Noah - Cyprien";
+const AIRTABLE_USERS_TABLE = "Users";
 
-async function updateAirtableVIP(email: string) {
+async function updateAirtableForma(email: string) {
   const airtableApiKey = Deno.env.get("AIRTABLE_API_KEY");
   // Use the specific Forma base ID (different from main base)
   const airtableBaseId = Deno.env.get("AIRTABLE_FORMA_BASE_ID");
   
   if (!airtableApiKey || !airtableBaseId) {
-    logStep("Airtable credentials missing, skipping VIP update");
+    logStep("Airtable Forma credentials missing, skipping VIP update");
     return;
   }
   
@@ -65,7 +66,7 @@ async function updateAirtableVIP(email: string) {
       }
     } else {
       // Record doesn't exist, create it with VIP = true
-      logStep("Record not found, creating new record with VIP=true", { email });
+      logStep("Record not found in Forma, creating new record with VIP=true", { email });
       
       const createResponse = await fetch(url, {
         method: "POST",
@@ -92,6 +93,86 @@ async function updateAirtableVIP(email: string) {
     }
   } catch (error) {
     logStep("Error updating VIP in Forma Airtable", { error: String(error) });
+  }
+}
+
+async function updateAirtableGeneral(email: string) {
+  const airtableApiKey = Deno.env.get("AIRTABLE_API_KEY");
+  // Use the main base ID for "AMZing FBA – Général"
+  const airtableBaseId = Deno.env.get("AIRTABLE_BASE_ID");
+  
+  if (!airtableApiKey || !airtableBaseId) {
+    logStep("Airtable General credentials missing, skipping update");
+    return;
+  }
+  
+  try {
+    const tableNameEncoded = encodeURIComponent(AIRTABLE_USERS_TABLE);
+    const url = `https://api.airtable.com/v0/${airtableBaseId}/${tableNameEncoded}`;
+    
+    // Find record by email
+    const searchUrl = `${url}?filterByFormula={Email (principal)}="${email}"`;
+    const searchResponse = await fetch(searchUrl, {
+      headers: {
+        "Authorization": `Bearer ${airtableApiKey}`,
+        "Content-Type": "application/json",
+      },
+    });
+    
+    const searchData = await searchResponse.json();
+    
+    if (searchData.records && searchData.records.length > 0) {
+      const recordId = searchData.records[0].id;
+      
+      // Update "Type d'abonnement" to "1499,99"
+      const updateResponse = await fetch(`${url}/${recordId}`, {
+        method: "PATCH",
+        headers: {
+          "Authorization": `Bearer ${airtableApiKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          fields: {
+            "Type d'abonnement": "1499,99",
+          },
+        }),
+      });
+      
+      if (updateResponse.ok) {
+        logStep("Successfully updated Type d'abonnement=1499,99 in General Airtable", { email, recordId });
+      } else {
+        const errorData = await updateResponse.text();
+        logStep("Failed to update Type d'abonnement in General Airtable", { error: errorData });
+      }
+    } else {
+      // Record doesn't exist, create it with Type d'abonnement = "1499,99"
+      logStep("Record not found in General, creating new record with Type d'abonnement=1499,99", { email });
+      
+      const createResponse = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${airtableApiKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          fields: {
+            "Email (principal)": email,
+            "Type d'abonnement": "1499,99",
+            "date de création": new Date().toISOString().split('T')[0],
+          },
+          typecast: true,
+        }),
+      });
+      
+      if (createResponse.ok) {
+        logStep("Successfully created record with Type d'abonnement=1499,99 in General Airtable", { email });
+      } else {
+        const errorData = await createResponse.text();
+        logStep("Failed to create record in General Airtable", { error: errorData });
+      }
+    }
+  } catch (error) {
+    logStep("Error updating Type d'abonnement in General Airtable", { error: String(error) });
   }
 }
 
@@ -197,7 +278,10 @@ serve(async (req) => {
       const amount = session.amount_total ? session.amount_total / 100 : 1499.99;
       
       // 1. Update VIP = true in "Forma AMZing FBA Noah - Cyprien" Airtable table
-      await updateAirtableVIP(customerEmail);
+      await updateAirtableForma(customerEmail);
+      
+      // 2. Update "Type d'abonnement" = "1499,99" in "AMZing FBA – Général" Airtable table
+      await updateAirtableGeneral(customerEmail);
       
       // 2. Grant lifetime VIP in Supabase (record purchase + update subscription if user exists)
       await grantLifetimeVIP(supabaseClient, customerEmail, session_id, amount);
