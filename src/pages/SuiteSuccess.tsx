@@ -44,10 +44,18 @@ const SuiteSuccess = () => {
           setPaymentEmail(data.email);
           toast.success('Paiement confirmé !');
           
-          // If user is already logged in, redirect to dashboard after a delay
+          // If user is already logged in, redirect to dashboard
           if (user) {
             setTimeout(() => {
               navigate('/dashboard');
+            }, 2000);
+          } else {
+            // Force redirect to signup after 3 seconds if not logged in
+            if (data.email) {
+              sessionStorage.setItem('suite_payment_email', data.email);
+            }
+            setTimeout(() => {
+              navigate('/auth?mode=signup&redirect=/dashboard');
             }, 3000);
           }
         } else {
@@ -124,7 +132,7 @@ const SuiteSuccess = () => {
                       🎓 Dernière étape : Crée ton compte
                     </h3>
                     <p className="text-suite-gray mb-4">
-                      Pour accéder à ta formation et à tous tes avantages, crée ton compte avec le même email que ton paiement.
+                      Redirection automatique vers la création de compte...
                     </p>
                     
                     {paymentEmail && (
