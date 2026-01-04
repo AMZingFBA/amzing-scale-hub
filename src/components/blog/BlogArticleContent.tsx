@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { BlogArticle } from '@/lib/blog-data';
 import { CheckCircle, AlertTriangle, Lightbulb, TrendingUp, Info } from 'lucide-react';
 
@@ -144,7 +145,7 @@ const BlogArticleContent = ({ article }: BlogArticleContentProps) => {
 
   return (
     <article className="prose prose-lg max-w-none">
-      <ReactMarkdown components={components}>
+      <ReactMarkdown components={components} remarkPlugins={[remarkGfm]}>
         {article.content}
       </ReactMarkdown>
     </article>
