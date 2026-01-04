@@ -71,6 +71,8 @@ const Footer = () => {
                 <img 
                   src={logo} 
                   alt="AMZing FBA" 
+                  width={72}
+                  height={48}
                   className="h-12 transition-all duration-500 group-hover:scale-110 group-hover:drop-shadow-[0_0_15px_rgba(255,153,0,0.5)]" 
                 />
                 <div className="absolute -inset-2 bg-gradient-to-r from-primary/0 via-primary/20 to-primary/0 rounded-lg blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
@@ -131,6 +133,8 @@ const Footer = () => {
                 <img 
                   src={logo} 
                   alt="AMZing FBA" 
+                  width={72}
+                  height={48}
                   className="h-12 transition-all duration-500 group-hover:scale-110 group-hover:drop-shadow-[0_0_15px_rgba(255,153,0,0.5)] animate-fade-in" 
                 />
                 <div className="absolute -inset-2 bg-gradient-to-r from-primary/0 via-primary/20 to-primary/0 rounded-lg blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
