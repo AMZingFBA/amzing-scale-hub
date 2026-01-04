@@ -11,6 +11,75 @@ const logStep = (step: string, details?: any) => {
   console.log(`[VERIFY-SUITE-PAYMENT] ${step}${detailsStr}`);
 };
 
+// Airtable configuration for "Forma AMZing FBA Noah - Cyprien" table
+const AIRTABLE_FORMA_TABLE = "Forma AMZing FBA Noah - Cyprien";
+
+async function syncToAirtableForma(email: string, phone: string | null, name: string | null, paymentDate: string) {
+  const airtableApiKey = Deno.env.get("AIRTABLE_API_KEY");
+  const airtableBaseId = Deno.env.get("AIRTABLE_BASE_ID");
+  
+  if (!airtableApiKey || !airtableBaseId) {
+    logStep("Airtable credentials missing, skipping sync");
+    return;
+  }
+  
+  try {
+    const tableNameEncoded = encodeURIComponent(AIRTABLE_FORMA_TABLE);
+    const url = `https://api.airtable.com/v0/${airtableBaseId}/${tableNameEncoded}`;
+    
+    // Check if email already exists
+    const searchUrl = `${url}?filterByFormula={E-mail}="${email}"`;
+    const searchResponse = await fetch(searchUrl, {
+      headers: {
+        "Authorization": `Bearer ${airtableApiKey}`,
+        "Content-Type": "application/json",
+      },
+    });
+    
+    const searchData = await searchResponse.json();
+    
+    if (searchData.records && searchData.records.length > 0) {
+      logStep("User already exists in Forma table", { email });
+      return;
+    }
+    
+    // Create new record
+    const fields: Record<string, string> = {
+      "E-mail": email,
+      "Date": paymentDate,
+    };
+    
+    if (phone) {
+      fields["Numéro de téléphone"] = phone;
+    }
+    
+    if (name) {
+      fields["Nom"] = name;
+    }
+    
+    const createResponse = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${airtableApiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        fields,
+        typecast: true,
+      }),
+    });
+    
+    if (createResponse.ok) {
+      logStep("Successfully synced to Forma Airtable table", { email });
+    } else {
+      const errorData = await createResponse.text();
+      logStep("Failed to sync to Forma Airtable", { error: errorData });
+    }
+  } catch (error) {
+    logStep("Error syncing to Forma Airtable", { error: String(error) });
+  }
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -52,9 +121,17 @@ serve(async (req) => {
     if (session.payment_status === "paid") {
       logStep("Payment confirmed");
       
+      const customerEmail = session.customer_details?.email || session.customer_email || "";
+      const customerName = session.customer_details?.name || null;
+      const customerPhone = session.customer_details?.phone || null;
+      const paymentDate = new Date().toISOString().split('T')[0]; // Format: YYYY-MM-DD
+      
+      // Sync to "Forma AMZing FBA Noah - Cyprien" Airtable table
+      await syncToAirtableForma(customerEmail, customerPhone, customerName, paymentDate);
+      
       return new Response(JSON.stringify({ 
         paid: true,
-        email: session.customer_details?.email || session.customer_email,
+        email: customerEmail,
         amount: session.amount_total ? session.amount_total / 100 : 0,
         product: session.metadata?.product || "suite"
       }), {
