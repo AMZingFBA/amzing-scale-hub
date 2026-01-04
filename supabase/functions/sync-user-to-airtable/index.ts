@@ -80,7 +80,11 @@ serve(async (req) => {
 
   try {
     const { user } = await req.json() as { user: UserData };
-    
+
+    // Normalize email early to prevent duplicates caused by casing/spaces
+    const normalizedEmail = normalizeEmail(user.email);
+    user.email = normalizedEmail;
+
     // Format phone number
     const formattedPhone = formatPhoneNumber(user.phone);
     console.log(`[Sync User to Airtable] Syncing user:`, user.email, `phone: ${formattedPhone}, plan_type: ${user.plan_type}, status: ${user.status}`);
@@ -95,7 +99,7 @@ serve(async (req) => {
     await randomDelay(100, 500);
 
     // Check if user already exists in Airtable by email
-    let searchData = await searchUserInAirtable(user.email);
+    let searchData = await searchUserInAirtable(normalizedEmail);
     console.log(`[Sync User to Airtable] First search result:`, searchData);
 
     // Check if user was previously VIP (from existing Airtable record)
@@ -248,157 +252,101 @@ serve(async (req) => {
 
     console.log(`[Sync User to Airtable] Fields to sync:`, JSON.stringify(fields));
 
-    let response;
-    let isNewUserInAirtable = false;
-    
-    if (searchData.records && searchData.records.length > 0) {
-      // Update existing record
-      const recordId = searchData.records[0].id;
-      console.log(`[Sync User to Airtable] Updating existing record:`, recordId);
-      
-      response = await fetch(`https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${USERS_TABLE}/${recordId}`, {
-        method: 'PATCH',
-        headers: {
-          'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ fields }),
-      });
-    } else {
-      // DOUBLE CHECK before creating - to prevent race conditions
-      // Wait a bit and check again to make sure another request didn't create it
-      await randomDelay(200, 400);
-      searchData = await searchUserInAirtable(user.email);
-      
-      if (searchData.records && searchData.records.length > 0) {
-        // Another request created the record while we were waiting - UPDATE instead
-        const recordId = searchData.records[0].id;
-        console.log(`[Sync User to Airtable] Race condition detected! Record was just created by another request. Updating record:`, recordId);
-        
-        response = await fetch(`https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${USERS_TABLE}/${recordId}`, {
-          method: 'PATCH',
-          headers: {
-            'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ fields }),
-        });
-      } else {
-        // Create new record - this is a truly new user
-        console.log(`[Sync User to Airtable] Creating new record`);
-        isNewUserInAirtable = true;
-        
-        response = await fetch(`https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${USERS_TABLE}`, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ records: [{ fields }] }),
-        });
-      }
-    }
-
-    const result = await response.json();
-    console.log(`[Sync User to Airtable] Result:`, result);
-
-    if (result.error) {
-      throw new Error(result.error.message || 'Airtable error');
-    }
-
     // Airtable headers for reuse
     const airtableHeaders = {
       'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
       'Content-Type': 'application/json',
     };
 
+    // True if no record existed at the time of the first read (useful for downstream logic)
+    const isNewUserInAirtable = !(searchData.records && searchData.records.length > 0);
+
+    // === USERS TABLE (idempotent upsert) ===
+    // This prevents duplicate rows even if the function is called multiple times concurrently.
+    console.log(`[Sync User to Airtable] Upserting into "${USERS_TABLE}" (new=${isNewUserInAirtable})`);
+
+    const upsertResponse = await fetch(`https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${encodeURIComponent(USERS_TABLE)}`, {
+      method: 'PATCH',
+      headers: airtableHeaders,
+      body: JSON.stringify({
+        records: [{ fields }],
+        performUpsert: { fieldsToMergeOn: ["Email (principal)"] },
+      }),
+    });
+
+    const result = await upsertResponse.json();
+    console.log(`[Sync User to Airtable] Result:`, result);
+
+    if (!upsertResponse.ok || result?.error) {
+      throw new Error(result?.error?.message || `Airtable error (${upsertResponse.status})`);
+    }
+
     // === HANDLE "VIP" TABLE ===
     const isVipUser = user.plan_type === 'vip' && (user.status === 'active' || user.status === 'canceled');
-    
+
     if (isVipUser) {
-      console.log(`[Sync User to Airtable] User is VIP, checking "VIP" table`);
-      
-      // Check if user already exists in "VIP" table
-      const vipSearchUrl = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/VIP?filterByFormula={Email}="${user.email}"`;
-      const vipSearchResponse = await fetch(vipSearchUrl, {
-        method: 'GET',
-        headers: { 'Authorization': `Bearer ${AIRTABLE_API_KEY}` },
+      console.log(`[Sync User to Airtable] Upserting into "VIP" table`);
+
+      const vipFields: Record<string, unknown> = {
+        "Email": user.email,
+      };
+
+      const vipUpsertResponse = await fetch(`https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/VIP`, {
+        method: 'PATCH',
+        headers: airtableHeaders,
+        body: JSON.stringify({
+          records: [{ fields: vipFields }],
+          performUpsert: { fieldsToMergeOn: ["Email"] },
+        }),
       });
-      
-      const vipSearchData = await vipSearchResponse.json();
-      const existingVipRecord = vipSearchData.records?.[0];
-      
-      // Only CREATE if user doesn't already exist in VIP table (avoid duplicates)
-      if (!existingVipRecord) {
-        console.log(`[Sync User to Airtable] User not in VIP table, creating new record`);
-        
-        const vipFields: Record<string, unknown> = {
-          "Email": user.email,
-        };
-        
-        const createVipUrl = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/VIP`;
-        const createVipResponse = await fetch(createVipUrl, {
-          method: 'POST',
-          headers: airtableHeaders,
-          body: JSON.stringify({ fields: vipFields }),
-        });
-        
-        if (!createVipResponse.ok) {
-          const errorText = await createVipResponse.text();
-          console.error(`[Sync User to Airtable] Failed to create in VIP table:`, errorText);
-        } else {
-          console.log(`[Sync User to Airtable] Created user in VIP table (triggers automation)`);
-        }
+
+      const vipResult = await vipUpsertResponse.json();
+
+      if (!vipUpsertResponse.ok || vipResult?.error) {
+        console.error(`[Sync User to Airtable] VIP upsert error:`, vipResult?.error || vipResult);
       } else {
-        console.log(`[Sync User to Airtable] User already exists in VIP table, skipping to avoid duplicates`);
+        console.log(`[Sync User to Airtable] VIP upsert OK (automation triggered if configured)`);
       }
     }
 
     // === HANDLE "Amazon to airable" TABLE ===
-    
-    // If user becomes VIP, REMOVE them from "Amazon to airable" table
+
+    // If user becomes VIP, REMOVE them from "Amazon to airable" table (delete ALL matches)
     if (isCurrentlyVip) {
-      console.log(`[Sync User to Airtable] User is now VIP, checking if they need to be removed from Amazon to airable`);
-      
-      const amazonSearchUrl = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${encodeURIComponent(AMAZON_TO_AIRTABLE_TABLE)}?filterByFormula={Email}="${user.email}"`;
+      console.log(`[Sync User to Airtable] User is now VIP, removing from Amazon to airable (if present)`);
+
+      const formula = `LOWER({Email})="${user.email}"`;
+      const amazonSearchUrl = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${encodeURIComponent(AMAZON_TO_AIRTABLE_TABLE)}?filterByFormula=${encodeURIComponent(formula)}`;
       const amazonSearchResponse = await fetch(amazonSearchUrl, {
         headers: { 'Authorization': `Bearer ${AIRTABLE_API_KEY}` },
       });
       const amazonSearchData = await amazonSearchResponse.json();
-      
-      if (amazonSearchData.records && amazonSearchData.records.length > 0) {
-        // User exists in Amazon to airable - DELETE them
-        const recordId = amazonSearchData.records[0].id;
-        console.log(`[Sync User to Airtable] Deleting VIP user from Amazon to airable, record ID: ${recordId}`);
-        
-        const deleteResponse = await fetch(`https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${encodeURIComponent(AMAZON_TO_AIRTABLE_TABLE)}/${recordId}`, {
-          method: 'DELETE',
-          headers: { 'Authorization': `Bearer ${AIRTABLE_API_KEY}` },
-        });
-        
+
+      const records: Array<{ id: string }> = amazonSearchData.records || [];
+      for (const rec of records) {
+        const deleteResponse = await fetch(
+          `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${encodeURIComponent(AMAZON_TO_AIRTABLE_TABLE)}/${rec.id}`,
+          {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${AIRTABLE_API_KEY}` },
+          }
+        );
+
         if (deleteResponse.ok) {
-          console.log(`[Sync User to Airtable] Successfully removed VIP user from Amazon to airable`);
+          console.log(`[Sync User to Airtable] Removed from Amazon to airable: ${rec.id}`);
         } else {
           console.error(`[Sync User to Airtable] Failed to delete from Amazon to airable:`, await deleteResponse.text());
         }
       }
     }
-    
-    // Only ADD to "Amazon to airable" for NEW users who have NEVER been VIP
+
+    // Only ADD/UPDATE "Amazon to airable" for users who have NEVER been VIP
     const neverBeenVip = !wasVip && !hadStripeCustomer && !hadDateActivation;
     const isFreeUser = !isCurrentlyVip && !isCanceledVip && typeAbonnement === 'Gratuit' && neverBeenVip;
-    
-    // Handle "Amazon to airable" table for free users (create or update)
+
     if (isFreeUser) {
-      console.log(`[Sync User to Airtable] User is free and never been VIP, syncing to Amazon to airable table`);
-      
-      // Check if user already exists in Amazon to airable table
-      const amazonSearchUrl = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${encodeURIComponent(AMAZON_TO_AIRTABLE_TABLE)}?filterByFormula={Email}="${user.email}"`;
-      const amazonSearchResponse = await fetch(amazonSearchUrl, {
-        headers: { 'Authorization': `Bearer ${AIRTABLE_API_KEY}` },
-      });
-      const amazonSearchData = await amazonSearchResponse.json();
-      
+      console.log(`[Sync User to Airtable] Upserting into Amazon to airable (free + never VIP)`);
+
       const amazonFields: Record<string, unknown> = {
         "Email": user.email,
         "Nom": user.full_name || user.nickname || '',
@@ -406,46 +354,21 @@ serve(async (req) => {
         "Pays": "France",
         "inscrit mais non VIP": true,
       };
-      
-      if (amazonSearchData.records && amazonSearchData.records.length > 0) {
-        // User exists - UPDATE their record (including phone)
-        const amazonRecordId = amazonSearchData.records[0].id;
-        console.log(`[Sync User to Airtable] Updating existing Amazon to airable record:`, amazonRecordId, JSON.stringify(amazonFields));
-        
-        const amazonResponse = await fetch(`https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${encodeURIComponent(AMAZON_TO_AIRTABLE_TABLE)}/${amazonRecordId}`, {
-          method: 'PATCH',
-          headers: {
-            'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ fields: amazonFields }),
-        });
-        
-        const amazonResult = await amazonResponse.json();
-        console.log(`[Sync User to Airtable] Amazon to airable update result:`, amazonResult);
-        
-        if (amazonResult.error) {
-          console.error(`[Sync User to Airtable] Amazon to airable update error:`, amazonResult.error);
-        }
-      } else if (isNewUserInAirtable) {
-        // Only create for truly new users
-        console.log(`[Sync User to Airtable] Creating new Amazon to airable record:`, JSON.stringify(amazonFields));
-        
-        const amazonResponse = await fetch(`https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${encodeURIComponent(AMAZON_TO_AIRTABLE_TABLE)}`, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ records: [{ fields: amazonFields }] }),
-        });
-        
-        const amazonResult = await amazonResponse.json();
-        console.log(`[Sync User to Airtable] Amazon to airable result:`, amazonResult);
-        
-        if (amazonResult.error) {
-          console.error(`[Sync User to Airtable] Amazon to airable error:`, amazonResult.error);
-        }
+
+      const amazonUpsertResponse = await fetch(`https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${encodeURIComponent(AMAZON_TO_AIRTABLE_TABLE)}`, {
+        method: 'PATCH',
+        headers: airtableHeaders,
+        body: JSON.stringify({
+          records: [{ fields: amazonFields }],
+          performUpsert: { fieldsToMergeOn: ["Email"] },
+        }),
+      });
+
+      const amazonResult = await amazonUpsertResponse.json();
+      console.log(`[Sync User to Airtable] Amazon to airable upsert result:`, amazonResult);
+
+      if (!amazonUpsertResponse.ok || amazonResult?.error) {
+        console.error(`[Sync User to Airtable] Amazon to airable upsert error:`, amazonResult?.error || amazonResult);
       }
     }
 
