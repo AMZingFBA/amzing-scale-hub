@@ -376,9 +376,28 @@ serve(async (req) => {
       logStep("Payment confirmed");
       
       const customerEmail = session.customer_details?.email || session.customer_email || "";
-      const customerName = session.customer_details?.name || null;
-      const customerPhone = session.customer_details?.phone || null;
+      let customerName = session.customer_details?.name || null;
+      let customerPhone = session.customer_details?.phone || null;
       const amount = session.amount_total ? session.amount_total / 100 : 1499.99;
+
+      // If Stripe Checkout didn't return name/phone, fallback to the user's profile (Suite checkout is authenticated)
+      if (customerEmail && (!customerName || !customerPhone)) {
+        const { data: profile, error: profileError } = await supabaseClient
+          .from("profiles")
+          .select("full_name, phone")
+          .eq("email", customerEmail)
+          .maybeSingle();
+
+        if (profileError) {
+          logStep("Profile lookup failed (fallback for name/phone)", { email: customerEmail, error: profileError.message });
+        } else if (profile) {
+          customerName = customerName || profile.full_name || null;
+          customerPhone = customerPhone || profile.phone || null;
+          logStep("Customer details enriched from profile", { email: customerEmail, hasName: !!customerName, hasPhone: !!customerPhone });
+        } else {
+          logStep("No profile found to enrich customer details", { email: customerEmail });
+        }
+      }
       
       // 1. Update VIP = true in "Forma AMZing FBA Noah - Cyprien" Airtable table
       await updateAirtableForma(customerEmail, customerName, customerPhone);
@@ -388,7 +407,6 @@ serve(async (req) => {
       
       // 3. Grant lifetime VIP in Supabase (record purchase + update subscription if user exists)
       await grantLifetimeVIP(supabaseClient, customerEmail, session_id, amount);
-      
       return new Response(JSON.stringify({ 
         paid: true,
         email: customerEmail,
