@@ -1097,6 +1097,30 @@ export type Database = {
         }
         Relationships: []
       }
+      suite_purchases: {
+        Row: {
+          amount: number
+          created_at: string
+          email: string
+          id: string
+          stripe_session_id: string | null
+        }
+        Insert: {
+          amount?: number
+          created_at?: string
+          email: string
+          id?: string
+          stripe_session_id?: string | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          email?: string
+          id?: string
+          stripe_session_id?: string | null
+        }
+        Relationships: []
+      }
       tickets: {
         Row: {
           category: string | null
