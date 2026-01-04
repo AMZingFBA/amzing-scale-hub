@@ -251,6 +251,12 @@ const Navbar = () => {
         {/* Mobile Navigation */}
         {isOpen && (
           <div className="md:hidden py-4 space-y-4">
+            <Button variant="ghost" size="lg" className="w-full justify-start" asChild>
+              <Link to="/blog" onClick={() => setIsOpen(false)}>
+                <BookOpen className="w-4 h-4 mr-2" />
+                Blog
+              </Link>
+            </Button>
             {user ? (
               <div className="space-y-2 pt-2 border-t">
                 <div className="px-2 py-3 bg-gradient-to-r from-primary/10 to-secondary/10 rounded-lg">
