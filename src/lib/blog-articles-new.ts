@@ -8,16 +8,16 @@ import { BlogArticle } from './blog-data';
 // Article 1: Catégories les plus rentables
 export const articleCategoriesRentables: BlogArticle = {
   slug: 'categories-produits-rentables-amazon-fba',
-  title: "Top 10 Catégories de Produits Rentables sur Amazon FBA en 2025",
-  metaTitle: "Catégories Rentables Amazon FBA 2025 : Top 10 Niches Profitables",
-  metaDescription: "Découvrez les 10 catégories de produits les plus rentables sur Amazon FBA en 2025. Électronique, beauté, maison... Guide complet pour choisir votre niche.",
+  title: "Top 10 Catégories de Produits Rentables sur Amazon FBA en 2026",
+  metaTitle: "Catégories Rentables Amazon FBA 2026 : Top 10 Niches Profitables",
+  metaDescription: "Découvrez les 10 catégories de produits les plus rentables sur Amazon FBA en 2026. Électronique, beauté, maison... Guide complet pour choisir votre niche.",
   keywords: ['catégories rentables amazon', 'niche amazon fba', 'produits amazon fba', 'meilleures catégories amazon', 'catégorie produit amazon', 'niche rentable e-commerce', 'produits à vendre amazon', 'catégorie amazon fba', 'marché amazon france', 'vendre sur amazon catégories'],
   excerpt: "Électronique, beauté, maison, sport... Quelles sont les catégories de produits qui génèrent le plus de profits sur Amazon FBA ? Analyse détaillée des meilleures niches.",
   category: 'produits-rentables',
   type: 'satellite',
   readTime: 12,
-  publishedAt: '2025-01-04',
-  updatedAt: '2025-01-04',
+  publishedAt: '2026-01-04',
+  updatedAt: '2026-01-04',
   author: 'AMZing FBA',
   image: blogImages.categoriesRentables,
   relatedSlugs: ['trouver-produits-rentables-amazon-fba', 'amazon-fba-cest-quoi-guide-complet', 'wholesale-amazon-fba-guide'],
@@ -38,7 +38,7 @@ export const articleCategoriesRentables: BlogArticle = {
   content: `
 ## 📌 Résumé (TL;DR)
 
-Choisir la bonne catégorie de produits est crucial pour réussir sur Amazon FBA. Les catégories Beauté, Maison, Électronique accessoires et Sport dominent en termes de rentabilité en 2025. Privilégiez les produits légers, sans restrictions de marque, avec une demande stable. Évitez les catégories ultra-concurrencées ou fortement réglementées si vous débutez.
+Choisir la bonne catégorie de produits est crucial pour réussir sur Amazon FBA. Les catégories Beauté, Maison, Électronique accessoires et Sport dominent en termes de rentabilité en 2026. Privilégiez les produits légers, sans restrictions de marque, avec une demande stable. Évitez les catégories ultra-concurrencées ou fortement réglementées si vous débutez.
 
 ---
 
@@ -58,7 +58,7 @@ Sur Amazon, toutes les catégories ne se valent pas. Le choix de votre niche dé
 
 ---
 
-## Top 10 des catégories rentables Amazon FBA 2025
+## Top 10 des catégories rentables Amazon FBA 2026
 
 ### 1. Beauté & Soins Personnels
 
@@ -223,16 +223,16 @@ Le choix de votre catégorie Amazon FBA conditionne 50% de votre réussite. Comm
 // Article 2: Créer un compte vendeur Amazon
 export const articleCreerCompteVendeur: BlogArticle = {
   slug: 'creer-compte-vendeur-amazon-seller-central',
-  title: "Comment Créer un Compte Vendeur Amazon Seller Central [2025]",
-  metaTitle: "Créer Compte Vendeur Amazon 2025 : Tutoriel Seller Central Complet",
+  title: "Comment Créer un Compte Vendeur Amazon Seller Central [2026]",
+  metaTitle: "Créer Compte Vendeur Amazon 2026 : Tutoriel Seller Central Complet",
   metaDescription: "Tutoriel complet pour créer votre compte vendeur Amazon Seller Central. Documents requis, étapes d'inscription, vérification identité. Guide pas à pas.",
   keywords: ['créer compte vendeur amazon', 'seller central inscription', 'amazon seller central', 'devenir vendeur amazon', 'compte professionnel amazon', 'inscription amazon vendeur', 'ouvrir boutique amazon', 's\'inscrire amazon vendeur', 'seller central france', 'vendre amazon inscription'],
   excerpt: "De la création de compte à la première vente : tutoriel complet pour ouvrir votre compte vendeur Amazon Seller Central en quelques étapes simples.",
   category: 'vendre-amazon',
   type: 'satellite',
   readTime: 10,
-  publishedAt: '2025-01-04',
-  updatedAt: '2025-01-04',
+  publishedAt: '2026-01-04',
+  updatedAt: '2026-01-04',
   author: 'AMZing FBA',
   image: blogImages.creerCompteVendeur,
   relatedSlugs: ['vendre-sur-amazon-guide-debutant', 'amazon-fba-cest-quoi-guide-complet', 'quel-statut-juridique-amazon-fba'],
@@ -373,15 +373,15 @@ La création d'un compte vendeur Amazon est simple si vous êtes préparé. Rass
 export const articlePreparerEnvoiFba: BlogArticle = {
   slug: 'preparer-envoi-fba-amazon-etiquetage',
   title: "Comment Préparer un Envoi FBA : Étiquetage et Expédition [Guide]",
-  metaTitle: "Préparer Envoi FBA 2025 : Guide Étiquetage et Expédition Amazon",
+  metaTitle: "Préparer Envoi FBA 2026 : Guide Étiquetage et Expédition Amazon",
   metaDescription: "Maîtrisez la préparation d'envoi FBA : étiquetage FNSKU, emballage conforme, création d'expédition Seller Central. Tutoriel complet étape par étape.",
   keywords: ['préparer envoi fba', 'étiquetage amazon fba', 'fnsku amazon', 'expédition fba', 'prep center amazon', 'emballer produits amazon', 'envoyer produits amazon', 'préparation fba', 'étiquettes amazon', 'envoi entrepôt amazon'],
   excerpt: "De l'étiquetage FNSKU à l'expédition vers les entrepôts Amazon : guide complet pour préparer vos envois FBA sans erreur et éviter les refus.",
   category: 'logistique',
   type: 'satellite',
   readTime: 14,
-  publishedAt: '2025-01-04',
-  updatedAt: '2025-01-04',
+  publishedAt: '2026-01-04',
+  updatedAt: '2026-01-04',
   author: 'AMZing FBA',
   image: blogImages.preparerEnvoiFba,
   relatedSlugs: ['logistique-amazon-fba-guide-complet', 'amazon-fba-cest-quoi-guide-complet', 'gerer-retours-amazon-fba'],
@@ -575,15 +575,15 @@ La préparation d'envoi FBA demande de la rigueur mais devient routinière avec 
 export const articleWholesaleAmazon: BlogArticle = {
   slug: 'wholesale-amazon-fba-guide',
   title: "Wholesale Amazon FBA : Guide Complet pour Acheter en Gros",
-  metaTitle: "Wholesale Amazon FBA 2025 : Guide Achat en Gros et Fournisseurs",
+  metaTitle: "Wholesale Amazon FBA 2026 : Guide Achat en Gros et Fournisseurs",
   metaDescription: "Maîtrisez le wholesale Amazon FBA : trouver des fournisseurs, négocier, calculer la rentabilité. Guide complet pour acheter en gros et revendre sur Amazon.",
   keywords: ['wholesale amazon fba', 'achat en gros amazon', 'fournisseur amazon fba', 'grossiste amazon', 'revente amazon fba', 'distributeur amazon', 'acheter en gros revendre', 'wholesale france', 'fournisseur produits amazon', 'grossiste e-commerce'],
   excerpt: "Le wholesale Amazon FBA consiste à acheter des produits de marque en gros auprès de distributeurs officiels pour les revendre sur Amazon. Un modèle stable et scalable.",
   category: 'produits-rentables',
   type: 'satellite',
   readTime: 15,
-  publishedAt: '2025-01-04',
-  updatedAt: '2025-01-04',
+  publishedAt: '2026-01-04',
+  updatedAt: '2026-01-04',
   author: 'AMZing FBA',
   image: blogImages.wholesaleAmazon,
   relatedSlugs: ['trouver-produits-rentables-amazon-fba', 'amazon-fba-cest-quoi-guide-complet', 'categories-produits-rentables-amazon-fba'],
@@ -784,15 +784,15 @@ Le wholesale est le modèle idéal pour les vendeurs FBA qui veulent scaler sans
 export const articleOutilsSourcing: BlogArticle = {
   slug: 'outils-sourcing-amazon-fba-selleramp-keepa',
   title: "Meilleurs Outils de Sourcing Amazon FBA : SellerAmp, Keepa & Plus",
-  metaTitle: "Outils Sourcing Amazon FBA 2025 : SellerAmp, Keepa, Helium 10",
+  metaTitle: "Outils Sourcing Amazon FBA 2026 : SellerAmp, Keepa, Helium 10",
   metaDescription: "Comparatif des meilleurs outils de sourcing Amazon FBA : SellerAmp SAS, Keepa, Helium 10, Jungle Scout. Fonctionnalités, prix, pour quel usage.",
   keywords: ['outils sourcing amazon', 'selleramp sas', 'keepa amazon', 'helium 10', 'jungle scout', 'outils amazon fba', 'logiciel amazon seller', 'analyse produit amazon', 'extension chrome amazon', 'calculateur fba'],
   excerpt: "SellerAmp, Keepa, Helium 10... Quels outils utiliser pour trouver des produits rentables sur Amazon FBA ? Comparatif complet des fonctionnalités et prix.",
   category: 'produits-rentables',
   type: 'satellite',
   readTime: 11,
-  publishedAt: '2025-01-04',
-  updatedAt: '2025-01-04',
+  publishedAt: '2026-01-04',
+  updatedAt: '2026-01-04',
   author: 'AMZing FBA',
   image: blogImages.outilsSourcing,
   relatedSlugs: ['trouver-produits-rentables-amazon-fba', 'keepa-analyser-historique-prix-amazon', 'amazon-fba-cest-quoi-guide-complet'],
@@ -964,16 +964,16 @@ Les outils de sourcing ne sont pas un luxe mais un investissement rentable. Comm
 // Article 6: Private Label
 export const articlePrivateLabel: BlogArticle = {
   slug: 'private-label-amazon-fba-creer-marque',
-  title: "Private Label Amazon FBA : Créer sa Marque de A à Z [Guide 2025]",
-  metaTitle: "Private Label Amazon FBA 2025 : Guide Création de Marque Complète",
+  title: "Private Label Amazon FBA : Créer sa Marque de A à Z [Guide 2026]",
+  metaTitle: "Private Label Amazon FBA 2026 : Guide Création de Marque Complète",
   metaDescription: "Créez votre marque private label sur Amazon FBA : sourcing Alibaba, packaging, lancement produit. Guide complet pour développer votre propre marque.",
   keywords: ['private label amazon', 'créer marque amazon', 'marque propre fba', 'alibaba amazon fba', 'lancer produit amazon', 'produit marque blanche', 'private label france', 'développer marque amazon', 'fournisseur alibaba', 'créer sa marque e-commerce'],
   excerpt: "Le private label consiste à créer votre propre marque en faisant fabriquer des produits personnalisés. Le modèle le plus rentable mais aussi le plus exigeant sur Amazon FBA.",
   category: 'vendre-amazon',
   type: 'satellite',
   readTime: 18,
-  publishedAt: '2025-01-04',
-  updatedAt: '2025-01-04',
+  publishedAt: '2026-01-04',
+  updatedAt: '2026-01-04',
   author: 'AMZing FBA',
   image: blogImages.privateLabel,
   relatedSlugs: ['vendre-sur-amazon-guide-debutant', 'amazon-fba-cest-quoi-guide-complet', 'optimiser-listing-amazon-fba'],
@@ -1188,15 +1188,15 @@ Le private label est le modèle le plus rentable sur Amazon FBA, mais il demande
 export const articleGererRetours: BlogArticle = {
   slug: 'gerer-retours-amazon-fba',
   title: "Gérer les Retours Amazon FBA : Guide Complet SAV Vendeur",
-  metaTitle: "Retours Amazon FBA 2025 : Guide Gestion SAV et Remboursements",
+  metaTitle: "Retours Amazon FBA 2026 : Guide Gestion SAV et Remboursements",
   metaDescription: "Maîtrisez la gestion des retours Amazon FBA : politique remboursement, récupération stock, optimisation taux retour. Conseils pour réduire les retours clients.",
   keywords: ['retours amazon fba', 'remboursement amazon vendeur', 'sav amazon', 'retour client amazon', 'politique retour amazon', 'gérer retours fba', 'taux retour amazon', 'remboursement acheteur', 'litige amazon', 'réclamation client amazon'],
   excerpt: "Les retours font partie du jeu Amazon FBA. Apprenez à les gérer efficacement, réduire leur impact sur vos marges, et optimiser votre SAV pour maintenir une bonne réputation.",
   category: 'logistique',
   type: 'satellite',
   readTime: 10,
-  publishedAt: '2025-01-04',
-  updatedAt: '2025-01-04',
+  publishedAt: '2026-01-04',
+  updatedAt: '2026-01-04',
   author: 'AMZing FBA',
   image: blogImages.gererRetours,
   relatedSlugs: ['logistique-amazon-fba-guide-complet', 'amazon-fba-cest-quoi-guide-complet', 'preparer-envoi-fba-amazon-etiquetage'],
