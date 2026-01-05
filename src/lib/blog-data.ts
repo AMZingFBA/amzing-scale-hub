@@ -1654,6 +1654,15 @@ import {
   articleScalerBusiness
 } from './blog-articles-final';
 
+import {
+  articleFormationAmazonFba,
+  articleLogicielAmazonFba,
+  articleCommentSeLancerAmazon,
+  articleFraisFba,
+  articleAmazonFbm,
+  articleMeilleureFormation
+} from './blog-articles-seo-keywords';
+
 // ============================================
 // EXPORT DE TOUS LES ARTICLES
 // ============================================
@@ -1694,7 +1703,15 @@ export const blogArticles: BlogArticle[] = [
   articleArbitrageOnline,
   articleComptabiliteFba,
   articleErreursDebutants,
-  articleScalerBusiness
+  articleScalerBusiness,
+  
+  // Articles SEO mots-clés stratégiques
+  articleFormationAmazonFba,
+  articleLogicielAmazonFba,
+  articleCommentSeLancerAmazon,
+  articleFraisFba,
+  articleAmazonFbm,
+  articleMeilleureFormation
 ];
 
 // Fonction utilitaire pour récupérer un article par son slug
