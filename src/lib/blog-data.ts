@@ -3,6 +3,7 @@
 // ============================================
 
 import { blogImages } from './blog-images';
+import { seoNewArticles } from './blog-articles-seo-new';
 
 export interface BlogFAQ {
   question: string;
@@ -1711,7 +1712,10 @@ export const blogArticles: BlogArticle[] = [
   articleCommentSeLancerAmazon,
   articleFraisFba,
   articleAmazonFbm,
-  articleMeilleureFormation
+  articleMeilleureFormation,
+  
+  // Nouveaux articles SEO
+  ...seoNewArticles
 ];
 
 // Fonction utilitaire pour récupérer un article par son slug

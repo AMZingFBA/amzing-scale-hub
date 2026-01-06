@@ -488,4 +488,19 @@
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
+  <url>
+    <loc>https://amzingfba.com/blog/fulfillment-by-amazon-guide-complet-fba</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://amzingfba.com/blog/meilleur-formation-amazon-fba-comparatif</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://amzingfba.com/blog/amz-logistics-logistique-amazon-fba</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
 </urlset>
