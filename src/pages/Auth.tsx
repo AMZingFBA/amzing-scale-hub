@@ -311,8 +311,8 @@ export default function Auth() {
         if (isNativeApp) {
           navigate('/android-payment');
         } else {
-          // Sur le web, redirection directe vers Stripe
-          window.location.href = 'https://pay.amzingfba.com/b/4gMbJ15LD3zO1oT3vx00000';
+          // Sur le web, redirection directe vers systeme.io
+          window.location.href = 'https://amzingfba26.systeme.io/67172439';
         }
       } catch (error: any) {
         console.error('Error starting checkout:', error);
