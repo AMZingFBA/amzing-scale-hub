@@ -88,6 +88,7 @@ const CombienCouteAmazonFba = lazy(() => import("./pages/guide/CombienCouteAmazo
 const FormationAmazonFbaDebutant = lazy(() => import("./pages/guide/FormationAmazonFbaDebutant"));
 const SuiteLanding = lazy(() => import("./pages/SuiteLanding"));
 const SuiteSuccess = lazy(() => import("./pages/SuiteSuccess"));
+const PaymentSuccessSysteme = lazy(() => import("./pages/PaymentSuccessSysteme"));
 const Blog = lazy(() => import("./pages/Blog"));
 const BlogPost = lazy(() => import("./pages/BlogPost"));
 
@@ -196,6 +197,7 @@ const App = () => (
             {/* Landing page AMZing FBA Suite pour amzingfba.fr */}
             <Route path="/suite" element={<SuiteLanding />} />
             <Route path="/suite-success" element={<SuiteSuccess />} />
+            <Route path="/payment-success-systeme" element={<PaymentSuccessSysteme />} />
             
             {/* Blog SEO */}
             <Route path="/blog" element={<Blog />} />
