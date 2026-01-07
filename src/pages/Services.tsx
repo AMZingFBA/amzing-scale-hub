@@ -82,7 +82,7 @@ const Services = () => {
               Ce Que Tu Obtiens
             </h1>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Accès complet à tous les outils, ressources et services pour 34,99€/mois
+              Accès complet à tous les outils, ressources et services pour 700€/mois TTC ou ~64€/mois × 12 mois
             </p>
           </div>
 
@@ -504,7 +504,7 @@ const Services = () => {
                 Prêt à Démarrer ?
               </h2>
               <p className="text-xl mb-8 text-white/90 max-w-2xl mx-auto">
-                Rejoins l'espace VIP pour 34,99€/mois et accède à tout
+                Rejoins l'espace VIP pour 700€/mois TTC ou ~64€/mois × 12
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button variant="hero" size="xl" asChild>

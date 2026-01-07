@@ -79,8 +79,9 @@ const Tarifs = () => {
                 <CardTitle className="text-4xl mb-4 group-hover:text-primary transition-colors">Espace VIP AMZing FBA</CardTitle>
                 <CardDescription className="text-lg">Accès complet à tous les outils et services</CardDescription>
                 <div className="mt-8">
-                  <span className="text-6xl font-bold text-gradient animate-fade-in">34,99€</span>
-                  <span className="text-2xl text-muted-foreground">/mois</span>
+                  <span className="text-5xl font-bold text-gradient animate-fade-in">700€</span>
+                  <span className="text-xl text-muted-foreground">/mois TTC</span>
+                  <p className="text-lg text-muted-foreground mt-2">ou ~64€/mois × 12 mois</p>
                 </div>
               </CardHeader>
               <CardContent className="px-8">
@@ -160,13 +161,13 @@ const Tarifs = () => {
           {/* Trust Section */}
           <Card className="mb-16 bg-gradient-to-r from-primary/10 via-secondary/10 to-primary/10 border-2 border-primary/20">
             <CardContent className="p-8 text-center">
-              <h3 className="text-2xl font-bold mb-2">Sans engagement</h3>
+              <h3 className="text-2xl font-bold mb-2">Accès annuel (12 mois)</h3>
               <p className="text-muted-foreground mb-4">
-                Annule à tout moment sans frais.
+                Payez à l'année et profitez de l'accès pendant 12 mois complets.
               </p>
               <div className="flex flex-wrap justify-center gap-4">
                 <Badge className="bg-primary/20 text-primary border-primary/30">Paiement sécurisé</Badge>
-                <Badge className="bg-primary/20 text-primary border-primary/30">Sans engagement</Badge>
+                <Badge className="bg-primary/20 text-primary border-primary/30">Accès 12 mois</Badge>
                 <Badge className="bg-primary/20 text-primary border-primary/30">Support réactif</Badge>
               </div>
             </CardContent>
@@ -251,9 +252,10 @@ const Tarifs = () => {
           
           <div className="space-y-4 py-4">
             <div className="bg-primary/5 p-4 rounded-lg border border-primary/20">
-              <p className="text-sm font-semibold mb-2">Abonnement VIP AMZing FBA</p>
-              <p className="text-2xl font-bold text-primary">34,99€<span className="text-sm font-normal text-muted-foreground">/mois</span></p>
-              <p className="text-xs text-muted-foreground mt-2">Sans engagement • Résiliable à tout moment</p>
+              <p className="text-sm font-semibold mb-2">Abonnement VIP AMZing FBA - Annuel</p>
+              <p className="text-2xl font-bold text-primary">700€<span className="text-sm font-normal text-muted-foreground">/mois TTC</span></p>
+              <p className="text-sm text-muted-foreground">ou ~64€/mois × 12 mois</p>
+              <p className="text-xs text-muted-foreground mt-2">Accès pendant 12 mois</p>
             </div>
 
             <div className="flex items-start space-x-3">
