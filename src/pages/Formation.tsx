@@ -316,7 +316,7 @@ const Formation = () => {
     },
     {
       question: "Est-ce une formation CPF ?",
-      answer: "Non, AMZing FBA n'est pas éligible au CPF. L'abonnement est à 700€/mois TTC ou payable en 12 fois (~64€/mois), ce qui te permet d'étaler le coût."
+      answer: "Non, AMZing FBA n'est pas éligible au CPF. L'abonnement est à 700€/an TTC ou payable en 12 fois (~64€/mois), ce qui te permet d'étaler le coût."
     },
     {
       question: "Pourquoi vous plutôt qu'une formation classique ?",
@@ -381,7 +381,7 @@ const Formation = () => {
       <div className={`hidden lg:block fixed right-6 top-1/2 -translate-y-1/2 z-40 transition-all duration-300 ${showStickyCta ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-10'}`}>
         <div className="bg-card border rounded-xl shadow-xl p-4 space-y-3 max-w-[200px]">
           <p className="text-sm font-semibold text-center">Formation + Outils</p>
-          <p className="text-2xl font-bold text-center text-primary">700€<span className="text-sm font-normal text-muted-foreground">/mois</span></p>
+          <p className="text-2xl font-bold text-center text-primary">700€<span className="text-sm font-normal text-muted-foreground">/an</span></p>
           <Button variant="hero" size="sm" asChild className="w-full">
             <Link to="/tarifs">
               Accéder <ArrowRight className="ml-1 h-4 w-4" />
@@ -395,7 +395,7 @@ const Formation = () => {
       <div className={`lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-t shadow-lg p-4 transition-all duration-300 ${showStickyCta ? 'translate-y-0' : 'translate-y-full'}`}>
         <div className="flex items-center justify-between gap-4 max-w-lg mx-auto">
           <div>
-            <p className="font-semibold">700€/mois TTC</p>
+            <p className="font-semibold">700€/an TTC</p>
             <p className="text-xs text-muted-foreground">ou ~64€/mois × 12</p>
           </div>
           <Button variant="hero" asChild>
@@ -715,7 +715,7 @@ const Formation = () => {
                 </div>
                 <div className="flex items-start gap-3">
                   <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                  <span className="text-sm">700€/mois TTC, accès 12 mois</span>
+                  <span className="text-sm">700€/an TTC, accès 12 mois</span>
                 </div>
                 <div className="flex items-start gap-3">
                   <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />

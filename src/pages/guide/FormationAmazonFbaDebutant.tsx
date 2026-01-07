@@ -408,7 +408,7 @@ const FormationAmazonFbaDebutant = () => {
                     <td className="py-3 px-4 font-medium">Tarif</td>
                     <td className="py-3 px-4 text-center">Gratuit</td>
                     <td className="py-3 px-4 text-center">500-2000€</td>
-                    <td className="py-3 px-4 text-center bg-primary/5 font-semibold text-primary">700€/mois</td>
+                    <td className="py-3 px-4 text-center bg-primary/5 font-semibold text-primary">700€/an</td>
                   </tr>
                 </tbody>
               </table>
@@ -449,7 +449,7 @@ const FormationAmazonFbaDebutant = () => {
                         Accéder à la formation Amazon FBA <ArrowRight className="ml-2" />
                       </Link>
                     </Button>
-                    <p className="text-lg font-semibold text-primary mt-4">700€/mois TTC • Accès 12 mois</p>
+                    <p className="text-lg font-semibold text-primary mt-4">700€/an TTC • Accès 12 mois</p>
                   </div>
                 </CardContent>
               </Card>

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-// Lien de paiement systeme.io pour AMZing FBA Suite (700€/mois ou ~64€/mois x12)
+// Lien de paiement systeme.io pour AMZing FBA Suite (700€/an ou ~64€/mois x12)
 const SUITE_PAYMENT_LINK = "https://amzingfba26.systeme.io/67172439";
 
 export const useSuiteCheckout = () => {
