@@ -544,7 +544,7 @@ const CommentDebuterAmazonFba = () => {
                       Accéder à la formation Amazon FBA <ArrowRight className="ml-2" />
                     </Link>
                   </Button>
-                  <p className="text-sm text-muted-foreground mt-3">700€/mois TTC • Accès 12 mois</p>
+                  <p className="text-sm text-muted-foreground mt-3">700€/an TTC • Accès 12 mois</p>
                 </CardContent>
               </Card>
             </div>

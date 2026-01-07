@@ -203,7 +203,7 @@ const AndroidPayment = () => {
           <div className="space-y-4 py-4">
             <div className="bg-primary/5 p-4 rounded-lg border border-primary/20">
               <p className="text-sm font-semibold mb-2">Abonnement VIP AMZing FBA - Annuel</p>
-              <p className="text-2xl font-bold text-primary">700€<span className="text-sm font-normal text-muted-foreground">/mois TTC</span></p>
+              <p className="text-2xl font-bold text-primary">700€<span className="text-sm font-normal text-muted-foreground">/an TTC</span></p>
               <p className="text-sm text-muted-foreground">ou ~64€/mois × 12 mois</p>
               <p className="text-xs text-muted-foreground mt-2">Accès pendant 12 mois</p>
             </div>
