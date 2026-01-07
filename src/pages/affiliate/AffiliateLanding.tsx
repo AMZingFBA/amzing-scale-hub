@@ -222,6 +222,7 @@ const AffiliateLanding = () => {
           </div>
 
           <div className="grid md:grid-cols-2 gap-8 mb-12">
+            {/* Option 1: Paiement annuel */}
             <Card className="relative overflow-hidden border-2 border-primary/20 bg-gradient-to-br from-primary/10 via-card to-card hover-scale transition-all duration-300 hover:shadow-2xl animate-fade-in" style={{ animationDelay: '0.7s' }}>
               <div className="absolute -top-10 -right-10 w-40 h-40 bg-primary/20 rounded-full blur-3xl" />
               <CardHeader className="relative z-10">
@@ -230,19 +231,24 @@ const AffiliateLanding = () => {
                     <Award className="h-8 w-8 text-white" />
                   </div>
                   <div>
-                    <CardTitle className="text-2xl md:text-3xl">64 € / mois</CardTitle>
-                    <CardDescription className="text-base mt-1">Prix de l'abonnement (×12 mois)</CardDescription>
+                    <CardTitle className="text-2xl md:text-3xl">700 € / an</CardTitle>
+                    <CardDescription className="text-base mt-1">Paiement annuel unique</CardDescription>
                   </div>
                 </div>
               </CardHeader>
-              <CardContent className="relative z-10">
+              <CardContent className="relative z-10 space-y-2">
+                <div className="flex items-center gap-2 text-sm">
+                  <CheckCircle className="h-4 w-4 text-primary" />
+                  <span className="font-semibold text-primary">Ta commission : 140 €</span>
+                </div>
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <CheckCircle className="h-4 w-4 text-primary" />
-                  <span>1 seul niveau – 100% automatique</span>
+                  <span>Versée en une fois</span>
                 </div>
               </CardContent>
             </Card>
 
+            {/* Option 2: Paiement mensuel */}
             <Card className="relative overflow-hidden border-2 border-secondary/20 bg-gradient-to-br from-secondary/10 via-card to-card hover-scale transition-all duration-300 hover:shadow-2xl animate-fade-in" style={{ animationDelay: '0.8s' }}>
               <div className="absolute -top-10 -right-10 w-40 h-40 bg-secondary/20 rounded-full blur-3xl" />
               <CardHeader className="relative z-10">
@@ -251,15 +257,19 @@ const AffiliateLanding = () => {
                     <Euro className="h-8 w-8 text-white" />
                   </div>
                   <div>
-                    <CardTitle className="text-2xl md:text-3xl text-gradient">12,80 € / mois</CardTitle>
-                    <CardDescription className="text-base mt-1">Ta commission (20%)</CardDescription>
+                    <CardTitle className="text-2xl md:text-3xl">64 € / mois × 12</CardTitle>
+                    <CardDescription className="text-base mt-1">Paiement mensuel</CardDescription>
                   </div>
                 </div>
               </CardHeader>
-              <CardContent className="relative z-10">
+              <CardContent className="relative z-10 space-y-2">
+                <div className="flex items-center gap-2 text-sm">
+                  <CheckCircle className="h-4 w-4 text-secondary" />
+                  <span className="font-semibold text-secondary">Ta commission : 12,80 € / mois</span>
+                </div>
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <CheckCircle className="h-4 w-4 text-secondary" />
-                  <span>Par filleul actif – À vie</span>
+                  <span>Pendant 12 mois (153,60 € total)</span>
                 </div>
               </CardContent>
             </Card>
@@ -276,21 +286,27 @@ const AffiliateLanding = () => {
               </CardTitle>
             </div>
             <CardContent className="p-8">
-              <div className="bg-gradient-to-br from-primary/5 to-transparent rounded-2xl p-8 border-2 border-primary/20 mb-6">
-                <div className="flex items-center justify-between flex-wrap gap-4">
-                  <div>
-                    <div className="text-sm text-muted-foreground mb-2">🥇 Parrain direct</div>
-                    <div className="text-4xl font-bold text-gradient">20%</div>
-                    <div className="text-sm text-muted-foreground mt-1">sur chaque abonnement</div>
+              <div className="grid md:grid-cols-2 gap-6 mb-6">
+                {/* Commission paiement annuel */}
+                <div className="bg-gradient-to-br from-primary/5 to-transparent rounded-2xl p-6 border-2 border-primary/20">
+                  <div className="text-sm text-muted-foreground mb-2">💰 Si paiement annuel (700€)</div>
+                  <div className="flex items-center gap-3">
+                    <div className="text-3xl font-bold text-gradient">20%</div>
+                    <div className="text-3xl font-bold text-primary">=</div>
+                    <div className="text-3xl font-bold text-primary">140 €</div>
                   </div>
-                  <div className="text-center">
-                    <div className="text-6xl font-bold text-primary">=</div>
+                  <div className="text-sm text-muted-foreground mt-2">Commission unique par filleul</div>
+                </div>
+                
+                {/* Commission paiement mensuel */}
+                <div className="bg-gradient-to-br from-secondary/5 to-transparent rounded-2xl p-6 border-2 border-secondary/20">
+                  <div className="text-sm text-muted-foreground mb-2">📅 Si paiement mensuel (64€/mois)</div>
+                  <div className="flex items-center gap-3">
+                    <div className="text-3xl font-bold text-gradient">20%</div>
+                    <div className="text-3xl font-bold text-secondary">=</div>
+                    <div className="text-3xl font-bold text-secondary">12,80 €/mois</div>
                   </div>
-                  <div className="text-right">
-                    <div className="text-sm text-muted-foreground mb-2">Ta commission</div>
-                    <div className="text-4xl md:text-5xl font-bold text-primary">12,80 €</div>
-                    <div className="text-sm text-muted-foreground mt-1">par filleul / mois</div>
-                  </div>
+                  <div className="text-sm text-muted-foreground mt-2">Pendant 12 mois (153,60 € total)</div>
                 </div>
               </div>
               
@@ -299,7 +315,7 @@ const AffiliateLanding = () => {
                   <div className="flex items-start gap-3">
                     <CheckCircle className="h-6 w-6 text-primary flex-shrink-0 mt-0.5" />
                     <p className="text-sm font-medium">
-                      <strong className="text-primary">Commissions automatiques</strong> – Tant que ton filleul reste abonné, tu touches 12,80 € chaque mois
+                      <strong className="text-primary">Commissions automatiques</strong> – Calculées selon le mode de paiement choisi par ton filleul
                     </p>
                   </div>
                   <div className="flex items-start gap-3">
@@ -324,6 +340,7 @@ const AffiliateLanding = () => {
               </CardTitle>
             </div>
             <CardContent className="p-8">
+              <p className="text-sm text-muted-foreground mb-4 text-center">Exemple avec paiement mensuel (12,80€/mois par filleul)</p>
               <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 <div className="bg-gradient-to-br from-muted/50 to-muted/20 rounded-2xl p-6 text-center border border-border hover:border-primary/30 transition-all">
                   <div className="text-5xl font-bold mb-2">1</div>
@@ -353,6 +370,37 @@ const AffiliateLanding = () => {
                   <div className="text-xs text-muted-foreground mt-1">par mois</div>
                 </div>
               </div>
+
+              <p className="text-sm text-muted-foreground my-4 text-center">Ou avec paiement annuel (140€ par filleul)</p>
+              <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="bg-gradient-to-br from-muted/50 to-muted/20 rounded-2xl p-6 text-center border border-border hover:border-primary/30 transition-all">
+                  <div className="text-5xl font-bold mb-2">1</div>
+                  <div className="text-sm text-muted-foreground mb-3">filleul</div>
+                  <div className="text-2xl font-bold text-primary">140 €</div>
+                  <div className="text-xs text-muted-foreground mt-1">en une fois</div>
+                </div>
+                
+                <div className="bg-gradient-to-br from-primary/10 to-primary/5 rounded-2xl p-6 text-center border-2 border-primary/30 hover:border-primary/50 transition-all">
+                  <div className="text-5xl font-bold mb-2">5</div>
+                  <div className="text-sm text-muted-foreground mb-3">filleuls</div>
+                  <div className="text-2xl font-bold text-primary">700 €</div>
+                  <div className="text-xs text-muted-foreground mt-1">en une fois</div>
+                </div>
+                
+                <div className="bg-gradient-to-br from-secondary/10 to-secondary/5 rounded-2xl p-6 text-center border-2 border-secondary/30 hover:border-secondary/50 transition-all">
+                  <div className="text-5xl font-bold mb-2">10</div>
+                  <div className="text-sm text-muted-foreground mb-3">filleuls</div>
+                  <div className="text-2xl font-bold text-secondary">1 400 €</div>
+                  <div className="text-xs text-muted-foreground mt-1">en une fois</div>
+                </div>
+                
+                <div className="bg-gradient-to-br from-primary/20 to-secondary/20 rounded-2xl p-6 text-center border-2 border-primary/50 hover:border-primary transition-all shadow-glow">
+                  <div className="text-5xl font-bold mb-2">20</div>
+                  <div className="text-sm text-muted-foreground mb-3">filleuls</div>
+                  <div className="text-3xl font-bold text-gradient">2 800 €</div>
+                  <div className="text-xs text-muted-foreground mt-1">en une fois</div>
+                </div>
+              </div>
               
               <div className="mt-8 space-y-3">
                 <div className="flex items-center gap-3 bg-primary/5 rounded-lg p-4">
@@ -361,7 +409,7 @@ const AffiliateLanding = () => {
                 </div>
                 <div className="flex items-center gap-3 bg-secondary/5 rounded-lg p-4">
                   <CheckCircle className="h-6 w-6 text-secondary flex-shrink-0" />
-                  <p className="font-medium">Revenus récurrents – Chaque filleul te rapporte à vie</p>
+                  <p className="font-medium">20% garantis – Peu importe le mode de paiement de ton filleul</p>
                 </div>
               </div>
             </CardContent>
