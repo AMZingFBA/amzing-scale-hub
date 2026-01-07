@@ -255,10 +255,10 @@ export const useTrial = () => {
     setIsStarting(true);
 
     try {
-      console.log('💳 [handleConfirmPayment] Redirecting to Stripe checkout...');
+      console.log('💳 [handleConfirmPayment] Redirecting to systeme.io checkout...');
       toast.success("Redirection vers le paiement sécurisé...");
-      // Redirection directe vers le lien Stripe
-      window.location.href = 'https://pay.amzingfba.com/b/4gMbJ15LD3zO1oT3vx00000';
+      // Redirection vers la page de paiement systeme.io (abonnement annuel)
+      window.location.href = 'https://amzingfba26.systeme.io/67172439';
     } catch (error: any) {
       console.error('Error starting payment:', error);
       toast.error('Erreur lors de la redirection vers le paiement');

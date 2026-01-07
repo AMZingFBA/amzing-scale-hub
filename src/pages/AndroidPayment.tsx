@@ -35,8 +35,8 @@ const AndroidPayment = () => {
     setIsProcessing(true);
     try {
       toast.success("Redirection vers le paiement sécurisé...");
-      // Redirection directe vers le lien Stripe
-      window.location.href = 'https://pay.amzingfba.com/b/4gMbJ15LD3zO1oT3vx00000';
+      // Redirection vers systeme.io (abonnement annuel)
+      window.location.href = 'https://amzingfba26.systeme.io/67172439';
     } catch (error: any) {
       console.error('Erreur paiement:', error);
       toast.error("Erreur lors du paiement");
@@ -85,14 +85,17 @@ const AndroidPayment = () => {
           <div className="text-center mb-8 px-4 animate-fade-in" style={{ animationDelay: '0.1s' }}>
             <div className="relative w-full flex justify-center">
               <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-secondary/20 blur-2xl animate-pulse"></div>
-              <div className="relative flex items-baseline justify-center gap-2 w-full max-w-xs px-6 py-5 rounded-2xl bg-gradient-to-br from-primary/10 to-secondary/10 border-2 border-primary/30">
-                <span className="text-5xl sm:text-6xl font-black bg-gradient-to-r from-primary via-primary to-secondary bg-clip-text text-transparent">
-                  34,99€
-                </span>
-                <span className="text-xl sm:text-2xl font-semibold text-muted-foreground">/mois</span>
+              <div className="relative flex flex-col items-center justify-center w-full max-w-xs px-6 py-5 rounded-2xl bg-gradient-to-br from-primary/10 to-secondary/10 border-2 border-primary/30">
+                <div className="flex items-baseline justify-center gap-2">
+                  <span className="text-4xl sm:text-5xl font-black bg-gradient-to-r from-primary via-primary to-secondary bg-clip-text text-transparent">
+                    700€
+                  </span>
+                  <span className="text-lg sm:text-xl font-semibold text-muted-foreground">/mois TTC</span>
+                </div>
+                <p className="text-sm text-muted-foreground mt-2">ou ~64€/mois × 12 mois</p>
               </div>
             </div>
-            <p className="text-xs sm:text-sm text-muted-foreground mt-4 font-medium px-4">Sans engagement • Annulable à tout moment</p>
+            <p className="text-xs sm:text-sm text-muted-foreground mt-4 font-medium px-4">Accès annuel • Renouvellement à la fin de l'année</p>
           </div>
 
           {/* Features */}
@@ -158,7 +161,7 @@ const AndroidPayment = () => {
                 <span>•</span>
                 <span>💳 Cartes acceptées</span>
                 <span>•</span>
-                <span>✨ Sans engagement</span>
+                <span>📅 Accès 12 mois</span>
               </div>
             </div>
           </div>
@@ -167,7 +170,7 @@ const AndroidPayment = () => {
         {/* Info Cards */}
         <div className="max-w-lg mx-auto mt-6 grid grid-cols-3 gap-3">
           {[
-            { icon: "✓", title: "Sans engagement", desc: "Annulez en 1 clic" },
+            { icon: "📅", title: "Accès 12 mois", desc: "Abonnement annuel" },
             { icon: "⚡", title: "Accès immédiat", desc: "Dès le paiement" },
             { icon: "💬", title: "Support 24/7", desc: "Réponse rapide" },
           ].map((info, index) => (
@@ -199,9 +202,10 @@ const AndroidPayment = () => {
           
           <div className="space-y-4 py-4">
             <div className="bg-primary/5 p-4 rounded-lg border border-primary/20">
-              <p className="text-sm font-semibold mb-2">Abonnement VIP AMZing FBA</p>
-              <p className="text-2xl font-bold text-primary">34,99€<span className="text-sm font-normal text-muted-foreground">/mois</span></p>
-              <p className="text-xs text-muted-foreground mt-2">Sans engagement • Résiliable à tout moment</p>
+              <p className="text-sm font-semibold mb-2">Abonnement VIP AMZing FBA - Annuel</p>
+              <p className="text-2xl font-bold text-primary">700€<span className="text-sm font-normal text-muted-foreground">/mois TTC</span></p>
+              <p className="text-sm text-muted-foreground">ou ~64€/mois × 12 mois</p>
+              <p className="text-xs text-muted-foreground mt-2">Accès pendant 12 mois</p>
             </div>
 
             <div className="flex items-start space-x-3">

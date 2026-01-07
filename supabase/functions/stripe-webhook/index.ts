@@ -126,7 +126,7 @@ async function syncUserToAirtable(userData: {
       "Email (principal)": userData.email,
       "Nom": userData.full_name || '',
       "Abonnement actif": userData.plan_type === 'vip',
-      "Type d\u2019abonnement": userData.plan_type === 'vip' ? 'Mensuel' : 'Gratuit',
+      "Type d\u2019abonnement": userData.plan_type === 'vip' ? 'Annuel' : 'Gratuit',
       "ID Stripe / RevenueCat": userData.stripe_customer_id || '',
       "Dernière connexion": new Date().toISOString().split('T')[0],
     };
@@ -245,9 +245,9 @@ serve(async (req) => {
 
       logStep("User found", { userId: profile.id });
 
-      // Calculate expiry date (30 days subscription, no trial)
+      // Calculate expiry date (12 months annual subscription)
       const expiresAt = new Date();
-      expiresAt.setMonth(expiresAt.getMonth() + 1); // 30 days subscription
+      expiresAt.setFullYear(expiresAt.getFullYear() + 1); // 12 mois d'abonnement annuel
       const startedAt = new Date().toISOString();
 
       // Update subscription to VIP
