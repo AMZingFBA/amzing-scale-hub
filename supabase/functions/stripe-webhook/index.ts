@@ -102,6 +102,7 @@ async function syncUserToAirtable(userData: {
   email: string;
   full_name?: string;
   plan_type: string;
+  subscription_type?: string; // 'Annuel' or 'Mensuel'
   started_at?: string;
   stripe_customer_id?: string;
 }) {
@@ -121,12 +122,18 @@ async function syncUserToAirtable(userData: {
     });
     const searchData = await searchResponse.json();
 
+    // Determine subscription type for Airtable
+    let typeAbonnement = 'Gratuit';
+    if (userData.plan_type === 'vip') {
+      typeAbonnement = userData.subscription_type || 'Annuel';
+    }
+
     // Prepare fields
     const fields: Record<string, unknown> = {
       "Email (principal)": userData.email,
       "Nom": userData.full_name || '',
       "Abonnement actif": userData.plan_type === 'vip',
-      "Type d\u2019abonnement": userData.plan_type === 'vip' ? 'Annuel' : 'Gratuit',
+      "Type d\u2019abonnement": typeAbonnement,
       "ID Stripe / RevenueCat": userData.stripe_customer_id || '',
       "Dernière connexion": new Date().toISOString().split('T')[0],
     };
@@ -146,7 +153,7 @@ async function syncUserToAirtable(userData: {
         },
         body: JSON.stringify({ fields }),
       });
-      logStep("Airtable user updated", { email: userData.email });
+      logStep("Airtable user updated", { email: userData.email, typeAbonnement });
     } else {
       // Create new record
       await fetch(`https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/Users`, {
@@ -157,7 +164,7 @@ async function syncUserToAirtable(userData: {
         },
         body: JSON.stringify({ records: [{ fields }] }),
       });
-      logStep("Airtable user created", { email: userData.email });
+      logStep("Airtable user created", { email: userData.email, typeAbonnement });
     }
   } catch (error) {
     logStep("Airtable sync error", { error: error instanceof Error ? error.message : 'Unknown' });
@@ -278,6 +285,19 @@ serve(async (req) => {
       // Track conversion with Tradedoubler (server-side)
       const orderValue = session.amount_total ? session.amount_total / 100 : 0;
       
+      // Determine subscription type based on payment mode and amount
+      // Annuel = paiement unique (mode: payment) ou montant >= 500€
+      // Mensuel = abonnement récurrent (mode: subscription) ou montant < 100€
+      let subscriptionType = 'Annuel'; // Default
+      if (session.mode === 'subscription') {
+        subscriptionType = 'Mensuel';
+      } else if (orderValue < 100) {
+        // Small amount = monthly payment
+        subscriptionType = 'Mensuel';
+      }
+      
+      logStep("Subscription type detected", { mode: session.mode, amount: orderValue, subscriptionType });
+      
       // Get voucher code if any discount was applied
       let voucher = "";
       if (session.total_details?.breakdown?.discounts && session.total_details.breakdown.discounts.length > 0) {
@@ -295,11 +315,12 @@ serve(async (req) => {
         email: customerEmail, // For cross-device tracking
       });
 
-      // Sync to Airtable
+      // Sync to Airtable with subscription type
       await syncUserToAirtable({
         email: customerEmail,
         full_name: profile.full_name || '',
         plan_type: "vip",
+        subscription_type: subscriptionType,
         started_at: startedAt,
         stripe_customer_id: session.customer as string,
       });
