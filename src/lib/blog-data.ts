@@ -1736,7 +1736,10 @@ export const blogArticles: BlogArticle[] = [
   ...seoComplementaryArticles,
   
   // Articles focus "amazon fba" (mot-clé principal)
-  ...amazonFbaFocusArticles
+  ...amazonFbaFocusArticles,
+  
+  // Articles SEO keywords extra (brand registry, fulfillment, comptable, etc.)
+  ...seoKeywordsExtraArticles
 ];
 
 // Fonction utilitaire pour récupérer un article par son slug
