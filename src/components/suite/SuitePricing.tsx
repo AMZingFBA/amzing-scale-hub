@@ -64,7 +64,10 @@ const SuitePricing = () => {
                   <span className="text-2xl text-white">€</span>
                   <span className="text-lg text-suite-gray">/mois × 12</span>
                 </div>
-                <p className="text-suite-gray">ou <span className="text-white font-semibold">700€ TTC</span> en une fois</p>
+                <p className="text-suite-gray">
+                  ou <span className="text-white font-semibold">700€ TTC</span> en une fois 
+                  <span className="ml-2 bg-green-500/20 text-green-400 text-xs font-bold px-2 py-0.5 rounded">-10%</span>
+                </p>
               </div>
 
 
