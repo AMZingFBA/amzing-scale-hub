@@ -615,4 +615,68 @@
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
+
+  <!-- Nouveaux articles SEO - Mots-clés ciblés Janvier 2026 -->
+  <url>
+    <loc>https://amzingfba.com/blog/amazon-fba-cest-quoi-definition-complete</loc>
+    <lastmod>2026-01-07</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://amzingfba.com/blog/conseil-fba-amazon-reussir-vente</loc>
+    <lastmod>2026-01-07</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://amzingfba.com/blog/amazon-fba-guide-vendeur-2026</loc>
+    <lastmod>2026-01-07</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://amzingfba.com/blog/amazon-fba-france-vendeur-francais</loc>
+    <lastmod>2026-01-07</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://amzingfba.com/blog/optimisation-fiches-produits-amazon</loc>
+    <lastmod>2026-01-07</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Articles SEO complémentaires - Angles différents -->
+  <url>
+    <loc>https://amzingfba.com/blog/formation-amazon-fba-gratuite-ressources</loc>
+    <lastmod>2026-01-07</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://amzingfba.com/blog/meilleure-formation-amazon-fba-debutants</loc>
+    <lastmod>2026-01-07</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://amzingfba.com/blog/se-lancer-sur-amazon-sans-argent</loc>
+    <lastmod>2026-01-07</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://amzingfba.com/blog/frais-fba-reduire-optimiser-marges</loc>
+    <lastmod>2026-01-07</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://amzingfba.com/blog/amazon-fbm-vs-fba-comparatif-detaille</loc>
+    <lastmod>2026-01-07</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
 </urlset>
