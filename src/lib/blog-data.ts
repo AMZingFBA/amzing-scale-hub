@@ -9,6 +9,7 @@ import { seoExtraArticles } from './blog-articles-seo-extra';
 import { seoKeywordsNewArticles } from './blog-articles-seo-keywords-new';
 import { seoComplementaryArticles } from './blog-articles-seo-complementary';
 import { amazonFbaFocusArticles } from './blog-articles-amazon-fba-focus';
+import { seoKeywordsExtraArticles } from './blog-articles-seo-keywords-extra';
 
 export interface BlogFAQ {
   question: string;
