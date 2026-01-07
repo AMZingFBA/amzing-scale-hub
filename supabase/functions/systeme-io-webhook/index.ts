@@ -20,26 +20,9 @@ serve(async (req) => {
   try {
     logStep("Webhook received", { method: req.method });
 
-    // Validate secret from systeme.io
-    const expectedSecret = Deno.env.get("SYSTEME_IO_WEBHOOK_SECRET");
-    const receivedSecret = req.headers.get("x-webhook-secret") || 
-                           req.headers.get("authorization")?.replace("Bearer ", "");
-    
-    // Parse the webhook payload first to check for secret in body
+    // Parse the webhook payload
     const payload = await req.json();
     logStep("Payload received", payload);
-    
-    // systeme.io might send secret in different ways
-    const bodySecret = payload.secret || payload.webhook_secret;
-    const isValidSecret = receivedSecret === expectedSecret || bodySecret === expectedSecret;
-    
-    if (expectedSecret && !isValidSecret) {
-      logStep("WARNING: Secret validation failed - processing anyway for compatibility", { 
-        hasReceivedSecret: !!receivedSecret,
-        hasBodySecret: !!bodySecret 
-      });
-      // On continue quand même car systeme.io peut envoyer le secret différemment
-    }
 
     // systeme.io envoie les données dans différents formats selon le type d'événement
     // On cherche l'email dans les champs possibles
@@ -62,14 +45,66 @@ serve(async (req) => {
     logStep("Email extracted", { email: normalizedEmail });
 
     // Récupérer le nom si disponible
-    const name = payload.name ||
-                 payload.contact?.name ||
-                 payload.buyer?.name ||
-                 payload.customer?.name ||
-                 payload.data?.name ||
-                 payload.first_name ||
-                 payload.contact?.first_name ||
-                 null;
+    const firstName = payload.customer?.fields?.first_name ||
+                      payload.contact?.first_name ||
+                      payload.buyer?.first_name ||
+                      payload.first_name ||
+                      null;
+    
+    const lastName = payload.customer?.fields?.surname ||
+                     payload.contact?.last_name ||
+                     payload.buyer?.last_name ||
+                     payload.last_name ||
+                     null;
+    
+    const name = firstName && lastName ? `${firstName} ${lastName}` : firstName || lastName || null;
+
+    // Récupérer le téléphone
+    const phone = payload.customer?.fields?.phone_number ||
+                  payload.contact?.phone ||
+                  payload.buyer?.phone ||
+                  payload.phone ||
+                  null;
+
+    // Déterminer le type de paiement (Mensuel vs Annuel)
+    // systeme.io pricePlan.type: "one_shot" = paiement unique (annuel), "subscription" = récurrent (mensuel)
+    const pricePlanType = payload.pricePlan?.type;
+    const hasRecurring = payload.pricePlan?.recurringOptions != null;
+    const pricePlanName = (payload.pricePlan?.name || '').toLowerCase();
+    
+    // Si c'est un paiement unique (one_shot) ou si le nom contient "annuel"/"annual", c'est annuel
+    // Sinon si c'est subscription ou récurrent, c'est mensuel
+    let subscriptionType = 'Annuel'; // Par défaut annuel pour systeme.io
+    if (pricePlanType === 'subscription' || hasRecurring) {
+      subscriptionType = 'Mensuel';
+    } else if (pricePlanName.includes('mensuel') || pricePlanName.includes('monthly')) {
+      subscriptionType = 'Mensuel';
+    }
+    
+    logStep("Payment type detected", { 
+      pricePlanType, 
+      hasRecurring, 
+      pricePlanName,
+      subscriptionType 
+    });
+
+    // Calculer la date d'expiration
+    // Pour annuel: 1 an à partir d'aujourd'hui
+    // Pour mensuel: null (récurrent via systeme.io)
+    let expiresAt: string | null = null;
+    if (subscriptionType === 'Annuel') {
+      const expireDate = new Date();
+      expireDate.setFullYear(expireDate.getFullYear() + 1);
+      expiresAt = expireDate.toISOString();
+      logStep("Expiration date set", { expiresAt });
+    }
+
+    // Récupérer le montant
+    const amount = payload.pricePlan?.amount ? payload.pricePlan.amount / 100 : 
+                   payload.order?.totalPrice || 
+                   payload.amount || 
+                   payload.price || 
+                   770;
 
     // Initialize Supabase client with service role
     const supabaseClient = createClient(
@@ -93,21 +128,22 @@ serve(async (req) => {
         .from("suite_purchases")
         .insert({
           email: normalizedEmail,
-          amount: payload.amount || payload.price || 770,
-          stripe_session_id: `systeme_io_${Date.now()}`
+          amount: amount,
+          stripe_session_id: `systeme_io_${subscriptionType}_${Date.now()}`
         });
 
       if (purchaseError) {
         logStep("Error saving pending purchase", { error: purchaseError.message });
       } else {
-        logStep("Pending purchase saved - will activate VIP when user registers");
+        logStep("Pending purchase saved - will activate VIP when user registers", { subscriptionType });
       }
 
       return new Response(
         JSON.stringify({ 
           success: true, 
           message: "Payment recorded, VIP will be activated when user registers",
-          email: normalizedEmail
+          email: normalizedEmail,
+          subscriptionType
         }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 }
       );
@@ -121,7 +157,9 @@ serve(async (req) => {
       .update({
         plan_type: "vip",
         status: "active",
-        expires_at: null, // VIP à vie pour la formation
+        payment_provider: "systeme_io",
+        expires_at: expiresAt,
+        started_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       })
       .eq("user_id", profile.id);
@@ -134,15 +172,15 @@ serve(async (req) => {
       );
     }
 
-    logStep("VIP activated successfully");
+    logStep("VIP activated successfully", { subscriptionType, expiresAt });
 
     // Enregistrer l'achat
     const { error: purchaseError } = await supabaseClient
       .from("suite_purchases")
       .insert({
         email: normalizedEmail,
-        amount: payload.amount || payload.price || 770,
-        stripe_session_id: `systeme_io_${Date.now()}`
+        amount: amount,
+        stripe_session_id: `systeme_io_${subscriptionType}_${Date.now()}`
       });
 
     if (purchaseError) {
@@ -167,16 +205,21 @@ serve(async (req) => {
               "Authorization": `Bearer ${Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")}`
             },
             body: JSON.stringify({
-              email: normalizedEmail,
-              full_name: profile.full_name || name,
-              phone: profile.phone,
-              plan_type: "vip",
-              status: "active",
-              payment_provider: "systeme_io"
+              user: {
+                email: normalizedEmail,
+                full_name: profile.full_name || name,
+                phone: profile.phone || phone,
+                plan_type: "vip",
+                status: "active",
+                payment_provider: "systeme_io",
+                subscription_type: subscriptionType, // Mensuel ou Annuel
+                expires_at: expiresAt,
+                started_at: new Date().toISOString()
+              }
             })
           }
         );
-        logStep("Airtable sync triggered", { status: syncResponse.status });
+        logStep("Airtable sync triggered", { status: syncResponse.status, subscriptionType });
       }
     } catch (airtableError) {
       logStep("Airtable sync error (non-blocking)", { error: String(airtableError) });
@@ -187,7 +230,9 @@ serve(async (req) => {
         success: true, 
         message: "VIP activated successfully",
         email: normalizedEmail,
-        userId: profile.id
+        userId: profile.id,
+        subscriptionType,
+        expiresAt
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 }
     );
