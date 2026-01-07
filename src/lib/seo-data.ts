@@ -591,7 +591,7 @@ export const schemas = {
         "name": "Combien coûte la formation Amazon FBA AMZing FBA ?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "L'abonnement AMZing FBA est à partir de 34,99€/mois. Il inclut l'accès à la formation complète, aux moniteurs de produits rentables, au catalogue fournisseurs, au cashback et à la communauté. Il n'y a pas de frais cachés."
+          "text": "L'abonnement AMZing FBA est à 700€/mois TTC ou environ 64€/mois sur 12 mois. Il inclut l'accès à la formation complète, aux moniteurs de produits rentables, au catalogue fournisseurs, au cashback et à la communauté pendant 12 mois."
         }
       },
       {
@@ -795,7 +795,7 @@ export const schemas = {
         "name": "Combien coûte l'abonnement AMZing FBA ?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "L'abonnement VIP avec accès à la formation, aux moniteurs et à tous les outils est à 34,99€/mois."
+          "text": "L'abonnement VIP avec accès à la formation, aux moniteurs et à tous les outils est à 700€/mois TTC ou ~64€/mois sur 12 mois."
         }
       },
       {
@@ -1137,7 +1137,7 @@ export const schemas = {
         "name": "Combien coûte l'abonnement AMZing FBA ?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "L'abonnement AMZing FBA est à 34,99€/mois, sans engagement. Tu peux annuler à tout moment depuis ton espace membre. Il n'y a pas de frais cachés : le prix inclut l'accès à tous les outils, moniteurs, ressources et à la communauté."
+          "text": "L'abonnement AMZing FBA est à 700€/mois TTC ou environ 64€/mois sur 12 mois. C'est un accès annuel qui inclut tous les outils, moniteurs, ressources et la communauté pendant 12 mois complets."
         }
       },
       {

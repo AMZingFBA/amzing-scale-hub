@@ -33,7 +33,7 @@ const FormationAmazonFbaDebutant = () => {
     },
     {
       question: "Combien coûte une formation Amazon FBA ?",
-      answer: "Les formations varient de 0€ (YouTube, articles) à 2000€+ (coaching premium). Les formations classiques coûtent généralement 300-800€ en one-shot. AMZing FBA propose une approche différente : 34,99€/mois sans engagement, avec formation + outils + communauté inclus."
+      answer: "Les formations varient de 0€ (YouTube, articles) à 2000€+ (coaching premium). Les formations classiques coûtent généralement 300-800€ en one-shot. AMZing FBA propose une approche différente : 700€/mois TTC ou ~64€/mois sur 12 mois, avec formation + outils + communauté inclus."
     },
     {
       question: "Combien de temps dure une formation ?",
@@ -408,7 +408,7 @@ const FormationAmazonFbaDebutant = () => {
                     <td className="py-3 px-4 font-medium">Tarif</td>
                     <td className="py-3 px-4 text-center">Gratuit</td>
                     <td className="py-3 px-4 text-center">500-2000€</td>
-                    <td className="py-3 px-4 text-center bg-primary/5 font-semibold text-primary">34,99€/mois</td>
+                    <td className="py-3 px-4 text-center bg-primary/5 font-semibold text-primary">700€/mois</td>
                   </tr>
                 </tbody>
               </table>
@@ -432,7 +432,7 @@ const FormationAmazonFbaDebutant = () => {
                     <div className="flex flex-wrap justify-center gap-4 mb-6">
                       <div className="flex items-center gap-2 text-sm">
                         <CheckCircle2 className="w-5 h-5 text-green-500" />
-                        <span>Sans engagement</span>
+                        <span>Accès 12 mois</span>
                       </div>
                       <div className="flex items-center gap-2 text-sm">
                         <CheckCircle2 className="w-5 h-5 text-green-500" />
@@ -449,7 +449,7 @@ const FormationAmazonFbaDebutant = () => {
                         Accéder à la formation Amazon FBA <ArrowRight className="ml-2" />
                       </Link>
                     </Button>
-                    <p className="text-lg font-semibold text-primary mt-4">34,99€/mois • Sans engagement</p>
+                    <p className="text-lg font-semibold text-primary mt-4">700€/mois TTC • Accès 12 mois</p>
                   </div>
                 </CardContent>
               </Card>

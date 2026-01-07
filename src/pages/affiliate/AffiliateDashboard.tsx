@@ -394,9 +394,9 @@ const AffiliateDashboard = () => {
                   <div className="space-y-1">
                     <p className="font-semibold">Comment ça marche ?</p>
                     <ul className="text-sm text-muted-foreground space-y-1">
-                      <li>• Chaque filleul s'abonne à 34,99€/mois</li>
-                      <li>• Le premier paiement est effectué dès son inscription</li>
-                      <li>• Tu reçois 6,99 € par filleul chaque mois tant qu'il reste abonné</li>
+                      <li>• Chaque filleul souscrit à l'abonnement annuel (700€/mois ou ~64€/mois × 12)</li>
+                      <li>• Le paiement est effectué dès son inscription</li>
+                      <li>• Tu reçois une commission sur chaque vente</li>
                       <li>• Les paiements sont virés sur ton RIB fourni lors de l'inscription</li>
                     </ul>
                   </div>

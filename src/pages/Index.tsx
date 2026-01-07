@@ -187,7 +187,7 @@ const Index = () => {
               </Button>
             </div>
             <p className="mt-6 text-muted-foreground text-lg">
-              34,99€/mois • Sans engagement
+              700€/mois TTC ou ~64€/mois × 12 mois
             </p>
           </div>
         </div>
@@ -761,7 +761,7 @@ const Index = () => {
                   </span>
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground pl-8">
-                  L'abonnement AMZing FBA est à 34,99€/mois, sans engagement. Tu peux annuler à tout moment depuis ton espace membre. Il n'y a pas de frais cachés : le prix inclut l'accès à tous les outils, moniteurs, ressources et à la communauté.
+                  L'abonnement AMZing FBA est à 700€/mois TTC ou environ 64€/mois sur 12 mois. C'est un accès annuel qui te donne accès à tous les outils, moniteurs, ressources et à la communauté pendant 12 mois complets.
                 </AccordionContent>
               </AccordionItem>
               
@@ -869,7 +869,7 @@ const Index = () => {
             </Button>
           </div>
           <p className="mt-6 text-white/90 text-lg">
-            34,99€/mois • Sans engagement
+            700€/mois TTC ou ~64€/mois × 12 mois
           </p>
         </div>
       </section>
@@ -888,9 +888,10 @@ const Index = () => {
           
           <div className="space-y-4 py-4">
             <div className="bg-primary/5 p-4 rounded-lg border border-primary/20">
-              <p className="text-sm font-semibold mb-2">Abonnement VIP AMZing FBA</p>
-              <p className="text-2xl font-bold text-primary">34,99€<span className="text-sm font-normal text-muted-foreground">/mois</span></p>
-              <p className="text-xs text-muted-foreground mt-2">Sans engagement • Résiliable à tout moment</p>
+              <p className="text-sm font-semibold mb-2">Abonnement VIP AMZing FBA - Annuel</p>
+              <p className="text-2xl font-bold text-primary">700€<span className="text-sm font-normal text-muted-foreground">/mois TTC</span></p>
+              <p className="text-sm text-muted-foreground">ou ~64€/mois × 12 mois</p>
+              <p className="text-xs text-muted-foreground mt-2">Accès pendant 12 mois</p>
             </div>
 
             <div className="flex items-start space-x-3">
