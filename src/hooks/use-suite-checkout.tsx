@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
-// Lien de paiement Stripe direct pour AMZing FBA Suite (1499,99€)
-const SUITE_PAYMENT_LINK = "https://pay.amzingfba.com/b/28E7sLa1TdaoebF1np00001";
+// Lien de paiement systeme.io pour AMZing FBA Suite (700€/mois ou ~64€/mois x12)
+const SUITE_PAYMENT_LINK = "https://amzingfba26.systeme.io/67172439";
 
 export const useSuiteCheckout = () => {
   const [isLoading, setIsLoading] = useState(false);
