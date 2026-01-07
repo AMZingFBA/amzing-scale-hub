@@ -795,7 +795,7 @@ export const schemas = {
         "name": "Combien coûte l'abonnement AMZing FBA ?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "L'abonnement VIP avec accès à la formation, aux moniteurs et à tous les outils est à 700€/mois TTC ou ~64€/mois sur 12 mois."
+          "text": "L'abonnement VIP avec accès à la formation, aux moniteurs et à tous les outils est à 64€/mois × 12 ou 700€ TTC en une fois (-10%)."
         }
       },
       {
