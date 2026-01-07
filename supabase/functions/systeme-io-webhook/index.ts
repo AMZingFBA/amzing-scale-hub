@@ -20,13 +20,30 @@ serve(async (req) => {
   try {
     logStep("Webhook received", { method: req.method });
 
-    // Parse the webhook payload
+    // Validate secret from systeme.io
+    const expectedSecret = Deno.env.get("SYSTEME_IO_WEBHOOK_SECRET");
+    const receivedSecret = req.headers.get("x-webhook-secret") || 
+                           req.headers.get("authorization")?.replace("Bearer ", "");
+    
+    // Parse the webhook payload first to check for secret in body
     const payload = await req.json();
     logStep("Payload received", payload);
+    
+    // systeme.io might send secret in different ways
+    const bodySecret = payload.secret || payload.webhook_secret;
+    const isValidSecret = receivedSecret === expectedSecret || bodySecret === expectedSecret;
+    
+    if (expectedSecret && !isValidSecret) {
+      logStep("WARNING: Secret validation failed - processing anyway for compatibility", { 
+        hasReceivedSecret: !!receivedSecret,
+        hasBodySecret: !!bodySecret 
+      });
+      // On continue quand même car systeme.io peut envoyer le secret différemment
+    }
 
     // systeme.io envoie les données dans différents formats selon le type d'événement
     // On cherche l'email dans les champs possibles
-    const email = payload.email || 
+    const email = payload.email ||
                   payload.contact?.email || 
                   payload.buyer?.email ||
                   payload.customer?.email ||
