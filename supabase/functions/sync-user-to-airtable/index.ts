@@ -26,6 +26,8 @@ interface UserData {
   stripe_subscription_id?: string;
   platform?: string; // iOS, Android, or Web
   registration_source?: string; // site, App, Referral, Instagram, TikTok
+  payment_provider?: string; // stripe, systeme_io, apple
+  subscription_type?: string; // Mensuel, Annuel
 }
 
 // Format phone number to international format (+33 for French numbers)
@@ -154,9 +156,21 @@ serve(async (req) => {
     const isCanceledVip = user.plan_type === 'vip' && user.status === 'canceled';
 
     // Determine subscription type
+    // Priority: explicit subscription_type > payment_provider detection > existing record > default
     let typeAbonnement = 'Gratuit';
     if (isCurrentlyVip) {
-      typeAbonnement = 'Mensuel';
+      // If subscription_type is explicitly passed (from systeme.io), use it
+      if (user.subscription_type === 'Annuel') {
+        typeAbonnement = 'Annuel';
+      } else if (user.subscription_type === 'Mensuel') {
+        typeAbonnement = 'Mensuel';
+      } else if (user.payment_provider === 'systeme_io') {
+        // systeme.io without explicit type = default to Annuel (one-shot payment)
+        typeAbonnement = 'Annuel';
+      } else {
+        // Stripe or other = Mensuel (recurring)
+        typeAbonnement = 'Mensuel';
+      }
     } else if (isCanceledVip) {
       // User just canceled - they're now "Ancien VIP"
       typeAbonnement = 'Ancien VIP';
@@ -165,7 +179,7 @@ serve(async (req) => {
       typeAbonnement = 'Ancien VIP';
     }
 
-    console.log(`[Sync User to Airtable] Type abonnement: ${typeAbonnement}, wasVip: ${wasVip}, isCanceledVip: ${isCanceledVip}, hadStripeCustomer: ${hadStripeCustomer}, plan_type: ${user.plan_type}, status: ${user.status}`);
+    console.log(`[Sync User to Airtable] Type abonnement: ${typeAbonnement}, subscription_type: ${user.subscription_type}, payment_provider: ${user.payment_provider}, wasVip: ${wasVip}, isCanceledVip: ${isCanceledVip}, hadStripeCustomer: ${hadStripeCustomer}, plan_type: ${user.plan_type}, status: ${user.status}`);
 
     // Format activation date if available
     let dateActivation = null;
