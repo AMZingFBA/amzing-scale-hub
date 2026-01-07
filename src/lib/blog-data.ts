@@ -5,6 +5,7 @@
 import { blogImages } from './blog-images';
 import { seoNewArticles } from './blog-articles-seo-new';
 import { seoFinalArticles } from './blog-articles-seo-final';
+import { seoExtraArticles } from './blog-articles-seo-extra';
 
 export interface BlogFAQ {
   question: string;
@@ -1719,7 +1720,10 @@ export const blogArticles: BlogArticle[] = [
   ...seoNewArticles,
   
   // Articles SEO finaux
-  ...seoFinalArticles
+  ...seoFinalArticles,
+  
+  // Articles SEO extra
+  ...seoExtraArticles
 ];
 
 // Fonction utilitaire pour récupérer un article par son slug
