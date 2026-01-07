@@ -6,6 +6,7 @@ import { blogImages } from './blog-images';
 import { seoNewArticles } from './blog-articles-seo-new';
 import { seoFinalArticles } from './blog-articles-seo-final';
 import { seoExtraArticles } from './blog-articles-seo-extra';
+import { seoKeywordsNewArticles } from './blog-articles-seo-keywords-new';
 
 export interface BlogFAQ {
   question: string;
@@ -1723,7 +1724,10 @@ export const blogArticles: BlogArticle[] = [
   ...seoFinalArticles,
   
   // Articles SEO extra
-  ...seoExtraArticles
+  ...seoExtraArticles,
+  
+  // Articles SEO mots-clés ciblés (janvier 2026)
+  ...seoKeywordsNewArticles
 ];
 
 // Fonction utilitaire pour récupérer un article par son slug
