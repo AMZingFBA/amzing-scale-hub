@@ -869,7 +869,7 @@ const Index = () => {
             </Button>
           </div>
           <p className="mt-6 text-white/90 text-lg">
-            700€/mois TTC ou ~64€/mois × 12 mois
+            À partir de <span className="font-semibold">64€/mois × 12</span> ou <span className="font-semibold">700€ TTC</span> en une fois <span className="ml-1 bg-green-500/20 text-green-400 text-xs font-bold px-2 py-0.5 rounded">-10%</span>
           </p>
         </div>
       </section>

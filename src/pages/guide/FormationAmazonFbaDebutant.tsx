@@ -33,7 +33,7 @@ const FormationAmazonFbaDebutant = () => {
     },
     {
       question: "Combien coûte une formation Amazon FBA ?",
-      answer: "Les formations varient de 0€ (YouTube, articles) à 2000€+ (coaching premium). Les formations classiques coûtent généralement 300-800€ en one-shot. AMZing FBA propose une approche différente : 700€/mois TTC ou ~64€/mois sur 12 mois, avec formation + outils + communauté inclus."
+      answer: "Les formations varient de 0€ (YouTube, articles) à 2000€+ (coaching premium). Les formations classiques coûtent généralement 300-800€ en one-shot. AMZing FBA propose une approche différente : 64€/mois × 12 ou 700€ TTC en une fois (-10%), avec formation + outils + communauté inclus."
     },
     {
       question: "Combien de temps dure une formation ?",

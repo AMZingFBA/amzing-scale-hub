@@ -284,7 +284,7 @@ const Formation = () => {
     },
     {
       question: "Combien faut-il investir pour commencer ?",
-      answer: "L'abonnement AMZing FBA est à 700€/mois TTC ou ~64€/mois sur 12 mois. Pour le stock initial, tu peux démarrer avec 500-1000€ pour tester quelques produits. L'important n'est pas d'avoir un gros budget mais de bien choisir tes produits. Les moniteurs t'aident à optimiser chaque euro investi."
+      answer: "L'abonnement AMZing FBA est à 64€/mois × 12 ou 700€ TTC en une fois (-10%). Pour le stock initial, tu peux démarrer avec 500-1000€ pour tester quelques produits. L'important n'est pas d'avoir un gros budget mais de bien choisir tes produits. Les moniteurs t'aident à optimiser chaque euro investi."
     },
     {
       question: "Combien de temps pour faire ses premières ventes ?",
@@ -320,7 +320,7 @@ const Formation = () => {
     },
     {
       question: "Pourquoi vous plutôt qu'une formation classique ?",
-      answer: "Les formations classiques coûtent souvent 500-2000€ et te donnent des vidéos sans outils concrets. AMZing FBA combine une méthode structurée + des moniteurs automatisés + un catalogue fournisseurs + une communauté active. Tu as tout ce qu'il faut pour passer de la théorie à l'action, pour 700€/mois TTC ou ~64€/mois × 12."
+      answer: "Les formations classiques coûtent souvent 500-2000€ et te donnent des vidéos sans outils concrets. AMZing FBA combine une méthode structurée + des moniteurs automatisés + un catalogue fournisseurs + une communauté active. Tu as tout ce qu'il faut pour passer de la théorie à l'action, pour 64€/mois × 12 ou 700€ TTC (-10%)."
     },
     {
       question: "Amazon FBA est-il toujours rentable en 2026 ?",
