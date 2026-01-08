@@ -10,6 +10,7 @@ import { seoKeywordsNewArticles } from './blog-articles-seo-keywords-new';
 import { seoComplementaryArticles } from './blog-articles-seo-complementary';
 import { amazonFbaFocusArticles } from './blog-articles-amazon-fba-focus';
 import { seoKeywordsExtraArticles } from './blog-articles-seo-keywords-extra';
+import { seoAmazonAdsArticles } from './blog-articles-seo-amazon-ads';
 
 export interface BlogFAQ {
   question: string;
@@ -1739,7 +1740,10 @@ export const blogArticles: BlogArticle[] = [
   ...amazonFbaFocusArticles,
   
   // Articles SEO keywords extra (brand registry, fulfillment, comptable, etc.)
-  ...seoKeywordsExtraArticles
+  ...seoKeywordsExtraArticles,
+  
+  // Articles SEO Amazon Ads, Seller Central, Protection Marque
+  ...seoAmazonAdsArticles
 ];
 
 // Fonction utilitaire pour récupérer un article par son slug
