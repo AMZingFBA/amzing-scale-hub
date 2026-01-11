@@ -1743,7 +1743,10 @@ export const blogArticles: BlogArticle[] = [
   ...seoKeywordsExtraArticles,
   
   // Articles SEO Amazon Ads, Seller Central, Protection Marque
-  ...seoAmazonAdsArticles
+  ...seoAmazonAdsArticles,
+  
+  // Articles SEO Sourcing Amazon + Logiciel Amazon FBA
+  ...seoSourcingLogicielsArticles
 ];
 
 // Fonction utilitaire pour récupérer un article par son slug
