@@ -11,7 +11,7 @@ import { seoComplementaryArticles } from './blog-articles-seo-complementary';
 import { amazonFbaFocusArticles } from './blog-articles-amazon-fba-focus';
 import { seoKeywordsExtraArticles } from './blog-articles-seo-keywords-extra';
 import { seoAmazonAdsArticles } from './blog-articles-seo-amazon-ads';
-
+import { seoSourcingLogicielsArticles } from './blog-articles-seo-sourcing-logiciels';
 export interface BlogFAQ {
   question: string;
   answer: string;
