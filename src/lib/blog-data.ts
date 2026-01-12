@@ -12,6 +12,7 @@ import { amazonFbaFocusArticles } from './blog-articles-amazon-fba-focus';
 import { seoKeywordsExtraArticles } from './blog-articles-seo-keywords-extra';
 import { seoAmazonAdsArticles } from './blog-articles-seo-amazon-ads';
 import { seoSourcingLogicielsArticles } from './blog-articles-seo-sourcing-logiciels';
+import { seoLogicielsFbaArticles } from './blog-articles-seo-logiciels-fba';
 export interface BlogFAQ {
   question: string;
   answer: string;
@@ -1746,7 +1747,10 @@ export const blogArticles: BlogArticle[] = [
   ...seoAmazonAdsArticles,
   
   // Articles SEO Sourcing Amazon + Logiciel Amazon FBA
-  ...seoSourcingLogicielsArticles
+  ...seoSourcingLogicielsArticles,
+  
+  // Articles SEO Logiciel Amazon FBA (nouveaux)
+  ...seoLogicielsFbaArticles
 ];
 
 // Fonction utilitaire pour récupérer un article par son slug
