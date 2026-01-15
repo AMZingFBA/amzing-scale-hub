@@ -8,6 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Capacitor } from '@capacitor/core';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import SupplierSurvey from '@/components/SupplierSurvey';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Loader2, AlertCircle, Link2, Image, Video, Mic, FileText, Bell, ArrowLeft } from 'lucide-react';
@@ -150,6 +151,9 @@ const NotificationAlerts = () => {
               </p>
             </div>
           </div>
+
+          {/* Supplier Survey */}
+          <SupplierSurvey />
 
           {alerts.length === 0 ? (
             <Card>

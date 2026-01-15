@@ -1121,6 +1121,27 @@ export type Database = {
         }
         Relationships: []
       }
+      supplier_survey_responses: {
+        Row: {
+          created_at: string
+          id: string
+          response: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          response: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          response?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       tickets: {
         Row: {
           category: string | null
