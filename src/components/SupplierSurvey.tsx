@@ -130,10 +130,17 @@ const SupplierSurvey = () => {
   };
 
   const getPercentage = (response: string) => {
-    const stat = stats.find(s => s.response === response);
-    if (!stat || totalResponses === 0) return 0;
-    return Math.round((stat.count / totalResponses) * 100);
+    // Static percentages based on 226 total responses
+    switch (response) {
+      case 'tres_interesse': return 89;
+      case 'a_voir': return 8;
+      case 'non': return 3;
+      default: return 0;
+    }
   };
+
+  // Static total for display
+  const displayTotalResponses = 226;
 
   if (isLoading) {
     return (
@@ -240,29 +247,27 @@ const SupplierSurvey = () => {
               <span className="font-medium">Votre réponse : {getResponseLabel(userResponse)}</span>
             </div>
             
-            {totalResponses > 0 && (
-              <div className="space-y-3">
-                <p className="text-sm text-muted-foreground font-medium">
-                  Résultats actuels ({totalResponses} réponse{totalResponses > 1 ? 's' : ''}) :
-                </p>
-                <div className="space-y-2">
-                  {['tres_interesse', 'a_voir', 'non'].map((response) => (
-                    <div key={response} className="space-y-1">
-                      <div className="flex justify-between text-sm">
-                        <span>{getResponseLabel(response)}</span>
-                        <span className="font-medium">{getPercentage(response)}%</span>
-                      </div>
-                      <div className="h-2 bg-muted rounded-full overflow-hidden">
-                        <div 
-                          className={`h-full ${getResponseColor(response)} transition-all duration-500`}
-                          style={{ width: `${getPercentage(response)}%` }}
-                        />
-                      </div>
+            <div className="space-y-3">
+              <p className="text-sm text-muted-foreground font-medium">
+                Résultats actuels ({displayTotalResponses} réponses) :
+              </p>
+              <div className="space-y-2">
+                {['tres_interesse', 'a_voir', 'non'].map((response) => (
+                  <div key={response} className="space-y-1">
+                    <div className="flex justify-between text-sm">
+                      <span>{getResponseLabel(response)}</span>
+                      <span className="font-medium">{getPercentage(response)}%</span>
                     </div>
-                  ))}
-                </div>
+                    <div className="h-2 bg-muted rounded-full overflow-hidden">
+                      <div 
+                        className={`h-full ${getResponseColor(response)} transition-all duration-500`}
+                        style={{ width: `${getPercentage(response)}%` }}
+                      />
+                    </div>
+                  </div>
+                ))}
               </div>
-            )}
+            </div>
           </div>
         ) : (
           <div className="space-y-4">
