@@ -4,7 +4,6 @@
 
 import { blogImages } from './blog-images';
 import { seoNewArticles } from './blog-articles-seo-new';
-import { seoFinalArticles } from './blog-articles-seo-final';
 import { seoExtraArticles } from './blog-articles-seo-extra';
 import { seoKeywordsNewArticles } from './blog-articles-seo-keywords-new';
 import { seoComplementaryArticles } from './blog-articles-seo-complementary';
@@ -1727,9 +1726,6 @@ export const blogArticles: BlogArticle[] = [
   
   // Nouveaux articles SEO
   ...seoNewArticles,
-  
-  // Articles SEO finaux
-  ...seoFinalArticles,
   
   // Articles SEO extra
   ...seoExtraArticles,
