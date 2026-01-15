@@ -14,6 +14,7 @@ import { seoAmazonAdsArticles } from './blog-articles-seo-amazon-ads';
 import { seoSourcingLogicielsArticles } from './blog-articles-seo-sourcing-logiciels';
 import { seoLogicielsFbaArticles } from './blog-articles-seo-logiciels-fba';
 import { seoKeywordsMixArticles } from './blog-articles-seo-keywords-mix';
+import { seoVendeurAmazonArticles } from './blog-articles-seo-vendeur-amazon';
 export interface BlogFAQ {
   question: string;
   answer: string;
@@ -1754,7 +1755,10 @@ export const blogArticles: BlogArticle[] = [
   ...seoLogicielsFbaArticles,
   
   // Articles SEO Keywords Mix (fba on amazon, brand registry, formation, etc.)
-  ...seoKeywordsMixArticles
+  ...seoKeywordsMixArticles,
+  
+  // Articles SEO Vendeur Amazon (amazon vendeur, amazon seller, etc.)
+  ...seoVendeurAmazonArticles
 ];
 
 // Fonction utilitaire pour récupérer un article par son slug
