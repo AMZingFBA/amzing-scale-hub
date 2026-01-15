@@ -342,9 +342,7 @@ export default function ProduitsQogita() {
               <div>
                 <p className="text-sm text-muted-foreground">Produits filtrés</p>
                 <p className="text-2xl font-bold">{filteredProducts.length}</p>
-                {products.length > 0 && (
-                  <p className="text-xs text-muted-foreground mt-1">sur {products.length} total</p>
-                )}
+                <p className="text-xs text-muted-foreground mt-1">sur 26 770 analysés</p>
               </div>
               <Package className="w-8 h-8 text-primary" />
             </CardContent>
