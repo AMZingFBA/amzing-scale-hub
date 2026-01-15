@@ -18,12 +18,18 @@ const SupplierSurvey = () => {
   const [userResponse, setUserResponse] = useState<string>('');
   const [stats, setStats] = useState<{ response: string; count: number }[]>([]);
   const [totalResponses, setTotalResponses] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (user) {
-      checkExistingResponse();
-      loadStats();
-    }
+    const init = async () => {
+      setIsLoading(true);
+      if (user) {
+        await checkExistingResponse();
+        await loadStats();
+      }
+      setIsLoading(false);
+    };
+    init();
   }, [user]);
 
   const checkExistingResponse = async () => {
@@ -128,6 +134,19 @@ const SupplierSurvey = () => {
     if (!stat || totalResponses === 0) return 0;
     return Math.round((stat.count / totalResponses) * 100);
   };
+
+  if (isLoading) {
+    return (
+      <Card className="border-2 border-green-500/50 bg-gradient-to-br from-green-500/5 to-emerald-500/5 mb-8">
+        <CardContent className="py-8 text-center">
+          <div className="animate-pulse space-y-4">
+            <div className="h-6 bg-muted rounded w-3/4 mx-auto"></div>
+            <div className="h-4 bg-muted rounded w-1/2 mx-auto"></div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card className="border-2 border-green-500/50 bg-gradient-to-br from-green-500/5 to-emerald-500/5 mb-8">
