@@ -32,7 +32,7 @@ serve(async (req) => {
     // Get all profiles with their subscriptions
     const { data: profiles, error: profilesError } = await supabaseClient
       .from('profiles')
-      .select('id, email, full_name, nickname, created_at, registration_source');
+      .select('id, email, full_name, nickname, phone, created_at, registration_source');
 
     if (profilesError) {
       throw new Error(`Failed to fetch profiles: ${profilesError.message}`);
@@ -178,11 +178,28 @@ serve(async (req) => {
           sourceInscription = 'App';
         }
 
+        // Format phone number to international format
+        const formatPhone = (phone: string | null | undefined): string => {
+          if (!phone || phone.trim() === '') return '';
+          let formatted = phone.replace(/[\s\-\(\)\.]/g, '');
+          if (formatted.startsWith('0') && formatted.length === 10) {
+            formatted = '+33' + formatted.substring(1);
+          } else if (formatted.startsWith('33') && !formatted.startsWith('+')) {
+            formatted = '+' + formatted;
+          } else if (!formatted.startsWith('+')) {
+            formatted = '+33' + formatted;
+          }
+          return formatted;
+        };
+
+        const formattedPhone = formatPhone(profile.phone);
+
         // Prepare fields - use Unicode apostrophe (U+2019) for Airtable field name
         // DON'T update "Dernière connexion" during bulk sync - only update when user actually logs in
         const fields: Record<string, unknown> = {
           "Email (principal)": profile.email,
           "Nom": profile.full_name || profile.nickname || '',
+          "telephone": formattedPhone,
           "Abonnement actif": isVip,
           "Type d\u2019abonnement": typeAbonnement,
           "ID Stripe / RevenueCat": subscription?.stripe_customer_id || '',
