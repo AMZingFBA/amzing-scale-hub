@@ -236,7 +236,7 @@ const Dashboard = () => {
                 </AccordionTrigger>
                 <AccordionContent>
                   <div className="grid gap-3 pt-2">
-                    <CategoryItem icon={Building2} label="lego" link="/catalogue/lego" badge={notifications.catalogue_exclusif?.subcategories?.lego} />
+                    <CategoryItem icon={Building2} label="DJI" link="/catalogue/dji" badge={notifications.catalogue_exclusif?.subcategories?.dji} />
                     <CategoryItem icon={Building2} label="playmobil" link="/catalogue/playmobil" badge={notifications.catalogue_exclusif?.subcategories?.playmobil} />
                   </div>
                 </AccordionContent>
