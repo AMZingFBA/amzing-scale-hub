@@ -8,6 +8,7 @@ import ScrollToTop from "./components/ScrollToTop";
 import { AuthProvider } from "./hooks/use-auth";
 import { PushNotificationsProvider } from "./components/PushNotificationsProvider";
 import { StoreProvider } from "./components/StoreProvider";
+import ImpersonationBar from "./components/ImpersonationBar";
 
 // Pages critiques chargées immédiatement
 import Index from "./pages/Index";
@@ -73,7 +74,6 @@ const ProduitsQogita = lazy(() => import("./pages/ProduitsQogita"));
 const ProduitsEany = lazy(() => import("./pages/ProduitsEany"));
 const AdminAirtableContacts = lazy(() => import("./pages/AdminAirtableContacts"));
 const AdminAirtableUsers = lazy(() => import("./pages/AdminAirtableUsers"));
-const AdminViewUser = lazy(() => import("./pages/AdminViewUser"));
 
 const AndroidApp = lazy(() => import("./pages/AndroidApp"));
 const AmazonFbaDebutant = lazy(() => import("./pages/AmazonFbaDebutant"));
@@ -112,6 +112,7 @@ const App = () => (
           <StoreProvider>
             <PushNotificationsProvider>
               <ScrollToTop />
+              <ImpersonationBar />
               <Suspense fallback={<PageLoader />}>
             <Routes>
             <Route path="/" element={<Index />} />
@@ -181,7 +182,6 @@ const App = () => (
             <Route path="/products/eany" element={<ProduitsEany />} />
             <Route path="/admin/airtable-contacts" element={<AdminAirtableContacts />} />
             <Route path="/admin/airtable-users" element={<AdminAirtableUsers />} />
-            <Route path="/admin/view-user" element={<AdminViewUser />} />
             
             <Route path="/android" element={<AndroidApp />} />
             <Route path="/amazon-fba-debutant" element={<AmazonFbaDebutant />} />
