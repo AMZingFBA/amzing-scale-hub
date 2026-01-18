@@ -1004,6 +1004,33 @@ export type Database = {
         }
         Relationships: []
       }
+      qogita_catalogue: {
+        Row: {
+          brand: string
+          created_at: string
+          ean: string
+          id: string
+          price_ht: number
+          updated_at: string
+        }
+        Insert: {
+          brand: string
+          created_at?: string
+          ean: string
+          id?: string
+          price_ht: number
+          updated_at?: string
+        }
+        Update: {
+          brand?: string
+          created_at?: string
+          ean?: string
+          id?: string
+          price_ht?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       qogita_products: {
         Row: {
           alerts: string[] | null
