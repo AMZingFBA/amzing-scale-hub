@@ -77,3 +77,6 @@ verify_jwt = false
 
 [functions.admin-impersonation]
 verify_jwt = false
+
+[functions.sync-qogita-catalogue]
+verify_jwt = false
