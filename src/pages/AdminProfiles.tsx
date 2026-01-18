@@ -234,11 +234,27 @@ const AdminProfiles = () => {
         return;
       }
 
-      // Open in new tab
+      // Generate URL and copy to clipboard
       const url = `${window.location.origin}/admin/view-user?token=${data.token}`;
-      window.open(url, '_blank');
       
-      toast.success('Lien généré - valide 5 minutes');
+      // Copy to clipboard
+      await navigator.clipboard.writeText(url);
+      
+      // Try to open in new tab (may be blocked by popup blocker)
+      const newWindow = window.open(url, '_blank');
+      
+      if (newWindow) {
+        toast.success('Lien ouvert dans un nouvel onglet (copié aussi)');
+      } else {
+        // Popup was blocked, show the link in toast
+        toast.success(
+          <div className="space-y-2">
+            <div>Lien copié ! Valide 5 minutes.</div>
+            <div className="text-xs break-all opacity-80">{url}</div>
+          </div>,
+          { duration: 10000 }
+        );
+      }
     } catch (error: any) {
       console.error('Error generating view link:', error);
       toast.error('Erreur lors de la génération du lien');
