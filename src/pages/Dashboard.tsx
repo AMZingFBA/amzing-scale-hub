@@ -218,10 +218,25 @@ const Dashboard = () => {
                       badge={notifications.produits?.subcategories?.['produits-qogita']} 
                     />
                     <CategoryItem icon={Sparkles} label="produits eany" link="/products/eany" badge={notifications.produits?.subcategories?.['produits-eany']} />
-                    <CategoryItem icon={Database} label="catalogue qogita" link="/catalogue/qogita" badge={notifications.produits?.subcategories?.['catalogue-qogita']} />
-                    <CategoryItem icon={Package} label="grossistes" link="/grossistes" badge={notifications.produits?.subcategories?.['grossistes']} />
                     <CategoryItem icon={DollarSign} label="promotions" link="/promotions" badge={notifications.produits?.subcategories?.['promotions']} />
                     <CategoryItem icon={FileText} label="sitelist" link="/sitelist" badge={notifications.produits?.subcategories?.['sitelist']} />
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+
+              {/* GROSSISTES */}
+              <AccordionItem value="grossistes" className="border rounded-lg px-6 bg-card">
+                <AccordionTrigger className="hover:no-underline">
+                  <div className="flex items-center gap-3 w-full">
+                    <Package className="w-6 h-6 text-primary" />
+                    <span className="text-xl font-bold">GROSSISTES</span>
+                    <NotificationBadge count={notifications.grossistes?.total} size="md" className="ml-2" />
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent>
+                  <div className="grid gap-3 pt-2">
+                    <CategoryItem icon={Database} label="Catalogue Qogita" link="/catalogue/qogita" badge={notifications.grossistes?.subcategories?.['catalogue-qogita']} />
+                    <CategoryItem icon={Package} label="Alertes grossistes" link="/grossistes" badge={notifications.grossistes?.subcategories?.['alertes']} />
                   </div>
                 </AccordionContent>
               </AccordionItem>
