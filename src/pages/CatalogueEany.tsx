@@ -266,13 +266,13 @@ const CatalogueEany = () => {
       <Navbar />
       
       <div className="container mx-auto px-4 py-6">
-        {/* Header */}
-        <div className="flex items-center gap-4 mb-6">
+        {/* Header with back arrow */}
+        <div className="flex items-center gap-3 mb-6">
           <Button 
-            variant="ghost" 
+            variant="outline" 
             size="icon" 
             onClick={() => navigate('/dashboard')}
-            className="text-primary hover:text-primary hover:bg-primary/10"
+            className="border-primary text-primary hover:bg-primary hover:text-primary-foreground shrink-0"
           >
             <ArrowLeft className="h-5 w-5" />
           </Button>
