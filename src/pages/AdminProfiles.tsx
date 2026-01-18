@@ -3,7 +3,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { Loader2, Users, Mail, Phone, UserCircle, ArrowLeft, Search, Calendar, MessageCircle, Crown, Shield, Filter, ChevronLeft, ChevronRight, Clock, AlertCircle, Trash2, Copy, CheckCircle, RefreshCw } from 'lucide-react';
+import { Loader2, Users, Mail, Phone, UserCircle, ArrowLeft, Search, Calendar, MessageCircle, Crown, Shield, Filter, ChevronLeft, ChevronRight, Clock, AlertCircle, Trash2, Copy, CheckCircle, RefreshCw, Eye } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -47,6 +47,7 @@ const AdminProfiles = () => {
   const itemsPerPage = 20;
   const [copiedText, setCopiedText] = useState<string>('');
   const [syncing, setSyncing] = useState(false);
+  const [generatingLink, setGeneratingLink] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) {
@@ -208,6 +209,41 @@ const AdminProfiles = () => {
       toast.error(error.message || 'Erreur lors de la synchronisation avec Stripe');
     } finally {
       setSyncing(false);
+    }
+  };
+
+  const handleViewAsUser = async (userId: string) => {
+    try {
+      setGeneratingLink(userId);
+      
+      const { data: sessionData } = await supabase.auth.getSession();
+      if (!sessionData.session?.access_token) {
+        toast.error('Session expirée');
+        return;
+      }
+
+      const { data, error } = await supabase.functions.invoke('admin-impersonation', {
+        headers: {
+          Authorization: `Bearer ${sessionData.session.access_token}`,
+        },
+        body: { action: 'generate', targetUserId: userId }
+      });
+
+      if (error || !data.success) {
+        toast.error(data?.error || 'Erreur lors de la génération du lien');
+        return;
+      }
+
+      // Open in new tab
+      const url = `${window.location.origin}/admin/view-user?token=${data.token}`;
+      window.open(url, '_blank');
+      
+      toast.success('Lien généré - valide 5 minutes');
+    } catch (error: any) {
+      console.error('Error generating view link:', error);
+      toast.error('Erreur lors de la génération du lien');
+    } finally {
+      setGeneratingLink(null);
     }
   };
 
@@ -719,7 +755,22 @@ const AdminProfiles = () => {
                               </div>
                             </TableCell>
                             <TableCell className="text-right">
-                              <div className="flex gap-2 justify-end">
+                              <div className="flex gap-2 justify-end flex-wrap">
+                                <Button
+                                  size="sm"
+                                  variant="secondary"
+                                  onClick={() => handleViewAsUser(profile.id)}
+                                  className="gap-2"
+                                  disabled={generatingLink === profile.id}
+                                  title="Voir ce que voit l'utilisateur (lien valide 5 min)"
+                                >
+                                  {generatingLink === profile.id ? (
+                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                  ) : (
+                                    <Eye className="w-4 h-4" />
+                                  )}
+                                  Voir
+                                </Button>
                                 <Button
                                   size="sm"
                                   variant="outline"

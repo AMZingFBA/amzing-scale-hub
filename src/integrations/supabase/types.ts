@@ -59,6 +59,36 @@ export type Database = {
         }
         Relationships: []
       }
+      admin_impersonation_tokens: {
+        Row: {
+          admin_id: string
+          created_at: string
+          expires_at: string
+          id: string
+          target_user_id: string
+          token: string
+          used_at: string | null
+        }
+        Insert: {
+          admin_id: string
+          created_at?: string
+          expires_at: string
+          id?: string
+          target_user_id: string
+          token: string
+          used_at?: string | null
+        }
+        Update: {
+          admin_id?: string
+          created_at?: string
+          expires_at?: string
+          id?: string
+          target_user_id?: string
+          token?: string
+          used_at?: string | null
+        }
+        Relationships: []
+      }
       affiliate_clicks: {
         Row: {
           clicked_at: string
@@ -1259,6 +1289,7 @@ export type Database = {
     }
     Functions: {
       check_and_expire_subscriptions: { Args: never; Returns: undefined }
+      cleanup_expired_impersonation_tokens: { Args: never; Returns: undefined }
       generate_affiliate_referral_code: { Args: never; Returns: string }
       get_admin_user_id: { Args: never; Returns: string }
       get_all_notification_counts: {
