@@ -385,19 +385,35 @@ serve(async (req) => {
 
       // Update based on subscription status
       if (subscription.status === "active") {
-        const expiresAt = new Date(subscription.current_period_end * 1000);
+        // Get existing subscription to check current expires_at
+        const { data: existingSub } = await supabaseClient
+          .from("subscriptions")
+          .select("expires_at, started_at")
+          .eq("user_id", profile.id)
+          .single();
+
+        // Only update expires_at if subscription is new (no existing expires_at or it's in the past)
+        // This preserves the annual expiry date set at checkout
+        let expiresAt = existingSub?.expires_at;
+        if (!expiresAt || new Date(expiresAt) < new Date()) {
+          // New subscription - set to 1 year from now
+          const newExpiry = new Date();
+          newExpiry.setFullYear(newExpiry.getFullYear() + 1);
+          expiresAt = newExpiry.toISOString();
+        }
+
         await supabaseClient
           .from("subscriptions")
           .update({
             plan_type: "vip",
             status: "active",
-            expires_at: expiresAt.toISOString(),
+            expires_at: expiresAt,
             stripe_customer_id: subscription.customer as string,
             payment_provider: "stripe",
           })
           .eq("user_id", profile.id);
         
-        logStep("Subscription activated", { userId: profile.id });
+        logStep("Subscription activated", { userId: profile.id, expiresAt });
 
         // Sync to Airtable
         await syncUserToAirtable({
