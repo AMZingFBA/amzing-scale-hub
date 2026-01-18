@@ -19,7 +19,7 @@ export const articleAmazonSellerCentralGuide: BlogArticle = {
   publishedAt: '2026-01-11',
   updatedAt: '2026-01-11',
   author: 'AMZing FBA',
-  image: blogImages.creerCompte,
+  image: blogImages.creerCompteVendeur,
   relatedSlugs: ['creer-compte-vendeur-amazon-guide-complet', 'devenir-vendeur-amazon-guide-complet', 'amazon-fba-cest-quoi-guide-complet'],
   faqs: [
     { question: "C'est quoi Amazon Seller Central ?", answer: "Seller Central est la plateforme en ligne d'Amazon où les vendeurs gèrent leur business. Vous y créez vos annonces, gérez les stocks, suivez les ventes, répondez aux messages clients, et accédez aux rapports de performance. C'est le tableau de bord central de tout vendeur Amazon." },
