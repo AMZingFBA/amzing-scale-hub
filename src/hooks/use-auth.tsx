@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
 
 interface Subscription {
@@ -9,6 +9,20 @@ interface Subscription {
   status: 'active' | 'inactive' | 'canceled' | 'cancelled' | 'expired';
   expires_at: string | null;
   is_trial?: boolean;
+}
+
+interface ImpersonatedSubscription {
+  plan_type: string;
+  status: string;
+  expires_at: string | null;
+  is_trial: boolean;
+}
+
+interface ImpersonatedUser {
+  id: string;
+  full_name: string | null;
+  email: string;
+  nickname: string | null;
 }
 
 interface AuthContextType {
@@ -21,6 +35,13 @@ interface AuthContextType {
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
   refreshSubscription: () => Promise<void>;
+  // Impersonation
+  isImpersonating: boolean;
+  impersonatedUser: ImpersonatedUser | null;
+  impersonatedSubscription: ImpersonatedSubscription | null;
+  impersonationTimeRemaining: number;
+  stopImpersonation: () => void;
+  refreshImpersonation: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -31,14 +52,26 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  // Impersonation state
+  const [isImpersonating, setIsImpersonating] = useState(false);
+  const [impersonatedUser, setImpersonatedUser] = useState<ImpersonatedUser | null>(null);
+  const [impersonatedSubscription, setImpersonatedSubscription] = useState<ImpersonatedSubscription | null>(null);
+  const [impersonationToken, setImpersonationToken] = useState<string | null>(null);
+  const [impersonationExpiresAt, setImpersonationExpiresAt] = useState<Date | null>(null);
+  const [impersonationTimeRemaining, setImpersonationTimeRemaining] = useState(0);
 
   // Un utilisateur est VIP si:
-  // - plan_type est 'vip'
-  // - status est 'active' ou 'canceled' (résilié mais encore dans la période payée)
-  // - expires_at est null (illimité) ou dans le futur
-  const isVIP = subscription?.plan_type === 'vip' && 
-    (subscription?.status === 'active' || subscription?.status === 'canceled') &&
-    (!subscription?.expires_at || new Date(subscription.expires_at) > new Date());
+  // - En mode impersonation: utilise la subscription impersonée
+  // - Sinon: utilise la subscription réelle
+  const effectiveSubscription = isImpersonating && impersonatedSubscription 
+    ? impersonatedSubscription 
+    : subscription;
+  
+  const isVIP = effectiveSubscription?.plan_type === 'vip' && 
+    (effectiveSubscription?.status === 'active' || effectiveSubscription?.status === 'canceled') &&
+    (!effectiveSubscription?.expires_at || new Date(effectiveSubscription.expires_at) > new Date());
 
   const fetchSubscription = async (userId: string) => {
     try {
@@ -257,6 +290,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setUser(null);
       setSession(null);
       setSubscription(null);
+      stopImpersonation();
       
       toast.success('Déconnexion réussie');
       navigate('/auth');
@@ -265,6 +299,93 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       toast.error('Erreur lors de la déconnexion');
     }
   };
+
+  // Impersonation functions
+  const stopImpersonation = () => {
+    setIsImpersonating(false);
+    setImpersonatedUser(null);
+    setImpersonatedSubscription(null);
+    setImpersonationToken(null);
+    setImpersonationExpiresAt(null);
+    setImpersonationTimeRemaining(0);
+    
+    // Remove token from URL
+    const newParams = new URLSearchParams(searchParams);
+    newParams.delete('impersonate');
+    setSearchParams(newParams, { replace: true });
+  };
+
+  const refreshImpersonation = async () => {
+    if (!impersonationToken) return;
+
+    try {
+      const { data, error } = await supabase.functions.invoke('admin-impersonation', {
+        body: { action: 'refresh', impersonationToken: impersonationToken }
+      });
+
+      if (error || !data.success) {
+        toast.error('Impossible de prolonger la session');
+        return;
+      }
+
+      // Update URL with new token
+      const newParams = new URLSearchParams(searchParams);
+      newParams.set('impersonate', data.token);
+      setSearchParams(newParams, { replace: true });
+
+      setImpersonationToken(data.token);
+      setImpersonationExpiresAt(new Date(data.expiresAt));
+      toast.success('Session prolongée de 5 minutes');
+    } catch (err) {
+      console.error('Error refreshing impersonation:', err);
+      toast.error('Erreur lors du rafraîchissement');
+    }
+  };
+
+  // Check for impersonation token in URL
+  useEffect(() => {
+    const token = searchParams.get('impersonate');
+    if (token && !isImpersonating && user) {
+      // Validate token
+      supabase.functions.invoke('admin-impersonation', {
+        body: { action: 'validate', impersonationToken: token }
+      }).then(({ data, error }) => {
+        if (error || !data?.valid) {
+          console.log('Impersonation token invalid');
+          const newParams = new URLSearchParams(searchParams);
+          newParams.delete('impersonate');
+          setSearchParams(newParams, { replace: true });
+          return;
+        }
+
+        setIsImpersonating(true);
+        setImpersonatedUser(data.user);
+        setImpersonatedSubscription(data.subscription);
+        setImpersonationToken(token);
+        setImpersonationExpiresAt(new Date(data.expiresAt));
+      });
+    }
+  }, [searchParams, isImpersonating, user]);
+
+  // Impersonation timer countdown
+  useEffect(() => {
+    if (!impersonationExpiresAt || !isImpersonating) return;
+
+    const interval = setInterval(() => {
+      const now = new Date();
+      const remaining = Math.max(0, Math.floor((impersonationExpiresAt.getTime() - now.getTime()) / 1000));
+      setImpersonationTimeRemaining(remaining);
+
+      if (remaining <= 0) {
+        toast.error('Session d\'impersonation expirée');
+        stopImpersonation();
+        navigate('/admin/profiles');
+        clearInterval(interval);
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [impersonationExpiresAt, isImpersonating]);
 
   return (
     <AuthContext.Provider
@@ -278,6 +399,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         signIn,
         signOut,
         refreshSubscription,
+        // Impersonation
+        isImpersonating,
+        impersonatedUser,
+        impersonatedSubscription,
+        impersonationTimeRemaining,
+        stopImpersonation,
+        refreshImpersonation,
       }}
     >
       {children}

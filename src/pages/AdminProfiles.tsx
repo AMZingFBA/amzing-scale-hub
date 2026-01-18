@@ -234,33 +234,11 @@ const AdminProfiles = () => {
         return;
       }
 
-      // Generate URL
-      const url = `${window.location.origin}/admin/view-user?token=${data.token}`;
+      // Redirect to dashboard with impersonation token
+      const url = `/dashboard?impersonate=${data.token}`;
+      navigate(url);
       
-      // Try to copy to clipboard (may fail in some contexts)
-      let copied = false;
-      try {
-        await navigator.clipboard.writeText(url);
-        copied = true;
-      } catch (clipboardError) {
-        console.log('Clipboard not available');
-      }
-      
-      // Try to open in new tab (may be blocked by popup blocker)
-      const newWindow = window.open(url, '_blank');
-      
-      if (newWindow) {
-        toast.success(copied ? 'Lien ouvert dans un nouvel onglet (copié aussi)' : 'Lien ouvert dans un nouvel onglet');
-      } else {
-        // Popup was blocked, show the link
-        toast.success(
-          <div className="space-y-2">
-            <div>{copied ? 'Lien copié !' : 'Lien généré !'} Valide 5 minutes.</div>
-            <div className="text-xs break-all opacity-80 select-all">{url}</div>
-          </div>,
-          { duration: 15000 }
-        );
-      }
+      toast.success('Mode impersonation activé - vous voyez ce que voit l\'utilisateur');
     } catch (error: any) {
       console.error('Error generating view link:', error);
       toast.error('Erreur lors de la génération du lien');
