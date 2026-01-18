@@ -13,7 +13,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { xiaomiCatalogueProducts, getStockBadgeColor, XiaomiProduct } from '@/lib/xiaomi-catalogue-data';
-import { ShoppingCart, Plus, Minus, Trash2, Send, Search, Package, Barcode } from 'lucide-react';
+import { ShoppingCart, Plus, Minus, Trash2, Send, Search, Package, Barcode, ArrowLeft } from 'lucide-react';
 
 interface CartItem {
   product: XiaomiProduct;
@@ -186,15 +186,28 @@ ${cart.map(item => `[${item.product.id}] EAN: ${item.product.ean} | Qté: ${item
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Navbar />
-      <main className="flex-grow pt-20">
+      <main className="flex-grow pt-24">
         <div className="container mx-auto px-4 py-8">
-          {/* Header */}
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-            <div>
-              <h1 className="text-3xl font-bold flex items-center gap-3">
-                <Package className="w-8 h-8 text-orange-500" />
+          {/* Header with back arrow */}
+          <div className="flex items-center gap-3 mb-6">
+            <Button 
+              variant="outline" 
+              size="icon" 
+              onClick={() => navigate('/dashboard')}
+              className="border-primary text-primary hover:bg-primary hover:text-primary-foreground shrink-0"
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+            <div className="flex-1">
+              <h1 className="text-2xl font-bold flex items-center gap-2">
+                <Package className="w-6 h-6 text-orange-500" />
                 Catalogue Xiaomi
               </h1>
+            </div>
+          </div>
+          
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+            <div>
               <p className="text-muted-foreground mt-1">
                 {xiaomiCatalogueProducts.length} produits disponibles
               </p>
