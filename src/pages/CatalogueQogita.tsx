@@ -38,6 +38,7 @@ const CatalogueQogita = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [brandFilter, setBrandFilter] = useState<string>('all');
   const [brands, setBrands] = useState<string[]>([]);
+  const [brandSearch, setBrandSearch] = useState('');
   
   // Admin upload
   const [isUploading, setIsUploading] = useState(false);
@@ -53,21 +54,25 @@ const CatalogueQogita = () => {
     return () => clearTimeout(timer);
   }, [searchTerm]);
 
-  // Load brands for filter
+  // Load all brands using the optimized function
   useEffect(() => {
     const loadBrands = async () => {
-      const { data, error } = await supabase
-        .from('qogita_catalogue')
-        .select('brand')
-        .order('brand');
+      const { data, error } = await supabase.rpc('get_qogita_brands');
 
       if (!error && data) {
-        const uniqueBrands = [...new Set(data.map(d => d.brand))].slice(0, 100);
-        setBrands(uniqueBrands);
+        setBrands(data.map((d: { brand: string }) => d.brand));
       }
     };
     loadBrands();
   }, []);
+
+  // Filter brands for display in dropdown
+  const filteredBrands = useMemo(() => {
+    if (!brandSearch) return brands.slice(0, 200);
+    return brands.filter(b => 
+      b.toLowerCase().includes(brandSearch.toLowerCase())
+    ).slice(0, 200);
+  }, [brands, brandSearch]);
 
   // Load products with pagination and filters
   useEffect(() => {
@@ -332,15 +337,28 @@ const CatalogueQogita = () => {
                   className="pl-10"
                 />
               </div>
-              <Select value={brandFilter} onValueChange={(v) => { setBrandFilter(v); setCurrentPage(1); }}>
+              <Select value={brandFilter} onValueChange={(v) => { setBrandFilter(v); setCurrentPage(1); setBrandSearch(''); }}>
                 <SelectTrigger>
                   <SelectValue placeholder="Filtrer par marque" />
                 </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Toutes les marques</SelectItem>
-                  {brands.map(brand => (
+                <SelectContent className="max-h-[300px]">
+                  <div className="p-2 sticky top-0 bg-background">
+                    <Input
+                      placeholder="Rechercher une marque..."
+                      value={brandSearch}
+                      onChange={(e) => setBrandSearch(e.target.value)}
+                      className="h-8"
+                    />
+                  </div>
+                  <SelectItem value="all">Toutes les marques ({brands.length})</SelectItem>
+                  {filteredBrands.map(brand => (
                     <SelectItem key={brand} value={brand}>{brand}</SelectItem>
                   ))}
+                  {filteredBrands.length === 200 && (
+                    <p className="text-xs text-muted-foreground p-2 text-center">
+                      Affichage limité à 200 - utilisez la recherche
+                    </p>
+                  )}
                 </SelectContent>
               </Select>
             </div>

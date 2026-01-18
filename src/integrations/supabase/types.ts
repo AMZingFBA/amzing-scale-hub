@@ -1336,6 +1336,12 @@ export type Database = {
           nickname: string
         }[]
       }
+      get_qogita_brands: {
+        Args: never
+        Returns: {
+          brand: string
+        }[]
+      }
       get_unread_alerts_count: {
         Args: {
           category_param: string
