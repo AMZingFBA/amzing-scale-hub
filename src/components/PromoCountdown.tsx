@@ -10,8 +10,30 @@ interface TimeLeft {
 }
 
 const PromoCountdown = () => {
-  // Promo ends on Tuesday January 21, 2026 at 23:59:59 French time (mardi soir minuit)
-  const promoEndDate = new Date('2026-01-21T23:59:59+01:00');
+  // Initial promo ends on Tuesday January 21, 2026 at 23:59:59 French time
+  const initialPromoEnd = new Date('2026-01-21T23:59:59+01:00');
+  const promoDurationMs = 2 * 24 * 60 * 60 * 1000; // 2 days in milliseconds
+  
+  const calculateCurrentPromoEnd = (): Date => {
+    const now = new Date();
+    const initialEndTime = initialPromoEnd.getTime();
+    
+    // If we haven't reached the initial promo end yet
+    if (now.getTime() < initialEndTime) {
+      return initialPromoEnd;
+    }
+    
+    // Calculate how many complete 2-day cycles have passed since initial end
+    const timeSinceInitialEnd = now.getTime() - initialEndTime;
+    const completedCycles = Math.floor(timeSinceInitialEnd / promoDurationMs);
+    
+    // Next promo ends after (completedCycles + 1) * 2 days from initial end
+    const nextPromoEnd = new Date(initialEndTime + (completedCycles + 1) * promoDurationMs);
+    
+    return nextPromoEnd;
+  };
+  
+  const [promoEndDate, setPromoEndDate] = useState<Date>(calculateCurrentPromoEnd());
   
   const calculateTimeLeft = (): TimeLeft => {
     const now = new Date();
@@ -30,26 +52,23 @@ const PromoCountdown = () => {
   };
   
   const [timeLeft, setTimeLeft] = useState<TimeLeft>(calculateTimeLeft());
-  const [isExpired, setIsExpired] = useState(false);
   
   useEffect(() => {
     const timer = setInterval(() => {
       const newTimeLeft = calculateTimeLeft();
       setTimeLeft(newTimeLeft);
       
+      // When countdown reaches 0, start a new 2-day cycle
       if (newTimeLeft.days === 0 && newTimeLeft.hours === 0 && 
           newTimeLeft.minutes === 0 && newTimeLeft.seconds === 0) {
-        setIsExpired(true);
-        clearInterval(timer);
+        // Calculate the new promo end date
+        const newPromoEnd = calculateCurrentPromoEnd();
+        setPromoEndDate(newPromoEnd);
       }
     }, 1000);
     
     return () => clearInterval(timer);
-  }, []);
-  
-  if (isExpired) {
-    return null;
-  }
+  }, [promoEndDate]);
   
   const TimeBlock = ({ value, label }: { value: number; label: string }) => (
     <div className="flex flex-col items-center">
@@ -120,7 +139,7 @@ const PromoCountdown = () => {
         {/* Urgency text */}
         <p className="text-center mt-4 text-sm text-muted-foreground flex items-center justify-center gap-2">
           <Clock className="w-4 h-4 text-orange-500" />
-          Offre limitée jusqu'à <span className="font-semibold text-foreground">mardi soir minuit</span>
+          Offre limitée • <span className="font-semibold text-foreground">Se termine bientôt !</span>
         </p>
       </div>
     </div>
