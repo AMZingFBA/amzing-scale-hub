@@ -10,8 +10,8 @@ interface TimeLeft {
 }
 
 const PromoCountdown = () => {
-  // Promo ends on Thursday January 22, 2026 at 23:59:59 French time
-  const promoEndDate = new Date('2026-01-22T23:59:59+01:00');
+  // Promo ends on Tuesday January 21, 2026 at 23:59:59 French time (mardi soir minuit)
+  const promoEndDate = new Date('2026-01-21T23:59:59+01:00');
   
   const calculateTimeLeft = (): TimeLeft => {
     const now = new Date();
@@ -120,7 +120,7 @@ const PromoCountdown = () => {
         {/* Urgency text */}
         <p className="text-center mt-4 text-sm text-muted-foreground flex items-center justify-center gap-2">
           <Clock className="w-4 h-4 text-orange-500" />
-          Offre limitée jusqu'au <span className="font-semibold text-foreground">22 janvier à minuit</span>
+          Offre limitée jusqu'à <span className="font-semibold text-foreground">mardi soir minuit</span>
         </p>
       </div>
     </div>
