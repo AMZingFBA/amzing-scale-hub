@@ -70,44 +70,25 @@ const AdminProfiles = () => {
 
   const loadProfiles = async () => {
     try {
-      // Fetch profiles with their subscriptions and roles
-      const { data: profilesData, error: profilesError } = await supabase
-        .from('profiles')
-        .select('id, full_name, email, phone, nickname, avatar_url, created_at, updated_at')
-        .order('created_at', { ascending: false });
+      setLoading(true);
 
-      if (profilesError) throw profilesError;
+      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError) throw sessionError;
+      if (!sessionData.session?.access_token) throw new Error('Session expirée');
 
-      // Fetch subscriptions for all users
-      const { data: subscriptionsData, error: subsError } = await supabase
-        .from('subscriptions')
-        .select('user_id, plan_type, status, expires_at, is_trial');
-
-      if (subsError) throw subsError;
-
-      // Fetch roles for all users
-      const { data: rolesData, error: rolesError } = await supabase
-        .from('user_roles')
-        .select('user_id, role');
-
-      if (rolesError) throw rolesError;
-
-      // Combine the data
-      const enrichedProfiles = profilesData?.map(profile => {
-        const subscription = subscriptionsData?.find(s => s.user_id === profile.id);
-        const userRole = rolesData?.find(r => r.user_id === profile.id);
-        
-        return {
-          ...profile,
-          subscription: subscription || undefined,
-          role: userRole?.role || 'user'
-        };
+      const { data, error } = await supabase.functions.invoke('admin-get-profiles', {
+        headers: {
+          Authorization: `Bearer ${sessionData.session.access_token}`,
+        },
       });
 
-      setProfiles(enrichedProfiles || []);
+      if (error) throw error;
+
+      setProfiles((data?.profiles as ProfileData[]) || []);
     } catch (error: any) {
       console.error('Error loading profiles:', error);
       toast.error('Erreur lors du chargement des profils');
+      setProfiles([]);
     } finally {
       setLoading(false);
     }
@@ -258,6 +239,26 @@ const AdminProfiles = () => {
     } finally {
       setGeneratingLink(null);
     }
+  };
+
+  const now = new Date();
+
+  const isVipActive = (sub?: ProfileData['subscription']) => {
+    if (!sub) return false;
+    const validUntil = !sub.expires_at || new Date(sub.expires_at) > now;
+    return sub.plan_type === 'vip' && (sub.status === 'active' || sub.status === 'canceled') && validUntil;
+  };
+
+  const isExpiringSoon = (sub?: ProfileData['subscription']) => {
+    if (!isVipActive(sub) || !sub?.expires_at) return false;
+    const expiresAt = new Date(sub.expires_at);
+    const daysUntilExpiry = Math.ceil((expiresAt.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+    return daysUntilExpiry <= 7 && daysUntilExpiry > 0;
+  };
+
+  const isExpired = (sub?: ProfileData['subscription']) => {
+    if (!sub?.expires_at) return false;
+    return new Date(sub.expires_at) < now && sub.status !== 'unpaid';
   };
 
   const filteredProfiles = profiles.filter(profile => {
@@ -475,9 +476,7 @@ const AdminProfiles = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">
-                  {profiles.filter(p => p.subscription?.plan_type === 'vip' && p.subscription?.status === 'active').length}
-                </div>
+                <div className="text-2xl font-bold">{profiles.filter((p) => isVipActive(p.subscription)).length}</div>
               </CardContent>
             </Card>
 
@@ -490,9 +489,7 @@ const AdminProfiles = () => {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-orange-500">
-                  {profiles.filter(p => {
-                    return p.subscription?.plan_type === 'free' && p.subscription?.expires_at;
-                  }).length}
+                  {profiles.filter((p) => p.subscription?.status === 'canceled').length}
                 </div>
                 <p className="text-xs text-muted-foreground">ont résilié</p>
               </CardContent>
@@ -507,13 +504,7 @@ const AdminProfiles = () => {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-orange-500">
-                  {profiles.filter(p => {
-                    if (!p.subscription?.expires_at) return false;
-                    const expiresAt = new Date(p.subscription.expires_at);
-                    const now = new Date();
-                    const daysUntilExpiry = Math.ceil((expiresAt.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-                    return daysUntilExpiry <= 7 && daysUntilExpiry > 0;
-                  }).length}
+                  {profiles.filter((p) => isExpiringSoon(p.subscription)).length}
                 </div>
                 <p className="text-xs text-muted-foreground">dans 7 jours</p>
               </CardContent>
@@ -528,18 +519,13 @@ const AdminProfiles = () => {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-red-500">
-                  {profiles.filter(p => {
-                    if (!p.subscription?.expires_at) return false;
-                    const expiresAt = new Date(p.subscription.expires_at);
-                    const now = new Date();
-                    return expiresAt < now && p.subscription.plan_type === 'vip';
-                  }).length}
+                  {profiles.filter((p) => isExpired(p.subscription)).length}
                 </div>
                 <p className="text-xs text-muted-foreground">à traiter</p>
               </CardContent>
             </Card>
 
-            <Card 
+            <Card
               className="border-red-200 dark:border-red-800 cursor-pointer hover:shadow-md transition-shadow"
               onClick={() => {
                 setFilterPlan('unpaid');
@@ -554,7 +540,7 @@ const AdminProfiles = () => {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-red-500">
-                  {profiles.filter(p => p.subscription?.status === 'unpaid').length}
+                  {profiles.filter((p) => p.subscription?.status === 'unpaid').length}
                 </div>
                 <p className="text-xs text-muted-foreground">cliquez pour filtrer</p>
               </CardContent>
@@ -651,39 +637,68 @@ const AdminProfiles = () => {
                             </TableCell>
                             <TableCell>
                               <div className="flex flex-col gap-1">
-                                {profile.subscription?.plan_type === 'vip' ? (
-                                  profile.subscription?.status === 'active' ? (
-                                    <Badge className="bg-green-500 hover:bg-green-600">
-                                      <Crown className="w-3 h-3 mr-1" />
-                                      VIP Actif
-                                    </Badge>
-                                  ) : profile.subscription?.status === 'canceled' ? (
-                                    <Badge variant="secondary">
-                                      <Crown className="w-3 h-3 mr-1" />
-                                      VIP Annulé
-                                    </Badge>
-                                   ) : profile.subscription?.status === 'unpaid' ? (
-                                    <Badge variant="destructive">
-                                      <AlertCircle className="w-3 h-3 mr-1" />
-                                      Paiement échoué
-                                    </Badge>
-                                  ) : (
-                                    <Badge variant="outline" className="text-red-500 border-red-500">
-                                      <Crown className="w-3 h-3 mr-1" />
-                                      VIP Expiré
-                                    </Badge>
-                                  )
-                                ) : profile.subscription?.expires_at ? (
-                                  <div className="flex flex-col gap-1">
-                                    <Badge variant="outline">Gratuit</Badge>
-                                    <Badge variant="outline" className="text-orange-500 border-orange-500">
-                                      <Clock className="w-3 h-3 mr-1" />
-                                      Ancien VIP
-                                    </Badge>
-                                  </div>
-                                ) : (
-                                  <Badge variant="outline">Gratuit</Badge>
-                                )}
+                                {(() => {
+                                  const sub = profile.subscription;
+
+                                  if (!sub) {
+                                    return <Badge variant="outline">Gratuit</Badge>;
+                                  }
+
+                                  if (sub.status === 'unpaid') {
+                                    return (
+                                      <Badge variant="destructive">
+                                        <AlertCircle className="w-3 h-3 mr-1" />
+                                        Paiement échoué
+                                      </Badge>
+                                    );
+                                  }
+
+                                  const hasVipAccess =
+                                    sub.plan_type === 'vip' &&
+                                    (sub.status === 'active' || sub.status === 'canceled') &&
+                                    (!sub.expires_at || new Date(sub.expires_at) > now);
+
+                                  if (hasVipAccess) {
+                                    if (sub.status === 'canceled') {
+                                      return (
+                                        <Badge variant="secondary">
+                                          <Crown className="w-3 h-3 mr-1" />
+                                          VIP Annulé
+                                        </Badge>
+                                      );
+                                    }
+
+                                    return (
+                                      <Badge className="bg-green-500 hover:bg-green-600">
+                                        <Crown className="w-3 h-3 mr-1" />
+                                        VIP Actif
+                                      </Badge>
+                                    );
+                                  }
+
+                                  if (sub.expires_at && new Date(sub.expires_at) <= now) {
+                                    return (
+                                      <Badge variant="outline" className="text-red-500 border-red-500">
+                                        <Crown className="w-3 h-3 mr-1" />
+                                        VIP Expiré
+                                      </Badge>
+                                    );
+                                  }
+
+                                  if (sub.status === 'canceled' || sub.status === 'expired' || sub.expires_at) {
+                                    return (
+                                      <div className="flex flex-col gap-1">
+                                        <Badge variant="outline">Gratuit</Badge>
+                                        <Badge variant="outline" className="text-orange-500 border-orange-500">
+                                          <Clock className="w-3 h-3 mr-1" />
+                                          Ancien VIP
+                                        </Badge>
+                                      </div>
+                                    );
+                                  }
+
+                                  return <Badge variant="outline">Gratuit</Badge>;
+                                })()}
                               </div>
                             </TableCell>
                             <TableCell>
