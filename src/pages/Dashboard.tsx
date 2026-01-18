@@ -225,6 +225,22 @@ const Dashboard = () => {
                 </AccordionContent>
               </AccordionItem>
 
+              {/* CATALOGUE EXCLUSIF */}
+              <AccordionItem value="catalogue-exclusif" className="border rounded-lg px-6 bg-card">
+                <AccordionTrigger className="hover:no-underline">
+                  <div className="flex items-center gap-3 w-full">
+                    <Store className="w-6 h-6 text-primary" />
+                    <span className="text-xl font-bold">CATALOGUE EXCLUSIF</span>
+                    <NotificationBadge count={notifications.catalogue_exclusif?.total} size="md" className="ml-2" />
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent>
+                  <div className="grid gap-3 pt-2">
+                    <CategoryItem icon={Building2} label="lego" link="/catalogue/lego" badge={notifications.catalogue_exclusif?.subcategories?.lego} />
+                    <CategoryItem icon={Building2} label="playmobil" link="/catalogue/playmobil" badge={notifications.catalogue_exclusif?.subcategories?.playmobil} />
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
 
               {/* EXPÉDITION */}
               <AccordionItem value="expedition" className="border rounded-lg px-6 bg-card">
