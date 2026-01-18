@@ -99,7 +99,7 @@ const categories: LinkCategory[] = [
     links: [
       { url: "https://bricksdirect.fr/fr/", name: "Bricks Direct" },
       { url: "https://www.dinotoys.nl/fr/", name: "Dino Toys" },
-      { url: "https://www.placedespop.com/", name: "Place des Pop", note: "–10 % avec le code PLACEDESPOP" },
+      { url: "https://www.placedespop.com/", name: "Place des Pop" },
       { url: "http://dreamland.be/", name: "Dreamland" },
     ]
   },
