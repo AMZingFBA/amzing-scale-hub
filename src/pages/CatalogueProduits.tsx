@@ -577,8 +577,25 @@ Est-il toujours disponible ?`;
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-      <main className="flex-grow pt-20 bg-gradient-to-b from-background to-muted/20 p-4 md:p-8">
-        <div className="max-w-7xl mx-auto pt-12">
+      <main className="flex-grow pt-24 bg-gradient-to-b from-background to-muted/20 p-4 md:p-8">
+        <div className="max-w-7xl mx-auto">
+          {/* Header with back arrow */}
+          <div className="flex items-center gap-3 mb-6">
+            <Button 
+              variant="outline" 
+              size="icon" 
+              onClick={() => navigate('/dashboard')}
+              className="border-primary text-primary hover:bg-primary hover:text-primary-foreground shrink-0"
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+            <div className="flex-1">
+              <h1 className="text-2xl font-bold flex items-center gap-2">
+                <Package className="w-6 h-6 text-primary" />
+                Catalogue Pro
+              </h1>
+            </div>
+          </div>
           {/* Quantity Selection Dialog */}
         <Dialog open={showQuantityDialog} onOpenChange={setShowQuantityDialog}>
           <DialogContent className="max-w-md">
