@@ -406,7 +406,7 @@ export const articleCreerCompteAmazon: BlogArticle = {
   publishedAt: '2026-01-12',
   updatedAt: '2026-01-12',
   author: 'AMZing FBA',
-  image: blogImages.creerCompte,
+  image: blogImages.creerCompteVendeur,
   relatedSlugs: ['creer-compte-vendeur-amazon-guide-complet', 'devenir-vendeur-amazon-guide-complet', 'amazon-seller-central-guide-utilisation'],
   faqs: [
     { question: "Comment créer mon compte Amazon vendeur ?", answer: "Rendez-vous sur sellercentral.amazon.fr, cliquez sur 'S'inscrire', et suivez les étapes : email, informations entreprise, identité, coordonnées bancaires. Préparez votre pièce d'identité, justificatif domicile, RIB et SIRET." },

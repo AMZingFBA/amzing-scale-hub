@@ -282,7 +282,7 @@ export const articleCreerCompteVendeurAmazon: BlogArticle = {
   publishedAt: '2026-01-10',
   updatedAt: '2026-01-10',
   author: 'AMZing FBA',
-  image: blogImages.creerCompte,
+  image: blogImages.creerCompteVendeur,
   relatedSlugs: ['amazon-fba-cest-quoi-guide-complet', 'devenir-vendeur-amazon-guide-complet', 'amazon-seller-central-guide'],
   faqs: [
     { question: "Est-ce gratuit de créer un compte vendeur Amazon ?", answer: "La création du compte est gratuite. Mais il y a ensuite des frais : soit 0,99€/vente (compte Individuel) soit 39€/mois fixe (compte Professionnel). Le compte Pro est rentable dès 40 ventes/mois." },
@@ -840,7 +840,7 @@ export const articleDevenirVendeurAmazon: BlogArticle = {
   publishedAt: '2026-01-10',
   updatedAt: '2026-01-10',
   author: 'AMZing FBA',
-  image: blogImages.creerCompte,
+  image: blogImages.creerCompteVendeur,
   relatedSlugs: ['creer-compte-vendeur-amazon-guide-complet', 'amazon-fba-cest-quoi-guide-complet', 'formation-amazon-fba-guide-choisir'],
   faqs: [
     { question: "Peut-on devenir vendeur Amazon sans entreprise ?", answer: "Pour vendre régulièrement en France, vous devez avoir un statut professionnel (auto-entrepreneur minimum). Amazon exige un SIRET. Pour des ventes occasionnelles, le compte Individuel suffit mais limitera votre croissance." },
