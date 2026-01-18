@@ -268,7 +268,12 @@ const CatalogueQogita = () => {
       <div className="container mx-auto px-4 py-6">
         {/* Header */}
         <div className="flex items-center gap-4 mb-6">
-          <Button variant="ghost" size="icon" onClick={() => navigate('/dashboard')}>
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={() => navigate('/dashboard')}
+            className="text-primary hover:text-primary hover:bg-primary/10"
+          >
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <div className="flex-1">
