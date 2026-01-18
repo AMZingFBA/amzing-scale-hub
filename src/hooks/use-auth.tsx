@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 
 interface Subscription {
@@ -9,20 +9,6 @@ interface Subscription {
   status: 'active' | 'inactive' | 'canceled' | 'cancelled' | 'expired';
   expires_at: string | null;
   is_trial?: boolean;
-}
-
-interface ImpersonatedSubscription {
-  plan_type: string;
-  status: string;
-  expires_at: string | null;
-  is_trial: boolean;
-}
-
-interface ImpersonatedUser {
-  id: string;
-  full_name: string | null;
-  email: string;
-  nickname: string | null;
 }
 
 interface AuthContextType {
@@ -35,13 +21,9 @@ interface AuthContextType {
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
   refreshSubscription: () => Promise<void>;
-  // Impersonation
-  isImpersonating: boolean;
-  impersonatedUser: ImpersonatedUser | null;
-  impersonatedSubscription: ImpersonatedSubscription | null;
-  impersonationTimeRemaining: number;
-  stopImpersonation: () => void;
-  refreshImpersonation: () => Promise<void>;
+  // Admin impersonation - check if we have an original admin session stored
+  hasOriginalAdminSession: boolean;
+  returnToAdminSession: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -51,27 +33,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [hasOriginalAdminSession, setHasOriginalAdminSession] = useState(false);
   const navigate = useNavigate();
-  const [searchParams, setSearchParams] = useSearchParams();
 
-  // Impersonation state
-  const [isImpersonating, setIsImpersonating] = useState(false);
-  const [impersonatedUser, setImpersonatedUser] = useState<ImpersonatedUser | null>(null);
-  const [impersonatedSubscription, setImpersonatedSubscription] = useState<ImpersonatedSubscription | null>(null);
-  const [impersonationToken, setImpersonationToken] = useState<string | null>(null);
-  const [impersonationExpiresAt, setImpersonationExpiresAt] = useState<Date | null>(null);
-  const [impersonationTimeRemaining, setImpersonationTimeRemaining] = useState(0);
-
-  // Un utilisateur est VIP si:
-  // - En mode impersonation: utilise la subscription impersonée
-  // - Sinon: utilise la subscription réelle
-  const effectiveSubscription = isImpersonating && impersonatedSubscription 
-    ? impersonatedSubscription 
-    : subscription;
-  
-  const isVIP = effectiveSubscription?.plan_type === 'vip' && 
-    (effectiveSubscription?.status === 'active' || effectiveSubscription?.status === 'canceled') &&
-    (!effectiveSubscription?.expires_at || new Date(effectiveSubscription.expires_at) > new Date());
+  const isVIP = subscription?.plan_type === 'vip' && 
+    (subscription?.status === 'active' || subscription?.status === 'canceled') &&
+    (!subscription?.expires_at || new Date(subscription.expires_at) > new Date());
 
   const fetchSubscription = async (userId: string) => {
     try {
@@ -135,6 +102,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  // Check for stored admin session on mount
+  useEffect(() => {
+    const storedSession = localStorage.getItem('admin_original_session');
+    setHasOriginalAdminSession(!!storedSession);
+  }, []);
+
   useEffect(() => {
     // Set up auth state listener
     const { data: { subscription: authSubscription } } = supabase.auth.onAuthStateChange(
@@ -149,7 +122,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           }, 0);
           
           // Sync to Airtable on SIGNED_IN event (une seule fois)
-          if (event === 'SIGNED_IN') {
+          // Skip if this is an impersonation session (admin session stored)
+          if (event === 'SIGNED_IN' && !localStorage.getItem('admin_original_session')) {
             setTimeout(() => {
               syncToAirtable(session.user.id, (session.user.email || '').toLowerCase());
             }, 100);
@@ -157,6 +131,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         } else {
           setSubscription(null);
         }
+        
+        // Check if admin session exists after auth state change
+        setHasOriginalAdminSession(!!localStorage.getItem('admin_original_session'));
       }
     );
 
@@ -270,7 +247,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
       if (error) throw error;
 
-      // NOTE: Ne pas synchroniser ici : l’événement SIGNED_IN dans onAuthStateChange
+      // NOTE: Ne pas synchroniser ici : l'événement SIGNED_IN dans onAuthStateChange
       // déclenche déjà la synchro vers Airtable (évite doublons / appels multiples).
 
       toast.success('Connexion réussie !');
@@ -290,7 +267,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setUser(null);
       setSession(null);
       setSubscription(null);
-      stopImpersonation();
+      
+      // Clear any stored admin session
+      localStorage.removeItem('admin_original_session');
+      setHasOriginalAdminSession(false);
       
       toast.success('Déconnexion réussie');
       navigate('/auth');
@@ -300,92 +280,49 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  // Impersonation functions
-  const stopImpersonation = () => {
-    setIsImpersonating(false);
-    setImpersonatedUser(null);
-    setImpersonatedSubscription(null);
-    setImpersonationToken(null);
-    setImpersonationExpiresAt(null);
-    setImpersonationTimeRemaining(0);
-    
-    // Remove token from URL
-    const newParams = new URLSearchParams(searchParams);
-    newParams.delete('impersonate');
-    setSearchParams(newParams, { replace: true });
-  };
-
-  const refreshImpersonation = async () => {
-    if (!impersonationToken) return;
-
+  // Return to original admin session
+  const returnToAdminSession = async () => {
     try {
-      const { data, error } = await supabase.functions.invoke('admin-impersonation', {
-        body: { action: 'refresh', impersonationToken: impersonationToken }
-      });
-
-      if (error || !data.success) {
-        toast.error('Impossible de prolonger la session');
+      const storedSession = localStorage.getItem('admin_original_session');
+      if (!storedSession) {
+        toast.error('Aucune session admin sauvegardée');
         return;
       }
 
-      // Update URL with new token
-      const newParams = new URLSearchParams(searchParams);
-      newParams.set('impersonate', data.token);
-      setSearchParams(newParams, { replace: true });
+      const adminSession = JSON.parse(storedSession);
+      
+      // Sign out current user first
+      await supabase.auth.signOut();
+      
+      // Set the admin session
+      const { data, error } = await supabase.auth.setSession({
+        access_token: adminSession.access_token,
+        refresh_token: adminSession.refresh_token,
+      });
 
-      setImpersonationToken(data.token);
-      setImpersonationExpiresAt(new Date(data.expiresAt));
-      toast.success('Session prolongée de 5 minutes');
-    } catch (err) {
-      console.error('Error refreshing impersonation:', err);
-      toast.error('Erreur lors du rafraîchissement');
+      if (error) {
+        // If token is expired, try to refresh it
+        console.error('Error restoring admin session:', error);
+        toast.error('Session admin expirée. Veuillez vous reconnecter.');
+        localStorage.removeItem('admin_original_session');
+        setHasOriginalAdminSession(false);
+        navigate('/auth');
+        return;
+      }
+
+      // Clear stored admin session
+      localStorage.removeItem('admin_original_session');
+      setHasOriginalAdminSession(false);
+      
+      toast.success('Retour à votre session admin');
+      navigate('/admin/profiles');
+    } catch (error: any) {
+      console.error('Error returning to admin session:', error);
+      toast.error('Erreur lors du retour à la session admin');
+      localStorage.removeItem('admin_original_session');
+      setHasOriginalAdminSession(false);
     }
   };
-
-  // Check for impersonation token in URL
-  useEffect(() => {
-    const token = searchParams.get('impersonate');
-    if (token && !isImpersonating && user) {
-      // Validate token
-      supabase.functions.invoke('admin-impersonation', {
-        body: { action: 'validate', impersonationToken: token }
-      }).then(({ data, error }) => {
-        if (error || !data?.valid) {
-          console.log('Impersonation token invalid');
-          const newParams = new URLSearchParams(searchParams);
-          newParams.delete('impersonate');
-          setSearchParams(newParams, { replace: true });
-          return;
-        }
-
-        setIsImpersonating(true);
-        setImpersonatedUser(data.user);
-        setImpersonatedSubscription(data.subscription);
-        setImpersonationToken(token);
-        setImpersonationExpiresAt(new Date(data.expiresAt));
-      });
-    }
-  }, [searchParams, isImpersonating, user]);
-
-  // Impersonation timer countdown
-  useEffect(() => {
-    if (!impersonationExpiresAt || !isImpersonating) return;
-
-    const interval = setInterval(() => {
-      const now = new Date();
-      const remaining = Math.max(0, Math.floor((impersonationExpiresAt.getTime() - now.getTime()) / 1000));
-      setImpersonationTimeRemaining(remaining);
-
-      if (remaining <= 0) {
-        toast.error('Session d\'impersonation expirée');
-        stopImpersonation();
-        navigate('/admin/profiles');
-        clearInterval(interval);
-      }
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [impersonationExpiresAt, isImpersonating]);
 
   return (
     <AuthContext.Provider
@@ -399,13 +336,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         signIn,
         signOut,
         refreshSubscription,
-        // Impersonation
-        isImpersonating,
-        impersonatedUser,
-        impersonatedSubscription,
-        impersonationTimeRemaining,
-        stopImpersonation,
-        refreshImpersonation,
+        hasOriginalAdminSession,
+        returnToAdminSession,
       }}
     >
       {children}

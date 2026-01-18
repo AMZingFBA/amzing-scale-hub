@@ -222,26 +222,39 @@ const AdminProfiles = () => {
         return;
       }
 
+      // Save admin session before impersonating
+      localStorage.setItem('admin_original_session', JSON.stringify({
+        access_token: sessionData.session.access_token,
+        refresh_token: sessionData.session.refresh_token,
+        user: sessionData.session.user
+      }));
+
       const { data, error } = await supabase.functions.invoke('admin-impersonation', {
         headers: {
           Authorization: `Bearer ${sessionData.session.access_token}`,
         },
-        body: { action: 'generate', targetUserId: userId }
+        body: { action: 'impersonate', targetUserId: userId }
       });
 
       if (error || !data.success) {
-        toast.error(data?.error || 'Erreur lors de la génération du lien');
+        localStorage.removeItem('admin_original_session');
+        toast.error(data?.error || 'Erreur lors de l\'impersonation');
         return;
       }
 
-      // Redirect to dashboard with impersonation token
-      const url = `/dashboard?impersonate=${data.token}`;
-      navigate(url);
-      
-      toast.success('Mode impersonation activé - vous voyez ce que voit l\'utilisateur');
+      // The actionLink is a magic link that will log in as the user
+      if (data.actionLink) {
+        toast.success('Connexion en tant que ' + data.user.email + ' en cours...');
+        // Redirect to the magic link - this will create a real session for the target user
+        window.location.href = data.actionLink;
+      } else {
+        localStorage.removeItem('admin_original_session');
+        toast.error('Erreur: lien de connexion non généré');
+      }
     } catch (error: any) {
-      console.error('Error generating view link:', error);
-      toast.error('Erreur lors de la génération du lien');
+      console.error('Error impersonating user:', error);
+      localStorage.removeItem('admin_original_session');
+      toast.error('Erreur lors de l\'impersonation');
     } finally {
       setGeneratingLink(null);
     }
