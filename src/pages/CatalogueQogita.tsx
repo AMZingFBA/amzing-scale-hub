@@ -265,7 +265,7 @@ const CatalogueQogita = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
       
-      <div className="container mx-auto px-4 py-6">
+      <div className="container mx-auto px-4 pt-24 pb-6">
         {/* Header with back arrow */}
         <div className="flex items-center gap-3 mb-6">
           <Button 
