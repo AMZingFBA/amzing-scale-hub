@@ -18,8 +18,13 @@ import logo from "@/assets/logo-amzing.png";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const { user, isVIP, signOut } = useAuth();
+  const { user, isVIP, signOut, isImpersonating, impersonatedUser } = useAuth();
   const { isAdmin } = useAdmin();
+  
+  // Use impersonated user info when impersonating
+  const displayEmail = isImpersonating && impersonatedUser 
+    ? (impersonatedUser.email || 'Utilisateur') 
+    : user?.email;
   
   // Détection si on est dans l'app native pour ajuster le padding pour la safe area
   const isNativeApp = Capacitor.isNativePlatform();
@@ -43,7 +48,7 @@ const Navbar = () => {
           {user ? (
             <>
               <div className="px-4 py-3 bg-gradient-to-r from-primary/10 to-secondary/10 rounded-lg m-2">
-                <p className="text-base font-semibold">{user.email}</p>
+                <p className="text-base font-semibold">{displayEmail}</p>
                 {isVIP && (
                   <Badge className="mt-2 bg-gradient-to-r from-primary to-secondary text-white border-0 shadow-glow">
                     VIP
@@ -179,7 +184,7 @@ const Navbar = () => {
                   </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48">
                   <div className="px-2 py-1.5">
-                    <p className="text-sm font-medium">{user.email}</p>
+                    <p className="text-sm font-medium">{displayEmail}</p>
                     {isVIP && (
                       <p className="text-xs text-muted-foreground">Membre VIP</p>
                     )}
@@ -260,7 +265,7 @@ const Navbar = () => {
             {user ? (
               <div className="space-y-2 pt-2 border-t">
                 <div className="px-2 py-3 bg-gradient-to-r from-primary/10 to-secondary/10 rounded-lg">
-                  <p className="text-sm font-semibold">{user.email}</p>
+                  <p className="text-sm font-semibold">{displayEmail}</p>
                   {isVIP && (
                     <Badge className="mt-2 bg-gradient-to-r from-primary to-secondary text-white border-0 shadow-lg">
                       Membre VIP
