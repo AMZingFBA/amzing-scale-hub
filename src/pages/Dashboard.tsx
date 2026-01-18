@@ -236,6 +236,7 @@ const Dashboard = () => {
                 <AccordionContent>
                   <div className="grid gap-3 pt-2">
                     <CategoryItem icon={Database} label="Catalogue Qogita" link="/catalogue/qogita" badge={notifications.grossistes?.subcategories?.['catalogue-qogita']} />
+                    <CategoryItem icon={Database} label="Catalogue Eany" link="/catalogue/eany" badge={notifications.grossistes?.subcategories?.['catalogue-eany']} />
                     <CategoryItem icon={Package} label="Alertes grossistes" link="/grossistes" badge={notifications.grossistes?.subcategories?.['alertes']} />
                   </div>
                 </AccordionContent>

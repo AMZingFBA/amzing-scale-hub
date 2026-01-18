@@ -610,6 +610,33 @@ export type Database = {
           },
         ]
       }
+      eany_catalogue: {
+        Row: {
+          brand: string
+          created_at: string
+          ean: string
+          id: string
+          price_ht: number
+          updated_at: string
+        }
+        Insert: {
+          brand?: string
+          created_at?: string
+          ean: string
+          id?: string
+          price_ht: number
+          updated_at?: string
+        }
+        Update: {
+          brand?: string
+          created_at?: string
+          ean?: string
+          id?: string
+          price_ht?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       eany_products: {
         Row: {
           alerts: string[] | null
@@ -1322,6 +1349,12 @@ export type Database = {
       get_all_notification_counts: {
         Args: { user_id_param: string }
         Returns: Json
+      }
+      get_eany_brands: {
+        Args: never
+        Returns: {
+          brand: string
+        }[]
       }
       get_or_create_conversation: {
         Args: { other_user_id: string }
