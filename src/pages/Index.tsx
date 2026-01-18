@@ -29,6 +29,7 @@ import { useRegistrationSource } from "@/hooks/use-registration-source";
 import HomeDashboardPreview from "@/components/home/HomeDashboardPreview";
 import HomePreviewSection from "@/components/home/HomePreviewSection";
 import HomeMockups from "@/components/home/HomeMockups";
+import PromoCountdown from "@/components/PromoCountdown";
 
 const ServiceCard = ({ 
   children, 
@@ -187,8 +188,9 @@ const Index = () => {
               </Button>
             </div>
             <p className="mt-6 text-muted-foreground text-lg">
-              À partir de <span className="text-foreground font-semibold">64€/mois × 12</span> ou <span className="text-foreground font-semibold">700€ TTC</span> en une fois <span className="ml-1 bg-green-500/20 text-green-500 text-xs font-bold px-2 py-0.5 rounded">-10%</span>
+              À partir de <span className="text-foreground font-semibold">64€/mois × 12</span> ou <span className="line-through text-muted-foreground/70">700€</span> <span className="text-foreground font-semibold text-xl bg-gradient-to-r from-red-500 via-orange-500 to-yellow-500 bg-clip-text text-transparent">500€ TTC</span> en une fois <span className="ml-1 bg-red-500/20 text-red-500 text-xs font-bold px-2 py-0.5 rounded animate-pulse">-29%</span>
             </p>
+            <PromoCountdown />
           </div>
         </div>
       </section>
