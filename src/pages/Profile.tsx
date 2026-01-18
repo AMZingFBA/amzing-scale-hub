@@ -904,9 +904,9 @@ const Profile = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {subscription.expires_at && (
+                {subscription.expires_at && (
                     <p className="text-sm text-muted-foreground">
-                      Votre abonnement expire le : {new Date(subscription.expires_at).toLocaleDateString('fr-FR', {
+                      Prochain prélèvement le : {new Date(subscription.expires_at).toLocaleDateString('fr-FR', {
                         day: 'numeric',
                         month: 'long',
                         year: 'numeric'
