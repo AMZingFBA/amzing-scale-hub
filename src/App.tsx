@@ -58,6 +58,7 @@ const Annonces = lazy(() => import("./pages/Annonces"));
 const Actualite = lazy(() => import("./pages/Actualite"));
 const CatalogueProduits = lazy(() => import("./pages/CatalogueProduits"));
 const CatalogueDJI = lazy(() => import("./pages/CatalogueDJI"));
+const CatalogueXiaomi = lazy(() => import("./pages/CatalogueXiaomi"));
 const Questions = lazy(() => import("./pages/Questions"));
 const Avis = lazy(() => import("./pages/Avis"));
 const AdminProfiles = lazy(() => import("./pages/AdminProfiles"));
@@ -159,6 +160,7 @@ const App = () => (
             <Route path="/actualite" element={<Actualite />} />
             <Route path="/catalogue-produits" element={<CatalogueProduits />} />
             <Route path="/catalogue/dji" element={<CatalogueDJI />} />
+            <Route path="/catalogue/xiaomi" element={<CatalogueXiaomi />} />
             <Route path="/chat" element={<Chat />} />
             <Route path="/success" element={<Success />} />
             <Route path="/sales" element={<Sales />} />

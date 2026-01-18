@@ -237,6 +237,7 @@ const Dashboard = () => {
                 <AccordionContent>
                   <div className="grid gap-3 pt-2">
                     <CategoryItem icon={Building2} label="DJI" link="/catalogue/dji" badge={notifications.catalogue_exclusif?.subcategories?.dji} />
+                    <CategoryItem icon={Building2} label="Xiaomi" link="/catalogue/xiaomi" badge={notifications.catalogue_exclusif?.subcategories?.xiaomi} />
                     <CategoryItem icon={Building2} label="playmobil" link="/catalogue/playmobil" badge={notifications.catalogue_exclusif?.subcategories?.playmobil} />
                   </div>
                 </AccordionContent>
