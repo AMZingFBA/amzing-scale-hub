@@ -15,6 +15,9 @@ import { seoLogicielsFbaArticles } from './blog-articles-seo-logiciels-fba';
 import { seoKeywordsMixArticles } from './blog-articles-seo-keywords-mix';
 import { seoVendeurAmazonArticles } from './blog-articles-seo-vendeur-amazon';
 import { seoFinalArticles as seoFinalKeywordsArticles } from './blog-articles-seo-final-keywords';
+import { seoAmzingKeywordsArticles } from './blog-articles-seo-amzing-keywords';
+import { seoSellerCentralArticles } from './blog-articles-seo-seller-central';
+import { seoFbaDefinitionArticles } from './blog-articles-seo-fba-definition';
 export interface BlogFAQ {
   question: string;
   answer: string;
@@ -1758,7 +1761,16 @@ export const blogArticles: BlogArticle[] = [
   ...seoVendeurAmazonArticles,
   
   // Articles SEO Final (amazon fba france, repricer, formations, etc.)
-  ...seoFinalKeywordsArticles
+  ...seoFinalKeywordsArticles,
+  
+  // Articles SEO AMZing Keywords (amzing fba, selleramp, créer compte vendeur, etc.)
+  ...seoAmzingKeywordsArticles,
+  
+  // Articles SEO Seller Central (amazon seller central, expert comptable, logistique, etc.)
+  ...seoSellerCentralArticles,
+  
+  // Articles SEO FBA Definition (fba definition, variantes amazonfba, contenu enrichi, etc.)
+  ...seoFbaDefinitionArticles
 ];
 
 // Fonction utilitaire pour récupérer un article par son slug
