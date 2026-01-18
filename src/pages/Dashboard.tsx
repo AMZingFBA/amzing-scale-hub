@@ -260,22 +260,6 @@ const Dashboard = () => {
                 </AccordionContent>
               </AccordionItem>
 
-              {/* EXPÉDITION */}
-              <AccordionItem value="expedition" className="border rounded-lg px-6 bg-card">
-                <AccordionTrigger className="hover:no-underline">
-                  <div className="flex items-center gap-3 w-full">
-                    <Truck className="w-6 h-6 text-primary" />
-                    <span className="text-xl font-bold">EXPÉDITION</span>
-                    <NotificationBadge count={notifications.expedition?.total} size="md" className="ml-2" />
-                  </div>
-                </AccordionTrigger>
-                <AccordionContent>
-                  <div className="grid gap-3 pt-2">
-                    <CategoryItem icon={Settings} label="fournitures" badge={notifications.expedition?.subcategories?.fournitures} />
-                    <CategoryItem icon={Package} label="cartons" badge={notifications.expedition?.subcategories?.cartons} />
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
 
               {/* INFORMATIONS */}
               <AccordionItem value="informations" className="border rounded-lg px-6 bg-card">
