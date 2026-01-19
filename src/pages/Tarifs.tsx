@@ -13,6 +13,7 @@ import { useTrial } from "@/hooks/use-trial";
 import { useAuth } from "@/hooks/use-auth";
 import { seoData, schemas } from "@/lib/seo-data";
 import { useState } from "react";
+import PromoCountdown from "@/components/PromoCountdown";
 
 const Tarifs = () => {
   const navigate = useNavigate();
@@ -79,10 +80,15 @@ const Tarifs = () => {
                 <CardTitle className="text-4xl mb-4 group-hover:text-primary transition-colors">Espace VIP AMZing FBA</CardTitle>
                 <CardDescription className="text-lg">Accès complet à tous les outils et services</CardDescription>
                 <div className="mt-8">
-                  <span className="text-5xl font-bold text-gradient animate-fade-in">700€</span>
+                  <div className="flex items-center justify-center gap-2 mb-2">
+                    <Badge className="bg-red-500 text-white border-0 animate-pulse">🔥 OFFRE FLASH -200€</Badge>
+                  </div>
+                  <span className="text-2xl text-muted-foreground line-through">700€</span>
+                  <span className="text-5xl font-bold bg-gradient-to-r from-red-500 via-orange-500 to-yellow-500 bg-clip-text text-transparent animate-fade-in ml-2">500€</span>
                   <span className="text-xl text-muted-foreground">/an TTC</span>
                   <p className="text-lg text-muted-foreground mt-2">ou ~64€/mois × 12 mois</p>
                 </div>
+                <PromoCountdown />
               </CardHeader>
               <CardContent className="px-8">
                 <div className="space-y-4 mb-8">
@@ -253,7 +259,12 @@ const Tarifs = () => {
           <div className="space-y-4 py-4">
             <div className="bg-primary/5 p-4 rounded-lg border border-primary/20">
               <p className="text-sm font-semibold mb-2">Abonnement VIP AMZing FBA - Annuel</p>
-              <p className="text-2xl font-bold text-primary">700€<span className="text-sm font-normal text-muted-foreground">/an TTC</span></p>
+              <Badge className="bg-red-500 text-white border-0 text-xs mb-2">🔥 OFFRE FLASH -200€</Badge>
+              <p className="text-2xl font-bold">
+                <span className="line-through text-muted-foreground text-lg mr-2">700€</span>
+                <span className="bg-gradient-to-r from-red-500 via-orange-500 to-yellow-500 bg-clip-text text-transparent">500€</span>
+                <span className="text-sm font-normal text-muted-foreground">/an TTC</span>
+              </p>
               <p className="text-sm text-muted-foreground">ou ~64€/mois × 12 mois</p>
               <p className="text-xs text-muted-foreground mt-2">Accès pendant 12 mois</p>
             </div>

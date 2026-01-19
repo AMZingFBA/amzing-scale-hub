@@ -498,7 +498,12 @@ const CombienCouteAmazonFba = () => {
                       Accéder à la formation Amazon FBA <ArrowRight className="ml-2" />
                     </Link>
                   </Button>
-                  <p className="text-sm text-muted-foreground mt-3">700€/an TTC • Accès 12 mois</p>
+                  <p className="text-sm text-muted-foreground mt-3">
+                    <span className="line-through">700€</span>{" "}
+                    <span className="text-red-500 font-semibold">500€/an TTC</span>{" "}
+                    <span className="bg-red-500/20 text-red-500 text-xs px-2 py-0.5 rounded">🔥 OFFRE FLASH</span>
+                    • Accès 12 mois
+                  </p>
                 </CardContent>
               </Card>
             </div>
