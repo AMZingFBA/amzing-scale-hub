@@ -309,22 +309,22 @@ export default function ProduitsQogita() {
       const worksheet = workbook.Sheets[sheetName];
       const jsonData = XLSX.utils.sheet_to_json(worksheet);
 
-      // Transform Excel data to API format
+      // Transform Excel data to API format (matching exact column names from user's Excel)
       const products = jsonData.map((row: any) => ({
         ean: String(row.ean || row.EAN || ''),
         timestamp: row.timestamp || row.date || new Date().toLocaleDateString('fr-FR'),
         qogita: {
-          priceHT: parseFloat(row.priceHT || row.prix_ht || row.qogita_price_ht || 0),
-          priceTTC: parseFloat(row.priceTTC || row.prix_ttc || row.qogita_price_ttc || 0),
-          stock: row.stock !== undefined && row.stock !== '' ? parseInt(row.stock || row.qogita_stock || 0) : null,
+          priceHT: parseFloat(row.qogita_priceHT || row.priceHT || row.prix_ht || row.qogita_price_ht || 0),
+          priceTTC: parseFloat(row.qogita_priceTTC || row.priceTTC || row.prix_ttc || row.qogita_price_ttc || 0),
+          stock: row.qogita_stock !== undefined && row.qogita_stock !== '' ? parseInt(row.qogita_stock) : (row.stock !== undefined && row.stock !== '' ? parseInt(row.stock) : null),
           url: row.qogita_url || row.url_qogita || null,
         },
         selleramp: {
-          bsr: String(row.bsr || row.selleramp_bsr || ''),
-          salePrice: row.salePrice || row.sale_price || row.selleramp_sale_price ? parseFloat(row.salePrice || row.sale_price || row.selleramp_sale_price) : null,
-          sales: String(row.sales || row.ventes || row.selleramp_sales || ''),
-          sellers: String(row.sellers || row.vendeurs || row.selleramp_sellers || ''),
-          variations: String(row.variations || row.selleramp_variations || '0'),
+          bsr: String(row.selleramp_bsr || row.bsr || ''),
+          salePrice: row.selleramp_salePrice !== undefined ? parseFloat(row.selleramp_salePrice) : (row.salePrice ? parseFloat(row.salePrice) : null),
+          sales: String(row.selleramp_sales || row.sales || row.ventes || ''),
+          sellers: String(row.selleramp_sellers || row.sellers || row.vendeurs || ''),
+          variations: String(row.selleramp_variations || row.variations || '0'),
           url: row.selleramp_url || row.url_selleramp || null,
         },
         fbm: {
