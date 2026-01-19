@@ -59,19 +59,22 @@ serve(async (req) => {
 
     console.log('🗑️ Anciens produits supprimés');
 
-    // Transformer les données au format DB
-    const transformedProducts = products.map((product: any) => {
+    // Transformer les données au format DB et dédupliquer par EAN
+    const productMap = new Map();
+    for (const product of products) {
       // Convertir le timestamp du format français au format ISO
       const [datePart, timePart] = product.timestamp.split(' ');
       const [day, month, year] = datePart.split('/');
-      const isoTimestamp = `${year}-${month}-${day}T${timePart}.000Z`;
+      const isoTimestamp = timePart 
+        ? `${year}-${month}-${day}T${timePart}.000Z`
+        : `${year}-${month}-${day}T00:00:00.000Z`;
 
-      return {
+      const transformed = {
         ean: product.ean,
         timestamp: isoTimestamp,
         qogita_price_ht: product.qogita?.priceHT || 0,
         qogita_price_ttc: product.qogita?.priceTTC || 0,
-        qogita_stock: product.qogita?.stock || 0,
+        qogita_stock: product.qogita?.stock || null,
         qogita_url: product.qogita?.url || null,
         selleramp_bsr: product.selleramp?.bsr || null,
         selleramp_sale_price: product.selleramp?.salePrice || null,
@@ -86,7 +89,13 @@ serve(async (req) => {
         alerts: product.alerts || [],
         amazon_url: product.amazon?.url || null,
       };
-    });
+      
+      // Garder seulement la dernière occurrence de chaque EAN
+      productMap.set(product.ean, transformed);
+    }
+    
+    const transformedProducts = Array.from(productMap.values());
+    console.log(`📦 ${transformedProducts.length} produits uniques après déduplication`);
 
     // Insérer les nouveaux produits
     const { data, error } = await supabase
