@@ -57,6 +57,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { useState, useEffect } from "react";
+import PromoCountdown from "@/components/PromoCountdown";
 
 const Formation = () => {
   const navigate = useNavigate();
@@ -1090,15 +1091,17 @@ const Formation = () => {
             <div className="max-w-lg mx-auto">
               <Card className="border-2 border-primary shadow-xl">
                 <CardHeader className="text-center pb-2">
-                  <Badge className="mb-4 mx-auto bg-primary/10 text-primary border-primary/20">
-                    Tout inclus
+                  <Badge className="mb-2 mx-auto bg-red-500 text-white border-0 animate-pulse">
+                    🔥 OFFRE FLASH -200€
                   </Badge>
                   <CardTitle className="text-3xl">AMZing FBA VIP</CardTitle>
                   <div className="mt-4">
-                    <span className="text-5xl font-bold">700€</span>
-                    <span className="text-muted-foreground">/mois TTC</span>
+                    <span className="text-2xl text-muted-foreground line-through">700€</span>
+                    <span className="text-5xl font-bold bg-gradient-to-r from-red-500 via-orange-500 to-yellow-500 bg-clip-text text-transparent ml-2">500€</span>
+                    <span className="text-muted-foreground">/an TTC</span>
                   </div>
                   <p className="text-sm text-muted-foreground mt-2">ou ~64€/mois × 12 • Accès annuel</p>
+                  <PromoCountdown />
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <ul className="space-y-3">
