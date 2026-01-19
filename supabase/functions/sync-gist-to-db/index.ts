@@ -1,138 +1,29 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-const GIST_URL = 'https://gist.githubusercontent.com/raw/e21e9263794219260d0fd291a5361cc0/results.json';
+// DISABLED - La synchronisation Gist a été désactivée
+// Les produits Qogita sont maintenant gérés uniquement via l'import Excel
+// Pour réactiver, voir la version précédente de ce fichier
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
   }
 
-  try {
-    console.log('🔄 Début de la synchronisation Gist -> DB');
-    
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const supabase = createClient(supabaseUrl, supabaseKey);
-
-    // Récupérer les données du Gist
-    const gistResponse = await fetch(GIST_URL);
-    
-    if (!gistResponse.ok) {
-      throw new Error(`Erreur lors de la récupération du Gist: ${gistResponse.status}`);
+  console.log('⚠️ sync-gist-to-db est désactivé - Utiliser l\'import Excel à la place');
+  
+  return new Response(
+    JSON.stringify({ 
+      success: false,
+      message: 'Cette fonction est désactivée. Utilisez l\'import Excel sur /produits-gagnants/produits-qogita'
+    }),
+    { 
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      status: 200,
     }
-
-    const gistData = await gistResponse.json();
-    const products = gistData.products || [];
-
-    console.log(`📦 ${products.length} produits récupérés du Gist`);
-
-    if (products.length === 0) {
-      return new Response(
-        JSON.stringify({ 
-          success: true,
-          synced: 0,
-          message: 'Aucun produit à synchroniser'
-        }),
-        { 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 200,
-        }
-      );
-    }
-
-    // Supprimer tous les anciens produits avant la synchronisation
-    const { error: deleteError } = await supabase
-      .from('qogita_products')
-      .delete()
-      .neq('id', '00000000-0000-0000-0000-000000000000'); // Delete all
-
-    if (deleteError) {
-      console.error('❌ Erreur lors de la suppression:', deleteError);
-      throw deleteError;
-    }
-
-    console.log('🗑️ Anciens produits supprimés');
-
-    // Transformer les données au format DB et dédupliquer par EAN
-    const productMap = new Map();
-    for (const product of products) {
-      // Convertir le timestamp du format français au format ISO
-      const [datePart, timePart] = product.timestamp.split(' ');
-      const [day, month, year] = datePart.split('/');
-      const isoTimestamp = timePart 
-        ? `${year}-${month}-${day}T${timePart}.000Z`
-        : `${year}-${month}-${day}T00:00:00.000Z`;
-
-      const transformed = {
-        ean: product.ean,
-        timestamp: isoTimestamp,
-        qogita_price_ht: product.qogita?.priceHT || 0,
-        qogita_price_ttc: product.qogita?.priceTTC || 0,
-        qogita_stock: product.qogita?.stock || null,
-        qogita_url: product.qogita?.url || null,
-        selleramp_bsr: product.selleramp?.bsr || null,
-        selleramp_sale_price: product.selleramp?.salePrice || null,
-        selleramp_sales: product.selleramp?.sales || null,
-        selleramp_sellers: product.selleramp?.sellers || null,
-        selleramp_variations: product.selleramp?.variations || null,
-        selleramp_url: product.selleramp?.url || null,
-        fbm_profit: product.fbm?.profit || null,
-        fbm_roi: product.fbm?.roi || null,
-        fba_profit: product.fba?.profit || null,
-        fba_roi: product.fba?.roi || null,
-        alerts: product.alerts || [],
-        amazon_url: product.amazon?.url || null,
-      };
-      
-      // Garder seulement la dernière occurrence de chaque EAN
-      productMap.set(product.ean, transformed);
-    }
-    
-    const transformedProducts = Array.from(productMap.values());
-    console.log(`📦 ${transformedProducts.length} produits uniques après déduplication`);
-
-    // Insérer les nouveaux produits
-    const { data, error } = await supabase
-      .from('qogita_products')
-      .insert(transformedProducts);
-
-    if (error) {
-      console.error('❌ Erreur lors de la synchronisation:', error);
-      throw error;
-    }
-
-    console.log(`✅ ${transformedProducts.length} produits synchronisés vers la DB`);
-
-    return new Response(
-      JSON.stringify({ 
-        success: true,
-        synced: transformedProducts.length,
-        message: `${transformedProducts.length} produits synchronisés`,
-        gist_generated: gistData.generated
-      }),
-      { 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 200,
-      }
-    );
-
-  } catch (error) {
-    console.error('❌ Erreur dans sync-gist-to-db:', error);
-    return new Response(
-      JSON.stringify({ 
-        success: false, 
-        error: error instanceof Error ? error.message : 'Unknown error' 
-      }),
-      { 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 500,
-      }
-    );
-  }
+  );
 });
