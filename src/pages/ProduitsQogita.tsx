@@ -7,7 +7,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 
-import { Loader2, TrendingUp, Package, Clock, ArrowLeft, Copy, ExternalLink, Store, BarChart3, ShoppingCart, RotateCcw } from 'lucide-react';
+import { Loader2, TrendingUp, Package, Clock, ArrowLeft, Copy, ExternalLink, Store, BarChart3, ShoppingCart, RotateCcw, Flame } from 'lucide-react';
+import { Slider } from '@/components/ui/slider';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -97,6 +98,24 @@ export default function ProduitsQogita() {
   const [searchEAN, setSearchEAN] = useState('');
   const [profitType, setProfitType] = useState<'both' | 'fbm' | 'fba'>('both');
   const [fbmCost, setFbmCost] = useState('0');
+  const [minSales, setMinSales] = useState<number>(0);
+
+  // Sales filter presets
+  const salesPresets = [
+    { label: 'Tous', value: 0, icon: null },
+    { label: '10+', value: 10, icon: '📈' },
+    { label: '30+', value: 30, icon: '🔥' },
+    { label: '50+', value: 50, icon: '💎' },
+    { label: '100+', value: 100, icon: '🚀' },
+  ];
+
+  // Helper function to parse sales value from string
+  const parseSalesValue = (salesStr: string | undefined): number => {
+    if (!salesStr || salesStr === 'Unknown' || salesStr === 'N/A') return 0;
+    // Extract first number from string like "50-100" or "100+"
+    const match = salesStr.match(/(\d+)/);
+    return match ? parseInt(match[1]) : 0;
+  };
 
   // Load products from Supabase
   const loadProducts = async () => {
@@ -187,9 +206,14 @@ export default function ProduitsQogita() {
       if (searchEAN && !product.ean.includes(searchEAN)) {
         return false;
       }
+      // Filter by minimum sales
+      if (minSales > 0) {
+        const productSales = parseSalesValue(product.selleramp_sales);
+        if (productSales < minSales) return false;
+      }
       return true;
     });
-  }, [products, minProfit, minROI, maxBSR, searchEAN, profitType, fbmCost]);
+  }, [products, minProfit, minROI, maxBSR, searchEAN, profitType, fbmCost, minSales]);
 
   // Pagination
   const totalPages = Math.ceil(filteredProducts.length / PRODUCTS_PER_PAGE);
@@ -210,7 +234,7 @@ export default function ProduitsQogita() {
   useEffect(() => {
     setCurrentPage(1);
     localStorage.setItem(CURRENT_PAGE_KEY, '1');
-  }, [minProfit, minROI, maxBSR, searchEAN, profitType, fbmCost]);
+  }, [minProfit, minROI, maxBSR, searchEAN, profitType, fbmCost, minSales]);
 
   // Save scroll position
   const saveScrollPosition = () => {
@@ -388,6 +412,7 @@ export default function ProduitsQogita() {
                   setMinROI('');
                   setMaxBSR('');
                   setSearchEAN('');
+                  setMinSales(0);
                   toast.success('Filtres réinitialisés');
                 }}
                 className="gap-2"
@@ -467,6 +492,55 @@ export default function ProduitsQogita() {
               </div>
             </div>
             
+            {/* Sales Filter Section */}
+            <div className="pt-6 pb-6 border-b border-border">
+              <div className="flex items-center gap-2 mb-4">
+                <Flame className="w-5 h-5 text-orange-500" />
+                <label className="text-sm font-semibold text-foreground">Ventes mensuelles minimum</label>
+                {minSales > 0 && (
+                  <Badge variant="secondary" className="ml-2 bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400">
+                    {minSales}+ ventes/mois
+                  </Badge>
+                )}
+              </div>
+              
+              {/* Quick preset buttons */}
+              <div className="flex flex-wrap gap-2 mb-4">
+                {salesPresets.map((preset) => (
+                  <button
+                    key={preset.value}
+                    onClick={() => setMinSales(preset.value)}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-1.5 ${
+                      minSales === preset.value
+                        ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-md scale-105'
+                        : 'bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground border border-border'
+                    }`}
+                  >
+                    {preset.icon && <span>{preset.icon}</span>}
+                    {preset.label}
+                  </button>
+                ))}
+              </div>
+              
+              {/* Slider for precise control */}
+              <div className="px-2">
+                <Slider
+                  value={[minSales]}
+                  onValueChange={(values) => setMinSales(values[0])}
+                  max={200}
+                  step={5}
+                  className="w-full"
+                />
+                <div className="flex justify-between mt-2 text-xs text-muted-foreground">
+                  <span>0</span>
+                  <span>50</span>
+                  <span>100</span>
+                  <span>150</span>
+                  <span>200+</span>
+                </div>
+              </div>
+            </div>
+
             {/* Other filters */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 pt-6">
               <div>
