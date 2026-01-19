@@ -289,11 +289,11 @@ const AffiliateLanding = () => {
               <div className="grid md:grid-cols-2 gap-6 mb-6">
                 {/* Commission paiement annuel */}
                 <div className="bg-gradient-to-br from-primary/5 to-transparent rounded-2xl p-6 border-2 border-primary/20">
-                  <div className="text-sm text-muted-foreground mb-2">💰 Si paiement annuel (700€)</div>
+                  <div className="text-sm text-muted-foreground mb-2">💰 Si paiement annuel (500€ 🔥 OFFRE FLASH)</div>
                   <div className="flex items-center gap-3">
                     <div className="text-3xl font-bold text-gradient">20%</div>
                     <div className="text-3xl font-bold text-primary">=</div>
-                    <div className="text-3xl font-bold text-primary">140 €</div>
+                    <div className="text-3xl font-bold text-primary">100 €</div>
                   </div>
                   <div className="text-sm text-muted-foreground mt-2">Commission unique par filleul</div>
                 </div>
