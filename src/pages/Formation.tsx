@@ -484,7 +484,7 @@ const Formation = () => {
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
               <Button variant="hero" size="xl" asChild>
                 <Link to="/tarifs">
-                  Accéder à la plateforme (700€/mois)
+                  Accéder à la plateforme (70€/mois)
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
               </Button>
