@@ -87,12 +87,14 @@ const AndroidPayment = () => {
               <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-secondary/20 blur-2xl animate-pulse"></div>
               <div className="relative flex flex-col items-center justify-center w-full max-w-xs px-6 py-5 rounded-2xl bg-gradient-to-br from-primary/10 to-secondary/10 border-2 border-primary/30">
                 <div className="flex items-baseline justify-center gap-2">
+                  <span className="line-through text-2xl text-muted-foreground/70">700€</span>
                   <span className="text-4xl sm:text-5xl font-black bg-gradient-to-r from-primary via-primary to-secondary bg-clip-text text-transparent">
-                    700€
+                    500€
                   </span>
-                  <span className="text-lg sm:text-xl font-semibold text-muted-foreground">/mois TTC</span>
+                  <span className="text-lg sm:text-xl font-semibold text-muted-foreground">/an TTC</span>
                 </div>
                 <p className="text-sm text-muted-foreground mt-2">ou ~64€/mois × 12 mois</p>
+                <span className="mt-2 bg-red-500/20 text-red-500 text-xs font-bold px-2 py-0.5 rounded animate-pulse">🔥 OFFRE FLASH -200€</span>
               </div>
             </div>
             <p className="text-xs sm:text-sm text-muted-foreground mt-4 font-medium px-4">Accès annuel • Renouvellement à la fin de l'année</p>
@@ -203,9 +205,9 @@ const AndroidPayment = () => {
           <div className="space-y-4 py-4">
             <div className="bg-primary/5 p-4 rounded-lg border border-primary/20">
               <p className="text-sm font-semibold mb-2">Abonnement VIP AMZing FBA - Annuel</p>
-              <p className="text-2xl font-bold text-primary">700€<span className="text-sm font-normal text-muted-foreground">/an TTC</span></p>
+              <p className="text-2xl font-bold text-primary"><span className="line-through text-muted-foreground/70 text-lg mr-2">700€</span>500€<span className="text-sm font-normal text-muted-foreground">/an TTC</span></p>
               <p className="text-sm text-muted-foreground">ou ~64€/mois × 12 mois</p>
-              <p className="text-xs text-muted-foreground mt-2">Accès pendant 12 mois</p>
+              <p className="text-xs text-red-500 font-bold mt-2">🔥 OFFRE FLASH -200€ • Accès pendant 12 mois</p>
             </div>
 
             <div className="flex items-start space-x-3">
