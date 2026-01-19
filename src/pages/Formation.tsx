@@ -396,7 +396,8 @@ const Formation = () => {
       <div className={`lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-t shadow-lg p-4 transition-all duration-300 ${showStickyCta ? 'translate-y-0' : 'translate-y-full'}`}>
         <div className="flex items-center justify-between gap-4 max-w-lg mx-auto">
           <div>
-            <p className="font-semibold">700€/an TTC</p>
+            <p className="text-xs text-muted-foreground line-through">700€</p>
+            <p className="font-semibold bg-gradient-to-r from-red-500 via-orange-500 to-yellow-500 bg-clip-text text-transparent">500€/an TTC <span className="text-xs bg-red-500 text-white px-1.5 py-0.5 rounded ml-1">🔥 -200€</span></p>
             <p className="text-xs text-muted-foreground">ou ~64€/mois × 12</p>
           </div>
           <Button variant="hero" asChild>
