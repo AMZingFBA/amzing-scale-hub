@@ -16,13 +16,28 @@ serve(async (req) => {
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    const { products } = await req.json();
+    const body = await req.json();
+    console.log('📥 Request body keys:', Object.keys(body));
+    console.log('📥 Products type:', typeof body.products);
+    console.log('📥 Products is array:', Array.isArray(body.products));
+    
+    const { products } = body;
 
     if (!products || !Array.isArray(products)) {
-      throw new Error('Invalid products data');
+      console.error('❌ Invalid products - received:', JSON.stringify(body).substring(0, 500));
+      throw new Error('Invalid products data - expected { products: [...] }');
     }
 
-    console.log(`Syncing ${products.length} Qogita products...`);
+    if (products.length === 0) {
+      return new Response(
+        JSON.stringify({ success: true, synced: 0, message: 'Aucun produit à synchroniser' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
+      );
+    }
+
+    // Log first product structure for debugging
+    console.log('📦 First product sample:', JSON.stringify(products[0]).substring(0, 500));
+    console.log(`📦 Syncing ${products.length} Qogita products...`);
 
     // Transform and insert products
     const transformedProducts = products.map((product: any) => ({
