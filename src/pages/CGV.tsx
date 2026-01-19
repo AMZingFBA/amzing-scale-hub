@@ -55,7 +55,10 @@ const CGV = () => {
                       effectuées par N.Z Consulting auprès de clients professionnels ou consommateurs (ci-après le « Client »), via le site internet <a href="https://amzingfba.com" className="text-primary hover:underline">https://amzingfba.com</a> et, le cas échéant, via toute autre interface ou application associée (ci-après le « Site »).
                     </p>
                     <p className="text-muted-foreground leading-relaxed mb-3">
-                      Les présentes CGV complètent les <Link to="/cgu" className="text-primary hover:underline">Conditions Générales d'Utilisation (CGU)</Link> du Site. En cas de contradiction, les présentes CGV prévalent pour les aspects commerciaux et contractuels de la vente.
+                      Les présentes CGV complètent les <Link to="/cgu" className="text-primary hover:underline">Conditions Générales d'Utilisation (CGU)</Link> du Site.
+                    </p>
+                    <p className="text-muted-foreground leading-relaxed mb-3">
+                      En cas de contradiction, les présentes CGV prévalent pour les aspects commerciaux et contractuels de la vente.
                     </p>
                     <p className="text-muted-foreground leading-relaxed font-semibold">
                       Toute commande implique l'acceptation pleine et entière des présentes CGV par le Client.
@@ -100,7 +103,7 @@ const CGV = () => {
                       </div>
                       <div>
                         <p className="font-semibold">« Abonnement »</p>
-                        <p className="text-sm text-muted-foreground">formule de souscription donnant accès à des Services récurrents pour une durée déterminée, renouvelable ou non.</p>
+                        <p className="text-sm text-muted-foreground">formule de souscription donnant accès à des Services pour une durée annuelle ferme de douze (12) mois.</p>
                       </div>
                     </div>
                   </section>
@@ -108,7 +111,7 @@ const CGV = () => {
                   <section>
                     <h2 className="text-2xl font-semibold mb-3 text-primary">4. Informations précontractuelles</h2>
                     <p className="text-muted-foreground leading-relaxed">
-                      Avant toute commande, le Client reconnaît avoir reçu, de manière lisible et compréhensible, toutes les informations prévues par le Code de la consommation, et notamment : les caractéristiques essentielles des Services, le prix total TTC, les modalités de paiement, de fourniture et d'exécution, l'existence ou non d'un droit de rétractation, ses conditions, délais et modalités, l'identité du Prestataire et ses coordonnées.
+                      Avant toute commande, le Client reconnaît avoir reçu, de manière lisible et compréhensible, toutes les informations prévues par le Code de la consommation, et notamment : les caractéristiques essentielles des Services, le prix total TTC, les modalités de paiement, de fourniture et d'exécution, l'existence ou non d'un droit de rétractation, ses conditions, délais et modalités, ainsi que l'identité du Prestataire et ses coordonnées.
                     </p>
                   </section>
 
@@ -130,27 +133,37 @@ const CGV = () => {
                     
                     <h3 className="text-xl font-semibold mb-2 mt-4">6.1 Formations, programmes et contenus numériques</h3>
                     <p className="text-muted-foreground leading-relaxed mb-3">
-                      Le Prestataire propose notamment des formations en ligne (modules vidéo, PDF, replays, supports pédagogiques) portant principalement sur l'e-commerce, Amazon FBA/FBM, le marketing digital, l'automatisation, l'investissement et l'entrepreneuriat, des programmes d'accompagnement (individuels ou collectifs) pouvant inclure coaching, suivi, sessions en visio, et des contenus numériques mis à disposition via un espace membre sécurisé.
+                      Le Prestataire propose des formations en ligne (modules vidéo, PDF, replays, supports pédagogiques), des programmes d'accompagnement (individuels ou collectifs), ainsi que des contenus numériques mis à disposition via un espace membre sécurisé.
                     </p>
 
-                    <h3 className="text-xl font-semibold mb-2 mt-4">6.2 Abonnements et accès membres</h3>
+                    <h3 className="text-xl font-semibold mb-2 mt-4">6.2 Abonnement annuel</h3>
                     <p className="text-muted-foreground leading-relaxed mb-3">
-                      Le Prestataire peut proposer des abonnements mensuels ou annuels donnant accès à des espaces membres, communautés privées, mises à jour de contenus, outils, salons d'échange, etc.
+                      Les Services sont fournis exclusivement dans le cadre d'un abonnement annuel, conclu pour une durée ferme et incompressible de douze (12) mois.
+                    </p>
+                    <p className="text-muted-foreground leading-relaxed mb-3">
+                      Aucun abonnement mensuel autonome n'est proposé.
                     </p>
 
                     <h3 className="text-xl font-semibold mb-2 mt-4">6.3 Coaching et accompagnement individualisé</h3>
                     <p className="text-muted-foreground leading-relaxed">
-                      Les prestations de coaching ou conseil individualisé sont fournies selon les modalités indiquées sur la page de vente. Les conseils fournis sont de nature générale et pédagogique et ne constituent en aucun cas un conseil juridique, fiscal, social, comptable ou financier personnalisé, ni un conseil en investissement, ni une promesse ou garantie de résultat.
+                      Les prestations de coaching ou de conseil sont fournies selon les modalités indiquées sur la page de vente. Les conseils fournis sont de nature générale et pédagogique et ne constituent en aucun cas un conseil juridique, fiscal, comptable ou financier personnalisé, ni une promesse ou garantie de résultat.
                     </p>
                   </section>
 
                   <section>
                     <h2 className="text-2xl font-semibold mb-3 text-primary">7. Prix</h2>
                     <p className="text-muted-foreground leading-relaxed mb-3">
-                      Les prix sont indiqués en euros (€), hors TVA, la micro-entreprise du Prestataire n'étant pas assujettie à la TVA : TVA non applicable, article 293 B du CGI.
+                      Les prix sont indiqués en euros (€), hors TVA (TVA non applicable – article 293 B du CGI).
                     </p>
+                    <p className="text-muted-foreground leading-relaxed mb-3">
+                      Le prix de l'abonnement annuel est fixé :
+                    </p>
+                    <ul className="list-disc pl-6 space-y-2 text-muted-foreground mb-3">
+                      <li>à 700 € en cas de paiement comptant annuel,</li>
+                      <li>ou à 770 €, correspondant au prix annuel total, lorsque le Client opte pour une facilité de paiement en douze (12) échéances mensuelles.</li>
+                    </ul>
                     <p className="text-muted-foreground leading-relaxed">
-                      Les prix applicables sont ceux affichés sur le Site au moment de la commande. Le Prestataire se réserve la possibilité de modifier ses tarifs à tout moment pour l'avenir.
+                      Des offres promotionnelles temporaires peuvent être proposées. Le prix applicable est celui affiché au moment de la commande.
                     </p>
                   </section>
 
@@ -159,15 +172,15 @@ const CGV = () => {
                     
                     <h3 className="text-xl font-semibold mb-2">8.1 Processus de commande</h3>
                     <p className="text-muted-foreground leading-relaxed mb-3">
-                      Pour commander, le Client doit sélectionner l'offre souhaitée, vérifier le détail de sa commande, renseigner les informations demandées, accepter les présentes CGV en cochant la case prévue à cet effet, et procéder au paiement.
+                      Le Client sélectionne l'offre souhaitée, vérifie le détail de sa commande, renseigne les informations demandées, accepte les présentes CGV et procède au paiement.
                     </p>
                     <p className="text-muted-foreground leading-relaxed">
-                      La commande n'est définitive qu'après validation du paiement et confirmation par e-mail par le Prestataire.
+                      La commande n'est définitive qu'après validation du paiement et confirmation par e-mail.
                     </p>
 
-                    <h3 className="text-xl font-semibold mb-2 mt-4">8.2 Vérification et correction des erreurs</h3>
+                    <h3 className="text-xl font-semibold mb-2 mt-4">8.2 Vérification des erreurs</h3>
                     <p className="text-muted-foreground leading-relaxed">
-                      Le Client a la possibilité, à chaque étape du processus de commande, de vérifier le détail de sa commande et de corriger d'éventuelles erreurs avant de la valider.
+                      Le Client peut corriger toute erreur avant validation définitive de la commande.
                     </p>
                   </section>
 
@@ -176,54 +189,74 @@ const CGV = () => {
                     
                     <h3 className="text-xl font-semibold mb-2">9.1 Modalités de paiement</h3>
                     <p className="text-muted-foreground leading-relaxed mb-3">
-                      Le paiement s'effectue en ligne, de manière sécurisée, par les moyens indiqués sur le Site (carte bancaire, Stripe, etc.). Le Client garantit être pleinement habilité à utiliser le moyen de paiement choisi.
+                      Le paiement s'effectue en ligne via les solutions proposées sur le Site (notamment Stripe et Systeme.io).
+                    </p>
+                    <p className="text-muted-foreground leading-relaxed mb-3">
+                      Le Client peut choisir :
+                    </p>
+                    <ul className="list-disc pl-6 space-y-2 text-muted-foreground mb-3">
+                      <li>soit un paiement unique annuel,</li>
+                      <li>soit un paiement en douze (12) échéances mensuelles, à titre de facilité de paiement.</li>
+                    </ul>
+                    <p className="text-muted-foreground leading-relaxed">
+                      Le paiement échelonné ne constitue en aucun cas un abonnement mensuel, mais un échelonnement du prix annuel total, lequel demeure intégralement dû dès la souscription.
                     </p>
 
-                    <h3 className="text-xl font-semibold mb-2 mt-4">9.2 Défaut de paiement</h3>
+                    <h3 className="text-xl font-semibold mb-2 mt-4">9.2 Engagement ferme – Paiement intégral dû</h3>
+                    <p className="text-muted-foreground leading-relaxed mb-3">
+                      Toute souscription engage le Client pour la totalité de la durée annuelle de douze (12) mois.
+                    </p>
                     <p className="text-muted-foreground leading-relaxed">
-                      En cas de refus de paiement, de non-paiement ou d'incident de paiement, la commande sera automatiquement annulée ou suspendue, l'accès aux Services pourra être suspendu ou refusé, et le Prestataire se réserve le droit de résilier l'Abonnement.
+                      Le montant total de l'abonnement annuel est intégralement exigible, y compris en cas de paiement échelonné, de non-utilisation des Services ou de suspension de l'accès.
+                    </p>
+
+                    <h3 className="text-xl font-semibold mb-2 mt-4">9.3 Défaut de paiement – Suspension – Exigibilité immédiate</h3>
+                    <p className="text-muted-foreground leading-relaxed mb-3">
+                      En cas d'échec de paiement ou de non-paiement d'une échéance :
+                    </p>
+                    <ul className="list-disc pl-6 space-y-2 text-muted-foreground mb-3">
+                      <li>l'accès aux Services est suspendu immédiatement et sans préavis ;</li>
+                      <li>une mise en demeure est adressée au Client.</li>
+                    </ul>
+                    <p className="text-muted-foreground leading-relaxed">
+                      À défaut de régularisation dans un délai de cinq (5) jours calendaires, le solde total restant dû de l'abonnement annuel devient immédiatement exigible.
+                    </p>
+
+                    <h3 className="text-xl font-semibold mb-2 mt-4">9.4 Recouvrement – Frais</h3>
+                    <p className="text-muted-foreground leading-relaxed mb-3">
+                      À défaut de paiement après mise en demeure, le Prestataire se réserve le droit de confier le recouvrement de la créance à un tiers mandaté.
+                    </p>
+                    <p className="text-muted-foreground leading-relaxed">
+                      Conformément à l'article L441-10 du Code de commerce, une indemnité forfaitaire de 40 € pour frais de recouvrement sera exigible de plein droit, sans préjudice des frais supplémentaires engagés.
                     </p>
                   </section>
 
                   <section>
-                    <h2 className="text-2xl font-semibold mb-3 text-primary">10. Abonnements – Renouvellement – Résiliation</h2>
+                    <h2 className="text-2xl font-semibold mb-3 text-primary">10. Résiliation</h2>
                     
-                    <h3 className="text-xl font-semibold mb-2">10.1 Renouvellement</h3>
+                    <h3 className="text-xl font-semibold mb-2">10.1 Résiliation par le Client</h3>
                     <p className="text-muted-foreground leading-relaxed mb-3">
-                      Sauf mention contraire, les abonnements sont reconduits tacitement pour des périodes successives de même durée. Le montant est prélevé à chaque échéance jusqu'à résiliation.
+                      La résiliation n'est possible qu'à l'issue de la période annuelle de douze (12) mois.
                     </p>
-
-                    <h3 className="text-xl font-semibold mb-2 mt-4">10.2 Résiliation par le Client</h3>
-                    <p className="text-muted-foreground leading-relaxed mb-3">
-                      Le Client peut résilier son abonnement selon la procédure indiquée dans son espace compte. La résiliation prend effet à l'issue de la période en cours.
-                    </p>
-
-                    <h3 className="text-xl font-semibold mb-2 mt-4">10.3 Résiliation par le Prestataire</h3>
                     <p className="text-muted-foreground leading-relaxed">
-                      Le Prestataire se réserve le droit de résilier l'abonnement du Client en cas de manquement grave, de comportement frauduleux ou de non-paiement répété.
+                      Aucune résiliation anticipée ne donne lieu à remboursement, total ou partiel, y compris en cas de paiement échelonné ou de suspension de l'accès.
+                    </p>
+
+                    <h3 className="text-xl font-semibold mb-2 mt-4">10.2 Résiliation par le Prestataire</h3>
+                    <p className="text-muted-foreground leading-relaxed">
+                      Le Prestataire se réserve le droit de résilier l'abonnement en cas de manquement grave, de comportement frauduleux ou de non-paiement.
                     </p>
                   </section>
 
                   <section>
                     <h2 className="text-2xl font-semibold mb-3 text-primary">11. Droit de rétractation</h2>
-                    
-                    <h3 className="text-xl font-semibold mb-2">11.1 Principe</h3>
                     <p className="text-muted-foreground leading-relaxed mb-3">
-                      Lorsqu'il agit en tant que Consommateur, le Client bénéficie d'un délai de quatorze (14) jours pour exercer son droit de rétractation, conformément au Code de la consommation.
+                      Lors de la commande, le Client reconnaît expressément :
                     </p>
-
-                    <h3 className="text-xl font-semibold mb-2 mt-4">11.2 Exceptions – Contenu numérique et services exécutés</h3>
-                    <p className="text-muted-foreground leading-relaxed mb-3">
-                      Le droit de rétractation ne s'applique pas à la fourniture de contenus numériques non fournis sur un support matériel, lorsque l'exécution a commencé après accord préalable exprès du consommateur et renoncement exprès à son droit de rétractation.
-                    </p>
-                    <p className="text-muted-foreground leading-relaxed">
-                      Pour accéder immédiatement à un contenu numérique ou une formation, il sera demandé au Client de confirmer sa demande d'exécution immédiate et de reconnaître qu'il perd son droit de rétractation.
-                    </p>
-
-                    <h3 className="text-xl font-semibold mb-2 mt-4">11.3 Modalités d'exercice</h3>
-                    <p className="text-muted-foreground leading-relaxed">
-                      Lorsque applicable, le Client peut exercer son droit de rétractation en adressant une déclaration au Prestataire à <a href="mailto:contact@amzingfba.com" className="text-primary hover:underline">contact@amzingfba.com</a>.
-                    </p>
+                    <ul className="list-disc pl-6 space-y-2 text-muted-foreground mb-3">
+                      <li>demander l'exécution immédiate des Services,</li>
+                      <li>renoncer à son droit de rétractation conformément à l'article L221-28 du Code de la consommation.</li>
+                    </ul>
                   </section>
 
                   <section>
