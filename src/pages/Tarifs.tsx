@@ -79,16 +79,8 @@ const Tarifs = () => {
               <CardHeader className="text-center pb-8 pt-8">
                 <CardTitle className="text-4xl mb-4 group-hover:text-primary transition-colors">Espace VIP AMZing FBA</CardTitle>
                 <CardDescription className="text-lg">Accès complet à tous les outils et services</CardDescription>
-                <div className="mt-8">
-                  <div className="flex items-center justify-center gap-2 mb-2">
-                    <Badge className="bg-red-500 text-white border-0 animate-pulse">🔥 OFFRE FLASH -200€</Badge>
-                  </div>
-                  <span className="text-2xl text-muted-foreground line-through">700€</span>
-                  <span className="text-5xl font-bold bg-gradient-to-r from-red-500 via-orange-500 to-yellow-500 bg-clip-text text-transparent animate-fade-in ml-2">500€</span>
-                  <span className="text-xl text-muted-foreground">/an TTC</span>
-                  <p className="text-lg text-muted-foreground mt-2">ou ~64€/mois × 12 mois</p>
-                </div>
                 <PromoCountdown />
+                <p className="text-lg text-muted-foreground mt-4">ou ~64€/mois × 12 mois</p>
               </CardHeader>
               <CardContent className="px-8">
                 <div className="space-y-4 mb-8">
