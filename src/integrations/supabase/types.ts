@@ -1071,7 +1071,7 @@ export type Database = {
           id: string
           qogita_price_ht: number
           qogita_price_ttc: number
-          qogita_stock: number
+          qogita_stock: number | null
           qogita_url: string | null
           selleramp_bsr: string | null
           selleramp_sale_price: number | null
@@ -1094,7 +1094,7 @@ export type Database = {
           id?: string
           qogita_price_ht: number
           qogita_price_ttc: number
-          qogita_stock: number
+          qogita_stock?: number | null
           qogita_url?: string | null
           selleramp_bsr?: string | null
           selleramp_sale_price?: number | null
@@ -1117,7 +1117,7 @@ export type Database = {
           id?: string
           qogita_price_ht?: number
           qogita_price_ttc?: number
-          qogita_stock?: number
+          qogita_stock?: number | null
           qogita_url?: string | null
           selleramp_bsr?: string | null
           selleramp_sale_price?: number | null
