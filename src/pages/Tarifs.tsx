@@ -184,7 +184,7 @@ const Tarifs = () => {
                 </CardHeader>
                 <CardContent>
                   <p className="text-muted-foreground group-hover:translate-x-1 transition-transform duration-300">
-                    Aucun engagement. Vous pouvez annuler votre abonnement à tout moment sans frais.
+                    Oui, l{"'"}abonnement est sur 12 mois. Cela vous permet de bénéficier du meilleur tarif annuel et d{"'"}un accès complet à tous nos services pendant une année entière.
                   </p>
                 </CardContent>
               </Card>
