@@ -18,7 +18,7 @@ serve(async (req) => {
         success: false, 
         error: 'Cette API nécessite une requête POST avec un body JSON contenant { products: [...] }' 
       }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json; charset=utf-8' }, status: 400 }
     );
   }
 
@@ -57,7 +57,7 @@ serve(async (req) => {
     if (products.length === 0) {
       return new Response(
         JSON.stringify({ success: true, synced: 0, message: 'Aucun produit à synchroniser' }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json; charset=utf-8' }, status: 200 }
       );
     }
 
@@ -136,7 +136,7 @@ serve(async (req) => {
         message: `${transformedProducts.length} produits synchronisés`
       }),
       { 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...corsHeaders, 'Content-Type': 'application/json; charset=utf-8' },
         status: 200,
       }
     );
@@ -149,7 +149,7 @@ serve(async (req) => {
         error: error instanceof Error ? error.message : 'Unknown error' 
       }),
       { 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...corsHeaders, 'Content-Type': 'application/json; charset=utf-8' },
         status: 500,
       }
     );
