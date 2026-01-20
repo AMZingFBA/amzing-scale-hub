@@ -287,10 +287,28 @@ export default function ProduitsQogita() {
     return () => clearInterval(interval);
   }, [user]);
 
-  const handleRefresh = () => {
-    console.log('🔄 Refresh manuel déclenché');
+  const handleRefresh = async () => {
+    console.log('🔄 Refresh manuel déclenché - sync depuis Google Sheets');
     setIsRefreshing(true);
-    loadProducts();
+    
+    try {
+      // Sync from Google Sheets first
+      const { data, error } = await supabase.functions.invoke('sync-qogita-from-sheets');
+      
+      if (error) {
+        console.error('Erreur sync Google Sheets:', error);
+        toast.error('Erreur lors de la synchronisation');
+      } else if (data?.count > 0) {
+        toast.success(`${data.count} produits synchronisés depuis Google Sheets`);
+      } else {
+        toast.info('Aucun nouveau produit à synchroniser');
+      }
+    } catch (err) {
+      console.error('Erreur sync:', err);
+    }
+    
+    // Then reload from database
+    await loadProducts();
   };
 
   // Excel import for admins
