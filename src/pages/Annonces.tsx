@@ -10,7 +10,7 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, AlertCircle, Link2, Image, Video, Mic, FileText, Megaphone, ArrowLeft } from 'lucide-react';
+import { Loader2, AlertCircle, Link2, Image, Video, Mic, FileText, Megaphone, ArrowLeft, Download } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 const Annonces = () => {
@@ -214,10 +214,17 @@ const Annonces = () => {
                             <audio src={alert.file_url} controls className="w-full" />
                           </div>
                         )}
-                        <Badge variant="outline">
+                        <a 
+                          href={alert.file_url} 
+                          download={alert.file_name}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 px-3 py-1.5 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
+                        >
                           {getFileIcon(alert.file_type)}
                           <span className="ml-1">{alert.file_name}</span>
-                        </Badge>
+                          <Download className="w-4 h-4 ml-2" />
+                        </a>
                       </div>
                     )}
                   </CardContent>
