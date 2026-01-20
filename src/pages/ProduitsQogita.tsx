@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import * as XLSX from 'xlsx';
 
-import { Loader2, TrendingUp, Package, Clock, ArrowLeft, Copy, ExternalLink, Store, BarChart3, ShoppingCart, RotateCcw, Flame, Upload, FileSpreadsheet } from 'lucide-react';
+import { Loader2, TrendingUp, Package, Clock, ArrowLeft, Copy, ExternalLink, Store, BarChart3, ShoppingCart, RotateCcw, Flame, Upload, FileSpreadsheet, Trash2 } from 'lucide-react';
 import { Slider } from '@/components/ui/slider';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
@@ -296,6 +296,32 @@ export default function ProduitsQogita() {
   // Excel import for admins
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isImporting, setIsImporting] = useState(false);
+  const [isClearing, setIsClearing] = useState(false);
+
+  // Clear all products (admin only)
+  const handleClearProducts = async () => {
+    if (!confirm('⚠️ Êtes-vous sûr de vouloir supprimer TOUS les produits ?')) {
+      return;
+    }
+
+    setIsClearing(true);
+    try {
+      const { error } = await supabase
+        .from('qogita_products')
+        .delete()
+        .neq('id', '00000000-0000-0000-0000-000000000000'); // Delete all rows
+
+      if (error) throw error;
+
+      setProducts([]);
+      toast.success('✅ Tous les produits ont été supprimés');
+    } catch (error) {
+      console.error('Erreur suppression:', error);
+      toast.error('Erreur lors de la suppression');
+    } finally {
+      setIsClearing(false);
+    }
+  };
 
   const handleExcelImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -448,7 +474,7 @@ export default function ProduitsQogita() {
                       </p>
                     </div>
                   </div>
-                  <div>
+                  <div className="flex gap-2 flex-wrap">
                     <input
                       ref={fileInputRef}
                       type="file"
@@ -459,7 +485,7 @@ export default function ProduitsQogita() {
                     />
                     <Button
                       onClick={() => fileInputRef.current?.click()}
-                      disabled={isImporting}
+                      disabled={isImporting || isClearing}
                       className="bg-green-600 hover:bg-green-700 text-white gap-2"
                     >
                       {isImporting ? (
@@ -468,6 +494,19 @@ export default function ProduitsQogita() {
                         <Upload className="w-4 h-4" />
                       )}
                       {isImporting ? 'Import en cours...' : 'Importer Excel'}
+                    </Button>
+                    <Button
+                      onClick={handleClearProducts}
+                      disabled={isImporting || isClearing}
+                      variant="destructive"
+                      className="gap-2"
+                    >
+                      {isClearing ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <Trash2 className="w-4 h-4" />
+                      )}
+                      {isClearing ? 'Suppression...' : 'Vider la table'}
                     </Button>
                   </div>
                 </div>
