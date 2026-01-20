@@ -521,8 +521,8 @@ export default function ProduitsQogita() {
             <CardContent className="flex items-center justify-between p-6">
               <div>
                 <p className="text-sm text-muted-foreground">Produits filtrés</p>
-                <p className="text-2xl font-bold">550</p>
-                <p className="text-xs text-muted-foreground mt-1">sur 26 770 analysés</p>
+                <p className="text-2xl font-bold">{filteredProducts.length.toLocaleString('fr-FR')}</p>
+                <p className="text-xs text-muted-foreground mt-1">sur {products.length.toLocaleString('fr-FR')} au total</p>
               </div>
               <Package className="w-8 h-8 text-primary" />
             </CardContent>
@@ -546,7 +546,7 @@ export default function ProduitsQogita() {
             <CardContent className="flex items-center justify-between p-6">
               <div>
                 <p className="text-sm text-muted-foreground">Page actuelle</p>
-                <p className="text-2xl font-bold">1 / 104</p>
+                <p className="text-2xl font-bold">{currentPage} / {totalPages || 1}</p>
               </div>
               <TrendingUp className="w-8 h-8 text-primary" />
             </CardContent>
