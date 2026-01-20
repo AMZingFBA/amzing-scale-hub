@@ -118,102 +118,105 @@ export default function ProduitsQogita() {
     return match ? parseInt(match[1]) : 0;
   };
 
-  // Load products from Supabase
+  // Load products ONLY from Google Sheet (via backend function)
   const loadProducts = async () => {
     try {
-      const { data, error } = await (supabase as any)
-        .from('qogita_products')
-        .select('*')
-        .order('timestamp', { ascending: false });
+      const { data, error } = await supabase.functions.invoke('sync-qogita-from-sheets', {
+        body: {
+          sheetId: '1PNOSwe9pE9qnCunJ4OyUlnJLT7zMoGPWJZvt4lNWDvw',
+        },
+      });
 
       if (error) throw error;
 
-      if (!data || data.length === 0) {
-        console.log('No products found in database');
-        setProducts([]);
-        setLastUpdate(new Date().toISOString());
-        toast.info('Aucun produit disponible pour le moment');
-        return;
-      }
+      const sheetProducts = (data?.products ?? []) as any[];
 
-      // Transform DB data to app format
-      const transformedProducts: QogitaProduct[] = data.map((p: any) => ({
-        id: p.id,
+      const transformedProducts: QogitaProduct[] = sheetProducts.map((p: any) => ({
+        id: p.id || `${p.ean}-${p.timestamp}`,
         ean: p.ean,
         timestamp: p.timestamp,
-        qogita_price_ht: p.qogita_price_ht,
-        qogita_price_ttc: p.qogita_price_ttc,
-        qogita_stock: p.qogita_stock,
-        qogita_url: p.qogita_url,
-        selleramp_bsr: p.selleramp_bsr || 'N/A',
-        selleramp_sale_price: p.selleramp_sale_price || null,
-        selleramp_sales: p.selleramp_sales || 'Unknown',
-        selleramp_sellers: p.selleramp_sellers || 'N/A',
-        selleramp_variations: p.selleramp_variations || 'None',
-        selleramp_url: p.selleramp_url,
-        fbm_profit: p.fbm_profit || 0,
-        fbm_roi: p.fbm_roi || 0,
-        fba_profit: p.fba_profit || 0,
-        fba_roi: p.fba_roi || 0,
-        alerts: p.alerts || [],
-        amazon_url: p.amazon_url,
-        created_at: p.created_at
+        qogita_price_ht: p.qogita_price_ht ?? 0,
+        qogita_price_ttc: p.qogita_price_ttc ?? 0,
+        qogita_stock: p.qogita_stock ?? null,
+        qogita_url: p.qogita_url ?? undefined,
+        selleramp_bsr: p.selleramp_bsr ?? 'N/A',
+        selleramp_sale_price: p.selleramp_sale_price ?? null,
+        selleramp_sales: p.selleramp_sales ?? 'Unknown',
+        selleramp_sellers: p.selleramp_sellers ?? 'N/A',
+        selleramp_variations: p.selleramp_variations ?? 'None',
+        selleramp_url: p.selleramp_url ?? undefined,
+        fbm_profit: p.fbm_profit ?? 0,
+        fbm_roi: p.fbm_roi ?? 0,
+        fba_profit: p.fba_profit ?? 0,
+        fba_roi: p.fba_roi ?? 0,
+        alerts: p.alerts ?? [],
+        amazon_url: p.amazon_url ?? undefined,
+        created_at: p.created_at ?? new Date().toISOString(),
       }));
 
-      // Garde l'ordre par timestamp de la requête SQL (du plus récent au moins récent)
       setProducts(transformedProducts);
-      
-      // Get the most recent timestamp from ALL products (not just first by profit)
+
       if (transformedProducts.length > 0) {
         const mostRecentProduct = transformedProducts.reduce((latest, current) => {
           return new Date(current.timestamp) > new Date(latest.timestamp) ? current : latest;
         });
         setLastUpdate(mostRecentProduct.timestamp);
+      } else {
+        setLastUpdate('');
       }
-      
-      // Set the current time as last refresh time
+
       setLastRefresh(new Date().toISOString());
     } catch (error) {
-      console.error('Error loading products:', error);
-      toast.error('Erreur lors du chargement des produits');
+      console.error('Error loading products from Google Sheet:', error);
+      setProducts([]);
+      toast.error('Erreur de connexion au Google Sheet');
     } finally {
       setIsLoading(false);
       setIsRefreshing(false);
     }
   };
 
-  // Filtered products
+  // Filtered + default sort (FBA ROI décroissant)
   const filteredProducts = useMemo(() => {
-    return products.filter(product => {
+    const filtered = products.filter((product) => {
       // Filter by profit type
       const fbmCostValue = fbmCost ? parseFloat(fbmCost) : 0;
-      const profit = profitType === 'fbm' 
-        ? (product.fbm_profit ? product.fbm_profit - fbmCostValue : null)
-        : profitType === 'fba' 
-        ? product.fba_profit 
-        : Math.max((product.fbm_profit || 0) - fbmCostValue, product.fba_profit || 0);
-      const roi = profitType === 'fbm' ? product.fbm_roi : profitType === 'fba' ? product.fba_roi : Math.max(product.fbm_roi || 0, product.fba_roi || 0);
-      
-      if (minProfit && profit < parseFloat(minProfit)) {
-        return false;
-      }
-      if (minROI && roi < parseFloat(minROI)) {
-        return false;
-      }
+      const profit =
+        profitType === 'fbm'
+          ? product.fbm_profit
+            ? product.fbm_profit - fbmCostValue
+            : null
+          : profitType === 'fba'
+            ? product.fba_profit
+            : Math.max((product.fbm_profit || 0) - fbmCostValue, product.fba_profit || 0);
+      const roi =
+        profitType === 'fbm'
+          ? product.fbm_roi
+          : profitType === 'fba'
+            ? product.fba_roi
+            : Math.max(product.fbm_roi || 0, product.fba_roi || 0);
+
+      if (minProfit && profit < parseFloat(minProfit)) return false;
+      if (minROI && roi < parseFloat(minROI)) return false;
+
       if (maxBSR && product.selleramp_bsr) {
         const bsr = parseInt(product.selleramp_bsr.replace(/\D/g, ''));
         if (bsr > parseInt(maxBSR)) return false;
       }
-      if (searchEAN && !product.ean.includes(searchEAN)) {
-        return false;
-      }
+
+      if (searchEAN && !product.ean.includes(searchEAN)) return false;
+
       // Filter by minimum sales
       if (minSales > 0) {
         const productSales = parseSalesValue(product.selleramp_sales);
         if (productSales < minSales) return false;
       }
+
       return true;
     });
+
+    filtered.sort((a, b) => (b.fba_roi || 0) - (a.fba_roi || 0));
+    return filtered;
   }, [products, minProfit, minROI, maxBSR, searchEAN, profitType, fbmCost, minSales]);
 
   // Pagination
@@ -288,128 +291,9 @@ export default function ProduitsQogita() {
   }, [user]);
 
   const handleRefresh = async () => {
-    console.log('🔄 Refresh manuel déclenché - sync depuis Google Sheets');
+    console.log('🔄 Refresh manuel déclenché - reload depuis Google Sheet');
     setIsRefreshing(true);
-    
-    try {
-      // Sync from Google Sheets first
-      const { data, error } = await supabase.functions.invoke('sync-qogita-from-sheets');
-      
-      if (error) {
-        console.error('Erreur sync Google Sheets:', error);
-        toast.error('Erreur lors de la synchronisation');
-      } else if (data?.count > 0) {
-        toast.success(`${data.count} produits synchronisés depuis Google Sheets`);
-      } else {
-        toast.info('Aucun nouveau produit à synchroniser');
-      }
-    } catch (err) {
-      console.error('Erreur sync:', err);
-    }
-    
-    // Then reload from database
     await loadProducts();
-  };
-
-  // Excel import for admins
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const [isImporting, setIsImporting] = useState(false);
-  const [isClearing, setIsClearing] = useState(false);
-
-  // Clear all products (admin only)
-  const handleClearProducts = async () => {
-    if (!confirm('⚠️ Êtes-vous sûr de vouloir supprimer TOUS les produits ?')) {
-      return;
-    }
-
-    setIsClearing(true);
-    try {
-      const { error } = await supabase
-        .from('qogita_products')
-        .delete()
-        .neq('id', '00000000-0000-0000-0000-000000000000'); // Delete all rows
-
-      if (error) throw error;
-
-      setProducts([]);
-      toast.success('✅ Tous les produits ont été supprimés');
-    } catch (error) {
-      console.error('Erreur suppression:', error);
-      toast.error('Erreur lors de la suppression');
-    } finally {
-      setIsClearing(false);
-    }
-  };
-
-  const handleExcelImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    setIsImporting(true);
-    try {
-      const data = await file.arrayBuffer();
-      const workbook = XLSX.read(data);
-      const sheetName = workbook.SheetNames[0];
-      const worksheet = workbook.Sheets[sheetName];
-      const jsonData = XLSX.utils.sheet_to_json(worksheet);
-
-      // Transform Excel data to API format (matching exact column names from user's Excel)
-      const products = jsonData.map((row: any) => ({
-        ean: String(row.ean || row.EAN || ''),
-        timestamp: row.timestamp || row.date || new Date().toLocaleDateString('fr-FR'),
-        qogita: {
-          priceHT: parseFloat(row.qogita_priceHT || row.priceHT || row.prix_ht || row.qogita_price_ht || 0),
-          priceTTC: parseFloat(row.qogita_priceTTC || row.priceTTC || row.prix_ttc || row.qogita_price_ttc || 0),
-          stock: row.qogita_stock !== undefined && row.qogita_stock !== '' ? parseInt(row.qogita_stock) : (row.stock !== undefined && row.stock !== '' ? parseInt(row.stock) : null),
-          url: row.qogita_url || row.url_qogita || null,
-        },
-        selleramp: {
-          bsr: String(row.selleramp_bsr || row.bsr || ''),
-          salePrice: row.selleramp_salePrice !== undefined ? parseFloat(row.selleramp_salePrice) : (row.salePrice ? parseFloat(row.salePrice) : null),
-          sales: String(row.selleramp_sales || row.sales || row.ventes || ''),
-          sellers: String(row.selleramp_sellers || row.sellers || row.vendeurs || ''),
-          variations: String(row.selleramp_variations || row.variations || '0'),
-          url: row.selleramp_url || row.url_selleramp || null,
-        },
-        fbm: {
-          profit: parseFloat(row.fbm_profit || row.profit_fbm || 0),
-          roi: parseFloat(row.fbm_roi || row.roi_fbm || 0),
-        },
-        fba: {
-          profit: parseFloat(row.fba_profit || row.profit_fba || 0),
-          roi: parseFloat(row.fba_roi || row.roi_fba || 0),
-        },
-        alerts: row.alerts ? (typeof row.alerts === 'string' ? row.alerts.split(',').map((a: string) => a.trim()) : []) : [],
-        amazon: {
-          url: row.amazon_url || row.url_amazon || null,
-        },
-      })).filter((p: any) => p.ean && p.ean.length > 0);
-
-      if (products.length === 0) {
-        toast.error('Aucun produit valide trouvé dans le fichier');
-        return;
-      }
-
-      console.log(`📊 Import Excel: ${products.length} produits à synchroniser`);
-
-      // Send to edge function
-      const { data: result, error } = await supabase.functions.invoke('sync-qogita-products', {
-        body: { products },
-      });
-
-      if (error) throw error;
-
-      toast.success(`✅ ${products.length} produits importés avec succès !`);
-      loadProducts();
-    } catch (error) {
-      console.error('Erreur import Excel:', error);
-      toast.error('Erreur lors de l\'import du fichier Excel');
-    } finally {
-      setIsImporting(false);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
-    }
   };
 
   const handlePageChange = (page: number) => {
@@ -478,59 +362,7 @@ export default function ProduitsQogita() {
             </div>
           </div>
 
-          {/* Admin Excel Import */}
-          {isAdmin && (
-            <Card className="mb-4 border-2 border-dashed border-green-500/50 bg-green-50/50 dark:bg-green-900/10">
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between flex-wrap gap-4">
-                  <div className="flex items-center gap-3">
-                    <FileSpreadsheet className="w-8 h-8 text-green-600" />
-                    <div>
-                      <h3 className="font-semibold text-green-800 dark:text-green-400">Import Excel (Admin)</h3>
-                      <p className="text-sm text-muted-foreground">
-                        Colonnes: ean, priceHT, priceTTC, stock, bsr, salePrice, sales, sellers, variations, fbm_profit, fbm_roi, fba_profit, fba_roi, alerts
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex gap-2 flex-wrap">
-                    <input
-                      ref={fileInputRef}
-                      type="file"
-                      accept=".xlsx,.xls,.csv"
-                      onChange={handleExcelImport}
-                      className="hidden"
-                      id="excel-import"
-                    />
-                    <Button
-                      onClick={() => fileInputRef.current?.click()}
-                      disabled={isImporting || isClearing}
-                      className="bg-green-600 hover:bg-green-700 text-white gap-2"
-                    >
-                      {isImporting ? (
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                      ) : (
-                        <Upload className="w-4 h-4" />
-                      )}
-                      {isImporting ? 'Import en cours...' : 'Importer Excel'}
-                    </Button>
-                    <Button
-                      onClick={handleClearProducts}
-                      disabled={isImporting || isClearing}
-                      variant="destructive"
-                      className="gap-2"
-                    >
-                      {isClearing ? (
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                      ) : (
-                        <Trash2 className="w-4 h-4" />
-                      )}
-                      {isClearing ? 'Suppression...' : 'Vider la table'}
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          )}
+          {/* Admin Excel Import supprimé : cette page ne doit lire que le Google Sheet */}
         </div>
 
         {/* Statistics */}
