@@ -80,3 +80,9 @@ verify_jwt = false
 
 [functions.sync-qogita-catalogue]
 verify_jwt = false
+
+[functions.sync-qogita-from-sheets]
+verify_jwt = false
+
+[functions.sync-eany-from-sheets]
+verify_jwt = false
