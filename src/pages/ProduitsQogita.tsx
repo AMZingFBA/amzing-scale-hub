@@ -215,7 +215,8 @@ export default function ProduitsQogita() {
       return true;
     });
 
-    filtered.sort((a, b) => (b.fba_roi || 0) - (a.fba_roi || 0));
+    // Sort by timestamp descending (newest first)
+    filtered.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
     return filtered;
   }, [products, minProfit, minROI, maxBSR, searchEAN, profitType, fbmCost, minSales]);
 
