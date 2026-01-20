@@ -582,11 +582,11 @@ const AdminAlerts = () => {
                 </div>
 
                 <div>
-                  <Label htmlFor="file-upload">Fichier (image, vidéo, audio)</Label>
+                  <Label htmlFor="file-upload">Fichier (image, vidéo, audio, Excel)</Label>
                   <Input
                     id="file-upload"
                     type="file"
-                    accept="image/*,video/*,audio/*"
+                    accept="image/*,video/*,audio/*,.xlsx,.xls,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel"
                     onChange={handleFileChange}
                     className="cursor-pointer"
                   />
