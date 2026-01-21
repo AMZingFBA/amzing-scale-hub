@@ -39,7 +39,7 @@ const SCROLL_POSITION_KEY = 'eany_scroll_position';
 const CURRENT_PAGE_KEY = 'eany_current_page';
 
 // Default Eany Sheet ID - update this with your actual Sheet ID
-const EANY_SHEET_ID = '';
+const EANY_SHEET_ID = '1UNjqp8d7mCouPClazZfOKyX9nZMyRsxhxmmi52QeWbE';
 
 export default function ProduitsEany() {
   const navigate = useNavigate();
@@ -567,7 +567,7 @@ export default function ProduitsEany() {
         </Card>
 
         {/* Product count info */}
-        {EANY_SHEET_ID === '' && (
+        {!EANY_SHEET_ID && (
           <Card className="mb-8 border-amber-500/50 bg-amber-50/10">
             <CardContent className="p-4">
               <p className="text-amber-600 text-center">
