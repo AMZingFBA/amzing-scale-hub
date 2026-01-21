@@ -7,7 +7,7 @@ const corsHeaders = {
 };
 
 // Default Eany Sheet ID - you can override via request body
-const DEFAULT_SHEET_ID = "";
+const DEFAULT_SHEET_ID = "1UNjqp8d7mCouPClazZfOKyX9nZMyRsxhxmmi52QeWbE";
 
 serve(async (req) => {
   // Handle CORS preflight
