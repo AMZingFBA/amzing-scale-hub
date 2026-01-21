@@ -38,8 +38,8 @@ const PRODUCTS_PER_PAGE = 50;
 const SCROLL_POSITION_KEY = 'eany_scroll_position';
 const CURRENT_PAGE_KEY = 'eany_current_page';
 
-// Default Eany Sheet ID
-const EANY_SHEET_ID = '1UNjqp8d7mCouPClazZfOKyX9nZMyRsxhxmmi52QeWbE';
+// Default Eany Sheet ID - update this with your actual Sheet ID
+const EANY_SHEET_ID = '';
 
 export default function ProduitsEany() {
   const navigate = useNavigate();
@@ -565,6 +565,17 @@ export default function ProduitsEany() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Product count info */}
+        {EANY_SHEET_ID === '' && (
+          <Card className="mb-8 border-amber-500/50 bg-amber-50/10">
+            <CardContent className="p-4">
+              <p className="text-amber-600 text-center">
+                ⚠️ Aucun Google Sheet configuré. Contactez l'administrateur pour définir l'ID du Sheet Eany.
+              </p>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Products grid */}
         {paginatedProducts.length === 0 ? (
