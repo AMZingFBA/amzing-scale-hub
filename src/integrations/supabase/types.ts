@@ -1337,6 +1337,33 @@ export type Database = {
         }
         Relationships: []
       }
+      vibraforce_catalogue: {
+        Row: {
+          brand: string
+          created_at: string
+          ean: string
+          id: string
+          price_ht: number
+          updated_at: string
+        }
+        Insert: {
+          brand?: string
+          created_at?: string
+          ean: string
+          id?: string
+          price_ht: number
+          updated_at?: string
+        }
+        Update: {
+          brand?: string
+          created_at?: string
+          ean?: string
+          id?: string
+          price_ht?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -1386,6 +1413,12 @@ export type Database = {
       get_unread_count: {
         Args: { ticket_id_param: string; user_id_param: string }
         Returns: number
+      }
+      get_vibraforce_brands: {
+        Args: never
+        Returns: {
+          brand: string
+        }[]
       }
       has_open_ticket: { Args: { _user_id: string }; Returns: boolean }
       has_role: {
