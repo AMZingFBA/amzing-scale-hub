@@ -29,14 +29,13 @@ const CGV = () => {
 
         <div className="container mx-auto px-4 pt-32 pb-16">
           <h1 className="text-4xl md:text-5xl font-bold text-center mb-4 bg-gradient-to-r from-primary via-purple-500 to-pink-500 bg-clip-text text-transparent">
-            Conditions Générales de Vente
+            ✅ CGV AMZing FBA (Éditées par N.Z Consulting) — Version renforcée
           </h1>
-          <p className="text-center text-muted-foreground mb-12">du site et des services AMZing FBA</p>
+          <p className="text-center text-muted-foreground mb-12">(Édités par N.Z Consulting)</p>
 
           <div className="max-w-4xl mx-auto space-y-6">
             <Card className="border-primary/20 hover:border-primary/40 transition-colors">
               <CardContent className="p-6 space-y-4">
-                <p className="text-sm text-muted-foreground">(Édités par N.Z Consulting)</p>
                 <p className="text-sm text-muted-foreground">Dernière mise à jour : 25 novembre 2025</p>
                 
                 <div className="space-y-8">
@@ -198,8 +197,11 @@ const CGV = () => {
                       <li>soit un paiement unique annuel,</li>
                       <li>soit un paiement en douze (12) échéances mensuelles, à titre de facilité de paiement.</li>
                     </ul>
-                    <p className="text-muted-foreground leading-relaxed">
+                    <p className="text-muted-foreground leading-relaxed mb-3">
                       Le paiement échelonné ne constitue en aucun cas un abonnement mensuel, mais un échelonnement du prix annuel total, lequel demeure intégralement dû dès la souscription.
+                    </p>
+                    <p className="text-muted-foreground leading-relaxed">
+                      Le Client reconnaît que la facilité de paiement constitue un engagement de paiement irrévocable portant sur l'intégralité du prix annuel, et autorise expressément le Prestataire (ou son prestataire de paiement) à procéder aux prélèvements/encaissements des échéances, conformément au plan choisi.
                     </p>
 
                     <h3 className="text-xl font-semibold mb-2 mt-4">9.2 Engagement ferme – Paiement intégral dû</h3>
@@ -216,18 +218,26 @@ const CGV = () => {
                     </p>
                     <ul className="list-disc pl-6 space-y-2 text-muted-foreground mb-3">
                       <li>l'accès aux Services est suspendu immédiatement et sans préavis ;</li>
-                      <li>une mise en demeure est adressée au Client.</li>
+                      <li>une mise en demeure est adressée au Client (par e-mail et/ou courrier recommandé).</li>
                     </ul>
                     <p className="text-muted-foreground leading-relaxed">
-                      À défaut de régularisation dans un délai de cinq (5) jours calendaires, le solde total restant dû de l'abonnement annuel devient immédiatement exigible.
+                      À défaut de régularisation dans un délai de cinq (5) jours calendaires à compter de l'envoi de la mise en demeure, le solde total restant dû de l'abonnement annuel devient immédiatement exigible.
                     </p>
 
-                    <h3 className="text-xl font-semibold mb-2 mt-4">9.4 Recouvrement – Frais</h3>
+                    <h3 className="text-xl font-semibold mb-2 mt-4">9.4 Clause pénale (indemnité forfaitaire de retard)</h3>
+                    <p className="text-muted-foreground leading-relaxed">
+                      En cas de défaut de paiement non régularisé dans le délai indiqué à l'article 9.3, le Client sera redevable, à titre de clause pénale, d'une indemnité forfaitaire égale à 15 % du montant total restant dû, sans préjudice des intérêts légaux éventuels et des frais de recouvrement et/ou de procédure.
+                    </p>
+
+                    <h3 className="text-xl font-semibold mb-2 mt-4">9.5 Recouvrement – Frais (distinction Client professionnel / Consommateur)</h3>
                     <p className="text-muted-foreground leading-relaxed mb-3">
                       À défaut de paiement après mise en demeure, le Prestataire se réserve le droit de confier le recouvrement de la créance à un tiers mandaté.
                     </p>
+                    <p className="text-muted-foreground leading-relaxed mb-3">
+                      <strong>Pour les Clients professionnels :</strong> conformément à l'article L441-10 du Code de commerce, une indemnité forfaitaire de 40 € pour frais de recouvrement sera exigible de plein droit, sans préjudice des frais supplémentaires engagés.
+                    </p>
                     <p className="text-muted-foreground leading-relaxed">
-                      Conformément à l'article L441-10 du Code de commerce, une indemnité forfaitaire de 40 € pour frais de recouvrement sera exigible de plein droit, sans préjudice des frais supplémentaires engagés.
+                      <strong>Pour les Clients consommateurs :</strong> seuls les frais de recouvrement et/ou de procédure réellement engagés et légalement justifiables pourront être réclamés, dans les limites prévues par la réglementation applicable.
                     </p>
                   </section>
 
@@ -250,13 +260,23 @@ const CGV = () => {
 
                   <section>
                     <h2 className="text-2xl font-semibold mb-3 text-primary">11. Droit de rétractation</h2>
+                    
+                    <h3 className="text-xl font-semibold mb-2">11.1 Principe (Clients consommateurs)</h3>
                     <p className="text-muted-foreground leading-relaxed mb-3">
-                      Lors de la commande, le Client reconnaît expressément :
+                      Conformément au Code de la consommation, le Client consommateur dispose en principe d'un droit de rétractation, sauf exceptions légales.
+                    </p>
+
+                    <h3 className="text-xl font-semibold mb-2 mt-4">11.2 Exception – Contenus numériques / services exécutés immédiatement (L221-28)</h3>
+                    <p className="text-muted-foreground leading-relaxed mb-3">
+                      Lorsque l'accès aux contenus numériques ou services est fourni immédiatement après achat, le Client consommateur reconnaît expressément :
                     </p>
                     <ul className="list-disc pl-6 space-y-2 text-muted-foreground mb-3">
-                      <li>demander l'exécution immédiate des Services,</li>
-                      <li>renoncer à son droit de rétractation conformément à l'article L221-28 du Code de la consommation.</li>
+                      <li>demander l'exécution immédiate des Services avant la fin du délai de rétractation ;</li>
+                      <li>reconnaître qu'il perd son droit de rétractation conformément à l'article L221-28 du Code de la consommation.</li>
                     </ul>
+                    <p className="text-muted-foreground leading-relaxed">
+                      Cette renonciation est matérialisée au moment de la commande par une case à cocher dédiée (non pré-cochée) et/ou toute mention expresse équivalente. À défaut de recueil effectif de cet accord exprès, les règles légales de rétractation demeurent applicables.
+                    </p>
                   </section>
 
                   <section>
