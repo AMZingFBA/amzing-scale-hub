@@ -3,6 +3,7 @@ import { useAdmin } from '@/hooks/use-admin';
 import { useNotifications } from '@/hooks/use-notifications';
 import { usePullRefresh } from '@/hooks/use-pull-refresh';
 import { useAutoRefresh } from '@/hooks/use-auto-refresh';
+import { useAdminTicketsUnread } from '@/hooks/use-admin-tickets-unread';
 import { Navigate, Link, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import Navbar from '@/components/Navbar';
@@ -62,6 +63,7 @@ const Dashboard = () => {
   } = useAuth();
   const { isAdmin, isLoading: isAdminLoading } = useAdmin();
   const { notifications, markAsRead, loadNotifications } = useNotifications();
+  const { unreadCount: adminTicketsUnread } = useAdminTicketsUnread();
   const { toast } = useToast();
   const [isSyncing, setIsSyncing] = useState(false);
 
@@ -340,12 +342,13 @@ const Dashboard = () => {
                     <div className="flex items-center gap-3">
                       <Shield className="w-6 h-6 text-primary" />
                       <span className="text-xl font-bold">ADMINISTRATION</span>
+                      <NotificationBadge count={adminTicketsUnread} size="md" className="ml-2" />
                     </div>
                   </AccordionTrigger>
                   <AccordionContent>
                     <div className="grid gap-3 pt-2">
                       <CategoryItem icon={Users} label="gestion des profils" link="/admin/profiles" />
-                      <CategoryItem icon={Eye} label="gestion des tickets" link="/admin/tickets" />
+                      <CategoryItem icon={Eye} label="gestion des tickets" link="/admin/tickets" badge={adminTicketsUnread} />
                       <CategoryItem icon={Bell} label="gestion des alertes" link="/admin/alerts" />
                     </div>
                   </AccordionContent>
