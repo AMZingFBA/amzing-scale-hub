@@ -86,3 +86,9 @@ verify_jwt = false
 
 [functions.sync-eany-from-sheets]
 verify_jwt = false
+
+[functions.sync-vibraforce-catalogue]
+verify_jwt = false
+
+[functions.sync-eany-catalogue]
+verify_jwt = false
