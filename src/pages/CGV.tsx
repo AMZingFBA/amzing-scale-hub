@@ -29,7 +29,7 @@ const CGV = () => {
 
         <div className="container mx-auto px-4 pt-32 pb-16">
           <h1 className="text-4xl md:text-5xl font-bold text-center mb-4 bg-gradient-to-r from-primary via-purple-500 to-pink-500 bg-clip-text text-transparent">
-            ✅ CGV AMZing FBA (Éditées par N.Z Consulting) — Version renforcée
+            ✅ CGV AMZing FBA
           </h1>
           <p className="text-center text-muted-foreground mb-12">(Édités par N.Z Consulting)</p>
 
