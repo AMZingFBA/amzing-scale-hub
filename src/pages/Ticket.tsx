@@ -421,7 +421,9 @@ const Ticket = () => {
                         </>
                       )}
                       <p className="text-xs mt-2 opacity-70">
-                        {new Date(message.created_at).toLocaleTimeString('fr-FR', {
+                        {new Date(message.created_at).toLocaleDateString('fr-FR', {
+                          day: 'numeric',
+                          month: 'short',
                           hour: '2-digit',
                           minute: '2-digit'
                         })}
