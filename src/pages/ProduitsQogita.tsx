@@ -113,9 +113,20 @@ export default function ProduitsQogita() {
   // Helper function to parse sales value from string
   const parseSalesValue = (salesStr: string | undefined): number => {
     if (!salesStr || salesStr === 'Unknown' || salesStr === 'N/A') return 0;
-    // Extract first number from string like "50-100" or "100+"
-    const match = salesStr.match(/(\d+)/);
-    return match ? parseInt(match[1]) : 0;
+    
+    // Normalize the string: remove spaces, convert to lowercase
+    const normalized = salesStr.toLowerCase().trim();
+    
+    // Handle "2k+" or "2.5k" format (thousands)
+    const kMatch = normalized.match(/(\d+(?:\.\d+)?)\s*k/);
+    if (kMatch) {
+      return Math.floor(parseFloat(kMatch[1]) * 1000);
+    }
+    
+    // Handle ranges like "50-100" - take the first number
+    // Handle formats like "30+/mo", "100+", "29/mo"
+    const numMatch = normalized.match(/(\d+)/);
+    return numMatch ? parseInt(numMatch[1]) : 0;
   };
 
   // Load products ONLY from Google Sheet (via backend function)
