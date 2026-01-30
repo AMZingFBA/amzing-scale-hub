@@ -1,5 +1,6 @@
 // Service Worker pour cache et performance optimale
-const CACHE_VERSION = 'amzing-fba-v1';
+// Bump this version whenever we need to force clients to refresh cached assets.
+const CACHE_VERSION = 'amzing-fba-v2';
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const DYNAMIC_CACHE = `${CACHE_VERSION}-dynamic`;
 

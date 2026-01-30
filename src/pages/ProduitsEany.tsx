@@ -22,6 +22,7 @@ interface EanyProduct {
   selleramp_bsr?: string;
   selleramp_sale_price?: number;
   selleramp_sales?: string;
+  selleramp_sales_value?: number;
   selleramp_sellers?: string;
   selleramp_variations?: string;
   selleramp_url?: string;
@@ -76,22 +77,24 @@ export default function ProduitsEany() {
   ];
 
   // Helper function to parse sales value from string
-  const parseSalesValue = (salesStr: string | undefined): number => {
-    if (!salesStr || salesStr === 'Unknown' || salesStr === 'N/A') return 0;
-    
-    // Normalize the string: remove spaces, convert to lowercase
-    const normalized = salesStr.toLowerCase().trim();
-    
-    // Handle "2k+" or "2.5k" format (thousands)
-    const kMatch = normalized.match(/(\d+(?:\.\d+)?)\s*k/);
+  const parseSalesValue = (salesInput: unknown): number => {
+    if (typeof salesInput !== 'string') return 0;
+    const raw = salesInput.trim();
+    if (!raw || raw === 'Unknown' || raw === 'N/A') return 0;
+
+    const normalized = raw.toLowerCase().replace(/\s+/g, '');
+
+    // Handle "2k+", "2.5k", "2,5k" (thousands)
+    const kMatch = normalized.match(/(\d+(?:[\.,]\d+)?)k/);
     if (kMatch) {
-      return Math.floor(parseFloat(kMatch[1]) * 1000);
+      const n = parseFloat(kMatch[1].replace(',', '.'));
+      return Number.isFinite(n) ? Math.floor(n * 1000) : 0;
     }
-    
-    // Handle ranges like "50-100" - take the first number
-    // Handle formats like "30+/mo", "100+", "29/mo"
+
+    // Handle formats like "30+/mo", "100+", "29/mo", "50-100"
     const numMatch = normalized.match(/(\d+)/);
-    return numMatch ? parseInt(numMatch[1]) : 0;
+    const n = numMatch ? parseInt(numMatch[1], 10) : 0;
+    return Number.isFinite(n) ? n : 0;
   };
 
   // Load products ONLY from Google Sheet (via backend function)
@@ -107,7 +110,11 @@ export default function ProduitsEany() {
 
       const sheetProducts = (data?.products ?? []) as any[];
 
-      const transformedProducts: EanyProduct[] = sheetProducts.map((p: any) => ({
+      const transformedProducts: EanyProduct[] = sheetProducts.map((p: any) => {
+        const sellerampSalesRaw = p.selleramp_sales ?? 'Unknown';
+        const sellerampSalesValue = parseSalesValue(sellerampSalesRaw);
+
+        return {
         id: p.id || `${p.ean}-${p.timestamp}`,
         ean: p.ean,
         timestamp: p.timestamp,
@@ -117,7 +124,8 @@ export default function ProduitsEany() {
         qogita_url: p.qogita_url ?? undefined,
         selleramp_bsr: p.selleramp_bsr ?? 'N/A',
         selleramp_sale_price: p.selleramp_sale_price ?? null,
-        selleramp_sales: p.selleramp_sales ?? 'Unknown',
+          selleramp_sales: sellerampSalesRaw,
+          selleramp_sales_value: sellerampSalesValue,
         selleramp_sellers: p.selleramp_sellers ?? 'N/A',
         selleramp_variations: p.selleramp_variations ?? 'None',
         selleramp_url: p.selleramp_url ?? undefined,
@@ -128,7 +136,8 @@ export default function ProduitsEany() {
         alerts: p.alerts ?? [],
         amazon_url: p.amazon_url ?? undefined,
         created_at: p.created_at ?? new Date().toISOString(),
-      }));
+        };
+      });
 
       setProducts(transformedProducts);
 
@@ -204,7 +213,7 @@ export default function ProduitsEany() {
       if (searchEAN && !product.ean.includes(searchEAN)) return false;
 
       if (minSales > 0) {
-        const productSales = parseSalesValue(product.selleramp_sales);
+        const productSales = product.selleramp_sales_value ?? parseSalesValue(product.selleramp_sales);
         if (productSales < minSales) return false;
       }
 
@@ -703,7 +712,9 @@ export default function ProduitsEany() {
                           <p className="text-muted-foreground text-xs">Ventes/mois</p>
                           <p className="font-semibold flex items-center gap-1">
                             {product.selleramp_sales || 'N/A'}
-                            {parseSalesValue(product.selleramp_sales) >= 50 && <Flame className="w-3 h-3 text-orange-500" />}
+                            {(product.selleramp_sales_value ?? parseSalesValue(product.selleramp_sales)) >= 50 && (
+                              <Flame className="w-3 h-3 text-orange-500" />
+                            )}
                           </p>
                         </div>
                         <div className="bg-muted/50 rounded p-2">
