@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/use-auth';
 import { useAdmin } from '@/hooks/use-admin';
@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import * as XLSX from 'xlsx';
 
-import { Loader2, TrendingUp, Package, Clock, ArrowLeft, Copy, ExternalLink, Store, BarChart3, ShoppingCart, RotateCcw, Flame, Upload, FileSpreadsheet, Trash2 } from 'lucide-react';
+import { CheckCircle2, Loader2, TrendingUp, Package, Clock, ArrowLeft, Copy, ExternalLink, Store, BarChart3, ShoppingCart, RotateCcw, Flame, Upload, FileSpreadsheet, Trash2 } from 'lucide-react';
 import { Slider } from '@/components/ui/slider';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
@@ -103,6 +103,61 @@ export default function ProduitsQogita() {
   const [fbmCost, setFbmCost] = useState('0');
   const [minSales, setMinSales] = useState<number>(0);
 
+  type AppliedFilters = {
+    minProfit: string;
+    minROI: string;
+    maxBSR: string;
+    searchEAN: string;
+    profitType: 'both' | 'fbm' | 'fba';
+    fbmCost: string;
+    minSales: number;
+  };
+
+  const DEFAULT_FILTERS: AppliedFilters = {
+    minProfit: '',
+    minROI: '',
+    maxBSR: '',
+    searchEAN: '',
+    profitType: 'both',
+    fbmCost: '0',
+    minSales: 0,
+  };
+
+  // Apply filters only when user clicks "Afficher les résultats"
+  const [hasPendingFilters, setHasPendingFilters] = useState(false);
+  const [appliedFilters, setAppliedFilters] = useState<AppliedFilters>(DEFAULT_FILTERS);
+
+  const applyFilters = () => {
+    setAppliedFilters({
+      minProfit,
+      minROI,
+      maxBSR,
+      searchEAN,
+      profitType,
+      fbmCost,
+      minSales,
+    });
+    setHasPendingFilters(false);
+    setCurrentPage(1);
+    localStorage.setItem(CURRENT_PAGE_KEY, '1');
+    toast.success('Filtres appliqués');
+  };
+
+  const resetFilters = () => {
+    setProfitType(DEFAULT_FILTERS.profitType);
+    setFbmCost(DEFAULT_FILTERS.fbmCost);
+    setMinProfit(DEFAULT_FILTERS.minProfit);
+    setMinROI(DEFAULT_FILTERS.minROI);
+    setMaxBSR(DEFAULT_FILTERS.maxBSR);
+    setSearchEAN(DEFAULT_FILTERS.searchEAN);
+    setMinSales(DEFAULT_FILTERS.minSales);
+    setAppliedFilters(DEFAULT_FILTERS);
+    setHasPendingFilters(false);
+    setCurrentPage(1);
+    localStorage.setItem(CURRENT_PAGE_KEY, '1');
+    toast.success('Filtres réinitialisés');
+  };
+
   // Sales filter presets
   const salesPresets = [
     { label: 'Tous', value: 0, icon: null },
@@ -188,31 +243,31 @@ export default function ProduitsQogita() {
   const baseFilteredProducts = useMemo(() => {
     const filtered = products.filter((product) => {
       // Filter by profit type
-      const fbmCostValue = fbmCost ? parseFloat(fbmCost) : 0;
+      const fbmCostValue = appliedFilters.fbmCost ? parseFloat(appliedFilters.fbmCost) : 0;
       const profit =
-        profitType === 'fbm'
+        appliedFilters.profitType === 'fbm'
           ? product.fbm_profit
             ? product.fbm_profit - fbmCostValue
             : null
-          : profitType === 'fba'
+          : appliedFilters.profitType === 'fba'
             ? product.fba_profit
             : Math.max((product.fbm_profit || 0) - fbmCostValue, product.fba_profit || 0);
       const roi =
-        profitType === 'fbm'
+        appliedFilters.profitType === 'fbm'
           ? product.fbm_roi
-          : profitType === 'fba'
+          : appliedFilters.profitType === 'fba'
             ? product.fba_roi
             : Math.max(product.fbm_roi || 0, product.fba_roi || 0);
 
-      if (minProfit && profit < parseFloat(minProfit)) return false;
-      if (minROI && roi < parseFloat(minROI)) return false;
+      if (appliedFilters.minProfit && profit < parseFloat(appliedFilters.minProfit)) return false;
+      if (appliedFilters.minROI && roi < parseFloat(appliedFilters.minROI)) return false;
 
-      if (maxBSR && product.selleramp_bsr) {
+      if (appliedFilters.maxBSR && product.selleramp_bsr) {
         const bsr = parseInt(product.selleramp_bsr.replace(/\D/g, ''));
-        if (bsr > parseInt(maxBSR)) return false;
+        if (bsr > parseInt(appliedFilters.maxBSR)) return false;
       }
 
-      if (searchEAN && !product.ean.includes(searchEAN)) return false;
+      if (appliedFilters.searchEAN && !product.ean.includes(appliedFilters.searchEAN)) return false;
 
       return true;
     });
@@ -220,18 +275,18 @@ export default function ProduitsQogita() {
     // Sort by timestamp descending (newest first)
     filtered.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
     return filtered;
-  }, [products, minProfit, minROI, maxBSR, searchEAN, profitType, fbmCost]);
+  }, [products, appliedFilters]);
 
   // Filtre ventes (étape finale, anti-fuite)
   const filteredProducts = useMemo(() => {
-    if (!minSales || minSales <= 0) return baseFilteredProducts;
+    if (!appliedFilters.minSales || appliedFilters.minSales <= 0) return baseFilteredProducts;
     return baseFilteredProducts.filter((product) => {
       const sales = getMonthlySalesValue(product.selleramp_sales_value, product.selleramp_sales);
       // Important: si non-numérique/NaN => on exclut (ne doit jamais "passer" le seuil)
       if (!Number.isFinite(sales)) return false;
-      return sales >= minSales;
+      return sales >= appliedFilters.minSales;
     });
-  }, [baseFilteredProducts, minSales]);
+  }, [baseFilteredProducts, appliedFilters.minSales]);
 
   // Pagination
   const totalPages = Math.ceil(filteredProducts.length / PRODUCTS_PER_PAGE);
@@ -239,6 +294,17 @@ export default function ProduitsQogita() {
     (currentPage - 1) * PRODUCTS_PER_PAGE,
     currentPage * PRODUCTS_PER_PAGE
   );
+
+  // Anti-fuite UI: garantit que ce qui est rendu respecte toujours le seuil de ventes appliqué.
+  // (utile si des données incohérentes arrivent via refresh)
+  const renderProducts = useMemo(() => {
+    const threshold = appliedFilters.minSales;
+    if (!threshold || threshold <= 0) return paginatedProducts;
+    return paginatedProducts.filter((p) => {
+      const sales = getMonthlySalesValue(p.selleramp_sales_value, p.selleramp_sales);
+      return Number.isFinite(sales) && sales >= threshold;
+    });
+  }, [paginatedProducts, appliedFilters.minSales]);
 
   // Reset to page 1 if current page is out of bounds
   useEffect(() => {
@@ -248,11 +314,11 @@ export default function ProduitsQogita() {
     }
   }, [currentPage, totalPages]);
 
-  // Reset to page 1 when filters change
+  // Reset to page 1 when filters are applied
   useEffect(() => {
     setCurrentPage(1);
     localStorage.setItem(CURRENT_PAGE_KEY, '1');
-  }, [minProfit, minROI, maxBSR, searchEAN, profitType, fbmCost, minSales]);
+  }, [appliedFilters]);
 
   // Save scroll position
   const saveScrollPosition = () => {
@@ -422,24 +488,26 @@ export default function ProduitsQogita() {
           <CardContent className="p-8">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-lg font-semibold text-foreground">Filtres</h3>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  setProfitType('both');
-                  setFbmCost('0');
-                  setMinProfit('');
-                  setMinROI('');
-                  setMaxBSR('');
-                  setSearchEAN('');
-                  setMinSales(0);
-                  toast.success('Filtres réinitialisés');
-                }}
-                className="gap-2"
-              >
-                <RotateCcw className="w-4 h-4" />
-                Réinitialiser
-              </Button>
+              <div className="flex items-center gap-2">
+                <Button
+                  size="sm"
+                  onClick={applyFilters}
+                  disabled={!hasPendingFilters}
+                  className="gap-2"
+                >
+                  <CheckCircle2 className="w-4 h-4" />
+                  Afficher les résultats
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={resetFilters}
+                  className="gap-2"
+                >
+                  <RotateCcw className="w-4 h-4" />
+                  Réinitialiser
+                </Button>
+              </div>
             </div>
             {/* Type de profit section */}
             <div className="flex flex-col lg:flex-row items-center justify-between gap-6 pb-6 border-b border-border">
@@ -447,7 +515,10 @@ export default function ProduitsQogita() {
                 <label className="text-sm font-semibold mb-3 block text-foreground">Type de profit</label>
                 <div className="inline-flex rounded-xl border-2 border-border p-1.5 bg-muted/30 shadow-sm">
                   <button
-                    onClick={() => setProfitType('both')}
+                    onClick={() => {
+                      setProfitType('both');
+                      setHasPendingFilters(true);
+                    }}
                     className={`px-6 py-2.5 rounded-lg text-sm font-semibold transition-all ${
                       profitType === 'both'
                         ? 'bg-primary text-primary-foreground shadow-md scale-105'
@@ -457,7 +528,10 @@ export default function ProduitsQogita() {
                     Les 2
                   </button>
                   <button
-                    onClick={() => setProfitType('fbm')}
+                    onClick={() => {
+                      setProfitType('fbm');
+                      setHasPendingFilters(true);
+                    }}
                     className={`px-6 py-2.5 rounded-lg text-sm font-semibold transition-all ${
                       profitType === 'fbm'
                         ? 'bg-primary text-primary-foreground shadow-md scale-105'
@@ -467,7 +541,10 @@ export default function ProduitsQogita() {
                     FBM
                   </button>
                   <button
-                    onClick={() => setProfitType('fba')}
+                    onClick={() => {
+                      setProfitType('fba');
+                      setHasPendingFilters(true);
+                    }}
                     className={`px-6 py-2.5 rounded-lg text-sm font-semibold transition-all ${
                       profitType === 'fba'
                         ? 'bg-primary text-primary-foreground shadow-md scale-105'
@@ -487,6 +564,7 @@ export default function ProduitsQogita() {
                   placeholder="Ex: 2.50"
                   value={fbmCost}
                   onChange={(e) => {
+                    setHasPendingFilters(true);
                     const value = e.target.value;
                     if (value === '' || value === '0') {
                       setFbmCost('0');
@@ -499,6 +577,7 @@ export default function ProduitsQogita() {
                     }
                   }}
                   onBlur={(e) => {
+                    setHasPendingFilters(true);
                     // Au blur, nettoyer la valeur
                     const numValue = parseFloat(e.target.value);
                     if (!isNaN(numValue) && numValue > 0) {
@@ -517,9 +596,9 @@ export default function ProduitsQogita() {
               <div className="flex items-center gap-2 mb-4">
                 <Flame className="w-5 h-5 text-orange-500" />
                 <label className="text-sm font-semibold text-foreground">Ventes mensuelles minimum</label>
-                {minSales > 0 && (
+                {(hasPendingFilters ? minSales : appliedFilters.minSales) > 0 && (
                   <Badge variant="secondary" className="ml-2 bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400">
-                    {minSales}+ ventes/mois
+                    {hasPendingFilters ? `${minSales}+ (à appliquer)` : `${appliedFilters.minSales}+ ventes/mois`}
                   </Badge>
                 )}
               </div>
@@ -529,7 +608,10 @@ export default function ProduitsQogita() {
                 {salesPresets.map((preset) => (
                   <button
                     key={preset.value}
-                    onClick={() => setMinSales(preset.value)}
+                    onClick={() => {
+                      setMinSales(preset.value);
+                      setHasPendingFilters(true);
+                    }}
                     className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-1.5 ${
                       minSales === preset.value
                         ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-md scale-105'
@@ -546,7 +628,10 @@ export default function ProduitsQogita() {
               <div className="px-2">
                 <Slider
                   value={[minSales]}
-                  onValueChange={(values) => setMinSales(values[0])}
+                  onValueChange={(values) => {
+                    setMinSales(values[0]);
+                    setHasPendingFilters(true);
+                  }}
                   max={200}
                   step={5}
                   className="w-full"
@@ -572,6 +657,7 @@ export default function ProduitsQogita() {
                   placeholder="Ex: 2.00"
                   value={minProfit}
                   onChange={(e) => {
+                    setHasPendingFilters(true);
                     const value = e.target.value;
                     if (value === '' || value === '0') {
                       setMinProfit('0');
@@ -583,6 +669,7 @@ export default function ProduitsQogita() {
                     }
                   }}
                   onBlur={(e) => {
+                    setHasPendingFilters(true);
                     const numValue = parseFloat(e.target.value);
                     if (!isNaN(numValue) && numValue > 0) {
                       setMinProfit(String(numValue));
@@ -602,6 +689,7 @@ export default function ProduitsQogita() {
                   placeholder="Ex: 20"
                   value={minROI}
                   onChange={(e) => {
+                    setHasPendingFilters(true);
                     const value = e.target.value;
                     if (value === '' || value === '0') {
                       setMinROI('0');
@@ -613,6 +701,7 @@ export default function ProduitsQogita() {
                     }
                   }}
                   onBlur={(e) => {
+                    setHasPendingFilters(true);
                     const numValue = parseFloat(e.target.value);
                     if (!isNaN(numValue) && numValue > 0) {
                       setMinROI(String(numValue));
@@ -629,7 +718,10 @@ export default function ProduitsQogita() {
                   type="number"
                   placeholder="Ex: 1000"
                   value={maxBSR}
-                  onChange={(e) => setMaxBSR(e.target.value)}
+                  onChange={(e) => {
+                    setMaxBSR(e.target.value);
+                    setHasPendingFilters(true);
+                  }}
                   className="h-11 border-2 focus:ring-2"
                 />
               </div>
@@ -639,7 +731,10 @@ export default function ProduitsQogita() {
                   type="text"
                   placeholder="Ex: 0000030095656"
                   value={searchEAN}
-                  onChange={(e) => setSearchEAN(e.target.value)}
+                  onChange={(e) => {
+                    setSearchEAN(e.target.value);
+                    setHasPendingFilters(true);
+                  }}
                   className="h-11 border-2 focus:ring-2"
                 />
               </div>
@@ -648,7 +743,7 @@ export default function ProduitsQogita() {
         </Card>
 
         {/* Products Grid */}
-        {paginatedProducts.length === 0 ? (
+        {renderProducts.length === 0 ? (
           <Card>
             <CardContent className="p-12 text-center">
               <p className="text-muted-foreground">Aucun produit trouvé</p>
@@ -657,7 +752,7 @@ export default function ProduitsQogita() {
         ) : (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-              {paginatedProducts.map((product) => (
+              {renderProducts.map((product) => (
                 <Card key={product.id} className="hover:shadow-lg transition-shadow">
                   <CardHeader>
                     <CardTitle className="text-lg flex items-center justify-between">
