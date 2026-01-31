@@ -184,8 +184,8 @@ export default function ProduitsQogita() {
     }
   };
 
-  // Filtered + default sort (FBA ROI décroissant)
-  const filteredProducts = useMemo(() => {
+  // Base filters (sans le filtre ventes) + tri par date (newest first)
+  const baseFilteredProducts = useMemo(() => {
     const filtered = products.filter((product) => {
       // Filter by profit type
       const fbmCostValue = fbmCost ? parseFloat(fbmCost) : 0;
@@ -214,19 +214,24 @@ export default function ProduitsQogita() {
 
       if (searchEAN && !product.ean.includes(searchEAN)) return false;
 
-      // Filter by minimum sales
-      if (minSales > 0) {
-        const productSales = getMonthlySalesValue(product.selleramp_sales_value, product.selleramp_sales);
-        if (productSales < minSales) return false;
-      }
-
       return true;
     });
 
     // Sort by timestamp descending (newest first)
     filtered.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
     return filtered;
-  }, [products, minProfit, minROI, maxBSR, searchEAN, profitType, fbmCost, minSales]);
+  }, [products, minProfit, minROI, maxBSR, searchEAN, profitType, fbmCost]);
+
+  // Filtre ventes (étape finale, anti-fuite)
+  const filteredProducts = useMemo(() => {
+    if (!minSales || minSales <= 0) return baseFilteredProducts;
+    return baseFilteredProducts.filter((product) => {
+      const sales = getMonthlySalesValue(product.selleramp_sales_value, product.selleramp_sales);
+      // Important: si non-numérique/NaN => on exclut (ne doit jamais "passer" le seuil)
+      if (!Number.isFinite(sales)) return false;
+      return sales >= minSales;
+    });
+  }, [baseFilteredProducts, minSales]);
 
   // Pagination
   const totalPages = Math.ceil(filteredProducts.length / PRODUCTS_PER_PAGE);
