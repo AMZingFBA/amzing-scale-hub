@@ -1,6 +1,6 @@
 // Service Worker pour cache et performance optimale
 // Bump this version whenever we need to force clients to refresh cached assets.
-const CACHE_VERSION = 'amzing-fba-v2';
+const CACHE_VERSION = 'amzing-fba-v3';
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const DYNAMIC_CACHE = `${CACHE_VERSION}-dynamic`;
 
@@ -46,28 +46,39 @@ self.addEventListener('fetch', (event) => {
   
   // Ignorer les requêtes vers des domaines externes sauf images
   const url = new URL(request.url);
-  if (url.origin !== location.origin && !request.destination === 'image') {
+  if (url.origin !== location.origin && request.destination !== 'image') {
+    return;
+  }
+
+  // IMPORTANT: éviter de servir un JS/HTML obsolète (problème de filtres non appliqués)
+  // - Navigation (HTML) : Network-first sans fallback sur cache (sauf si offline -> cache)
+  // - Scripts/styles : Network-only (pas de cache)
+  if (request.mode === 'navigate') {
+    event.respondWith(
+      fetch(request).catch(() => caches.match('/index.html'))
+    );
+    return;
+  }
+
+  if (request.destination === 'script' || request.destination === 'style') {
+    event.respondWith(fetch(request));
     return;
   }
 
   event.respondWith(
     fetch(request)
       .then((response) => {
-        // Clone la réponse car elle ne peut être consommée qu'une fois
         const responseClone = response.clone();
-        
-        // Met en cache les réponses réussies
-        if (response.status === 200) {
+
+        // Met en cache uniquement les assets "stables" (images, fonts)
+        if (response.status === 200 && (request.destination === 'image' || request.destination === 'font')) {
           caches.open(DYNAMIC_CACHE).then((cache) => {
             cache.put(request, responseClone);
           });
         }
-        
+
         return response;
       })
-      .catch(() => {
-        // En cas d'échec réseau, retourne depuis le cache
-        return caches.match(request);
-      })
+      .catch(() => caches.match(request))
   );
 });
