@@ -24,10 +24,10 @@ const SuitePricing = () => {
       <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-            Accès VIP — <span className="text-suite-orange">À partir de 64€/mois</span>
+            Accès à vie — <span className="text-suite-orange">Paiement unique</span>
           </h2>
           <p className="text-suite-gray text-lg">
-            Ou 700€ en une fois • Accès 12 mois complet
+            Un seul paiement, accès illimité à vie
           </p>
         </div>
 
@@ -53,20 +53,19 @@ const SuitePricing = () => {
             <div className="bg-gradient-to-br from-suite-card to-suite-bg border-2 border-suite-orange/50 rounded-2xl p-8 relative overflow-hidden">
               {/* Popular badge */}
               <div className="absolute top-0 right-0 bg-suite-orange text-white text-xs font-bold px-4 py-1.5 rounded-bl-xl">
-                ACCÈS 12 MOIS
+                ACCÈS À VIE
               </div>
 
               {/* Price */}
               <div className="mb-8">
-                <p className="text-suite-gray text-sm mb-2 line-through">Valeur réelle : 1 200€/an</p>
+                <p className="text-suite-gray text-sm mb-2 line-through">Valeur réelle : 2 500€</p>
                 <div className="flex items-baseline gap-2 mb-1">
-                  <span className="text-5xl font-bold text-white">64</span>
+                  <span className="text-5xl font-bold text-white">1 499,99</span>
                   <span className="text-2xl text-white">€</span>
-                  <span className="text-lg text-suite-gray">/mois × 12</span>
                 </div>
                 <p className="text-suite-gray">
-                  ou <span className="text-white font-semibold">700€ TTC</span> en une fois 
-                  <span className="ml-2 bg-green-500/20 text-green-400 text-xs font-bold px-2 py-0.5 rounded">-10%</span>
+                  Paiement unique • <span className="text-white font-semibold">Accès à vie</span>
+                  <span className="ml-2 bg-green-500/20 text-green-400 text-xs font-bold px-2 py-0.5 rounded">-40%</span>
                 </p>
               </div>
 
