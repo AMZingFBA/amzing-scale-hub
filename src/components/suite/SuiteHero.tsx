@@ -16,7 +16,7 @@ const SuiteHero = () => {
   };
 
   const benefits = [
-    "Produits rentables envoyés chaque semaine",
+    "40 à 50 produits rentables envoyés chaque mois",
     "Calcul ROI et marges automatique",
     "Accès fournisseurs & catalogues exclusifs",
     "Communauté privée + support 9h–19h",
