@@ -109,6 +109,7 @@ export default function ProduitsQogita() {
     { label: '10+', value: 10, icon: '📈' },
     { label: '30+', value: 30, icon: '🔥' },
     { label: '50+', value: 50, icon: '💎' },
+    { label: '85+', value: 85, icon: '⭐' },
     { label: '100+', value: 100, icon: '🚀' },
   ];
 
@@ -213,7 +214,7 @@ export default function ProduitsQogita() {
 
       if (searchEAN && !product.ean.includes(searchEAN)) return false;
 
-      // Filter by minimum sales (robust: avoids NaN / non-numeric values passing the threshold)
+      // Filter by minimum sales
       if (minSales > 0) {
         const productSales = getMonthlySalesValue(product.selleramp_sales_value, product.selleramp_sales);
         if (productSales < minSales) return false;
