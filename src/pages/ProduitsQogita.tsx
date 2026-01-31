@@ -126,6 +126,7 @@ export default function ProduitsQogita() {
   // Apply filters only when user clicks "Afficher les résultats"
   const [hasPendingFilters, setHasPendingFilters] = useState(false);
   const [appliedFilters, setAppliedFilters] = useState<AppliedFilters>(DEFAULT_FILTERS);
+  const [filtersVersion, setFiltersVersion] = useState(0);
 
   const applyFilters = () => {
     setAppliedFilters({
@@ -137,10 +138,12 @@ export default function ProduitsQogita() {
       fbmCost,
       minSales,
     });
+    // Force a fresh render/apply even if values look identical (helps avoid UI “stale cards”).
+    setFiltersVersion((v) => v + 1);
     setHasPendingFilters(false);
     setCurrentPage(1);
     localStorage.setItem(CURRENT_PAGE_KEY, '1');
-    toast.success('Filtres appliqués');
+    toast.success(hasPendingFilters ? 'Filtres appliqués' : 'Résultats actualisés');
   };
 
   const resetFilters = () => {
@@ -492,7 +495,6 @@ export default function ProduitsQogita() {
                 <Button
                   size="sm"
                   onClick={applyFilters}
-                  disabled={!hasPendingFilters}
                   className="gap-2"
                 >
                   <CheckCircle2 className="w-4 h-4" />
@@ -751,7 +753,10 @@ export default function ProduitsQogita() {
           </Card>
         ) : (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            <div
+              key={`results-${filtersVersion}-${currentPage}`}
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8"
+            >
               {renderProducts.map((product) => (
                 <Card key={product.id} className="hover:shadow-lg transition-shadow">
                   <CardHeader>
