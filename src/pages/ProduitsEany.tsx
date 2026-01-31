@@ -10,6 +10,7 @@ import { Loader2, TrendingUp, Package, Clock, ArrowLeft, Copy, ExternalLink, Sto
 import { Slider } from '@/components/ui/slider';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import { getMonthlySalesValue, parseMonthlySalesValue } from '@/lib/monthly-sales';
 
 interface EanyProduct {
   id: string;
@@ -76,26 +77,7 @@ export default function ProduitsEany() {
     { label: '100+', value: 100, icon: '🚀' },
   ];
 
-  // Helper function to parse sales value from string
-  const parseSalesValue = (salesInput: unknown): number => {
-    if (typeof salesInput !== 'string') return 0;
-    const raw = salesInput.trim();
-    if (!raw || raw === 'Unknown' || raw === 'N/A') return 0;
-
-    const normalized = raw.toLowerCase().replace(/\s+/g, '');
-
-    // Handle "2k+", "2.5k", "2,5k" (thousands)
-    const kMatch = normalized.match(/(\d+(?:[\.,]\d+)?)k/);
-    if (kMatch) {
-      const n = parseFloat(kMatch[1].replace(',', '.'));
-      return Number.isFinite(n) ? Math.floor(n * 1000) : 0;
-    }
-
-    // Handle formats like "30+/mo", "100+", "29/mo", "50-100"
-    const numMatch = normalized.match(/(\d+)/);
-    const n = numMatch ? parseInt(numMatch[1], 10) : 0;
-    return Number.isFinite(n) ? n : 0;
-  };
+  // NOTE: Parsing sales moved to src/lib/monthly-sales.ts for consistency.
 
   // Load products ONLY from Google Sheet (via backend function)
   const loadProducts = async () => {
@@ -111,8 +93,13 @@ export default function ProduitsEany() {
       const sheetProducts = (data?.products ?? []) as any[];
 
       const transformedProducts: EanyProduct[] = sheetProducts.map((p: any) => {
-        const sellerampSalesRaw = p.selleramp_sales ?? 'Unknown';
-        const sellerampSalesValue = parseSalesValue(sellerampSalesRaw);
+        const sellerampSalesRaw =
+          typeof p.selleramp_sales === 'string'
+            ? p.selleramp_sales
+            : p.selleramp_sales == null
+              ? 'Unknown'
+              : String(p.selleramp_sales);
+        const sellerampSalesValue = parseMonthlySalesValue(sellerampSalesRaw);
 
         return {
         id: p.id || `${p.ean}-${p.timestamp}`,
@@ -213,7 +200,7 @@ export default function ProduitsEany() {
       if (searchEAN && !product.ean.includes(searchEAN)) return false;
 
       if (minSales > 0) {
-        const productSales = product.selleramp_sales_value ?? parseSalesValue(product.selleramp_sales);
+        const productSales = getMonthlySalesValue(product.selleramp_sales_value, product.selleramp_sales);
         if (productSales < minSales) return false;
       }
 
@@ -712,7 +699,7 @@ export default function ProduitsEany() {
                           <p className="text-muted-foreground text-xs">Ventes/mois</p>
                           <p className="font-semibold flex items-center gap-1">
                             {product.selleramp_sales || 'N/A'}
-                            {(product.selleramp_sales_value ?? parseSalesValue(product.selleramp_sales)) >= 50 && (
+                            {getMonthlySalesValue(product.selleramp_sales_value, product.selleramp_sales) >= 50 && (
                               <Flame className="w-3 h-3 text-orange-500" />
                             )}
                           </p>
