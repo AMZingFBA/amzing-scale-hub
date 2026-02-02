@@ -37,219 +37,228 @@ interface ParsedAlert {
 
 function parseAlertMessage(message: string): ParsedAlert | null {
   try {
-    const lines = message.trim().split('\n').map(l => l.trim()).filter(l => l);
+    const lines = message.trim().split('\n').map(l => l.trim());
     
-    if (lines.length < 5) return null;
+    // Initialize result
+    const result: ParsedAlert = {
+      source_name: '',
+      product_title: '',
+      ean: '',
+      original_price: null,
+      current_price: 0,
+      bsr: null,
+      bsr_percent: null,
+      cost_price: null,
+      sale_price: null,
+      monthly_sales: null,
+      profit: null,
+      roi: null,
+      fba_profit: null,
+      fba_roi: null,
+      private_label: null,
+      product_size: null,
+      meltable: null,
+      variations: null,
+      sellers: null,
+      amazon_url: null,
+      sas_url: null,
+      source_url: null
+    };
 
-    // First line is source name
-    const source_name = lines[0];
-    
-    // Find product title (line after source, before EAN)
-    let product_title = '';
-    let eanIndex = -1;
-    
-    for (let i = 1; i < lines.length; i++) {
-      if (lines[i] === 'EAN' || lines[i].startsWith('EAN')) {
-        eanIndex = i;
-        break;
-      }
-      if (lines[i] && !lines[i].includes(':') && lines[i].length > 10) {
-        product_title = lines[i];
-      }
-    }
-
-    if (!product_title) {
-      product_title = lines[1];
-    }
-
-    // Find EAN
-    let ean = '';
-    for (let i = 0; i < lines.length; i++) {
-      if (lines[i] === 'EAN' && lines[i + 1]) {
-        ean = lines[i + 1].replace(/\D/g, '');
-        break;
-      }
-      const eanMatch = lines[i].match(/^(\d{12,13})$/);
-      if (eanMatch) {
-        ean = eanMatch[1];
-        break;
-      }
-    }
-
-    // Parse Price
-    let original_price: number | null = null;
-    let current_price = 0;
-    
-    for (let i = 0; i < lines.length; i++) {
-      if (lines[i] === 'Price' && lines[i + 1]) {
-        const priceMatch = lines[i + 1].match(/(\d+[.,]?\d*)\s*€?\s*→\s*(\d+[.,]?\d*)\s*€?/);
-        if (priceMatch) {
-          original_price = parseFloat(priceMatch[1].replace(',', '.'));
-          current_price = parseFloat(priceMatch[2].replace(',', '.'));
-        } else {
-          const singlePrice = lines[i + 1].match(/(\d+[.,]?\d*)\s*€?/);
-          if (singlePrice) {
-            current_price = parseFloat(singlePrice[1].replace(',', '.'));
-          }
-        }
-        break;
-      }
-    }
-
-    // Parse SAS section
-    let bsr: string | null = null;
-    let bsr_percent: string | null = null;
-    let cost_price: number | null = null;
-    let sale_price: number | null = null;
-    let monthly_sales: string | null = null;
-    let profit: number | null = null;
-    let roi: number | null = null;
-    let fba_profit: number | null = null;
-    let fba_roi: number | null = null;
-
+    // First non-empty line is source name
     for (const line of lines) {
-      // BSR
-      if (line.includes('BSR:')) {
-        const bsrMatch = line.match(/BSR:\s*(\d+)/);
-        const percentMatch = line.match(/\(([^)]+)\)/);
-        if (bsrMatch) bsr = bsrMatch[1];
-        if (percentMatch) bsr_percent = percentMatch[1];
-      }
-      
-      // Cost Price
-      if (line.includes('Cost Price:')) {
-        const match = line.match(/Cost Price:\s*(\d+[.,]?\d*)/);
-        if (match) cost_price = parseFloat(match[1].replace(',', '.'));
-      }
-      
-      // Sale Price
-      if (line.includes('Sale Price:')) {
-        const match = line.match(/Sale Price:\s*(\d+[.,]?\d*)/);
-        if (match) sale_price = parseFloat(match[1].replace(',', '.'));
-      }
-      
-      // Sales
-      if (line.includes('Sales:')) {
-        const match = line.match(/Sales:\s*(.+)/);
-        if (match) monthly_sales = match[1].trim();
-      }
-      
-      // FBM Profit & ROI
-      if (line.includes('Type:') && line.includes('FBM')) {
-        // Next lines contain profit and ROI
-      }
-      if (line.includes('Profit:') && !fba_profit) {
-        const match = line.match(/Profit:\s*(\d+[.,]?\d*)/);
-        if (match) profit = parseFloat(match[1].replace(',', '.'));
-      }
-      if (line.includes('ROI:') && !fba_roi) {
-        const match = line.match(/ROI:\s*(\d+[.,]?\d*)/);
-        if (match) roi = parseFloat(match[1].replace(',', '.'));
+      if (line && !line.includes(':') && line.length < 50) {
+        result.source_name = line;
+        break;
       }
     }
 
-    // Parse FBA section specifically
-    let inFBA = false;
-    for (const line of lines) {
-      if (line.includes('Type:') && line.includes('FBA')) {
-        inFBA = true;
+    // Find sections
+    let currentSection = 'header';
+    let productTitleLines: string[] = [];
+    let fbmFound = false;
+    let fbaFound = false;
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      const nextLine = lines[i + 1] || '';
+      
+      // Detect sections
+      if (line === 'EAN') {
+        currentSection = 'ean';
         continue;
       }
-      if (inFBA) {
-        if (line.includes('Profit:')) {
-          const match = line.match(/Profit:\s*(\d+[.,]?\d*)/);
-          if (match) fba_profit = parseFloat(match[1].replace(',', '.'));
-        }
-        if (line.includes('ROI:')) {
-          const match = line.match(/ROI:\s*(\d+[.,]?\d*)/);
-          if (match) fba_roi = parseFloat(match[1].replace(',', '.'));
-          inFBA = false; // End of FBA section
-        }
+      if (line === 'Price') {
+        currentSection = 'price';
+        continue;
       }
-    }
+      if (line === 'SAS') {
+        currentSection = 'sas';
+        continue;
+      }
+      if (line === 'Alerts') {
+        currentSection = 'alerts';
+        continue;
+      }
+      if (line === 'Links') {
+        currentSection = 'links';
+        continue;
+      }
 
-    // Parse Alerts section
-    let private_label: string | null = null;
-    let product_size: string | null = null;
-    let meltable: string | null = null;
-    let variations: string | null = null;
-    let sellers: string | null = null;
-
-    for (const line of lines) {
-      if (line.includes('Private Label:')) {
-        const match = line.match(/Private Label:\s*(.+)/);
-        if (match) private_label = match[1].trim();
-      }
-      if (line.includes('Size:')) {
-        const match = line.match(/Size:\s*(.+)/);
-        if (match) product_size = match[1].trim();
-      }
-      if (line.includes('Meltable:')) {
-        const match = line.match(/Meltable:\s*(.+)/);
-        if (match) meltable = match[1].trim();
-      }
-      if (line.includes('Variations:')) {
-        const match = line.match(/Variations:\s*(.+)/);
-        if (match) variations = match[1].trim();
-      }
-      if (line.includes('Sellers:')) {
-        const match = line.match(/Sellers:\s*(.+)/);
-        if (match) sellers = match[1].trim();
-      }
-    }
-
-    // Parse Links section
-    let amazon_url: string | null = null;
-    let sas_url: string | null = null;
-    let source_url: string | null = null;
-
-    for (let i = 0; i < lines.length; i++) {
-      if (lines[i] === 'Links') {
-        const linksLine = lines[i + 1];
-        if (linksLine) {
-          // Links are in format: "Amazon | SAS | Leclerc"
-          // We need to find the URLs - they might be in the next lines or embedded
-          continue;
+      // Parse based on section
+      if (currentSection === 'header') {
+        // Collect product title (lines after source, before EAN)
+        if (line && line !== result.source_name && !line.match(/^\d{12,13}$/)) {
+          productTitleLines.push(line);
         }
       }
-      // Look for URLs
-      if (lines[i].includes('amazon.') || lines[i].includes('amzn.')) {
-        amazon_url = lines[i].startsWith('http') ? lines[i] : `https://${lines[i]}`;
+
+      // EAN section
+      if (currentSection === 'ean') {
+        const eanMatch = line.match(/^(\d{12,13})$/);
+        if (eanMatch) {
+          result.ean = eanMatch[1];
+          currentSection = 'after_ean';
+        }
+      }
+
+      // Price section
+      if (currentSection === 'price') {
+        // Format: "24.11 € → 8.00 €" or just "8.00 €"
+        const priceArrowMatch = line.match(/(\d+[.,]?\d*)\s*€?\s*→\s*(\d+[.,]?\d*)\s*€?/);
+        if (priceArrowMatch) {
+          result.original_price = parseFloat(priceArrowMatch[1].replace(',', '.'));
+          result.current_price = parseFloat(priceArrowMatch[2].replace(',', '.'));
+          currentSection = 'after_price';
+        } else {
+          const singlePriceMatch = line.match(/(\d+[.,]?\d*)\s*€/);
+          if (singlePriceMatch) {
+            result.current_price = parseFloat(singlePriceMatch[1].replace(',', '.'));
+            currentSection = 'after_price';
+          }
+        }
+      }
+
+      // SAS section - parse all fields
+      if (currentSection === 'sas') {
+        // BSR: 45576 (0.71%)
+        const bsrMatch = line.match(/BSR:\s*(\d+)\s*\(([^)]+)\)/);
+        if (bsrMatch) {
+          result.bsr = bsrMatch[1];
+          result.bsr_percent = bsrMatch[2];
+        }
+
+        // Cost Price: 8.00 €
+        const costMatch = line.match(/Cost\s*Price:\s*(\d+[.,]?\d*)\s*€?/);
+        if (costMatch) {
+          result.cost_price = parseFloat(costMatch[1].replace(',', '.'));
+        }
+
+        // Sale Price: 24.11 €
+        const saleMatch = line.match(/Sale\s*Price:\s*(\d+[.,]?\d*)\s*€?/);
+        if (saleMatch) {
+          result.sale_price = parseFloat(saleMatch[1].replace(',', '.'));
+        }
+
+        // Sales: 131 /mo
+        const salesMatch = line.match(/Sales:\s*(.+)/);
+        if (salesMatch) {
+          result.monthly_sales = salesMatch[1].trim();
+        }
+
+        // Type: FBM 🔹 followed by Profit and ROI
+        if (line.includes('Type:') && line.includes('FBM')) {
+          fbmFound = true;
+          fbaFound = false;
+        }
+        if (line.includes('Type:') && line.includes('FBA')) {
+          fbaFound = true;
+          fbmFound = false;
+        }
+
+        // Profit: 9.28 €
+        const profitMatch = line.match(/Profit:\s*(\d+[.,]?\d*)\s*€?/);
+        if (profitMatch) {
+          const profitValue = parseFloat(profitMatch[1].replace(',', '.'));
+          if (fbmFound && result.profit === null) {
+            result.profit = profitValue;
+          } else if (fbaFound) {
+            result.fba_profit = profitValue;
+          } else if (result.profit === null) {
+            result.profit = profitValue;
+          }
+        }
+
+        // ROI: 82.78 %
+        const roiMatch = line.match(/ROI:\s*(\d+[.,]?\d*)\s*%?/);
+        if (roiMatch) {
+          const roiValue = parseFloat(roiMatch[1].replace(',', '.'));
+          if (fbmFound && result.roi === null) {
+            result.roi = roiValue;
+          } else if (fbaFound) {
+            result.fba_roi = roiValue;
+          } else if (result.roi === null) {
+            result.roi = roiValue;
+          }
+        }
+      }
+
+      // Alerts section
+      if (currentSection === 'alerts') {
+        // Private Label: Likely
+        const plMatch = line.match(/Private\s*Label:\s*(.+)/);
+        if (plMatch) {
+          result.private_label = plMatch[1].trim();
+        }
+
+        // Size: Standard
+        const sizeMatch = line.match(/Size:\s*(\S+)/);
+        if (sizeMatch) {
+          result.product_size = sizeMatch[1].trim();
+        }
+
+        // Meltable: No
+        const meltMatch = line.match(/Meltable:\s*(\S+)/);
+        if (meltMatch) {
+          result.meltable = meltMatch[1].trim();
+        }
+
+        // Variations: 0
+        const varMatch = line.match(/Variations:\s*(\S+)/);
+        if (varMatch) {
+          result.variations = varMatch[1].trim();
+        }
+
+        // Sellers: 18
+        const sellersMatch = line.match(/Sellers:\s*(\S+)/);
+        if (sellersMatch) {
+          result.sellers = sellersMatch[1].trim();
+        }
+      }
+
+      // Links section - typically "Amazon | SAS | Leclerc"
+      if (currentSection === 'links') {
+        // Generate URLs based on EAN
+        if (result.ean) {
+          result.amazon_url = `https://www.amazon.fr/dp/s?k=${result.ean}`;
+          result.sas_url = `https://www.selleramp.com/sas/lookup?ean=${result.ean}`;
+        }
       }
     }
 
-    // Generate standard URLs if we have the EAN
-    if (ean) {
-      if (!amazon_url) {
-        amazon_url = `https://www.amazon.fr/dp/s?k=${ean}`;
-      }
-      sas_url = `https://www.selleramp.com/sas/lookup?ean=${ean}`;
+    // Set product title from collected lines
+    if (productTitleLines.length > 0) {
+      // Take the longest line as product title (usually the actual title)
+      result.product_title = productTitleLines.reduce((a, b) => a.length > b.length ? a : b);
     }
 
-    return {
-      source_name,
-      product_title,
-      ean,
-      original_price,
-      current_price,
-      bsr,
-      bsr_percent,
-      cost_price,
-      sale_price,
-      monthly_sales,
-      profit,
-      roi,
-      fba_profit,
-      fba_roi,
-      private_label,
-      product_size,
-      meltable,
-      variations,
-      sellers,
-      amazon_url,
-      sas_url,
-      source_url
-    };
+    // Validate minimum required fields
+    if (!result.ean || !result.product_title || !result.source_name) {
+      console.error('Missing required fields:', { ean: result.ean, title: result.product_title, source: result.source_name });
+      return null;
+    }
+
+    return result;
   } catch (error) {
     console.error('Error parsing message:', error);
     return null;
@@ -263,7 +272,7 @@ export default function AdminProductAlertForm({ onSuccess }: AdminProductAlertFo
 
   const handleParse = () => {
     const parsed = parseAlertMessage(message);
-    if (parsed && parsed.ean && parsed.product_title) {
+    if (parsed) {
       setParsedPreview(parsed);
       toast.success('Message parsé avec succès !');
     } else {
@@ -319,14 +328,39 @@ export default function AdminProductAlertForm({ onSuccess }: AdminProductAlertFo
 Barbie Color Reveal Poupée...
 
 EAN
+
 0194735178766
 
 Price
+
 24.11 € → 8.00 €
 
 SAS
+
 BSR: 45576 (0.71%)
-...`}
+Cost Price: 8.00 €
+Sale Price: 24.11 €
+Sales: 131 /mo
+
+Type: FBM 🔹
+Profit: 9.28 €
+ROI: 82.78 %
+
+Type: FBA 🔸
+Profit: 4.48 €
+ROI: 44.14 %
+
+Alerts
+
+Private Label: Likely
+Size: Standard
+Meltable: No
+Variations: 0
+Sellers: 18
+
+Links
+
+Amazon | SAS | Leclerc`}
           className="min-h-[300px] font-mono text-sm"
         />
       </div>
@@ -361,16 +395,76 @@ BSR: 45576 (0.71%)
       {/* Preview */}
       {parsedPreview && (
         <Card className="mt-4 border-green-500/50 bg-green-500/5">
-          <CardContent className="p-4 space-y-2">
-            <h4 className="font-semibold text-green-600">Aperçu de l'alerte</h4>
-            <div className="grid grid-cols-2 gap-2 text-sm">
-              <div><span className="text-muted-foreground">Source:</span> {parsedPreview.source_name}</div>
-              <div><span className="text-muted-foreground">EAN:</span> {parsedPreview.ean}</div>
-              <div className="col-span-2"><span className="text-muted-foreground">Produit:</span> {parsedPreview.product_title}</div>
-              <div><span className="text-muted-foreground">Prix:</span> {parsedPreview.original_price && `${parsedPreview.original_price}€ → `}{parsedPreview.current_price}€</div>
-              {parsedPreview.bsr && <div><span className="text-muted-foreground">BSR:</span> {parsedPreview.bsr}</div>}
-              {parsedPreview.profit && <div><span className="text-muted-foreground">FBM Profit:</span> {parsedPreview.profit}€ ({parsedPreview.roi}%)</div>}
-              {parsedPreview.fba_profit && <div><span className="text-muted-foreground">FBA Profit:</span> {parsedPreview.fba_profit}€ ({parsedPreview.fba_roi}%)</div>}
+          <CardContent className="p-4 space-y-3">
+            <h4 className="font-semibold text-green-600 text-lg">✅ Aperçu de l'alerte</h4>
+            
+            <div className="grid grid-cols-2 gap-3 text-sm">
+              <div><span className="text-muted-foreground">Source:</span> <strong>{parsedPreview.source_name}</strong></div>
+              <div><span className="text-muted-foreground">EAN:</span> <code className="bg-muted px-1 rounded">{parsedPreview.ean}</code></div>
+            </div>
+            
+            <div className="text-sm">
+              <span className="text-muted-foreground">Produit:</span> <strong>{parsedPreview.product_title}</strong>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-3 text-sm border-t pt-3">
+              <div>
+                <span className="text-muted-foreground">Prix:</span>{' '}
+                {parsedPreview.original_price && <span className="line-through mr-1">{parsedPreview.original_price}€</span>}
+                <strong className="text-green-600">{parsedPreview.current_price}€</strong>
+              </div>
+              {parsedPreview.bsr && (
+                <div>
+                  <span className="text-muted-foreground">BSR:</span>{' '}
+                  <strong>{parsedPreview.bsr}</strong>
+                  {parsedPreview.bsr_percent && <span className="text-muted-foreground ml-1">({parsedPreview.bsr_percent})</span>}
+                </div>
+              )}
+            </div>
+
+            <div className="grid grid-cols-3 gap-3 text-sm">
+              {parsedPreview.cost_price && (
+                <div><span className="text-muted-foreground">Cost Price:</span> <strong>{parsedPreview.cost_price}€</strong></div>
+              )}
+              {parsedPreview.sale_price && (
+                <div><span className="text-muted-foreground">Sale Price:</span> <strong>{parsedPreview.sale_price}€</strong></div>
+              )}
+              {parsedPreview.monthly_sales && (
+                <div><span className="text-muted-foreground">Sales:</span> <strong>{parsedPreview.monthly_sales}</strong></div>
+              )}
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 text-sm border-t pt-3">
+              {(parsedPreview.profit || parsedPreview.roi) && (
+                <div className="p-2 bg-blue-500/10 rounded">
+                  <span className="font-semibold text-blue-600">FBM 🔹</span>
+                  <div>Profit: <strong>{parsedPreview.profit}€</strong> | ROI: <strong>{parsedPreview.roi}%</strong></div>
+                </div>
+              )}
+              {(parsedPreview.fba_profit || parsedPreview.fba_roi) && (
+                <div className="p-2 bg-orange-500/10 rounded">
+                  <span className="font-semibold text-orange-600">FBA 🔸</span>
+                  <div>Profit: <strong>{parsedPreview.fba_profit}€</strong> | ROI: <strong>{parsedPreview.fba_roi}%</strong></div>
+                </div>
+              )}
+            </div>
+
+            <div className="grid grid-cols-5 gap-2 text-xs border-t pt-3">
+              {parsedPreview.private_label && (
+                <div><span className="text-muted-foreground">Private Label:</span> <strong>{parsedPreview.private_label}</strong></div>
+              )}
+              {parsedPreview.product_size && (
+                <div><span className="text-muted-foreground">Size:</span> <strong>{parsedPreview.product_size}</strong></div>
+              )}
+              {parsedPreview.meltable && (
+                <div><span className="text-muted-foreground">Meltable:</span> <strong>{parsedPreview.meltable}</strong></div>
+              )}
+              {parsedPreview.variations && (
+                <div><span className="text-muted-foreground">Variations:</span> <strong>{parsedPreview.variations}</strong></div>
+              )}
+              {parsedPreview.sellers && (
+                <div><span className="text-muted-foreground">Sellers:</span> <strong>{parsedPreview.sellers}</strong></div>
+              )}
             </div>
           </CardContent>
         </Card>
