@@ -220,6 +220,7 @@ const Dashboard = () => {
                       badge={notifications.produits?.subcategories?.['produits-qogita']} 
                     />
                     <CategoryItem icon={Sparkles} label="produits eany" link="/products/eany" badge={notifications.produits?.subcategories?.['produits-eany']} />
+                    <CategoryItem icon={AlertCircle} label="alertes produits" link="/product-alerts" badge={notifications.produits?.subcategories?.['alertes-produits']} />
                     <CategoryItem icon={DollarSign} label="promotions" link="/promotions" badge={notifications.produits?.subcategories?.['promotions']} />
                     <CategoryItem icon={FileText} label="sitelist" link="/sitelist" badge={notifications.produits?.subcategories?.['sitelist']} />
                   </div>

@@ -52,6 +52,7 @@ const Suggestions = lazy(() => import("./pages/Suggestions"));
 const Marketplace = lazy(() => import("./pages/Marketplace"));
 const WantToSell = lazy(() => import("./pages/WantToSell"));
 const ProductAlerts = lazy(() => import("./pages/ProductAlerts"));
+const ProductFindAlerts = lazy(() => import("./pages/ProductFindAlerts"));
 const Sitelist = lazy(() => import("./pages/Sitelist"));
 const NotificationAlerts = lazy(() => import("./pages/NotificationAlerts"));
 const RulesAlerts = lazy(() => import("./pages/RulesAlerts"));
@@ -157,6 +158,7 @@ const App = () => (
             <Route path="/produits-eany" element={<ProductAlerts />} />
             <Route path="/grossistes" element={<ProductAlerts />} />
             <Route path="/promotions" element={<ProductAlerts />} />
+            <Route path="/product-alerts" element={<ProductFindAlerts />} />
             <Route path="/sitelist" element={<Sitelist />} />
             <Route path="/notification-alerts" element={<NotificationAlerts />} />
             <Route path="/rules-alerts" element={<RulesAlerts />} />
