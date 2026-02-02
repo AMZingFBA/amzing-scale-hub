@@ -908,6 +908,99 @@ export type Database = {
         }
         Relationships: []
       }
+      product_find_alerts: {
+        Row: {
+          admin_id: string
+          amazon_url: string | null
+          bsr: string | null
+          bsr_percent: string | null
+          cost_price: number | null
+          created_at: string
+          current_price: number
+          ean: string
+          fba_profit: number | null
+          fba_roi: number | null
+          fulfillment_type: string | null
+          id: string
+          meltable: string | null
+          monthly_sales: string | null
+          original_price: number | null
+          private_label: string | null
+          product_size: string | null
+          product_title: string
+          profit: number | null
+          raw_message: string | null
+          roi: number | null
+          sale_price: number | null
+          sas_url: string | null
+          sellers: string | null
+          source_name: string
+          source_url: string | null
+          updated_at: string
+          variations: string | null
+        }
+        Insert: {
+          admin_id: string
+          amazon_url?: string | null
+          bsr?: string | null
+          bsr_percent?: string | null
+          cost_price?: number | null
+          created_at?: string
+          current_price: number
+          ean: string
+          fba_profit?: number | null
+          fba_roi?: number | null
+          fulfillment_type?: string | null
+          id?: string
+          meltable?: string | null
+          monthly_sales?: string | null
+          original_price?: number | null
+          private_label?: string | null
+          product_size?: string | null
+          product_title: string
+          profit?: number | null
+          raw_message?: string | null
+          roi?: number | null
+          sale_price?: number | null
+          sas_url?: string | null
+          sellers?: string | null
+          source_name: string
+          source_url?: string | null
+          updated_at?: string
+          variations?: string | null
+        }
+        Update: {
+          admin_id?: string
+          amazon_url?: string | null
+          bsr?: string | null
+          bsr_percent?: string | null
+          cost_price?: number | null
+          created_at?: string
+          current_price?: number
+          ean?: string
+          fba_profit?: number | null
+          fba_roi?: number | null
+          fulfillment_type?: string | null
+          id?: string
+          meltable?: string | null
+          monthly_sales?: string | null
+          original_price?: number | null
+          private_label?: string | null
+          product_size?: string | null
+          product_title?: string
+          profit?: number | null
+          raw_message?: string | null
+          roi?: number | null
+          sale_price?: number | null
+          sas_url?: string | null
+          sellers?: string | null
+          source_name?: string
+          source_url?: string | null
+          updated_at?: string
+          variations?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
