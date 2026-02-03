@@ -227,6 +227,7 @@ export default function ProductFindAlerts() {
                     <DialogTitle>Nouvelle alerte produit</DialogTitle>
                   </DialogHeader>
                   <AdminProductAlertForm 
+                    defaultSource={sourceFilter || ''}
                     onSuccess={() => {
                       setShowAdminForm(false);
                       loadAlerts();
