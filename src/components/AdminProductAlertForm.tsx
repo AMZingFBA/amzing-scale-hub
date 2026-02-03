@@ -11,9 +11,9 @@ const AVAILABLE_SOURCES = [
   { value: 'Leclerc', label: 'Leclerc' },
   { value: 'Carrefour', label: 'Carrefour' },
   { value: 'Auchan', label: 'Auchan' },
-  { value: 'SmythsToys', label: 'SmythsToys' },
+  { value: 'Smyths-toys', label: 'Smyths-toys' },
   { value: 'Miamland', label: 'Miamland' },
-  { value: 'Stokomani', label: 'Stokomani' },
+  { value: 'Stockmani', label: 'Stockmani' },
   { value: 'Eany', label: 'Eany' },
   { value: 'Qogita 2', label: 'Qogita 2' },
 ];
