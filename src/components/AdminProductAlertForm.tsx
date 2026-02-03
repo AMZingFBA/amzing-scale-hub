@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -20,6 +20,7 @@ const AVAILABLE_SOURCES = [
 
 interface AdminProductAlertFormProps {
   onSuccess: () => void;
+  defaultSource?: string;
 }
 
 interface ParsedAlert {
@@ -273,11 +274,16 @@ function parseAlertMessage(message: string): ParsedAlert | null {
   }
 }
 
-export default function AdminProductAlertForm({ onSuccess }: AdminProductAlertFormProps) {
+export default function AdminProductAlertForm({ onSuccess, defaultSource = '' }: AdminProductAlertFormProps) {
   const [message, setMessage] = useState('');
-  const [selectedSource, setSelectedSource] = useState<string>('');
+  const [selectedSource, setSelectedSource] = useState<string>(defaultSource);
   const [isLoading, setIsLoading] = useState(false);
   const [parsedPreview, setParsedPreview] = useState<ParsedAlert | null>(null);
+
+  // Sync selectedSource when defaultSource changes (page navigation)
+  useEffect(() => {
+    setSelectedSource(defaultSource);
+  }, [defaultSource]);
 
   const handleParse = () => {
     if (!selectedSource) {
