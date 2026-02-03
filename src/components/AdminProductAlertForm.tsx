@@ -15,7 +15,7 @@ const AVAILABLE_SOURCES = [
   { value: 'Miamland', label: 'Miamland' },
   { value: 'Stokomani', label: 'Stokomani' },
   { value: 'Eany', label: 'Eany' },
-  { value: 'Qogita2', label: 'Qogita 2' },
+  { value: 'Qogita 2', label: 'Qogita 2' },
 ];
 
 interface AdminProductAlertFormProps {
