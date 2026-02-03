@@ -215,9 +215,9 @@ const Dashboard = () => {
                     <CategoryItem icon={Store} label="Produits Leclerc" link="/product-alerts/leclerc" badge={notifications.produits?.subcategories?.['produits-leclerc']} />
                     <CategoryItem icon={Store} label="Produits Carrefour" link="/product-alerts/carrefour" badge={notifications.produits?.subcategories?.['produits-carrefour']} />
                     <CategoryItem icon={Store} label="Produits Auchan" link="/product-alerts/auchan" badge={notifications.produits?.subcategories?.['produits-auchan']} />
-                    <CategoryItem icon={Store} label="Produits Smyth-toys" link="/product-alerts/smyth-toys" badge={notifications.produits?.subcategories?.['produits-smyth-toys']} />
+                    <CategoryItem icon={Store} label="Produits SmythsToys" link="/product-alerts/smyth-toys" badge={notifications.produits?.subcategories?.['produits-smythstoys']} />
                     <CategoryItem icon={Store} label="Produits Miamland" link="/product-alerts/miamland" badge={notifications.produits?.subcategories?.['produits-miamland']} />
-                    <CategoryItem icon={Store} label="Produits Stockmani" link="/product-alerts/stockmani" badge={notifications.produits?.subcategories?.['produits-stockmani']} />
+                    <CategoryItem icon={Store} label="Produits Stokomani" link="/product-alerts/stokomani" badge={notifications.produits?.subcategories?.['produits-stokomani']} />
                     <CategoryItem icon={Store} label="Produits Eany" link="/product-alerts/eany" badge={notifications.produits?.subcategories?.['produits-eany']} />
                     <CategoryItem 
                       icon={Sparkles} 

@@ -16,9 +16,9 @@ const SOURCE_MAP: Record<string, string> = {
   'leclerc': 'Leclerc',
   'carrefour': 'Carrefour',
   'auchan': 'Auchan',
-  'smyth-toys': 'Smyth-toys',
+  'smyth-toys': 'SmythsToys',
   'miamland': 'Miamland',
-  'stockmani': 'Stockmani',
+  'stokomani': 'Stokomani',
   'eany': 'Eany',
 };
 
@@ -26,9 +26,9 @@ const SOURCE_TITLES: Record<string, string> = {
   'leclerc': 'Produits Leclerc',
   'carrefour': 'Produits Carrefour',
   'auchan': 'Produits Auchan',
-  'smyth-toys': 'Produits Smyth-toys',
+  'smyth-toys': 'Produits SmythsToys',
   'miamland': 'Produits Miamland',
-  'stockmani': 'Produits Stockmani',
+  'stokomani': 'Produits Stokomani',
   'eany': 'Produits Eany',
 };
 
@@ -96,11 +96,27 @@ export default function ProductFindAlerts() {
     }
   };
 
+  // Marquer les alertes comme lues quand on visite la page
+  const markAlertsAsRead = async () => {
+    try {
+      await supabase.rpc('mark_product_find_alerts_as_read', {
+        source_filter: sourceFilter || null
+      });
+    } catch (error) {
+      console.error('Error marking alerts as read:', error);
+    }
+  };
+
   useEffect(() => {
     if (!authLoading && user) {
       loadAlerts();
+      // Marquer comme lu après un petit délai
+      const timer = setTimeout(() => {
+        markAlertsAsRead();
+      }, 2000);
+      return () => clearTimeout(timer);
     }
-  }, [user, authLoading]);
+  }, [user, authLoading, sourceFilter]);
 
   // Real-time subscription
   useEffect(() => {
