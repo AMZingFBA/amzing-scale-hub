@@ -219,7 +219,8 @@ const Dashboard = () => {
                     <CategoryItem icon={Store} label="Produits Miamland" link="/product-alerts/miamland" badge={notifications.produits?.subcategories?.['produits-miamland']} />
                     <CategoryItem icon={Store} label="Produits Stokomani" link="/product-alerts/stokomani" badge={notifications.produits?.subcategories?.['produits-stokomani']} />
                     <CategoryItem icon={Store} label="Produits Eany" link="/product-alerts/eany" badge={notifications.produits?.subcategories?.['produits-eany']} />
-                    <CategoryItem 
+                    <CategoryItem icon={Store} label="Produits Qogita 2" link="/product-alerts/qogita2" badge={notifications.produits?.subcategories?.['produits-qogita2']} />
+                    <CategoryItem
                       icon={Sparkles} 
                       label="produits qogita" 
                       onClick={handleQogitaClick}

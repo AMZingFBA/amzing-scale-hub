@@ -6,7 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, ArrowLeft, Copy, ExternalLink, TrendingUp, Package, Users, AlertTriangle, Sparkles, Store, Plus } from 'lucide-react';
+import { Loader2, ArrowLeft, Copy, ExternalLink, TrendingUp, Package, Users, AlertTriangle, Sparkles, Store, Plus, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import AdminProductAlertForm from '@/components/AdminProductAlertForm';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -20,6 +20,7 @@ const SOURCE_MAP: Record<string, string> = {
   'miamland': 'Miamland',
   'stokomani': 'Stokomani',
   'eany': 'Eany',
+  'qogita2': 'Qogita2',
 };
 
 const SOURCE_TITLES: Record<string, string> = {
@@ -30,6 +31,7 @@ const SOURCE_TITLES: Record<string, string> = {
   'miamland': 'Produits Miamland',
   'stokomani': 'Produits Stokomani',
   'eany': 'Produits Eany',
+  'qogita2': 'Produits Qogita 2',
 };
 
 interface ProductAlert {
@@ -141,6 +143,23 @@ export default function ProductFindAlerts() {
     toast.success('Copié !');
   };
 
+  const deleteAlert = async (alertId: string) => {
+    try {
+      const { error } = await supabase
+        .from('product_find_alerts')
+        .delete()
+        .eq('id', alertId);
+
+      if (error) throw error;
+      
+      toast.success('Alerte supprimée !');
+      loadAlerts();
+    } catch (error) {
+      console.error('Error deleting alert:', error);
+      toast.error('Erreur lors de la suppression');
+    }
+  };
+
   if (authLoading || isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -231,7 +250,13 @@ export default function ProductFindAlerts() {
         ) : (
           <div className="grid gap-6">
             {alerts.map((alert) => (
-              <ProductAlertCard key={alert.id} alert={alert} onCopy={copyToClipboard} />
+              <ProductAlertCard 
+                key={alert.id} 
+                alert={alert} 
+                onCopy={copyToClipboard} 
+                onDelete={deleteAlert}
+                isAdmin={isAdmin}
+              />
             ))}
           </div>
         )}
@@ -240,7 +265,12 @@ export default function ProductFindAlerts() {
   );
 }
 
-function ProductAlertCard({ alert, onCopy }: { alert: ProductAlert; onCopy: (text: string) => void }) {
+function ProductAlertCard({ alert, onCopy, onDelete, isAdmin }: { 
+  alert: ProductAlert; 
+  onCopy: (text: string) => void;
+  onDelete: (id: string) => void;
+  isAdmin: boolean;
+}) {
   const hasDiscount = alert.original_price && alert.original_price > alert.current_price;
   const discountPercent = hasDiscount 
     ? Math.round(((alert.original_price! - alert.current_price) / alert.original_price!) * 100)
@@ -255,14 +285,26 @@ function ProductAlertCard({ alert, onCopy }: { alert: ProductAlert; onCopy: (tex
             <Store className="w-5 h-5 text-primary" />
             <span className="font-bold text-lg">{alert.source_name}</span>
           </div>
-          <span className="text-sm text-muted-foreground">
-            {new Date(alert.created_at).toLocaleDateString('fr-FR', {
-              day: 'numeric',
-              month: 'short',
-              hour: '2-digit',
-              minute: '2-digit'
-            })}
-          </span>
+          <div className="flex items-center gap-3">
+            <span className="text-sm text-muted-foreground">
+              {new Date(alert.created_at).toLocaleDateString('fr-FR', {
+                day: 'numeric',
+                month: 'short',
+                hour: '2-digit',
+                minute: '2-digit'
+              })}
+            </span>
+            {isAdmin && (
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+                onClick={() => onDelete(alert.id)}
+              >
+                <Trash2 className="w-4 h-4" />
+              </Button>
+            )}
+          </div>
         </div>
       </div>
 
