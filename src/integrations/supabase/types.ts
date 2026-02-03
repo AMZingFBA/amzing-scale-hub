@@ -1001,6 +1001,38 @@ export type Database = {
         }
         Relationships: []
       }
+      product_find_read_status: {
+        Row: {
+          alert_id: string
+          created_at: string
+          id: string
+          is_read: boolean
+          user_id: string
+        }
+        Insert: {
+          alert_id: string
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          user_id: string
+        }
+        Update: {
+          alert_id?: string
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_find_read_status_alert_id_fkey"
+            columns: ["alert_id"]
+            isOneToOne: false
+            referencedRelation: "product_find_alerts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -1536,6 +1568,10 @@ export type Database = {
       is_vip_user: { Args: { _user_id: string }; Returns: boolean }
       mark_alerts_as_read: {
         Args: { category_param: string; subcategory_param?: string }
+        Returns: undefined
+      }
+      mark_product_find_alerts_as_read: {
+        Args: { source_filter?: string }
         Returns: undefined
       }
       mark_ticket_messages_as_read: {
