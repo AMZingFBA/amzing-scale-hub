@@ -5,6 +5,7 @@ import { useAdmin } from '@/hooks/use-admin';
 import { useMarkAsRead } from '@/hooks/use-mark-as-read';
 import { usePullRefresh } from '@/hooks/use-pull-refresh';
 import { useAutoRefresh } from '@/hooks/use-auto-refresh';
+import { useScrollPosition } from '@/hooks/use-scroll-position';
 import { supabase } from '@/integrations/supabase/client';
 import { Capacitor } from '@capacitor/core';
 import Navbar from '@/components/Navbar';
@@ -24,6 +25,9 @@ const ProductAlerts = () => {
   const [alerts, setAlerts] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const isNativeApp = Capacitor.isNativePlatform();
+
+  // Sauvegarder/restaurer la position de scroll pour cette page
+  useScrollPosition(location.pathname);
 
   // Déterminer la sous-catégorie basée sur l'URL
   const getSubcategoryFromPath = () => {
