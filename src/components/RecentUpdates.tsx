@@ -15,6 +15,7 @@ interface RecentUpdate {
   subcategory: string | null;
   created_at: string;
   link?: string;
+  type: 'admin_alert' | 'product_find';
 }
 
 const getCategoryRoute = (category: string, subcategory: string | null) => {
@@ -106,22 +107,62 @@ export const RecentUpdates = () => {
       if (!user) return;
 
       try {
-        const { data: alerts } = await supabase
+        // Fetch admin alerts
+        const { data: adminAlerts } = await supabase
           .from('admin_alerts')
           .select('id, title, category, subcategory, created_at, link_url')
           .order('created_at', { ascending: false })
-          .limit(3);
+          .limit(5);
 
-        if (alerts) {
-          setUpdates(alerts.map(alert => ({
-            id: alert.id,
-            title: alert.title,
-            category: alert.category,
-            subcategory: alert.subcategory,
-            created_at: alert.created_at,
-            link: alert.link_url
-          })));
+        // Fetch product find alerts
+        const { data: productAlerts } = await supabase
+          .from('product_find_alerts')
+          .select('id, product_title, source_name, created_at, source_url')
+          .order('created_at', { ascending: false })
+          .limit(5);
+
+        const allUpdates: RecentUpdate[] = [];
+
+        if (adminAlerts) {
+          adminAlerts.forEach(alert => {
+            allUpdates.push({
+              id: alert.id,
+              title: alert.title,
+              category: alert.category,
+              subcategory: alert.subcategory,
+              created_at: alert.created_at,
+              link: alert.link_url || undefined,
+              type: 'admin_alert'
+            });
+          });
         }
+
+        if (productAlerts) {
+          productAlerts.forEach(alert => {
+            const sourceMap: Record<string, string> = {
+              'Leclerc': 'produits-leclerc',
+              'Carrefour': 'produits-carrefour',
+              'Auchan': 'produits-auchan',
+              'SmythsToys': 'produits-smythstoys',
+              'Miamland': 'produits-miamland',
+              'Stokomani': 'produits-stokomani',
+              'Eany': 'produits-eany'
+            };
+            allUpdates.push({
+              id: alert.id,
+              title: alert.product_title,
+              category: 'produits',
+              subcategory: sourceMap[alert.source_name] || 'produits-find',
+              created_at: alert.created_at,
+              link: alert.source_url || undefined,
+              type: 'product_find'
+            });
+          });
+        }
+
+        // Sort by date and take 3 most recent
+        allUpdates.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+        setUpdates(allUpdates.slice(0, 3));
       } catch (error) {
         console.error('Error fetching recent updates:', error);
       } finally {
@@ -137,6 +178,11 @@ export const RecentUpdates = () => {
       .on(
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'admin_alerts' },
+        () => fetchRecentUpdates()
+      )
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'product_find_alerts' },
         () => fetchRecentUpdates()
       )
       .subscribe();
