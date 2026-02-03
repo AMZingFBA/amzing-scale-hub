@@ -166,7 +166,7 @@ function parseAlertMessage(message: string): ParsedAlert | null {
           result.monthly_sales = salesMatch[1].trim();
         }
 
-        // Type: FBM 🔹 followed by Profit and ROI
+        // Detect Type sections - FBM comes first, then FBA
         if (line.includes('Type:') && line.includes('FBM')) {
           fbmFound = true;
           fbaFound = false;
@@ -180,11 +180,9 @@ function parseAlertMessage(message: string): ParsedAlert | null {
         const profitMatch = line.match(/Profit:\s*(\d+[.,]?\d*)\s*€?/);
         if (profitMatch) {
           const profitValue = parseFloat(profitMatch[1].replace(',', '.'));
-          if (fbmFound && result.profit === null) {
-            result.profit = profitValue;
-          } else if (fbaFound) {
+          if (fbaFound) {
             result.fba_profit = profitValue;
-          } else if (result.profit === null) {
+          } else if (fbmFound) {
             result.profit = profitValue;
           }
         }
@@ -193,11 +191,9 @@ function parseAlertMessage(message: string): ParsedAlert | null {
         const roiMatch = line.match(/ROI:\s*(\d+[.,]?\d*)\s*%?/);
         if (roiMatch) {
           const roiValue = parseFloat(roiMatch[1].replace(',', '.'));
-          if (fbmFound && result.roi === null) {
-            result.roi = roiValue;
-          } else if (fbaFound) {
+          if (fbaFound) {
             result.fba_roi = roiValue;
-          } else if (result.roi === null) {
+          } else if (fbmFound) {
             result.roi = roiValue;
           }
         }
@@ -395,19 +391,22 @@ Amazon | SAS | Leclerc`}
       {/* Preview */}
       {parsedPreview && (
         <Card className="mt-4 border-green-500/50 bg-green-500/5">
-          <CardContent className="p-4 space-y-3">
+          <CardContent className="p-4 space-y-4">
             <h4 className="font-semibold text-green-600 text-lg">✅ Aperçu de l'alerte</h4>
             
-            <div className="grid grid-cols-2 gap-3 text-sm">
+            <div className="flex flex-wrap items-center justify-between gap-3 text-sm">
               <div><span className="text-muted-foreground">Source:</span> <strong>{parsedPreview.source_name}</strong></div>
-              <div><span className="text-muted-foreground">EAN:</span> <code className="bg-muted px-1 rounded">{parsedPreview.ean}</code></div>
+              <div className="flex items-center gap-2">
+                <span className="text-muted-foreground">EAN:</span>
+                <code className="bg-muted px-2 py-1 rounded font-mono">{parsedPreview.ean}</code>
+              </div>
             </div>
             
             <div className="text-sm">
               <span className="text-muted-foreground">Produit:</span> <strong>{parsedPreview.product_title}</strong>
             </div>
             
-            <div className="grid grid-cols-2 gap-3 text-sm border-t pt-3">
+            <div className="flex flex-wrap gap-6 text-sm border-t pt-3">
               <div>
                 <span className="text-muted-foreground">Prix:</span>{' '}
                 {parsedPreview.original_price && <span className="line-through mr-1">{parsedPreview.original_price}€</span>}
@@ -422,11 +421,11 @@ Amazon | SAS | Leclerc`}
               )}
             </div>
 
-            <div className="grid grid-cols-3 gap-3 text-sm">
-              {parsedPreview.cost_price && (
+            <div className="flex flex-wrap gap-6 text-sm">
+              {parsedPreview.cost_price !== null && (
                 <div><span className="text-muted-foreground">Cost Price:</span> <strong>{parsedPreview.cost_price}€</strong></div>
               )}
-              {parsedPreview.sale_price && (
+              {parsedPreview.sale_price !== null && (
                 <div><span className="text-muted-foreground">Sale Price:</span> <strong>{parsedPreview.sale_price}€</strong></div>
               )}
               {parsedPreview.monthly_sales && (
@@ -434,36 +433,36 @@ Amazon | SAS | Leclerc`}
               )}
             </div>
 
-            <div className="grid grid-cols-2 gap-3 text-sm border-t pt-3">
-              {(parsedPreview.profit || parsedPreview.roi) && (
-                <div className="p-2 bg-blue-500/10 rounded">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm border-t pt-3">
+              {(parsedPreview.profit !== null || parsedPreview.roi !== null) && (
+                <div className="p-3 bg-blue-500/10 rounded-lg border border-blue-500/30">
                   <span className="font-semibold text-blue-600">FBM 🔹</span>
-                  <div>Profit: <strong>{parsedPreview.profit}€</strong> | ROI: <strong>{parsedPreview.roi}%</strong></div>
+                  <div className="mt-1">Profit: <strong>{parsedPreview.profit}€</strong> | ROI: <strong>{parsedPreview.roi}%</strong></div>
                 </div>
               )}
-              {(parsedPreview.fba_profit || parsedPreview.fba_roi) && (
-                <div className="p-2 bg-orange-500/10 rounded">
+              {(parsedPreview.fba_profit !== null || parsedPreview.fba_roi !== null) && (
+                <div className="p-3 bg-orange-500/10 rounded-lg border border-orange-500/30">
                   <span className="font-semibold text-orange-600">FBA 🔸</span>
-                  <div>Profit: <strong>{parsedPreview.fba_profit}€</strong> | ROI: <strong>{parsedPreview.fba_roi}%</strong></div>
+                  <div className="mt-1">Profit: <strong>{parsedPreview.fba_profit}€</strong> | ROI: <strong>{parsedPreview.fba_roi}%</strong></div>
                 </div>
               )}
             </div>
 
-            <div className="grid grid-cols-5 gap-2 text-xs border-t pt-3">
+            <div className="flex flex-wrap gap-3 text-xs border-t pt-3">
               {parsedPreview.private_label && (
-                <div><span className="text-muted-foreground">Private Label:</span> <strong>{parsedPreview.private_label}</strong></div>
+                <span className="bg-muted px-2 py-1 rounded">Private Label: <strong>{parsedPreview.private_label}</strong></span>
               )}
               {parsedPreview.product_size && (
-                <div><span className="text-muted-foreground">Size:</span> <strong>{parsedPreview.product_size}</strong></div>
+                <span className="bg-muted px-2 py-1 rounded">Size: <strong>{parsedPreview.product_size}</strong></span>
               )}
               {parsedPreview.meltable && (
-                <div><span className="text-muted-foreground">Meltable:</span> <strong>{parsedPreview.meltable}</strong></div>
+                <span className="bg-muted px-2 py-1 rounded">Meltable: <strong>{parsedPreview.meltable}</strong></span>
               )}
               {parsedPreview.variations && (
-                <div><span className="text-muted-foreground">Variations:</span> <strong>{parsedPreview.variations}</strong></div>
+                <span className="bg-muted px-2 py-1 rounded">Variations: <strong>{parsedPreview.variations}</strong></span>
               )}
               {parsedPreview.sellers && (
-                <div><span className="text-muted-foreground">Sellers:</span> <strong>{parsedPreview.sellers}</strong></div>
+                <span className="bg-muted px-2 py-1 rounded">Sellers: <strong>{parsedPreview.sellers}</strong></span>
               )}
             </div>
           </CardContent>
