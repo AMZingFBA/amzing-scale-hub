@@ -3,8 +3,20 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent } from '@/components/ui/card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
 import { Loader2, Sparkles, CheckCircle } from 'lucide-react';
+
+const AVAILABLE_SOURCES = [
+  { value: 'Leclerc', label: 'Leclerc' },
+  { value: 'Carrefour', label: 'Carrefour' },
+  { value: 'Auchan', label: 'Auchan' },
+  { value: 'SmythsToys', label: 'SmythsToys' },
+  { value: 'Miamland', label: 'Miamland' },
+  { value: 'Stokomani', label: 'Stokomani' },
+  { value: 'Eany', label: 'Eany' },
+  { value: 'Qogita2', label: 'Qogita 2' },
+];
 
 interface AdminProductAlertFormProps {
   onSuccess: () => void;
@@ -248,9 +260,9 @@ function parseAlertMessage(message: string): ParsedAlert | null {
       result.product_title = productTitleLines.reduce((a, b) => a.length > b.length ? a : b);
     }
 
-    // Validate minimum required fields
-    if (!result.ean || !result.product_title || !result.source_name) {
-      console.error('Missing required fields:', { ean: result.ean, title: result.product_title, source: result.source_name });
+    // Validate minimum required fields (source_name is provided by selector)
+    if (!result.ean || !result.product_title) {
+      console.error('Missing required fields:', { ean: result.ean, title: result.product_title });
       return null;
     }
 
@@ -263,12 +275,19 @@ function parseAlertMessage(message: string): ParsedAlert | null {
 
 export default function AdminProductAlertForm({ onSuccess }: AdminProductAlertFormProps) {
   const [message, setMessage] = useState('');
+  const [selectedSource, setSelectedSource] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
   const [parsedPreview, setParsedPreview] = useState<ParsedAlert | null>(null);
 
   const handleParse = () => {
+    if (!selectedSource) {
+      toast.error('Sélectionnez une source d\'abord');
+      return;
+    }
     const parsed = parseAlertMessage(message);
     if (parsed) {
+      // Override source with selected value
+      parsed.source_name = selectedSource;
       setParsedPreview(parsed);
       toast.success('Message parsé avec succès !');
     } else {
@@ -300,6 +319,7 @@ export default function AdminProductAlertForm({ onSuccess }: AdminProductAlertFo
 
       toast.success('Alerte publiée avec succès !');
       setMessage('');
+      setSelectedSource('');
       setParsedPreview(null);
       onSuccess();
     } catch (error) {
@@ -314,14 +334,30 @@ export default function AdminProductAlertForm({ onSuccess }: AdminProductAlertFo
     <div className="space-y-4">
       <div>
         <label className="text-sm font-medium mb-2 block">
+          Source de l'alerte
+        </label>
+        <Select value={selectedSource} onValueChange={setSelectedSource}>
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="Sélectionner une source..." />
+          </SelectTrigger>
+          <SelectContent>
+            {AVAILABLE_SOURCES.map((source) => (
+              <SelectItem key={source.value} value={source.value}>
+                {source.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div>
+        <label className="text-sm font-medium mb-2 block">
           Coller le message d'alerte
         </label>
         <Textarea
           value={message}
           onChange={(e) => setMessage(e.target.value)}
-          placeholder={`Leclerc
-
-Barbie Color Reveal Poupée...
+          placeholder={`Barbie Color Reveal Poupée...
 
 EAN
 
