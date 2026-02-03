@@ -146,7 +146,8 @@ export const RecentUpdates = () => {
               'SmythsToys': 'produits-smythstoys',
               'Miamland': 'produits-miamland',
               'Stokomani': 'produits-stokomani',
-              'Eany': 'produits-eany'
+              'Eany': 'produits-eany',
+              'Qogita2': 'produits-qogita2'
             };
             allUpdates.push({
               id: alert.id,
