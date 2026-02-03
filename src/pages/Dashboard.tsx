@@ -212,6 +212,7 @@ const Dashboard = () => {
                 </AccordionTrigger>
                 <AccordionContent>
                   <div className="grid gap-3 pt-2">
+                    <CategoryItem icon={Search} label="Product Find" link="/product-alerts" badge={notifications.produits?.subcategories?.['product-find']} />
                     <CategoryItem icon={Store} label="Produits Leclerc" link="/product-alerts/leclerc" badge={notifications.produits?.subcategories?.['produits-leclerc']} />
                     <CategoryItem icon={Store} label="Produits Carrefour" link="/product-alerts/carrefour" badge={notifications.produits?.subcategories?.['produits-carrefour']} />
                     <CategoryItem icon={Store} label="Produits Auchan" link="/product-alerts/auchan" badge={notifications.produits?.subcategories?.['produits-auchan']} />
