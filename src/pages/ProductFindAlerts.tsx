@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/use-auth';
 import { useAdmin } from '@/hooks/use-admin';
+import { useScrollPosition } from '@/hooks/use-scroll-position';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -64,12 +65,16 @@ interface ProductAlert {
 
 export default function ProductFindAlerts() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { source } = useParams<{ source?: string }>();
   const { user, isLoading: authLoading, isVIP } = useAuth();
   const { isAdmin } = useAdmin();
   const [alerts, setAlerts] = useState<ProductAlert[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showAdminForm, setShowAdminForm] = useState(false);
+
+  // Sauvegarder/restaurer la position de scroll pour cette page
+  useScrollPosition(location.pathname);
 
   // Déterminer le filtre source basé sur l'URL
   const sourceFilter = source ? SOURCE_MAP[source] : null;
