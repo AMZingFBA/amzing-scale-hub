@@ -7,15 +7,16 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { toast } from 'sonner';
 import { Loader2, Sparkles, CheckCircle } from 'lucide-react';
 
+// Ces valeurs DOIVENT correspondre exactement à SOURCE_MAP dans ProductFindAlerts.tsx
 const AVAILABLE_SOURCES = [
   { value: 'Leclerc', label: 'Leclerc' },
   { value: 'Carrefour', label: 'Carrefour' },
   { value: 'Auchan', label: 'Auchan' },
-  { value: 'Smyths-toys', label: 'Smyths-toys' },
+  { value: 'SmythsToys', label: 'SmythsToys' },
   { value: 'Miamland', label: 'Miamland' },
-  { value: 'Stockmani', label: 'Stockmani' },
+  { value: 'Stokomani', label: 'Stokomani' },
   { value: 'Eany', label: 'Eany' },
-  { value: 'Qogita 2', label: 'Qogita 2' },
+  { value: 'Qogita2', label: 'Qogita 2' },
 ];
 
 interface AdminProductAlertFormProps {
