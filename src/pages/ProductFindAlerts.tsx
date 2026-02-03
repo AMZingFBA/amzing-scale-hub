@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '@/hooks/use-auth';
 import { useAdmin } from '@/hooks/use-admin';
 import { supabase } from '@/integrations/supabase/client';
@@ -10,6 +10,27 @@ import { Loader2, ArrowLeft, Copy, ExternalLink, TrendingUp, Package, Users, Ale
 import { toast } from 'sonner';
 import AdminProductAlertForm from '@/components/AdminProductAlertForm';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+
+// Mapping des slugs URL vers les noms de source dans la BDD
+const SOURCE_MAP: Record<string, string> = {
+  'leclerc': 'Leclerc',
+  'carrefour': 'Carrefour',
+  'auchan': 'Auchan',
+  'smyth-toys': 'Smyth-toys',
+  'miamland': 'Miamland',
+  'stockmani': 'Stockmani',
+  'eany': 'Eany',
+};
+
+const SOURCE_TITLES: Record<string, string> = {
+  'leclerc': 'Produits Leclerc',
+  'carrefour': 'Produits Carrefour',
+  'auchan': 'Produits Auchan',
+  'smyth-toys': 'Produits Smyth-toys',
+  'miamland': 'Produits Miamland',
+  'stockmani': 'Produits Stockmani',
+  'eany': 'Produits Eany',
+};
 
 interface ProductAlert {
   id: string;
@@ -41,18 +62,29 @@ interface ProductAlert {
 
 export default function ProductFindAlerts() {
   const navigate = useNavigate();
+  const { source } = useParams<{ source?: string }>();
   const { user, isLoading: authLoading, isVIP } = useAuth();
   const { isAdmin } = useAdmin();
   const [alerts, setAlerts] = useState<ProductAlert[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showAdminForm, setShowAdminForm] = useState(false);
 
+  // Déterminer le filtre source basé sur l'URL
+  const sourceFilter = source ? SOURCE_MAP[source] : null;
+  const pageTitle = source ? SOURCE_TITLES[source] || 'Product Find' : '🔥 Product Find';
+
   const loadAlerts = async () => {
     try {
-      const { data, error } = await supabase
+      let query = supabase
         .from('product_find_alerts')
-        .select('*')
-        .order('created_at', { ascending: false });
+        .select('*');
+      
+      // Filtrer par source si spécifié dans l'URL
+      if (sourceFilter) {
+        query = query.ilike('source_name', `%${sourceFilter}%`);
+      }
+      
+      const { data, error } = await query.order('created_at', { ascending: false });
 
       if (error) throw error;
       setAlerts(data || []);
@@ -86,7 +118,7 @@ export default function ProductFindAlerts() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, []);
+  }, [sourceFilter]);
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
@@ -137,10 +169,10 @@ export default function ProductFindAlerts() {
             </button>
             <div className="text-center flex-1">
               <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent pb-2">
-                🔥 Product Find
+                {pageTitle}
               </h1>
               <p className="text-muted-foreground">
-                Alertes produits rentables en temps réel
+                {sourceFilter ? `Alertes ${sourceFilter} en temps réel` : 'Alertes produits rentables en temps réel'}
               </p>
             </div>
           </div>

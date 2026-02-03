@@ -212,15 +212,35 @@ const Dashboard = () => {
                 </AccordionTrigger>
                 <AccordionContent>
                   <div className="grid gap-3 pt-2">
-                    <CategoryItem icon={Sparkles} label="product find" link="/produits-find" badge={notifications.produits?.subcategories?.['produits-find']} />
+                    {/* Product Find avec sous-catégories par enseigne */}
+                    <Accordion type="single" collapsible className="w-full">
+                      <AccordionItem value="product-find" className="border rounded-lg bg-accent/30">
+                        <AccordionTrigger className="hover:no-underline px-4 py-3">
+                          <div className="flex items-center gap-3 w-full">
+                            <Sparkles className="w-5 h-5 text-primary" />
+                            <span className="font-medium">Product Find</span>
+                            <NotificationBadge count={notifications.produits?.subcategories?.['product-find-total']} size="sm" className="ml-2" />
+                          </div>
+                        </AccordionTrigger>
+                        <AccordionContent className="px-2 pb-3">
+                          <div className="grid gap-2 pt-2">
+                            <CategoryItem icon={Store} label="Produits Leclerc" link="/product-alerts/leclerc" badge={notifications.produits?.subcategories?.['produits-leclerc']} />
+                            <CategoryItem icon={Store} label="Produits Carrefour" link="/product-alerts/carrefour" badge={notifications.produits?.subcategories?.['produits-carrefour']} />
+                            <CategoryItem icon={Store} label="Produits Auchan" link="/product-alerts/auchan" badge={notifications.produits?.subcategories?.['produits-auchan']} />
+                            <CategoryItem icon={Store} label="Produits Smyth-toys" link="/product-alerts/smyth-toys" badge={notifications.produits?.subcategories?.['produits-smyth-toys']} />
+                            <CategoryItem icon={Store} label="Produits Miamland" link="/product-alerts/miamland" badge={notifications.produits?.subcategories?.['produits-miamland']} />
+                            <CategoryItem icon={Store} label="Produits Stockmani" link="/product-alerts/stockmani" badge={notifications.produits?.subcategories?.['produits-stockmani']} />
+                            <CategoryItem icon={Store} label="Produits Eany" link="/product-alerts/eany" badge={notifications.produits?.subcategories?.['produits-eany']} />
+                          </div>
+                        </AccordionContent>
+                      </AccordionItem>
+                    </Accordion>
                     <CategoryItem 
                       icon={Sparkles} 
                       label="produits qogita" 
                       onClick={handleQogitaClick}
                       badge={notifications.produits?.subcategories?.['produits-qogita']} 
                     />
-                    <CategoryItem icon={Sparkles} label="produits eany" link="/products/eany" badge={notifications.produits?.subcategories?.['produits-eany']} />
-                    <CategoryItem icon={AlertCircle} label="alertes produits" link="/product-alerts" badge={notifications.produits?.subcategories?.['alertes-produits']} />
                     <CategoryItem icon={DollarSign} label="promotions" link="/promotions" badge={notifications.produits?.subcategories?.['promotions']} />
                     <CategoryItem icon={FileText} label="sitelist" link="/sitelist" badge={notifications.produits?.subcategories?.['sitelist']} />
                   </div>
