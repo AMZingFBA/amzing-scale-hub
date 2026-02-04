@@ -266,6 +266,7 @@ const Dashboard = () => {
                     <CategoryItem icon={Building2} label="DJI" link="/catalogue/dji" badge={notifications.catalogue_exclusif?.subcategories?.dji} />
                     <CategoryItem icon={Building2} label="Xiaomi" link="/catalogue/xiaomi" badge={notifications.catalogue_exclusif?.subcategories?.xiaomi} />
                     <CategoryItem icon={Building2} label="playmobil" link="/catalogue/playmobil" badge={notifications.catalogue_exclusif?.subcategories?.playmobil} />
+                    <CategoryItem icon={Building2} label="Lego" link="/catalogue/lego" badge={notifications.catalogue_exclusif?.subcategories?.lego} />
                   </div>
                 </AccordionContent>
               </AccordionItem>
