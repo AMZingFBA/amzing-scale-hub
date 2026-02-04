@@ -8,7 +8,7 @@ const corsHeaders = {
 
 // Google Sheet ID
 const SHEET_ID = "1fh85PAOtLXWUU-Q4SgZuYv7zwS9L1GD6yRe7yHYkscQ";
-const SHEET_NAME = "Sheet1"; // Adjust if different
+const SHEET_NAME = "Sheet1";
 
 // Mapping des sources vers les noms dans la BDD
 // Exception: "Qogita" doit être mappé vers "Qogita2"
@@ -54,6 +54,37 @@ const parseNumber = (value: string | undefined | null): number | null => {
   return isNaN(num) ? null : num;
 };
 
+// Better CSV parsing that handles quotes and special characters
+const parseCSVLine = (line: string): string[] => {
+  const result: string[] = [];
+  let current = '';
+  let inQuotes = false;
+  
+  for (let i = 0; i < line.length; i++) {
+    const char = line[i];
+    const nextChar = line[i + 1];
+    
+    if (char === '"') {
+      if (inQuotes && nextChar === '"') {
+        // Escaped quote
+        current += '"';
+        i++;
+      } else {
+        inQuotes = !inQuotes;
+      }
+    } else if (char === ',' && !inQuotes) {
+      result.push(current.trim());
+      current = '';
+    } else {
+      current += char;
+    }
+  }
+  result.push(current.trim());
+  
+  // Clean up quotes from values
+  return result.map(v => v.replace(/^"|"$/g, '').replace(/""/g, '"'));
+};
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -92,56 +123,43 @@ serve(async (req) => {
       );
     }
 
-    // Parse CSV header
-    const parseCSVLine = (line: string): string[] => {
-      const result: string[] = [];
-      let current = '';
-      let inQuotes = false;
-      
-      for (let i = 0; i < line.length; i++) {
-        const char = line[i];
-        if (char === '"') {
-          inQuotes = !inQuotes;
-        } else if (char === ',' && !inQuotes) {
-          result.push(current.trim().replace(/^"|"$/g, ''));
-          current = '';
-        } else {
-          current += char;
-        }
-      }
-      result.push(current.trim().replace(/^"|"$/g, ''));
-      return result;
-    };
-
     const headers = parseCSVLine(lines[0]);
     console.log('📋 Headers:', headers);
+    console.log('📋 Number of headers:', headers.length);
 
-    // Column mapping (0-indexed based on the user's specification)
-    // ID; Date/Heure; Canal; Source; Titre Produit; EAN; Prix Achat; Prix Vente; BSR; BSR %; Ventes/mois; FBM Profit; FBM ROI; FBA Profit; FBA ROI; Private Label; Taille; Meltable; Variations; Vendeurs; Lien Amazon; Lien Source
+    // Build column index map from headers
+    const headerMap: Record<string, number> = {};
+    headers.forEach((h, i) => {
+      headerMap[h.toLowerCase().trim()] = i;
+    });
+
+    // Column indices
     const COL = {
-      ID: 0,
-      DATE_HEURE: 1,
-      CANAL: 2,
-      SOURCE: 3,
-      TITRE_PRODUIT: 4,
-      EAN: 5,
-      PRIX_ACHAT: 6,
-      PRIX_VENTE: 7,
-      BSR: 8,
-      BSR_PERCENT: 9,
-      VENTES_MOIS: 10,
-      FBM_PROFIT: 11,
-      FBM_ROI: 12,
-      FBA_PROFIT: 13,
-      FBA_ROI: 14,
-      PRIVATE_LABEL: 15,
-      TAILLE: 16,
-      MELTABLE: 17,
-      VARIATIONS: 18,
-      VENDEURS: 19,
-      LIEN_AMAZON: 20,
-      LIEN_SOURCE: 21,
+      ID: headerMap['id'] ?? 0,
+      DATE_HEURE: headerMap['date/heure'] ?? 1,
+      CANAL: headerMap['canal'] ?? 2,
+      SOURCE: headerMap['source'] ?? 3,
+      TITRE_PRODUIT: headerMap['titre produit'] ?? 4,
+      EAN: headerMap['ean'] ?? 5,
+      PRIX_ACHAT: headerMap['prix achat'] ?? 6,
+      PRIX_VENTE: headerMap['prix vente'] ?? 7,
+      BSR: headerMap['bsr'] ?? 8,
+      BSR_PERCENT: headerMap['bsr %'] ?? 9,
+      VENTES_MOIS: headerMap['ventes/mois'] ?? 10,
+      FBM_PROFIT: headerMap['fbm profit'] ?? 11,
+      FBM_ROI: headerMap['fbm roi'] ?? 12,
+      FBA_PROFIT: headerMap['fba profit'] ?? 13,
+      FBA_ROI: headerMap['fba roi'] ?? 14,
+      PRIVATE_LABEL: headerMap['private label'] ?? 15,
+      TAILLE: headerMap['taille'] ?? 16,
+      MELTABLE: headerMap['meltable'] ?? 17,
+      VARIATIONS: headerMap['variations'] ?? 18,
+      VENDEURS: headerMap['vendeurs'] ?? 19,
+      LIEN_AMAZON: headerMap['lien amazon'] ?? 20,
+      LIEN_SOURCE: headerMap['lien source'] ?? 21,
     };
+
+    console.log('📋 Column mapping:', COL);
 
     // Get existing IDs to avoid duplicates
     const { data: existingAlerts } = await supabaseClient
@@ -154,7 +172,16 @@ serve(async (req) => {
 
     let insertedCount = 0;
     let skippedCount = 0;
+    let updatedCount = 0;
     const dataRows = lines.slice(1);
+
+    // Log first row for debugging
+    if (dataRows.length > 0) {
+      const firstCols = parseCSVLine(dataRows[0]);
+      console.log('📋 First row columns count:', firstCols.length);
+      console.log('📋 Lien Amazon (col ' + COL.LIEN_AMAZON + '):', firstCols[COL.LIEN_AMAZON]);
+      console.log('📋 Lien Source (col ' + COL.LIEN_SOURCE + '):', firstCols[COL.LIEN_SOURCE]);
+    }
 
     for (const line of dataRows) {
       try {
@@ -175,11 +202,9 @@ serve(async (req) => {
         const createdAt = parseDate(dateHeure);
         const key = `${ean}_${createdAt.slice(0, 10)}`;
         
-        // Skip if already exists
-        if (existingKeys.has(key)) {
-          skippedCount++;
-          continue;
-        }
+        // Get link values
+        const amazonUrl = cols[COL.LIEN_AMAZON]?.trim() || null;
+        const sourceUrl = cols[COL.LIEN_SOURCE]?.trim() || null;
 
         const alertData = {
           admin_id: adminId,
@@ -201,10 +226,30 @@ serve(async (req) => {
           meltable: cols[COL.MELTABLE]?.trim() || null,
           variations: cols[COL.VARIATIONS]?.trim() || null,
           sellers: cols[COL.VENDEURS]?.trim() || null,
-          amazon_url: cols[COL.LIEN_AMAZON]?.trim() || null,
-          source_url: cols[COL.LIEN_SOURCE]?.trim() || null,
+          amazon_url: amazonUrl,
+          source_url: sourceUrl,
           created_at: createdAt,
         };
+
+        // Check if already exists
+        if (existingKeys.has(key)) {
+          // Update existing record to add links if they were missing
+          const { error: updateError } = await supabaseClient
+            .from('product_find_alerts')
+            .update({
+              amazon_url: amazonUrl,
+              source_url: sourceUrl,
+            })
+            .eq('ean', ean)
+            .gte('created_at', createdAt.slice(0, 10))
+            .lt('created_at', createdAt.slice(0, 10) + 'T23:59:59');
+
+          if (!updateError) {
+            updatedCount++;
+          }
+          skippedCount++;
+          continue;
+        }
 
         const { error: insertError } = await supabaseClient
           .from('product_find_alerts')
@@ -216,7 +261,7 @@ serve(async (req) => {
         } else {
           existingKeys.add(key);
           insertedCount++;
-          console.log(`✅ Inserted: ${title.substring(0, 50)}... (${source} -> ${alertData.source_name})`);
+          console.log(`✅ Inserted: ${title.substring(0, 50)}... (${source} -> ${alertData.source_name}) Amazon: ${amazonUrl ? 'YES' : 'NO'}`);
         }
       } catch (rowError) {
         console.error('❌ Row processing error:', rowError);
@@ -224,7 +269,7 @@ serve(async (req) => {
       }
     }
 
-    console.log(`✅ Sync completed: ${insertedCount} inserted, ${skippedCount} skipped`);
+    console.log(`✅ Sync completed: ${insertedCount} inserted, ${updatedCount} updated, ${skippedCount} skipped`);
 
     return new Response(
       JSON.stringify({
@@ -233,6 +278,7 @@ serve(async (req) => {
         stats: {
           total: dataRows.length,
           inserted: insertedCount,
+          updated: updatedCount,
           skipped: skippedCount,
         },
       }),
