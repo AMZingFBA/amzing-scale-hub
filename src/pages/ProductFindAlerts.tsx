@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/use-auth';
 import { useAdmin } from '@/hooks/use-admin';
@@ -11,7 +11,6 @@ import { Loader2, ArrowLeft, Copy, ExternalLink, TrendingUp, Package, Users, Ale
 import { toast } from 'sonner';
 import AdminProductAlertForm from '@/components/AdminProductAlertForm';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-
 // Mapping des slugs URL vers les noms de source dans la BDD
 const SOURCE_MAP: Record<string, string> = {
   'leclerc': 'Leclerc',
@@ -73,7 +72,8 @@ export default function ProductFindAlerts() {
   const [isLoading, setIsLoading] = useState(true);
   const [showAdminForm, setShowAdminForm] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
-
+  const [lastSyncTime, setLastSyncTime] = useState<Date | null>(null);
+  const autoSyncRef = useRef<NodeJS.Timeout | null>(null);
   // Sauvegarder/restaurer la position de scroll pour cette page
   useScrollPosition(location.pathname);
 
@@ -81,7 +81,8 @@ export default function ProductFindAlerts() {
   const sourceFilter = source ? SOURCE_MAP[source] : null;
   const pageTitle = source ? SOURCE_TITLES[source] || 'Product Find' : '🔥 Product Find';
 
-  const syncFromSheet = async () => {
+  const syncFromSheet = useCallback(async (silent = false) => {
+    if (isSyncing) return;
     setIsSyncing(true);
     try {
       const { data, error } = await supabase.functions.invoke('sync-product-find-from-sheets');
@@ -89,18 +90,24 @@ export default function ProductFindAlerts() {
       if (error) throw error;
       
       if (data?.success) {
-        toast.success(`Sync terminée: ${data.stats.inserted} nouvelles alertes, ${data.stats.skipped} ignorées`);
+        setLastSyncTime(new Date());
+        // Only show toast if not silent and there are new alerts
+        if (!silent && data.stats.inserted > 0) {
+          toast.success(`Sync terminée: ${data.stats.inserted} nouvelles alertes`);
+        }
         loadAlerts();
       } else {
         throw new Error(data?.error || 'Sync failed');
       }
     } catch (error) {
       console.error('Sync error:', error);
-      toast.error('Erreur lors de la synchronisation');
+      if (!silent) {
+        toast.error('Erreur lors de la synchronisation');
+      }
     } finally {
       setIsSyncing(false);
     }
-  };
+  }, [isSyncing]);
 
   const loadAlerts = async () => {
     try {
@@ -146,6 +153,25 @@ export default function ProductFindAlerts() {
       return () => clearTimeout(timer);
     }
   }, [user, authLoading, sourceFilter]);
+
+  // Auto-sync every 30 seconds
+  useEffect(() => {
+    if (!authLoading && user && (isVIP || isAdmin)) {
+      // Initial sync
+      syncFromSheet(true);
+      
+      // Set up auto-sync interval (30 seconds)
+      autoSyncRef.current = setInterval(() => {
+        syncFromSheet(true);
+      }, 30000);
+
+      return () => {
+        if (autoSyncRef.current) {
+          clearInterval(autoSyncRef.current);
+        }
+      };
+    }
+  }, [user, authLoading, isVIP, isAdmin]);
 
   // Real-time subscription
   useEffect(() => {
@@ -245,7 +271,7 @@ export default function ProductFindAlerts() {
               <Button 
                 variant="outline" 
                 className="gap-2" 
-                onClick={syncFromSheet}
+                onClick={() => syncFromSheet(false)}
                 disabled={isSyncing}
               >
                 <RefreshCw className={`w-4 h-4 ${isSyncing ? 'animate-spin' : ''}`} />
