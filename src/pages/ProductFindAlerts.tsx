@@ -7,7 +7,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, ArrowLeft, Copy, ExternalLink, TrendingUp, Package, Users, AlertTriangle, Sparkles, Store, Plus, Trash2 } from 'lucide-react';
+import { Loader2, ArrowLeft, Copy, ExternalLink, TrendingUp, Package, Users, AlertTriangle, Sparkles, Store, Plus, Trash2, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 import AdminProductAlertForm from '@/components/AdminProductAlertForm';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -28,7 +28,7 @@ const SOURCE_TITLES: Record<string, string> = {
   'leclerc': 'Produits Leclerc',
   'carrefour': 'Produits Carrefour',
   'auchan': 'Produits Auchan',
-  'smyth-toys': 'Produits SmythsToys',
+  'smyth-toys': 'Produits Smyths Toys',
   'miamland': 'Produits Miamland',
   'stokomani': 'Produits Stokomani',
   'eany': 'Produits Eany',
@@ -72,6 +72,7 @@ export default function ProductFindAlerts() {
   const [alerts, setAlerts] = useState<ProductAlert[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showAdminForm, setShowAdminForm] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
 
   // Sauvegarder/restaurer la position de scroll pour cette page
   useScrollPosition(location.pathname);
@@ -79,6 +80,27 @@ export default function ProductFindAlerts() {
   // Déterminer le filtre source basé sur l'URL
   const sourceFilter = source ? SOURCE_MAP[source] : null;
   const pageTitle = source ? SOURCE_TITLES[source] || 'Product Find' : '🔥 Product Find';
+
+  const syncFromSheet = async () => {
+    setIsSyncing(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('sync-product-find-from-sheets');
+      
+      if (error) throw error;
+      
+      if (data?.success) {
+        toast.success(`Sync terminée: ${data.stats.inserted} nouvelles alertes, ${data.stats.skipped} ignorées`);
+        loadAlerts();
+      } else {
+        throw new Error(data?.error || 'Sync failed');
+      }
+    } catch (error) {
+      console.error('Sync error:', error);
+      toast.error('Erreur lors de la synchronisation');
+    } finally {
+      setIsSyncing(false);
+    }
+  };
 
   const loadAlerts = async () => {
     try {
@@ -217,9 +239,18 @@ export default function ProductFindAlerts() {
             </div>
           </div>
 
-          {/* Admin button */}
+          {/* Admin buttons */}
           {isAdmin && (
-            <div className="flex justify-center">
+            <div className="flex justify-center gap-3">
+              <Button 
+                variant="outline" 
+                className="gap-2" 
+                onClick={syncFromSheet}
+                disabled={isSyncing}
+              >
+                <RefreshCw className={`w-4 h-4 ${isSyncing ? 'animate-spin' : ''}`} />
+                {isSyncing ? 'Synchronisation...' : 'Sync Google Sheet'}
+              </Button>
               <Dialog open={showAdminForm} onOpenChange={setShowAdminForm}>
                 <DialogTrigger asChild>
                   <Button className="gap-2">
