@@ -62,6 +62,7 @@ const CatalogueProduits = lazy(() => import("./pages/CatalogueProduits"));
 const CatalogueDJI = lazy(() => import("./pages/CatalogueDJI"));
 const CatalogueXiaomi = lazy(() => import("./pages/CatalogueXiaomi"));
 const CataloguePlaymobil = lazy(() => import("./pages/CataloguePlaymobil"));
+const CatalogueLego = lazy(() => import("./pages/CatalogueLego"));
 const CatalogueQogita = lazy(() => import("./pages/CatalogueQogita"));
 const CatalogueEany = lazy(() => import("./pages/CatalogueEany"));
 const CatalogueVibraforce = lazy(() => import("./pages/CatalogueVibraforce"));
@@ -169,7 +170,8 @@ const App = () => (
             <Route path="/catalogue-produits" element={<CatalogueProduits />} />
             <Route path="/catalogue/dji" element={<CatalogueDJI />} />
             <Route path="/catalogue/xiaomi" element={<CatalogueXiaomi />} />
-            <Route path="/catalogue/playmobil" element={<CataloguePlaymobil />} />
+<Route path="/catalogue/playmobil" element={<CataloguePlaymobil />} />
+            <Route path="/catalogue/lego" element={<CatalogueLego />} />
             <Route path="/catalogue/qogita" element={<CatalogueQogita />} />
             <Route path="/catalogue/eany" element={<CatalogueEany />} />
             <Route path="/catalogue/vibraforce" element={<CatalogueVibraforce />} />
