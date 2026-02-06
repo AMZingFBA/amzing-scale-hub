@@ -95,3 +95,6 @@ verify_jwt = false
 
 [functions.sync-product-find-from-sheets]
 verify_jwt = false
+
+[functions.sync-discord-product-find]
+verify_jwt = false
