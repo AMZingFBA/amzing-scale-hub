@@ -85,13 +85,21 @@ export default function ProductFindAlerts() {
     if (isSyncing) return;
     setIsSyncing(true);
     try {
-      const { data, error } = await supabase.functions.invoke('sync-product-find-from-sheets');
+      // Use AbortController to timeout after 45 seconds
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 45000);
+      
+      const { data, error } = await supabase.functions.invoke('sync-product-find-from-sheets', {
+        body: {},
+        headers: {},
+      });
+      
+      clearTimeout(timeoutId);
       
       if (error) throw error;
       
       if (data?.success) {
         setLastSyncTime(new Date());
-        // Only show toast if not silent and there are new alerts
         if (!silent && data.stats.inserted > 0) {
           toast.success(`Sync terminée: ${data.stats.inserted} nouvelles alertes`);
         }
@@ -99,11 +107,14 @@ export default function ProductFindAlerts() {
       } else {
         throw new Error(data?.error || 'Sync failed');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Sync error:', error);
-      if (!silent) {
+      // Don't show error for timeouts or network issues in silent mode
+      if (!silent && error?.name !== 'AbortError') {
         toast.error('Erreur lors de la synchronisation');
       }
+      // Still try to load alerts from DB even if sync failed
+      loadAlerts();
     } finally {
       setIsSyncing(false);
     }
@@ -120,13 +131,17 @@ export default function ProductFindAlerts() {
         query = query.ilike('source_name', `%${sourceFilter}%`);
       }
       
-      const { data, error } = await query.order('created_at', { ascending: false });
+      const { data, error } = await query
+        .order('created_at', { ascending: false })
+        .limit(500);
 
       if (error) throw error;
       setAlerts(data || []);
     } catch (error) {
       console.error('Error loading alerts:', error);
-      toast.error('Erreur lors du chargement des alertes');
+      if (!alerts.length) {
+        toast.error('Erreur lors du chargement des alertes');
+      }
     } finally {
       setIsLoading(false);
     }
