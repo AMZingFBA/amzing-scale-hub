@@ -154,16 +154,16 @@ export default function ProductFindAlerts() {
     }
   }, [user, authLoading, sourceFilter]);
 
-  // Auto-sync every 30 seconds
+  // Auto-sync every 60 seconds (reduced frequency to avoid pool saturation)
   useEffect(() => {
     if (!authLoading && user && (isVIP || isAdmin)) {
       // Initial sync
       syncFromSheet(true);
       
-      // Set up auto-sync interval (30 seconds)
+      // Set up auto-sync interval (60 seconds)
       autoSyncRef.current = setInterval(() => {
         syncFromSheet(true);
-      }, 30000);
+      }, 60000);
 
       return () => {
         if (autoSyncRef.current) {
@@ -173,20 +173,27 @@ export default function ProductFindAlerts() {
     }
   }, [user, authLoading, isVIP, isAdmin]);
 
-  // Real-time subscription
+  // Real-time subscription - debounced to avoid hammering the DB
   useEffect(() => {
+    let debounceTimer: NodeJS.Timeout | null = null;
+    
     const channel = supabase
       .channel('product-find-alerts')
       .on(
         'postgres_changes',
-        { event: '*', schema: 'public', table: 'product_find_alerts' },
+        { event: 'INSERT', schema: 'public', table: 'product_find_alerts' },
         () => {
-          loadAlerts();
+          // Debounce: wait 3 seconds before reloading to batch multiple inserts
+          if (debounceTimer) clearTimeout(debounceTimer);
+          debounceTimer = setTimeout(() => {
+            loadAlerts();
+          }, 3000);
         }
       )
       .subscribe();
 
     return () => {
+      if (debounceTimer) clearTimeout(debounceTimer);
       supabase.removeChannel(channel);
     };
   }, [sourceFilter]);
