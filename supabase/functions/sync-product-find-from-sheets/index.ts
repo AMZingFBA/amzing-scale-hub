@@ -161,13 +161,13 @@ serve(async (req) => {
 
     console.log('📋 Column mapping:', COL);
 
-    // Get existing IDs to avoid duplicates
+    // Get existing EANs per source to avoid duplicates
     const { data: existingAlerts } = await supabaseClient
       .from('product_find_alerts')
-      .select('ean, created_at');
+      .select('ean, source_name');
     
     const existingKeys = new Set(
-      (existingAlerts || []).map(a => `${a.ean}_${a.created_at?.slice(0, 10)}`)
+      (existingAlerts || []).map(a => `${a.ean}_${a.source_name}`)
     );
 
     let insertedCount = 0;
@@ -200,7 +200,8 @@ serve(async (req) => {
         }
 
         const createdAt = parseDate(dateHeure);
-        const key = `${ean}_${createdAt.slice(0, 10)}`;
+        const mappedSource = mapSourceName(source);
+        const key = `${ean}_${mappedSource}`;
         
         // Get link values
         const amazonUrl = cols[COL.LIEN_AMAZON]?.trim() || null;
@@ -239,10 +240,16 @@ serve(async (req) => {
             .update({
               amazon_url: amazonUrl,
               source_url: sourceUrl,
+              cost_price: alertData.cost_price,
+              current_price: alertData.current_price,
+              sale_price: alertData.sale_price,
+              profit: alertData.profit,
+              roi: alertData.roi,
+              fba_profit: alertData.fba_profit,
+              fba_roi: alertData.fba_roi,
             })
             .eq('ean', ean)
-            .gte('created_at', createdAt.slice(0, 10))
-            .lt('created_at', createdAt.slice(0, 10) + 'T23:59:59');
+            .eq('source_name', mappedSource);
 
           if (!updateError) {
             updatedCount++;
