@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/use-auth';
 import { useAdmin } from '@/hooks/use-admin';
@@ -12,7 +12,7 @@ import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, Users, Euro, CalendarDays, TrendingUp, Search, RefreshCw, CreditCard, AlertCircle, CheckCircle2, XCircle, Clock } from 'lucide-react';
+import { ArrowLeft, Users, Euro, CalendarDays, TrendingUp, Search, RefreshCw, CreditCard, AlertCircle, CheckCircle2, XCircle, Clock, ChevronLeft, ChevronRight, X } from 'lucide-react';
 
 interface MemberPayment {
   id: string;
@@ -330,59 +330,9 @@ const AdminSubscriptions = () => {
                 </Card>
               </TabsContent>
 
-              {/* Calendar / Forecast Tab */}
+              {/* Calendar Tab */}
               <TabsContent value="calendar" className="space-y-4">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <CalendarDays className="h-5 w-5" />
-                      Prévisions de revenus (12 prochains mois)
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    {sortedForecastMonths.length === 0 ? (
-                      <p className="text-center text-muted-foreground py-8">Aucune prévision disponible</p>
-                    ) : (
-                      <div className="space-y-3">
-                        {sortedForecastMonths.map(([monthKey, data]) => (
-                          <div key={monthKey} className="flex items-center gap-4 p-3 rounded-lg border bg-card">
-                            <div className="min-w-[140px]">
-                              <p className="font-semibold capitalize">{formatMonth(monthKey)}</p>
-                            </div>
-                            <div className="flex-1">
-                              <div className="flex items-center gap-2">
-                                <div
-                                  className="h-4 bg-primary/80 rounded"
-                                  style={{
-                                    width: `${Math.min(100, (data.amount / Math.max(...sortedForecastMonths.map(([, d]) => d.amount))) * 100)}%`,
-                                    minWidth: '8px',
-                                  }}
-                                />
-                              </div>
-                            </div>
-                            <div className="text-right min-w-[80px]">
-                              <p className="font-bold text-lg text-green-500">{data.amount.toFixed(0)}€</p>
-                              <p className="text-xs text-muted-foreground">{data.members.length} membre{data.members.length > 1 ? 's' : ''}</p>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-
-                {/* Monthly revenue from past payments */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Euro className="h-5 w-5" />
-                      Historique des revenus mensuels
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <PastRevenueHistory members={members} />
-                  </CardContent>
-                </Card>
+                <RevenueCalendar members={members} />
               </TabsContent>
 
               {/* Member Detail Tab */}
@@ -407,7 +357,265 @@ const AdminSubscriptions = () => {
   );
 };
 
-// Past revenue history component
+// Revenue Calendar Component — real day-by-day calendar
+interface DayPayment {
+  email: string;
+  amount: number;
+  type: 'past' | 'upcoming';
+}
+
+const RevenueCalendar = ({ members }: { members: Member[] }) => {
+  const [currentDate, setCurrentDate] = useState(() => new Date());
+  const [selectedDay, setSelectedDay] = useState<string | null>(null);
+
+  const year = currentDate.getFullYear();
+  const month = currentDate.getMonth();
+
+  const prevMonth = useCallback(() => setCurrentDate(new Date(year, month - 1, 1)), [year, month]);
+  const nextMonth = useCallback(() => setCurrentDate(new Date(year, month + 1, 1)), [year, month]);
+
+  // Build a map of date -> payments
+  const dayPayments = useMemo(() => {
+    const map: Record<string, DayPayment[]> = {};
+    const addEntry = (dateStr: string, email: string, amount: number, type: 'past' | 'upcoming') => {
+      const dayKey = dateStr.substring(0, 10); // YYYY-MM-DD
+      if (!map[dayKey]) map[dayKey] = [];
+      map[dayKey].push({ email, amount, type });
+    };
+
+    for (const member of members) {
+      // Past payments
+      for (const payment of member.stripe.payments) {
+        addEntry(payment.date, member.email, payment.amount, 'past');
+      }
+      // Upcoming invoice
+      if (member.stripe.upcoming_invoice) {
+        addEntry(member.stripe.upcoming_invoice.date, member.email, member.stripe.upcoming_invoice.amount, 'upcoming');
+      }
+      // Forecast: if active sub with upcoming, project next 11 months
+      if (member.stripe.active_subscription && member.stripe.upcoming_invoice && !member.stripe.active_subscription.cancel_at_period_end) {
+        const baseDate = new Date(member.stripe.upcoming_invoice.date);
+        const amt = member.stripe.upcoming_invoice.amount;
+        for (let i = 1; i < 12; i++) {
+          const futureDate = new Date(baseDate);
+          futureDate.setMonth(futureDate.getMonth() + i);
+          addEntry(futureDate.toISOString(), member.email, amt, 'upcoming');
+        }
+      }
+    }
+    return map;
+  }, [members]);
+
+  // Calendar grid
+  const firstDayOfMonth = new Date(year, month, 1);
+  const lastDayOfMonth = new Date(year, month + 1, 0);
+  const daysInMonth = lastDayOfMonth.getDate();
+  // Monday = 0, Sunday = 6
+  let startDow = firstDayOfMonth.getDay() - 1;
+  if (startDow < 0) startDow = 6;
+
+  const weeks: (number | null)[][] = [];
+  let currentWeek: (number | null)[] = [];
+  for (let i = 0; i < startDow; i++) currentWeek.push(null);
+  for (let d = 1; d <= daysInMonth; d++) {
+    currentWeek.push(d);
+    if (currentWeek.length === 7) {
+      weeks.push(currentWeek);
+      currentWeek = [];
+    }
+  }
+  if (currentWeek.length > 0) {
+    while (currentWeek.length < 7) currentWeek.push(null);
+    weeks.push(currentWeek);
+  }
+
+  const monthLabel = firstDayOfMonth.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
+
+  const getDayKey = (day: number) => {
+    const mm = String(month + 1).padStart(2, '0');
+    const dd = String(day).padStart(2, '0');
+    return `${year}-${mm}-${dd}`;
+  };
+
+  const todayKey = (() => {
+    const now = new Date();
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+  })();
+
+  // Monthly totals
+  const monthTotals = useMemo(() => {
+    let past = 0;
+    let upcoming = 0;
+    let count = 0;
+    for (let d = 1; d <= daysInMonth; d++) {
+      const key = getDayKey(d);
+      const entries = dayPayments[key];
+      if (entries) {
+        for (const e of entries) {
+          if (e.type === 'past') past += e.amount;
+          else upcoming += e.amount;
+          count++;
+        }
+      }
+    }
+    return { past, upcoming, total: past + upcoming, count };
+  }, [dayPayments, year, month, daysInMonth]);
+
+  const selectedEntries = selectedDay ? (dayPayments[selectedDay] || []) : [];
+  const selectedTotal = selectedEntries.reduce((s, e) => s + e.amount, 0);
+
+  const dayNames = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
+
+  return (
+    <div className="space-y-4">
+      {/* Month summary */}
+      <div className="grid grid-cols-3 gap-3">
+        <Card>
+          <CardContent className="p-3 text-center">
+            <p className="text-xs text-muted-foreground">Encaissé</p>
+            <p className="text-xl font-bold text-green-500">{monthTotals.past.toFixed(0)}€</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-3 text-center">
+            <p className="text-xs text-muted-foreground">Prévu</p>
+            <p className="text-xl font-bold text-blue-500">{monthTotals.upcoming.toFixed(0)}€</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-3 text-center">
+            <p className="text-xs text-muted-foreground">Total mois</p>
+            <p className="text-xl font-bold">{monthTotals.total.toFixed(0)}€</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Calendar */}
+      <Card>
+        <CardHeader className="pb-2">
+          <div className="flex items-center justify-between">
+            <Button variant="ghost" size="icon" onClick={prevMonth}>
+              <ChevronLeft className="h-5 w-5" />
+            </Button>
+            <CardTitle className="capitalize text-lg">{monthLabel}</CardTitle>
+            <Button variant="ghost" size="icon" onClick={nextMonth}>
+              <ChevronRight className="h-5 w-5" />
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent className="p-2 sm:p-4">
+          {/* Day headers */}
+          <div className="grid grid-cols-7 gap-1 mb-1">
+            {dayNames.map((dn) => (
+              <div key={dn} className="text-center text-xs font-medium text-muted-foreground py-1">
+                {dn}
+              </div>
+            ))}
+          </div>
+          {/* Weeks */}
+          {weeks.map((week, wi) => (
+            <div key={wi} className="grid grid-cols-7 gap-1">
+              {week.map((day, di) => {
+                if (day === null) return <div key={di} className="aspect-square" />;
+                const key = getDayKey(day);
+                const entries = dayPayments[key];
+                const isToday = key === todayKey;
+                const isSelected = key === selectedDay;
+                const totalAmount = entries ? entries.reduce((s, e) => s + e.amount, 0) : 0;
+                const hasPast = entries?.some(e => e.type === 'past');
+                const hasUpcoming = entries?.some(e => e.type === 'upcoming');
+
+                return (
+                  <button
+                    key={di}
+                    onClick={() => setSelectedDay(isSelected ? null : key)}
+                    className={`
+                      aspect-square rounded-lg flex flex-col items-center justify-center text-xs relative transition-all border
+                      ${isToday ? 'border-primary ring-1 ring-primary/30' : 'border-transparent'}
+                      ${isSelected ? 'bg-primary text-primary-foreground' : entries ? 'bg-accent/50 hover:bg-accent' : 'hover:bg-muted/50'}
+                    `}
+                  >
+                    <span className={`font-medium ${isSelected ? '' : isToday ? 'text-primary' : ''}`}>{day}</span>
+                    {entries && !isSelected && (
+                      <span className={`text-[10px] font-bold mt-0.5 ${hasPast ? 'text-green-500' : 'text-blue-500'}`}>
+                        {totalAmount.toFixed(0)}€
+                      </span>
+                    )}
+                    {entries && isSelected && (
+                      <span className="text-[10px] font-bold mt-0.5">{totalAmount.toFixed(0)}€</span>
+                    )}
+                    {/* Dot indicators */}
+                    {entries && !isSelected && (
+                      <div className="flex gap-0.5 mt-0.5">
+                        {hasPast && <span className="w-1 h-1 rounded-full bg-green-500" />}
+                        {hasUpcoming && <span className="w-1 h-1 rounded-full bg-blue-500" />}
+                      </div>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+
+      {/* Selected day details */}
+      {selectedDay && (
+        <Card>
+          <CardHeader className="pb-2">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-base">
+                {new Date(selectedDay + 'T00:00:00').toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+              </CardTitle>
+              <Button variant="ghost" size="icon" onClick={() => setSelectedDay(null)}>
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              {selectedEntries.length} paiement{selectedEntries.length > 1 ? 's' : ''} — Total : <span className="font-bold text-foreground">{selectedTotal.toFixed(0)}€</span>
+            </p>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              {selectedEntries.map((entry, i) => (
+                <div key={i} className="flex items-center justify-between p-2 rounded-lg border">
+                  <div className="flex items-center gap-2">
+                    {entry.type === 'past' ? (
+                      <CheckCircle2 className="h-4 w-4 text-green-500 shrink-0" />
+                    ) : (
+                      <Clock className="h-4 w-4 text-blue-500 shrink-0" />
+                    )}
+                    <span className="text-sm truncate">{entry.email}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className={`font-bold text-sm ${entry.type === 'past' ? 'text-green-500' : 'text-blue-500'}`}>
+                      {entry.amount.toFixed(0)}€
+                    </span>
+                    <Badge variant="outline" className="text-[10px]">
+                      {entry.type === 'past' ? 'Encaissé' : 'Prévu'}
+                    </Badge>
+                  </div>
+                </div>
+              ))}
+              {selectedEntries.length === 0 && (
+                <p className="text-center text-muted-foreground py-4 text-sm">Aucun paiement ce jour</p>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Legend */}
+      <div className="flex items-center gap-4 text-xs text-muted-foreground px-1">
+        <div className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-green-500" /> Encaissé</div>
+        <div className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-blue-500" /> Prévu</div>
+        <div className="flex items-center gap-1"><span className="w-3 h-3 rounded border border-primary" /> Aujourd'hui</div>
+      </div>
+    </div>
+  );
+};
+
+// Past revenue history component (kept for reference data)
 const PastRevenueHistory = ({ members }: { members: Member[] }) => {
   const monthlyRevenue = useMemo(() => {
     const months: Record<string, number> = {};
