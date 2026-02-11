@@ -7,7 +7,7 @@ import { useAuth } from '@/hooks/use-auth';
 const AppInstallBanner = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [platform, setPlatform] = useState<'ios' | 'android' | 'desktop'>('desktop');
-  const { isVIP } = useAuth();
+  const { isVIP, user } = useAuth();
 
   useEffect(() => {
     // Detect platform
@@ -29,7 +29,8 @@ const AppInstallBanner = () => {
     // Only show banner on mobile platforms (not desktop) and not to VIP users
     const isNativePlatform = Capacitor.isNativePlatform();
     
-    if (!isNativePlatform && !isVIP && detectedPlatform !== 'desktop') {
+    const isAdmin = user?.email === 'amzingfba26@gmail.com';
+    if (!isNativePlatform && !isVIP && !isAdmin && detectedPlatform !== 'desktop') {
       // Check if user has dismissed the banner in the last 24 hours
       const dismissedUntil = localStorage.getItem('app-install-banner-dismissed-until');
       
