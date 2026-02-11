@@ -138,7 +138,16 @@ export const RecentUpdates = () => {
         }
 
         if (productAlerts) {
-          productAlerts.forEach(alert => {
+          // Deduplicate by product_title + source_name (keep most recent)
+          const seen = new Set<string>();
+          const uniqueAlerts = productAlerts.filter(alert => {
+            const key = `${alert.product_title}_${alert.source_name}`;
+            if (seen.has(key)) return false;
+            seen.add(key);
+            return true;
+          });
+          
+          uniqueAlerts.forEach(alert => {
             const sourceMap: Record<string, string> = {
               'Leclerc': 'produits-leclerc',
               'Carrefour': 'produits-carrefour',
