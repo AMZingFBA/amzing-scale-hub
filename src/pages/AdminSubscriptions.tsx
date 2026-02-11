@@ -485,8 +485,71 @@ const RevenueCalendar = ({ members }: { members: Member[] }) => {
 
   const dayNames = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
 
+  // Today's payments
+  const todayEntries = dayPayments[todayKey] || [];
+  const todayTotal = todayEntries.reduce((s, e) => s + e.amount, 0);
+  const todayReceived = todayEntries.filter(e => e.type === 'past').reduce((s, e) => s + e.amount, 0);
+  const todayPending = todayEntries.filter(e => e.type === 'upcoming').reduce((s, e) => s + e.amount, 0);
+
   return (
     <div className="space-y-4">
+      {/* TODAY'S PAYMENTS */}
+      {todayEntries.length > 0 && (
+        <Card className="border-primary/30">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base flex items-center gap-2">
+              <CalendarDays className="h-5 w-5 text-primary" />
+              Paiements du jour — {new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })}
+            </CardTitle>
+            <div className="flex gap-4 text-sm">
+              <span className="text-muted-foreground">Total attendu : <span className="font-bold text-foreground">{todayTotal.toFixed(0)}€</span></span>
+              <span className="text-green-500 font-medium">{todayReceived.toFixed(0)}€ reçu</span>
+              {todayPending > 0 && <span className="text-red-500 font-medium">{todayPending.toFixed(0)}€ en attente</span>}
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              {todayEntries.map((entry, i) => (
+                <div key={i} className={`flex items-center justify-between p-3 rounded-lg border ${
+                  entry.type === 'past' 
+                    ? 'border-green-500/30 bg-green-500/10' 
+                    : 'border-red-500/30 bg-red-500/10'
+                }`}>
+                  <div className="flex items-center gap-2">
+                    {entry.type === 'past' ? (
+                      <CheckCircle2 className="h-5 w-5 text-green-500 shrink-0" />
+                    ) : (
+                      <XCircle className="h-5 w-5 text-red-500 shrink-0" />
+                    )}
+                    <span className="text-sm font-medium">{entry.email}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className={`font-bold ${entry.type === 'past' ? 'text-green-500' : 'text-red-500'}`}>
+                      {entry.amount.toFixed(0)}€
+                    </span>
+                    <Badge className={entry.type === 'past' 
+                      ? 'bg-green-500/20 text-green-400 border-green-500/30' 
+                      : 'bg-red-500/20 text-red-400 border-red-500/30'
+                    }>
+                      {entry.type === 'past' ? '✓ Débité' : '✗ En attente'}
+                    </Badge>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {todayEntries.length === 0 && (
+        <Card className="border-muted">
+          <CardContent className="p-4 text-center text-muted-foreground">
+            <CalendarDays className="h-8 w-8 mx-auto mb-2 opacity-30" />
+            <p className="text-sm">Aucun paiement prévu aujourd'hui</p>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Month summary */}
       <div className="grid grid-cols-3 gap-3">
         <Card>
@@ -625,9 +688,10 @@ const RevenueCalendar = ({ members }: { members: Member[] }) => {
       )}
 
       {/* Legend */}
-      <div className="flex items-center gap-4 text-xs text-muted-foreground px-1">
-        <div className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-green-500" /> Encaissé</div>
-        <div className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-blue-500" /> Prévu</div>
+      <div className="flex items-center gap-4 text-xs text-muted-foreground px-1 flex-wrap">
+        <div className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-green-500" /> Encaissé (Stripe confirmé)</div>
+        <div className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-blue-500" /> Prévu (projection)</div>
+        <div className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-red-500" /> En attente (pas encore débité)</div>
         <div className="flex items-center gap-1"><span className="w-3 h-3 rounded border border-primary" /> Aujourd'hui</div>
       </div>
     </div>
