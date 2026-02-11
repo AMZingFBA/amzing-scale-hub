@@ -98,3 +98,6 @@ verify_jwt = false
 
 [functions.sync-discord-product-find]
 verify_jwt = false
+
+[functions.admin-get-subscriptions]
+verify_jwt = false
