@@ -86,7 +86,7 @@ serve(async (req) => {
             status: inv.status,
             period_start: inv.period_start ? new Date(inv.period_start * 1000).toISOString() : null,
             period_end: inv.period_end ? new Date(inv.period_end * 1000).toISOString() : null,
-          }));
+          })).filter((p: any) => !isNaN(new Date(p.date).getTime()));
 
           totalPaid = stripePayments.reduce((sum: number, p: any) => sum + p.amount, 0);
           paymentCount = stripePayments.length;

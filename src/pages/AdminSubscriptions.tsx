@@ -375,33 +375,52 @@ const RevenueCalendar = ({ members }: { members: Member[] }) => {
   const nextMonth = useCallback(() => setCurrentDate(new Date(year, month + 1, 1)), [year, month]);
 
   // Build a map of date -> payments
+  // Logic: each VIP member has a 12-month engagement at ~64€/month
+  // We use their actual past payments + project remaining months until 12 total
   const dayPayments = useMemo(() => {
     const map: Record<string, DayPayment[]> = {};
     const addEntry = (dateStr: string, email: string, amount: number, type: 'past' | 'upcoming') => {
       const dayKey = dateStr.substring(0, 10); // YYYY-MM-DD
+      if (dayKey === 'NaN-' || dayKey.includes('NaN')) return; // skip invalid dates
       if (!map[dayKey]) map[dayKey] = [];
       map[dayKey].push({ email, amount, type });
     };
 
     for (const member of members) {
-      // Past payments
+      // Past payments — always show
       for (const payment of member.stripe.payments) {
         addEntry(payment.date, member.email, payment.amount, 'past');
       }
-      // Upcoming invoice
-      if (member.stripe.upcoming_invoice) {
-        addEntry(member.stripe.upcoming_invoice.date, member.email, member.stripe.upcoming_invoice.amount, 'upcoming');
-      }
-      // Forecast: if active sub with upcoming, project next 11 months
-      if (member.stripe.active_subscription && member.stripe.upcoming_invoice && !member.stripe.active_subscription.cancel_at_period_end) {
-        const baseDate = new Date(member.stripe.upcoming_invoice.date);
-        const amt = member.stripe.upcoming_invoice.amount;
-        for (let i = 1; i < 12; i++) {
-          const futureDate = new Date(baseDate);
+
+      // Project remaining months of the 12-month engagement
+      const totalPayments = member.stripe.payment_count;
+      const monthlyAmount = 64; // standard monthly amount
+
+      if (totalPayments > 0 && totalPayments < 12) {
+        // Find the first payment date to calculate engagement start
+        const sortedPayments = [...member.stripe.payments].sort(
+          (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+        );
+        const firstPaymentDate = new Date(sortedPayments[0]?.date);
+        if (isNaN(firstPaymentDate.getTime())) continue;
+
+        // Project remaining months (from payment_count+1 to 12)
+        for (let i = totalPayments; i < 12; i++) {
+          const futureDate = new Date(firstPaymentDate);
           futureDate.setMonth(futureDate.getMonth() + i);
-          addEntry(futureDate.toISOString(), member.email, amt, 'upcoming');
+          addEntry(futureDate.toISOString(), member.email, monthlyAmount, 'upcoming');
+        }
+      } else if (totalPayments === 0 && member.subscription.plan_type === 'vip' && member.subscription.status === 'active') {
+        // VIP with no payments yet (trial?) — project from started_at
+        const startDate = new Date(member.subscription.started_at);
+        if (isNaN(startDate.getTime())) continue;
+        for (let i = 0; i < 12; i++) {
+          const futureDate = new Date(startDate);
+          futureDate.setMonth(futureDate.getMonth() + i);
+          addEntry(futureDate.toISOString(), member.email, monthlyAmount, 'upcoming');
         }
       }
+      // If 12+ payments already made, engagement complete — no projection needed
     }
     return map;
   }, [members]);
