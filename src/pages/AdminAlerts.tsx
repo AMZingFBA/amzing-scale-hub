@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Checkbox } from '@/components/ui/checkbox';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/use-auth';
 import { useAdmin } from '@/hooks/use-admin';
@@ -33,6 +34,7 @@ const AdminAlerts = () => {
   const [filePreview, setFilePreview] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState('introduction');
   const [selectedSubcategory, setSelectedSubcategory] = useState('');
+  const [addWhatsApp, setAddWhatsApp] = useState(false);
 
   // Edit state
   const [editingAlert, setEditingAlert] = useState<any>(null);
@@ -197,7 +199,9 @@ const AdminAlerts = () => {
         .insert({
           admin_id: user?.id,
           title: title.trim(),
-          content: content.trim() || null,
+          content: addWhatsApp
+            ? ((content.trim() ? content.trim() + '\n\n' : '') + '📲 Pour passer commande, envoyez un WhatsApp au 0780930274')
+            : (content.trim() || null),
           link_url: linkUrl.trim() || null,
           file_url: fileUrl,
           file_type: fileType,
@@ -564,6 +568,17 @@ const AdminAlerts = () => {
                     onChange={(e) => setContent(e.target.value)}
                     rows={4}
                   />
+                </div>
+
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="whatsapp"
+                    checked={addWhatsApp}
+                    onCheckedChange={(checked) => setAddWhatsApp(checked === true)}
+                  />
+                  <Label htmlFor="whatsapp" className="cursor-pointer text-sm">
+                    Ajouter "Pour passer commande, envoyez un WhatsApp au 0780930274"
+                  </Label>
                 </div>
 
                 <div>
