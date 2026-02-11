@@ -136,7 +136,16 @@ export default function ProductFindAlerts() {
         .limit(500);
 
       if (error) throw error;
-      setAlerts(data || []);
+      
+      // Deduplicate by EAN+source_name, keeping the most recent entry
+      const seen = new Map<string, typeof data[0]>();
+      for (const alert of data || []) {
+        const key = `${alert.ean}_${alert.source_name}`;
+        if (!seen.has(key)) {
+          seen.set(key, alert);
+        }
+      }
+      setAlerts(Array.from(seen.values()));
     } catch (error) {
       console.error('Error loading alerts:', error);
       if (!alerts.length) {
