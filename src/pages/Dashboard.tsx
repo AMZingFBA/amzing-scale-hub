@@ -62,7 +62,9 @@ const Dashboard = () => {
     isLoading
   } = useAuth();
   const { isAdmin, isLoading: isAdminLoading } = useAdmin();
-  const { notifications, markAsRead, loadNotifications } = useNotifications();
+  const { notifications: rawNotifications, markAsRead, loadNotifications } = useNotifications();
+  // Hide notification badges for admin
+  const notifications = isAdmin ? {} as typeof rawNotifications : rawNotifications;
   const { unreadCount: adminTicketsUnread } = useAdminTicketsUnread();
   const { toast } = useToast();
   const [isSyncing, setIsSyncing] = useState(false);
