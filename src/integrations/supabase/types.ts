@@ -1255,6 +1255,36 @@ export type Database = {
         }
         Relationships: []
       }
+      subscription_engagements: {
+        Row: {
+          created_at: string
+          custom_monthly_amount: number | null
+          engagement_months: number
+          id: string
+          notes: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          custom_monthly_amount?: number | null
+          engagement_months?: number
+          id?: string
+          notes?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          custom_monthly_amount?: number | null
+          engagement_months?: number
+          id?: string
+          notes?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       subscriptions: {
         Row: {
           apple_transaction_id: string | null

@@ -12,7 +12,8 @@ import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, Users, Euro, CalendarDays, TrendingUp, Search, RefreshCw, CreditCard, AlertCircle, CheckCircle2, XCircle, Clock, ChevronLeft, ChevronRight, X } from 'lucide-react';
+import { ArrowLeft, Users, Euro, CalendarDays, TrendingUp, Search, RefreshCw, CreditCard, AlertCircle, CheckCircle2, XCircle, Clock, ChevronLeft, ChevronRight, X, Save, Edit2 } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface MemberPayment {
   id: string;
@@ -52,6 +53,13 @@ interface Member {
   };
 }
 
+interface EngagementOverride {
+  user_id: string;
+  engagement_months: number;
+  custom_monthly_amount: number | null;
+  notes: string | null;
+}
+
 interface ForecastMonth {
   amount: number;
   members: string[];
@@ -76,6 +84,7 @@ const AdminSubscriptions = () => {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedMember, setSelectedMember] = useState<Member | null>(null);
+  const [engagements, setEngagements] = useState<Record<string, EngagementOverride>>({});
 
   useEffect(() => {
     if (!authLoading && !adminLoading) {
@@ -93,14 +102,26 @@ const AdminSubscriptions = () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) throw new Error('No session');
 
-      const response = await supabase.functions.invoke('admin-get-subscriptions', {
-        headers: { Authorization: `Bearer ${session.access_token}` },
-      });
+      const [response, engResponse] = await Promise.all([
+        supabase.functions.invoke('admin-get-subscriptions', {
+          headers: { Authorization: `Bearer ${session.access_token}` },
+        }),
+        supabase.from('subscription_engagements').select('*'),
+      ]);
 
       if (response.error) throw response.error;
 
       setMembers(response.data.members);
       setSummary(response.data.summary);
+
+      // Build engagements map
+      const engMap: Record<string, EngagementOverride> = {};
+      if (engResponse.data) {
+        for (const e of engResponse.data) {
+          engMap[e.user_id] = e as EngagementOverride;
+        }
+      }
+      setEngagements(engMap);
     } catch (err: any) {
       toast({
         title: 'Erreur',
@@ -109,6 +130,22 @@ const AdminSubscriptions = () => {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const saveEngagement = async (userId: string, months: number, customAmount: number | null, notes: string | null) => {
+    try {
+      const { error } = await supabase.from('subscription_engagements').upsert({
+        user_id: userId,
+        engagement_months: months,
+        custom_monthly_amount: customAmount,
+        notes: notes,
+      }, { onConflict: 'user_id' });
+      if (error) throw error;
+      setEngagements(prev => ({ ...prev, [userId]: { user_id: userId, engagement_months: months, custom_monthly_amount: customAmount, notes } }));
+      toast({ title: 'Engagement mis à jour' });
+    } catch (err: any) {
+      toast({ title: 'Erreur', description: err.message, variant: 'destructive' });
     }
   };
 
@@ -332,13 +369,13 @@ const AdminSubscriptions = () => {
 
               {/* Calendar Tab */}
               <TabsContent value="calendar" className="space-y-4">
-                <RevenueCalendar members={members} />
+                <RevenueCalendar members={members} engagements={engagements} />
               </TabsContent>
 
               {/* Member Detail Tab */}
               <TabsContent value="detail" className="space-y-4">
                 {selectedMember ? (
-                  <MemberDetail member={selectedMember} formatDate={formatDate} />
+                  <MemberDetail member={selectedMember} formatDate={formatDate} engagement={engagements[selectedMember.user_id]} onSaveEngagement={saveEngagement} />
                 ) : (
                   <Card>
                     <CardContent className="py-12 text-center text-muted-foreground">
@@ -364,7 +401,7 @@ interface DayPayment {
   type: 'past' | 'upcoming';
 }
 
-const RevenueCalendar = ({ members }: { members: Member[] }) => {
+const RevenueCalendar = ({ members, engagements }: { members: Member[]; engagements: Record<string, EngagementOverride> }) => {
   const [currentDate, setCurrentDate] = useState(() => new Date());
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
 
@@ -392,38 +429,36 @@ const RevenueCalendar = ({ members }: { members: Member[] }) => {
         addEntry(payment.date, member.email, payment.amount, 'past');
       }
 
-      // Project remaining months of the 12-month engagement
+      // Project remaining months based on engagement (default 12)
+      const eng = engagements[member.user_id];
+      const engMonths = eng?.engagement_months ?? 12;
       const totalPayments = member.stripe.payment_count;
-      const monthlyAmount = 64; // standard monthly amount
+      const monthlyAmount = eng?.custom_monthly_amount ?? 64;
 
-      if (totalPayments > 0 && totalPayments < 12) {
-        // Find the first payment date to calculate engagement start
+      if (totalPayments > 0 && totalPayments < engMonths) {
         const sortedPayments = [...member.stripe.payments].sort(
           (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
         );
         const firstPaymentDate = new Date(sortedPayments[0]?.date);
         if (isNaN(firstPaymentDate.getTime())) continue;
 
-        // Project remaining months (from payment_count+1 to 12)
-        for (let i = totalPayments; i < 12; i++) {
+        for (let i = totalPayments; i < engMonths; i++) {
           const futureDate = new Date(firstPaymentDate);
           futureDate.setMonth(futureDate.getMonth() + i);
           addEntry(futureDate.toISOString(), member.email, monthlyAmount, 'upcoming');
         }
       } else if (totalPayments === 0 && member.subscription.plan_type === 'vip' && member.subscription.status === 'active') {
-        // VIP with no payments yet (trial?) — project from started_at
         const startDate = new Date(member.subscription.started_at);
         if (isNaN(startDate.getTime())) continue;
-        for (let i = 0; i < 12; i++) {
+        for (let i = 0; i < engMonths; i++) {
           const futureDate = new Date(startDate);
           futureDate.setMonth(futureDate.getMonth() + i);
           addEntry(futureDate.toISOString(), member.email, monthlyAmount, 'upcoming');
         }
       }
-      // If 12+ payments already made, engagement complete — no projection needed
     }
     return map;
-  }, [members]);
+  }, [members, engagements]);
 
   // Calendar grid
   const firstDayOfMonth = new Date(year, month, 1);
@@ -735,7 +770,40 @@ const PastRevenueHistory = ({ members }: { members: Member[] }) => {
 };
 
 // Member detail component
-const MemberDetail = ({ member, formatDate }: { member: Member; formatDate: (d: string | null) => string }) => {
+const MemberDetail = ({ member, formatDate, engagement, onSaveEngagement }: { 
+  member: Member; 
+  formatDate: (d: string | null) => string;
+  engagement?: EngagementOverride;
+  onSaveEngagement: (userId: string, months: number, customAmount: number | null, notes: string | null) => Promise<void>;
+}) => {
+  const [editing, setEditing] = useState(false);
+  const [engMonths, setEngMonths] = useState(engagement?.engagement_months ?? 12);
+  const [customAmount, setCustomAmount] = useState<string>(engagement?.custom_monthly_amount?.toString() ?? '');
+  const [notes, setNotes] = useState(engagement?.notes ?? '');
+  const [saving, setSaving] = useState(false);
+
+  // Sync when engagement prop changes
+  useEffect(() => {
+    setEngMonths(engagement?.engagement_months ?? 12);
+    setCustomAmount(engagement?.custom_monthly_amount?.toString() ?? '');
+    setNotes(engagement?.notes ?? '');
+  }, [engagement]);
+
+  const handleSave = async () => {
+    setSaving(true);
+    await onSaveEngagement(
+      member.user_id, 
+      engMonths, 
+      customAmount ? parseFloat(customAmount) : null,
+      notes || null
+    );
+    setSaving(false);
+    setEditing(false);
+  };
+
+  const currentEngMonths = engagement?.engagement_months ?? 12;
+  const currentAmount = engagement?.custom_monthly_amount ?? 64;
+
   return (
     <div className="space-y-4">
       <Card>
@@ -812,6 +880,98 @@ const MemberDetail = ({ member, formatDate }: { member: Member; formatDate: (d: 
         </CardContent>
       </Card>
 
+      {/* Engagement Settings */}
+      <Card className="border-primary/30">
+        <CardHeader className="pb-2">
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-base flex items-center gap-2">
+              <Edit2 className="h-4 w-4" />
+              Engagement
+            </CardTitle>
+            {!editing ? (
+              <Button variant="outline" size="sm" onClick={() => setEditing(true)}>
+                <Edit2 className="h-3 w-3 mr-1" /> Modifier
+              </Button>
+            ) : (
+              <div className="flex gap-2">
+                <Button variant="ghost" size="sm" onClick={() => setEditing(false)}>Annuler</Button>
+                <Button size="sm" onClick={handleSave} disabled={saving}>
+                  <Save className="h-3 w-3 mr-1" /> {saving ? 'Sauvegarde...' : 'Sauvegarder'}
+                </Button>
+              </div>
+            )}
+          </div>
+        </CardHeader>
+        <CardContent>
+          {!editing ? (
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+              <div className="p-3 rounded-lg border text-center">
+                <p className="text-xs text-muted-foreground">Durée engagement</p>
+                <p className="text-2xl font-bold">{currentEngMonths} mois</p>
+              </div>
+              <div className="p-3 rounded-lg border text-center">
+                <p className="text-xs text-muted-foreground">Montant mensuel</p>
+                <p className="text-2xl font-bold">{currentAmount}€</p>
+              </div>
+              <div className="p-3 rounded-lg border text-center">
+                <p className="text-xs text-muted-foreground">Total engagement</p>
+                <p className="text-2xl font-bold">{(currentEngMonths * currentAmount).toFixed(0)}€</p>
+              </div>
+              {engagement?.notes && (
+                <div className="col-span-full p-3 rounded-lg border bg-muted/30">
+                  <p className="text-xs text-muted-foreground mb-1">Notes</p>
+                  <p className="text-sm">{engagement.notes}</p>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs text-muted-foreground mb-1 block">Durée d'engagement</label>
+                  <Select value={engMonths.toString()} onValueChange={(v) => setEngMonths(parseInt(v))}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(m => (
+                        <SelectItem key={m} value={m.toString()}>
+                          {m} mois {m === 12 ? '(standard)' : m === 1 ? '(exception)' : ''}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <label className="text-xs text-muted-foreground mb-1 block">Montant mensuel (€)</label>
+                  <Input 
+                    type="number" 
+                    placeholder="64" 
+                    value={customAmount} 
+                    onChange={(e) => setCustomAmount(e.target.value)}
+                  />
+                  <p className="text-[10px] text-muted-foreground mt-1">Laisser vide = 64€ par défaut</p>
+                </div>
+              </div>
+              <div>
+                <label className="text-xs text-muted-foreground mb-1 block">Notes (optionnel)</label>
+                <Input 
+                  placeholder="Ex: Promo spéciale, 1 mois sans engagement..." 
+                  value={notes} 
+                  onChange={(e) => setNotes(e.target.value)}
+                />
+              </div>
+              {engMonths !== 12 && (
+                <div className="p-2 rounded-lg border border-yellow-500/30 bg-yellow-500/10 text-sm flex items-center gap-2">
+                  <AlertCircle className="h-4 w-4 text-yellow-500 shrink-0" />
+                  <span>Exception : engagement de {engMonths} mois au lieu de 12</span>
+                </div>
+              )}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
       {/* Payment History */}
       <Card>
         <CardHeader>
@@ -852,7 +1012,7 @@ const MemberDetail = ({ member, formatDate }: { member: Member; formatDate: (d: 
         </CardContent>
       </Card>
 
-      {/* Engagement Calculation */}
+      {/* Engagement Summary */}
       <Card>
         <CardHeader>
           <CardTitle className="text-base flex items-center gap-2">
@@ -861,10 +1021,10 @@ const MemberDetail = ({ member, formatDate }: { member: Member; formatDate: (d: 
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="p-3 rounded-lg border text-center">
-              <p className="text-xs text-muted-foreground">Mois d'engagement</p>
-              <p className="text-2xl font-bold">{member.stripe.payment_count}</p>
+              <p className="text-xs text-muted-foreground">Paiements effectués</p>
+              <p className="text-2xl font-bold">{member.stripe.payment_count}/{currentEngMonths}</p>
             </div>
             <div className="p-3 rounded-lg border text-center">
               <p className="text-xs text-muted-foreground">1er paiement</p>
@@ -875,11 +1035,15 @@ const MemberDetail = ({ member, formatDate }: { member: Member; formatDate: (d: 
               </p>
             </div>
             <div className="p-3 rounded-lg border text-center">
-              <p className="text-xs text-muted-foreground">Paiement mensuel</p>
+              <p className="text-xs text-muted-foreground">Restant à percevoir</p>
+              <p className="text-2xl font-bold text-blue-500">
+                {Math.max(0, currentEngMonths - member.stripe.payment_count) * currentAmount}€
+              </p>
+            </div>
+            <div className="p-3 rounded-lg border text-center">
+              <p className="text-xs text-muted-foreground">Mois restants</p>
               <p className="text-2xl font-bold">
-                {member.stripe.payment_count > 1
-                  ? `${(member.stripe.payments[0].amount).toFixed(0)}€`
-                  : '—'}
+                {Math.max(0, currentEngMonths - member.stripe.payment_count)}
               </p>
             </div>
           </div>
