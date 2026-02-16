@@ -6,72 +6,48 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// Google Sheet ID
 const SHEET_ID = "1fh85PAOtLXWUU-Q4SgZuYv7zwS9L1GD6yRe7yHYkscQ";
 const SHEET_NAME = "Sheet1";
 
-// Mapping des sources vers les noms dans la BDD
-// Exception: "Qogita" doit être mappé vers "Qogita2"
 const mapSourceName = (source: string): string => {
   const trimmed = source?.trim() || '';
-  if (trimmed.toLowerCase() === 'qogita') {
-    return 'Qogita2';
-  }
+  if (trimmed.toLowerCase() === 'qogita') return 'Qogita2';
   return trimmed;
 };
 
-// Parse French date format "DD/MM/YYYY HH:mm:ss" or other formats
 const parseDate = (dateStr: string): string => {
   if (!dateStr) return new Date().toISOString();
-  
   try {
-    // Try DD/MM/YYYY HH:mm:ss format
     const frenchMatch = dateStr.match(/(\d{2})\/(\d{2})\/(\d{4})\s+(\d{2}):(\d{2}):?(\d{2})?/);
     if (frenchMatch) {
       const [, day, month, year, hour, minute, second = '00'] = frenchMatch;
       return new Date(`${year}-${month}-${day}T${hour}:${minute}:${second}`).toISOString();
     }
-    
-    // Try ISO format
     const date = new Date(dateStr);
-    if (!isNaN(date.getTime())) {
-      return date.toISOString();
-    }
+    if (!isNaN(date.getTime())) return date.toISOString();
   } catch (e) {
     console.error('Date parse error:', e);
   }
-  
   return new Date().toISOString();
 };
 
-// Parse number safely
 const parseNumber = (value: string | undefined | null): number | null => {
   if (!value || value === '' || value === '-' || value === 'N/A') return null;
-  
-  // Replace comma with dot for French decimals
   const cleaned = value.toString().replace(',', '.').replace(/[^\d.-]/g, '');
   const num = parseFloat(cleaned);
   return isNaN(num) ? null : num;
 };
 
-// Better CSV parsing that handles quotes and special characters
 const parseCSVLine = (line: string): string[] => {
   const result: string[] = [];
   let current = '';
   let inQuotes = false;
-  
   for (let i = 0; i < line.length; i++) {
     const char = line[i];
     const nextChar = line[i + 1];
-    
     if (char === '"') {
-      if (inQuotes && nextChar === '"') {
-        // Escaped quote
-        current += '"';
-        i++;
-      } else {
-        inQuotes = !inQuotes;
-      }
+      if (inQuotes && nextChar === '"') { current += '"'; i++; }
+      else inQuotes = !inQuotes;
     } else if (char === ',' && !inQuotes) {
       result.push(current.trim());
       current = '';
@@ -80,8 +56,6 @@ const parseCSVLine = (line: string): string[] => {
     }
   }
   result.push(current.trim());
-  
-  // Clean up quotes from values
   return result.map(v => v.replace(/^"|"$/g, '').replace(/""/g, '"'));
 };
 
@@ -91,15 +65,15 @@ serve(async (req) => {
   }
 
   try {
-    console.log("🔄 Starting Product Find sync from Google Sheets...");
+    console.log("🔄 Starting incremental Product Find sync...");
 
     const supabaseClient = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
     );
 
-    // Get admin user ID from user_roles table
-    const { data: adminRole, error: adminError } = await supabaseClient
+    // Get admin user ID
+    const { data: adminRole } = await supabaseClient
       .from('user_roles')
       .select('user_id')
       .eq('role', 'admin')
@@ -107,19 +81,27 @@ serve(async (req) => {
       .maybeSingle();
     
     const adminId = adminRole?.user_id;
-    if (!adminId) {
-      console.error('Admin lookup error:', adminError);
-      throw new Error('No admin user found');
+    if (!adminId) throw new Error('No admin user found');
+
+    // Load existing EAN+source pairs to skip duplicates
+    const { data: existingAlerts, error: existingError } = await supabaseClient
+      .from('product_find_alerts')
+      .select('ean, source_name');
+
+    if (existingError) {
+      console.error('Error loading existing alerts:', existingError);
+      throw new Error('Failed to load existing alerts');
     }
 
-    // Fetch Google Sheet as CSV
+    const existingKeys = new Set(
+      (existingAlerts || []).map(a => `${a.ean}__${a.source_name}`)
+    );
+    console.log(`📊 ${existingKeys.size} existing EAN+source pairs loaded`);
+
+    // Fetch Google Sheet
     const csvUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(SHEET_NAME)}`;
-    console.log(`📡 Fetching from: ${csvUrl}`);
-
     const response = await fetch(csvUrl);
-    if (!response.ok) {
-      throw new Error(`Failed to fetch sheet: ${response.statusText}`);
-    }
+    if (!response.ok) throw new Error(`Failed to fetch sheet: ${response.statusText}`);
 
     const csvText = await response.text();
     const lines = csvText.split('\n').filter(line => line.trim());
@@ -132,20 +114,11 @@ serve(async (req) => {
     }
 
     const headers = parseCSVLine(lines[0]);
-    console.log('📋 Headers:', headers);
-    console.log('📋 Number of headers:', headers.length);
-
-    // Build column index map from headers
     const headerMap: Record<string, number> = {};
-    headers.forEach((h, i) => {
-      headerMap[h.toLowerCase().trim()] = i;
-    });
+    headers.forEach((h, i) => { headerMap[h.toLowerCase().trim()] = i; });
 
-    // Column indices
     const COL = {
-      ID: headerMap['id'] ?? 0,
       DATE_HEURE: headerMap['date/heure'] ?? 1,
-      CANAL: headerMap['canal'] ?? 2,
       SOURCE: headerMap['source'] ?? 3,
       TITRE_PRODUIT: headerMap['titre produit'] ?? 4,
       EAN: headerMap['ean'] ?? 5,
@@ -167,52 +140,36 @@ serve(async (req) => {
       LIEN_SOURCE: headerMap['lien source'] ?? 21,
     };
 
-    console.log('📋 Column mapping:', COL);
-
-    // Skip loading all existing alerts (too slow with 280k+ rows)
-    // Instead, use upsert with ON CONFLICT to handle duplicates
-
+    const dataRows = lines.slice(1);
     let insertedCount = 0;
     let skippedCount = 0;
-    let updatedCount = 0;
-    const dataRows = lines.slice(1);
 
-    // Log first row for debugging
-    if (dataRows.length > 0) {
-      const firstCols = parseCSVLine(dataRows[0]);
-      console.log('📋 First row columns count:', firstCols.length);
-      console.log('📋 Lien Amazon (col ' + COL.LIEN_AMAZON + '):', firstCols[COL.LIEN_AMAZON]);
-      console.log('📋 Lien Source (col ' + COL.LIEN_SOURCE + '):', firstCols[COL.LIEN_SOURCE]);
-    }
+    // Collect new rows to batch insert
+    const newAlerts: any[] = [];
 
     for (const line of dataRows) {
       try {
         const cols = parseCSVLine(line);
-        
         const ean = cols[COL.EAN]?.trim();
-        const dateHeure = cols[COL.DATE_HEURE]?.trim();
         const source = cols[COL.SOURCE]?.trim();
         const title = cols[COL.TITRE_PRODUIT]?.trim();
         
-        // Skip if missing required fields
-        if (!ean || !source || !title) {
-          console.log('⏭️ Skipping row with missing required fields');
-          skippedCount++;
-          continue;
-        }
+        if (!ean || !source || !title) { skippedCount++; continue; }
 
-        const createdAt = parseDate(dateHeure);
         const mappedSource = mapSourceName(source);
-        
-        // Get link values
-        const amazonUrl = cols[COL.LIEN_AMAZON]?.trim() || null;
-        const sourceUrl = cols[COL.LIEN_SOURCE]?.trim() || null;
+        const key = `${ean}__${mappedSource}`;
 
-        const alertData = {
+        // Skip if already exists in DB
+        if (existingKeys.has(key)) { skippedCount++; continue; }
+
+        // Mark as seen to avoid duplicates within this batch
+        existingKeys.add(key);
+
+        newAlerts.push({
           admin_id: adminId,
-          source_name: mapSourceName(source),
+          source_name: mappedSource,
           product_title: title,
-          ean: ean,
+          ean,
           cost_price: parseNumber(cols[COL.PRIX_ACHAT]),
           current_price: parseNumber(cols[COL.PRIX_VENTE]) || 0,
           sale_price: parseNumber(cols[COL.PRIX_VENTE]),
@@ -228,56 +185,49 @@ serve(async (req) => {
           meltable: cols[COL.MELTABLE]?.trim() || null,
           variations: cols[COL.VARIATIONS]?.trim() || null,
           sellers: cols[COL.VENDEURS]?.trim() || null,
-          amazon_url: amazonUrl,
-          source_url: sourceUrl,
-          created_at: createdAt,
-        };
-
-        // Upsert: insert or update on conflict (ean, source_name)
-        const { error: upsertError } = await supabaseClient
-          .from('product_find_alerts')
-          .upsert(alertData, { onConflict: 'ean,source_name', ignoreDuplicates: false });
-
-        if (upsertError) {
-          // If upsert fails (e.g. no unique constraint), try insert and ignore duplicates
-          if (upsertError.code === '42P10' || upsertError.message?.includes('unique')) {
-            skippedCount++;
-          } else {
-            console.error('❌ Insert error:', upsertError);
-            skippedCount++;
-          }
-        } else {
-          insertedCount++;
-          console.log(`✅ Inserted: ${title.substring(0, 50)}... (${source} -> ${alertData.source_name}) Amazon: ${amazonUrl ? 'YES' : 'NO'}`);
-        }
+          amazon_url: cols[COL.LIEN_AMAZON]?.trim() || null,
+          source_url: cols[COL.LIEN_SOURCE]?.trim() || null,
+          created_at: parseDate(cols[COL.DATE_HEURE]?.trim()),
+        });
       } catch (rowError) {
-        console.error('❌ Row processing error:', rowError);
+        console.error('❌ Row error:', rowError);
         skippedCount++;
       }
     }
 
-    console.log(`✅ Sync completed: ${insertedCount} inserted, ${updatedCount} updated, ${skippedCount} skipped`);
+    // Batch insert new alerts in chunks of 500
+    if (newAlerts.length > 0) {
+      const BATCH_SIZE = 500;
+      for (let i = 0; i < newAlerts.length; i += BATCH_SIZE) {
+        const batch = newAlerts.slice(i, i + BATCH_SIZE);
+        const { error: insertError } = await supabaseClient
+          .from('product_find_alerts')
+          .insert(batch);
+
+        if (insertError) {
+          console.error(`❌ Batch insert error (${i}-${i + batch.length}):`, insertError);
+          skippedCount += batch.length;
+        } else {
+          insertedCount += batch.length;
+          console.log(`✅ Inserted batch: ${batch.length} rows`);
+        }
+      }
+    }
+
+    console.log(`✅ Sync done: ${insertedCount} new, ${skippedCount} skipped (total sheet rows: ${dataRows.length})`);
 
     return new Response(
       JSON.stringify({
         success: true,
         message: `Sync completed`,
-        stats: {
-          total: dataRows.length,
-          inserted: insertedCount,
-          updated: updatedCount,
-          skipped: skippedCount,
-        },
+        stats: { total: dataRows.length, inserted: insertedCount, skipped: skippedCount },
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error) {
     console.error("❌ Sync error:", error);
     return new Response(
-      JSON.stringify({
-        success: false,
-        error: error instanceof Error ? error.message : 'Unknown error',
-      }),
+      JSON.stringify({ success: false, error: error instanceof Error ? error.message : 'Unknown error' }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 500 }
     );
   }
