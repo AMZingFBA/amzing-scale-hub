@@ -124,16 +124,16 @@ export default function ProductFindAlerts() {
     try {
       let query = supabase
         .from('product_find_alerts')
-        .select('*');
+        .select('id,source_name,product_title,ean,original_price,current_price,bsr,bsr_percent,cost_price,sale_price,monthly_sales,fulfillment_type,profit,roi,fba_profit,fba_roi,private_label,product_size,meltable,variations,sellers,amazon_url,sas_url,source_url,created_at');
       
-      // Filtrer par source si spécifié dans l'URL
+      // Filtrer par source si spécifié dans l'URL (eq exact match = utilise l'index)
       if (sourceFilter) {
-        query = query.ilike('source_name', `%${sourceFilter}%`);
+        query = query.eq('source_name', sourceFilter);
       }
       
       const { data, error } = await query
         .order('created_at', { ascending: false })
-        .limit(500);
+        .limit(200);
 
       if (error) throw error;
       
