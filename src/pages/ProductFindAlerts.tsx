@@ -178,24 +178,21 @@ export default function ProductFindAlerts() {
     }
   }, [user, authLoading, sourceFilter]);
 
-  // Auto-sync every 60 seconds (reduced frequency to avoid pool saturation)
-  useEffect(() => {
-    if (!authLoading && user && (isVIP || isAdmin)) {
-      // Initial sync
-      syncFromSheet(true);
-      
-      // Set up auto-sync interval (60 seconds)
-      autoSyncRef.current = setInterval(() => {
-        syncFromSheet(true);
-      }, 60000);
-
-      return () => {
-        if (autoSyncRef.current) {
-          clearInterval(autoSyncRef.current);
-        }
-      };
-    }
-  }, [user, authLoading, isVIP, isAdmin]);
+  // Auto-sync disabled temporarily - DB is overloaded with 280k+ duplicate rows
+  // Will re-enable after cleanup
+  // useEffect(() => {
+  //   if (!authLoading && user && (isVIP || isAdmin)) {
+  //     syncFromSheet(true);
+  //     autoSyncRef.current = setInterval(() => {
+  //       syncFromSheet(true);
+  //     }, 60000);
+  //     return () => {
+  //       if (autoSyncRef.current) {
+  //         clearInterval(autoSyncRef.current);
+  //       }
+  //     };
+  //   }
+  // }, [user, authLoading, isVIP, isAdmin]);
 
   // Real-time subscription - debounced to avoid hammering the DB
   useEffect(() => {
