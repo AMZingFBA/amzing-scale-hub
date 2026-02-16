@@ -42,14 +42,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const fetchSubscription = async (userId: string) => {
     try {
-      const { data, error } = await supabase
-        .from('subscriptions')
-        .select('plan_type, status, expires_at, is_trial')
-        .eq('user_id', userId)
-        .single();
+      const result = await Promise.race([
+        supabase
+          .from('subscriptions')
+          .select('plan_type, status, expires_at, is_trial')
+          .eq('user_id', userId)
+          .single(),
+        new Promise<never>((_, reject) => setTimeout(() => reject(new Error('timeout')), 5000))
+      ]);
 
-      if (error) throw error;
-      setSubscription(data as Subscription);
+      if (result.error) throw result.error;
+      setSubscription(result.data as Subscription);
     } catch (error) {
       console.error('Error fetching subscription:', error);
       setSubscription({ plan_type: 'free', status: 'active', expires_at: null, is_trial: false });
@@ -251,6 +254,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       // déclenche déjà la synchro vers Airtable (évite doublons / appels multiples).
 
       toast.success('Connexion réussie !');
+      navigate('/');
       return { error: null };
     } catch (error: any) {
       toast.error(error.message || 'Erreur lors de la connexion');
