@@ -98,9 +98,17 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
     );
 
-    // Get admin user ID
-    const { data: adminId } = await supabaseClient.rpc('get_admin_user_id');
+    // Get admin user ID from user_roles table
+    const { data: adminRole, error: adminError } = await supabaseClient
+      .from('user_roles')
+      .select('user_id')
+      .eq('role', 'admin')
+      .limit(1)
+      .maybeSingle();
+    
+    const adminId = adminRole?.user_id;
     if (!adminId) {
+      console.error('Admin lookup error:', adminError);
       throw new Error('No admin user found');
     }
 
@@ -161,14 +169,8 @@ serve(async (req) => {
 
     console.log('📋 Column mapping:', COL);
 
-    // Get existing EANs per source to avoid duplicates
-    const { data: existingAlerts } = await supabaseClient
-      .from('product_find_alerts')
-      .select('ean, source_name');
-    
-    const existingKeys = new Set(
-      (existingAlerts || []).map(a => `${a.ean}_${a.source_name}`)
-    );
+    // Skip loading all existing alerts (too slow with 280k+ rows)
+    // Instead, use upsert with ON CONFLICT to handle duplicates
 
     let insertedCount = 0;
     let skippedCount = 0;
@@ -201,7 +203,6 @@ serve(async (req) => {
 
         const createdAt = parseDate(dateHeure);
         const mappedSource = mapSourceName(source);
-        const key = `${ean}_${mappedSource}`;
         
         // Get link values
         const amazonUrl = cols[COL.LIEN_AMAZON]?.trim() || null;
@@ -232,41 +233,20 @@ serve(async (req) => {
           created_at: createdAt,
         };
 
-        // Check if already exists
-        if (existingKeys.has(key)) {
-          // Update existing record to add links if they were missing
-          const { error: updateError } = await supabaseClient
-            .from('product_find_alerts')
-            .update({
-              amazon_url: amazonUrl,
-              source_url: sourceUrl,
-              cost_price: alertData.cost_price,
-              current_price: alertData.current_price,
-              sale_price: alertData.sale_price,
-              profit: alertData.profit,
-              roi: alertData.roi,
-              fba_profit: alertData.fba_profit,
-              fba_roi: alertData.fba_roi,
-            })
-            .eq('ean', ean)
-            .eq('source_name', mappedSource);
-
-          if (!updateError) {
-            updatedCount++;
-          }
-          skippedCount++;
-          continue;
-        }
-
-        const { error: insertError } = await supabaseClient
+        // Upsert: insert or update on conflict (ean, source_name)
+        const { error: upsertError } = await supabaseClient
           .from('product_find_alerts')
-          .insert(alertData);
+          .upsert(alertData, { onConflict: 'ean,source_name', ignoreDuplicates: false });
 
-        if (insertError) {
-          console.error('❌ Insert error:', insertError);
-          skippedCount++;
+        if (upsertError) {
+          // If upsert fails (e.g. no unique constraint), try insert and ignore duplicates
+          if (upsertError.code === '42P10' || upsertError.message?.includes('unique')) {
+            skippedCount++;
+          } else {
+            console.error('❌ Insert error:', upsertError);
+            skippedCount++;
+          }
         } else {
-          existingKeys.add(key);
           insertedCount++;
           console.log(`✅ Inserted: ${title.substring(0, 50)}... (${source} -> ${alertData.source_name}) Amazon: ${amazonUrl ? 'YES' : 'NO'}`);
         }
