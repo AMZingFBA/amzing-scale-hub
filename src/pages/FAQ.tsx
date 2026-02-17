@@ -22,7 +22,7 @@ const FAQ = () => {
     },
     {
       question: "💰 Combien coûte le service AMZing FBA ?",
-      answer: "Nous avons plusieurs formules selon tes besoins :\n\n• Accès formation + communauté VIP : abonnement mensuel (tarif sur la page \"Rejoindre\")\n• Service logistique AMZing FBA 360 : facturation à l'usage (stockage + expéditions)\n• Catalogue grossiste : prix variables selon les produits et volumes d'achat\n\nTu ne payes que ce dont tu as réellement besoin, sans engagement caché."
+      answer: "Nous avons plusieurs formules selon tes besoins :\n\n• Accès formation + communauté VIP : abonnement annuel (tarif sur la page \"Rejoindre\")\n• Service logistique AMZing FBA 360 : facturation à l'usage (stockage + expéditions)\n• Catalogue grossiste : prix variables selon les produits et volumes d'achat\n\nTu ne payes que ce dont tu as réellement besoin, sans engagement caché."
     },
     {
       question: "📦 Comment fonctionne le service logistique AMZing FBA 360 ?",
