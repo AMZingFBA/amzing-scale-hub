@@ -443,24 +443,64 @@ serve(async (req) => {
           logStep("Referral payment status updated", { referralId: referral.id });
         }
       } else if (subscription.status === "canceled" || subscription.status === "unpaid" || subscription.status === "past_due") {
-        await supabaseClient
+        // IMPORTANT: Pour les facilités de paiement 12 mois, l'utilisateur garde
+        // son accès VIP jusqu'à la fin de son engagement (expires_at d'origine).
+        // On ne révoque PAS immédiatement l'accès.
+        const { data: existingSub } = await supabaseClient
           .from("subscriptions")
-          .update({
-            plan_type: "free",
-            status: "expired",
-            is_trial: false,
-            expires_at: new Date().toISOString(),
-          })
-          .eq("user_id", profile.id);
-        
-        logStep("Subscription cancelled/unpaid", { userId: profile.id, status: subscription.status });
+          .select("expires_at, started_at")
+          .eq("user_id", profile.id)
+          .single();
 
-        // Sync to Airtable
-        await syncUserToAirtable({
-          email: customerEmail,
-          full_name: profile.full_name || '',
-          plan_type: "free",
-        });
+        const now = new Date();
+        const existingExpiry = existingSub?.expires_at ? new Date(existingSub.expires_at) : null;
+
+        if (existingExpiry && existingExpiry > now) {
+          // L'engagement n'est pas terminé : garder VIP avec status "canceled"
+          // Le trigger check_subscription_expiry s'occupera de l'expiration à la date prévue
+          await supabaseClient
+            .from("subscriptions")
+            .update({
+              plan_type: "vip",
+              status: "canceled",
+              stripe_subscription_id: null, // L'abonnement Stripe est annulé
+            })
+            .eq("user_id", profile.id);
+          
+          logStep("Subscription canceled but VIP maintained until engagement end", { 
+            userId: profile.id, 
+            status: subscription.status,
+            expiresAt: existingSub.expires_at 
+          });
+
+          // Sync to Airtable - still VIP
+          await syncUserToAirtable({
+            email: customerEmail,
+            full_name: profile.full_name || '',
+            plan_type: "vip",
+            stripe_customer_id: subscription.customer as string,
+          });
+        } else {
+          // Engagement terminé ou pas de date d'expiration : révoquer l'accès
+          await supabaseClient
+            .from("subscriptions")
+            .update({
+              plan_type: "free",
+              status: "expired",
+              is_trial: false,
+              expires_at: now.toISOString(),
+            })
+            .eq("user_id", profile.id);
+          
+          logStep("Subscription expired (engagement ended)", { userId: profile.id, status: subscription.status });
+
+          // Sync to Airtable
+          await syncUserToAirtable({
+            email: customerEmail,
+            full_name: profile.full_name || '',
+            plan_type: "free",
+          });
+        }
       }
     }
 
@@ -501,25 +541,50 @@ serve(async (req) => {
         });
       }
 
-      // Immediately suspend VIP access when payment fails
-      await supabaseClient
+      // Check if engagement period is still active before suspending
+      const { data: existingSub } = await supabaseClient
         .from("subscriptions")
-        .update({
-          plan_type: "free",
-          status: "unpaid",
-          is_trial: false,
-          expires_at: new Date().toISOString(),
-        })
-        .eq("user_id", profile.id);
-      
-      logStep("VIP access suspended due to payment failure", { userId: profile.id });
+        .select("expires_at")
+        .eq("user_id", profile.id)
+        .single();
 
-      // Sync to Airtable
-      await syncUserToAirtable({
-        email: customerEmail,
-        full_name: profile.full_name || '',
-        plan_type: "free",
-      });
+      const now = new Date();
+      const existingExpiry = existingSub?.expires_at ? new Date(existingSub.expires_at) : null;
+
+      if (existingExpiry && existingExpiry > now) {
+        // Engagement still active: keep VIP but mark as canceled
+        await supabaseClient
+          .from("subscriptions")
+          .update({
+            plan_type: "vip",
+            status: "canceled",
+          })
+          .eq("user_id", profile.id);
+        
+        logStep("Payment failed but VIP maintained until engagement end", { 
+          userId: profile.id, expiresAt: existingSub.expires_at 
+        });
+      } else {
+        // Engagement ended: suspend access
+        await supabaseClient
+          .from("subscriptions")
+          .update({
+            plan_type: "free",
+            status: "unpaid",
+            is_trial: false,
+            expires_at: now.toISOString(),
+          })
+          .eq("user_id", profile.id);
+        
+        logStep("VIP access suspended due to payment failure (engagement ended)", { userId: profile.id });
+
+        // Sync to Airtable
+        await syncUserToAirtable({
+          email: customerEmail,
+          full_name: profile.full_name || '',
+          plan_type: "free",
+        });
+      }
     }
 
     return new Response(JSON.stringify({ received: true }), {
