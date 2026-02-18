@@ -66,8 +66,8 @@ Deno.serve(async (req) => {
       { data: roles, error: rolesError },
       { data: alertReadStatus, error: alertReadError },
       { data: productFindReadStatus, error: pfReadError },
-      { data: totalAlerts, error: totalAlertsError },
-      { data: totalProductFinds, error: totalPfError },
+      alertsCountResult,
+      pfCountResult,
     ] = await Promise.all([
       supabaseAdmin
         .from("profiles")
@@ -79,22 +79,22 @@ Deno.serve(async (req) => {
       supabaseAdmin
         .from("user_roles")
         .select("user_id, role"),
-      // Count read alerts per user
+      // Read alerts per user
       supabaseAdmin
         .from("alert_read_status")
         .select("user_id, is_read"),
-      // Count read product find alerts per user
+      // Read product find alerts per user
       supabaseAdmin
         .from("product_find_read_status")
         .select("user_id, is_read"),
       // Total alerts count
       supabaseAdmin
         .from("admin_alerts")
-        .select("id", { count: "exact", head: true }),
+        .select("*", { count: "exact", head: true }),
       // Total product find alerts count
       supabaseAdmin
         .from("product_find_alerts")
-        .select("id", { count: "exact", head: true }),
+        .select("*", { count: "exact", head: true }),
     ]);
 
     if (profilesError) throw profilesError;
@@ -126,11 +126,11 @@ Deno.serve(async (req) => {
       page++;
     }
 
-    // Build unread counts per user
-    const totalAlertsCount = totalAlerts ?? 0;
-    const totalPfCount = totalProductFinds ?? 0;
-    const actualTotalAlerts = totalAlertsError ? 0 : (totalAlertsCount as any);
-    const actualTotalPf = totalPfError ? 0 : (totalPfCount as any);
+    // Total counts from head requests
+    const actualTotalAlerts = alertsCountResult.count ?? 0;
+    const actualTotalPf = pfCountResult.count ?? 0;
+
+    console.log(`[ADMIN-GET-PROFILES] Total alerts: ${actualTotalAlerts}, Total PF: ${actualTotalPf}`);
 
     // Count read alerts per user
     const readAlertsPerUser = new Map<string, number>();
