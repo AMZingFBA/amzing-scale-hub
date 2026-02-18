@@ -6,10 +6,8 @@ import { useScrollPosition } from '@/hooks/use-scroll-position';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Loader2, ArrowLeft, Search, SlidersHorizontal, Sparkles, RefreshCw } from 'lucide-react';
+import { Loader2, ArrowLeft, Sparkles, RefreshCw, Bell } from 'lucide-react';
 import { toast } from 'sonner';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { A2AProductCard, parseNumericValue } from '@/components/a2a/A2AProductCard';
 import type { A2AProduct } from '@/components/a2a/A2AProductCard';
 
@@ -38,9 +36,8 @@ export default function AmazonToAmazon() {
   const [allProducts, setAllProducts] = useState<A2AProduct[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSyncing, setIsSyncing] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [sortBy, setSortBy] = useState<string>('date');
-  const [minRoi, setMinRoi] = useState('');
+  const [previousCount, setPreviousCount] = useState<number | null>(null);
+  const [newCount, setNewCount] = useState(0);
   const autoSyncRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useScrollPosition(location.pathname);
@@ -55,7 +52,15 @@ export default function AmazonToAmazon() {
       const { data, error } = await supabase.functions.invoke('sync-a2a-from-sheets');
       if (error) throw error;
       if (data?.success) {
-        setAllProducts(data.products || []);
+        const products = data.products || [];
+        
+        // Calculate new alerts count
+        if (previousCount !== null && products.length > previousCount) {
+          setNewCount(products.length - previousCount);
+        }
+        setPreviousCount(products.length);
+        
+        setAllProducts(products);
         if (!silent) toast.success(`${data.count} produits chargés`);
       } else {
         throw new Error(data?.error || 'Fetch failed');
@@ -69,7 +74,7 @@ export default function AmazonToAmazon() {
       setIsSyncing(false);
       setIsLoading(false);
     }
-  }, [isSyncing]);
+  }, [isSyncing, previousCount]);
 
   useEffect(() => {
     if (!authLoading && user && (isVIP || isAdmin)) {
@@ -82,25 +87,8 @@ export default function AmazonToAmazon() {
   const filteredProducts = allProducts
     .filter((p) => {
       if (canalFilter && p.canal.toLowerCase() !== canalFilter) return false;
-      if (searchTerm) {
-        const term = searchTerm.toLowerCase();
-        return p.titre.toLowerCase().includes(term) || p.asin.toLowerCase().includes(term) || p.source.toLowerCase().includes(term);
-      }
-      return true;
-    })
-    .filter((p) => {
-      if (minRoi) return parseNumericValue(p.roi) >= parseFloat(minRoi);
       return true;
     });
-
-  const sortedProducts = [...filteredProducts].sort((a, b) => {
-    switch (sortBy) {
-      case 'roi': return parseNumericValue(b.roi) - parseNumericValue(a.roi);
-      case 'profit': return parseNumericValue(b.profit) - parseNumericValue(a.profit);
-      case 'rank': return parseNumericValue(a.classement) - parseNumericValue(b.classement);
-      default: return 0;
-    }
-  });
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
@@ -134,9 +122,25 @@ export default function AmazonToAmazon() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-secondary/10 to-primary/5">
       <div className="container mx-auto px-4 py-8">
+        {/* New alerts banner */}
+        {newCount > 0 && (
+          <div
+            className="mb-4 bg-destructive text-destructive-foreground rounded-lg px-4 py-3 flex items-center justify-between cursor-pointer animate-pulse"
+            onClick={() => { setNewCount(0); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+          >
+            <div className="flex items-center gap-2">
+              <Bell className="w-5 h-5" />
+              <span className="font-semibold text-sm">
+                🔔 {newCount} nouvelle{newCount > 1 ? 's' : ''} alerte{newCount > 1 ? 's' : ''} !
+              </span>
+            </div>
+            <span className="text-xs underline">Voir</span>
+          </div>
+        )}
+
         {/* Header */}
         <div className="mb-6">
-          <div className="flex items-center gap-3 mb-4">
+          <div className="flex items-center gap-3 mb-2">
             <button
               onClick={() => navigate('/dashboard')}
               className="bg-primary hover:bg-primary/90 p-3 md:p-2 rounded-full shadow-lg transition-all shrink-0"
@@ -149,7 +153,7 @@ export default function AmazonToAmazon() {
                 {pageTitle}
               </h1>
               <p className="text-sm text-muted-foreground">
-                {sortedProducts.length} produit{sortedProducts.length > 1 ? 's' : ''}
+                {filteredProducts.length} produit{filteredProducts.length > 1 ? 's' : ''}
               </p>
             </div>
             <Button
@@ -162,31 +166,10 @@ export default function AmazonToAmazon() {
               <RefreshCw className={`w-4 h-4 ${isSyncing ? 'animate-spin' : ''}`} />
             </Button>
           </div>
-
-          {/* Filters */}
-          <div className="flex flex-wrap gap-2">
-            <div className="relative flex-1 min-w-[180px]">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <Input placeholder="Rechercher..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="pl-10 h-9 text-sm" />
-            </div>
-            <Input type="number" placeholder="ROI min %" value={minRoi} onChange={(e) => setMinRoi(e.target.value)} className="w-24 h-9 text-sm" />
-            <Select value={sortBy} onValueChange={setSortBy}>
-              <SelectTrigger className="w-32 h-9 text-sm">
-                <SlidersHorizontal className="w-3.5 h-3.5 mr-1" />
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="date">Récent</SelectItem>
-                <SelectItem value="roi">ROI ↓</SelectItem>
-                <SelectItem value="profit">Profit ↓</SelectItem>
-                <SelectItem value="rank">Rank ↑</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
         </div>
 
         {/* Products */}
-        {sortedProducts.length === 0 ? (
+        {filteredProducts.length === 0 ? (
           <Card className="text-center py-12">
             <CardContent>
               <Sparkles className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
@@ -196,7 +179,7 @@ export default function AmazonToAmazon() {
           </Card>
         ) : (
           <div className="grid gap-4 md:grid-cols-2">
-            {sortedProducts.map((product) => (
+            {filteredProducts.map((product) => (
               <A2AProductCard key={product.id} product={product} onCopy={copyToClipboard} />
             ))}
           </div>
