@@ -41,6 +41,15 @@ const NOTIFICATION_CATEGORIES = [
     { key: 'sitelist', label: 'Sitelist' }
   ]},
   
+  // 🔄 AMAZON TO AMAZON
+  { category: 'amazon_to_amazon', label: '🔄 Amazon to Amazon', subcategories: [
+    { key: 'france-medium', label: 'France Medium' },
+    { key: 'france-high', label: 'France High' },
+    { key: 'allemagne', label: 'Allemagne' },
+    { key: 'espagne', label: 'Espagne' },
+    { key: 'italie', label: 'Italie' }
+  ]},
+  
   // 🚚 EXPÉDITION
   { category: 'expedition', label: '🚚 Expédition', subcategories: [
     { key: 'fournitures', label: 'Fournitures' },

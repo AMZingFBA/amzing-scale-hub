@@ -235,6 +235,26 @@ const Dashboard = () => {
                 </AccordionContent>
               </AccordionItem>
 
+              {/* AMAZON TO AMAZON */}
+              <AccordionItem value="amazon-to-amazon" className="border rounded-lg px-6 bg-card">
+                <AccordionTrigger className="hover:no-underline">
+                  <div className="flex items-center gap-3 w-full">
+                    <Euro className="w-6 h-6 text-primary" />
+                    <span className="text-xl font-bold">AMAZON TO AMAZON</span>
+                    <NotificationBadge count={notifications.amazon_to_amazon?.total} size="md" className="ml-2" />
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent>
+                  <div className="grid gap-3 pt-2">
+                    <CategoryItem icon={Store} label="France Medium" link="/product-alerts/a2a-france-medium" badge={notifications.amazon_to_amazon?.subcategories?.['france-medium']} />
+                    <CategoryItem icon={Store} label="France High" link="/product-alerts/a2a-france-high" badge={notifications.amazon_to_amazon?.subcategories?.['france-high']} />
+                    <CategoryItem icon={Store} label="Allemagne" link="/product-alerts/a2a-allemagne" badge={notifications.amazon_to_amazon?.subcategories?.['allemagne']} />
+                    <CategoryItem icon={Store} label="Espagne" link="/product-alerts/a2a-espagne" badge={notifications.amazon_to_amazon?.subcategories?.['espagne']} />
+                    <CategoryItem icon={Store} label="Italie" link="/product-alerts/a2a-italie" badge={notifications.amazon_to_amazon?.subcategories?.['italie']} />
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+
               {/* GROSSISTES */}
               <AccordionItem value="grossistes" className="border rounded-lg px-6 bg-card">
                 <AccordionTrigger className="hover:no-underline">
