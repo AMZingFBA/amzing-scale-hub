@@ -248,16 +248,12 @@ export function A2AProductCard({ product, onCopy }: A2AProductCardProps) {
           )}
 
           {/* Amazon link button */}
-          {product.lien_amazon ? (
+          {product.lien_amazon && (
             <a href={product.lien_amazon} target="_blank" rel="noopener noreferrer" className="block">
               <Button variant="outline" size="sm" className="w-full gap-1.5 text-xs">
                 <ExternalLink className="w-3 h-3" /> Voir sur Amazon
               </Button>
             </a>
-          ) : (
-            <Button variant="outline" size="sm" className="w-full gap-1.5 text-xs opacity-50 cursor-default" disabled>
-              <ExternalLink className="w-3 h-3" /> Lien Amazon non disponible
-            </Button>
           )}
         </div>
       </CardContent>
