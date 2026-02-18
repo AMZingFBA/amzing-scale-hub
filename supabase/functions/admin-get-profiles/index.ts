@@ -64,10 +64,7 @@ Deno.serve(async (req) => {
       { data: profiles, error: profilesError },
       { data: subs, error: subsError },
       { data: roles, error: rolesError },
-      { data: alertReadStatus, error: alertReadError },
-      { data: productFindReadStatus, error: pfReadError },
-      alertsCountResult,
-      pfCountResult,
+      { data: badgeCounts, error: badgeError },
     ] = await Promise.all([
       supabaseAdmin
         .from("profiles")
@@ -79,27 +76,22 @@ Deno.serve(async (req) => {
       supabaseAdmin
         .from("user_roles")
         .select("user_id, role"),
-      // Read alerts per user
       supabaseAdmin
-        .from("alert_read_status")
-        .select("user_id, is_read"),
-      // Read product find alerts per user
-      supabaseAdmin
-        .from("product_find_read_status")
-        .select("user_id, is_read"),
-      // Total alerts count
-      supabaseAdmin
-        .from("admin_alerts")
-        .select("*", { count: "exact", head: true }),
-      // Total product find alerts count
-      supabaseAdmin
-        .from("product_find_alerts")
-        .select("*", { count: "exact", head: true }),
+        .from("user_badge_counts")
+        .select("user_id, badge_count"),
     ]);
 
     if (profilesError) throw profilesError;
     if (subsError) throw subsError;
     if (rolesError) throw rolesError;
+
+    // Build badge count map
+    const badgeMap = new Map<string, number>();
+    if (badgeCounts) {
+      for (const row of badgeCounts) {
+        badgeMap.set(row.user_id, row.badge_count);
+      }
+    }
 
     // Get auth users for last_sign_in_at
     const authUsersMap = new Map<string, string | null>();
@@ -126,42 +118,9 @@ Deno.serve(async (req) => {
       page++;
     }
 
-    // Total counts from head requests
-    const actualTotalAlerts = alertsCountResult.count ?? 0;
-    const actualTotalPf = pfCountResult.count ?? 0;
-
-    console.log(`[ADMIN-GET-PROFILES] Total alerts: ${actualTotalAlerts}, Total PF: ${actualTotalPf}`);
-
-    // Count read alerts per user
-    const readAlertsPerUser = new Map<string, number>();
-    if (alertReadStatus) {
-      for (const row of alertReadStatus) {
-        if (row.is_read) {
-          readAlertsPerUser.set(row.user_id, (readAlertsPerUser.get(row.user_id) || 0) + 1);
-        }
-      }
-    }
-
-    const readPfPerUser = new Map<string, number>();
-    if (productFindReadStatus) {
-      for (const row of productFindReadStatus) {
-        if (row.is_read) {
-          readPfPerUser.set(row.user_id, (readPfPerUser.get(row.user_id) || 0) + 1);
-        }
-      }
-    }
-
     const enriched = (profiles ?? []).map((p) => {
       const subscription = (subs ?? []).find((s) => s.user_id === p.id);
       const role = (roles ?? []).find((r) => r.user_id === p.id);
-      
-      const readAlerts = readAlertsPerUser.get(p.id) || 0;
-      const readPf = readPfPerUser.get(p.id) || 0;
-      
-      // Use the count from the head request
-      const unreadAlerts = Math.max(0, (actualTotalAlerts as number) - readAlerts);
-      const unreadPf = Math.max(0, (actualTotalPf as number) - readPf);
-      const totalUnread = unreadAlerts + unreadPf;
 
       return {
         ...p,
@@ -175,7 +134,7 @@ Deno.serve(async (req) => {
           : undefined,
         role: role?.role ?? "user",
         last_sign_in_at: authUsersMap.get(p.id) ?? null,
-        unread_notifications: totalUnread,
+        unread_notifications: badgeMap.get(p.id) ?? 0,
       };
     });
 
