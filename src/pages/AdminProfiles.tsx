@@ -3,7 +3,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { Loader2, Users, Mail, Phone, UserCircle, ArrowLeft, Search, Calendar, MessageCircle, Crown, Shield, Filter, ChevronLeft, ChevronRight, Clock, AlertCircle, Trash2, Copy, CheckCircle, RefreshCw, Eye } from 'lucide-react';
+import { Loader2, Users, Mail, Phone, UserCircle, ArrowLeft, Search, Calendar, MessageCircle, Crown, Shield, Filter, ChevronLeft, ChevronRight, Clock, AlertCircle, Trash2, Copy, CheckCircle, RefreshCw, Eye, Bell, BellOff, Activity, Wifi, WifiOff } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -31,6 +31,8 @@ interface ProfileData {
     is_trial: boolean;
   };
   role?: string;
+  last_sign_in_at?: string | null;
+  unread_notifications?: number;
 }
 
 const AdminProfiles = () => {
@@ -43,6 +45,7 @@ const AdminProfiles = () => {
   const [filterRole, setFilterRole] = useState<string>('all');
   const [filterPlan, setFilterPlan] = useState<string>('all');
   const [filterExpiry, setFilterExpiry] = useState<string>('all');
+  const [filterActivity, setFilterActivity] = useState<string>('all');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
   const [copiedText, setCopiedText] = useState<string>('');
@@ -243,6 +246,33 @@ const AdminProfiles = () => {
 
   const now = new Date();
 
+  const getActivityStatus = (lastSignIn: string | null | undefined) => {
+    if (!lastSignIn) return { label: 'Jamais connecté', color: 'text-muted-foreground', icon: WifiOff, bg: 'bg-muted' };
+    const last = new Date(lastSignIn);
+    const diffDays = Math.floor((now.getTime() - last.getTime()) / (1000 * 60 * 60 * 24));
+    if (diffDays <= 3) return { label: 'Actif', color: 'text-green-500', icon: Wifi, bg: 'bg-green-500/10' };
+    if (diffDays <= 14) return { label: 'Récent', color: 'text-blue-500', icon: Activity, bg: 'bg-blue-500/10' };
+    if (diffDays <= 30) return { label: 'Inactif', color: 'text-orange-500', icon: Clock, bg: 'bg-orange-500/10' };
+    return { label: 'Dormant', color: 'text-red-500', icon: WifiOff, bg: 'bg-red-500/10' };
+  };
+
+  const formatRelativeDate = (dateString: string | null | undefined) => {
+    if (!dateString) return 'Jamais';
+    const date = new Date(dateString);
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / (1000 * 60));
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    
+    if (diffMins < 1) return "À l'instant";
+    if (diffMins < 60) return `Il y a ${diffMins} min`;
+    if (diffHours < 24) return `Il y a ${diffHours}h`;
+    if (diffDays === 1) return 'Hier';
+    if (diffDays < 7) return `Il y a ${diffDays} jours`;
+    if (diffDays < 30) return `Il y a ${Math.floor(diffDays / 7)} sem.`;
+    return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+  };
+
   const isVipActive = (sub?: ProfileData['subscription']) => {
     if (!sub) return false;
     const validUntil = !sub.expires_at || new Date(sub.expires_at) > now;
@@ -291,7 +321,18 @@ const AdminProfiles = () => {
       matchesExpiry = false;
     }
 
-    return matchesSearch && matchesRole && matchesPlan && matchesExpiry;
+    // Filter by activity
+    let matchesActivity = true;
+    if (filterActivity !== 'all') {
+      const activity = getActivityStatus(profile.last_sign_in_at);
+      if (filterActivity === 'active') matchesActivity = activity.label === 'Actif';
+      else if (filterActivity === 'recent') matchesActivity = activity.label === 'Récent';
+      else if (filterActivity === 'inactive') matchesActivity = activity.label === 'Inactif';
+      else if (filterActivity === 'dormant') matchesActivity = activity.label === 'Dormant';
+      else if (filterActivity === 'never') matchesActivity = activity.label === 'Jamais connecté';
+    }
+
+    return matchesSearch && matchesRole && matchesPlan && matchesExpiry && matchesActivity;
   });
 
   // Pagination
@@ -384,7 +425,7 @@ const AdminProfiles = () => {
           {/* Search & Filters */}
           <Card className="mb-6">
             <CardContent className="pt-6">
-              <div className="grid gap-4 md:grid-cols-4">
+              <div className="grid gap-4 md:grid-cols-5">
                 <div className="md:col-span-1">
                   <div className="relative">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
@@ -446,6 +487,25 @@ const AdminProfiles = () => {
                       <SelectItem value="all">Toutes les expirations</SelectItem>
                       <SelectItem value="expiring_soon">Expire bientôt (7j)</SelectItem>
                       <SelectItem value="expired">Expirés</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <Select value={filterActivity} onValueChange={(value) => {
+                    setFilterActivity(value);
+                    setCurrentPage(1);
+                  }}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Filtrer par activité" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Toutes les activités</SelectItem>
+                      <SelectItem value="active">Actifs (3j)</SelectItem>
+                      <SelectItem value="recent">Récents (14j)</SelectItem>
+                      <SelectItem value="inactive">Inactifs (30j)</SelectItem>
+                      <SelectItem value="dormant">Dormants (+30j)</SelectItem>
+                      <SelectItem value="never">Jamais connectés</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -567,6 +627,8 @@ const AdminProfiles = () => {
                         <TableRow>
                           <TableHead>Utilisateur</TableHead>
                           <TableHead>Contact</TableHead>
+                          <TableHead>Activité</TableHead>
+                          <TableHead>Notifications</TableHead>
                           <TableHead>Abonnement</TableHead>
                           <TableHead>Expiration</TableHead>
                           <TableHead>Inscrit</TableHead>
@@ -633,6 +695,41 @@ const AdminProfiles = () => {
                                     <span className="text-muted-foreground italic text-xs">Non renseigné</span>
                                   )}
                                 </div>
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              {(() => {
+                                const activity = getActivityStatus(profile.last_sign_in_at);
+                                const ActivityIcon = activity.icon;
+                                return (
+                                  <div className="flex flex-col gap-1">
+                                    <div className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-xs font-medium ${activity.bg} ${activity.color} w-fit`}>
+                                      <ActivityIcon className="w-3 h-3" />
+                                      {activity.label}
+                                    </div>
+                                    <span className="text-xs text-muted-foreground">
+                                      {formatRelativeDate(profile.last_sign_in_at)}
+                                    </span>
+                                  </div>
+                                );
+                              })()}
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex items-center gap-2">
+                                {(profile.unread_notifications ?? 0) > 0 ? (
+                                  <div className="flex items-center gap-1.5">
+                                    <Bell className="w-4 h-4 text-orange-500" />
+                                    <span className="text-sm font-semibold text-orange-500">
+                                      {profile.unread_notifications}
+                                    </span>
+                                    <span className="text-xs text-muted-foreground">non lues</span>
+                                  </div>
+                                ) : (
+                                  <div className="flex items-center gap-1.5 text-muted-foreground">
+                                    <BellOff className="w-4 h-4" />
+                                    <span className="text-xs">Tout lu</span>
+                                  </div>
+                                )}
                               </div>
                             </TableCell>
                             <TableCell>
