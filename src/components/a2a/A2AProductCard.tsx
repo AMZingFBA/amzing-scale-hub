@@ -1,4 +1,4 @@
-import { Copy, ExternalLink, TrendingUp, Package, Search, BarChart3 } from 'lucide-react';
+import { Copy, ExternalLink, TrendingUp, BarChart3 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 
@@ -46,9 +46,33 @@ const COUNTRY_LABEL: Record<string, string> = {
   'nl': 'NL', 'be': 'BE', 'pl': 'PL', 'se': 'SE',
 };
 
+// Map Keepa domain codes
+const KEEPA_DOMAIN: Record<string, number> = {
+  'fr': 4, 'france': 4,
+  'de': 3, 'allemagne': 3, 'germany': 3,
+  'it': 8, 'italie': 8, 'italy': 8,
+  'es': 9, 'espagne': 9, 'spain': 9,
+  'uk': 2, 'gb': 2,
+};
+
+function inferCountryFromSource(source: string): string {
+  if (!source) return '';
+  const s = source.toLowerCase();
+  if (s.includes('.fr')) return 'FR';
+  if (s.includes('.de')) return 'DE';
+  if (s.includes('.it')) return 'IT';
+  if (s.includes('.es')) return 'ES';
+  if (s.includes('.co.uk') || s.includes('.uk')) return 'UK';
+  if (s.includes('.nl')) return 'NL';
+  if (s.includes('.be')) return 'BE';
+  if (s.includes('.pl')) return 'PL';
+  if (s.includes('.se')) return 'SE';
+  return '';
+}
+
 function getFlag(country: string): string {
-  if (!country) return '🏳️';
-  return FLAG_MAP[country.toLowerCase().trim()] || '🏳️';
+  if (!country) return '';
+  return FLAG_MAP[country.toLowerCase().trim()] || '';
 }
 
 function getLabel(country: string): string {
@@ -66,6 +90,13 @@ function val(v: string): string {
   return v && v.trim() ? v.trim() : '—';
 }
 
+function getKeepaChartUrl(asin: string, country: string): string | null {
+  if (!asin) return null;
+  const c = country?.toLowerCase().trim();
+  const domain = KEEPA_DOMAIN[c] || 4; // default FR
+  return `https://graph.keepa.com/pricehistory.png?asin=${asin}&domain=${domain}&range=90`;
+}
+
 interface A2AProductCardProps {
   product: A2AProduct;
   onCopy: (text: string) => void;
@@ -75,12 +106,16 @@ export function A2AProductCard({ product, onCopy }: A2AProductCardProps) {
   const roiValue = parseNumericValue(product.roi);
   const roiColor = product.roi ? (roiValue >= 30 ? 'text-green-400' : roiValue >= 15 ? 'text-orange-400' : 'text-foreground') : 'text-muted-foreground';
 
-  const hasAnyLink = product.lien_sas || product.lien_bbp || product.lien_keepa || product.lien_idealo || product.lien_amazon;
+  // Fix empty pays_achat by inferring from source
+  const paysAchat = product.pays_achat || inferCountryFromSource(product.source);
+  const paysVente = product.pays_vente;
+
+  const keepaChartUrl = getKeepaChartUrl(product.asin, paysVente);
 
   return (
     <Card className="overflow-hidden border border-border/60 bg-card hover:border-primary/40 transition-all duration-300">
       <CardContent className="p-0">
-        {/* Top bar: source + canal + date */}
+        {/* Top bar */}
         <div className="flex items-center justify-between px-4 py-2 border-b border-border/40 bg-muted/30">
           <div className="flex items-center gap-2">
             <span className="text-xs font-medium text-foreground capitalize">{val(product.source)}</span>
@@ -111,25 +146,25 @@ export function A2AProductCard({ product, onCopy }: A2AProductCardProps) {
             </div>
           </div>
 
-          {/* Country comparison: Buy vs Sell - ALWAYS shown */}
+          {/* Country comparison */}
           <div className="grid grid-cols-2 gap-2">
             <div className="bg-muted/40 rounded-lg p-2.5 text-center">
               <div className="flex items-center justify-center gap-1.5 mb-1">
-                <span className="text-base">{getFlag(product.pays_achat)}</span>
-                <span className="text-[11px] font-medium text-muted-foreground">| {getLabel(product.pays_achat)}</span>
+                {getFlag(paysAchat) && <span className="text-base">{getFlag(paysAchat)}</span>}
+                <span className="text-[11px] font-medium text-muted-foreground">Achat | {getLabel(paysAchat)}</span>
               </div>
               <p className="text-base font-bold text-green-400">{val(product.prix_achat)}</p>
             </div>
             <div className="bg-muted/40 rounded-lg p-2.5 text-center">
               <div className="flex items-center justify-center gap-1.5 mb-1">
-                <span className="text-base">{getFlag(product.pays_vente)}</span>
-                <span className="text-[11px] font-medium text-muted-foreground">| {getLabel(product.pays_vente)}</span>
+                {getFlag(paysVente) && <span className="text-base">{getFlag(paysVente)}</span>}
+                <span className="text-[11px] font-medium text-muted-foreground">Vente | {getLabel(paysVente)}</span>
               </div>
               <p className="text-base font-bold text-primary">{val(product.prix_vente)}</p>
             </div>
           </div>
 
-          {/* Calculs + Ventes - ALWAYS shown */}
+          {/* Calculs + Ventes */}
           <div className="grid grid-cols-2 gap-2">
             <div className="bg-muted/40 rounded-lg p-2.5 space-y-0.5">
               <div className="flex items-center gap-1.5 mb-1">
@@ -151,7 +186,7 @@ export function A2AProductCard({ product, onCopy }: A2AProductCardProps) {
             </div>
           </div>
 
-          {/* ASIN + Offers - ALWAYS shown */}
+          {/* ASIN + Offers */}
           <div className="grid grid-cols-2 gap-2">
             <div className="bg-muted/40 rounded-lg p-2.5">
               <span className="text-[11px] font-semibold block mb-1">🔢 | ASIN</span>
@@ -170,51 +205,45 @@ export function A2AProductCard({ product, onCopy }: A2AProductCardProps) {
             </div>
           </div>
 
-          {/* Links - ALWAYS shown */}
-          <div className="grid grid-cols-2 gap-2">
-            <div className="bg-muted/40 rounded-lg p-2.5">
-              <div className="flex items-center gap-1.5 mb-1.5">
-                <Search className="w-3.5 h-3.5 text-primary" />
-                <span className="text-[11px] font-semibold">Liens de recherche</span>
-              </div>
-              <div className="flex flex-wrap gap-x-2 gap-y-1">
-                {product.lien_sas ? (
-                  <a href={product.lien_sas} target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:underline font-medium">SAS</a>
-                ) : (
-                  <span className="text-xs text-muted-foreground">SAS —</span>
-                )}
-                <span className="text-muted-foreground text-xs">|</span>
-                {product.lien_bbp ? (
-                  <a href={product.lien_bbp} target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:underline font-medium">BBP</a>
-                ) : (
-                  <span className="text-xs text-muted-foreground">BBP —</span>
-                )}
-                <span className="text-muted-foreground text-xs">|</span>
-                {product.lien_keepa ? (
-                  <a href={product.lien_keepa} target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:underline font-medium">Keepa</a>
-                ) : (
-                  <span className="text-xs text-muted-foreground">Keepa —</span>
-                )}
-              </div>
-            </div>
-
-            <div className="bg-muted/40 rounded-lg p-2.5">
-              <span className="text-[11px] font-semibold block mb-1.5">ℹ️ | Idealo</span>
+          {/* Links */}
+          <div className="bg-muted/40 rounded-lg p-2.5">
+            <span className="text-[11px] font-semibold block mb-1.5">🔗 Liens</span>
+            <div className="flex flex-wrap gap-x-3 gap-y-1">
+              {product.lien_sas ? (
+                <a href={product.lien_sas} target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:underline font-medium">SAS</a>
+              ) : (
+                <span className="text-xs text-muted-foreground">SAS —</span>
+              )}
+              {product.lien_bbp ? (
+                <a href={product.lien_bbp} target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:underline font-medium">BBP</a>
+              ) : (
+                <span className="text-xs text-muted-foreground">BBP —</span>
+              )}
+              {product.lien_keepa ? (
+                <a href={product.lien_keepa} target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:underline font-medium">Keepa</a>
+              ) : (
+                <span className="text-xs text-muted-foreground">Keepa —</span>
+              )}
               {product.lien_idealo ? (
                 <a href={product.lien_idealo} target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:underline font-medium">Idealo</a>
-              ) : (
-                <span className="text-xs text-muted-foreground">—</span>
-              )}
+              ) : null}
             </div>
           </div>
 
-          {/* Note - ALWAYS shown */}
-          <div className="bg-muted/40 rounded-lg p-2.5">
-            <span className="text-[11px] font-semibold block mb-1">📝 Note</span>
-            <p className="text-xs text-muted-foreground">{val(product.note)}</p>
-          </div>
+          {/* Keepa Chart */}
+          {keepaChartUrl && (
+            <div className="rounded-lg overflow-hidden border border-border/40 bg-white">
+              <img
+                src={keepaChartUrl}
+                alt={`Keepa chart for ${product.asin}`}
+                className="w-full h-auto"
+                loading="lazy"
+                onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+              />
+            </div>
+          )}
 
-          {/* Amazon link button - ALWAYS shown */}
+          {/* Amazon link button */}
           {product.lien_amazon ? (
             <a href={product.lien_amazon} target="_blank" rel="noopener noreferrer" className="block">
               <Button variant="outline" size="sm" className="w-full gap-1.5 text-xs">
