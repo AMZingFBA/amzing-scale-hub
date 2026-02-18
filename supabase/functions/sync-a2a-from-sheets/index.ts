@@ -2,11 +2,38 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
 const SHEET_ID = "1kZqaYXEakpDfRKk37Tr3S7DXktoa8DytHpsiOAGvILo";
 const SHEET_NAME = "Sheet1";
+
+// Column indices (0-based) matching the Google Sheet structure A-W
+const COL = {
+  ID: 0,
+  DATE: 1,
+  CANAL: 2,
+  SOURCE: 3,
+  TITRE: 4,
+  PAYS_ACHAT: 5,
+  PAYS_VENTE: 6,
+  PRIX_ACHAT: 7,
+  PRIX_VENTE: 8,
+  PROFIT: 9,
+  MARGE: 10,
+  ROI: 11,
+  VENTES: 12,
+  CLASSEMENT: 13,
+  ASIN: 14,
+  OFFRES: 15,
+  LIEN_SAS: 16,
+  LIEN_BBP: 17,
+  LIEN_KEEPA: 18,
+  LIEN_IDEALO: 19,
+  LIEN_AMAZON: 20,
+  IMAGE: 21,
+  NOTE: 22,
+};
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -26,59 +53,56 @@ serve(async (req) => {
     const csvText = await response.text();
     const lines = csvText.split("\n").filter((line) => line.trim());
 
-    if (lines.length < 2) {
-      return new Response(
-        JSON.stringify({ success: true, products: [], count: 0 }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" } },
-      );
-    }
-
-    const headers = parseCSVRow(lines[0]).map((h) => h.toLowerCase().trim());
-
+    // First line is a title row ("Alertes Smile - France Europe"), skip it
+    // Data starts from line index 1 (no real header row with column names)
     const products: any[] = [];
+    const seenIds = new Set<string>();
 
     for (let i = 1; i < lines.length; i++) {
       const values = parseCSVRow(lines[i]);
-      if (values.length === 0) continue;
+      if (values.length < 5) continue;
 
-      const row: Record<string, string> = {};
-      headers.forEach((header, index) => {
-        row[header] = (values[index] ?? "").trim();
-      });
+      const get = (idx: number) => (values[idx] ?? "").trim();
 
-      // Skip rows without essential data
-      const canal = row["canal"] || "";
-      const titre = row["titre produit"] || "";
-      if (!canal || !titre) continue;
+      const canal = get(COL.CANAL);
+      const titre = get(COL.TITRE);
+      const id = get(COL.ID) || `row-${i}`;
+
+      // Skip empty rows
+      if (!canal && !titre) continue;
+
+      // Deduplicate by ID
+      if (seenIds.has(id)) continue;
+      seenIds.add(id);
 
       products.push({
-        id: row["id"] || `${i}`,
-        date: row["date/heure"] || "",
+        id,
+        date: get(COL.DATE),
         canal,
-        source: row["source"] || "",
+        source: get(COL.SOURCE),
         titre,
-        pays_achat: row["pays achat"] || "",
-        pays_vente: row["pays vente"] || "",
-        prix_achat: row["prix achat"] || "",
-        prix_vente: row["prix vente"] || "",
-        profit: row["profit"] || "",
-        marge_profit: row["marge profit"] || "",
-        roi: row["roi"] || "",
-        ventes_amazon: row["ventes amazon"] || "",
-        classement: row["classement"] || "",
-        asin: row["asin"] || "",
-        offres: row["offres"] || "",
-        lien_sas: row["lien sas"] || "",
-        lien_bbp: row["lien bbp"] || "",
-        lien_keepa: row["lien keepa"] || "",
-        lien_idealo: row["lien idealo"] || "",
-        lien_amazon: row["lien amazon"] || "",
-        image: row["image"] || "",
-        note: row["note"] || "",
+        pays_achat: get(COL.PAYS_ACHAT),
+        pays_vente: get(COL.PAYS_VENTE),
+        prix_achat: get(COL.PRIX_ACHAT),
+        prix_vente: get(COL.PRIX_VENTE),
+        profit: get(COL.PROFIT),
+        marge_profit: get(COL.MARGE),
+        roi: get(COL.ROI),
+        ventes_amazon: get(COL.VENTES),
+        classement: get(COL.CLASSEMENT),
+        asin: get(COL.ASIN),
+        offres: get(COL.OFFRES),
+        lien_sas: get(COL.LIEN_SAS),
+        lien_bbp: get(COL.LIEN_BBP),
+        lien_keepa: get(COL.LIEN_KEEPA),
+        lien_idealo: get(COL.LIEN_IDEALO),
+        lien_amazon: get(COL.LIEN_AMAZON),
+        image: get(COL.IMAGE),
+        note: get(COL.NOTE),
       });
     }
 
-    console.log("✅ Parsed A2A products", { count: products.length });
+    console.log("✅ Parsed A2A products", { count: products.length, duplicatesRemoved: seenIds.size !== lines.length - 1 });
 
     return new Response(
       JSON.stringify({ success: true, products, count: products.length }),
