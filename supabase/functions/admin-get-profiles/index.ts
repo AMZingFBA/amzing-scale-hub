@@ -64,7 +64,6 @@ Deno.serve(async (req) => {
       { data: profiles, error: profilesError },
       { data: subs, error: subsError },
       { data: roles, error: rolesError },
-      { data: badgeCounts, error: badgeError },
     ] = await Promise.all([
       supabaseAdmin
         .from("profiles")
@@ -76,22 +75,11 @@ Deno.serve(async (req) => {
       supabaseAdmin
         .from("user_roles")
         .select("user_id, role"),
-      supabaseAdmin
-        .from("user_badge_counts")
-        .select("user_id, badge_count"),
     ]);
 
     if (profilesError) throw profilesError;
     if (subsError) throw subsError;
     if (rolesError) throw rolesError;
-
-    // Build badge count map
-    const badgeMap = new Map<string, number>();
-    if (badgeCounts) {
-      for (const row of badgeCounts) {
-        badgeMap.set(row.user_id, row.badge_count);
-      }
-    }
 
     // Get auth users for last_sign_in_at
     const authUsersMap = new Map<string, string | null>();
@@ -118,6 +106,39 @@ Deno.serve(async (req) => {
       page++;
     }
 
+    // Get unread notification counts for all users via RPC (in batches)
+    const unreadMap = new Map<string, number>();
+    const userIds = (profiles ?? []).map((p) => p.id);
+    
+    // Process in parallel batches of 20
+    const batchSize = 20;
+    for (let i = 0; i < userIds.length; i += batchSize) {
+      const batch = userIds.slice(i, i + batchSize);
+      const results = await Promise.all(
+        batch.map(async (userId) => {
+          const { data } = await supabaseAdmin.rpc("get_all_notification_counts", {
+            user_id_param: userId,
+          });
+          
+          if (data && typeof data === "object") {
+            // Sum all "total" values from each category
+            let total = 0;
+            for (const category of Object.values(data as Record<string, any>)) {
+              if (category && typeof category === "object" && "total" in category) {
+                total += (category as any).total || 0;
+              }
+            }
+            return { userId, total };
+          }
+          return { userId, total: 0 };
+        })
+      );
+      
+      for (const r of results) {
+        unreadMap.set(r.userId, r.total);
+      }
+    }
+
     const enriched = (profiles ?? []).map((p) => {
       const subscription = (subs ?? []).find((s) => s.user_id === p.id);
       const role = (roles ?? []).find((r) => r.user_id === p.id);
@@ -134,7 +155,7 @@ Deno.serve(async (req) => {
           : undefined,
         role: role?.role ?? "user",
         last_sign_in_at: authUsersMap.get(p.id) ?? null,
-        unread_notifications: badgeMap.get(p.id) ?? 0,
+        unread_notifications: unreadMap.get(p.id) ?? 0,
       };
     });
 
