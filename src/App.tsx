@@ -84,6 +84,7 @@ const ProduitsEany = lazy(() => import("./pages/ProduitsEany"));
 const AdminAirtableContacts = lazy(() => import("./pages/AdminAirtableContacts"));
 const AdminAirtableUsers = lazy(() => import("./pages/AdminAirtableUsers"));
 const AdminSubscriptions = lazy(() => import("./pages/AdminSubscriptions"));
+const AmazonToAmazon = lazy(() => import("./pages/AmazonToAmazon"));
 
 const AndroidApp = lazy(() => import("./pages/AndroidApp"));
 const AmazonFbaDebutant = lazy(() => import("./pages/AmazonFbaDebutant"));
@@ -163,6 +164,7 @@ const App = () => (
             <Route path="/promotions" element={<ProductAlerts />} />
             <Route path="/product-alerts" element={<ProductFindAlerts />} />
             <Route path="/product-alerts/:source" element={<ProductFindAlerts />} />
+            <Route path="/a2a/:source" element={<AmazonToAmazon />} />
             <Route path="/sitelist" element={<Sitelist />} />
             <Route path="/notification-alerts" element={<NotificationAlerts />} />
             <Route path="/rules-alerts" element={<RulesAlerts />} />

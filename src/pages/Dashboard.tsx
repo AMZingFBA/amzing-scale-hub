@@ -246,11 +246,11 @@ const Dashboard = () => {
                 </AccordionTrigger>
                 <AccordionContent>
                   <div className="grid gap-3 pt-2">
-                    <CategoryItem icon={Store} label="France Medium" link="/product-alerts/a2a-france-medium" badge={notifications.amazon_to_amazon?.subcategories?.['france-medium']} />
-                    <CategoryItem icon={Store} label="France High" link="/product-alerts/a2a-france-high" badge={notifications.amazon_to_amazon?.subcategories?.['france-high']} />
-                    <CategoryItem icon={Store} label="Allemagne" link="/product-alerts/a2a-allemagne" badge={notifications.amazon_to_amazon?.subcategories?.['allemagne']} />
-                    <CategoryItem icon={Store} label="Espagne" link="/product-alerts/a2a-espagne" badge={notifications.amazon_to_amazon?.subcategories?.['espagne']} />
-                    <CategoryItem icon={Store} label="Italie" link="/product-alerts/a2a-italie" badge={notifications.amazon_to_amazon?.subcategories?.['italie']} />
+                    <CategoryItem icon={Store} label="France Medium" link="/a2a/a2a-france-medium" badge={notifications.amazon_to_amazon?.subcategories?.['france-medium']} />
+                    <CategoryItem icon={Store} label="France High" link="/a2a/a2a-france-high" badge={notifications.amazon_to_amazon?.subcategories?.['france-high']} />
+                    <CategoryItem icon={Store} label="Allemagne" link="/a2a/a2a-allemagne" badge={notifications.amazon_to_amazon?.subcategories?.['allemagne']} />
+                    <CategoryItem icon={Store} label="Espagne" link="/a2a/a2a-espagne" badge={notifications.amazon_to_amazon?.subcategories?.['espagne']} />
+                    <CategoryItem icon={Store} label="Italie" link="/a2a/a2a-italie" badge={notifications.amazon_to_amazon?.subcategories?.['italie']} />
                   </div>
                 </AccordionContent>
               </AccordionItem>
