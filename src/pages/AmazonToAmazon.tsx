@@ -114,10 +114,10 @@ export default function AmazonToAmazon() {
     if (!authLoading && user && (isVIP || isAdmin)) {
       fetchProducts(true);
 
-      // Auto-refresh every 5 minutes
+      // Auto-refresh every 1 minute
       autoSyncRef.current = setInterval(() => {
         fetchProducts(true);
-      }, 5 * 60 * 1000);
+      }, 60 * 1000);
 
       return () => {
         if (autoSyncRef.current) clearInterval(autoSyncRef.current);
