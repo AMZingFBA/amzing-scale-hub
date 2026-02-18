@@ -29,7 +29,13 @@ const ProductAlerts = () => {
   // Sauvegarder/restaurer la position de scroll pour cette page
   useScrollPosition(location.pathname);
 
-  // Déterminer la sous-catégorie basée sur l'URL
+  // Déterminer la catégorie et sous-catégorie basées sur l'URL
+  const getCategoryFromPath = () => {
+    const path = location.pathname;
+    if (path.includes('/a2a-')) return 'amazon_to_amazon';
+    return 'produits';
+  };
+
   const getSubcategoryFromPath = () => {
     const path = location.pathname;
     if (path.includes('produits-find')) return 'produits-find';
@@ -38,13 +44,19 @@ const ProductAlerts = () => {
     if (path.includes('grossistes')) return 'grossistes';
     if (path.includes('promotions')) return 'promotions';
     if (path.includes('sitelist')) return 'sitelist';
+    if (path.includes('a2a-france-medium')) return 'france-medium';
+    if (path.includes('a2a-france-high')) return 'france-high';
+    if (path.includes('a2a-allemagne')) return 'allemagne';
+    if (path.includes('a2a-espagne')) return 'espagne';
+    if (path.includes('a2a-italie')) return 'italie';
     return null;
   };
 
+  const currentCategory = getCategoryFromPath();
   const currentSubcategory = getSubcategoryFromPath();
 
   // Mark alerts as read when visiting this page
-  useMarkAsRead({ category: 'produits', subcategory: currentSubcategory || undefined });
+  useMarkAsRead({ category: currentCategory, subcategory: currentSubcategory || undefined });
 
   useEffect(() => {
     if (!user && !isAuthLoading) {
@@ -100,7 +112,7 @@ const ProductAlerts = () => {
       let query = supabase
         .from('admin_alerts')
         .select('*')
-        .eq('category', 'produits');
+        .eq('category', currentCategory);
 
       // Filtrer par sous-catégorie si définie
       if (currentSubcategory) {
@@ -145,7 +157,12 @@ const ProductAlerts = () => {
       case 'grossistes': return 'Grossistes';
       case 'promotions': return 'Promotions';
       case 'sitelist': return 'Sitelist';
-      default: return 'Produits Gagnants';
+      case 'france-medium': return 'A2A France Medium';
+      case 'france-high': return 'A2A France High';
+      case 'allemagne': return 'A2A Allemagne';
+      case 'espagne': return 'A2A Espagne';
+      case 'italie': return 'A2A Italie';
+      default: return currentCategory === 'amazon_to_amazon' ? 'Amazon to Amazon' : 'Produits Gagnants';
     }
   };
 
