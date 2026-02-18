@@ -152,9 +152,6 @@ export default function AmazonToAmazon() {
               <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent pb-1">
                 {pageTitle}
               </h1>
-              <p className="text-sm text-muted-foreground">
-                {filteredProducts.length} produit{filteredProducts.length > 1 ? 's' : ''}
-              </p>
             </div>
             <Button
               variant="outline"
