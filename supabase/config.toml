@@ -101,3 +101,6 @@ verify_jwt = false
 
 [functions.admin-get-subscriptions]
 verify_jwt = false
+
+[functions.sync-a2a-from-sheets]
+verify_jwt = false
