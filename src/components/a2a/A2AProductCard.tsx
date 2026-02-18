@@ -12,6 +12,8 @@ export interface A2AProduct {
   pays_vente: string;
   prix_achat: string;
   prix_vente: string;
+  lien_amazon_achat: string;
+  lien_amazon_vente: string;
   profit: string;
   marge_profit: string;
   roi: string;
@@ -148,20 +150,22 @@ export function A2AProductCard({ product, onCopy }: A2AProductCardProps) {
 
           {/* Country comparison */}
           <div className="grid grid-cols-2 gap-2">
-            <div className="bg-muted/40 rounded-lg p-2.5 text-center">
+            <a href={product.lien_amazon_achat || undefined} target="_blank" rel="noopener noreferrer" className={`bg-muted/40 rounded-lg p-2.5 text-center ${product.lien_amazon_achat ? 'hover:ring-1 hover:ring-primary/50 transition-all cursor-pointer' : ''}`}>
               <div className="flex items-center justify-center gap-1.5 mb-1">
                 {getFlag(paysAchat) && <span className="text-base">{getFlag(paysAchat)}</span>}
                 <span className="text-[11px] font-medium text-muted-foreground">Achat | {getLabel(paysAchat)}</span>
               </div>
               <p className="text-base font-bold text-green-400">{val(product.prix_achat)}</p>
-            </div>
-            <div className="bg-muted/40 rounded-lg p-2.5 text-center">
+              {product.lien_amazon_achat && <span className="text-[10px] text-primary underline">Voir sur Amazon</span>}
+            </a>
+            <a href={product.lien_amazon_vente || undefined} target="_blank" rel="noopener noreferrer" className={`bg-muted/40 rounded-lg p-2.5 text-center ${product.lien_amazon_vente ? 'hover:ring-1 hover:ring-primary/50 transition-all cursor-pointer' : ''}`}>
               <div className="flex items-center justify-center gap-1.5 mb-1">
                 {getFlag(paysVente) && <span className="text-base">{getFlag(paysVente)}</span>}
                 <span className="text-[11px] font-medium text-muted-foreground">Vente | {getLabel(paysVente)}</span>
               </div>
               <p className="text-base font-bold text-primary">{val(product.prix_vente)}</p>
-            </div>
+              {product.lien_amazon_vente && <span className="text-[10px] text-primary underline">Voir sur Amazon</span>}
+            </a>
           </div>
 
           {/* Calculs + Ventes */}
