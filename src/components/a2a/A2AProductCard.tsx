@@ -1,7 +1,6 @@
-import { Copy, ExternalLink, TrendingUp, Package, Search } from 'lucide-react';
+import { Copy, ExternalLink, TrendingUp, Package, Search, BarChart3 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 
 export interface A2AProduct {
   id: string;
@@ -30,50 +29,30 @@ export interface A2AProduct {
 }
 
 const FLAG_MAP: Record<string, string> = {
-  'fr': '🇫🇷',
-  'france': '🇫🇷',
-  'it': '🇮🇹',
-  'italie': '🇮🇹',
-  'italy': '🇮🇹',
-  'de': '🇩🇪',
-  'allemagne': '🇩🇪',
-  'germany': '🇩🇪',
-  'es': '🇪🇸',
-  'espagne': '🇪🇸',
-  'spain': '🇪🇸',
-  'uk': '🇬🇧',
-  'gb': '🇬🇧',
-  'nl': '🇳🇱',
-  'be': '🇧🇪',
-  'pl': '🇵🇱',
-  'se': '🇸🇪',
+  'fr': '🇫🇷', 'france': '🇫🇷',
+  'it': '🇮🇹', 'italie': '🇮🇹', 'italy': '🇮🇹',
+  'de': '🇩🇪', 'allemagne': '🇩🇪', 'germany': '🇩🇪',
+  'es': '🇪🇸', 'espagne': '🇪🇸', 'spain': '🇪🇸',
+  'uk': '🇬🇧', 'gb': '🇬🇧',
+  'nl': '🇳🇱', 'be': '🇧🇪', 'pl': '🇵🇱', 'se': '🇸🇪',
 };
 
 const COUNTRY_LABEL: Record<string, string> = {
-  'fr': 'FR',
-  'france': 'FR',
-  'it': 'IT',
-  'italie': 'IT',
-  'italy': 'IT',
-  'de': 'DE',
-  'allemagne': 'DE',
-  'germany': 'DE',
-  'es': 'ES',
-  'espagne': 'ES',
-  'spain': 'ES',
-  'uk': 'UK',
-  'gb': 'GB',
-  'nl': 'NL',
-  'be': 'BE',
-  'pl': 'PL',
-  'se': 'SE',
+  'fr': 'FR', 'france': 'FR',
+  'it': 'IT', 'italie': 'IT', 'italy': 'IT',
+  'de': 'DE', 'allemagne': 'DE', 'germany': 'DE',
+  'es': 'ES', 'espagne': 'ES', 'spain': 'ES',
+  'uk': 'UK', 'gb': 'GB',
+  'nl': 'NL', 'be': 'BE', 'pl': 'PL', 'se': 'SE',
 };
 
 function getFlag(country: string): string {
+  if (!country) return '🏳️';
   return FLAG_MAP[country.toLowerCase().trim()] || '🏳️';
 }
 
 function getLabel(country: string): string {
+  if (!country) return '—';
   return COUNTRY_LABEL[country.toLowerCase().trim()] || country.toUpperCase();
 }
 
@@ -83,6 +62,10 @@ export function parseNumericValue(value: string): number {
   return parseFloat(cleaned) || 0;
 }
 
+function val(v: string): string {
+  return v && v.trim() ? v.trim() : '—';
+}
+
 interface A2AProductCardProps {
   product: A2AProduct;
   onCopy: (text: string) => void;
@@ -90,158 +73,158 @@ interface A2AProductCardProps {
 
 export function A2AProductCard({ product, onCopy }: A2AProductCardProps) {
   const roiValue = parseNumericValue(product.roi);
-  const roiColor = roiValue >= 30 ? 'text-green-400' : roiValue >= 15 ? 'text-orange-400' : 'text-muted-foreground';
+  const roiColor = product.roi ? (roiValue >= 30 ? 'text-green-400' : roiValue >= 15 ? 'text-orange-400' : 'text-foreground') : 'text-muted-foreground';
+
+  const hasAnyLink = product.lien_sas || product.lien_bbp || product.lien_keepa || product.lien_idealo || product.lien_amazon;
 
   return (
     <Card className="overflow-hidden border border-border/60 bg-card hover:border-primary/40 transition-all duration-300">
       <CardContent className="p-0">
-        {/* Top bar: source + date */}
+        {/* Top bar: source + canal + date */}
         <div className="flex items-center justify-between px-4 py-2 border-b border-border/40 bg-muted/30">
-          <span className="text-xs text-muted-foreground capitalize">{product.source || product.canal.replace('-', ' ')}</span>
-          <span className="text-xs text-muted-foreground">{product.date}</span>
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-medium text-foreground capitalize">{val(product.source)}</span>
+            <span className="text-xs text-muted-foreground">•</span>
+            <span className="text-xs text-muted-foreground capitalize">{val(product.canal).replace('-', ' ')}</span>
+          </div>
+          <span className="text-xs text-muted-foreground">{val(product.date)}</span>
         </div>
 
-        <div className="p-4 space-y-4">
-          {/* Title + Image row */}
+        <div className="p-4 space-y-3">
+          {/* Title + Image */}
           <div className="flex gap-3">
             <div className="flex-1 min-w-0">
-              <h3 className="font-semibold text-sm leading-tight line-clamp-2">{product.titre}</h3>
+              <h3 className="font-semibold text-sm leading-tight line-clamp-2">{val(product.titre)}</h3>
             </div>
-            {product.image && (
-              <img
-                src={product.image}
-                alt={product.titre}
-                className="w-16 h-16 object-contain rounded-lg border border-border bg-white shrink-0"
-                loading="lazy"
-                onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
-              />
-            )}
-          </div>
-
-          {/* Country comparison: Buy vs Sell */}
-          <div className="grid grid-cols-2 gap-3">
-            <div className="bg-muted/40 rounded-lg p-3 text-center space-y-1">
-              <div className="flex items-center justify-center gap-1.5">
-                <span className="text-lg">{getFlag(product.pays_achat)}</span>
-                <span className="text-xs font-medium text-muted-foreground">| {getLabel(product.pays_achat)}</span>
-              </div>
-              <p className="text-lg font-bold text-green-400">{product.prix_achat || '—'}</p>
-            </div>
-            <div className="bg-muted/40 rounded-lg p-3 text-center space-y-1">
-              <div className="flex items-center justify-center gap-1.5">
-                <span className="text-lg">{getFlag(product.pays_vente)}</span>
-                <span className="text-xs font-medium text-muted-foreground">| {getLabel(product.pays_vente)}</span>
-              </div>
-              <p className="text-lg font-bold text-primary">{product.prix_vente || '—'}</p>
+            <div className="w-16 h-16 shrink-0 rounded-lg border border-border bg-white flex items-center justify-center overflow-hidden">
+              {product.image ? (
+                <img
+                  src={product.image}
+                  alt={product.titre}
+                  className="w-full h-full object-contain"
+                  loading="lazy"
+                  onError={(e) => { (e.target as HTMLImageElement).parentElement!.innerHTML = '<span class="text-xs text-muted-foreground">📦</span>'; }}
+                />
+              ) : (
+                <span className="text-2xl">📦</span>
+              )}
             </div>
           </div>
 
-          {/* Calculs + Ventes */}
-          <div className="grid grid-cols-2 gap-3">
-            {/* Calculs */}
-            <div className="bg-muted/40 rounded-lg p-3 space-y-1">
+          {/* Country comparison: Buy vs Sell - ALWAYS shown */}
+          <div className="grid grid-cols-2 gap-2">
+            <div className="bg-muted/40 rounded-lg p-2.5 text-center">
+              <div className="flex items-center justify-center gap-1.5 mb-1">
+                <span className="text-base">{getFlag(product.pays_achat)}</span>
+                <span className="text-[11px] font-medium text-muted-foreground">| {getLabel(product.pays_achat)}</span>
+              </div>
+              <p className="text-base font-bold text-green-400">{val(product.prix_achat)}</p>
+            </div>
+            <div className="bg-muted/40 rounded-lg p-2.5 text-center">
+              <div className="flex items-center justify-center gap-1.5 mb-1">
+                <span className="text-base">{getFlag(product.pays_vente)}</span>
+                <span className="text-[11px] font-medium text-muted-foreground">| {getLabel(product.pays_vente)}</span>
+              </div>
+              <p className="text-base font-bold text-primary">{val(product.prix_vente)}</p>
+            </div>
+          </div>
+
+          {/* Calculs + Ventes - ALWAYS shown */}
+          <div className="grid grid-cols-2 gap-2">
+            <div className="bg-muted/40 rounded-lg p-2.5 space-y-0.5">
               <div className="flex items-center gap-1.5 mb-1">
                 <TrendingUp className="w-3.5 h-3.5 text-primary" />
-                <span className="text-xs font-semibold">Calculs</span>
+                <span className="text-[11px] font-semibold">Calculs</span>
               </div>
-              {product.profit && (
-                <p className="text-xs">Profit: <span className="font-bold text-green-400">{product.profit}</span></p>
-              )}
-              {product.marge_profit && (
-                <p className="text-xs">Marge: <span className="font-bold">{product.marge_profit}</span></p>
-              )}
-              {product.roi && (
-                <p className="text-xs">ROI: <span className={`font-bold ${roiColor}`}>{product.roi}</span></p>
-              )}
+              <p className="text-xs">Profit: <span className="font-bold text-green-400">{val(product.profit)}</span></p>
+              <p className="text-xs">Marge: <span className="font-bold">{val(product.marge_profit)}</span></p>
+              <p className="text-xs">ROI: <span className={`font-bold ${roiColor}`}>{val(product.roi)}</span></p>
             </div>
 
-            {/* Ventes */}
-            <div className="bg-muted/40 rounded-lg p-3 space-y-1">
+            <div className="bg-muted/40 rounded-lg p-2.5 space-y-0.5">
               <div className="flex items-center gap-1.5 mb-1">
-                <Package className="w-3.5 h-3.5 text-primary" />
-                <span className="text-xs font-semibold">Ventes</span>
+                <BarChart3 className="w-3.5 h-3.5 text-primary" />
+                <span className="text-[11px] font-semibold">Ventes</span>
               </div>
-              {product.ventes_amazon && (
-                <p className="text-xs">Sales: <span className="font-bold">{product.ventes_amazon}</span></p>
-              )}
-              {product.classement && (
-                <p className="text-xs">Rank: <span className="font-bold">{product.classement}</span></p>
-              )}
+              <p className="text-xs">Amazon Sales: <span className="font-bold">{val(product.ventes_amazon)}</span></p>
+              <p className="text-xs">Salesrank: <span className="font-bold">{val(product.classement)}</span></p>
             </div>
           </div>
 
-          {/* ASIN + Offers */}
-          <div className="grid grid-cols-2 gap-3">
-            <div className="bg-muted/40 rounded-lg p-3">
-              <span className="text-xs font-semibold block mb-1">ASIN</span>
-              {product.asin ? (
-                <div className="flex items-center gap-1.5">
-                  <code className="text-xs font-mono">{product.asin}</code>
-                  <Button variant="ghost" size="icon" className="h-5 w-5" onClick={() => onCopy(product.asin)}>
+          {/* ASIN + Offers - ALWAYS shown */}
+          <div className="grid grid-cols-2 gap-2">
+            <div className="bg-muted/40 rounded-lg p-2.5">
+              <span className="text-[11px] font-semibold block mb-1">🔢 | ASIN</span>
+              <div className="flex items-center gap-1.5">
+                <code className="text-xs font-mono truncate">{val(product.asin)}</code>
+                {product.asin && (
+                  <Button variant="ghost" size="icon" className="h-5 w-5 shrink-0" onClick={() => onCopy(product.asin)}>
                     <Copy className="w-3 h-3" />
                   </Button>
-                </div>
+                )}
+              </div>
+            </div>
+            <div className="bg-muted/40 rounded-lg p-2.5">
+              <span className="text-[11px] font-semibold block mb-1">👥 | Offres</span>
+              <span className="text-xs font-bold">{val(product.offres)}</span>
+            </div>
+          </div>
+
+          {/* Links - ALWAYS shown */}
+          <div className="grid grid-cols-2 gap-2">
+            <div className="bg-muted/40 rounded-lg p-2.5">
+              <div className="flex items-center gap-1.5 mb-1.5">
+                <Search className="w-3.5 h-3.5 text-primary" />
+                <span className="text-[11px] font-semibold">Liens de recherche</span>
+              </div>
+              <div className="flex flex-wrap gap-x-2 gap-y-1">
+                {product.lien_sas ? (
+                  <a href={product.lien_sas} target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:underline font-medium">SAS</a>
+                ) : (
+                  <span className="text-xs text-muted-foreground">SAS —</span>
+                )}
+                <span className="text-muted-foreground text-xs">|</span>
+                {product.lien_bbp ? (
+                  <a href={product.lien_bbp} target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:underline font-medium">BBP</a>
+                ) : (
+                  <span className="text-xs text-muted-foreground">BBP —</span>
+                )}
+                <span className="text-muted-foreground text-xs">|</span>
+                {product.lien_keepa ? (
+                  <a href={product.lien_keepa} target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:underline font-medium">Keepa</a>
+                ) : (
+                  <span className="text-xs text-muted-foreground">Keepa —</span>
+                )}
+              </div>
+            </div>
+
+            <div className="bg-muted/40 rounded-lg p-2.5">
+              <span className="text-[11px] font-semibold block mb-1.5">ℹ️ | Idealo</span>
+              {product.lien_idealo ? (
+                <a href={product.lien_idealo} target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:underline font-medium">Idealo</a>
               ) : (
                 <span className="text-xs text-muted-foreground">—</span>
               )}
             </div>
-            <div className="bg-muted/40 rounded-lg p-3">
-              <span className="text-xs font-semibold block mb-1">Offres</span>
-              <span className="text-xs font-bold">{product.offres || '—'}</span>
-            </div>
           </div>
 
-          {/* Links row */}
-          <div className="grid grid-cols-2 gap-3">
-            {/* Research links */}
-            <div className="bg-muted/40 rounded-lg p-3">
-              <div className="flex items-center gap-1.5 mb-2">
-                <Search className="w-3.5 h-3.5 text-primary" />
-                <span className="text-xs font-semibold">Liens</span>
-              </div>
-              <div className="flex flex-wrap gap-1.5">
-                {product.lien_sas && (
-                  <a href={product.lien_sas} target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:underline font-medium">SAS</a>
-                )}
-                {product.lien_bbp && (
-                  <>
-                    {product.lien_sas && <span className="text-muted-foreground text-xs">|</span>}
-                    <a href={product.lien_bbp} target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:underline font-medium">BBP</a>
-                  </>
-                )}
-                {product.lien_keepa && (
-                  <>
-                    {(product.lien_sas || product.lien_bbp) && <span className="text-muted-foreground text-xs">|</span>}
-                    <a href={product.lien_keepa} target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:underline font-medium">Keepa</a>
-                  </>
-                )}
-              </div>
-            </div>
-
-            {/* Idealo + Note */}
-            <div className="flex gap-2">
-              {product.lien_idealo && (
-                <div className="bg-muted/40 rounded-lg p-3 flex-1">
-                  <span className="text-xs font-semibold block mb-1">Idealo</span>
-                  <a href={product.lien_idealo} target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:underline font-medium">Idealo</a>
-                </div>
-              )}
-              {product.note && (
-                <div className="bg-muted/40 rounded-lg p-3 flex-1">
-                  <span className="text-xs font-semibold block mb-1">Note</span>
-                  <p className="text-xs text-muted-foreground line-clamp-2">{product.note}</p>
-                </div>
-              )}
-            </div>
+          {/* Note - ALWAYS shown */}
+          <div className="bg-muted/40 rounded-lg p-2.5">
+            <span className="text-[11px] font-semibold block mb-1">📝 Note</span>
+            <p className="text-xs text-muted-foreground">{val(product.note)}</p>
           </div>
 
-          {/* Amazon link button */}
-          {product.lien_amazon && (
+          {/* Amazon link button - ALWAYS shown */}
+          {product.lien_amazon ? (
             <a href={product.lien_amazon} target="_blank" rel="noopener noreferrer" className="block">
               <Button variant="outline" size="sm" className="w-full gap-1.5 text-xs">
                 <ExternalLink className="w-3 h-3" /> Voir sur Amazon
               </Button>
             </a>
+          ) : (
+            <Button variant="outline" size="sm" className="w-full gap-1.5 text-xs opacity-50 cursor-default" disabled>
+              <ExternalLink className="w-3 h-3" /> Lien Amazon non disponible
+            </Button>
           )}
         </div>
       </CardContent>
