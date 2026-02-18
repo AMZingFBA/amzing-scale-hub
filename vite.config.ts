@@ -21,7 +21,7 @@ export default defineConfig(({ mode }) => ({
   },
   optimizeDeps: {
     include: ['react', 'react-dom', 'react/jsx-runtime', '@tanstack/react-query'],
-    force: true,
+    force: true, // rebuild cache
   },
   build: {
     // Code splitting optimisé pour réduire le bundle initial
