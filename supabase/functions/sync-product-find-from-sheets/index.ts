@@ -83,20 +83,37 @@ serve(async (req) => {
     const adminId = adminRole?.user_id;
     if (!adminId) throw new Error('No admin user found');
 
-    // Load existing EAN+source pairs to skip duplicates
-    const { data: existingAlerts, error: existingError } = await supabaseClient
-      .from('product_find_alerts')
-      .select('ean, source_name');
+    // Load ALL existing EAN+source+date combos to skip duplicates
+    // Must paginate since Supabase default limit is 1000
+    const existingKeys = new Set<string>();
+    let offset = 0;
+    const PAGE_SIZE = 1000;
+    let hasMore = true;
 
-    if (existingError) {
-      console.error('Error loading existing alerts:', existingError);
-      throw new Error('Failed to load existing alerts');
+    while (hasMore) {
+      const { data: batch, error: batchError } = await supabaseClient
+        .from('product_find_alerts')
+        .select('ean, source_name, created_at')
+        .range(offset, offset + PAGE_SIZE - 1);
+
+      if (batchError) {
+        console.error('Error loading existing alerts:', batchError);
+        throw new Error('Failed to load existing alerts');
+      }
+
+      if (!batch || batch.length === 0) {
+        hasMore = false;
+      } else {
+        for (const a of batch) {
+          // Use EAN+source+date(day only) as key to allow same product on different days
+          const dateKey = a.created_at ? a.created_at.substring(0, 10) : '';
+          existingKeys.add(`${a.ean}__${a.source_name}__${dateKey}`);
+        }
+        offset += PAGE_SIZE;
+        hasMore = batch.length === PAGE_SIZE;
+      }
     }
-
-    const existingKeys = new Set(
-      (existingAlerts || []).map(a => `${a.ean}__${a.source_name}`)
-    );
-    console.log(`📊 ${existingKeys.size} existing EAN+source pairs loaded`);
+    console.log(`📊 ${existingKeys.size} existing EAN+source+date combos loaded (paginated ${offset / PAGE_SIZE} pages)`);
 
     // Fetch Google Sheet
     const csvUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(SHEET_NAME)}`;
@@ -157,9 +174,11 @@ serve(async (req) => {
         if (!ean || !source || !title) { skippedCount++; continue; }
 
         const mappedSource = mapSourceName(source);
-        const key = `${ean}__${mappedSource}`;
+        const alertDate = parseDate(cols[COL.DATE_HEURE]?.trim());
+        const dateKey = alertDate.substring(0, 10);
+        const key = `${ean}__${mappedSource}__${dateKey}`;
 
-        // Skip if already exists in DB
+        // Skip if already exists in DB (same EAN + source + same day)
         if (existingKeys.has(key)) { skippedCount++; continue; }
 
         // Mark as seen to avoid duplicates within this batch
@@ -187,7 +206,7 @@ serve(async (req) => {
           sellers: cols[COL.VENDEURS]?.trim() || null,
           amazon_url: cols[COL.LIEN_AMAZON]?.trim() || null,
           source_url: cols[COL.LIEN_SOURCE]?.trim() || null,
-          created_at: parseDate(cols[COL.DATE_HEURE]?.trim()),
+          created_at: alertDate,
         });
       } catch (rowError) {
         console.error('❌ Row error:', rowError);
