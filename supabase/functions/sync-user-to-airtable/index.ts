@@ -277,7 +277,24 @@ serve(async (req) => {
     const isNewUserInAirtable = !(searchData.records && searchData.records.length > 0);
 
     // === USERS TABLE (idempotent upsert) ===
-    // This prevents duplicate rows even if the function is called multiple times concurrently.
+    // If duplicates exist for this email, delete extras first to allow upsert
+    if (searchData.records && searchData.records.length > 1) {
+      console.log(`[Sync User to Airtable] Found ${searchData.records.length} duplicates for ${user.email}, cleaning up...`);
+      // Keep the first record (oldest), delete the rest
+      const duplicates = searchData.records.slice(1);
+      for (const dup of duplicates) {
+        const delRes = await fetch(
+          `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${encodeURIComponent(USERS_TABLE)}/${dup.id}`,
+          { method: 'DELETE', headers: { 'Authorization': `Bearer ${AIRTABLE_API_KEY}` } }
+        );
+        if (delRes.ok) {
+          console.log(`[Sync User to Airtable] Deleted duplicate record: ${dup.id}`);
+        } else {
+          console.error(`[Sync User to Airtable] Failed to delete duplicate:`, await delRes.text());
+        }
+      }
+    }
+
     console.log(`[Sync User to Airtable] Upserting into "${USERS_TABLE}" (new=${isNewUserInAirtable})`);
 
     const upsertResponse = await fetch(`https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${encodeURIComponent(USERS_TABLE)}`, {
