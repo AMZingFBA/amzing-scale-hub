@@ -289,6 +289,8 @@ const Dashboard = () => {
                     <CategoryItem icon={Building2} label="Xiaomi" link="/catalogue/xiaomi" badge={notifications.catalogue_exclusif?.subcategories?.xiaomi} />
                     <CategoryItem icon={Building2} label="playmobil" link="/catalogue/playmobil" badge={notifications.catalogue_exclusif?.subcategories?.playmobil} />
                     <CategoryItem icon={Building2} label="Lego" link="/catalogue/lego" badge={notifications.catalogue_exclusif?.subcategories?.lego} />
+                    <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wider pt-3 pb-1">France Hexagone</p>
+                    <CategoryItem icon={Building2} label="France Hexagone" link="/catalogue/france-hexagone" badge={notifications.catalogue_exclusif?.subcategories?.['france-hexagone']} />
                   </div>
                 </AccordionContent>
               </AccordionItem>
