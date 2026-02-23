@@ -112,37 +112,46 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   useEffect(() => {
-    // Set up auth state listener
+    let initialSessionHandled = false;
+    let lastSyncedUserId: string | null = null;
+
+    // Set up auth state listener FIRST
     const { data: { subscription: authSubscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
         
-        // Fetch subscription when user logs in
         if (session?.user) {
-          setTimeout(() => {
+          // Only fetch subscription if this is a real auth change (not the initial session)
+          if (initialSessionHandled) {
             fetchSubscription(session.user.id);
-          }, 0);
+          }
           
-          // Sync to Airtable on SIGNED_IN event (une seule fois)
-          // Skip if this is an impersonation session (admin session stored)
-          if (event === 'SIGNED_IN' && !localStorage.getItem('admin_original_session')) {
+          // Sync to Airtable ONLY on actual SIGNED_IN (not TOKEN_REFRESHED, not INITIAL_SESSION)
+          // Also skip impersonation sessions and prevent duplicate syncs for same user
+          if (
+            event === 'SIGNED_IN' && 
+            !localStorage.getItem('admin_original_session') &&
+            lastSyncedUserId !== session.user.id
+          ) {
+            lastSyncedUserId = session.user.id;
             setTimeout(() => {
               syncToAirtable(session.user.id, (session.user.email || '').toLowerCase());
             }, 100);
           }
         } else {
           setSubscription(null);
+          lastSyncedUserId = null;
         }
         
-        // Check if admin session exists after auth state change
         setHasOriginalAdminSession(!!localStorage.getItem('admin_original_session'));
       }
     );
 
-    // Check for existing session
+    // Then check for existing session
     supabase.auth.getSession().then(({ data: { session }, error }) => {
-      // Si erreur ou pas de session, forcer la déconnexion complète
+      initialSessionHandled = true;
+      
       if (error || !session) {
         setSession(null);
         setUser(null);
