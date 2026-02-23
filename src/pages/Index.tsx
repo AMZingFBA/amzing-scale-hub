@@ -90,7 +90,7 @@ const Index = () => {
     setAcceptedCGV, 
     handleConfirmPayment 
   } = useTrial();
-  const { isVIP, isLoading, user } = useAuth();
+  const { isVIP, isLoading, user, subscription } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
   const isNativeApp = Capacitor.isNativePlatform();
@@ -103,8 +103,14 @@ const Index = () => {
   useEffect(() => {
     if (isLoading || !user) return;
     
+    // If already VIP, redirect immediately without waiting for admin check
+    if (isVIP) {
+      navigate('/dashboard', { replace: true });
+      return;
+    }
+    
+    // Otherwise check admin status
     const checkAndRedirect = async () => {
-      // Check admin status
       const { data: roleData } = await supabase
         .from('user_roles')
         .select('role')
@@ -112,16 +118,13 @@ const Index = () => {
         .eq('role', 'admin')
         .maybeSingle();
       
-      const isAdmin = roleData?.role === 'admin';
-      
-      if (isVIP || isAdmin) {
-        console.log('Redirecting to dashboard - VIP:', isVIP, 'Admin:', isAdmin);
+      if (roleData?.role === 'admin') {
         navigate('/dashboard', { replace: true });
       }
     };
     
     checkAndRedirect();
-  }, [isVIP, isLoading, user, navigate]);
+  }, [isVIP, isLoading, user, navigate, subscription]);
 
   // Schéma combiné pour la home
   const homeSchema = [...schemas.homePageSchemas, schemas.homeFAQ];
