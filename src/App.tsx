@@ -66,6 +66,7 @@ const CatalogueLego = lazy(() => import("./pages/CatalogueLego"));
 const CatalogueQogita = lazy(() => import("./pages/CatalogueQogita"));
 const CatalogueEany = lazy(() => import("./pages/CatalogueEany"));
 const CatalogueVibraforce = lazy(() => import("./pages/CatalogueVibraforce"));
+const CatalogueFranceHexagone = lazy(() => import("./pages/CatalogueFranceHexagone"));
 const Questions = lazy(() => import("./pages/Questions"));
 const Avis = lazy(() => import("./pages/Avis"));
 const AdminProfiles = lazy(() => import("./pages/AdminProfiles"));
@@ -178,6 +179,7 @@ const App = () => (
             <Route path="/catalogue/qogita" element={<CatalogueQogita />} />
             <Route path="/catalogue/eany" element={<CatalogueEany />} />
             <Route path="/catalogue/vibraforce" element={<CatalogueVibraforce />} />
+            <Route path="/catalogue/france-hexagone" element={<CatalogueFranceHexagone />} />
             <Route path="/chat" element={<Chat />} />
             <Route path="/success" element={<Success />} />
             <Route path="/sales" element={<Sales />} />
