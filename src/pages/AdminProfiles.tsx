@@ -3,7 +3,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { Loader2, Users, Mail, Phone, UserCircle, ArrowLeft, Search, Calendar, MessageCircle, Crown, Shield, Filter, ChevronLeft, ChevronRight, Clock, AlertCircle, Trash2, Copy, CheckCircle, RefreshCw, Eye, Bell, BellOff, Activity, Wifi, WifiOff } from 'lucide-react';
+import { Loader2, Users, Mail, Phone, UserCircle, ArrowLeft, Search, Calendar, MessageCircle, Crown, Shield, Filter, ChevronLeft, ChevronRight, Clock, AlertCircle, Trash2, Copy, CheckCircle, RefreshCw, Eye, Bell, BellOff, Activity, Wifi, WifiOff, UserPlus, UserMinus } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -51,6 +51,7 @@ const AdminProfiles = () => {
   const [copiedText, setCopiedText] = useState<string>('');
   const [syncing, setSyncing] = useState(false);
   const [generatingLink, setGeneratingLink] = useState<string | null>(null);
+  const [togglingVip, setTogglingVip] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) {
@@ -241,6 +242,40 @@ const AdminProfiles = () => {
       toast.error('Erreur lors de l\'impersonation');
     } finally {
       setGeneratingLink(null);
+    }
+  };
+
+  const handleToggleVip = async (userId: string, userEmail: string, currentlyVip: boolean) => {
+    const action = currentlyVip ? 'revoke' : 'grant';
+    const confirmMsg = currentlyVip
+      ? `Retirer le VIP de ${userEmail} ?`
+      : `Accorder le VIP à ${userEmail} pour 12 mois ?`;
+
+    if (!confirm(confirmMsg)) return;
+
+    try {
+      setTogglingVip(userId);
+
+      const { data: sessionData } = await supabase.auth.getSession();
+      if (!sessionData.session?.access_token) {
+        toast.error('Session expirée');
+        return;
+      }
+
+      const { data, error } = await supabase.functions.invoke('admin-toggle-vip', {
+        headers: { Authorization: `Bearer ${sessionData.session.access_token}` },
+        body: { userId, action },
+      });
+
+      if (error) throw error;
+
+      toast.success(currentlyVip ? `VIP retiré pour ${userEmail}` : `VIP accordé à ${userEmail}`);
+      await loadProfiles();
+    } catch (error: any) {
+      console.error('Error toggling VIP:', error);
+      toast.error(error.message || 'Erreur lors de la modification du VIP');
+    } finally {
+      setTogglingVip(null);
     }
   };
 
@@ -905,6 +940,27 @@ const AdminProfiles = () => {
                                   <MessageCircle className="w-4 h-4" />
                                   Contact
                                 </Button>
+                                {profile.role !== 'admin' && (() => {
+                                  const vipActive = isVipActive(profile.subscription);
+                                  return (
+                                    <Button
+                                      size="sm"
+                                      variant={vipActive ? "outline" : "default"}
+                                      onClick={() => handleToggleVip(profile.id, profile.email, vipActive)}
+                                      className={`gap-2 ${vipActive ? 'border-red-500 text-red-500 hover:bg-red-50 dark:hover:bg-red-950' : ''}`}
+                                      disabled={togglingVip === profile.id}
+                                    >
+                                      {togglingVip === profile.id ? (
+                                        <Loader2 className="w-4 h-4 animate-spin" />
+                                      ) : vipActive ? (
+                                        <UserMinus className="w-4 h-4" />
+                                      ) : (
+                                        <UserPlus className="w-4 h-4" />
+                                      )}
+                                      {vipActive ? 'Retirer VIP' : 'Donner VIP'}
+                                    </Button>
+                                  );
+                                })()}
                                 {profile.role !== 'admin' && (
                                   <Button
                                     size="sm"
