@@ -228,11 +228,12 @@ function IboodProductCard({ product, onCopy }: { product: IboodProduct; onCopy: 
       <CardContent className="p-6 space-y-6">
         {/* Chart image / product photo */}
         {currentImageSrc && (
-          <div className="rounded-xl overflow-hidden border">
+          <div className="rounded-xl overflow-hidden border bg-white flex items-center justify-center p-4">
             <img
               src={currentImageSrc}
               alt={product.product_name}
-              className="w-full h-auto max-h-64 object-contain bg-white"
+              className="w-full h-auto object-contain"
+              style={{ maxHeight: '500px', minHeight: '200px' }}
               loading="lazy"
               referrerPolicy="no-referrer"
               onLoad={handleImageLoad}
