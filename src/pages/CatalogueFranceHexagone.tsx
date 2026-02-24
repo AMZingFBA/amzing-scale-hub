@@ -13,12 +13,21 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { franceHexagoneCatalogueProducts, FranceHexagoneProduct } from '@/lib/france-hexagone-catalogue-data';
-import { ShoppingCart, Plus, Minus, Trash2, Send, Search, Package, ArrowLeft, Barcode } from 'lucide-react';
+import { useCatalogueAdminEdit } from '@/hooks/use-catalogue-admin-edit';
+import CatalogueEditDialog, { EditField } from '@/components/CatalogueEditDialog';
+import { ShoppingCart, Plus, Minus, Trash2, Send, Search, Package, ArrowLeft, Barcode, Pencil, RotateCcw } from 'lucide-react';
 
 interface CartItem {
   product: FranceHexagoneProduct;
   quantity: number;
 }
+
+const editFields: EditField[] = [
+  { key: 'nom', label: 'Nom du produit', type: 'text' },
+  { key: 'ean', label: 'EAN', type: 'text' },
+  { key: 'prixTTC', label: 'Prix TTC (€)', type: 'number' },
+  { key: 'quantite', label: 'Quantité', type: 'number' },
+];
 
 const CatalogueFranceHexagone = () => {
   const { user, isVIP } = useAuth();
@@ -28,8 +37,13 @@ const CatalogueFranceHexagone = () => {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [editProduct, setEditProduct] = useState<FranceHexagoneProduct | null>(null);
 
-  const filteredProducts = franceHexagoneCatalogueProducts.filter(product =>
+  const { products, isAdmin, updateProduct, deleteProduct, resetToDefault } = useCatalogueAdminEdit<FranceHexagoneProduct>(
+    'france-hexagone', franceHexagoneCatalogueProducts, 'ean'
+  );
+
+  const filteredProducts = products.filter(product =>
     product.nom.toLowerCase().includes(searchTerm.toLowerCase()) ||
     product.ean.includes(searchTerm)
   );
@@ -66,6 +80,12 @@ const CatalogueFranceHexagone = () => {
 
   const totalTTC = cart.reduce((sum, item) => sum + item.product.prixTTC * item.quantity, 0);
   const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+
+  const handleDelete = (ean: string) => {
+    deleteProduct(ean);
+    removeFromCart(ean);
+    toast({ title: "Produit supprimé", description: "Le produit a été retiré du catalogue." });
+  };
 
   const submitOrder = async () => {
     if (!user) {
@@ -167,10 +187,16 @@ ${cart.map(item => `EAN: ${item.product.ean} | Qté: ${item.quantity}`).join('\n
                 Catalogue France Hexagone
               </h1>
             </div>
+            {isAdmin && (
+              <Button variant="outline" size="sm" onClick={resetToDefault} className="gap-1 text-xs">
+                <RotateCcw className="w-3 h-3" />
+                Réinitialiser
+              </Button>
+            )}
           </div>
 
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-            <p className="text-muted-foreground">{franceHexagoneCatalogueProducts.length} produits disponibles</p>
+            <p className="text-muted-foreground">{products.length} produits disponibles</p>
 
             <Dialog open={isCartOpen} onOpenChange={setIsCartOpen}>
               <DialogTrigger asChild>
@@ -269,6 +295,7 @@ ${cart.map(item => `EAN: ${item.product.ean} | Qté: ${item.quantity}`).join('\n
                       <TableHead className="text-right">Prix TTC</TableHead>
                       <TableHead className="text-right">Quantité</TableHead>
                       <TableHead className="w-[100px]"></TableHead>
+                      {isAdmin && <TableHead className="w-[80px]">Admin</TableHead>}
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -296,6 +323,18 @@ ${cart.map(item => `EAN: ${item.product.ean} | Qté: ${item.quantity}`).join('\n
                             <span className="hidden sm:inline">Ajouter</span>
                           </Button>
                         </TableCell>
+                        {isAdmin && (
+                          <TableCell>
+                            <div className="flex gap-1">
+                              <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setEditProduct(product)}>
+                                <Pencil className="w-3.5 h-3.5 text-primary" />
+                              </Button>
+                              <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleDelete(product.ean)}>
+                                <Trash2 className="w-3.5 h-3.5 text-destructive" />
+                              </Button>
+                            </div>
+                          </TableCell>
+                        )}
                       </TableRow>
                     ))}
                   </TableBody>
@@ -313,6 +352,18 @@ ${cart.map(item => `EAN: ${item.product.ean} | Qté: ${item.quantity}`).join('\n
         </div>
       </main>
       <Footer />
+
+      <CatalogueEditDialog
+        open={!!editProduct}
+        onOpenChange={(open) => !open && setEditProduct(null)}
+        product={editProduct}
+        fields={editFields}
+        idField="ean"
+        onSave={(id, updates) => {
+          updateProduct(id, updates);
+          toast({ title: "✅ Produit modifié", description: "Les changements ont été enregistrés." });
+        }}
+      />
     </div>
   );
 };
