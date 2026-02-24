@@ -225,162 +225,164 @@ function IboodProductCard({ product, onCopy }: { product: IboodProduct; onCopy: 
         </div>
       </div>
 
-      <CardContent className="p-6 space-y-6">
-        {/* Chart image / product photo */}
-        {currentImageSrc && (
-          <div className="rounded-xl overflow-hidden border bg-white flex items-center justify-center p-4">
-            <img
-              src={currentImageSrc}
-              alt={product.product_name}
-              className="w-full h-auto object-contain"
-              style={{ maxHeight: '500px', minHeight: '200px' }}
-              loading="lazy"
-              referrerPolicy="no-referrer"
-              onLoad={handleImageLoad}
-              onError={goToNextImage}
-            />
+      <CardContent className="p-6">
+        {/* Top section: info left, image right */}
+        <div className="flex flex-col md:flex-row gap-6">
+          {/* Left: product details */}
+          <div className="flex-1 space-y-4 min-w-0">
+            {/* Product title */}
+            <h3 className="text-xl font-semibold leading-tight">{product.product_name}</h3>
+
+            {/* ASIN */}
+            {product.asin && (
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground">ASIN:</span>
+                <code className="bg-muted px-3 py-1 rounded font-mono text-sm">{product.asin}</code>
+                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => onCopy(product.asin!)}>
+                  <Copy className="w-4 h-4" />
+                </Button>
+              </div>
+            )}
+
+            {/* Prices row */}
+            <div className="flex flex-wrap items-center gap-4">
+              {product.cost && (
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-muted-foreground">Coût:</span>
+                  <span className="font-bold">{product.cost}</span>
+                </div>
+              )}
+              {product.sale_price && (
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-muted-foreground">Prix vente:</span>
+                  <span className="text-xl font-bold text-green-500">{product.sale_price} €</span>
+                </div>
+              )}
+            </div>
+
+            {/* SAS Info Grid */}
+            <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 p-3 bg-muted/30 rounded-xl text-sm">
+              {product.bsr && (
+                <div className="space-y-0.5">
+                  <span className="text-xs text-muted-foreground block">BSR</span>
+                  <span className="font-semibold">{product.bsr}</span>
+                </div>
+              )}
+              {product.monthly_sales && (
+                <div className="space-y-0.5">
+                  <span className="text-xs text-muted-foreground block">Ventes/mois</span>
+                  <span className="font-semibold">{product.monthly_sales}</span>
+                </div>
+              )}
+              {product.private_label && (
+                <div className="space-y-0.5">
+                  <span className="text-xs text-muted-foreground block">Private Label</span>
+                  <Badge variant={product.private_label === 'PL' ? 'destructive' : 'secondary'} className="text-xs">
+                    {product.private_label}
+                  </Badge>
+                </div>
+              )}
+              {product.size && (
+                <div className="space-y-0.5">
+                  <span className="text-xs text-muted-foreground block">Taille</span>
+                  <span className="font-semibold">{product.size}</span>
+                </div>
+              )}
+              {product.meltable && (
+                <div className="space-y-0.5">
+                  <span className="text-xs text-muted-foreground block">Meltable</span>
+                  <Badge variant={product.meltable === 'Yes' ? 'destructive' : 'secondary'} className="text-xs">
+                    {product.meltable}
+                  </Badge>
+                </div>
+              )}
+              {product.variations && (
+                <div className="space-y-0.5">
+                  <span className="text-xs text-muted-foreground block">Variations</span>
+                  <span className="font-semibold">{product.variations}</span>
+                </div>
+              )}
+              {product.sellers && (
+                <div className="space-y-0.5">
+                  <span className="text-xs text-muted-foreground block">Sellers</span>
+                  <span className="font-semibold">{product.sellers}</span>
+                </div>
+              )}
+            </div>
+
+            {/* Profit Info */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {product.fbm_profit && product.fbm_roi && (
+                <div className="p-3 rounded-xl bg-blue-500/10 border border-blue-500/30">
+                  <div className="flex items-center gap-2 mb-1.5">
+                    <Badge className="bg-blue-500 text-xs">FBM 🔹</Badge>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <span className="text-xs text-muted-foreground block">Profit</span>
+                      <span className="text-base font-bold text-green-500">{product.fbm_profit}</span>
+                    </div>
+                    <div>
+                      <span className="text-xs text-muted-foreground block">ROI</span>
+                      <span className="text-base font-bold text-primary">{product.fbm_roi}</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+              {product.fba_profit && product.fba_roi && (
+                <div className="p-3 rounded-xl bg-orange-500/10 border border-orange-500/30">
+                  <div className="flex items-center gap-2 mb-1.5">
+                    <Badge className="bg-orange-500 text-xs">FBA 📦</Badge>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <span className="text-xs text-muted-foreground block">Profit</span>
+                      <span className="text-base font-bold text-green-500">{product.fba_profit}</span>
+                    </div>
+                    <div>
+                      <span className="text-xs text-muted-foreground block">ROI</span>
+                      <span className="text-base font-bold text-primary">{product.fba_roi}</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Links */}
+            <div className="flex flex-wrap gap-3">
+              {product.amazon_url && (
+                <Button variant="outline" size="sm" asChild>
+                  <a href={product.amazon_url} target="_blank" rel="noopener noreferrer" className="gap-2">
+                    <ExternalLink className="w-4 h-4" />
+                    Amazon
+                  </a>
+                </Button>
+              )}
+              {product.ibood_url && (
+                <Button variant="outline" size="sm" asChild>
+                  <a href={product.ibood_url} target="_blank" rel="noopener noreferrer" className="gap-2">
+                    <ExternalLink className="w-4 h-4" />
+                    iBood
+                  </a>
+                </Button>
+              )}
+            </div>
           </div>
-        )}
 
-        {/* Product title */}
-        <h3 className="text-xl font-semibold leading-tight">{product.product_name}</h3>
-
-        {/* ASIN */}
-        {product.asin && (
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-muted-foreground">ASIN:</span>
-            <code className="bg-muted px-3 py-1 rounded font-mono text-sm">{product.asin}</code>
-            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => onCopy(product.asin!)}>
-              <Copy className="w-4 h-4" />
-            </Button>
-          </div>
-        )}
-
-        {/* Prices row */}
-        <div className="flex flex-wrap items-center gap-4">
-          {product.cost && (
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground">Coût:</span>
-              <span className="font-bold">{product.cost}</span>
+          {/* Right: product image */}
+          {currentImageSrc && (
+            <div className="w-full md:w-[380px] lg:w-[440px] shrink-0 rounded-xl overflow-hidden border bg-white flex items-center justify-center p-3 self-start">
+              <img
+                src={currentImageSrc}
+                alt={product.product_name}
+                className="w-full h-auto object-contain"
+                style={{ maxHeight: '420px' }}
+                loading="lazy"
+                referrerPolicy="no-referrer"
+                onLoad={handleImageLoad}
+                onError={goToNextImage}
+              />
             </div>
-          )}
-          {product.sale_price && (
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground">Prix vente:</span>
-              <span className="text-xl font-bold text-green-500">{product.sale_price} €</span>
-            </div>
-          )}
-        </div>
-
-        {/* SAS Info Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4 bg-muted/30 rounded-xl">
-          {product.bsr && (
-            <div className="space-y-1">
-              <span className="text-xs text-muted-foreground block">BSR</span>
-              <span className="font-semibold">{product.bsr}</span>
-            </div>
-          )}
-          {product.monthly_sales && (
-            <div className="space-y-1">
-              <span className="text-xs text-muted-foreground block">Ventes/mois</span>
-              <span className="font-semibold">{product.monthly_sales}</span>
-            </div>
-          )}
-          {product.private_label && (
-            <div className="space-y-1">
-              <span className="text-xs text-muted-foreground block">Private Label</span>
-              <Badge variant={product.private_label === 'PL' ? 'destructive' : 'secondary'}>
-                {product.private_label}
-              </Badge>
-            </div>
-          )}
-          {product.size && (
-            <div className="space-y-1">
-              <span className="text-xs text-muted-foreground block">Taille</span>
-              <span className="font-semibold">{product.size}</span>
-            </div>
-          )}
-          {product.meltable && (
-            <div className="space-y-1">
-              <span className="text-xs text-muted-foreground block">Meltable</span>
-              <Badge variant={product.meltable === 'Yes' ? 'destructive' : 'secondary'}>
-                {product.meltable}
-              </Badge>
-            </div>
-          )}
-          {product.variations && (
-            <div className="space-y-1">
-              <span className="text-xs text-muted-foreground block">Variations</span>
-              <span className="font-semibold">{product.variations}</span>
-            </div>
-          )}
-          {product.sellers && (
-            <div className="space-y-1">
-              <span className="text-xs text-muted-foreground block">Sellers</span>
-              <span className="font-semibold">{product.sellers}</span>
-            </div>
-          )}
-        </div>
-
-        {/* Profit Info */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* FBM */}
-          {product.fbm_profit && product.fbm_roi && (
-            <div className="p-4 rounded-xl bg-blue-500/10 border border-blue-500/30">
-              <div className="flex items-center gap-2 mb-2">
-                <Badge className="bg-blue-500">FBM 🔹</Badge>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <span className="text-xs text-muted-foreground block">Profit</span>
-                  <span className="text-lg font-bold text-green-500">{product.fbm_profit}</span>
-                </div>
-                <div>
-                  <span className="text-xs text-muted-foreground block">ROI</span>
-                  <span className="text-lg font-bold text-primary">{product.fbm_roi}</span>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* FBA */}
-          {product.fba_profit && product.fba_roi && (
-            <div className="p-4 rounded-xl bg-orange-500/10 border border-orange-500/30">
-              <div className="flex items-center gap-2 mb-2">
-                <Badge className="bg-orange-500">FBA 📦</Badge>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <span className="text-xs text-muted-foreground block">Profit</span>
-                  <span className="text-lg font-bold text-green-500">{product.fba_profit}</span>
-                </div>
-                <div>
-                  <span className="text-xs text-muted-foreground block">ROI</span>
-                  <span className="text-lg font-bold text-primary">{product.fba_roi}</span>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-
-
-        {/* Links */}
-        <div className="flex flex-wrap gap-3">
-          {product.amazon_url && (
-            <Button variant="outline" size="sm" asChild>
-              <a href={product.amazon_url} target="_blank" rel="noopener noreferrer" className="gap-2">
-                <ExternalLink className="w-4 h-4" />
-                Amazon
-              </a>
-            </Button>
-          )}
-          {product.ibood_url && (
-            <Button variant="outline" size="sm" asChild>
-              <a href={product.ibood_url} target="_blank" rel="noopener noreferrer" className="gap-2">
-                <ExternalLink className="w-4 h-4" />
-                iBood
-              </a>
-            </Button>
           )}
         </div>
       </CardContent>
