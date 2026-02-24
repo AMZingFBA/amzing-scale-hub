@@ -35,12 +35,24 @@ serve(async (req) => {
   }
 
   try {
-    const csvUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(SHEET_NAME)}`;
-    const response = await fetch(csvUrl);
-    if (!response.ok) throw new Error(`Failed to fetch sheet: ${response.statusText}`);
+    // Use export format which works better with shared sheets
+    const csvUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=0`;
+    console.log('Fetching CSV from:', csvUrl);
+    const response = await fetch(csvUrl, {
+      headers: { 'Accept': 'text/csv' },
+      redirect: 'follow',
+    });
+    if (!response.ok) {
+      const body = await response.text();
+      console.error('Sheet fetch failed:', response.status, body.substring(0, 500));
+      throw new Error(`Failed to fetch sheet: ${response.status} ${response.statusText}`);
+    }
 
     const csvText = await response.text();
+    console.log('CSV first 500 chars:', csvText.substring(0, 500));
+    console.log('CSV total length:', csvText.length);
     const lines = csvText.split('\n').filter(line => line.trim());
+    console.log('Total lines:', lines.length);
 
     if (lines.length < 2) {
       return new Response(
@@ -61,16 +73,17 @@ serve(async (req) => {
         const ean = cols[1]?.trim();
         const asin = cols[2]?.trim();
 
-        if (!ean || !productName) continue;
+        if (!productName) continue;
 
-        // Deduplicate by EAN
-        if (seen.has(ean)) continue;
-        seen.add(ean);
+        // Use EAN, ASIN or product name as unique key
+        const uniqueKey = ean || asin || productName;
+        if (seen.has(uniqueKey)) continue;
+        seen.add(uniqueKey);
 
         products.push({
-          id: ean,
+          id: uniqueKey,
           product_name: productName,
-          ean,
+          ean: ean || null,
           asin: asin || null,
           bsr: cols[3]?.trim() || null,
           cost: cols[4]?.trim() || null,
