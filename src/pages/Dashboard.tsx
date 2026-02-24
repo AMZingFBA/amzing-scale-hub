@@ -309,6 +309,11 @@ const Dashboard = () => {
                     />
                     <CategoryItem
                       icon={Store}
+                      label="Produits Ibood"
+                      link="/produits-ibood"
+                    />
+                    <CategoryItem
+                      icon={Store}
                       label="Produits Carrefour"
                       link="/product-alerts/carrefour"
                       badge={notifications.produits?.subcategories?.["produits-carrefour"]}
