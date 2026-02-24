@@ -6,97 +6,13 @@ const corsHeaders = {
 };
 
 const SHEET_ID = "1Lx-Rj-uT8thkTjxnW7Hxo8fu-xUpMdVNe8G7uCDSb24";
-const SHEET_NAME = "Analyse SellerAmp";
-
-const imageCache = new Map<string, { url: string | null; expiresAt: number }>();
-const IMAGE_CACHE_TTL_MS = 30 * 60 * 1000;
-
-const parseCSVLine = (line: string): string[] => {
-  const result: string[] = [];
-  let current = '';
-  let inQuotes = false;
-  for (let i = 0; i < line.length; i++) {
-    const char = line[i];
-    const nextChar = line[i + 1];
-    if (char === '"') {
-      if (inQuotes && nextChar === '"') { current += '"'; i++; }
-      else inQuotes = !inQuotes;
-    } else if (char === ',' && !inQuotes) {
-      result.push(current.trim());
-      current = '';
-    } else {
-      current += char;
-    }
-  }
-  result.push(current.trim());
-  return result.map(v => v.replace(/^"|"$/g, '').replace(/""/g, '"'));
-};
 
 const parseImageFormula = (raw?: string | null): string | null => {
   if (!raw) return null;
   const trimmed = raw.trim();
-  const imageMatch = trimmed.match(/^=IMAGE\("([^"]+)"\)/i);
+  const imageMatch = trimmed.match(/=IMAGE\("([^"]+)"\)/i);
   if (imageMatch?.[1]) return imageMatch[1].trim();
   if (/^https?:\/\//i.test(trimmed)) return trimmed;
-  return null;
-};
-
-const extractMetaImage = (html: string): string | null => {
-  const patterns = [
-    /<meta\s+property=["']og:image["']\s+content=["']([^"']+)["'][^>]*>/i,
-    /<meta\s+content=["']([^"']+)["']\s+property=["']og:image["'][^>]*>/i,
-    /<meta\s+name=["']twitter:image["']\s+content=["']([^"']+)["'][^>]*>/i,
-    /<meta\s+content=["']([^"']+)["']\s+name=["']twitter:image["'][^>]*>/i,
-    /!\[[^\]]*\]\((https?:\/\/[^)\s]+)\)/i,
-  ];
-
-  for (const pattern of patterns) {
-    const match = html.match(pattern);
-    if (match?.[1]?.trim()) return match[1].trim();
-  }
-
-  const iboodImageMatch = html.match(/https:\/\/image\.ibood\.io\/image\/[^"'\s<)]+/i);
-  if (iboodImageMatch?.[0]) return iboodImageMatch[0].trim();
-
-  return null;
-};
-
-const resolveIboodImage = async (iboodUrl?: string | null): Promise<string | null> => {
-  if (!iboodUrl) return null;
-
-  const now = Date.now();
-  const cached = imageCache.get(iboodUrl);
-  if (cached && cached.expiresAt > now) return cached.url;
-
-  const sources = [
-    iboodUrl,
-    `https://r.jina.ai/http://${iboodUrl.replace(/^https?:\/\//i, "")}`,
-  ];
-
-  for (const sourceUrl of sources) {
-    try {
-      const pageResponse = await fetch(sourceUrl, {
-        headers: {
-          "User-Agent": "Mozilla/5.0",
-          "Accept": "text/html,text/plain,application/xhtml+xml",
-        },
-        redirect: 'follow',
-      });
-
-      if (!pageResponse.ok) continue;
-
-      const html = await pageResponse.text();
-      const imageUrl = extractMetaImage(html);
-      if (imageUrl) {
-        imageCache.set(iboodUrl, { url: imageUrl, expiresAt: now + IMAGE_CACHE_TTL_MS });
-        return imageUrl;
-      }
-    } catch {
-      // try next source
-    }
-  }
-
-  imageCache.set(iboodUrl, { url: null, expiresAt: now + IMAGE_CACHE_TTL_MS });
   return null;
 };
 
@@ -106,80 +22,117 @@ serve(async (req) => {
   }
 
   try {
-    // Use export format which works better with shared sheets
-    const csvUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=0`;
-    console.log('Fetching CSV from:', csvUrl);
-    const response = await fetch(csvUrl, {
-      headers: { 'Accept': 'text/csv' },
+    // Use gviz JSON endpoint which preserves IMAGE() formulas (CSV strips them)
+    const gvizUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=0`;
+    console.log('Fetching gviz JSON from:', gvizUrl);
+
+    const response = await fetch(gvizUrl, {
+      headers: { 'Accept': 'application/json, text/plain' },
       redirect: 'follow',
     });
+
     if (!response.ok) {
       const body = await response.text();
       console.error('Sheet fetch failed:', response.status, body.substring(0, 500));
-      throw new Error(`Failed to fetch sheet: ${response.status} ${response.statusText}`);
+      throw new Error(`Failed to fetch sheet: ${response.status}`);
     }
 
-    const csvText = await response.text();
-    console.log('CSV first 500 chars:', csvText.substring(0, 500));
-    console.log('CSV total length:', csvText.length);
-    const lines = csvText.split('\n').filter(line => line.trim());
-    console.log('Total lines:', lines.length);
+    const rawText = await response.text();
 
-    if (lines.length < 2) {
+    // Strip JSONP wrapper: google.visualization.Query.setResponse({...})
+    const jsonMatch = rawText.match(/google\.visualization\.Query\.setResponse\((.+)\);?\s*$/s);
+    if (!jsonMatch?.[1]) {
+      console.error('Could not parse gviz response, first 500 chars:', rawText.substring(0, 500));
+      throw new Error('Invalid gviz response format');
+    }
+
+    const gvizData = JSON.parse(jsonMatch[1]);
+    const cols = gvizData.table?.cols || [];
+    const rows = gvizData.table?.rows || [];
+
+    console.log('Columns:', cols.map((c: any) => c.label).join(', '));
+    console.log('Total rows:', rows.length);
+
+    if (rows.length === 0) {
       return new Response(
         JSON.stringify({ success: true, products: [], count: 0 }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    // Skip header row
-    const dataRows = lines.slice(1);
+    // Get cell value: check v (value) first, then f (formatted/formula)
+    const getCellValue = (cell: any): string | null => {
+      if (!cell) return null;
+      if (cell.v !== null && cell.v !== undefined) return String(cell.v);
+      if (cell.f) return String(cell.f);
+      return null;
+    };
+
+    // For IMAGE() formulas, the value is often null but formula is in f
+    const getCellFormula = (cell: any): string | null => {
+      if (!cell) return null;
+      // f contains the formula or formatted value
+      if (cell.f) return String(cell.f);
+      if (cell.v !== null && cell.v !== undefined) return String(cell.v);
+      return null;
+    };
+
     const seen = new Set<string>();
     const products: any[] = [];
 
-    for (const line of dataRows) {
+    for (const row of rows) {
       try {
-        const cols = parseCSVLine(line);
-        const productName = cols[0]?.trim();
-        const ean = cols[1]?.trim();
-        const asin = cols[2]?.trim();
+        const cells = row.c || [];
+        const productName = getCellValue(cells[0])?.trim();
+        const ean = getCellValue(cells[1])?.trim() || null;
+        const asin = getCellValue(cells[2])?.trim() || null;
 
         if (!productName) continue;
 
-        // Use EAN, ASIN or product name as unique key
         const uniqueKey = ean || asin || productName;
         if (seen.has(uniqueKey)) continue;
         seen.add(uniqueKey);
 
-        const iboodUrl = cols[20]?.trim() || null;
-        const imageFromSheet = parseImageFormula(cols[21]?.trim() || null);
-        const resolvedImageUrl = imageFromSheet || await resolveIboodImage(iboodUrl);
-        const fallbackAmazonImage = asin ? `https://images-na.ssl-images-amazon.com/images/P/${asin}.01._SX679_.jpg` : null;
+        const iboodUrl = getCellValue(cells[20])?.trim() || null;
+
+        // Column V (index 21) = Chart with IMAGE() formulas
+        // Try both value and formula fields to extract the image URL
+        const chartRaw = getCellFormula(cells[21]);
+        const chartImageUrl = parseImageFormula(chartRaw);
+
+        // Log first few for debugging
+        if (products.length < 3) {
+          console.log(`[${productName?.substring(0, 30)}] Chart raw: "${chartRaw}", parsed: "${chartImageUrl}"`);
+        }
+
+        const fallbackAmazonImage = asin
+          ? `https://images-na.ssl-images-amazon.com/images/P/${asin}.01._SX679_.jpg`
+          : null;
 
         products.push({
           id: uniqueKey,
           product_name: productName,
-          ean: ean || null,
-          asin: asin || null,
-          bsr: cols[3]?.trim() || null,
-          cost: cols[4]?.trim() || null,
-          sale_price: cols[5]?.trim() || null,
-          monthly_sales: cols[6]?.trim() || null,
-          fba_profit: cols[7]?.trim() || null,
-          fba_roi: cols[8]?.trim() || null,
-          fbm_profit: cols[9]?.trim() || null,
-          fbm_roi: cols[10]?.trim() || null,
-          private_label: cols[11]?.trim() || null,
-          size: cols[12]?.trim() || null,
-          meltable: cols[13]?.trim() || null,
-          variations: cols[14]?.trim() || null,
-          sellers: cols[15]?.trim() || null,
-          nb_vendors: cols[16]?.trim() || null,
-          nb_fba: cols[17]?.trim() || null,
-          nb_fbm: cols[18]?.trim() || null,
-          amazon_url: cols[19]?.trim() || null,
+          ean,
+          asin,
+          bsr: getCellValue(cells[3])?.trim() || null,
+          cost: getCellValue(cells[4])?.trim() || null,
+          sale_price: getCellValue(cells[5])?.trim() || null,
+          monthly_sales: getCellValue(cells[6])?.trim() || null,
+          fba_profit: getCellValue(cells[7])?.trim() || null,
+          fba_roi: getCellValue(cells[8])?.trim() || null,
+          fbm_profit: getCellValue(cells[9])?.trim() || null,
+          fbm_roi: getCellValue(cells[10])?.trim() || null,
+          private_label: getCellValue(cells[11])?.trim() || null,
+          size: getCellValue(cells[12])?.trim() || null,
+          meltable: getCellValue(cells[13])?.trim() || null,
+          variations: getCellValue(cells[14])?.trim() || null,
+          sellers: getCellValue(cells[15])?.trim() || null,
+          nb_vendors: getCellValue(cells[16])?.trim() || null,
+          nb_fba: getCellValue(cells[17])?.trim() || null,
+          nb_fbm: getCellValue(cells[18])?.trim() || null,
+          amazon_url: getCellValue(cells[19])?.trim() || null,
           ibood_url: iboodUrl,
-          chart_url: resolvedImageUrl || fallbackAmazonImage,
+          chart_url: chartImageUrl || fallbackAmazonImage,
         });
       } catch (e) {
         console.error('Row parse error:', e);
