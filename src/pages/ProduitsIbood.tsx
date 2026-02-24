@@ -202,28 +202,32 @@ function IboodProductCard({ product, onCopy }: { product: IboodProduct; onCopy: 
       </div>
 
       <CardContent className="p-6 space-y-6">
+        {/* Chart image / product photo */}
+        {chartImageUrl && (
+          <div className="rounded-xl overflow-hidden border">
+            <img
+              src={chartImageUrl}
+              alt={product.product_name}
+              className="w-full h-auto max-h-64 object-contain bg-white"
+              loading="lazy"
+              onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+            />
+          </div>
+        )}
+
         {/* Product title */}
         <h3 className="text-xl font-semibold leading-tight">{product.product_name}</h3>
 
-        {/* EAN, ASIN & Prices */}
-        <div className="flex flex-wrap items-center gap-4">
+        {/* ASIN */}
+        {product.asin && (
           <div className="flex items-center gap-2">
-            <span className="text-sm text-muted-foreground">EAN:</span>
-            <code className="bg-muted px-3 py-1 rounded font-mono text-sm">{product.ean}</code>
-            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => onCopy(product.ean)}>
+            <span className="text-sm text-muted-foreground">ASIN:</span>
+            <code className="bg-muted px-3 py-1 rounded font-mono text-sm">{product.asin}</code>
+            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => onCopy(product.asin!)}>
               <Copy className="w-4 h-4" />
             </Button>
           </div>
-          {product.asin && (
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground">ASIN:</span>
-              <code className="bg-muted px-3 py-1 rounded font-mono text-sm">{product.asin}</code>
-              <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => onCopy(product.asin!)}>
-                <Copy className="w-4 h-4" />
-              </Button>
-            </div>
-          )}
-        </div>
+        )}
 
         {/* Prices row */}
         <div className="flex flex-wrap items-center gap-4">
@@ -289,24 +293,6 @@ function IboodProductCard({ product, onCopy }: { product: IboodProduct; onCopy: 
               <span className="font-semibold">{product.sellers}</span>
             </div>
           )}
-          {product.nb_vendors && (
-            <div className="space-y-1">
-              <span className="text-xs text-muted-foreground block">Nb vendeurs</span>
-              <span className="font-semibold">{product.nb_vendors}</span>
-            </div>
-          )}
-          {product.nb_fba && (
-            <div className="space-y-1">
-              <span className="text-xs text-muted-foreground block">Nb FBA</span>
-              <span className="font-semibold">{product.nb_fba}</span>
-            </div>
-          )}
-          {product.nb_fbm && (
-            <div className="space-y-1">
-              <span className="text-xs text-muted-foreground block">Nb FBM</span>
-              <span className="font-semibold">{product.nb_fbm}</span>
-            </div>
-          )}
         </div>
 
         {/* Profit Info */}
@@ -350,18 +336,6 @@ function IboodProductCard({ product, onCopy }: { product: IboodProduct; onCopy: 
           )}
         </div>
 
-        {/* Chart image */}
-        {chartImageUrl && (
-          <div className="rounded-xl overflow-hidden border">
-            <img
-              src={chartImageUrl}
-              alt="Keepa chart"
-              className="w-full h-auto"
-              loading="lazy"
-              onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
-            />
-          </div>
-        )}
 
         {/* Links */}
         <div className="flex flex-wrap gap-3">
