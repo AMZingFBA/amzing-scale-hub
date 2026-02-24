@@ -8,6 +8,9 @@ const corsHeaders = {
 const SHEET_ID = "1Lx-Rj-uT8thkTjxnW7Hxo8fu-xUpMdVNe8G7uCDSb24";
 const SHEET_NAME = "Analyse SellerAmp";
 
+const imageCache = new Map<string, { url: string | null; expiresAt: number }>();
+const IMAGE_CACHE_TTL_MS = 30 * 60 * 1000;
+
 const parseCSVLine = (line: string): string[] => {
   const result: string[] = [];
   let current = '';
@@ -27,6 +30,65 @@ const parseCSVLine = (line: string): string[] => {
   }
   result.push(current.trim());
   return result.map(v => v.replace(/^"|"$/g, '').replace(/""/g, '"'));
+};
+
+const parseImageFormula = (raw?: string | null): string | null => {
+  if (!raw) return null;
+  const trimmed = raw.trim();
+  const imageMatch = trimmed.match(/^=IMAGE\("([^"]+)"\)/i);
+  if (imageMatch?.[1]) return imageMatch[1].trim();
+  if (/^https?:\/\//i.test(trimmed)) return trimmed;
+  return null;
+};
+
+const extractMetaImage = (html: string): string | null => {
+  const patterns = [
+    /<meta\s+property=["']og:image["']\s+content=["']([^"']+)["'][^>]*>/i,
+    /<meta\s+content=["']([^"']+)["']\s+property=["']og:image["'][^>]*>/i,
+    /<meta\s+name=["']twitter:image["']\s+content=["']([^"']+)["'][^>]*>/i,
+    /<meta\s+content=["']([^"']+)["']\s+name=["']twitter:image["'][^>]*>/i,
+  ];
+
+  for (const pattern of patterns) {
+    const match = html.match(pattern);
+    if (match?.[1]?.trim()) return match[1].trim();
+  }
+
+  const iboodImageMatch = html.match(/https:\/\/image\.ibood\.io\/image\/[^"'\s<)]+/i);
+  if (iboodImageMatch?.[0]) return iboodImageMatch[0].trim();
+
+  return null;
+};
+
+const resolveIboodImage = async (iboodUrl?: string | null): Promise<string | null> => {
+  if (!iboodUrl) return null;
+
+  const now = Date.now();
+  const cached = imageCache.get(iboodUrl);
+  if (cached && cached.expiresAt > now) return cached.url;
+
+  try {
+    const pageResponse = await fetch(iboodUrl, {
+      headers: {
+        "User-Agent": "Mozilla/5.0 (compatible; AMZingBot/1.0)",
+        "Accept": "text/html,application/xhtml+xml",
+      },
+      redirect: 'follow',
+    });
+
+    if (!pageResponse.ok) {
+      imageCache.set(iboodUrl, { url: null, expiresAt: now + IMAGE_CACHE_TTL_MS });
+      return null;
+    }
+
+    const html = await pageResponse.text();
+    const imageUrl = extractMetaImage(html);
+    imageCache.set(iboodUrl, { url: imageUrl, expiresAt: now + IMAGE_CACHE_TTL_MS });
+    return imageUrl;
+  } catch {
+    imageCache.set(iboodUrl, { url: null, expiresAt: now + IMAGE_CACHE_TTL_MS });
+    return null;
+  }
 };
 
 serve(async (req) => {
@@ -80,6 +142,11 @@ serve(async (req) => {
         if (seen.has(uniqueKey)) continue;
         seen.add(uniqueKey);
 
+        const iboodUrl = cols[20]?.trim() || null;
+        const imageFromSheet = parseImageFormula(cols[21]?.trim() || null);
+        const resolvedImageUrl = imageFromSheet || await resolveIboodImage(iboodUrl);
+        const fallbackAmazonImage = asin ? `https://images.amazon.com/images/P/${asin}.01._SX600_.jpg` : null;
+
         products.push({
           id: uniqueKey,
           product_name: productName,
@@ -102,8 +169,8 @@ serve(async (req) => {
           nb_fba: cols[17]?.trim() || null,
           nb_fbm: cols[18]?.trim() || null,
           amazon_url: cols[19]?.trim() || null,
-          ibood_url: cols[20]?.trim() || null,
-          chart_url: cols[21]?.trim() || null,
+          ibood_url: iboodUrl,
+          chart_url: resolvedImageUrl || fallbackAmazonImage,
         });
       } catch (e) {
         console.error('Row parse error:', e);
