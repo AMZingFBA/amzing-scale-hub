@@ -60,7 +60,6 @@ serve(async (req) => {
       );
     }
 
-    // Get cell value: check v (value) first, then f (formatted/formula)
     const getCellValue = (cell: any): string | null => {
       if (!cell) return null;
       if (cell.v !== null && cell.v !== undefined) return String(cell.v);
@@ -68,26 +67,20 @@ serve(async (req) => {
       return null;
     };
 
-    // For IMAGE() formulas, the value is often null but formula is in f
-    const getCellFormula = (cell: any): string | null => {
-      if (!cell) return null;
-      // f contains the formula or formatted value
-      if (cell.f) return String(cell.f);
-      if (cell.v !== null && cell.v !== undefined) return String(cell.v);
-      return null;
-    };
-
     const seen = new Set<string>();
     const products: any[] = [];
 
-    for (const row of rows) {
+    // Skip header row (index 0) - gviz includes headers as first data row when sheet has no frozen header
+    for (let i = 0; i < rows.length; i++) {
       try {
-        const cells = row.c || [];
+        const cells = rows[i].c || [];
         const productName = getCellValue(cells[0])?.trim();
         const ean = getCellValue(cells[1])?.trim() || null;
         const asin = getCellValue(cells[2])?.trim() || null;
 
         if (!productName) continue;
+        // Skip header row
+        if (productName === 'Nom du produit') continue;
 
         const uniqueKey = ean || asin || productName;
         if (seen.has(uniqueKey)) continue;
@@ -95,14 +88,12 @@ serve(async (req) => {
 
         const iboodUrl = getCellValue(cells[20])?.trim() || null;
 
-        // Column V (index 21) = Chart with IMAGE() formulas
-        // Try both value and formula fields to extract the image URL
-        const chartRaw = getCellFormula(cells[21]);
-        const chartImageUrl = parseImageFormula(chartRaw);
+        // Column W (index 22) = "Chart URL" plain text URLs
+        const chartUrl = getCellValue(cells[22])?.trim() || null;
 
         // Log first few for debugging
         if (products.length < 3) {
-          console.log(`[${productName?.substring(0, 30)}] Chart raw: "${chartRaw}", parsed: "${chartImageUrl}"`);
+          console.log(`[${productName?.substring(0, 30)}] Chart URL (col W): "${chartUrl}"`);
         }
 
         const fallbackAmazonImage = asin
@@ -132,7 +123,7 @@ serve(async (req) => {
           nb_fbm: getCellValue(cells[18])?.trim() || null,
           amazon_url: getCellValue(cells[19])?.trim() || null,
           ibood_url: iboodUrl,
-          chart_url: chartImageUrl || fallbackAmazonImage,
+          chart_url: chartUrl || fallbackAmazonImage,
         });
       } catch (e) {
         console.error('Row parse error:', e);
