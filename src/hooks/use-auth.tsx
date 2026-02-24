@@ -263,7 +263,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       // déclenche déjà la synchro vers Airtable (évite doublons / appels multiples).
 
       toast.success('Connexion réussie !');
-      navigate('/');
+      navigate('/dashboard');
       return { error: null };
     } catch (error: any) {
       toast.error(error.message || 'Erreur lors de la connexion');
