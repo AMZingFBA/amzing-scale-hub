@@ -47,6 +47,7 @@ const extractMetaImage = (html: string): string | null => {
     /<meta\s+content=["']([^"']+)["']\s+property=["']og:image["'][^>]*>/i,
     /<meta\s+name=["']twitter:image["']\s+content=["']([^"']+)["'][^>]*>/i,
     /<meta\s+content=["']([^"']+)["']\s+name=["']twitter:image["'][^>]*>/i,
+    /!\[[^\]]*\]\((https?:\/\/[^)\s]+)\)/i,
   ];
 
   for (const pattern of patterns) {
@@ -67,28 +68,36 @@ const resolveIboodImage = async (iboodUrl?: string | null): Promise<string | nul
   const cached = imageCache.get(iboodUrl);
   if (cached && cached.expiresAt > now) return cached.url;
 
-  try {
-    const pageResponse = await fetch(iboodUrl, {
-      headers: {
-        "User-Agent": "Mozilla/5.0 (compatible; AMZingBot/1.0)",
-        "Accept": "text/html,application/xhtml+xml",
-      },
-      redirect: 'follow',
-    });
+  const sources = [
+    iboodUrl,
+    `https://r.jina.ai/http://${iboodUrl.replace(/^https?:\/\//i, "")}`,
+  ];
 
-    if (!pageResponse.ok) {
-      imageCache.set(iboodUrl, { url: null, expiresAt: now + IMAGE_CACHE_TTL_MS });
-      return null;
+  for (const sourceUrl of sources) {
+    try {
+      const pageResponse = await fetch(sourceUrl, {
+        headers: {
+          "User-Agent": "Mozilla/5.0",
+          "Accept": "text/html,text/plain,application/xhtml+xml",
+        },
+        redirect: 'follow',
+      });
+
+      if (!pageResponse.ok) continue;
+
+      const html = await pageResponse.text();
+      const imageUrl = extractMetaImage(html);
+      if (imageUrl) {
+        imageCache.set(iboodUrl, { url: imageUrl, expiresAt: now + IMAGE_CACHE_TTL_MS });
+        return imageUrl;
+      }
+    } catch {
+      // try next source
     }
-
-    const html = await pageResponse.text();
-    const imageUrl = extractMetaImage(html);
-    imageCache.set(iboodUrl, { url: imageUrl, expiresAt: now + IMAGE_CACHE_TTL_MS });
-    return imageUrl;
-  } catch {
-    imageCache.set(iboodUrl, { url: null, expiresAt: now + IMAGE_CACHE_TTL_MS });
-    return null;
   }
+
+  imageCache.set(iboodUrl, { url: null, expiresAt: now + IMAGE_CACHE_TTL_MS });
+  return null;
 };
 
 serve(async (req) => {
@@ -144,7 +153,7 @@ serve(async (req) => {
 
         const iboodUrl = cols[20]?.trim() || null;
         const imageFromSheet = parseImageFormula(cols[21]?.trim() || null);
-        const resolvedImageUrl = imageFromSheet || await resolveIboodImage(iboodUrl);
+        const resolvedImageUrl = imageFromSheet;
         const fallbackAmazonImage = asin ? `https://images.amazon.com/images/P/${asin}.01._SX600_.jpg` : null;
 
         products.push({
