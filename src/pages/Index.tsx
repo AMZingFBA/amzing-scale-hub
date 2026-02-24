@@ -101,7 +101,8 @@ const Index = () => {
 
   // Redirect VIP users and admins to dashboard immediately when they land on homepage
   useEffect(() => {
-    if (isLoading || !user) return;
+    // Wait until auth is fully loaded AND subscription data is resolved
+    if (isLoading || !user || subscription === null) return;
     
     // If already VIP, redirect immediately without waiting for admin check
     if (isVIP) {
