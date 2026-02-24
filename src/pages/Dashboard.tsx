@@ -499,6 +499,12 @@ const Dashboard = () => {
                       link="/catalogue/france-hexagone"
                       badge={notifications.catalogue_exclusif?.subcategories?.["france-hexagone"]}
                     />
+                    <CategoryItem
+                      icon={Building2}
+                      label="BH Distribution"
+                      link="/catalogue/bh-distribution"
+                      badge={notifications.catalogue_exclusif?.subcategories?.["bh-distribution"]}
+                    />
                   </div>
                 </AccordionContent>
               </AccordionItem>

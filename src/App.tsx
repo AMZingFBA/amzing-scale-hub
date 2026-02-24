@@ -67,6 +67,7 @@ const CatalogueQogita = lazy(() => import("./pages/CatalogueQogita"));
 const CatalogueEany = lazy(() => import("./pages/CatalogueEany"));
 const CatalogueVibraforce = lazy(() => import("./pages/CatalogueVibraforce"));
 const CatalogueFranceHexagone = lazy(() => import("./pages/CatalogueFranceHexagone"));
+const CatalogueBHDistribution = lazy(() => import("./pages/CatalogueBHDistribution"));
 const Questions = lazy(() => import("./pages/Questions"));
 const Avis = lazy(() => import("./pages/Avis"));
 const AdminProfiles = lazy(() => import("./pages/AdminProfiles"));
@@ -180,6 +181,7 @@ const App = () => (
             <Route path="/catalogue/eany" element={<CatalogueEany />} />
             <Route path="/catalogue/vibraforce" element={<CatalogueVibraforce />} />
             <Route path="/catalogue/france-hexagone" element={<CatalogueFranceHexagone />} />
+            <Route path="/catalogue/bh-distribution" element={<CatalogueBHDistribution />} />
             <Route path="/chat" element={<Chat />} />
             <Route path="/success" element={<Success />} />
             <Route path="/sales" element={<Sales />} />
