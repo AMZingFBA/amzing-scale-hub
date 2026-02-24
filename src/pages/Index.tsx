@@ -101,11 +101,27 @@ const Index = () => {
 
   // Redirect VIP users and admins to dashboard immediately when they land on homepage
   useEffect(() => {
+    console.log('[Index] Redirect check:', { isLoading, hasUser: !!user, subscription, isVIP });
+    
     // Wait until auth is fully loaded AND subscription data is resolved
-    if (isLoading || !user || subscription === null) return;
+    if (isLoading) {
+      console.log('[Index] Still loading auth, waiting...');
+      return;
+    }
+    if (!user) {
+      console.log('[Index] No user, staying on homepage');
+      return;
+    }
+    if (!subscription) {
+      console.log('[Index] User present but subscription not yet loaded, waiting...');
+      return;
+    }
+    
+    console.log('[Index] All data ready. isVIP:', isVIP, 'subscription:', subscription);
     
     // If already VIP, redirect immediately without waiting for admin check
     if (isVIP) {
+      console.log('[Index] User is VIP, redirecting to dashboard');
       navigate('/dashboard', { replace: true });
       return;
     }
@@ -119,6 +135,7 @@ const Index = () => {
         .eq('role', 'admin')
         .maybeSingle();
       
+      console.log('[Index] Admin check result:', roleData);
       if (roleData?.role === 'admin') {
         navigate('/dashboard', { replace: true });
       }
