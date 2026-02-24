@@ -153,8 +153,8 @@ serve(async (req) => {
 
         const iboodUrl = cols[20]?.trim() || null;
         const imageFromSheet = parseImageFormula(cols[21]?.trim() || null);
-        const resolvedImageUrl = imageFromSheet;
-        const fallbackAmazonImage = asin ? `https://images.amazon.com/images/P/${asin}.01._SX600_.jpg` : null;
+        const resolvedImageUrl = imageFromSheet || await resolveIboodImage(iboodUrl);
+        const fallbackAmazonImage = asin ? `https://images-na.ssl-images-amazon.com/images/P/${asin}.01._SX679_.jpg` : null;
 
         products.push({
           id: uniqueKey,

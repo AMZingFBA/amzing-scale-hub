@@ -184,20 +184,34 @@ export default function ProduitsIbood() {
 }
 
 function IboodProductCard({ product, onCopy }: { product: IboodProduct; onCopy: (text: string) => void }) {
-  // Extract chart image URL from the IMAGE formula if present
   const chartImageUrl = product.chart_url
     ? product.chart_url.replace(/^=IMAGE\("?/i, '').replace(/"?\)$/i, '').replace(/^"|"$/g, '')
     : null;
 
+  const normalizedChartUrl = chartImageUrl?.startsWith('//') ? `https:${chartImageUrl}` : chartImageUrl;
+
   const fallbackImages = [
-    chartImageUrl,
+    normalizedChartUrl,
     product.asin ? `https://images-na.ssl-images-amazon.com/images/P/${product.asin}.01._SX679_.jpg` : null,
-    product.ibood_url ? `https://image.thum.io/get/width/1200/noanimate/${encodeURIComponent(product.ibood_url)}` : null,
+    product.ibood_url ? `https://image.thum.io/get/width/1200/noanimate/${product.ibood_url}` : null,
     '/placeholder.svg',
   ].filter(Boolean) as string[];
 
   const [imageIndex, setImageIndex] = useState(0);
   const currentImageSrc = fallbackImages[imageIndex] ?? null;
+
+  const goToNextImage = () => {
+    setImageIndex((prev) => (prev < fallbackImages.length - 1 ? prev + 1 : prev));
+  };
+
+  const handleImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    const img = e.currentTarget;
+    const isTinyPixel = img.naturalWidth <= 1 && img.naturalHeight <= 1;
+
+    if (isTinyPixel) {
+      goToNextImage();
+    }
+  };
 
   return (
     <Card className="overflow-hidden border-2 hover:border-primary/50 transition-all duration-300 hover:shadow-xl">
@@ -221,11 +235,8 @@ function IboodProductCard({ product, onCopy }: { product: IboodProduct; onCopy: 
               className="w-full h-auto max-h-64 object-contain bg-white"
               loading="lazy"
               referrerPolicy="no-referrer"
-              onError={() => {
-                if (imageIndex < fallbackImages.length - 1) {
-                  setImageIndex((prev) => prev + 1);
-                }
-              }}
+              onLoad={handleImageLoad}
+              onError={goToNextImage}
             />
           </div>
         )}
