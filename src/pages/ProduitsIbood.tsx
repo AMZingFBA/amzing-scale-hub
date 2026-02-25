@@ -189,34 +189,12 @@ export default function ProduitsIbood() {
 }
 
 function IboodProductCard({ product, onCopy }: { product: IboodProduct; onCopy: (text: string) => void }) {
+  // Only use chart_url from column Z (Keepa graph)
   const chartImageUrl = product.chart_url
     ? product.chart_url.replace(/^=IMAGE\("?/i, '').replace(/"?\)$/i, '').replace(/^"|"$/g, '')
     : null;
 
   const normalizedChartUrl = chartImageUrl?.startsWith('//') ? `https:${chartImageUrl}` : chartImageUrl;
-
-  const fallbackImages = [
-    normalizedChartUrl,
-    product.asin ? `https://images-na.ssl-images-amazon.com/images/P/${product.asin}.01._SX679_.jpg` : null,
-    product.ibood_url ? `https://image.thum.io/get/width/1200/noanimate/${product.ibood_url}` : null,
-    '/placeholder.svg',
-  ].filter(Boolean) as string[];
-
-  const [imageIndex, setImageIndex] = useState(0);
-  const currentImageSrc = fallbackImages[imageIndex] ?? null;
-
-  const goToNextImage = () => {
-    setImageIndex((prev) => (prev < fallbackImages.length - 1 ? prev + 1 : prev));
-  };
-
-  const handleImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
-    const img = e.currentTarget;
-    const isTinyPixel = img.naturalWidth <= 1 && img.naturalHeight <= 1;
-
-    if (isTinyPixel) {
-      goToNextImage();
-    }
-  };
 
   return (
     <Card className="overflow-hidden border-2 hover:border-primary/50 transition-all duration-300 hover:shadow-xl">
@@ -379,17 +357,15 @@ function IboodProductCard({ product, onCopy }: { product: IboodProduct; onCopy: 
           </div>
 
           {/* Right: product image */}
-          {currentImageSrc && (
+          {normalizedChartUrl && (
             <div className="w-full md:w-[380px] lg:w-[440px] shrink-0 rounded-xl overflow-hidden border bg-white flex items-center justify-center p-3 self-start">
               <img
-                src={currentImageSrc}
-                alt={product.product_name}
+                src={normalizedChartUrl}
+                alt={`Graphique Keepa – ${product.product_name}`}
                 className="w-full h-auto object-contain"
                 style={{ maxHeight: '420px' }}
                 loading="lazy"
                 referrerPolicy="no-referrer"
-                onLoad={handleImageLoad}
-                onError={goToNextImage}
               />
             </div>
           )}
