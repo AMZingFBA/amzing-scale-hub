@@ -62,7 +62,7 @@ export default function ProduitsIbood() {
       const { data, error } = await supabase.functions.invoke('sync-ibood-from-sheets');
       if (error) throw error;
       if (data?.success) {
-        const loadedProducts = data.products || [];
+        const loadedProducts = (data.products || []).reverse();
         if (previousCount !== null && loadedProducts.length > previousCount) {
           setNewCount(loadedProducts.length - previousCount);
         }
