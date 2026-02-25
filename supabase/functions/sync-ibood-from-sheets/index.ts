@@ -138,13 +138,11 @@ serve(async (req) => {
           .single();
 
         if (adminRole) {
-          // Get existing iBood alerts from last 24h to avoid duplicates
-          const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+          // Get ALL existing iBood alerts to avoid duplicates (no time limit)
           const { data: existingAlerts } = await supabase
             .from('product_find_alerts')
             .select('product_title, ean')
-            .eq('source_name', 'iBood')
-            .gte('created_at', oneDayAgo);
+            .eq('source_name', 'iBood');
 
           const existingKeys = new Set(
             (existingAlerts || []).map(a => `${a.product_title}_${a.ean || ''}`)
