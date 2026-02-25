@@ -24,10 +24,15 @@ interface IboodProduct {
   fbm_profit: string | null;
   fbm_roi: string | null;
   private_label: string | null;
-  size: string | null;
-  meltable: string | null;
   variations: string | null;
-  sellers: string | null;
+  ip: string | null;
+  hazmat: string | null;
+  meltable: string | null;
+  adult: string | null;
+  fragile: string | null;
+  oversize: string | null;
+  restriction: string | null;
+  raw_alerts: string | null;
   nb_vendors: string | null;
   nb_fba: string | null;
   nb_fbm: string | null;
@@ -274,41 +279,45 @@ function IboodProductCard({ product, onCopy }: { product: IboodProduct; onCopy: 
                   <span className="font-semibold">{product.monthly_sales}</span>
                 </div>
               )}
-              {product.private_label && (
-                <div className="space-y-0.5">
-                  <span className="text-xs text-muted-foreground block">Private Label</span>
-                  <Badge variant={product.private_label === 'PL' ? 'destructive' : 'secondary'} className="text-xs">
-                    {product.private_label}
-                  </Badge>
-                </div>
-              )}
-              {product.size && (
-                <div className="space-y-0.5">
-                  <span className="text-xs text-muted-foreground block">Taille</span>
-                  <span className="font-semibold">{product.size}</span>
-                </div>
-              )}
-              {product.meltable && (
-                <div className="space-y-0.5">
-                  <span className="text-xs text-muted-foreground block">Meltable</span>
-                  <Badge variant={product.meltable === 'Yes' ? 'destructive' : 'secondary'} className="text-xs">
-                    {product.meltable}
-                  </Badge>
-                </div>
-              )}
               {product.variations && (
                 <div className="space-y-0.5">
                   <span className="text-xs text-muted-foreground block">Variations</span>
                   <span className="font-semibold">{product.variations}</span>
                 </div>
               )}
-              {product.sellers && (
+              {product.nb_vendors && (
                 <div className="space-y-0.5">
-                  <span className="text-xs text-muted-foreground block">Sellers</span>
-                  <span className="font-semibold">{product.sellers}</span>
+                  <span className="text-xs text-muted-foreground block">Vendeurs</span>
+                  <span className="font-semibold">{product.nb_vendors}</span>
+                </div>
+              )}
+              {product.nb_fba && (
+                <div className="space-y-0.5">
+                  <span className="text-xs text-muted-foreground block">FBA</span>
+                  <span className="font-semibold">{product.nb_fba}</span>
+                </div>
+              )}
+              {product.nb_fbm && (
+                <div className="space-y-0.5">
+                  <span className="text-xs text-muted-foreground block">FBM</span>
+                  <span className="font-semibold">{product.nb_fbm}</span>
                 </div>
               )}
             </div>
+
+            {/* Alert flags */}
+            {(product.private_label || product.ip || product.hazmat || product.meltable || product.adult || product.fragile || product.oversize || product.restriction) && (
+              <div className="flex flex-wrap gap-2">
+                {product.private_label && <Badge variant="destructive" className="text-xs">PL</Badge>}
+                {product.ip && <Badge variant="destructive" className="text-xs">IP</Badge>}
+                {product.hazmat && <Badge variant="destructive" className="text-xs">Hazmat</Badge>}
+                {product.meltable && <Badge variant="destructive" className="text-xs">Meltable</Badge>}
+                {product.adult && <Badge variant="destructive" className="text-xs">Adult</Badge>}
+                {product.fragile && <Badge className="bg-amber-500 text-xs">Fragile</Badge>}
+                {product.oversize && <Badge className="bg-amber-500 text-xs">Oversize</Badge>}
+                {product.restriction && <Badge variant="destructive" className="text-xs">Restricted</Badge>}
+              </div>
+            )}
 
             {/* Profit Info */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">

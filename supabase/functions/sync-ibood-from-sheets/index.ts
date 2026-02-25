@@ -22,7 +22,6 @@ serve(async (req) => {
   }
 
   try {
-    // Use gviz JSON endpoint which preserves IMAGE() formulas (CSV strips them)
     const gvizUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=0`;
     console.log('Fetching gviz JSON from:', gvizUrl);
 
@@ -39,7 +38,6 @@ serve(async (req) => {
 
     const rawText = await response.text();
 
-    // Strip JSONP wrapper: google.visualization.Query.setResponse({...})
     const jsonMatch = rawText.match(/google\.visualization\.Query\.setResponse\((.+)\);?\s*$/s);
     if (!jsonMatch?.[1]) {
       console.error('Could not parse gviz response, first 500 chars:', rawText.substring(0, 500));
@@ -70,7 +68,35 @@ serve(async (req) => {
     const seen = new Set<string>();
     const products: any[] = [];
 
-    // Skip header row (index 0) - gviz includes headers as first data row when sheet has no frozen header
+    // New column mapping (0-indexed):
+    // 0  Nom du produit
+    // 1  EAN
+    // 2  ASIN
+    // 3  BSR
+    // 4  Cout
+    // 5  Prix de vente
+    // 6  Ventes/mois
+    // 7  Profit FBA
+    // 8  ROI FBA
+    // 9  Profit FBM
+    // 10 ROI FBM
+    // 11 PL
+    // 12 Nb variations
+    // 13 IP
+    // 14 Hazmat
+    // 15 Meltable
+    // 16 Adult
+    // 17 Fragile
+    // 18 Oversize
+    // 19 Restriction
+    // 20 Alertes brutes
+    // 21 Nb vendeurs
+    // 22 Nb FBA
+    // 23 Nb FBM
+    // 24 Lien Amazon
+    // 25 Chart (=IMAGE(...))
+    // 26 Lien iBood
+
     for (let i = 0; i < rows.length; i++) {
       try {
         const cells = rows[i].c || [];
@@ -79,26 +105,23 @@ serve(async (req) => {
         const asin = getCellValue(cells[2])?.trim() || null;
 
         if (!productName) continue;
-        // Skip header row
         if (productName === 'Nom du produit') continue;
 
         const uniqueKey = ean || asin || productName;
         if (seen.has(uniqueKey)) continue;
         seen.add(uniqueKey);
 
-        const iboodUrl = getCellValue(cells[20])?.trim() || null;
-
-        // Column W (index 22) = "Chart URL" plain text URLs
-        const chartUrl = getCellValue(cells[22])?.trim() || null;
-
-        // Log first few for debugging
-        if (products.length < 3) {
-          console.log(`[${productName?.substring(0, 30)}] Chart URL (col W): "${chartUrl}"`);
-        }
+        // Column 25 = Chart — parse IMAGE() formula to get the Keepa URL
+        const chartRaw = getCellValue(cells[25]);
+        const chartUrl = parseImageFormula(chartRaw);
 
         const fallbackAmazonImage = asin
           ? `https://images-na.ssl-images-amazon.com/images/P/${asin}.01._SX679_.jpg`
           : null;
+
+        if (products.length < 3) {
+          console.log(`[${productName?.substring(0, 30)}] Chart raw: "${chartRaw}" → parsed: "${chartUrl}"`);
+        }
 
         products.push({
           id: uniqueKey,
@@ -114,16 +137,21 @@ serve(async (req) => {
           fbm_profit: getCellValue(cells[9])?.trim() || null,
           fbm_roi: getCellValue(cells[10])?.trim() || null,
           private_label: getCellValue(cells[11])?.trim() || null,
-          size: getCellValue(cells[12])?.trim() || null,
-          meltable: getCellValue(cells[13])?.trim() || null,
-          variations: getCellValue(cells[14])?.trim() || null,
-          sellers: getCellValue(cells[15])?.trim() || null,
-          nb_vendors: getCellValue(cells[16])?.trim() || null,
-          nb_fba: getCellValue(cells[17])?.trim() || null,
-          nb_fbm: getCellValue(cells[18])?.trim() || null,
-          amazon_url: getCellValue(cells[19])?.trim() || null,
-          ibood_url: iboodUrl,
+          variations: getCellValue(cells[12])?.trim() || null,
+          ip: getCellValue(cells[13])?.trim() || null,
+          hazmat: getCellValue(cells[14])?.trim() || null,
+          meltable: getCellValue(cells[15])?.trim() || null,
+          adult: getCellValue(cells[16])?.trim() || null,
+          fragile: getCellValue(cells[17])?.trim() || null,
+          oversize: getCellValue(cells[18])?.trim() || null,
+          restriction: getCellValue(cells[19])?.trim() || null,
+          raw_alerts: getCellValue(cells[20])?.trim() || null,
+          nb_vendors: getCellValue(cells[21])?.trim() || null,
+          nb_fba: getCellValue(cells[22])?.trim() || null,
+          nb_fbm: getCellValue(cells[23])?.trim() || null,
+          amazon_url: getCellValue(cells[24])?.trim() || null,
           chart_url: chartUrl || fallbackAmazonImage,
+          ibood_url: getCellValue(cells[26])?.trim() || null,
         });
       } catch (e) {
         console.error('Row parse error:', e);
