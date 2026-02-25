@@ -23,8 +23,6 @@ serve(async (req) => {
 
   try {
     const gvizUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=0`;
-    console.log('Fetching gviz JSON from:', gvizUrl);
-
     const response = await fetch(gvizUrl, {
       headers: { 'Accept': 'application/json, text/plain' },
       redirect: 'follow',
@@ -37,19 +35,13 @@ serve(async (req) => {
     }
 
     const rawText = await response.text();
-
     const jsonMatch = rawText.match(/google\.visualization\.Query\.setResponse\((.+)\);?\s*$/s);
     if (!jsonMatch?.[1]) {
-      console.error('Could not parse gviz response, first 500 chars:', rawText.substring(0, 500));
       throw new Error('Invalid gviz response format');
     }
 
     const gvizData = JSON.parse(jsonMatch[1]);
-    const cols = gvizData.table?.cols || [];
     const rows = gvizData.table?.rows || [];
-
-    console.log('Columns:', cols.map((c: any) => c.label).join(', '));
-    console.log('Total rows:', rows.length);
 
     if (rows.length === 0) {
       return new Response(
@@ -65,64 +57,45 @@ serve(async (req) => {
       return null;
     };
 
+    // Helper: returns null if the value is just a label like "EAN:" or empty
+    const cleanEan = (raw: string | null): string | null => {
+      if (!raw) return null;
+      const cleaned = raw.replace(/^EAN:\s*/i, '').trim();
+      return cleaned.length >= 8 ? cleaned : null; // Valid EANs are 8-13 digits
+    };
+
     const seen = new Set<string>();
     const products: any[] = [];
 
-    // New column mapping (0-indexed):
-    // 0  Nom du produit
-    // 1  EAN
-    // 2  ASIN
-    // 3  BSR
-    // 4  Cout
-    // 5  Prix de vente
-    // 6  Ventes/mois
-    // 7  Profit FBA
-    // 8  ROI FBA
-    // 9  Profit FBM
-    // 10 ROI FBM
-    // 11 PL
-    // 12 Nb variations
-    // 13 IP
-    // 14 Hazmat
-    // 15 Meltable
-    // 16 Adult
-    // 17 Fragile
-    // 18 Oversize
-    // 19 Restriction
-    // 20 Alertes brutes
-    // 21 Nb vendeurs
-    // 22 Nb FBA
-    // 23 Nb FBM
-    // 24 Lien Amazon
-    // 25 Chart (=IMAGE(...))
-    // 26 Lien iBood
+    // Column mapping (0-indexed):
+    // 0=Nom, 1=EAN, 2=ASIN, 3=BSR, 4=Cout, 5=Prix vente, 6=Ventes/mois
+    // 7=Profit FBA, 8=ROI FBA, 9=Profit FBM, 10=ROI FBM
+    // 11=PL, 12=Nb variations, 13=IP, 14=Hazmat, 15=Meltable
+    // 16=Adult, 17=Fragile, 18=Oversize, 19=Restriction
+    // 20=Alertes brutes, 21=Nb vendeurs, 22=Nb FBA, 23=Nb FBM
+    // 24=Lien Amazon, 25=Chart, 26=Lien iBood
 
     for (let i = 0; i < rows.length; i++) {
       try {
         const cells = rows[i].c || [];
         const productName = getCellValue(cells[0])?.trim();
-        const ean = getCellValue(cells[1])?.trim() || null;
-        const asin = getCellValue(cells[2])?.trim() || null;
-
         if (!productName) continue;
         if (productName === 'Nom du produit') continue;
 
-        const uniqueKey = ean || asin || productName;
+        const ean = cleanEan(getCellValue(cells[1])?.trim() || null);
+        const asin = getCellValue(cells[2])?.trim() || null;
+
+        // Unique key: use ASIN+productName combo to allow different products with same ASIN
+        const uniqueKey = `${asin || ''}_${productName}`;
         if (seen.has(uniqueKey)) continue;
         seen.add(uniqueKey);
 
-        // Column 25 = Chart — gviz can't read IMAGE() formulas, so build Keepa URL from ASIN
         const chartRaw = getCellValue(cells[25]);
         const chartFromFormula = parseImageFormula(chartRaw);
-        // If formula parsing fails (gviz returns null for IMAGE()), construct from ASIN
         const chartUrl = chartFromFormula || (asin ? `https://graph.keepa.com/pricehistory.png?asin=${asin}&domain=fr` : null);
 
-        if (products.length < 3) {
-          console.log(`[${productName?.substring(0, 30)}] Chart raw: "${chartRaw}" → parsed: "${chartUrl}"`);
-        }
-
         products.push({
-          id: uniqueKey,
+          id: `${i}_${asin || productName}`,
           product_name: productName,
           ean,
           asin,
@@ -156,7 +129,7 @@ serve(async (req) => {
       }
     }
 
-    console.log(`✅ iBood: ${products.length} products loaded`);
+    console.log(`✅ iBood: ${products.length} products loaded from ${rows.length} rows`);
 
     return new Response(
       JSON.stringify({ success: true, products, count: products.length }),
