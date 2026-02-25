@@ -189,146 +189,124 @@ export default function ProduitsIbood() {
 }
 
 function IboodProductCard({ product, onCopy }: { product: IboodProduct; onCopy: (text: string) => void }) {
-  // Only use chart_url from column Z (Keepa graph)
   const chartImageUrl = product.chart_url
     ? product.chart_url.replace(/^=IMAGE\("?/i, '').replace(/"?\)$/i, '').replace(/^"|"$/g, '')
     : null;
 
   const normalizedChartUrl = chartImageUrl?.startsWith('//') ? `https:${chartImageUrl}` : chartImageUrl;
 
+  const hasAlertFlags = product.private_label || product.ip || product.hazmat || product.meltable || product.adult || product.fragile || product.oversize || product.restriction;
+
   return (
-    <Card className="overflow-hidden border-2 hover:border-primary/50 transition-all duration-300 hover:shadow-xl">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-primary/20 to-secondary/20 px-6 py-3 border-b">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Store className="w-5 h-5 text-primary" />
-            <span className="font-bold text-lg">iBood</span>
-          </div>
+    <Card className="overflow-hidden border border-border/60 hover:border-primary/40 transition-all duration-300 hover:shadow-lg">
+      {/* Compact Header */}
+      <div className="px-4 py-2.5 border-b bg-muted/30 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Store className="w-4 h-4 text-primary" />
+          <span className="font-semibold text-sm text-primary">iBood</span>
+        </div>
+        <div className="flex items-center gap-2">
+          {product.asin && (
+            <button
+              onClick={() => onCopy(product.asin!)}
+              className="flex items-center gap-1.5 bg-muted hover:bg-muted/80 px-2.5 py-1 rounded-md transition-colors"
+            >
+              <code className="font-mono text-xs">{product.asin}</code>
+              <Copy className="w-3 h-3 text-muted-foreground" />
+            </button>
+          )}
         </div>
       </div>
 
-      <CardContent className="p-6">
-        {/* Top section: info left, image right */}
-        <div className="flex flex-col md:flex-row gap-6">
-          {/* Left: product details */}
-          <div className="flex-1 space-y-4 min-w-0">
-            {/* Product title */}
-            <h3 className="text-xl font-semibold leading-tight">{product.product_name}</h3>
+      <CardContent className="p-4">
+        {/* Title + Alert flags */}
+        <div className="mb-3">
+          <h3 className="text-base font-semibold leading-snug mb-2">{product.product_name}</h3>
+          {hasAlertFlags && (
+            <div className="flex flex-wrap gap-1.5">
+              {product.private_label && <Badge variant="destructive" className="text-[10px] px-1.5 py-0">PL</Badge>}
+              {product.ip && <Badge variant="destructive" className="text-[10px] px-1.5 py-0">IP</Badge>}
+              {product.hazmat && <Badge variant="destructive" className="text-[10px] px-1.5 py-0">Hazmat</Badge>}
+              {product.meltable && <Badge variant="destructive" className="text-[10px] px-1.5 py-0">Meltable</Badge>}
+              {product.adult && <Badge variant="destructive" className="text-[10px] px-1.5 py-0">Adult</Badge>}
+              {product.fragile && <Badge className="bg-amber-500/90 text-white text-[10px] px-1.5 py-0">Fragile</Badge>}
+              {product.oversize && <Badge className="bg-amber-500/90 text-white text-[10px] px-1.5 py-0">Oversize</Badge>}
+              {product.restriction && <Badge variant="destructive" className="text-[10px] px-1.5 py-0">Restricted</Badge>}
+            </div>
+          )}
+        </div>
 
-            {/* ASIN */}
-            {product.asin && (
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-muted-foreground">ASIN:</span>
-                <code className="bg-muted px-3 py-1 rounded font-mono text-sm">{product.asin}</code>
-                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => onCopy(product.asin!)}>
-                  <Copy className="w-4 h-4" />
-                </Button>
-              </div>
-            )}
-
-            {/* Prices row */}
-            <div className="flex flex-wrap items-center gap-4">
+        <div className="flex flex-col md:flex-row gap-4">
+          {/* Left column */}
+          <div className="flex-1 space-y-3 min-w-0">
+            {/* Prices + Stats combined row */}
+            <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-2 p-2.5 bg-muted/20 rounded-lg text-sm">
               {product.cost && (
-                <div className="flex items-center gap-2">
-                  <span className="text-sm text-muted-foreground">Coût:</span>
-                  <span className="font-bold">{product.cost}</span>
+                <div>
+                  <span className="text-[10px] text-muted-foreground block uppercase tracking-wide">Coût</span>
+                  <span className="font-bold text-sm">{product.cost}</span>
                 </div>
               )}
               {product.sale_price && (
-                <div className="flex items-center gap-2">
-                  <span className="text-sm text-muted-foreground">Prix vente:</span>
-                  <span className="text-xl font-bold text-green-500">{product.sale_price} €</span>
+                <div>
+                  <span className="text-[10px] text-muted-foreground block uppercase tracking-wide">Prix vente</span>
+                  <span className="font-bold text-sm text-green-500">{product.sale_price} €</span>
                 </div>
               )}
-            </div>
-
-            {/* SAS Info Grid */}
-            <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 p-3 bg-muted/30 rounded-xl text-sm">
               {product.bsr && (
-                <div className="space-y-0.5">
-                  <span className="text-xs text-muted-foreground block">BSR</span>
-                  <span className="font-semibold">{product.bsr}</span>
+                <div>
+                  <span className="text-[10px] text-muted-foreground block uppercase tracking-wide">BSR</span>
+                  <span className="font-semibold text-sm">{product.bsr}</span>
                 </div>
               )}
               {product.monthly_sales && (
-                <div className="space-y-0.5">
-                  <span className="text-xs text-muted-foreground block">Ventes/mois</span>
-                  <span className="font-semibold">{product.monthly_sales}</span>
-                </div>
-              )}
-              {product.variations && (
-                <div className="space-y-0.5">
-                  <span className="text-xs text-muted-foreground block">Variations</span>
-                  <span className="font-semibold">{product.variations}</span>
+                <div>
+                  <span className="text-[10px] text-muted-foreground block uppercase tracking-wide">Ventes/mo</span>
+                  <span className="font-semibold text-sm">{product.monthly_sales}</span>
                 </div>
               )}
               {product.nb_vendors && (
-                <div className="space-y-0.5">
-                  <span className="text-xs text-muted-foreground block">Vendeurs</span>
-                  <span className="font-semibold">{product.nb_vendors}</span>
+                <div>
+                  <span className="text-[10px] text-muted-foreground block uppercase tracking-wide">Vendeurs</span>
+                  <span className="font-semibold text-sm">{product.nb_vendors}</span>
                 </div>
               )}
               {product.nb_fba && (
-                <div className="space-y-0.5">
-                  <span className="text-xs text-muted-foreground block">FBA</span>
-                  <span className="font-semibold">{product.nb_fba}</span>
-                </div>
-              )}
-              {product.nb_fbm && (
-                <div className="space-y-0.5">
-                  <span className="text-xs text-muted-foreground block">FBM</span>
-                  <span className="font-semibold">{product.nb_fbm}</span>
+                <div>
+                  <span className="text-[10px] text-muted-foreground block uppercase tracking-wide">FBA / FBM</span>
+                  <span className="font-semibold text-sm">{product.nb_fba} / {product.nb_fbm || '0'}</span>
                 </div>
               )}
             </div>
 
-            {/* Alert flags */}
-            {(product.private_label || product.ip || product.hazmat || product.meltable || product.adult || product.fragile || product.oversize || product.restriction) && (
-              <div className="flex flex-wrap gap-2">
-                {product.private_label && <Badge variant="destructive" className="text-xs">PL</Badge>}
-                {product.ip && <Badge variant="destructive" className="text-xs">IP</Badge>}
-                {product.hazmat && <Badge variant="destructive" className="text-xs">Hazmat</Badge>}
-                {product.meltable && <Badge variant="destructive" className="text-xs">Meltable</Badge>}
-                {product.adult && <Badge variant="destructive" className="text-xs">Adult</Badge>}
-                {product.fragile && <Badge className="bg-amber-500 text-xs">Fragile</Badge>}
-                {product.oversize && <Badge className="bg-amber-500 text-xs">Oversize</Badge>}
-                {product.restriction && <Badge variant="destructive" className="text-xs">Restricted</Badge>}
-              </div>
-            )}
-
-            {/* Profit Info */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {/* Profit cards side by side */}
+            <div className="grid grid-cols-2 gap-2">
               {product.fbm_profit && product.fbm_roi && (
-                <div className="p-3 rounded-xl bg-blue-500/10 border border-blue-500/30">
-                  <div className="flex items-center gap-2 mb-1.5">
-                    <Badge className="bg-blue-500 text-xs">FBM 🔹</Badge>
-                  </div>
-                  <div className="grid grid-cols-2 gap-3">
+                <div className="p-2.5 rounded-lg bg-blue-500/10 border border-blue-500/20">
+                  <span className="text-[10px] font-semibold text-blue-500 uppercase tracking-wide block mb-1">FBM 🔹</span>
+                  <div className="flex items-baseline gap-3">
                     <div>
-                      <span className="text-xs text-muted-foreground block">Profit</span>
-                      <span className="text-base font-bold text-green-500">{product.fbm_profit}</span>
+                      <span className="text-[10px] text-muted-foreground block">Profit</span>
+                      <span className="text-sm font-bold text-green-500">{product.fbm_profit}</span>
                     </div>
                     <div>
-                      <span className="text-xs text-muted-foreground block">ROI</span>
-                      <span className="text-base font-bold text-primary">{product.fbm_roi}</span>
+                      <span className="text-[10px] text-muted-foreground block">ROI</span>
+                      <span className="text-sm font-bold text-primary">{product.fbm_roi}</span>
                     </div>
                   </div>
                 </div>
               )}
               {product.fba_profit && product.fba_roi && (
-                <div className="p-3 rounded-xl bg-orange-500/10 border border-orange-500/30">
-                  <div className="flex items-center gap-2 mb-1.5">
-                    <Badge className="bg-orange-500 text-xs">FBA 📦</Badge>
-                  </div>
-                  <div className="grid grid-cols-2 gap-3">
+                <div className="p-2.5 rounded-lg bg-orange-500/10 border border-orange-500/20">
+                  <span className="text-[10px] font-semibold text-orange-500 uppercase tracking-wide block mb-1">FBA 📦</span>
+                  <div className="flex items-baseline gap-3">
                     <div>
-                      <span className="text-xs text-muted-foreground block">Profit</span>
-                      <span className="text-base font-bold text-green-500">{product.fba_profit}</span>
+                      <span className="text-[10px] text-muted-foreground block">Profit</span>
+                      <span className="text-sm font-bold text-green-500">{product.fba_profit}</span>
                     </div>
                     <div>
-                      <span className="text-xs text-muted-foreground block">ROI</span>
-                      <span className="text-base font-bold text-primary">{product.fba_roi}</span>
+                      <span className="text-[10px] text-muted-foreground block">ROI</span>
+                      <span className="text-sm font-bold text-primary">{product.fba_roi}</span>
                     </div>
                   </div>
                 </div>
@@ -336,19 +314,19 @@ function IboodProductCard({ product, onCopy }: { product: IboodProduct; onCopy: 
             </div>
 
             {/* Links */}
-            <div className="flex flex-wrap gap-3">
+            <div className="flex gap-2">
               {product.amazon_url && (
-                <Button variant="outline" size="sm" asChild>
-                  <a href={product.amazon_url} target="_blank" rel="noopener noreferrer" className="gap-2">
-                    <ExternalLink className="w-4 h-4" />
+                <Button variant="outline" size="sm" className="h-8 text-xs" asChild>
+                  <a href={product.amazon_url} target="_blank" rel="noopener noreferrer" className="gap-1.5">
+                    <ExternalLink className="w-3.5 h-3.5" />
                     Amazon
                   </a>
                 </Button>
               )}
               {product.ibood_url && (
-                <Button variant="outline" size="sm" asChild>
-                  <a href={product.ibood_url} target="_blank" rel="noopener noreferrer" className="gap-2">
-                    <ExternalLink className="w-4 h-4" />
+                <Button variant="outline" size="sm" className="h-8 text-xs" asChild>
+                  <a href={product.ibood_url} target="_blank" rel="noopener noreferrer" className="gap-1.5">
+                    <ExternalLink className="w-3.5 h-3.5" />
                     iBood
                   </a>
                 </Button>
@@ -356,14 +334,14 @@ function IboodProductCard({ product, onCopy }: { product: IboodProduct; onCopy: 
             </div>
           </div>
 
-          {/* Right: product image */}
+          {/* Right: Keepa chart */}
           {normalizedChartUrl && (
-            <div className="w-full md:w-[380px] lg:w-[440px] shrink-0 rounded-xl overflow-hidden border bg-white flex items-center justify-center p-3 self-start">
+            <div className="w-full md:w-[340px] lg:w-[400px] shrink-0 rounded-lg overflow-hidden border bg-white flex items-center justify-center p-2 self-start">
               <img
                 src={normalizedChartUrl}
                 alt={`Graphique Keepa – ${product.product_name}`}
                 className="w-full h-auto object-contain"
-                style={{ maxHeight: '420px' }}
+                style={{ maxHeight: '360px' }}
                 loading="lazy"
                 referrerPolicy="no-referrer"
               />
