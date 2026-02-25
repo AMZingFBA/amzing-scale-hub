@@ -122,7 +122,7 @@ serve(async (req) => {
 
     console.log(`✅ iBood: ${products.length} products loaded from ${rows.length} rows`);
 
-    // --- Auto-create alert in admin_alerts if product list changed ---
+    // --- Insert individual product alerts into product_find_alerts (like other monitors) ---
     if (products.length > 0) {
       try {
         const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
@@ -138,37 +138,56 @@ serve(async (req) => {
           .single();
 
         if (adminRole) {
-          // Check if there's already a recent ibood alert (< 30 min) with the same count
-          const thirtyMinAgo = new Date(Date.now() - 30 * 60 * 1000).toISOString();
-          const { data: recentAlert } = await supabase
-            .from('admin_alerts')
-            .select('id, title')
-            .eq('category', 'produits')
-            .eq('subcategory', 'produits-ibood')
-            .gte('created_at', thirtyMinAgo)
-            .limit(1);
+          // Get existing iBood alerts from last 24h to avoid duplicates
+          const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+          const { data: existingAlerts } = await supabase
+            .from('product_find_alerts')
+            .select('product_title, ean')
+            .eq('source_name', 'iBood')
+            .gte('created_at', oneDayAgo);
 
-          // Only insert if no recent alert exists OR count changed
-          const currentTitle = `🔥 ${products.length} produits iBood disponibles`;
-          const alreadyExists = recentAlert && recentAlert.length > 0 && recentAlert[0].title === currentTitle;
+          const existingKeys = new Set(
+            (existingAlerts || []).map(a => `${a.product_title}_${a.ean || ''}`)
+          );
 
-          if (!alreadyExists) {
-            // Build content with first 3 product names
-            const preview = products.slice(0, 3).map(p => `• ${p.product_name}`).join('\n');
-            const content = `${products.length} produits iBood analysés :\n${preview}${products.length > 3 ? `\n... et ${products.length - 3} autres` : ''}`;
+          const newAlerts = products.filter(p => {
+            const key = `${p.product_name}_${p.ean || ''}`;
+            return !existingKeys.has(key);
+          });
 
-            await supabase.from('admin_alerts').insert({
+          if (newAlerts.length > 0) {
+            const inserts = newAlerts.map(p => ({
               admin_id: adminRole.user_id,
-              title: currentTitle,
-              content,
-              category: 'produits',
-              subcategory: 'produits-ibood',
-              link_url: 'https://amzingfba.com/produits-ibood',
-            });
+              product_title: p.product_name,
+              ean: p.ean || p.asin || 'N/A',
+              current_price: parseFloat(p.cost) || 0,
+              sale_price: parseFloat(p.sale_price) || null,
+              source_name: 'iBood',
+              source_url: p.ibood_url || p.amazon_url || null,
+              amazon_url: p.amazon_url || null,
+              roi: parseFloat(p.fba_roi) || null,
+              fba_roi: parseFloat(p.fba_roi) || null,
+              fba_profit: parseFloat(p.fba_profit) || null,
+              profit: parseFloat(p.fba_profit) || null,
+              bsr: p.bsr || null,
+              monthly_sales: p.monthly_sales || null,
+              sellers: p.nb_vendors || null,
+              private_label: p.private_label || null,
+              meltable: p.meltable || null,
+              variations: p.variations || null,
+            }));
 
-            console.log('📢 New iBood alert created in admin_alerts');
+            const { error: insertErr } = await supabase
+              .from('product_find_alerts')
+              .insert(inserts);
+
+            if (insertErr) {
+              console.error('product_find_alerts insert error:', insertErr);
+            } else {
+              console.log(`📢 ${newAlerts.length} new iBood product alerts created`);
+            }
           } else {
-            console.log('⏭️ iBood alert already exists, skipping');
+            console.log('⏭️ No new iBood products to alert');
           }
         }
       } catch (alertErr) {

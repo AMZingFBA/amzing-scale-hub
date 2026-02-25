@@ -157,7 +157,8 @@ export const RecentUpdates = () => {
               'Miamland': 'produits-miamland',
               'Stokomani': 'produits-stokomani',
               'Eany': 'produits-eany',
-              'Qogita2': 'produits-qogita2'
+              'Qogita2': 'produits-qogita2',
+              'iBood': 'produits-ibood'
             };
             allUpdates.push({
               id: alert.id,
