@@ -311,6 +311,7 @@ const Dashboard = () => {
                       icon={Store}
                       label="Produits Ibood"
                       link="/produits-ibood"
+                      badge={notifications.produits?.subcategories?.["produits-ibood"]}
                     />
                     <CategoryItem
                       icon={Store}
