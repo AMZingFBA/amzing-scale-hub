@@ -7,7 +7,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, ArrowLeft, Copy, ExternalLink, Sparkles, RefreshCw, Bell, Store, TrendingUp, Package, Users } from 'lucide-react';
+import { Loader2, ArrowLeft, Copy, ExternalLink, Sparkles, RefreshCw, Bell, Store, TrendingUp, Package, Users, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface IboodProduct {
@@ -103,6 +103,11 @@ export default function ProduitsIbood() {
     toast.success('Copié !');
   };
 
+  const deleteProduct = (productId: string) => {
+    setProducts(prev => prev.filter(p => p.id !== productId));
+    toast.success('Produit supprimé de la liste');
+  };
+
   if (authLoading || isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -186,7 +191,7 @@ export default function ProduitsIbood() {
         ) : (
           <div className="grid gap-6">
             {products.map((product) => (
-              <IboodProductCard key={product.id} product={product} onCopy={copyToClipboard} />
+              <IboodProductCard key={product.id} product={product} onCopy={copyToClipboard} onDelete={isAdmin ? deleteProduct : undefined} />
             ))}
           </div>
         )}
@@ -195,7 +200,7 @@ export default function ProduitsIbood() {
   );
 }
 
-function IboodProductCard({ product, onCopy }: { product: IboodProduct; onCopy: (text: string) => void }) {
+function IboodProductCard({ product, onCopy, onDelete }: { product: IboodProduct; onCopy: (text: string) => void; onDelete?: (id: string) => void }) {
   const chartImageUrl = product.chart_url
     ? product.chart_url.replace(/^=IMAGE\("?/i, '').replace(/"?\)$/i, '').replace(/^"|"$/g, '')
     : null;
@@ -221,6 +226,16 @@ function IboodProductCard({ product, onCopy }: { product: IboodProduct; onCopy: 
               <code className="font-mono text-xs">{product.asin}</code>
               <Copy className="w-3 h-3 text-muted-foreground" />
             </button>
+          )}
+          {onDelete && (
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+              onClick={() => onDelete(product.id)}
+            >
+              <Trash2 className="w-4 h-4" />
+            </Button>
           )}
         </div>
       </div>
