@@ -115,10 +115,6 @@ serve(async (req) => {
         const chartRaw = getCellValue(cells[25]);
         const chartUrl = parseImageFormula(chartRaw);
 
-        const fallbackAmazonImage = asin
-          ? `https://images-na.ssl-images-amazon.com/images/P/${asin}.01._SX679_.jpg`
-          : null;
-
         if (products.length < 3) {
           console.log(`[${productName?.substring(0, 30)}] Chart raw: "${chartRaw}" → parsed: "${chartUrl}"`);
         }
@@ -150,7 +146,7 @@ serve(async (req) => {
           nb_fba: getCellValue(cells[22])?.trim() || null,
           nb_fbm: getCellValue(cells[23])?.trim() || null,
           amazon_url: getCellValue(cells[24])?.trim() || null,
-          chart_url: chartUrl || fallbackAmazonImage,
+          chart_url: chartUrl,
           ibood_url: getCellValue(cells[26])?.trim() || null,
         });
       } catch (e) {
