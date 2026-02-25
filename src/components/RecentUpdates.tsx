@@ -46,6 +46,7 @@ const getCategoryRoute = (category: string, subcategory: string | null) => {
       'produits-find': '/produits-find',
       'produits-qogita': '/produits-qogita',
       'produits-eany': '/produits-eany',
+      'produits-ibood': '/produits-ibood',
       'grossistes': '/grossistes',
       'promotions': '/promotions',
       'sitelist': '/sitelist',

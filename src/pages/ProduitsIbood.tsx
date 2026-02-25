@@ -87,6 +87,13 @@ export default function ProduitsIbood() {
     if (!authLoading && user && (isVIP || isAdmin)) {
       fetchProducts(true);
       autoSyncRef.current = setInterval(() => fetchProducts(true), 60 * 1000);
+
+      // Mark ibood alerts as read
+      supabase.rpc('mark_alerts_as_read', { 
+        category_param: 'produits', 
+        subcategory_param: 'produits-ibood' 
+      });
+
       return () => { if (autoSyncRef.current) clearInterval(autoSyncRef.current); };
     }
   }, [user, authLoading, isVIP, isAdmin]);
