@@ -13,7 +13,7 @@ import Footer from '@/components/Footer';
 import { RefreshButton } from '@/components/RefreshButton';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, AlertCircle, Link2, Image, Video, Mic, FileText, Sparkles, ArrowLeft, Download } from 'lucide-react';
+import { Loader2, AlertCircle, Link2, Image, Video, Mic, FileText, Sparkles, ArrowLeft, Download, Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 const ProductAlerts = () => {
@@ -135,6 +135,21 @@ const ProductAlerts = () => {
     }
   };
 
+  const deleteAlert = async (alertId: string) => {
+    try {
+      const { error } = await supabase
+        .from('admin_alerts')
+        .delete()
+        .eq('id', alertId);
+      if (error) throw error;
+      toast({ description: "✓ Alerte supprimée" });
+      loadAlerts();
+    } catch (error) {
+      console.error('Error deleting alert:', error);
+      toast({ title: "Erreur", description: "Impossible de supprimer l'alerte", variant: "destructive" });
+    }
+  };
+
   const { isRefreshing, handleRefresh } = usePullRefresh(loadAlerts);
   
   // Auto-refresh every 30 seconds
@@ -245,10 +260,21 @@ const ProductAlerts = () => {
                           })}
                         </CardDescription>
                       </div>
-                      <Badge variant="default" className="bg-primary">
-                        <Sparkles className="w-3 h-3 mr-1" />
-                        Nouveau
-                      </Badge>
+                      <div className="flex items-center gap-2">
+                        {isAdmin && (
+                          <button
+                            onClick={() => deleteAlert(alert.id)}
+                            className="p-2 rounded-full text-destructive hover:bg-destructive/10 transition-colors"
+                            aria-label="Supprimer l'alerte"
+                          >
+                            <Trash2 className="w-5 h-5" />
+                          </button>
+                        )}
+                        <Badge variant="default" className="bg-primary">
+                          <Sparkles className="w-3 h-3 mr-1" />
+                          Nouveau
+                        </Badge>
+                      </div>
                     </div>
                   </CardHeader>
                   <CardContent className="space-y-4">
