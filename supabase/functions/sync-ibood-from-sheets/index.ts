@@ -111,9 +111,11 @@ serve(async (req) => {
         if (seen.has(uniqueKey)) continue;
         seen.add(uniqueKey);
 
-        // Column 25 = Chart — parse IMAGE() formula to get the Keepa URL
+        // Column 25 = Chart — gviz can't read IMAGE() formulas, so build Keepa URL from ASIN
         const chartRaw = getCellValue(cells[25]);
-        const chartUrl = parseImageFormula(chartRaw);
+        const chartFromFormula = parseImageFormula(chartRaw);
+        // If formula parsing fails (gviz returns null for IMAGE()), construct from ASIN
+        const chartUrl = chartFromFormula || (asin ? `https://graph.keepa.com/pricehistory.png?asin=${asin}&domain=fr` : null);
 
         if (products.length < 3) {
           console.log(`[${productName?.substring(0, 30)}] Chart raw: "${chartRaw}" → parsed: "${chartUrl}"`);
