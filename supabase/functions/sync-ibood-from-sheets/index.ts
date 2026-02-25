@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -57,23 +58,14 @@ serve(async (req) => {
       return null;
     };
 
-    // Helper: returns null if the value is just a label like "EAN:" or empty
     const cleanEan = (raw: string | null): string | null => {
       if (!raw) return null;
       const cleaned = raw.replace(/^EAN:\s*/i, '').trim();
-      return cleaned.length >= 8 ? cleaned : null; // Valid EANs are 8-13 digits
+      return cleaned.length >= 8 ? cleaned : null;
     };
 
     const seen = new Set<string>();
     const products: any[] = [];
-
-    // Column mapping (0-indexed):
-    // 0=Nom, 1=EAN, 2=ASIN, 3=BSR, 4=Cout, 5=Prix vente, 6=Ventes/mois
-    // 7=Profit FBA, 8=ROI FBA, 9=Profit FBM, 10=ROI FBM
-    // 11=PL, 12=Nb variations, 13=IP, 14=Hazmat, 15=Meltable
-    // 16=Adult, 17=Fragile, 18=Oversize, 19=Restriction
-    // 20=Alertes brutes, 21=Nb vendeurs, 22=Nb FBA, 23=Nb FBM
-    // 24=Lien Amazon, 25=Chart, 26=Lien iBood
 
     for (let i = 0; i < rows.length; i++) {
       try {
@@ -85,7 +77,6 @@ serve(async (req) => {
         const ean = cleanEan(getCellValue(cells[1])?.trim() || null);
         const asin = getCellValue(cells[2])?.trim() || null;
 
-        // Unique key: use ASIN+productName combo to allow different products with same ASIN
         const uniqueKey = `${asin || ''}_${productName}`;
         if (seen.has(uniqueKey)) continue;
         seen.add(uniqueKey);
@@ -130,6 +121,60 @@ serve(async (req) => {
     }
 
     console.log(`✅ iBood: ${products.length} products loaded from ${rows.length} rows`);
+
+    // --- Auto-create alert in admin_alerts if product list changed ---
+    if (products.length > 0) {
+      try {
+        const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+        const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+        const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+        // Get admin user id
+        const { data: adminRole } = await supabase
+          .from('user_roles')
+          .select('user_id')
+          .eq('role', 'admin')
+          .limit(1)
+          .single();
+
+        if (adminRole) {
+          // Check if there's already a recent ibood alert (< 30 min) with the same count
+          const thirtyMinAgo = new Date(Date.now() - 30 * 60 * 1000).toISOString();
+          const { data: recentAlert } = await supabase
+            .from('admin_alerts')
+            .select('id, title')
+            .eq('category', 'produits')
+            .eq('subcategory', 'produits-ibood')
+            .gte('created_at', thirtyMinAgo)
+            .limit(1);
+
+          // Only insert if no recent alert exists OR count changed
+          const currentTitle = `🔥 ${products.length} produits iBood disponibles`;
+          const alreadyExists = recentAlert && recentAlert.length > 0 && recentAlert[0].title === currentTitle;
+
+          if (!alreadyExists) {
+            // Build content with first 3 product names
+            const preview = products.slice(0, 3).map(p => `• ${p.product_name}`).join('\n');
+            const content = `${products.length} produits iBood analysés :\n${preview}${products.length > 3 ? `\n... et ${products.length - 3} autres` : ''}`;
+
+            await supabase.from('admin_alerts').insert({
+              admin_id: adminRole.user_id,
+              title: currentTitle,
+              content,
+              category: 'produits',
+              subcategory: 'produits-ibood',
+              link_url: 'https://amzingfba.com/produits-ibood',
+            });
+
+            console.log('📢 New iBood alert created in admin_alerts');
+          } else {
+            console.log('⏭️ iBood alert already exists, skipping');
+          }
+        }
+      } catch (alertErr) {
+        console.error('Alert creation error (non-blocking):', alertErr);
+      }
+    }
 
     return new Response(
       JSON.stringify({ success: true, products, count: products.length }),
