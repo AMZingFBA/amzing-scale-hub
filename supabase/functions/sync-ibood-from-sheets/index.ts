@@ -138,18 +138,36 @@ serve(async (req) => {
           .single();
 
         if (adminRole) {
-          // Get ALL existing iBood alerts to avoid duplicates (no time limit)
-          const { data: existingAlerts } = await supabase
-            .from('product_find_alerts')
-            .select('product_title, ean')
-            .eq('source_name', 'iBood');
+          // Get ALL existing iBood alerts to avoid duplicates (paginate to bypass 1000 rows default limit)
+          const existingKeys = new Set<string>();
+          const pageSize = 1000;
+          let from = 0;
 
-          const existingKeys = new Set(
-            (existingAlerts || []).map(a => `${a.product_title}_${a.ean || ''}`)
-          );
+          while (true) {
+            const { data: existingBatch, error: existingErr } = await supabase
+              .from('product_find_alerts')
+              .select('product_title, ean')
+              .eq('source_name', 'iBood')
+              .range(from, from + pageSize - 1);
+
+            if (existingErr) {
+              console.error('existing iBood alerts fetch error:', existingErr);
+              break;
+            }
+
+            if (!existingBatch || existingBatch.length === 0) break;
+
+            for (const alert of existingBatch) {
+              existingKeys.add(`${alert.product_title}_${alert.ean || ''}`);
+            }
+
+            if (existingBatch.length < pageSize) break;
+            from += pageSize;
+          }
 
           const newAlerts = products.filter(p => {
-            const key = `${p.product_name}_${p.ean || ''}`;
+            const normalizedEan = p.ean || p.asin || 'N/A';
+            const key = `${p.product_name}_${normalizedEan}`;
             return !existingKeys.has(key);
           });
 
