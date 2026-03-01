@@ -344,16 +344,26 @@ function AuchanProductCard({ product, onCopy, onDelete }: { product: AuchanProdu
             </div>
           </div>
 
-          {normalizedChartUrl && (
+          {product.asin && (
             <div className="w-full md:w-[340px] lg:w-[400px] shrink-0 rounded-lg overflow-hidden border bg-white flex items-center justify-center p-2 self-start">
-              <img
-                src={normalizedChartUrl}
-                alt={`Graphique Keepa – ${product.product_name}`}
-                className="w-full h-auto object-contain"
-                style={{ maxHeight: '360px' }}
-                loading="lazy"
-                referrerPolicy="no-referrer"
-              />
+              <a href={`https://keepa.com/#!product/4-${product.asin}`} target="_blank" rel="noopener noreferrer">
+                <img
+                  src={`https://graph.keepa.com/pricehistory.png?asin=${product.asin}&domain=fr&salesrank=1&bb=1&range=90`}
+                  alt={`Graphique Keepa – ${product.product_name}`}
+                  className="w-full h-auto object-contain"
+                  style={{ maxHeight: '360px' }}
+                  loading="lazy"
+                  referrerPolicy="no-referrer"
+                  crossOrigin="anonymous"
+                  onError={(e) => {
+                    const img = e.currentTarget;
+                    if (!img.dataset.retried) {
+                      img.dataset.retried = 'true';
+                      img.src = `https://graph.keepa.com/pricehistory.png?asin=${product.asin}&domain=fr`;
+                    }
+                  }}
+                />
+              </a>
             </div>
           )}
         </div>
