@@ -12,23 +12,32 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
-  const supabaseClient = createClient(
+  // Anon client for auth only
+  const anonClient = createClient(
     Deno.env.get("SUPABASE_URL") ?? "",
     Deno.env.get("SUPABASE_ANON_KEY") ?? ""
+  );
+
+  // Service role client for DB queries (bypasses RLS)
+  const adminClient = createClient(
+    Deno.env.get("SUPABASE_URL") ?? "",
+    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
   );
 
   try {
     const authHeader = req.headers.get("Authorization")!;
     const token = authHeader.replace("Bearer ", "");
-    const { data: { user } } = await supabaseClient.auth.getUser(token);
+    const { data: { user } } = await anonClient.auth.getUser(token);
     if (!user) throw new Error("Non authentifié");
 
     // Get user's subscription to find stripe_customer_id
-    const { data: subscription } = await supabaseClient
+    const { data: subscription, error: subError } = await adminClient
       .from("subscriptions")
       .select("stripe_customer_id, stripe_subscription_id")
       .eq("user_id", user.id)
-      .single();
+      .maybeSingle();
+
+    console.log("User:", user.email, "Subscription:", JSON.stringify(subscription), "Error:", subError);
 
     if (!subscription?.stripe_customer_id) {
       return new Response(JSON.stringify({ invoices: [] }), {
@@ -41,7 +50,7 @@ serve(async (req) => {
     });
 
     // Get user profile for invoice details
-    const { data: profile } = await supabaseClient
+    const { data: profile } = await adminClient
       .from("profiles")
       .select("full_name, email, phone")
       .eq("id", user.id)
@@ -53,6 +62,8 @@ serve(async (req) => {
       limit: 100,
     });
 
+    console.log("Charges found:", charges.data.length, "for customer:", subscription.stripe_customer_id);
+
     // Also fetch invoices from Stripe if they exist (for subscription payments)
     let stripeInvoices: any[] = [];
     try {
@@ -62,8 +73,9 @@ serve(async (req) => {
         status: 'paid',
       });
       stripeInvoices = invoicesResult.data;
+      console.log("Stripe invoices found:", stripeInvoices.length);
     } catch (e) {
-      console.log("No Stripe invoices found");
+      console.log("No Stripe invoices found:", e);
     }
 
     // Build invoice data from charges
@@ -73,7 +85,7 @@ serve(async (req) => {
         // Find matching Stripe invoice for more details
         const matchingInvoice = stripeInvoices.find(inv => inv.charge === charge.id);
         
-        const amountTTC = charge.amount / 100; // Convert cents to euros
+        const amountTTC = charge.amount / 100;
         
         // Check for discount/coupon from the Stripe invoice
         let discount = 0;
@@ -89,12 +101,10 @@ serve(async (req) => {
           }
         }
 
-        // Invoice number: F-YYYY-XXX based on payment order
         const paymentDate = new Date(charge.created * 1000);
         const year = paymentDate.getFullYear();
-        const invoiceNumber = arr.length - index; // Reverse order so first payment = 001
+        const invoiceNumber = arr.length - index;
 
-        // Determine description
         let description = charge.description || 'AMZing FBA - Abonnement VIP';
         if (matchingInvoice?.lines?.data?.[0]?.description) {
           description = matchingInvoice.lines.data[0].description;
@@ -105,7 +115,7 @@ serve(async (req) => {
           invoiceNumber: `F-${year}-${String(invoiceNumber).padStart(3, '0')}`,
           date: paymentDate.toISOString(),
           amountTTC,
-          amountHT: amountTTC, // TVA non applicable art 293B
+          amountHT: amountTTC,
           tva: 0,
           description,
           discount,
@@ -115,6 +125,8 @@ serve(async (req) => {
         };
       })
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+    console.log("Invoices generated:", invoices.length);
 
     return new Response(JSON.stringify({ invoices }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
