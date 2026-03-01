@@ -217,7 +217,26 @@ export const ProfileInvoices = () => {
     );
   }
 
-  if (invoices.length === 0) return null;
+  if (invoices.length === 0) {
+    return (
+      <Card className="mt-6">
+        <CardHeader>
+          <div className="flex items-center gap-2">
+            <FileText className="w-5 h-5 text-primary" />
+            <div>
+              <CardTitle>Mes factures</CardTitle>
+              <CardDescription>Vos factures de paiement apparaîtront ici</CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-muted-foreground text-center py-4">
+            Aucune facture disponible pour le moment.
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card className="mt-6">
