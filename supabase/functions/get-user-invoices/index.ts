@@ -1,0 +1,129 @@
+import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import Stripe from "https://esm.sh/stripe@18.5.0";
+import { createClient } from "npm:@supabase/supabase-js@2.57.2";
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
+};
+
+serve(async (req) => {
+  if (req.method === "OPTIONS") {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  const supabaseClient = createClient(
+    Deno.env.get("SUPABASE_URL") ?? "",
+    Deno.env.get("SUPABASE_ANON_KEY") ?? ""
+  );
+
+  try {
+    const authHeader = req.headers.get("Authorization")!;
+    const token = authHeader.replace("Bearer ", "");
+    const { data: { user } } = await supabaseClient.auth.getUser(token);
+    if (!user) throw new Error("Non authentifié");
+
+    // Get user's subscription to find stripe_customer_id
+    const { data: subscription } = await supabaseClient
+      .from("subscriptions")
+      .select("stripe_customer_id, stripe_subscription_id")
+      .eq("user_id", user.id)
+      .single();
+
+    if (!subscription?.stripe_customer_id) {
+      return new Response(JSON.stringify({ invoices: [] }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
+      apiVersion: "2025-08-27.basil",
+    });
+
+    // Get user profile for invoice details
+    const { data: profile } = await supabaseClient
+      .from("profiles")
+      .select("full_name, email, phone")
+      .eq("id", user.id)
+      .single();
+
+    // Fetch all successful charges for this customer
+    const charges = await stripe.charges.list({
+      customer: subscription.stripe_customer_id,
+      limit: 100,
+    });
+
+    // Also fetch invoices from Stripe if they exist (for subscription payments)
+    let stripeInvoices: any[] = [];
+    try {
+      const invoicesResult = await stripe.invoices.list({
+        customer: subscription.stripe_customer_id,
+        limit: 100,
+        status: 'paid',
+      });
+      stripeInvoices = invoicesResult.data;
+    } catch (e) {
+      console.log("No Stripe invoices found");
+    }
+
+    // Build invoice data from charges
+    const invoices = charges.data
+      .filter(c => c.status === 'succeeded' && c.paid)
+      .map((charge, index, arr) => {
+        // Find matching Stripe invoice for more details
+        const matchingInvoice = stripeInvoices.find(inv => inv.charge === charge.id);
+        
+        const amountTTC = charge.amount / 100; // Convert cents to euros
+        
+        // Check for discount/coupon from the Stripe invoice
+        let discount = 0;
+        let discountDescription = '';
+        if (matchingInvoice?.discount) {
+          const coupon = matchingInvoice.discount.coupon;
+          if (coupon.percent_off) {
+            discount = amountTTC * (coupon.percent_off / 100);
+            discountDescription = `Réduction ${coupon.percent_off}%`;
+          } else if (coupon.amount_off) {
+            discount = coupon.amount_off / 100;
+            discountDescription = `Réduction ${discount.toFixed(2)} €`;
+          }
+        }
+
+        // Invoice number: F-YYYY-XXX based on payment order
+        const paymentDate = new Date(charge.created * 1000);
+        const year = paymentDate.getFullYear();
+        const invoiceNumber = arr.length - index; // Reverse order so first payment = 001
+
+        // Determine description
+        let description = charge.description || 'AMZing FBA - Abonnement VIP';
+        if (matchingInvoice?.lines?.data?.[0]?.description) {
+          description = matchingInvoice.lines.data[0].description;
+        }
+
+        return {
+          id: charge.id,
+          invoiceNumber: `F-${year}-${String(invoiceNumber).padStart(3, '0')}`,
+          date: paymentDate.toISOString(),
+          amountTTC,
+          amountHT: amountTTC, // TVA non applicable art 293B
+          tva: 0,
+          description,
+          discount,
+          discountDescription,
+          customerName: profile?.full_name || user.email,
+          customerEmail: profile?.email || user.email,
+        };
+      })
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+    return new Response(JSON.stringify({ invoices }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  } catch (error: any) {
+    console.error("Error:", error);
+    return new Response(JSON.stringify({ error: error.message }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      status: 500,
+    });
+  }
+});
