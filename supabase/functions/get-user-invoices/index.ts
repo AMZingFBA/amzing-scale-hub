@@ -56,6 +56,13 @@ serve(async (req) => {
       .eq("id", user.id)
       .single();
 
+    // Get Stripe customer billing details
+    const stripeCustomer = await stripe.customers.retrieve(subscription.stripe_customer_id);
+    const billingAddress = (stripeCustomer as any).address;
+    const billingName = (stripeCustomer as any).name;
+    
+    console.log("Stripe customer billing:", JSON.stringify({ name: billingName, address: billingAddress }));
+
     // Fetch all successful charges for this customer
     const charges = await stripe.charges.list({
       customer: subscription.stripe_customer_id,
@@ -120,8 +127,14 @@ serve(async (req) => {
           description,
           discount,
           discountDescription,
-          customerName: profile?.full_name || user.email,
+          customerName: billingName || profile?.full_name || user.email,
           customerEmail: profile?.email || user.email,
+          customerAddress: billingAddress ? [
+            billingAddress.line1,
+            billingAddress.line2,
+            [billingAddress.postal_code, billingAddress.city].filter(Boolean).join(' '),
+            billingAddress.country,
+          ].filter(Boolean).join(', ') : '',
         };
       })
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
