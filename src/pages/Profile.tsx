@@ -12,6 +12,7 @@ import { Label } from '@/components/ui/label';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { ArrowLeft, User, Mail, Phone, Edit2, Save, Loader2, Lock, Shield } from 'lucide-react';
+import { ProfileInvoices } from '@/components/ProfileInvoices';
 import { useToast } from '@/hooks/use-toast';
 import { NotificationSettings } from '@/components/NotificationSettings';
 
@@ -941,6 +942,9 @@ const Profile = () => {
               </CardHeader>
             </Card>
           )}
+
+          {/* Invoices Section - visible even for non-VIP */}
+          <ProfileInvoices />
 
           {/* Delete Account Section */}
           <Card className="mt-6 border-red-500/50 bg-red-50/50 dark:bg-red-950/20">
