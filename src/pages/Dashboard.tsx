@@ -322,7 +322,7 @@ const Dashboard = () => {
                     <CategoryItem
                       icon={Store}
                       label="Produits Auchan"
-                      link="/product-alerts/auchan"
+                      link="/produits-auchan"
                       badge={notifications.produits?.subcategories?.["produits-auchan"]}
                     />
                     <CategoryItem
