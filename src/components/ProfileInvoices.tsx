@@ -20,6 +20,7 @@ interface Invoice {
   discountDescription: string;
   customerName: string;
   customerEmail: string;
+  customerAddress: string;
 }
 
 const generateInvoiceHTML = (invoice: Invoice): string => {
@@ -99,7 +100,7 @@ const generateInvoiceHTML = (invoice: Invoice): string => {
   <div class="party">
     <h4>Client</h4>
     <p class="name">${invoice.customerName}</p>
-    <p>${invoice.customerEmail}</p>
+    <p>${invoice.customerAddress ? invoice.customerAddress + '<br>' : ''}${invoice.customerEmail}</p>
   </div>
 </div>
 
