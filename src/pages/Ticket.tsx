@@ -28,6 +28,7 @@ const Ticket = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [signedUrls, setSignedUrls] = useState<Record<string, string>>({});
+  const [ticketUserProfile, setTicketUserProfile] = useState<any>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -146,6 +147,26 @@ const Ticket = () => {
       }
 
       setTicket(ticketData);
+
+      // Fetch ticket owner profile for admin view
+      if (isAdmin && ticketData.user_id !== user!.id) {
+        const { data: profileData } = await supabase
+          .from('profiles')
+          .select('email, full_name, nickname, phone, created_at')
+          .eq('id', ticketData.user_id)
+          .single();
+        
+        if (profileData) {
+          // Also fetch subscription info
+          const { data: subData } = await supabase
+            .from('subscriptions')
+            .select('plan_type, status')
+            .eq('user_id', ticketData.user_id)
+            .single();
+          
+          setTicketUserProfile({ ...profileData, subscription: subData });
+        }
+      }
 
       const { data: messagesData, error: messagesError } = await supabase
         .from('messages')
@@ -364,6 +385,50 @@ const Ticket = () => {
               </div>
             </CardHeader>
           </Card>
+
+          {isAdmin && ticketUserProfile && (
+            <Card className="mb-4 border-primary/30 bg-primary/5">
+              <CardContent className="pt-4 pb-4">
+                <div className="flex items-center gap-3">
+                  <Avatar className="w-10 h-10">
+                    <AvatarFallback className="bg-primary text-primary-foreground text-sm font-bold">
+                      {(ticketUserProfile.full_name || ticketUserProfile.email || '?').charAt(0).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2 text-sm">
+                    <div>
+                      <span className="text-muted-foreground">Nom :</span>{' '}
+                      <span className="font-medium">{ticketUserProfile.full_name || '—'}</span>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">Pseudo :</span>{' '}
+                      <span className="font-medium">{ticketUserProfile.nickname || '—'}</span>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">Email :</span>{' '}
+                      <span className="font-medium break-all">{ticketUserProfile.email}</span>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">Tél :</span>{' '}
+                      <span className="font-medium">{ticketUserProfile.phone || '—'}</span>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">Abonnement :</span>{' '}
+                      <Badge variant={ticketUserProfile.subscription?.plan_type === 'vip' ? 'default' : 'secondary'} className="ml-1">
+                        {ticketUserProfile.subscription?.plan_type || 'free'} ({ticketUserProfile.subscription?.status || '—'})
+                      </Badge>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">Inscrit le :</span>{' '}
+                      <span className="font-medium">
+                        {new Date(ticketUserProfile.created_at).toLocaleDateString('fr-FR')}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           <Card className="mb-4">
             <CardContent className="pt-6">
