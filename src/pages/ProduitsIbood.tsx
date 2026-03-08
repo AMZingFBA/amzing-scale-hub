@@ -106,7 +106,8 @@ export default function ProduitsIbood() {
           ibood_url: row.source_url,
           chart_url: asin ? `https://graph.keepa.com/pricehistory.png?asin=${asin}&domain=fr&salesrank=1&bb=1&range=90` : null,
           created_at: row.created_at,
-      }));
+        };
+      });
 
       if (previousCount !== null && mapped.length > previousCount) {
         setNewCount(mapped.length - previousCount);
