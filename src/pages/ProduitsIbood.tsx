@@ -70,7 +70,7 @@ export default function ProduitsIbood() {
         .select('id, product_title, ean, amazon_url, source_url, bsr, monthly_sales, sellers, sale_price, current_price, fba_profit, fba_roi, profit, roi, private_label, meltable, variations, created_at')
         .eq('source_name', 'iBood')
         .order('created_at', { ascending: false })
-        .limit(50);
+        .limit(100);
 
       if (error) throw error;
 
