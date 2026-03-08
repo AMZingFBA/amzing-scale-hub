@@ -57,6 +57,12 @@ export default function ProduitsIbood() {
   useScrollPosition(location.pathname);
 
   // Fast load from DB (product_find_alerts table)
+  const extractAsin = (url: string | null): string | null => {
+    if (!url) return null;
+    const match = url.match(/\/(?:dp|gp\/product)\/([A-Z0-9]{10})/i);
+    return match?.[1] || null;
+  };
+
   const loadFromDB = useCallback(async () => {
     try {
       const { data, error } = await supabase
@@ -64,40 +70,42 @@ export default function ProduitsIbood() {
         .select('id, product_title, ean, amazon_url, source_url, bsr, monthly_sales, sellers, sale_price, current_price, fba_profit, fba_roi, profit, roi, private_label, meltable, variations, created_at')
         .eq('source_name', 'iBood')
         .order('created_at', { ascending: false })
-        .limit(200);
+        .limit(50);
 
       if (error) throw error;
 
-      const mapped: IboodProduct[] = (data || []).map((row) => ({
-        id: row.id,
-        product_name: row.product_title,
-        ean: row.ean,
-        asin: null,
-        bsr: row.bsr,
-        cost: row.current_price ? `${row.current_price}€` : null,
-        sale_price: row.sale_price ? String(row.sale_price) : null,
-        monthly_sales: row.monthly_sales,
-        fba_profit: row.fba_profit ? `€ ${row.fba_profit}` : null,
-        fba_roi: row.fba_roi ? `${row.fba_roi}%` : null,
-        fbm_profit: row.profit ? `€ ${row.profit}` : null,
-        fbm_roi: row.roi ? `${row.roi}%` : null,
-        private_label: row.private_label,
-        variations: row.variations,
-        ip: null,
-        hazmat: null,
-        meltable: row.meltable,
-        adult: null,
-        fragile: null,
-        oversize: null,
-        restriction: null,
-        raw_alerts: null,
-        nb_vendors: row.sellers,
-        nb_fba: null,
-        nb_fbm: null,
-        amazon_url: row.amazon_url,
-        ibood_url: row.source_url,
-        chart_url: null,
-        created_at: row.created_at,
+      const mapped: IboodProduct[] = (data || []).map((row) => {
+        const asin = extractAsin(row.amazon_url);
+        return {
+          id: row.id,
+          product_name: row.product_title,
+          ean: row.ean,
+          asin,
+          bsr: row.bsr,
+          cost: row.current_price ? `${row.current_price}€` : null,
+          sale_price: row.sale_price ? String(row.sale_price) : null,
+          monthly_sales: row.monthly_sales,
+          fba_profit: row.fba_profit ? `€ ${row.fba_profit}` : null,
+          fba_roi: row.fba_roi ? `${row.fba_roi}%` : null,
+          fbm_profit: row.profit ? `€ ${row.profit}` : null,
+          fbm_roi: row.roi ? `${row.roi}%` : null,
+          private_label: row.private_label,
+          variations: row.variations,
+          ip: null,
+          hazmat: null,
+          meltable: row.meltable,
+          adult: null,
+          fragile: null,
+          oversize: null,
+          restriction: null,
+          raw_alerts: null,
+          nb_vendors: row.sellers,
+          nb_fba: null,
+          nb_fbm: null,
+          amazon_url: row.amazon_url,
+          ibood_url: row.source_url,
+          chart_url: asin ? `https://graph.keepa.com/pricehistory.png?asin=${asin}&domain=fr&salesrank=1&bb=1&range=90` : null,
+          created_at: row.created_at,
       }));
 
       if (previousCount !== null && mapped.length > previousCount) {
