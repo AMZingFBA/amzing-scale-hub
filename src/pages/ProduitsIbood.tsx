@@ -7,7 +7,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, ArrowLeft, Copy, ExternalLink, Sparkles, RefreshCw, Bell, Store, TrendingUp, Package, Users, Trash2 } from 'lucide-react';
+import { Loader2, ArrowLeft, Copy, ExternalLink, Sparkles, RefreshCw, Bell, Store, Trash2, Clock } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface IboodProduct {
@@ -39,6 +39,7 @@ interface IboodProduct {
   amazon_url: string | null;
   ibood_url: string | null;
   chart_url: string | null;
+  created_at: string | null;
 }
 
 export default function ProduitsIbood() {
@@ -55,43 +56,93 @@ export default function ProduitsIbood() {
 
   useScrollPosition(location.pathname);
 
-  const fetchProducts = useCallback(async (silent = false) => {
+  // Fast load from DB (product_find_alerts table)
+  const loadFromDB = useCallback(async () => {
+    try {
+      const { data, error } = await supabase
+        .from('product_find_alerts')
+        .select('id, product_title, ean, amazon_url, source_url, bsr, monthly_sales, sellers, sale_price, current_price, fba_profit, fba_roi, profit, roi, private_label, meltable, variations, created_at')
+        .eq('source_name', 'iBood')
+        .order('created_at', { ascending: false })
+        .limit(200);
+
+      if (error) throw error;
+
+      const mapped: IboodProduct[] = (data || []).map((row) => ({
+        id: row.id,
+        product_name: row.product_title,
+        ean: row.ean,
+        asin: null,
+        bsr: row.bsr,
+        cost: row.current_price ? `${row.current_price}€` : null,
+        sale_price: row.sale_price ? String(row.sale_price) : null,
+        monthly_sales: row.monthly_sales,
+        fba_profit: row.fba_profit ? `€ ${row.fba_profit}` : null,
+        fba_roi: row.fba_roi ? `${row.fba_roi}%` : null,
+        fbm_profit: row.profit ? `€ ${row.profit}` : null,
+        fbm_roi: row.roi ? `${row.roi}%` : null,
+        private_label: row.private_label,
+        variations: row.variations,
+        ip: null,
+        hazmat: null,
+        meltable: row.meltable,
+        adult: null,
+        fragile: null,
+        oversize: null,
+        restriction: null,
+        raw_alerts: null,
+        nb_vendors: row.sellers,
+        nb_fba: null,
+        nb_fbm: null,
+        amazon_url: row.amazon_url,
+        ibood_url: row.source_url,
+        chart_url: null,
+        created_at: row.created_at,
+      }));
+
+      if (previousCount !== null && mapped.length > previousCount) {
+        setNewCount(mapped.length - previousCount);
+      }
+      setPreviousCount(mapped.length);
+      setProducts(mapped);
+    } catch (err) {
+      console.error('DB load error:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [previousCount]);
+
+  // Background sync from sheets (non-blocking)
+  const syncFromSheets = useCallback(async (silent = true) => {
     if (isSyncing) return;
     setIsSyncing(true);
     try {
       const { data, error } = await supabase.functions.invoke('sync-ibood-from-sheets');
       if (error) throw error;
-      if (data?.success) {
-        const loadedProducts = (data.products || []).reverse();
-        if (previousCount !== null && loadedProducts.length > previousCount) {
-          setNewCount(loadedProducts.length - previousCount);
-        }
-        setPreviousCount(loadedProducts.length);
-        setProducts(loadedProducts);
-        if (!silent) toast.success(`${data.count} produits iBood chargés`);
-      } else {
-        throw new Error(data?.error || 'Fetch failed');
-      }
+      if (!silent) toast.success(`${data?.count || 0} produits iBood synchronisés`);
+      // Reload from DB after sync
+      await loadFromDB();
     } catch (error: any) {
-      console.error('iBood fetch error:', error);
-      if (!silent && error?.name !== 'AbortError') {
-        toast.error('Erreur lors du chargement des produits iBood');
-      }
+      console.error('iBood sync error:', error);
+      if (!silent) toast.error('Erreur lors de la synchronisation');
     } finally {
       setIsSyncing(false);
-      setIsLoading(false);
     }
-  }, [isSyncing, previousCount]);
+  }, [isSyncing, loadFromDB]);
 
   useEffect(() => {
     if (!authLoading && user && (isVIP || isAdmin)) {
-      fetchProducts(true);
-      autoSyncRef.current = setInterval(() => fetchProducts(true), 60 * 1000);
+      // Fast: load from DB immediately
+      loadFromDB();
+      // Then sync in background
+      syncFromSheets(true);
+      // Auto-sync every 60s
+      autoSyncRef.current = setInterval(() => syncFromSheets(true), 60 * 1000);
 
       // Mark ibood alerts as read
-      supabase.rpc('mark_alerts_as_read', { 
-        category_param: 'produits', 
-        subcategory_param: 'produits-ibood' 
+      supabase.rpc('mark_alerts_as_read', {
+        category_param: 'produits',
+        subcategory_param: 'produits-ibood'
       });
 
       return () => { if (autoSyncRef.current) clearInterval(autoSyncRef.current); };
@@ -103,9 +154,15 @@ export default function ProduitsIbood() {
     toast.success('Copié !');
   };
 
-  const deleteProduct = (productId: string) => {
-    setProducts(prev => prev.filter(p => p.id !== productId));
-    toast.success('Produit supprimé de la liste');
+  const deleteProduct = async (productId: string) => {
+    const { error } = await supabase
+      .from('product_find_alerts')
+      .delete()
+      .eq('id', productId);
+    if (!error) {
+      setProducts(prev => prev.filter(p => p.id !== productId));
+      toast.success('Produit supprimé');
+    }
   };
 
   if (authLoading || isLoading) {
@@ -135,7 +192,6 @@ export default function ProduitsIbood() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-secondary/10 to-primary/5">
       <div className="container mx-auto px-4 py-8">
-        {/* New alerts banner */}
         {newCount > 0 && (
           <div
             className="mb-4 bg-destructive text-destructive-foreground rounded-lg px-4 py-3 flex items-center justify-between cursor-pointer animate-pulse"
@@ -151,7 +207,6 @@ export default function ProduitsIbood() {
           </div>
         )}
 
-        {/* Header */}
         <div className="mb-6">
           <div className="flex items-center gap-3 mb-2">
             <button
@@ -170,7 +225,7 @@ export default function ProduitsIbood() {
             <Button
               variant="outline"
               size="icon"
-              onClick={() => fetchProducts(false)}
+              onClick={() => syncFromSheets(false)}
               disabled={isSyncing}
               className="shrink-0"
             >
@@ -179,7 +234,6 @@ export default function ProduitsIbood() {
           </div>
         </div>
 
-        {/* Products */}
         {products.length === 0 ? (
           <Card className="text-center py-12">
             <CardContent>
@@ -200,37 +254,54 @@ export default function ProduitsIbood() {
   );
 }
 
-function IboodProductCard({ product, onCopy, onDelete }: { product: IboodProduct; onCopy: (text: string) => void; onDelete?: (id: string) => void }) {
-  const chartImageUrl = product.chart_url
-    ? product.chart_url.replace(/^=IMAGE\("?/i, '').replace(/"?\)$/i, '').replace(/^"|"$/g, '')
-    : null;
+function formatDateTime(dateStr: string | null): string | null {
+  if (!dateStr) return null;
+  try {
+    const d = new Date(dateStr);
+    return d.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' }) +
+      ' à ' +
+      d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+  } catch {
+    return null;
+  }
+}
 
-  const normalizedChartUrl = chartImageUrl?.startsWith('//') ? `https:${chartImageUrl}` : chartImageUrl;
+function IboodProductCard({ product, onCopy, onDelete }: { product: IboodProduct; onCopy: (text: string) => void; onDelete?: (id: string) => void }) {
+  const keepaChartUrl = product.asin
+    ? `https://graph.keepa.com/pricehistory.png?asin=${product.asin}&domain=fr&salesrank=1&bb=1&range=90`
+    : null;
 
   const hasAlertFlags = product.private_label || product.ip || product.hazmat || product.meltable || product.adult || product.fragile || product.oversize || product.restriction;
 
+  const dateTime = formatDateTime(product.created_at);
+
   return (
     <Card className="overflow-hidden border border-border/60 hover:border-primary/40 transition-all duration-300 hover:shadow-lg">
-      {/* Compact Header */}
       <div className="px-4 py-2.5 border-b bg-muted/30 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Store className="w-4 h-4 text-primary" />
           <span className="font-semibold text-sm text-primary">iBood</span>
+          {dateTime && (
+            <span className="flex items-center gap-1 text-[11px] text-muted-foreground ml-2">
+              <Clock className="w-3 h-3" />
+              {dateTime}
+            </span>
+          )}
         </div>
         <div className="flex items-center gap-2">
-          {product.asin && (
+          {product.ean && product.ean !== 'N/A' && (
             <button
-              onClick={() => onCopy(product.asin!)}
+              onClick={() => onCopy(product.ean)}
               className="flex items-center gap-1.5 bg-muted hover:bg-muted/80 px-2.5 py-1 rounded-md transition-colors"
             >
-              <code className="font-mono text-xs">{product.asin}</code>
+              <code className="font-mono text-xs">{product.ean}</code>
               <Copy className="w-3 h-3 text-muted-foreground" />
             </button>
           )}
           {onDelete && (
-            <Button 
-              variant="ghost" 
-              size="icon" 
+            <Button
+              variant="ghost"
+              size="icon"
               className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
               onClick={() => onDelete(product.id)}
             >
@@ -241,7 +312,6 @@ function IboodProductCard({ product, onCopy, onDelete }: { product: IboodProduct
       </div>
 
       <CardContent className="p-4">
-        {/* Title + Alert flags */}
         <div className="mb-3">
           <h3 className="text-base font-semibold leading-snug mb-2">{product.product_name}</h3>
           {hasAlertFlags && (
@@ -259,9 +329,7 @@ function IboodProductCard({ product, onCopy, onDelete }: { product: IboodProduct
         </div>
 
         <div className="flex flex-col md:flex-row gap-4">
-          {/* Left column */}
           <div className="flex-1 space-y-3 min-w-0">
-            {/* Prices + Stats combined row */}
             <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-2 p-2.5 bg-muted/20 rounded-lg text-sm">
               {product.cost && (
                 <div>
@@ -293,15 +361,8 @@ function IboodProductCard({ product, onCopy, onDelete }: { product: IboodProduct
                   <span className="font-semibold text-sm">{product.nb_vendors}</span>
                 </div>
               )}
-              {product.nb_fba && (
-                <div>
-                  <span className="text-[10px] text-muted-foreground block uppercase tracking-wide">FBA / FBM</span>
-                  <span className="font-semibold text-sm">{product.nb_fba} / {product.nb_fbm || '0'}</span>
-                </div>
-              )}
             </div>
 
-            {/* Profit cards side by side */}
             <div className="grid grid-cols-2 gap-2">
               {product.fbm_profit && product.fbm_roi && (
                 <div className="p-2.5 rounded-lg bg-blue-500/10 border border-blue-500/20">
@@ -335,7 +396,6 @@ function IboodProductCard({ product, onCopy, onDelete }: { product: IboodProduct
               )}
             </div>
 
-            {/* Links */}
             <div className="flex gap-2">
               {product.amazon_url && (
                 <Button variant="outline" size="sm" className="h-8 text-xs" asChild>
@@ -356,11 +416,10 @@ function IboodProductCard({ product, onCopy, onDelete }: { product: IboodProduct
             </div>
           </div>
 
-          {/* Right: Keepa chart */}
-          {normalizedChartUrl && (
+          {keepaChartUrl && (
             <div className="w-full md:w-[340px] lg:w-[400px] shrink-0 rounded-lg overflow-hidden border bg-white flex items-center justify-center p-2 self-start">
               <img
-                src={normalizedChartUrl}
+                src={keepaChartUrl}
                 alt={`Graphique Keepa – ${product.product_name}`}
                 className="w-full h-auto object-contain"
                 style={{ maxHeight: '360px' }}
