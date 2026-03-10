@@ -196,7 +196,7 @@ export default function ProductFindAlerts() {
 
   // Real-time subscription - debounced to avoid hammering the DB
   useEffect(() => {
-    let debounceTimer: NodeJS.Timeout | null = null;
+    let debounceTimer: ReturnType<typeof setTimeout> | null = null;
     
     const channel = supabase
       .channel('product-find-alerts')
