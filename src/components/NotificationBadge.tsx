@@ -24,7 +24,7 @@ export const NotificationBadge = ({ count, className, size = 'sm' }: Notificatio
         className
       )}
     >
-      {count > 99 ? '99+' : count}
+      {count >= 999 ? '999+' : count > 99 ? '99+' : count}
     </span>
   );
 };

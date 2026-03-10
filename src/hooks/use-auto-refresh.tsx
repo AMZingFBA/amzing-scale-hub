@@ -12,7 +12,7 @@ export const useAutoRefresh = (
 ) => {
   // Sur mobile, rafraîchir moins souvent pour économiser batterie et data
   const isNative = Capacitor.isNativePlatform();
-  const defaultInterval = isNative ? 60000 : 30000; // 60s sur mobile, 30s sur web
+  const defaultInterval = isNative ? 120000 : 60000; // 120s sur mobile, 60s sur web
   const { enabled = true, interval = defaultInterval } = options;
 
   useEffect(() => {
