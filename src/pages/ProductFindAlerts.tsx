@@ -73,7 +73,7 @@ export default function ProductFindAlerts() {
   const [showAdminForm, setShowAdminForm] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
   const [lastSyncTime, setLastSyncTime] = useState<Date | null>(null);
-  const autoSyncRef = useRef<NodeJS.Timeout | null>(null);
+  const autoSyncRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   // Sauvegarder/restaurer la position de scroll pour cette page
   useScrollPosition(location.pathname);
 
