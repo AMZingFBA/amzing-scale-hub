@@ -90,6 +90,15 @@ export const useNotifications = () => {
     }
   };
 
+  // Debounced fetch to avoid hammering the DB on rapid realtime events
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const debouncedFetch = useCallback(() => {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => {
+      fetchNotifications();
+    }, 3000);
+  }, [user]);
+
   useEffect(() => {
     if (!user) {
       setIsLoading(false);
@@ -105,46 +114,47 @@ export const useNotifications = () => {
     };
     window.addEventListener('refreshNotifications', handleRefresh);
 
-    // Subscribe to changes
+    // Subscribe to changes - debounced
     const channel = supabase
       .channel('notifications-changes')
       .on(
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'admin_alerts' },
-        () => fetchNotifications()
+        () => debouncedFetch()
       )
       .on(
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'messages' },
-        () => fetchNotifications()
+        () => debouncedFetch()
       )
       .on(
         'postgres_changes',
         { event: 'UPDATE', schema: 'public', table: 'alert_read_status' },
-        () => fetchNotifications()
+        () => debouncedFetch()
       )
       .on(
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'alert_read_status' },
-        () => fetchNotifications()
+        () => debouncedFetch()
       )
       .on(
         'postgres_changes',
         { event: 'UPDATE', schema: 'public', table: 'message_read_status' },
-        () => fetchNotifications()
+        () => debouncedFetch()
       )
       .on(
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'message_read_status' },
-        () => fetchNotifications()
+        () => debouncedFetch()
       )
       .subscribe();
 
     return () => {
       window.removeEventListener('refreshNotifications', handleRefresh);
+      if (debounceRef.current) clearTimeout(debounceRef.current);
       supabase.removeChannel(channel);
     };
-  }, [user]);
+  }, [user, debouncedFetch]);
 
   // Note: Le reset du badge se fait UNIQUEMENT dans use-push-notifications.tsx
   // quand l'utilisateur CLIQUE sur une notification, pas automatiquement à l'ouverture
