@@ -1,8 +1,8 @@
+import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Package, TrendingUp, DollarSign, BarChart3, ShoppingCart, Truck } from 'lucide-react';
+import { Package, TrendingUp, DollarSign, BarChart3, ChevronUp, ChevronDown } from 'lucide-react';
 import type { ProductResult } from '@/lib/product-search-types';
 
 interface SearchResultsProps {
@@ -12,39 +12,87 @@ interface SearchResultsProps {
   resultsCount?: number;
 }
 
+type SortKey = 'roi' | 'profit' | 'monthly_profit' | 'monthly_sales' | 'price' | 'supplier_price' | 'bsr' | 'margin';
+
+function avg(arr: number[]): number {
+  const valid = arr.filter(n => n > 0 && isFinite(n));
+  if (!valid.length) return 0;
+  return valid.reduce((s, n) => s + n, 0) / valid.length;
+}
+
+function fmt2(n: number): string { return (Math.round(n * 100) / 100).toFixed(2); }
+
 function CompetitionBadge({ level }: { level?: string }) {
   if (!level) return null;
-  const variants: Record<string, { class: string; label: string }> = {
-    low: { class: 'bg-green-100 text-green-800 border-green-200', label: 'Faible' },
-    medium: { class: 'bg-yellow-100 text-yellow-800 border-yellow-200', label: 'Moyenne' },
-    high: { class: 'bg-red-100 text-red-800 border-red-200', label: 'Forte' },
+  const map: Record<string, { cls: string; label: string }> = {
+    low:    { cls: 'bg-green-100 text-green-800 border-green-200',  label: 'Faible' },
+    medium: { cls: 'bg-yellow-100 text-yellow-800 border-yellow-200', label: 'Moy.' },
+    high:   { cls: 'bg-red-100 text-red-800 border-red-200',         label: 'Forte' },
   };
-  const v = variants[level] || variants.medium;
-  return <span className={`inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-medium border ${v.class}`}>{v.label}</span>;
+  const v = map[level] ?? map.medium;
+  return (
+    <span className={`inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-medium border ${v.cls}`}>
+      {v.label}
+    </span>
+  );
 }
 
 export default function SearchResults({ results, cacheHit, processingDuration, resultsCount }: SearchResultsProps) {
+  const [sortKey, setSortKey] = useState<SortKey>('roi');
+  const [sortAsc, setSortAsc] = useState(false);
+
   if (results.length === 0) {
     return (
       <Card>
         <CardContent className="py-12 text-center">
           <Package className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-          <p className="text-muted-foreground text-lg">Aucun résultat trouvé</p>
+          <p className="text-muted-foreground text-lg">Aucun résultat</p>
           <p className="text-muted-foreground text-sm mt-1">Essayez d'élargir vos critères</p>
         </CardContent>
       </Card>
     );
   }
 
-  const avgRoi = Math.round(results.reduce((s, r) => s + r.roi, 0) / results.length * 100) / 100;
-  const avgProfit = Math.round(results.reduce((s, r) => s + r.profit, 0) / results.length * 100) / 100;
-  const totalMonthlyProfit = Math.round(results.reduce((s, r) => s + (r.monthly_profit || 0), 0) * 100) / 100;
-  const totalMonthlySales = results.reduce((s, r) => s + (r.monthly_sales || 0), 0);
+  const sorted = [...results].sort((a, b) => {
+    const va = (a as any)[sortKey] ?? 0;
+    const vb = (b as any)[sortKey] ?? 0;
+    return sortAsc ? va - vb : vb - va;
+  });
+
+  function toggleSort(key: SortKey) {
+    if (sortKey === key) setSortAsc(p => !p);
+    else { setSortKey(key); setSortAsc(false); }
+  }
+
+  function SortIcon({ k }: { k: SortKey }) {
+    if (sortKey !== k) return <ChevronUp className="w-3 h-3 opacity-20" />;
+    return sortAsc
+      ? <ChevronUp className="w-3 h-3 text-primary" />
+      : <ChevronDown className="w-3 h-3 text-primary" />;
+  }
+
+  function SortTh({ k, label, right }: { k: SortKey; label: string; right?: boolean }) {
+    return (
+      <TableHead
+        className={`cursor-pointer select-none whitespace-nowrap ${right ? 'text-right' : ''}`}
+        onClick={() => toggleSort(k)}
+      >
+        <span className={`inline-flex items-center gap-1 ${right ? 'justify-end w-full' : ''}`}>
+          {label} <SortIcon k={k} />
+        </span>
+      </TableHead>
+    );
+  }
+
+  const avgRoi    = avg(results.map(r => r.roi));
+  const avgProfit = avg(results.map(r => r.profit));
+  const totalMonthlySales  = results.reduce((s, r) => s + (r.monthly_sales || 0), 0);
+  const totalMonthlyProfit = results.reduce((s, r) => s + (r.monthly_profit || 0), 0);
 
   return (
     <div className="space-y-3">
       {/* Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
         <Card>
           <CardContent className="p-3 text-center">
             <Package className="w-4 h-4 mx-auto text-primary mb-0.5" />
@@ -55,29 +103,22 @@ export default function SearchResults({ results, cacheHit, processingDuration, r
         <Card>
           <CardContent className="p-3 text-center">
             <TrendingUp className="w-4 h-4 mx-auto text-green-600 mb-0.5" />
-            <p className="text-xl font-bold text-green-600">{avgRoi}%</p>
+            <p className="text-xl font-bold text-green-600">{fmt2(avgRoi)}%</p>
             <p className="text-[10px] text-muted-foreground">ROI moyen</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-3 text-center">
             <DollarSign className="w-4 h-4 mx-auto text-amber-600 mb-0.5" />
-            <p className="text-xl font-bold text-amber-600">{avgProfit}€</p>
+            <p className="text-xl font-bold text-amber-600">{fmt2(avgProfit)}€</p>
             <p className="text-[10px] text-muted-foreground">Profit unit. moy.</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-3 text-center">
-            <BarChart3 className="w-4 h-4 mx-auto text-blue-600 mb-0.5" />
-            <p className="text-xl font-bold text-blue-600">{totalMonthlySales.toLocaleString()}</p>
-            <p className="text-[10px] text-muted-foreground">Ventes/mois total</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-3 text-center">
-            <DollarSign className="w-4 h-4 mx-auto text-purple-600 mb-0.5" />
-            <p className="text-xl font-bold text-purple-600">{totalMonthlyProfit.toLocaleString()}€</p>
-            <p className="text-[10px] text-muted-foreground">Profit/mois total</p>
+            <BarChart3 className="w-4 h-4 mx-auto text-purple-600 mb-0.5" />
+            <p className="text-xl font-bold text-purple-600">{fmt2(totalMonthlyProfit)}€</p>
+            <p className="text-[11px] text-muted-foreground">Profit/mois total</p>
           </CardContent>
         </Card>
       </div>
@@ -89,82 +130,110 @@ export default function SearchResults({ results, cacheHit, processingDuration, r
             {cacheHit ? 'Cache' : 'Recherche fraîche'}
           </Badge>
         )}
-        {processingDuration !== undefined && (
-          <span>{processingDuration}ms</span>
-        )}
+        {processingDuration !== undefined && <span>{processingDuration}ms</span>}
+        <span className="text-muted-foreground">Ventes/mois total : {totalMonthlySales.toLocaleString('fr')}</span>
+        <span className="text-xs text-muted-foreground ml-auto">Cliquer en-tête pour trier</span>
       </div>
 
       {/* Table */}
       <Card>
         <CardHeader className="py-2 px-4">
-          <CardTitle className="text-sm flex items-center gap-2">
-            <ShoppingCart className="w-4 h-4 text-primary" />
-            Résultats
-          </CardTitle>
+          <CardTitle className="text-sm">{sorted.length} résultats</CardTitle>
         </CardHeader>
         <CardContent className="p-0">
-          <ScrollArea className="w-full">
-            <div className="min-w-[1100px]">
-              <Table>
-                <TableHeader>
-                  <TableRow className="text-xs">
-                    <TableHead className="w-[200px]">Produit</TableHead>
-                    <TableHead>ASIN</TableHead>
-                    <TableHead className="text-right">
-                      <span className="flex items-center justify-end gap-1"><Truck className="w-3 h-3" />Fournisseur</span>
-                    </TableHead>
-                    <TableHead className="text-right">Prix fourn.</TableHead>
-                    <TableHead className="text-right">Prix Amazon</TableHead>
-                    <TableHead className="text-right">Profit unit.</TableHead>
-                    <TableHead className="text-right">ROI</TableHead>
-                    <TableHead className="text-right">Ventes/mois</TableHead>
-                    <TableHead className="text-right">Profit/mois</TableHead>
-                    <TableHead className="text-right">BSR</TableHead>
-                    <TableHead>Conc.</TableHead>
+          {/* Scrollable wrapper — horizontal AND vertical */}
+          <div className="overflow-x-auto overflow-y-auto max-h-[600px] rounded-b-lg">
+            <Table className="min-w-[1200px] text-xs">
+              <TableHeader className="sticky top-0 bg-background z-10">
+                <TableRow>
+                  <TableHead className="w-[220px] whitespace-nowrap">Produit</TableHead>
+                  <TableHead className="whitespace-nowrap">ASIN</TableHead>
+                  <TableHead className="whitespace-nowrap">Fournisseur</TableHead>
+                  <SortTh k="supplier_price" label="Prix fourn." right />
+                  <SortTh k="price"          label="Prix Amazon" right />
+                  <SortTh k="profit"         label="Profit unit." right />
+                  <SortTh k="roi"            label="ROI" right />
+                  <SortTh k="margin"         label="Marge" right />
+                  <SortTh k="monthly_sales"  label="Ventes/mois" right />
+                  <SortTh k="monthly_profit" label="Profit/mois" right />
+                  <SortTh k="bsr"            label="BSR" right />
+                  <TableHead className="whitespace-nowrap">Conc.</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {sorted.map((p) => (
+                  <TableRow key={p.id} className="hover:bg-accent/50">
+                    {/* Produit */}
+                    <TableCell className="max-w-[220px]">
+                      <p className="font-medium truncate" title={p.title}>{p.title || '—'}</p>
+                      <div className="flex gap-1 mt-0.5 flex-wrap">
+                        {p.brand    && <Badge variant="outline" className="text-[9px] h-4 px-1">{p.brand}</Badge>}
+                        {p.category && <Badge variant="outline" className="text-[9px] h-4 px-1">{p.category}</Badge>}
+                        {p.marketplace && <Badge variant="outline" className="text-[9px] h-4 px-1">{p.marketplace}</Badge>}
+                      </div>
+                    </TableCell>
+                    {/* ASIN */}
+                    <TableCell>
+                      {p.asin
+                        ? <a
+                            href={`https://www.amazon.fr/dp/${p.asin}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="font-mono text-[10px] bg-muted px-1 py-0.5 rounded hover:underline text-primary"
+                          >{p.asin}</a>
+                        : <span className="text-muted-foreground">—</span>}
+                    </TableCell>
+                    {/* Fournisseur */}
+                    <TableCell>
+                      <Badge variant="secondary" className="text-[10px] h-4 px-1 max-w-[110px] truncate block">
+                        {p.supplier || '—'}
+                      </Badge>
+                    </TableCell>
+                    {/* Prix fournisseur */}
+                    <TableCell className="text-right font-medium">
+                      {p.supplier_price > 0 ? `${fmt2(p.supplier_price)}€` : '—'}
+                    </TableCell>
+                    {/* Prix Amazon */}
+                    <TableCell className="text-right font-medium">
+                      {p.price > 0 ? `${fmt2(p.price)}€` : '—'}
+                    </TableCell>
+                    {/* Profit unitaire */}
+                    <TableCell className="text-right">
+                      <span className={`font-bold ${p.profit >= 5 ? 'text-green-600' : p.profit >= 2 ? 'text-yellow-600' : 'text-red-500'}`}>
+                        {p.profit !== 0 ? `${fmt2(p.profit)}€` : '—'}
+                      </span>
+                    </TableCell>
+                    {/* ROI */}
+                    <TableCell className="text-right">
+                      <span className={`font-bold ${p.roi >= 30 ? 'text-green-600' : p.roi >= 15 ? 'text-yellow-600' : 'text-red-500'}`}>
+                        {p.roi > 0 ? `${p.roi.toFixed(1)}%` : '—'}
+                      </span>
+                    </TableCell>
+                    {/* Marge */}
+                    <TableCell className="text-right text-muted-foreground">
+                      {p.margin > 0 ? `${p.margin.toFixed(1)}%` : '—'}
+                    </TableCell>
+                    {/* Ventes/mois */}
+                    <TableCell className="text-right">
+                      {p.monthly_sales ? p.monthly_sales.toLocaleString('fr') : '—'}
+                    </TableCell>
+                    {/* Profit/mois */}
+                    <TableCell className="text-right font-medium text-purple-600">
+                      {p.monthly_profit ? `${fmt2(p.monthly_profit)}€` : '—'}
+                    </TableCell>
+                    {/* BSR */}
+                    <TableCell className="text-right text-muted-foreground">
+                      {p.bsr ? p.bsr.toLocaleString('fr') : '—'}
+                    </TableCell>
+                    {/* Concurrence */}
+                    <TableCell>
+                      <CompetitionBadge level={p.competition_level} />
+                    </TableCell>
                   </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {results.map((p) => (
-                    <TableRow key={p.id} className="hover:bg-accent/50 text-xs">
-                      <TableCell>
-                        <p className="font-medium text-xs truncate max-w-[200px]" title={p.title}>
-                          {p.title}
-                        </p>
-                        <div className="flex gap-1 mt-0.5">
-                          {p.brand && <Badge variant="outline" className="text-[10px] h-4 px-1">{p.brand}</Badge>}
-                          {p.category && <Badge variant="outline" className="text-[10px] h-4 px-1">{p.category}</Badge>}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <code className="text-[10px] bg-muted px-1 py-0.5 rounded">{p.asin || '-'}</code>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <Badge variant="secondary" className="text-[10px] h-4 px-1">{p.supplier || '-'}</Badge>
-                      </TableCell>
-                      <TableCell className="text-right font-medium">{p.supplier_price?.toFixed(2) ?? '-'}€</TableCell>
-                      <TableCell className="text-right font-medium">{p.price.toFixed(2)}€</TableCell>
-                      <TableCell className="text-right">
-                        <span className={`font-bold ${p.profit >= 5 ? 'text-green-600' : p.profit >= 2 ? 'text-yellow-600' : 'text-red-500'}`}>
-                          {p.profit.toFixed(2)}€
-                        </span>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <span className={`font-bold ${p.roi >= 30 ? 'text-green-600' : p.roi >= 15 ? 'text-yellow-600' : 'text-red-500'}`}>
-                          {p.roi.toFixed(1)}%
-                        </span>
-                      </TableCell>
-                      <TableCell className="text-right">{p.monthly_sales ?? '-'}</TableCell>
-                      <TableCell className="text-right font-medium text-purple-600">
-                        {p.monthly_profit ? `${p.monthly_profit.toFixed(0)}€` : '-'}
-                      </TableCell>
-                      <TableCell className="text-right text-muted-foreground">{p.bsr?.toLocaleString() ?? '-'}</TableCell>
-                      <TableCell><CompetitionBadge level={p.competition_level} /></TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          </ScrollArea>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
         </CardContent>
       </Card>
     </div>

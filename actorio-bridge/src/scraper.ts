@@ -759,31 +759,49 @@ async function scrapeFromDom(page: Page): Promise<ActorioProduct[]> {
                              .filter(function(s) { return s.length > 0; });
       const supplier = supLines[supLines.length - 1] ?? '';
 
-      const amzRaw = (cells[5] as HTMLElement).innerText ?? '';
-      const amzMatch = amzRaw.match(/(\d+[\s\u00a0]?\d*[.,]\d{2})/);
-      const amazon_price = amzMatch ? parseFloat(amzMatch[1].replace(/\s/g, '').replace(',', '.')) : 0;
+      // Helper: extract first non-N/A numeric line from a cell
+      function firstNumLine(el: HTMLElement, stripChars: RegExp): number {
+        const lines = el.innerText.split('\n');
+        for (const line of lines) {
+          const t = line.trim();
+          if (!t || /^N\/A$/i.test(t) || !/\d/.test(t)) continue;
+          const cleaned = t.replace(stripChars, '').replace(',', '.');
+          const n = parseFloat(cleaned);
+          if (!isNaN(n) && isFinite(n)) return n;
+        }
+        return 0;
+      }
 
-      const p6  = (cells[6]  as HTMLElement).innerText.replace(/[€£\s\u00a0]/g, '').replace(',', '.');
-      const p8  = (cells[8]  as HTMLElement).innerText.replace(/[€£\s\u00a0]/g, '').replace(',', '.');
-      const p9  = (cells[9]  as HTMLElement).innerText.replace(/[%\s\u00a0]/g,  '').replace(',', '.');
-      // monthly_sales: cell has multi-marketplace lines like "14 \n 3 \n 17 \n N/A" — take first line only
-      const p10first = (cells[10] as HTMLElement).innerText.split('\n')[0].trim();
-      const p10 = p10first.replace(/[\s\u00a0]/g, '');
-      const p11 = (cells[11] as HTMLElement).innerText.replace(/[€£\s\u00a0]/g, '').replace(',', '.');
-      const p13 = (cells[13] as HTMLElement).innerText.replace(/[\s\u00a0]/g,   '');
-      const p14 = (cells[14] as HTMLElement).innerText.replace(/[%\s\u00a0]/g,  '').replace(',', '.');
+      const amazon_price = firstNumLine(cells[5] as HTMLElement, /[€£\s\u00a0]/g);
+      const supplier_price = firstNumLine(cells[6] as HTMLElement, /[€£\s\u00a0]/g);
+      const profit  = firstNumLine(cells[8] as HTMLElement, /[€£\s\u00a0]/g);
+      const roiRaw  = firstNumLine(cells[9] as HTMLElement, /[%\s\u00a0]/g);
+      const roi     = (roiRaw > 0 && roiRaw <= 500) ? roiRaw : 0; // sanity cap
+      const monthly_sales   = firstNumLine(cells[10] as HTMLElement, /[\s\u00a0]/g);
+      const monthly_profit  = firstNumLine(cells[11] as HTMLElement, /[€£\s\u00a0]/g);
+      const bsr    = firstNumLine(cells[13] as HTMLElement, /[^\d]/g);
+      const margin = firstNumLine(cells[14] as HTMLElement, /[%\s\u00a0]/g);
+
+      // Legacy vars kept for debug block below
+      const p6  = String(supplier_price);
+      const p8  = String(profit);
+      const p9  = String(roi);
+      const p10 = String(monthly_sales);
+      const p11 = String(monthly_profit);
+      const p13 = String(bsr);
+      const p14 = String(margin);
 
       if (!asin && !title) return;
 
       results.push({ title, asin, ean, image_url: imageUrl, supplier,
         amazon_price,
-        supplier_price: parseFloat(p6)  || 0,
-        profit:         parseFloat(p8)  || 0,
-        roi:            parseFloat(p9)  || 0,
-        monthly_sales:  parseInt(p10)   || 0,
-        monthly_profit: parseFloat(p11) || 0,
-        bsr:            parseInt(p13)   || 0,
-        margin:         parseFloat(p14) || 0,
+        supplier_price,
+        profit,
+        roi,
+        monthly_sales,
+        monthly_profit,
+        bsr,
+        margin,
         _debug: results.length === 0 ? { // log first row only
           c0: col0Text.substring(0, 40),
           c5: (cells[5] as HTMLElement).innerText.trim().substring(0, 20),

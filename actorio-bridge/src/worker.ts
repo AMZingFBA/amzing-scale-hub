@@ -85,10 +85,23 @@ async function processNext(db: any, secret: string) {
     }));
 
     const duration = Date.now() - t0;
-    const summary = results.length > 0 ? {
-      avg_roi:    r2(mean(results, 'roi')),
-      avg_margin: r2(mean(results, 'margin')),
-      avg_price:  r2(mean(results, 'price')),
+
+    // Re-apply filters client-side (Actorio server filtering is best-effort)
+    const filtered = results.filter(r => {
+      if (filters.roi_min          !== undefined && r.roi            < filters.roi_min)          return false;
+      if (filters.roi_max          !== undefined && r.roi            > filters.roi_max)          return false;
+      if (filters.unit_profit_min  !== undefined && r.profit         < filters.unit_profit_min)  return false;
+      if (filters.unit_profit_max  !== undefined && r.profit         > filters.unit_profit_max)  return false;
+      if (filters.amazon_price_min !== undefined && r.price          < filters.amazon_price_min) return false;
+      if (filters.amazon_price_max !== undefined && r.price          > filters.amazon_price_max) return false;
+      if (filters.monthly_profit_min !== undefined && r.monthly_profit < filters.monthly_profit_min) return false;
+      if (filters.monthly_sales_min  !== undefined && r.monthly_sales  < filters.monthly_sales_min)  return false;
+      return true;
+    });
+    const summary = filtered.length > 0 ? {
+      avg_roi:    r2(mean(filtered, 'roi')),
+      avg_margin: r2(mean(filtered, 'margin')),
+      avg_price:  r2(mean(filtered, 'price')),
     } : null;
 
     // Write results to cache
@@ -96,8 +109,8 @@ async function processNext(db: any, secret: string) {
     const { error: cacheErr } = await db.rpc('bridge_upsert_cache', {
       p_secret:       secret,
       p_filters_hash: record.filters_hash,
-      p_results:      results,
-      p_count:        results.length,
+      p_results:      filtered,
+      p_count:        filtered.length,
       p_expires_at:   expiresAt,
     });
     if (cacheErr) console.error('[worker] Cache RPC error:', cacheErr.message);
@@ -106,12 +119,12 @@ async function processNext(db: any, secret: string) {
     await db.rpc('bridge_complete_search', {
       p_secret:      secret,
       p_id:          record.id,
-      p_count:       results.length,
+      p_count:       filtered.length,
       p_summary:     summary,
       p_duration_ms: duration,
     });
 
-    console.log(`[worker] Done ${record.id}: ${results.length} results in ${duration} ms`);
+    console.log(`[worker] Done ${record.id}: ${filtered.length}/${results.length} results (after filter) in ${duration} ms`);
 
   } catch (err: any) {
     console.error(`[worker] Failed ${record.id}:`, err.message);
