@@ -319,56 +319,10 @@ export function useProductSearch() {
     const searchId = (newSearch as any).id;
     console.log('[search] Queued search:', searchId);
 
-    // Phase 1 — attendre max 30 s que le bridge prenne en charge la recherche.
-    // Si après 30 s le statut est toujours 'pending', le bridge est hors-ligne :
-    // on bascule en mode mock pour ne pas laisser l'utilisateur bloqué.
-    const bridgePickupDeadline = Date.now() + 30_000;
-    let bridgePickedUp = false;
-
-    while (Date.now() < bridgePickupDeadline) {
-      await new Promise(r => setTimeout(r, 5000));
-
-      const { data: record } = await supabase
-        .from('product_searches')
-        .select('id, status, error_message, results_count, processing_duration_ms, results_summary')
-        .eq('id', searchId)
-        .single();
-
-      if (!record) continue;
-      const rec = record as any;
-
-      if (rec.status === 'completed') {
-        const summary = rec.results_summary as any;
-        const results: ProductResult[] = Array.isArray(summary?.results) ? summary.results : [];
-        setCurrentResults(results);
-        await loadSearches();
-        return {
-          search_id: rec.id, status: 'completed', cache_hit: false,
-          results, results_count: results.length,
-          processing_duration_ms: rec.processing_duration_ms || 0,
-        };
-      }
-
-      if (rec.status === 'error') {
-        throw new Error(rec.error_message || 'La recherche a échoué côté serveur');
-      }
-
-      if (rec.status === 'processing') {
-        // Bridge a pris en charge la recherche — continuer à attendre (phase 2)
-        bridgePickedUp = true;
-        break;
-      }
-    }
-
-    // Bridge hors-ligne : fallback mock immédiat
-    if (!bridgePickedUp) {
-      console.warn('[search] Bridge non disponible après 30 s — fallback mock');
-      return await submitSearchLocal(filters);
-    }
-
-    // Phase 2 — bridge en cours de traitement, attendre jusqu'à 5 min
-    const processingDeadline = Date.now() + 5 * 60_000;
-    while (Date.now() < processingDeadline) {
+    // Polling toutes les 5 s jusqu'à ce que le bridge complète la recherche.
+    // submitSearch gère le timeout de 30 s avec Promise.race — pas besoin ici.
+    const deadline = Date.now() + 5 * 60_000; // max 5 min
+    while (Date.now() < deadline) {
       await new Promise(r => setTimeout(r, 5000));
 
       const { data: record } = await supabase
@@ -396,9 +350,7 @@ export function useProductSearch() {
         throw new Error(rec.error_message || 'La recherche a échoué côté serveur');
       }
     }
-
-    throw new Error('Timeout : la recherche a pris plus de 5 minutes');
-  }, [user, loadSearches, submitSearchLocal]);
+  }, [user, loadSearches]);
 
   const submitSearch = useCallback(async (filters: SearchFilters): Promise<SearchResponse | null> => {
     if (!user) return null;
