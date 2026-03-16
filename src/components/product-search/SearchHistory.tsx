@@ -54,7 +54,7 @@ function StatusBadge({ status, cacheHit }: { status: string; cacheHit?: boolean 
   }
 }
 
-export default function SearchHistory({ searches }: SearchHistoryProps) {
+export default function SearchHistory({ searches, onViewResults }: SearchHistoryProps) {
   if (searches.length === 0) {
     return (
       <Card>
