@@ -86,18 +86,9 @@ async function processNext(db: any, secret: string) {
 
     const duration = Date.now() - t0;
 
-    // Re-apply filters client-side (Actorio server filtering is best-effort)
-    const filtered = results.filter(r => {
-      if (filters.roi_min          !== undefined && r.roi            < filters.roi_min)          return false;
-      if (filters.roi_max          !== undefined && r.roi            > filters.roi_max)          return false;
-      if (filters.unit_profit_min  !== undefined && r.profit         < filters.unit_profit_min)  return false;
-      if (filters.unit_profit_max  !== undefined && r.profit         > filters.unit_profit_max)  return false;
-      if (filters.amazon_price_min !== undefined && r.price          < filters.amazon_price_min) return false;
-      if (filters.amazon_price_max !== undefined && r.price          > filters.amazon_price_max) return false;
-      if (filters.monthly_profit_min !== undefined && r.monthly_profit < filters.monthly_profit_min) return false;
-      if (filters.monthly_sales_min  !== undefined && r.monthly_sales  < filters.monthly_sales_min)  return false;
-      return true;
-    });
+    // Actorio already filters server-side via URL params — no client-side re-filter.
+    // Re-filtering caused false negatives when DOM parsing extracted 0 for roi/monthly_sales.
+    const filtered = results;
     const summary = {
       avg_roi:    r2(mean(filtered, 'roi')),
       avg_margin: r2(mean(filtered, 'margin')),

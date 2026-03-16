@@ -314,9 +314,9 @@ async function fillFilters(page: Page, filters: ActorioFilters): Promise<void> {
 
 /**
  * Perform a product search on Actorio.
- * Uses form-filling (not URL params — Actorio's server ignores raw GET params).
- * The form is GET-based, so clicking submit navigates to the filtered URL.
- * Pagination uses Django's ?page=N links.
+ * Navigates directly to the URL built by buildSearchUrl (GET params).
+ * The user confirmed this URL format works: Actorio honors GET params.
+ * Pagination uses Django's &page=N appended to the same URL.
  */
 export async function search(filters: ActorioFilters, maxResults = 100): Promise<ScraperResult> {
   if (!context) throw new Error('Browser not initialized');
@@ -325,173 +325,43 @@ export async function search(filters: ActorioFilters, maxResults = 100): Promise
   const startTime = Date.now();
   const page = await context.newPage();
 
-  // Capture all non-static network requests for diagnostics
-  const netLog: string[] = [];
-  page.on('request', req => {
-    const u = req.url();
-    if (u.includes('actorio.com') && !/\.(png|jpg|gif|css|woff|ico)(\?|$)/i.test(u)) {
-      const rawPost = req.postData() ?? '';
-      const postLen = u.includes('save_user_preference') ? 800 : 80;
-      netLog.push(`REQ ${req.method()} ${u.substring(0, 100)}${rawPost ? ' POST=' + rawPost.substring(0, postLen) : ''}`);
-    }
-  });
-  page.on('response', res => {
-    const u = res.url();
-    if (u.includes('actorio.com') && !/\.(png|jpg|gif|css|woff|ico)(\?|$)/i.test(u)) {
-      netLog.push(`RES ${res.status()} ${u.substring(0, 100)}`);
-    }
-  });
-
   try {
-    // Navigate to the search form page
-    console.log('[scraper] Loading search form...');
-    await page.goto(`${ACTORIO_URL}/products/search/`, { waitUntil: 'domcontentloaded', timeout: 30000 });
-
-    // Dismiss cookie banner if present
-    const acceptBtn = page.locator('button.cky-btn-accept[data-cky-tag="accept-button"]');
-    if (await acceptBtn.isVisible().catch(() => false)) {
-      await acceptBtn.click();
-      await page.waitForTimeout(500);
-    }
-
-    // Wait for the filter form to be present
-    await page.waitForSelector('#filter_button', { timeout: 15000 });
-
-    // Inspect form structure
-    const formInfo = await page.evaluate((): any => {
-      const form = document.querySelector('form') as HTMLFormElement | null;
-      const btn = document.querySelector('#filter_button') as HTMLButtonElement | null;
-      const mpSel = document.querySelector('#id_marketplace') as HTMLSelectElement | null;
-      const storeSel = document.querySelector('#id_store') as HTMLSelectElement | null;
-      const storeOpts = storeSel ? Array.from(storeSel.options).slice(0, 10).map(o => ({ val: o.value, label: o.text.trim().substring(0, 30) })) : [];
-      // Get all form field values
-      const formData: any = {};
-      if (form) { Array.from(new FormData(form).entries()).forEach(([k, v]) => { formData[k] = v; }); }
-      return {
-        formMethod: form?.method,
-        formAction: form?.action?.replace(/^https?:\/\/[^/]+/, ''),
-        formId: form?.id,
-        btnType: btn?.type,
-        btnForm: btn?.getAttribute('form'),
-        btnOnClick: btn?.getAttribute('onclick')?.substring(0, 80),
-        mpName: mpSel?.name,
-        mpCurrentVal: mpSel?.value,
-        storeOpts,
-        formData,
-        selectMpFnSrc: typeof (window as any).selectMarketplace === 'function'
-          ? (window as any).selectMarketplace.toString().substring(0, 600)
-          : 'NOT FOUND',
-      };
-    });
-    console.log('[scraper] Form info:', JSON.stringify(formInfo));
-
-    // Fill standard form fields (inputs)
-    await fillFilters(page, filters);
-
-    // Use jQuery to trigger marketplace/store change handlers.
-    // Actorio stores marketplace in server-side session via a save_user_preference AJAX call
-    // that is fired by the custom multiselect plugin's onChange handler.
-    // page.selectOption() on hidden #id_marketplace doesn't trigger these handlers.
-    const mpMap: Record<string, string> = {
-      'amazon.fr': 'FR', 'amazon.de': 'DE', 'amazon.es': 'ES',
-      'amazon.it': 'IT', 'amazon.co.uk': 'GB',
-    };
-    const mpCode = filters.marketplace ? (mpMap[filters.marketplace] ?? filters.marketplace) : 'FR';
-    const storeVal = filters.suppliers?.length ? filters.suppliers : ['ALL'];
-
-    await page.evaluate((params: { mp: string; stores: string[] }): void => {
-      const jq = (window as any).jQuery;
-      if (!jq) return;
-      // Set marketplace via jQuery (fires change handler → save_user_preference AJAX)
-      jq('#id_marketplace').val(params.mp).trigger('change');
-      if (typeof (window as any).selectMarketplace === 'function') {
-        (window as any).selectMarketplace();
-      }
-      // Set store value WITHOUT triggering 'change' — triggering change opens a modal dialog
-      // The form's GET submit will still include the store value in the URL
-      jq('#id_store').val(params.stores);
-      // Enable the submit button
-      const btn = document.querySelector('#filter_button') as HTMLButtonElement | null;
-      if (btn) { btn.disabled = false; btn.removeAttribute('disabled'); }
-    }, { mp: mpCode, stores: storeVal });
-
-    // Wait for save_user_preference AJAX to complete before submitting
-    console.log(`[scraper] Marketplace=${mpCode} store=${storeVal.join(',')} — waiting for session save...`);
-    netLog.length = 0; // clear page-load traffic before AJAX logging
-    await page.waitForTimeout(2000);
-    console.log('[scraper] Network during AJAX wait:', JSON.stringify(netLog));
-    netLog.length = 0;
-
-    // Dismiss any open modal (e.g. #modalStore) that could block the click
-    await page.evaluate((): void => {
-      const jq = (window as any).jQuery;
-      if (jq) jq('.modal.show').modal('hide');
-      // Also force-remove backdrop
-      document.querySelectorAll('.modal-backdrop').forEach(function(el) { el.remove(); });
-      document.body.classList.remove('modal-open');
-    });
-
-    // Submit form — GET form submit navigates to filtered URL
-    console.log('[scraper] Submitting search form...');
-    const navPromise = page.waitForNavigation({ waitUntil: 'domcontentloaded', timeout: 20000 }).catch(() => {});
-    await page.locator('#filter_button').first().click();
-    await navPromise;
-    // Wait for save_user_preference AJAX to complete on results page
-    await page.waitForTimeout(3000);
-
-    // Check for session expiry (redirected to login page)
-    if (page.url().includes('/accounts/login')) {
-      console.log('[scraper] Session expired during form submit — re-logging in...');
-      isLoggedIn = false;
-      const email = process.env.ACTORIO_EMAIL!;
-      const password = process.env.ACTORIO_PASSWORD!;
-      const relogged = await login(email, password);
-      if (!relogged) throw new Error('Re-login failed after session expiry');
-      // Retry: navigate to search form and submit again
-      await page.goto(`${ACTORIO_URL}/products/search/`, { waitUntil: 'domcontentloaded', timeout: 30000 });
-      await page.waitForSelector('#filter_button', { timeout: 15000 });
-      await fillFilters(page, filters);
-      await page.evaluate((params: { mp: string; stores: string[] }): void => {
-        const jq = (window as any).jQuery;
-        if (!jq) return;
-        jq('#id_marketplace').val(params.mp).trigger('change');
-        if (typeof (window as any).selectMarketplace === 'function') (window as any).selectMarketplace();
-        jq('#id_store').val(params.stores);
-        const btn = document.querySelector('#filter_button') as HTMLButtonElement | null;
-        if (btn) { btn.disabled = false; btn.removeAttribute('disabled'); }
-      }, { mp: mpCode, stores: storeVal });
-      await page.waitForTimeout(2000);
-      const retryNav = page.waitForNavigation({ waitUntil: 'domcontentloaded', timeout: 20000 }).catch(() => {});
-      await page.locator('#filter_button').first().click();
-      await retryNav;
-      await page.waitForTimeout(3000);
-    }
-
-    // Capture the filtered URL for pagination
-    const filteredUrl = page.url();
-    const baseFilteredUrl = filteredUrl.replace(/[?&]page=\d+/, '');
-    console.log(`[scraper] Filtered URL: ${filteredUrl}`);
+    const baseUrl = buildSearchUrl(filters);
+    console.log(`[scraper] Search URL: ${baseUrl}`);
 
     const allResults: ActorioProduct[] = [];
     let pageNum = 1;
     let totalCount = 0;
 
     while (allResults.length < maxResults) {
-      if (pageNum > 1) {
-        const sep = baseFilteredUrl.includes('?') ? '&' : '?';
-        const pageUrl = `${baseFilteredUrl}${sep}page=${pageNum}`;
-        console.log(`[scraper] Page ${pageNum}: ${pageUrl}`);
-        await page.goto(pageUrl, { waitUntil: 'domcontentloaded', timeout: 30000 });
-      } else {
-        console.log('[scraper] Page 1 (already loaded)');
+      const pageUrl = pageNum === 1 ? baseUrl : `${baseUrl}&page=${pageNum}`;
+      console.log(`[scraper] Loading page ${pageNum}: ${pageUrl}`);
+      await page.goto(pageUrl, { waitUntil: 'domcontentloaded', timeout: 30000 });
+
+      // Dismiss cookie banner (first page only)
+      if (pageNum === 1) {
+        const acceptBtn = page.locator('button.cky-btn-accept[data-cky-tag="accept-button"]');
+        if (await acceptBtn.isVisible().catch(() => false)) {
+          console.log('[scraper] Dismissing cookie banner...');
+          await acceptBtn.click();
+          await page.waitForTimeout(500);
+        }
       }
 
-      // Wait for table rows (max 20s)
+      // Check for session expiry
+      if (page.url().includes('/accounts/login')) {
+        console.log('[scraper] Session expired — re-logging in...');
+        isLoggedIn = false;
+        const relogged = await login(process.env.ACTORIO_EMAIL!, process.env.ACTORIO_PASSWORD!);
+        if (!relogged) throw new Error('Re-login failed after session expiry');
+        await page.goto(pageUrl, { waitUntil: 'domcontentloaded', timeout: 30000 });
+      }
+
+      // Wait for table rows (up to 20s)
       let loaded = false;
       for (let i = 0; i < 10; i++) {
         await page.waitForTimeout(2000);
         const rowCount = await page.evaluate((): number => {
-          // Try #main-table first, then fall back to the table with most tbody.rows
           const mainTbl = document.querySelector('table#main-table') as HTMLTableElement | null;
           if (mainTbl && mainTbl.tBodies[0]) return mainTbl.tBodies[0].rows.length;
           let max = 0;
@@ -506,16 +376,14 @@ export async function search(filters: ActorioFilters, maxResults = 100): Promise
       }
 
       if (!loaded) {
-        console.log('[scraper] No rows, stopping');
+        console.log('[scraper] No rows found, stopping');
         break;
       }
 
       const pageRows = await scrapeFromDom(page);
       if (pageRows.length === 0) break;
-
       allResults.push(...pageRows);
 
-      // Get pagination info (pass pageNum as parameter since page.evaluate runs in browser scope)
       const paginationInfo = await page.evaluate((currentPage: number): { total: number; maxPage: number } => {
         const body = document.body?.innerText ?? '';
         const totalMatch = body.match(/sur\s+([\d\s]+)\s+résultat/i)
