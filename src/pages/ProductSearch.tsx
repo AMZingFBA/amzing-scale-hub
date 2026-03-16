@@ -174,7 +174,7 @@ const ProductSearch = () => {
             )}
 
             {/* History */}
-            <SearchHistory searches={searches} />
+            <SearchHistory searches={searches} onViewResults={handleViewResults} />
           </div>
         </div>
       </main>
