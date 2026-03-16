@@ -1,13 +1,15 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Clock, CheckCircle, AlertCircle, Loader2, Database, RefreshCw } from 'lucide-react';
+import { Clock, CheckCircle, AlertCircle, Loader2, Database, RefreshCw, Eye } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import type { ProductSearch } from '@/lib/product-search-types';
 
 interface SearchHistoryProps {
   searches: ProductSearch[];
+  onViewResults?: (search: ProductSearch) => void;
 }
 
 function StatusBadge({ status, cacheHit }: { status: string; cacheHit?: boolean }) {
@@ -52,7 +54,7 @@ function StatusBadge({ status, cacheHit }: { status: string; cacheHit?: boolean 
   }
 }
 
-export default function SearchHistory({ searches }: SearchHistoryProps) {
+export default function SearchHistory({ searches, onViewResults }: SearchHistoryProps) {
   if (searches.length === 0) {
     return (
       <Card>
@@ -110,9 +112,22 @@ export default function SearchHistory({ searches }: SearchHistoryProps) {
                       </div>
                     )}
                   </div>
-                  <span className="text-xs text-muted-foreground whitespace-nowrap">
-                    {formatDistanceToNow(new Date(search.created_at), { addSuffix: true, locale: fr })}
-                  </span>
+                  <div className="flex flex-col items-end gap-1.5 shrink-0">
+                    <span className="text-xs text-muted-foreground whitespace-nowrap">
+                      {formatDistanceToNow(new Date(search.created_at), { addSuffix: true, locale: fr })}
+                    </span>
+                    {search.status === 'completed' && search.results_count > 0 && onViewResults && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="h-7 text-xs gap-1"
+                        onClick={() => onViewResults(search)}
+                      >
+                        <Eye className="w-3 h-3" />
+                        Voir les résultats
+                      </Button>
+                    )}
+                  </div>
                 </div>
               </div>
             ))}
