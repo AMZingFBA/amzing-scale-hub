@@ -42,28 +42,6 @@ const ProductSearch = () => {
     }
   }, [currentResults]);
 
-  if (isLoading || isAdminLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-      </div>
-    );
-  }
-
-  if (!user) return <Navigate to="/auth" replace />;
-  if (!isVIP && !isAdmin) return <Navigate to="/" replace />;
-
-  const handleSubmit = async (filters: SearchFilters) => {
-    setError(null);
-    const response = await submitSearch(filters);
-    if (response) setLastResponse(response);
-  };
-
-  const handleLoadPreset = (preset: SearchPreset) => {
-    setCurrentResults([]);
-    setLastResponse(null);
-  };
-
   const handleViewResults = useCallback(async (search: ProductSearchType) => {
     // Try loading from search_results_cache first
     const { data: cached } = await supabase
@@ -106,6 +84,28 @@ const ProductSearch = () => {
 
     toast.error('Les résultats de cette recherche ne sont plus disponibles');
   }, [setCurrentResults]);
+
+  if (isLoading || isAdminLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  if (!user) return <Navigate to="/auth" replace />;
+  if (!isVIP && !isAdmin) return <Navigate to="/" replace />;
+
+  const handleSubmit = async (filters: SearchFilters) => {
+    setError(null);
+    const response = await submitSearch(filters);
+    if (response) setLastResponse(response);
+  };
+
+  const handleLoadPreset = (preset: SearchPreset) => {
+    setCurrentResults([]);
+    setLastResponse(null);
+  };
 
   return (
     <div className="min-h-screen flex flex-col">
