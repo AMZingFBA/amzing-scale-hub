@@ -604,8 +604,16 @@ async function scrapeFromDom(page: Page, marketplace: string): Promise<ActorioPr
   });
   console.log(`[scraper] table diag: ${JSON.stringify(diag)}`);
 
-  // Extra wait to let async content (Amazon prices, Keepa) load — up to 8s
-  for (let w = 0; w < 4; w++) {
+  // Scroll to bottom then back to top — triggers intersection-observer lazy-loads
+  // (Amazon prices and Keepa images are lazy-loaded based on viewport on Actorio)
+  await page.evaluate(() => {
+    window.scrollTo({ top: document.body.scrollHeight });
+  });
+  await page.waitForTimeout(2000);
+  await page.evaluate(() => { window.scrollTo({ top: 0 }); });
+
+  // Wait up to 12s for Amazon prices to appear in c5
+  for (let w = 0; w < 6; w++) {
     await page.waitForTimeout(2000);
     const hasPrices = await page.evaluate((): boolean => {
       let table = document.querySelector('table#main-table') as HTMLTableElement | null;
@@ -625,7 +633,8 @@ async function scrapeFromDom(page: Page, marketplace: string): Promise<ActorioPr
       if (cells.length < 6) return false;
       // Check if cells[5] (amazon price) has a number
       const txt = (cells[5] as HTMLElement).innerText ?? '';
-      return /\d/.test(txt);
+      const dataOrd = cells[5].getAttribute('data-order') ?? '';
+      return /\d/.test(txt) || /^\d/.test(dataOrd);
     });
     if (hasPrices) {
       console.log(`[scraper] Amazon prices loaded after ${(w + 1) * 2}s`);
@@ -792,26 +801,20 @@ async function scrapeFromDom(page: Page, marketplace: string): Promise<ActorioPr
       // --- col 11: Bénéfice Mensuel (multi-country) ---
       var monthly_profit  = helpers.numCountry(cells[11] as HTMLElement, /[€£\s\u00a0]/g, countryIdx);
 
-      // --- col 12: Graphique Keepa (90j) — 5 images par produit, une par pays dans l'ordre DB_AMZ ---
-      // Il faut prendre l'image à l'index countryIdx (pas la première qui est toujours DE).
-      var keepaImgs = Array.from(cells[12].querySelectorAll('img')) as HTMLImageElement[];
-      // Essayer aussi les images lazy (data-src)
-      if (keepaImgs.length === 0) {
-        keepaImgs = Array.from(cells[12].querySelectorAll('[data-src]')) as HTMLImageElement[];
-      }
-      var keepaImg = keepaImgs[countryIdx] ?? keepaImgs[0] ?? null;
-      var keepa_url = keepaImg
-        ? (keepaImg.getAttribute('src') || keepaImg.getAttribute('data-src') || '')
+      // --- col 12: Graphique Keepa (90j) ---
+      // Les images Keepa ne chargent QUE sur click/hover sur Actorio (lazy-load interactif).
+      // querySelectorAll('img') ne retourne que des src vides. On construit l'URL
+      // directement depuis l'ASIN : https://graph.keepa.com/pricehistory.png?asin=...
+      var keepaDomainMap: Record<string, string> = {
+        'amazon.fr': 'fr', 'amazon.de': 'de', 'amazon.es': 'es',
+        'amazon.it': 'it', 'amazon.co.uk': 'co.uk', 'amazon.com': 'com',
+      };
+      var keepaDomain = keepaDomainMap[mktplace] ?? 'fr';
+      var keepa_url = asin
+        ? 'https://graph.keepa.com/pricehistory.png?asin=' + asin
+          + '&domain=' + keepaDomain
+          + '&salesrank=0&new=1&used=0&rating=0&range=90'
         : '';
-      // Si l'URL a encore un paramètre domain=xx, le corriger aussi
-      if (keepa_url) {
-        var keepaDomainMap: Record<string, string> = {
-          'amazon.fr': 'fr', 'amazon.de': 'de', 'amazon.es': 'es',
-          'amazon.it': 'it', 'amazon.co.uk': 'co.uk', 'amazon.com': 'com',
-        };
-        var keepaDomain = keepaDomainMap[mktplace] ?? 'fr';
-        keepa_url = keepa_url.replace(/([?&]domain=)[^&]+/, '$1' + keepaDomain);
-      }
 
       // --- col 13: BSR ---
       var bsr    = helpers.num(cells[13] as HTMLElement, /[^\d]/g);
@@ -831,16 +834,17 @@ async function scrapeFromDom(page: Page, marketplace: string): Promise<ActorioPr
         _debug: results.length === 0 ? {
           c0: col0Text.substring(0, 40),
           c3_text: c3text.trim().substring(0, 100),
-          c3_html: cells[3].innerHTML.substring(0, 200),
           correspondance_extracted: correspondance,
           c5_text: (cells[5] as HTMLElement).innerText.trim().substring(0, 80),
+          c5_html: cells[5].innerHTML.substring(0, 200),
+          c5_data_order: cells[5].getAttribute('data-order') ?? '',
+          c5_attrs: cells[5].getAttributeNames().join(', '),
           c6: (cells[6] as HTMLElement).innerText.trim().substring(0, 40),
           c8: (cells[8] as HTMLElement).innerText.trim().substring(0, 60),
           c9: (cells[9] as HTMLElement).innerText.trim().substring(0, 60),
           c10: (cells[10] as HTMLElement).innerText.trim().substring(0, 60),
           c14: (cells[14] as HTMLElement).innerText.trim().substring(0, 60),
-          keepa_imgs_count: keepaImgs.length,
-          keepa_url_raw: keepa_url.substring(0, 100),
+          keepa_url: keepa_url.substring(0, 80),
           total_cells: cells.length,
           countryIdx,
           marketplace: mktplace,
