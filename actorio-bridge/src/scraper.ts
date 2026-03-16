@@ -679,48 +679,36 @@ async function scrapeFromDom(page: Page, marketplace: string): Promise<ActorioPr
       const eanM = col0Text.match(/\b\d{8,14}\b/);
       const ean  = eanM ? eanM[0] : '';
 
-      // --- col 1: Correspondance ---
-      // Actorio shows similarity as a colored badge/progress or text in c1.
-      var correspondance = '';
-      var col1Html = cells[1].innerHTML ?? '';
-      var col1El = cells[1] as HTMLElement;
-      // Try progress bar aria-valuenow first (e.g. <div aria-valuenow="87">)
-      var avnMatch = col1Html.match(/aria-valuenow="(\d+)"/);
-      if (avnMatch) {
-        correspondance = avnMatch[1] + '%';
-      }
-      // Try data-value or data-score attribute
-      if (!correspondance) {
-        var dvMatch = col1Html.match(/data-(?:value|score|similarity)="([^"]+)"/);
-        if (dvMatch) correspondance = dvMatch[1];
-      }
-      // Try percentage text "xx%" anywhere in the cell
-      if (!correspondance) {
-        var pctM = (col1El.innerText ?? '').match(/(\d+)\s*%/);
-        if (pctM) correspondance = pctM[1] + '%';
-      }
-      // Try quality-level text (Élevé/Moyen/Faible)
-      if (!correspondance) {
-        var col1Lower = (col1El.innerText ?? '').toLowerCase();
-        if (/élevé|eleve|high|exact/i.test(col1Lower))  correspondance = 'Élevé';
-        else if (/moyen|medium/i.test(col1Lower))        correspondance = 'Moyen';
-        else if (/faible|low/i.test(col1Lower))          correspondance = 'Faible';
-      }
-      // Also check c2 (title cell) for an embedded similarity badge
-      if (!correspondance) {
-        var c2html = cells[2].innerHTML ?? '';
-        var c2pct  = c2html.match(/aria-valuenow="(\d+)"|data-similarity="([^"]+)"|\bclass="[^"]*similarity[^"]*"[^>]*>([^<]*)/);
-        if (c2pct) correspondance = (c2pct[1] || c2pct[2] || c2pct[3] || '').trim();
-      }
+      // --- col 1: Restrictions (ignoré) ---
 
       // --- col 2: Titre ---
       const titleRaw = (cells[2] as HTMLElement).innerText ?? '';
       const title = titleRaw.split('\n').map(function(s) { return s.trim(); })
                              .filter(function(s) { return s.length > 10; })[0] ?? '';
 
-      // --- col 3: Info AMZ (image) ---
+      // --- col 3: Info AMZ — image produit ET "Correspondance: XX%" ---
       const imgEl = cells[3].querySelector('img') as HTMLImageElement | null;
       const imageUrl = imgEl?.getAttribute('src') ?? '';
+      // Correspondance est affiché sous l'image dans cette même colonne
+      var correspondance = '';
+      var c3text = (cells[3] as HTMLElement).innerText ?? '';
+      // Chercher "Correspondance: XX%" ou "Correspondance :\n XX%"
+      var corrTextMatch = c3text.match(/Correspondance\s*:?\s*\n?\s*(\d+)\s*%/i);
+      if (corrTextMatch) {
+        correspondance = corrTextMatch[1] + '%';
+      }
+      // Fallback: progress bar aria-valuenow dans c3
+      if (!correspondance) {
+        var c3html = cells[3].innerHTML ?? '';
+        var avnM = c3html.match(/aria-valuenow="(\d+)"/);
+        if (avnM) correspondance = avnM[1] + '%';
+      }
+      // Fallback: chercher Élevé/Moyen/Faible dans c3
+      if (!correspondance) {
+        if (/élevé|eleve|exact/i.test(c3text))      correspondance = 'Élevé';
+        else if (/moyen|medium/i.test(c3text))       correspondance = 'Moyen';
+        else if (/faible|low/i.test(c3text))         correspondance = 'Faible';
+      }
 
       // --- col 4: Fournisseur (supplier name + logo + URL) ---
       var supAnchor = cells[4].querySelector('a') as HTMLAnchorElement | null;
@@ -778,9 +766,10 @@ async function scrapeFromDom(page: Page, marketplace: string): Promise<ActorioPr
         }
       };
 
-      // --- col 5: Prix AMZ (may still be empty if JS hasn't loaded yet) ---
-      var amazon_price = helpers.num(cells[5] as HTMLElement, /[€£\s\u00a0]/g);
-      // Fallback: try data-sort attribute on the cell (Django-tables2 often adds this)
+      // --- col 5: Prix AMZ Actuel (multi-country, un prix par pays dans l'ordre DB_AMZ) ---
+      // Même structure que c8-c11 : prendre le prix au bon index pays.
+      var amazon_price = helpers.numCountry(cells[5] as HTMLElement, /[€£\s\u00a0]/g, countryIdx);
+      // Fallback : data-sort/data-order si la valeur async n'est pas encore là
       if (!amazon_price) {
         var sortVal = cells[5].getAttribute('data-sort') ?? cells[5].getAttribute('data-order') ?? '';
         if (sortVal && /^\d/.test(sortVal)) amazon_price = parseFloat(sortVal) || 0;
@@ -803,14 +792,18 @@ async function scrapeFromDom(page: Page, marketplace: string): Promise<ActorioPr
       // --- col 11: Bénéfice Mensuel (multi-country) ---
       var monthly_profit  = helpers.numCountry(cells[11] as HTMLElement, /[€£\s\u00a0]/g, countryIdx);
 
-      // --- col 12: Graphique Keepa (fix domain param to match searched marketplace) ---
-      var keepaImg = cells[12].querySelector('img') as HTMLImageElement | null;
-      var keepa_url = keepaImg ? (keepaImg.getAttribute('src') ?? '') : '';
-      if (!keepa_url) {
-        // Try data-src (lazy loading)
-        keepa_url = (cells[12].querySelector('img[data-src]') as HTMLImageElement | null)?.getAttribute('data-src') ?? '';
+      // --- col 12: Graphique Keepa (90j) — 5 images par produit, une par pays dans l'ordre DB_AMZ ---
+      // Il faut prendre l'image à l'index countryIdx (pas la première qui est toujours DE).
+      var keepaImgs = Array.from(cells[12].querySelectorAll('img')) as HTMLImageElement[];
+      // Essayer aussi les images lazy (data-src)
+      if (keepaImgs.length === 0) {
+        keepaImgs = Array.from(cells[12].querySelectorAll('[data-src]')) as HTMLImageElement[];
       }
-      // The Keepa chart URL always defaults to domain=de — replace with searched marketplace domain.
+      var keepaImg = keepaImgs[countryIdx] ?? keepaImgs[0] ?? null;
+      var keepa_url = keepaImg
+        ? (keepaImg.getAttribute('src') || keepaImg.getAttribute('data-src') || '')
+        : '';
+      // Si l'URL a encore un paramètre domain=xx, le corriger aussi
       if (keepa_url) {
         var keepaDomainMap: Record<string, string> = {
           'amazon.fr': 'fr', 'amazon.de': 'de', 'amazon.es': 'es',
@@ -837,21 +830,20 @@ async function scrapeFromDom(page: Page, marketplace: string): Promise<ActorioPr
         keepa_url, correspondance,
         _debug: results.length === 0 ? {
           c0: col0Text.substring(0, 40),
-          c1_text: (cells[1] as HTMLElement).innerText.trim().substring(0, 60),
-          c1_html: cells[1].innerHTML.substring(0, 150),
+          c3_text: c3text.trim().substring(0, 100),
+          c3_html: cells[3].innerHTML.substring(0, 200),
           correspondance_extracted: correspondance,
-          c5_text: (cells[5] as HTMLElement).innerText.trim().substring(0, 40),
-          c5_html: cells[5].innerHTML.substring(0, 100),
+          c5_text: (cells[5] as HTMLElement).innerText.trim().substring(0, 80),
           c6: (cells[6] as HTMLElement).innerText.trim().substring(0, 40),
           c8: (cells[8] as HTMLElement).innerText.trim().substring(0, 60),
           c9: (cells[9] as HTMLElement).innerText.trim().substring(0, 60),
           c10: (cells[10] as HTMLElement).innerText.trim().substring(0, 60),
           c14: (cells[14] as HTMLElement).innerText.trim().substring(0, 60),
-          c12_html: cells[12].innerHTML.substring(0, 100),
+          keepa_imgs_count: keepaImgs.length,
+          keepa_url_raw: keepa_url.substring(0, 100),
           total_cells: cells.length,
           countryIdx,
-          supplier_url_raw: supplier_url.substring(0, 80),
-          keepa_url_raw: keepa_url.substring(0, 80),
+          marketplace: mktplace,
         } : undefined,
       });
     });
