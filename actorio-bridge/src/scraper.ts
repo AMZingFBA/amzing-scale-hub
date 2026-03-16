@@ -760,7 +760,7 @@ async function scrapeFromDom(page: Page): Promise<ActorioProduct[]> {
       const supplier = supLines[supLines.length - 1] ?? '';
 
       // Helper: extract first non-N/A numeric line from a cell
-      function firstNumLine(el: HTMLElement, stripChars: RegExp): number {
+      const firstNumLine = (el: HTMLElement, stripChars: RegExp): number => {
         const lines = el.innerText.split('\n');
         for (const line of lines) {
           const t = line.trim();
@@ -770,7 +770,7 @@ async function scrapeFromDom(page: Page): Promise<ActorioProduct[]> {
           if (!isNaN(n) && isFinite(n)) return n;
         }
         return 0;
-      }
+      };
 
       const amazon_price = firstNumLine(cells[5] as HTMLElement, /[€£\s\u00a0]/g);
       const supplier_price = firstNumLine(cells[6] as HTMLElement, /[€£\s\u00a0]/g);
