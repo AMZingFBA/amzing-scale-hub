@@ -7,11 +7,9 @@
 import { chromium, type Browser, type BrowserContext, type Page } from 'playwright';
 import * as fs from 'fs';
 import * as path from 'path';
-import { fileURLToPath } from 'url';
 
-const _dirname = path.dirname(fileURLToPath(import.meta.url));
+const SESSION_STATE_FILE = path.resolve(process.cwd(), '.actorio-session.json');
 const ACTORIO_URL = 'https://app.actorio.com';
-const SESSION_STATE_FILE = path.resolve(_dirname, '../../.actorio-session.json');
 
 export interface ActorioFilters {
   // Amazon filters
@@ -718,6 +716,9 @@ async function scrapeFromDom(page: Page): Promise<ActorioProduct[]> {
   console.log(`[scraper] table diag: ${JSON.stringify(diag)}`);
 
   const rows = await page.evaluate((): any[] => {
+    // Shim for esbuild --keep-names: __name() doesn't exist in browser context.
+    // Use new Function() so esbuild cannot transform this expression.
+    var __name = new Function('f', 'return f') as any;
     // Find the product table: try #main-table, then best-rows
     let table = document.querySelector('table#main-table') as HTMLTableElement | null;
     if (!table) {
