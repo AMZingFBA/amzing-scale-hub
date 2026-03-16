@@ -1035,112 +1035,55 @@ export type Database = {
       }
       product_searches: {
         Row: {
-          id: string
-          user_id: string
-          name: string
-          filters: Json
-          filters_hash: string
-          status: string
-          provider: string
-          results_count: number
-          cache_hit: boolean
-          processing_duration_ms: number | null
+          cache_hit: boolean | null
+          created_at: string | null
           error_message: string | null
-          results_summary: Json | null
-          created_at: string
-          updated_at: string
-          expires_at: string
-        }
-        Insert: {
-          id?: string
-          user_id: string
-          name: string
-          filters?: Json
-          filters_hash: string
-          status?: string
-          provider?: string
-          results_count?: number
-          cache_hit?: boolean
-          processing_duration_ms?: number | null
-          error_message?: string | null
-          results_summary?: Json | null
-          created_at?: string
-          updated_at?: string
-          expires_at?: string
-        }
-        Update: {
-          id?: string
-          user_id?: string
-          name?: string
-          filters?: Json
-          filters_hash?: string
-          status?: string
-          provider?: string
-          results_count?: number
-          cache_hit?: boolean
-          processing_duration_ms?: number | null
-          error_message?: string | null
-          results_summary?: Json | null
-          created_at?: string
-          updated_at?: string
-          expires_at?: string
-        }
-        Relationships: []
-      }
-      search_presets: {
-        Row: {
-          id: string
-          user_id: string
-          name: string
+          expires_at: string | null
           filters: Json
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id?: string
-          user_id: string
-          name: string
-          filters?: Json
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          id?: string
-          user_id?: string
-          name?: string
-          filters?: Json
-          created_at?: string
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      search_results_cache: {
-        Row: {
+          filters_hash: string
           id: string
-          filters_hash: string
-          results: Json
+          name: string
+          processing_duration_ms: number | null
           provider: string
-          results_count: number
-          created_at: string
-          expires_at: string
+          results_count: number | null
+          results_summary: Json | null
+          status: string
+          updated_at: string | null
+          user_id: string
         }
         Insert: {
-          id?: string
+          cache_hit?: boolean | null
+          created_at?: string | null
+          error_message?: string | null
+          expires_at?: string | null
+          filters?: Json
           filters_hash: string
-          results?: Json
+          id?: string
+          name: string
+          processing_duration_ms?: number | null
           provider?: string
-          results_count?: number
-          created_at?: string
-          expires_at?: string
+          results_count?: number | null
+          results_summary?: Json | null
+          status?: string
+          updated_at?: string | null
+          user_id: string
         }
         Update: {
-          id?: string
+          cache_hit?: boolean | null
+          created_at?: string | null
+          error_message?: string | null
+          expires_at?: string | null
+          filters?: Json
           filters_hash?: string
-          results?: Json
+          id?: string
+          name?: string
+          processing_duration_ms?: number | null
           provider?: string
-          results_count?: number
-          created_at?: string
-          expires_at?: string
+          results_count?: number | null
+          results_summary?: Json | null
+          status?: string
+          updated_at?: string | null
+          user_id?: string
         }
         Relationships: []
       }
@@ -1363,6 +1306,63 @@ export type Database = {
           selleramp_variations?: string | null
           timestamp?: string
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      search_presets: {
+        Row: {
+          created_at: string | null
+          filters: Json
+          id: string
+          name: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          filters?: Json
+          id?: string
+          name: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          filters?: Json
+          id?: string
+          name?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      search_results_cache: {
+        Row: {
+          created_at: string | null
+          expires_at: string | null
+          filters_hash: string
+          id: string
+          provider: string
+          results: Json
+          results_count: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          expires_at?: string | null
+          filters_hash: string
+          id?: string
+          provider?: string
+          results?: Json
+          results_count?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          expires_at?: string | null
+          filters_hash?: string
+          id?: string
+          provider?: string
+          results?: Json
+          results_count?: number | null
         }
         Relationships: []
       }
@@ -1635,6 +1635,56 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      bridge_claim_next_search: {
+        Args: { p_secret: string }
+        Returns: {
+          cache_hit: boolean | null
+          created_at: string | null
+          error_message: string | null
+          expires_at: string | null
+          filters: Json
+          filters_hash: string
+          id: string
+          name: string
+          processing_duration_ms: number | null
+          provider: string
+          results_count: number | null
+          results_summary: Json | null
+          status: string
+          updated_at: string | null
+          user_id: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "product_searches"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      bridge_complete_search: {
+        Args: {
+          p_count: number
+          p_duration_ms: number
+          p_id: string
+          p_secret: string
+          p_summary: Json
+        }
+        Returns: undefined
+      }
+      bridge_fail_search: {
+        Args: { p_error: string; p_id: string; p_secret: string }
+        Returns: undefined
+      }
+      bridge_upsert_cache: {
+        Args: {
+          p_count: number
+          p_expires_at: string
+          p_filters_hash: string
+          p_results: Json
+          p_secret: string
+        }
+        Returns: undefined
+      }
       check_and_expire_subscriptions: { Args: never; Returns: undefined }
       cleanup_expired_impersonation_tokens: { Args: never; Returns: undefined }
       generate_affiliate_referral_code: { Args: never; Returns: string }
