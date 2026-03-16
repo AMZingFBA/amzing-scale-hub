@@ -39,6 +39,7 @@ function amazonUrl(asin: string, marketplace?: string): string {
 export default function SearchResults({ results, cacheHit, processingDuration, resultsCount }: SearchResultsProps) {
   const [sortKey, setSortKey] = useState<SortKey>(null);
   const [sortAsc, setSortAsc] = useState(false);
+  const [keepaModal, setKeepaModal] = useState<string | null>(null);
 
   if (results.length === 0) {
     return (
@@ -253,18 +254,17 @@ export default function SearchResults({ results, cacheHit, processingDuration, r
                       {p.monthly_sales ? p.monthly_sales.toLocaleString('fr') : '—'}
                     </TableCell>
 
-                    {/* Keepa chart 90j */}
+                    {/* Keepa chart 90j — chargé à la demande pour éviter le rate limit */}
                     <TableCell className="text-center">
                       {(p.keepa_b64 || p.keepa_url)
-                        ? <a href={p.keepa_url || '#'} target="_blank" rel="noopener noreferrer">
-                            <img
-                              src={p.keepa_b64 || p.keepa_url}
-                              referrerPolicy="no-referrer"
-                              alt="Keepa"
-                              className="h-10 w-auto rounded border border-border hover:opacity-80 transition-opacity"
-                              loading="lazy"
-                            />
-                          </a>
+                        ? <button
+                            onClick={() => setKeepaModal(p.keepa_b64 || p.keepa_url || null)}
+                            className="inline-flex items-center gap-1 px-2 py-1 text-xs rounded bg-muted hover:bg-muted/80 transition-colors"
+                            title="Voir le graphique Keepa"
+                          >
+                            <BarChart3 className="w-3.5 h-3.5" />
+                            Keepa
+                          </button>
                         : <span className="text-muted-foreground">—</span>}
                     </TableCell>
                   </TableRow>
@@ -274,6 +274,47 @@ export default function SearchResults({ results, cacheHit, processingDuration, r
           </div>
         </CardContent>
       </Card>
+
+      {/* Modal Keepa — s'affiche au clic, charge 1 image à la fois */}
+      {keepaModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
+          onClick={() => setKeepaModal(null)}
+        >
+          <div
+            className="bg-background rounded-xl shadow-2xl p-4 max-w-2xl w-full mx-4"
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between mb-3">
+              <span className="font-semibold text-sm flex items-center gap-2">
+                <BarChart3 className="w-4 h-4" /> Graphique Keepa — 90 jours
+              </span>
+              <div className="flex items-center gap-2">
+                <a
+                  href={keepaModal.startsWith('data:') ? '#' : keepaModal}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-primary flex items-center gap-1 hover:underline"
+                >
+                  <ExternalLink className="w-3 h-3" /> Ouvrir
+                </a>
+                <button
+                  onClick={() => setKeepaModal(null)}
+                  className="text-muted-foreground hover:text-foreground text-lg leading-none px-1"
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
+            <img
+              src={keepaModal}
+              referrerPolicy="no-referrer"
+              alt="Graphique Keepa 90 jours"
+              className="w-full rounded border border-border"
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
