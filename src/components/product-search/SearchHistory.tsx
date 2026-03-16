@@ -1,8 +1,9 @@
+import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Clock, CheckCircle, AlertCircle, Loader2, Database, RefreshCw, Eye } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Clock, CheckCircle, AlertCircle, Loader2, Database, RefreshCw, Eye, Trash2, Pencil, Check, X } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import type { ProductSearch } from '@/lib/product-search-types';
@@ -10,9 +11,11 @@ import type { ProductSearch } from '@/lib/product-search-types';
 interface SearchHistoryProps {
   searches: ProductSearch[];
   onViewResults?: (search: ProductSearch) => void;
+  onDelete?: (id: string) => void;
+  onRename?: (id: string, name: string) => void;
 }
 
-function StatusBadge({ status, cacheHit }: { status: string; cacheHit?: boolean }) {
+function StatusBadge({ status }: { status: string }) {
   switch (status) {
     case 'pending':
       return (
@@ -54,7 +57,27 @@ function StatusBadge({ status, cacheHit }: { status: string; cacheHit?: boolean 
   }
 }
 
-export default function SearchHistory({ searches, onViewResults }: SearchHistoryProps) {
+export default function SearchHistory({ searches, onViewResults, onDelete, onRename }: SearchHistoryProps) {
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editingName, setEditingName] = useState('');
+
+  const startEdit = (search: ProductSearch) => {
+    setEditingId(search.id);
+    setEditingName(search.name);
+  };
+
+  const cancelEdit = () => {
+    setEditingId(null);
+    setEditingName('');
+  };
+
+  const saveEdit = (id: string) => {
+    const trimmed = editingName.trim();
+    if (trimmed && onRename) onRename(id, trimmed);
+    setEditingId(null);
+    setEditingName('');
+  };
+
   if (searches.length === 0) {
     return (
       <Card>
@@ -76,46 +99,70 @@ export default function SearchHistory({ searches, onViewResults }: SearchHistory
         </CardTitle>
       </CardHeader>
       <CardContent className="p-0">
-        <ScrollArea className="max-h-[400px]">
-          <div className="divide-y">
-            {searches.map((search) => (
-              <div key={search.id} className="px-6 py-3 hover:bg-accent/30 transition-colors">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0 flex-1">
-                    <p className="font-medium text-sm truncate">{search.name}</p>
-                    <div className="flex flex-wrap items-center gap-2 mt-1">
-                      <StatusBadge status={search.status} cacheHit={search.cache_hit} />
-                      {search.results_count > 0 && (
-                        <span className="text-xs text-muted-foreground">
-                          {search.results_count} résultat{search.results_count > 1 ? 's' : ''}
-                        </span>
-                      )}
-                      {search.processing_duration_ms && (
-                        <span className="text-xs text-muted-foreground">
-                          {search.processing_duration_ms}ms
-                        </span>
-                      )}
-                      {search.cache_hit && (
-                        <Badge variant="outline" className="text-xs">
-                          <Database className="w-3 h-3 mr-1" />
-                          cache
-                        </Badge>
+        <div className="max-h-[400px] overflow-y-auto divide-y">
+          {searches.map((search) => (
+            <div key={search.id} className="px-6 py-3 hover:bg-accent/30 transition-colors">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0 flex-1">
+                  {/* Name + rename */}
+                  {editingId === search.id ? (
+                    <div className="flex items-center gap-1.5 mb-1">
+                      <Input
+                        className="h-7 text-sm py-0"
+                        value={editingName}
+                        onChange={e => setEditingName(e.target.value)}
+                        onKeyDown={e => {
+                          if (e.key === 'Enter') saveEdit(search.id);
+                          if (e.key === 'Escape') cancelEdit();
+                        }}
+                        autoFocus
+                      />
+                      <Button variant="ghost" size="icon" className="h-7 w-7 shrink-0 text-green-600 hover:text-green-700" onClick={() => saveEdit(search.id)}>
+                        <Check className="w-3.5 h-3.5" />
+                      </Button>
+                      <Button variant="ghost" size="icon" className="h-7 w-7 shrink-0" onClick={cancelEdit}>
+                        <X className="w-3.5 h-3.5" />
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-1.5 mb-1">
+                      <p className="font-medium text-sm truncate">{search.name}</p>
+                      {onRename && (
+                        <Button variant="ghost" size="icon" className="h-5 w-5 shrink-0 opacity-40 hover:opacity-100" onClick={() => startEdit(search)}>
+                          <Pencil className="w-3 h-3" />
+                        </Button>
                       )}
                     </div>
-                    {search.error_message && (
-                      <p className="text-xs text-destructive mt-1 truncate">{search.error_message}</p>
+                  )}
+                  <div className="flex flex-wrap items-center gap-2">
+                    <StatusBadge status={search.status} />
+                    {search.results_count > 0 && (
+                      <span className="text-xs text-muted-foreground">
+                        {search.results_count} résultat{search.results_count > 1 ? 's' : ''}
+                      </span>
                     )}
-                    {search.results_summary && (
-                      <div className="flex gap-3 mt-1 text-xs text-muted-foreground">
-                        <span>ROI moy: {search.results_summary.avg_roi}%</span>
-                        <span>Marge moy: {search.results_summary.avg_margin}%</span>
-                      </div>
+                    {search.cache_hit && (
+                      <Badge variant="outline" className="text-xs">
+                        <Database className="w-3 h-3 mr-1" />
+                        cache
+                      </Badge>
                     )}
                   </div>
-                  <div className="flex flex-col items-end gap-1.5 shrink-0">
-                    <span className="text-xs text-muted-foreground whitespace-nowrap">
-                      {formatDistanceToNow(new Date(search.created_at), { addSuffix: true, locale: fr })}
-                    </span>
+                  {search.error_message && (
+                    <p className="text-xs text-destructive mt-1 truncate">{search.error_message}</p>
+                  )}
+                  {search.results_summary && (
+                    <div className="flex gap-3 mt-1 text-xs text-muted-foreground">
+                      <span>ROI moy: {search.results_summary.avg_roi}%</span>
+                      <span>Marge moy: {search.results_summary.avg_margin}%</span>
+                    </div>
+                  )}
+                </div>
+                <div className="flex flex-col items-end gap-1.5 shrink-0">
+                  <span className="text-xs text-muted-foreground whitespace-nowrap">
+                    {formatDistanceToNow(new Date(search.created_at), { addSuffix: true, locale: fr })}
+                  </span>
+                  <div className="flex items-center gap-1">
                     {search.status === 'completed' && search.results_count > 0 && onViewResults && (
                       <Button
                         variant="outline"
@@ -124,15 +171,25 @@ export default function SearchHistory({ searches, onViewResults }: SearchHistory
                         onClick={() => onViewResults(search)}
                       >
                         <Eye className="w-3 h-3" />
-                        Voir les résultats
+                        Voir
+                      </Button>
+                    )}
+                    {onDelete && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7 text-muted-foreground hover:text-destructive"
+                        onClick={() => onDelete(search.id)}
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
                       </Button>
                     )}
                   </div>
                 </div>
               </div>
-            ))}
-          </div>
-        </ScrollArea>
+            </div>
+          ))}
+        </div>
       </CardContent>
     </Card>
   );

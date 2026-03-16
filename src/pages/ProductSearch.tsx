@@ -28,6 +28,8 @@ const ProductSearch = () => {
     submitSearch,
     savePreset,
     deletePreset,
+    deleteSearch,
+    renameSearch,
     setCurrentResults,
     setError,
   } = useProductSearch();
@@ -174,7 +176,12 @@ const ProductSearch = () => {
             )}
 
             {/* History */}
-            <SearchHistory searches={searches} onViewResults={handleViewResults} />
+            <SearchHistory
+              searches={searches}
+              onViewResults={handleViewResults}
+              onDelete={deleteSearch}
+              onRename={renameSearch}
+            />
           </div>
         </div>
       </main>

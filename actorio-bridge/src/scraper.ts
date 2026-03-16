@@ -329,28 +329,40 @@ export async function search(filters: ActorioFilters, maxResults = 100): Promise
   const startTime = Date.now();
   const page = await context.newPage();
 
-  // Intercept AJAX responses that may contain Amazon prices
-  // Actorio loads prices dynamically via JS after page render
+  // Intercept ALL JSON responses to find which API loads Amazon prices
   const pricesByAsin: Map<string, number> = new Map();
+  const seenApiUrls = new Set<string>();
   page.on('response', async (response) => {
     try {
       const url = response.url();
       const ct = response.headers()['content-type'] ?? '';
       if (!ct.includes('json')) return;
-      // Only intercept Actorio API calls (skip analytics, fonts, etc.)
-      if (!url.includes('actorio.com') && !url.includes('/api/') && !url.includes('/products/')) return;
+      // Log every unique JSON API URL (first page only, to diagnose price loading)
+      const urlKey = url.split('?')[0];
+      if (!seenApiUrls.has(urlKey)) {
+        seenApiUrls.add(urlKey);
+        console.log(`[scraper] JSON API: ${url.substring(0, 120)}`);
+      }
       const body = await response.json().catch(() => null);
       if (!body) return;
-      // Look for price data keyed by ASIN
-      const items: any[] = Array.isArray(body) ? body : (body.data ?? body.results ?? body.products ?? []);
-      if (!Array.isArray(items) || !items.length) return;
-      let found = 0;
-      for (const item of items) {
-        const asin = item.asin ?? item.ASIN ?? '';
-        const price = item.amazon_price ?? item.competitive_price ?? item.price ?? 0;
-        if (asin && price > 0) { pricesByAsin.set(asin, price); found++; }
+      // Try to extract prices from any structure
+      const tryExtract = (obj: any) => {
+        if (!obj || typeof obj !== 'object') return;
+        const asin = obj.asin ?? obj.ASIN ?? obj.asin_id ?? '';
+        const price = obj.amazon_price ?? obj.competitive_price ?? obj.buy_box_price
+          ?? obj.price ?? obj.current_price ?? obj.selling_price ?? 0;
+        if (asin && typeof asin === 'string' && asin.match(/^B0[A-Z0-9]{8}$/) && price > 0) {
+          pricesByAsin.set(asin, parseFloat(String(price)));
+        }
+      };
+      const items = Array.isArray(body) ? body : Object.values(body);
+      items.forEach((item: any) => {
+        if (Array.isArray(item)) item.forEach(tryExtract);
+        else tryExtract(item);
+      });
+      if (pricesByAsin.size > 0) {
+        console.log(`[scraper] Prices intercepted so far: ${pricesByAsin.size} (from ${url.substring(0, 80)})`);
       }
-      if (found > 0) console.log(`[scraper] Intercepted ${found} prices from ${url.substring(0, 80)}`);
     } catch { /* ignore */ }
   });
 
@@ -823,10 +835,50 @@ async function scrapeFromDom(page: Page, marketplace: string, pricesByAsin: Map<
         }
       };
 
-      // --- col 5: Prix AMZ Actuel (multi-country, un prix par pays dans l'ordre DB_AMZ) ---
-      // Même structure que c8-c11 : prendre le prix au bon index pays.
-      var amazon_price = helpers.numCountry(cells[5] as HTMLElement, /[€£\s\u00a0]/g, countryIdx);
-      // Fallback : data-sort/data-order si la valeur async n'est pas encore là
+      // --- col 5: Prix AMZ Actuel (countries-table, un prix par pays) ---
+      // Structure: <table class="countries-table"><tr class="FR"><td><span class="buybox-tooltipped tooltipped FR">
+      // Le prix peut être dans data-tooltip, aria-label, data-content, data-sort du td ou span
+      var amazon_price = 0;
+      var countryCode = DB_AMZ[countryIdx] ?? 'FR';
+      // Tentative 1: chercher dans la tr.[CC] de countries-table → tous attributs data-* + tooltips
+      var countryRow5 = cells[5].querySelector('tr.' + countryCode) as HTMLElement | null;
+      if (countryRow5) {
+        // data-* sur les <td> de cette ligne
+        var c5tds = Array.from(countryRow5.querySelectorAll('td')) as HTMLElement[];
+        for (var c5td of c5tds) {
+          for (var da of ['data-sort', 'data-order', 'data-value', 'data-price']) {
+            var dav = c5td.getAttribute(da) ?? '';
+            if (dav && /^\d/.test(dav)) { amazon_price = parseFloat(dav) || 0; break; }
+          }
+          if (amazon_price) break;
+        }
+        // data-tooltip / aria-label / title / data-content sur tous les spans
+        if (!amazon_price) {
+          var buyboxSpans = Array.from(countryRow5.querySelectorAll('span')) as HTMLElement[];
+          for (var bs of buyboxSpans) {
+            var tt = bs.getAttribute('data-tooltip') ?? bs.getAttribute('aria-label')
+              ?? bs.getAttribute('title') ?? bs.getAttribute('data-content') ?? '';
+            if (tt && /\d/.test(tt)) {
+              var pm = tt.match(/[\d]+[.,][\d]+|[\d]+/);
+              if (pm) { amazon_price = parseFloat(pm[0].replace(',', '.')) || 0; break; }
+            }
+            if (!amazon_price) {
+              var st = bs.innerText.replace(/[€£\s\u00a0]/g, '').replace(',', '.').trim();
+              if (/^\d+(\.\d+)?$/.test(st)) { amazon_price = parseFloat(st) || 0; break; }
+            }
+          }
+        }
+        // innerText de la ligne (dernier recours)
+        if (!amazon_price) {
+          var rowNums5 = countryRow5.innerText.replace(/[€£\s\u00a0]/g, '').replace(',', '.').match(/\d+\.\d+|\d{2,}/g) ?? [];
+          if (rowNums5.length > 0) amazon_price = parseFloat(rowNums5[0]) || 0;
+        }
+      }
+      // Tentative 2: numCountry (fallback général)
+      if (!amazon_price) {
+        amazon_price = helpers.numCountry(cells[5] as HTMLElement, /[€£\s\u00a0]/g, countryIdx);
+      }
+      // Tentative 3: data-sort/data-order sur la cellule td principale
       if (!amazon_price) {
         var sortVal = cells[5].getAttribute('data-sort') ?? cells[5].getAttribute('data-order') ?? '';
         if (sortVal && /^\d/.test(sortVal)) amazon_price = parseFloat(sortVal) || 0;
@@ -883,10 +935,23 @@ async function scrapeFromDom(page: Page, marketplace: string, pricesByAsin: Map<
           c0: col0Text.substring(0, 40),
           c3_text: c3text.trim().substring(0, 100),
           correspondance_extracted: correspondance,
-          c5_text: (cells[5] as HTMLElement).innerText.trim().substring(0, 80),
-          c5_html: cells[5].innerHTML.substring(0, 200),
+          c5_text: (cells[5] as HTMLElement).innerText.trim().substring(0, 120),
+          c5_html: cells[5].innerHTML.substring(0, 800),
           c5_data_order: cells[5].getAttribute('data-order') ?? '',
-          c5_attrs: cells[5].getAttributeNames().join(', '),
+          c5_spans: (function() {
+            var spans = cells[5].querySelectorAll('span[class*="buybox"], span[class*="price"], td');
+            var out: any[] = [];
+            spans.forEach(function(el: Element) {
+              out.push({
+                tag: el.tagName,
+                cls: el.className.substring(0, 40),
+                text: (el as HTMLElement).innerText.trim().substring(0, 30),
+                data: el.getAttributeNames().filter(function(a: string) { return a.startsWith('data-'); })
+                  .map(function(a: string) { return a + '=' + (el.getAttribute(a) ?? '').substring(0, 20); }).join(', ')
+              });
+            });
+            return out.slice(0, 8);
+          })(),
           c6: (cells[6] as HTMLElement).innerText.trim().substring(0, 40),
           c8: (cells[8] as HTMLElement).innerText.trim().substring(0, 60),
           c9: (cells[9] as HTMLElement).innerText.trim().substring(0, 60),

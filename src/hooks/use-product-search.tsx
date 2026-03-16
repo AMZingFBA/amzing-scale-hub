@@ -412,6 +412,28 @@ export function useProductSearch() {
     }
   }, [loadPresets]);
 
+  const deleteSearch = useCallback(async (searchId: string) => {
+    const { error: err } = await supabase
+      .from('product_searches')
+      .delete()
+      .eq('id', searchId);
+
+    if (!err) {
+      setSearches(prev => prev.filter(s => s.id !== searchId));
+    }
+  }, []);
+
+  const renameSearch = useCallback(async (searchId: string, name: string) => {
+    const { error: err } = await supabase
+      .from('product_searches')
+      .update({ name })
+      .eq('id', searchId);
+
+    if (!err) {
+      setSearches(prev => prev.map(s => s.id === searchId ? { ...s, name } : s));
+    }
+  }, []);
+
   useEffect(() => {
     if (!user) return;
 
@@ -441,7 +463,10 @@ export function useProductSearch() {
           filter: `user_id=eq.${user.id}`,
         } as any,
         (payload: any) => {
-          if (payload.eventType === 'UPDATE' || payload.eventType === 'INSERT') {
+          if (payload.eventType === 'DELETE') {
+            const deletedId = payload.old?.id;
+            if (deletedId) setSearches(prev => prev.filter(s => s.id !== deletedId));
+          } else if (payload.eventType === 'UPDATE' || payload.eventType === 'INSERT') {
             setSearches(prev => {
               const updated = payload.new as ProductSearch;
               const exists = prev.findIndex(s => s.id === updated.id);
@@ -472,6 +497,8 @@ export function useProductSearch() {
     submitSearch,
     savePreset,
     deletePreset,
+    deleteSearch,
+    renameSearch,
     loadSearches,
     setCurrentResults,
     setError,
