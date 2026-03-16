@@ -371,16 +371,30 @@ export function useProductSearch() {
       if (bridgeAvailable) {
         return await submitSearchActorio(filters);
       }
-      // All members on amzingfba.com: queue the search via Supabase.
-      // The bridge on the owner's machine picks it up and sends results back.
-      return await submitSearchQueue(filters);
+      // Queue the search via Supabase — the bridge picks it up.
+      // If the bridge doesn't respond within 30s, fall back to the edge function.
+      try {
+        const queueResult = await Promise.race([
+          submitSearchQueue(filters),
+          new Promise<null>((_, reject) =>
+            setTimeout(() => reject(new Error('__QUEUE_TIMEOUT__')), 30_000)
+          ),
+        ]);
+        return queueResult;
+      } catch (queueErr: any) {
+        if (queueErr?.message === '__QUEUE_TIMEOUT__') {
+          console.log('[search] Queue timeout — fallback vers edge function');
+          return await submitSearchRemote(filters);
+        }
+        throw queueErr;
+      }
     } catch (err: any) {
       setError(err?.message || 'Erreur inattendue');
       return null;
     } finally {
       setIsSearching(false);
     }
-  }, [user, bridgeAvailable, submitSearchActorio, submitSearchQueue]);
+  }, [user, bridgeAvailable, submitSearchActorio, submitSearchQueue, submitSearchRemote]);
 
   const savePreset = useCallback(async (name: string, filters: SearchFilters) => {
     if (!user) return;
