@@ -259,6 +259,7 @@ export default function SearchResults({ results, cacheHit, processingDuration, r
                         ? <a href={p.keepa_url || '#'} target="_blank" rel="noopener noreferrer">
                             <img
                               src={p.keepa_b64 || p.keepa_url}
+                              referrerPolicy="no-referrer"
                               alt="Keepa"
                               className="h-10 w-auto rounded border border-border hover:opacity-80 transition-opacity"
                               loading="lazy"

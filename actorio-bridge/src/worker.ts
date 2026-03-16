@@ -99,25 +99,6 @@ async function processNext(db: any, secret: string) {
 
     const duration = Date.now() - t0;
 
-    // Fetch Keepa images server-side (no Referer → bypasses hotlink protection)
-    // 20 concurrent fetches to stay respectful
-    const keepaUrls = results.filter((r: any) => r.keepa_url);
-    if (keepaUrls.length > 0) {
-      console.log(`[worker] Fetching ${keepaUrls.length} Keepa images server-side...`);
-      const BATCH = 20;
-      for (let i = 0; i < results.length; i += BATCH) {
-        await Promise.all(
-          results.slice(i, i + BATCH).map(async (r: any) => {
-            if (r.keepa_url) {
-              r.keepa_b64 = await fetchImageBase64(r.keepa_url);
-            }
-          })
-        );
-      }
-      const fetched = results.filter((r: any) => r.keepa_b64).length;
-      console.log(`[worker] Keepa images ready: ${fetched}/${keepaUrls.length}`);
-    }
-
     // Actorio already filters server-side via URL params — no client-side re-filter.
     // Re-filtering caused false negatives when DOM parsing extracted 0 for roi/monthly_sales.
     const filtered = results;
@@ -158,21 +139,6 @@ async function processNext(db: any, secret: string) {
       p_error:  (err.message || 'Unknown error').substring(0, 500),
     });
   }
-}
-
-/** Fetch an image server-side and return a base64 data URL.
- *  Node.js sends no Referer, so hotlink-protected hosts (e.g. graph.keepa.com) accept the request. */
-async function fetchImageBase64(url: string): Promise<string> {
-  try {
-    const resp = await fetch(url, {
-      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; AMZingBridge/1.0)' },
-    });
-    if (!resp.ok) return '';
-    const buf = await resp.arrayBuffer();
-    const b64 = Buffer.from(buf).toString('base64');
-    const ct = resp.headers.get('content-type') || 'image/png';
-    return `data:${ct};base64,${b64}`;
-  } catch { return ''; }
 }
 
 function mean(arr: any[], key: string): number {
