@@ -334,13 +334,12 @@ export function useProductSearch() {
       const rec = record as any;
 
       if (rec.status === 'completed') {
-        // Fetch results from the cache written by the bridge
-        const { data: cacheData } = await supabase
-          .from('search_results_cache')
-          .select('results, results_count')
-          .eq('filters_hash', rec.filters_hash)
-          .single();
+        // Fetch results from the cache via RPC (bypasses RLS)
+        const { data: cacheRows } = await supabase.rpc('bridge_read_cache', {
+          p_filters_hash: rec.filters_hash,
+        });
 
+        const cacheData = Array.isArray(cacheRows) && cacheRows.length > 0 ? cacheRows[0] : null;
         const results = (cacheData?.results as ProductResult[]) || [];
         setCurrentResults(results);
         await loadSearches();

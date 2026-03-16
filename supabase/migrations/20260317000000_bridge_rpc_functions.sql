@@ -138,3 +138,22 @@ END;
 $$;
 
 GRANT EXECUTE ON FUNCTION public.bridge_fail_search(TEXT, UUID, TEXT) TO anon, authenticated;
+
+-- ---------------------------------------------------------------------------
+-- 5. Read results from search_results_cache (bypasses RLS for authenticated)
+-- ---------------------------------------------------------------------------
+CREATE OR REPLACE FUNCTION public.bridge_read_cache(p_filters_hash TEXT)
+RETURNS TABLE(results JSONB, results_count INTEGER)
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+BEGIN
+  RETURN QUERY
+  SELECT c.results, c.results_count
+  FROM public.search_results_cache c
+  WHERE c.filters_hash = p_filters_hash
+  LIMIT 1;
+END;
+$$;
+
+GRANT EXECUTE ON FUNCTION public.bridge_read_cache(TEXT) TO anon, authenticated;
