@@ -111,7 +111,7 @@ const ProductSearch = () => {
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-3"></div>
                 <p className="text-lg font-semibold">Recherche en cours...</p>
                 <p className="text-sm text-muted-foreground mt-1">
-                  Les résultats Actorio sont en train d'être récupérés. Cela peut prendre jusqu'à 1 minute.
+                  Récupération des produits Actorio. Si le serveur ne répond pas en 30 secondes, des résultats de démonstration s'afficheront automatiquement.
                 </p>
               </div>
             )}
