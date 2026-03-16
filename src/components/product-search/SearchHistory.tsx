@@ -1,13 +1,15 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Clock, CheckCircle, AlertCircle, Loader2, Database, RefreshCw } from 'lucide-react';
+import { Clock, CheckCircle, AlertCircle, Loader2, Database, RefreshCw, Eye } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import type { ProductSearch } from '@/lib/product-search-types';
 
 interface SearchHistoryProps {
   searches: ProductSearch[];
+  onViewResults?: (search: ProductSearch) => void;
 }
 
 function StatusBadge({ status, cacheHit }: { status: string; cacheHit?: boolean }) {
