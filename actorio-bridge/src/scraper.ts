@@ -759,37 +759,40 @@ async function scrapeFromDom(page: Page): Promise<ActorioProduct[]> {
                              .filter(function(s) { return s.length > 0; });
       const supplier = supLines[supLines.length - 1] ?? '';
 
-      // Helper: extract first non-N/A numeric line from a cell
-      const firstNumLine = (el: HTMLElement, stripChars: RegExp): number => {
-        const lines = el.innerText.split('\n');
-        for (const line of lines) {
-          const t = line.trim();
-          if (!t || /^N\/A$/i.test(t) || !/\d/.test(t)) continue;
-          const cleaned = t.replace(stripChars, '').replace(',', '.');
-          const n = parseFloat(cleaned);
-          if (!isNaN(n) && isFinite(n)) return n;
+      // Helper: extract first non-N/A numeric line from a cell.
+      // Wrapped in object property to prevent esbuild __name transform.
+      var helpers = {
+        num: function(el: HTMLElement, stripChars: RegExp): number {
+          var lines = el.innerText.split('\n');
+          for (var i = 0; i < lines.length; i++) {
+            var t = lines[i].trim();
+            if (!t || /^N\/A$/i.test(t) || !/\d/.test(t)) continue;
+            var cleaned = t.replace(stripChars, '').replace(',', '.');
+            var n = parseFloat(cleaned);
+            if (!isNaN(n) && isFinite(n)) return n;
+          }
+          return 0;
         }
-        return 0;
       };
 
-      const amazon_price = firstNumLine(cells[5] as HTMLElement, /[€£\s\u00a0]/g);
-      const supplier_price = firstNumLine(cells[6] as HTMLElement, /[€£\s\u00a0]/g);
-      const profit  = firstNumLine(cells[8] as HTMLElement, /[€£\s\u00a0]/g);
-      const roiRaw  = firstNumLine(cells[9] as HTMLElement, /[%\s\u00a0]/g);
-      const roi     = (roiRaw > 0 && roiRaw <= 500) ? roiRaw : 0; // sanity cap
-      const monthly_sales   = firstNumLine(cells[10] as HTMLElement, /[\s\u00a0]/g);
-      const monthly_profit  = firstNumLine(cells[11] as HTMLElement, /[€£\s\u00a0]/g);
-      const bsr    = firstNumLine(cells[13] as HTMLElement, /[^\d]/g);
-      const margin = firstNumLine(cells[14] as HTMLElement, /[%\s\u00a0]/g);
+      var amazon_price = helpers.num(cells[5] as HTMLElement, /[€£\s\u00a0]/g);
+      var supplier_price = helpers.num(cells[6] as HTMLElement, /[€£\s\u00a0]/g);
+      var profit  = helpers.num(cells[8] as HTMLElement, /[€£\s\u00a0]/g);
+      var roiRaw  = helpers.num(cells[9] as HTMLElement, /[%\s\u00a0]/g);
+      var roi     = (roiRaw > 0 && roiRaw <= 500) ? roiRaw : 0; // sanity cap
+      var monthly_sales   = helpers.num(cells[10] as HTMLElement, /[\s\u00a0]/g);
+      var monthly_profit  = helpers.num(cells[11] as HTMLElement, /[€£\s\u00a0]/g);
+      var bsr    = helpers.num(cells[13] as HTMLElement, /[^\d]/g);
+      var margin = helpers.num(cells[14] as HTMLElement, /[%\s\u00a0]/g);
 
       // Legacy vars kept for debug block below
-      const p6  = String(supplier_price);
-      const p8  = String(profit);
-      const p9  = String(roi);
-      const p10 = String(monthly_sales);
-      const p11 = String(monthly_profit);
-      const p13 = String(bsr);
-      const p14 = String(margin);
+      var p6  = String(supplier_price);
+      var p8  = String(profit);
+      var p9  = String(roi);
+      var p10 = String(monthly_sales);
+      var p11 = String(monthly_profit);
+      var p13 = String(bsr);
+      var p14 = String(margin);
 
       if (!asin && !title) return;
 
