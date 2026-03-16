@@ -60,6 +60,14 @@ async function processNext(db: any, secret: string) {
     const scraperResult = await search(filters, 300);
 
     // Map Actorio fields → ProductResult shape expected by the frontend
+    const mp = filters.marketplace ?? 'amazon.fr';
+    const amzDomainMap: Record<string, string> = {
+      'amazon.fr': 'www.amazon.fr', 'amazon.de': 'www.amazon.de',
+      'amazon.es': 'www.amazon.es', 'amazon.it': 'www.amazon.it',
+      'amazon.co.uk': 'www.amazon.co.uk', 'amazon.com': 'www.amazon.com',
+    };
+    const amzDomain = amzDomainMap[mp] ?? 'www.amazon.fr';
+
     const results = scraperResult.results.map((item: any) => ({
       id:               crypto.randomUUID(),
       title:            item.title            || '',
@@ -76,11 +84,12 @@ async function processNext(db: any, secret: string) {
       bsr:              item.bsr              || 0,
       category:         item.category         || '',
       brand:            item.brand            || '',
-      marketplace:      filters.marketplace   || 'amazon.fr',
+      marketplace:      mp,
       supplier:         item.supplier         || '',
       supplier_price:   item.supplier_price   || 0,
       supplier_price_ht: item.supplier_price_ht ?? false,
       supplier_url:     item.supplier_url     || '',
+      amazon_url:       item.asin ? `https://${amzDomain}/dp/${item.asin}` : '',
       keepa_url:        item.keepa_url        || '',
       correspondance:   item.correspondance   || '',
       competition_level: item.competition_level || '',

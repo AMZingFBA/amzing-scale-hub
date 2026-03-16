@@ -51,6 +51,7 @@ export interface ProductResult {
   supplier_price?: number;
   supplier_price_ht?: boolean;
   supplier_url?: string;
+  amazon_url?: string;
   keepa_url?: string;
   correspondance?: string;
   source: string;

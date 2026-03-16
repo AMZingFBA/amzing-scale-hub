@@ -384,7 +384,7 @@ export async function search(filters: ActorioFilters, maxResults = 100): Promise
         break;
       }
 
-      const pageRows = await scrapeFromDom(page);
+      const pageRows = await scrapeFromDom(page, filters.marketplace ?? 'amazon.fr');
       if (pageRows.length === 0) break;
       allResults.push(...pageRows);
 
@@ -577,8 +577,12 @@ function parseRowObject(row: Record<string, any>): ActorioProduct {
 /**
  * Scrape product rows from the DataTables DOM on the current page.
  * Actorio renders results server-side (Django-tables2, NOT SSP AJAX).
+ *
+ * @param marketplace - e.g. 'amazon.fr', 'amazon.de' — used to extract the
+ *   correct per-country value from multi-country cells (c8, c9, c10, c11, c14).
+ *   Actorio always renders countries in db_amz_countries order: DE, ES, FR, GB, IT.
  */
-async function scrapeFromDom(page: Page): Promise<ActorioProduct[]> {
+async function scrapeFromDom(page: Page, marketplace: string): Promise<ActorioProduct[]> {
   // Quick diagnostic: check main-table row and cell counts
   const diag = await page.evaluate((): any => {
     // Try #main-table first, then best-rows table
@@ -630,10 +634,21 @@ async function scrapeFromDom(page: Page): Promise<ActorioProduct[]> {
     console.log(`[scraper] Waiting for Amazon prices... (${(w + 1) * 2}s)`);
   }
 
-  const rows = await page.evaluate((): any[] => {
+  const rows = await page.evaluate((mktplace: string): any[] => {
     // Shim for esbuild --keep-names: __name() doesn't exist in browser context.
     // Use new Function() so esbuild cannot transform this expression.
     var __name = new Function('f', 'return f') as any;
+
+    // db_amz_countries: FIXED order Actorio uses for multi-country cells
+    // (matches hidden input #db_amz_countries on the page)
+    var DB_AMZ = ['DE', 'ES', 'FR', 'GB', 'IT'];
+    var mpToCode: Record<string, string> = {
+      'amazon.fr': 'FR', 'amazon.de': 'DE', 'amazon.es': 'ES',
+      'amazon.it': 'IT', 'amazon.co.uk': 'GB', 'amazon.com': 'US',
+    };
+    var code = mpToCode[mktplace] ?? mktplace.toUpperCase().replace('AMAZON.', '');
+    var countryIdx = DB_AMZ.indexOf(code);
+    if (countryIdx < 0) countryIdx = 0; // fallback to first country
     // Find the product table: try #main-table, then best-rows
     let table = document.querySelector('table#main-table') as HTMLTableElement | null;
     if (!table) {
@@ -698,18 +713,40 @@ async function scrapeFromDom(page: Page): Promise<ActorioProduct[]> {
                              .filter(function(s) { return s.length > 0; });
       const supplier = supLines[supLines.length - 1] ?? '';
 
-      // Helper: extract first non-N/A numeric line from a cell — first line = searched marketplace.
+      // Helpers
       var helpers = {
-        num: function(el: HTMLElement, stripChars: RegExp): number {
+        // For single-country cells (c6): first non-N/A numeric line
+        num: function(el: HTMLElement, strip: RegExp): number {
           var lines = el.innerText.split('\n');
           for (var i = 0; i < lines.length; i++) {
             var t = lines[i].trim();
             if (!t || /^N\/A$/i.test(t) || !/\d/.test(t)) continue;
-            var cleaned = t.replace(stripChars, '').replace(',', '.');
+            var cleaned = t.replace(strip, '').replace(',', '.');
             var n = parseFloat(cleaned);
             if (!isNaN(n) && isFinite(n)) return n;
           }
           return 0;
+        },
+        // For multi-country cells (c8-c11): get value at countryIdx.
+        // Actorio separates country blocks by blank lines (double \n).
+        // Order = DB_AMZ = ['DE','ES','FR','GB','IT'].
+        numCountry: function(el: HTMLElement, strip: RegExp, idx: number): number {
+          var raw = el.innerText;
+          // Split on one or more consecutive blank/whitespace-only lines
+          var blocks = raw.split(/\n[ \t]*\n/).map(function(b) { return b.trim(); })
+                          .filter(function(b) { return b.length > 0; });
+          var block = idx < blocks.length ? blocks[idx] : '';
+          if (!block || /^N\/A$/i.test(block)) return 0;
+          var cleaned = block.replace(strip, '').replace(',', '.').trim();
+          var n = parseFloat(cleaned);
+          return (!isNaN(n) && isFinite(n)) ? n : 0;
+        },
+        // For c14 margin (all values on one line separated by spaces):
+        // extract all numbers in order, pick at countryIdx.
+        marginCountry: function(el: HTMLElement, idx: number): number {
+          var nums = (el.innerText.match(/\d+(?:[.,]\d+)?/g) || []);
+          var val = nums[idx] ?? nums[0] ?? '0';
+          return parseFloat(String(val).replace(',', '.')) || 0;
         }
       };
 
@@ -725,18 +762,18 @@ async function scrapeFromDom(page: Page): Promise<ActorioProduct[]> {
       var supplier_price = helpers.num(cells[6] as HTMLElement, /[€£\s\u00a0]/g);
       var supplier_price_ht = /(hors\s+TVA|HT|excl\.?\s*VAT)/i.test((cells[6] as HTMLElement).innerText ?? '');
 
-      // --- col 8: Bénéfice Unitaire (multi-country: first line = searched MP) ---
-      var profit  = helpers.num(cells[8] as HTMLElement, /[€£\s\u00a0]/g);
+      // --- col 8: Bénéfice Unitaire (multi-country) ---
+      var profit  = helpers.numCountry(cells[8] as HTMLElement, /[€£\s\u00a0]/g, countryIdx);
 
-      // --- col 9: ROI ---
-      var roiRaw  = helpers.num(cells[9] as HTMLElement, /[%\s\u00a0]/g);
+      // --- col 9: ROI (multi-country) ---
+      var roiRaw  = helpers.numCountry(cells[9] as HTMLElement, /[%\s\u00a0]/g,   countryIdx);
       var roi     = (roiRaw > 0 && roiRaw <= 500) ? roiRaw : 0;
 
-      // --- col 10: Ventes Mensuelles ---
-      var monthly_sales   = helpers.num(cells[10] as HTMLElement, /[\s\u00a0]/g);
+      // --- col 10: Ventes Mensuelles (multi-country) ---
+      var monthly_sales   = helpers.numCountry(cells[10] as HTMLElement, /[\s\u00a0]/g, countryIdx);
 
-      // --- col 11: Bénéfice Mensuel ---
-      var monthly_profit  = helpers.num(cells[11] as HTMLElement, /[€£\s\u00a0]/g);
+      // --- col 11: Bénéfice Mensuel (multi-country) ---
+      var monthly_profit  = helpers.numCountry(cells[11] as HTMLElement, /[€£\s\u00a0]/g, countryIdx);
 
       // --- col 12: Graphique Keepa ---
       var keepaImg = cells[12].querySelector('img') as HTMLImageElement | null;
@@ -749,8 +786,8 @@ async function scrapeFromDom(page: Page): Promise<ActorioProduct[]> {
       // --- col 13: BSR ---
       var bsr    = helpers.num(cells[13] as HTMLElement, /[^\d]/g);
 
-      // --- col 14: Marge ---
-      var margin = helpers.num(cells[14] as HTMLElement, /[%\s\u00a0]/g);
+      // --- col 14: Marge (multi-country, one line space-separated) ---
+      var margin = helpers.marginCountry(cells[14] as HTMLElement, countryIdx);
 
       if (!asin && !title) return;
 
@@ -767,11 +804,13 @@ async function scrapeFromDom(page: Page): Promise<ActorioProduct[]> {
           c5_text: (cells[5] as HTMLElement).innerText.trim().substring(0, 40),
           c5_html: cells[5].innerHTML.substring(0, 100),
           c6: (cells[6] as HTMLElement).innerText.trim().substring(0, 40),
-          c8: (cells[8] as HTMLElement).innerText.trim().substring(0, 40),
-          c9: (cells[9] as HTMLElement).innerText.trim().substring(0, 40),
-          c10: (cells[10] as HTMLElement).innerText.trim().substring(0, 40),
+          c8: (cells[8] as HTMLElement).innerText.trim().substring(0, 60),
+          c9: (cells[9] as HTMLElement).innerText.trim().substring(0, 60),
+          c10: (cells[10] as HTMLElement).innerText.trim().substring(0, 60),
+          c14: (cells[14] as HTMLElement).innerText.trim().substring(0, 60),
           c12_html: cells[12].innerHTML.substring(0, 100),
           total_cells: cells.length,
+          countryIdx,
           supplier_url_raw: supplier_url.substring(0, 80),
           keepa_url_raw: keepa_url.substring(0, 80),
         } : undefined,
@@ -779,7 +818,7 @@ async function scrapeFromDom(page: Page): Promise<ActorioProduct[]> {
     });
 
     return results;
-  });
+  }, marketplace);
 
   console.log(`[scraper] DOM scrape: ${rows.length} products extracted`);
   if (rows.length > 0 && (rows[0] as any)._debug) {
