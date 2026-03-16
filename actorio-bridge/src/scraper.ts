@@ -679,17 +679,38 @@ async function scrapeFromDom(page: Page, marketplace: string): Promise<ActorioPr
       const eanM = col0Text.match(/\b\d{8,14}\b/);
       const ean  = eanM ? eanM[0] : '';
 
-      // --- col 1: Correspondance / Restrictions ---
+      // --- col 1: Correspondance ---
+      // Actorio shows similarity as a colored badge/progress or text in c1.
       var correspondance = '';
+      var col1Html = cells[1].innerHTML ?? '';
       var col1El = cells[1] as HTMLElement;
-      // Look for a percentage (e.g. "85%") or numeric similarity score
-      var corrMatch = (col1El.innerText ?? '').match(/(\d+)\s*%/);
-      if (corrMatch) {
-        correspondance = corrMatch[1] + '%';
-      } else {
-        // Try to get any numeric value from the cell
-        var col1Txt = (col1El.innerText ?? '').trim();
-        if (col1Txt && /\d/.test(col1Txt)) correspondance = col1Txt.substring(0, 30);
+      // Try progress bar aria-valuenow first (e.g. <div aria-valuenow="87">)
+      var avnMatch = col1Html.match(/aria-valuenow="(\d+)"/);
+      if (avnMatch) {
+        correspondance = avnMatch[1] + '%';
+      }
+      // Try data-value or data-score attribute
+      if (!correspondance) {
+        var dvMatch = col1Html.match(/data-(?:value|score|similarity)="([^"]+)"/);
+        if (dvMatch) correspondance = dvMatch[1];
+      }
+      // Try percentage text "xx%" anywhere in the cell
+      if (!correspondance) {
+        var pctM = (col1El.innerText ?? '').match(/(\d+)\s*%/);
+        if (pctM) correspondance = pctM[1] + '%';
+      }
+      // Try quality-level text (Élevé/Moyen/Faible)
+      if (!correspondance) {
+        var col1Lower = (col1El.innerText ?? '').toLowerCase();
+        if (/élevé|eleve|high|exact/i.test(col1Lower))  correspondance = 'Élevé';
+        else if (/moyen|medium/i.test(col1Lower))        correspondance = 'Moyen';
+        else if (/faible|low/i.test(col1Lower))          correspondance = 'Faible';
+      }
+      // Also check c2 (title cell) for an embedded similarity badge
+      if (!correspondance) {
+        var c2html = cells[2].innerHTML ?? '';
+        var c2pct  = c2html.match(/aria-valuenow="(\d+)"|data-similarity="([^"]+)"|\bclass="[^"]*similarity[^"]*"[^>]*>([^<]*)/);
+        if (c2pct) correspondance = (c2pct[1] || c2pct[2] || c2pct[3] || '').trim();
       }
 
       // --- col 2: Titre ---
@@ -728,14 +749,21 @@ async function scrapeFromDom(page: Page, marketplace: string): Promise<ActorioPr
           return 0;
         },
         // For multi-country cells (c8-c11): get value at countryIdx.
-        // Actorio separates country blocks by blank lines (double \n).
         // Order = DB_AMZ = ['DE','ES','FR','GB','IT'].
+        // Approach: collect lines that contain a number OR explicit "N/A" — one per country.
+        // This handles both "\n\n"-separated AND "\n"-separated (single newline) cell formats.
         numCountry: function(el: HTMLElement, strip: RegExp, idx: number): number {
-          var raw = el.innerText;
-          // Split on one or more consecutive blank/whitespace-only lines
-          var blocks = raw.split(/\n[ \t]*\n/).map(function(b) { return b.trim(); })
-                          .filter(function(b) { return b.length > 0; });
-          var block = idx < blocks.length ? blocks[idx] : '';
+          var lines = el.innerText.split('\n');
+          var values: string[] = [];
+          for (var i = 0; i < lines.length; i++) {
+            var t = lines[i].trim();
+            if (t === '') continue; // skip blank lines
+            // Keep lines that are a number OR explicit N/A marker
+            if (/^N\/A$/i.test(t) || /\d/.test(t)) {
+              values.push(t);
+            }
+          }
+          var block = idx < values.length ? values[idx] : '';
           if (!block || /^N\/A$/i.test(block)) return 0;
           var cleaned = block.replace(strip, '').replace(',', '.').trim();
           var n = parseFloat(cleaned);
@@ -775,12 +803,21 @@ async function scrapeFromDom(page: Page, marketplace: string): Promise<ActorioPr
       // --- col 11: Bénéfice Mensuel (multi-country) ---
       var monthly_profit  = helpers.numCountry(cells[11] as HTMLElement, /[€£\s\u00a0]/g, countryIdx);
 
-      // --- col 12: Graphique Keepa ---
+      // --- col 12: Graphique Keepa (fix domain param to match searched marketplace) ---
       var keepaImg = cells[12].querySelector('img') as HTMLImageElement | null;
       var keepa_url = keepaImg ? (keepaImg.getAttribute('src') ?? '') : '';
       if (!keepa_url) {
         // Try data-src (lazy loading)
         keepa_url = (cells[12].querySelector('img[data-src]') as HTMLImageElement | null)?.getAttribute('data-src') ?? '';
+      }
+      // The Keepa chart URL always defaults to domain=de — replace with searched marketplace domain.
+      if (keepa_url) {
+        var keepaDomainMap: Record<string, string> = {
+          'amazon.fr': 'fr', 'amazon.de': 'de', 'amazon.es': 'es',
+          'amazon.it': 'it', 'amazon.co.uk': 'co.uk', 'amazon.com': 'com',
+        };
+        var keepaDomain = keepaDomainMap[mktplace] ?? 'fr';
+        keepa_url = keepa_url.replace(/([?&]domain=)[^&]+/, '$1' + keepaDomain);
       }
 
       // --- col 13: BSR ---
@@ -800,7 +837,9 @@ async function scrapeFromDom(page: Page, marketplace: string): Promise<ActorioPr
         keepa_url, correspondance,
         _debug: results.length === 0 ? {
           c0: col0Text.substring(0, 40),
-          c1: (cells[1] as HTMLElement).innerText.trim().substring(0, 40),
+          c1_text: (cells[1] as HTMLElement).innerText.trim().substring(0, 60),
+          c1_html: cells[1].innerHTML.substring(0, 150),
+          correspondance_extracted: correspondance,
           c5_text: (cells[5] as HTMLElement).innerText.trim().substring(0, 40),
           c5_html: cells[5].innerHTML.substring(0, 100),
           c6: (cells[6] as HTMLElement).innerText.trim().substring(0, 40),

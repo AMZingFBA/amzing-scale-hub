@@ -12,7 +12,7 @@ interface SearchResultsProps {
   resultsCount?: number;
 }
 
-type SortKey = 'roi' | 'profit' | 'monthly_profit' | 'monthly_sales' | 'price' | 'supplier_price' | null;
+type SortKey = 'roi' | 'profit' | 'monthly_sales' | 'price' | 'supplier_price' | null;
 
 function avg(arr: number[]): number {
   const valid = arr.filter(n => n > 0 && isFinite(n));
@@ -87,8 +87,7 @@ export default function SearchResults({ results, cacheHit, processingDuration, r
 
   const avgRoi    = avg(results.map(r => r.roi));
   const avgProfit = avg(results.map(r => r.profit));
-  const totalMonthlySales  = results.reduce((s, r) => s + (r.monthly_sales || 0), 0);
-  const totalMonthlyProfit = results.reduce((s, r) => s + (r.monthly_profit || 0), 0);
+  const totalMonthlySales = results.reduce((s, r) => s + (r.monthly_sales || 0), 0);
 
   return (
     <div className="space-y-3">
@@ -118,8 +117,8 @@ export default function SearchResults({ results, cacheHit, processingDuration, r
         <Card>
           <CardContent className="p-3 text-center">
             <BarChart3 className="w-4 h-4 mx-auto text-purple-600 mb-0.5" />
-            <p className="text-xl font-bold text-purple-600">{fmt2(totalMonthlyProfit)}€</p>
-            <p className="text-[11px] text-muted-foreground">Profit/mois total</p>
+            <p className="text-xl font-bold text-purple-600">{totalMonthlySales.toLocaleString('fr')}</p>
+            <p className="text-[11px] text-muted-foreground">Ventes/mois total</p>
           </CardContent>
         </Card>
       </div>
@@ -132,7 +131,6 @@ export default function SearchResults({ results, cacheHit, processingDuration, r
           </Badge>
         )}
         {processingDuration !== undefined && <span>{processingDuration}ms</span>}
-        <span className="text-muted-foreground">Ventes/mois total : {totalMonthlySales.toLocaleString('fr')}</span>
         <span className="ml-auto flex items-center gap-2">
           {sortKey === null
             ? <span className="text-[10px] text-primary font-medium">Ordre original • cliquer colonne pour trier</span>
@@ -162,7 +160,6 @@ export default function SearchResults({ results, cacheHit, processingDuration, r
                   <SortTh k="profit"         label="Profit unit." right />
                   <SortTh k="roi"            label="ROI" right />
                   <SortTh k="monthly_sales"  label="Ventes/mois" right />
-                  <SortTh k="monthly_profit" label="Profit/mois" right />
                   <TableHead className="whitespace-nowrap text-center">Keepa 90j</TableHead>
                 </TableRow>
               </TableHeader>
@@ -254,11 +251,6 @@ export default function SearchResults({ results, cacheHit, processingDuration, r
                     {/* Ventes/mois */}
                     <TableCell className="text-right">
                       {p.monthly_sales ? p.monthly_sales.toLocaleString('fr') : '—'}
-                    </TableCell>
-
-                    {/* Profit/mois */}
-                    <TableCell className="text-right font-medium text-purple-600">
-                      {p.monthly_profit ? `${fmt2(p.monthly_profit)}€` : '—'}
                     </TableCell>
 
                     {/* Keepa chart 90j */}
