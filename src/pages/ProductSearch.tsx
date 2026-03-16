@@ -10,7 +10,7 @@ import { useProductSearch } from '@/hooks/use-product-search';
 import { Badge } from '@/components/ui/badge';
 import { Search, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import type { SearchPreset, SearchResponse, SearchFilters } from '@/lib/product-search-types';
 
 const ProductSearch = () => {
@@ -31,6 +31,14 @@ const ProductSearch = () => {
   } = useProductSearch();
 
   const [lastResponse, setLastResponse] = useState<SearchResponse | null>(null);
+  const resultsRef = useRef<HTMLDivElement>(null);
+
+  // Auto-scroll vers les résultats quand ils apparaissent
+  useEffect(() => {
+    if (currentResults.length > 0 && resultsRef.current) {
+      resultsRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, [currentResults]);
 
   if (isLoading || isAdminLoading) {
     return (
@@ -74,7 +82,7 @@ const ProductSearch = () => {
                 variant={bridgeAvailable ? 'default' : 'secondary'}
                 className={`ml-auto text-xs ${bridgeAvailable ? 'bg-green-600' : ''}`}
               >
-                {bridgeAvailable === null ? 'Connexion...' : bridgeAvailable ? 'Actorio Live' : 'Mock (demo)'}
+                {bridgeAvailable === null ? 'Connexion...' : bridgeAvailable ? 'Actorio Live' : 'Actorio (via serveur)'}
               </Badge>
             </div>
 
@@ -97,9 +105,20 @@ const ProductSearch = () => {
               />
             </div>
 
+            {/* Indicateur de progrès pendant la recherche */}
+            {isSearching && (
+              <div className="mb-5 p-6 rounded-lg border bg-card text-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-3"></div>
+                <p className="text-lg font-semibold">Recherche en cours...</p>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Les résultats Actorio sont en train d'être récupérés. Cela peut prendre jusqu'à 1 minute.
+                </p>
+              </div>
+            )}
+
             {/* Results */}
             {currentResults.length > 0 && (
-              <div className="mb-5">
+              <div className="mb-5" ref={resultsRef}>
                 <SearchResults
                   results={currentResults}
                   cacheHit={lastResponse?.cache_hit}
