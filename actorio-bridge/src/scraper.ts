@@ -384,18 +384,31 @@ export async function search(filters: ActorioFilters, maxResults = 100): Promise
       if (pageRows.length === 0) break;
       allResults.push(...pageRows);
 
-      const paginationInfo = await page.evaluate((currentPage: number): { total: number; maxPage: number } => {
-        const body = document.body?.innerText ?? '';
-        const totalMatch = body.match(/sur\s+([\d\s]+)\s+résultat/i)
-          ?? body.match(/of\s+([\d\s]+)\s+result/i);
-        const total = totalMatch ? parseInt(totalMatch[1].replace(/\s/g, '')) : 0;
-        const pageLinks = Array.from(document.querySelectorAll('a[href*="page="]')) as HTMLAnchorElement[];
-        const maxPage = pageLinks.reduce(function(mx, a) {
-          const m = a.href.match(/[?&]page=(\d+)/);
-          return m ? Math.max(mx, parseInt(m[1])) : mx;
-        }, currentPage);
-        return { total, maxPage };
-      }, pageNum);
+      const paginationInfo = await page.evaluate(
+        (params: { currentPage: number; pageSize: number }): { total: number; maxPage: number } => {
+          const body = document.body?.innerText ?? '';
+          const totalMatch = body.match(/sur\s+([\d\s]+)\s+résultat/i)
+            ?? body.match(/of\s+([\d\s]+)\s+result/i);
+          const total = totalMatch ? parseInt(totalMatch[1].replace(/\s/g, '')) : 0;
+
+          // Max page from visible pagination links
+          const pageLinks = Array.from(document.querySelectorAll('a[href*="page="]')) as HTMLAnchorElement[];
+          const maxPageFromLinks = pageLinks.reduce(function(mx, a) {
+            const m = a.href.match(/[?&]page=(\d+)/);
+            return m ? Math.max(mx, parseInt(m[1])) : mx;
+          }, params.currentPage);
+
+          // Max page computed from total ÷ pageSize (more reliable — pagination widget
+          // may only show a window of 8 page numbers even if there are more pages)
+          const maxPageFromTotal = (total > 0 && params.pageSize > 0)
+            ? Math.ceil(total / params.pageSize)
+            : maxPageFromLinks;
+
+          const maxPage = Math.max(maxPageFromLinks, maxPageFromTotal);
+          return { total, maxPage };
+        },
+        { currentPage: pageNum, pageSize: pageRows.length }
+      );
 
       if (totalCount === 0 && paginationInfo.total > 0) totalCount = paginationInfo.total;
       console.log(`[scraper] Page ${pageNum}/${paginationInfo.maxPage} | fetched ${allResults.length} | total=${paginationInfo.total}`);

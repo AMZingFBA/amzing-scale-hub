@@ -12,7 +12,7 @@ interface SearchResultsProps {
   resultsCount?: number;
 }
 
-type SortKey = 'roi' | 'profit' | 'monthly_profit' | 'monthly_sales' | 'price' | 'supplier_price' | 'bsr' | 'margin';
+type SortKey = 'roi' | 'profit' | 'monthly_profit' | 'monthly_sales' | 'price' | 'supplier_price' | 'bsr' | 'margin' | null;
 
 function avg(arr: number[]): number {
   const valid = arr.filter(n => n > 0 && isFinite(n));
@@ -38,7 +38,7 @@ function CompetitionBadge({ level }: { level?: string }) {
 }
 
 export default function SearchResults({ results, cacheHit, processingDuration, resultsCount }: SearchResultsProps) {
-  const [sortKey, setSortKey] = useState<SortKey>('roi');
+  const [sortKey, setSortKey] = useState<SortKey>(null);
   const [sortAsc, setSortAsc] = useState(false);
 
   if (results.length === 0) {
@@ -53,25 +53,27 @@ export default function SearchResults({ results, cacheHit, processingDuration, r
     );
   }
 
-  const sorted = [...results].sort((a, b) => {
-    const va = (a as any)[sortKey] ?? 0;
-    const vb = (b as any)[sortKey] ?? 0;
-    return sortAsc ? va - vb : vb - va;
-  });
+  const sorted = sortKey === null
+    ? results
+    : [...results].sort((a, b) => {
+        const va = (a as any)[sortKey] ?? 0;
+        const vb = (b as any)[sortKey] ?? 0;
+        return sortAsc ? va - vb : vb - va;
+      });
 
-  function toggleSort(key: SortKey) {
+  function toggleSort(key: NonNullable<SortKey>) {
     if (sortKey === key) setSortAsc(p => !p);
     else { setSortKey(key); setSortAsc(false); }
   }
 
-  function SortIcon({ k }: { k: SortKey }) {
+  function SortIcon({ k }: { k: NonNullable<SortKey> }) {
     if (sortKey !== k) return <ChevronUp className="w-3 h-3 opacity-20" />;
     return sortAsc
       ? <ChevronUp className="w-3 h-3 text-primary" />
       : <ChevronDown className="w-3 h-3 text-primary" />;
   }
 
-  function SortTh({ k, label, right }: { k: SortKey; label: string; right?: boolean }) {
+  function SortTh({ k, label, right }: { k: NonNullable<SortKey>; label: string; right?: boolean }) {
     return (
       <TableHead
         className={`cursor-pointer select-none whitespace-nowrap ${right ? 'text-right' : ''}`}
@@ -132,7 +134,14 @@ export default function SearchResults({ results, cacheHit, processingDuration, r
         )}
         {processingDuration !== undefined && <span>{processingDuration}ms</span>}
         <span className="text-muted-foreground">Ventes/mois total : {totalMonthlySales.toLocaleString('fr')}</span>
-        <span className="text-xs text-muted-foreground ml-auto">Cliquer en-tête pour trier</span>
+        <span className="ml-auto flex items-center gap-2">
+          {sortKey === null
+            ? <span className="text-[10px] text-primary font-medium">Ordre Actorio • cliquer colonne pour trier</span>
+            : <button className="text-[10px] underline hover:text-primary" onClick={() => setSortKey(null)}>
+                Réinitialiser (ordre Actorio)
+              </button>
+          }
+        </span>
       </div>
 
       {/* Table */}
