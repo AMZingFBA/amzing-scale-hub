@@ -64,6 +64,49 @@ const ProductSearch = () => {
     setLastResponse(null);
   };
 
+  const handleViewResults = useCallback(async (search: ProductSearchType) => {
+    // Try loading from search_results_cache first
+    const { data: cached } = await supabase
+      .from('search_results_cache')
+      .select('results, results_count')
+      .eq('filters_hash', search.filters_hash)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (cached && Array.isArray((cached as any).results)) {
+      setCurrentResults((cached as any).results);
+      setLastResponse({
+        search_id: search.id,
+        status: 'completed',
+        cache_hit: true,
+        results: (cached as any).results,
+        results_count: (cached as any).results_count || (cached as any).results.length,
+        processing_duration_ms: search.processing_duration_ms || 0,
+      });
+      toast.success(`${(cached as any).results.length} résultats chargés`);
+      return;
+    }
+
+    // Fallback: check results_summary.results
+    const summary = search.results_summary as any;
+    if (summary && Array.isArray(summary.results) && summary.results.length > 0) {
+      setCurrentResults(summary.results);
+      setLastResponse({
+        search_id: search.id,
+        status: 'completed',
+        cache_hit: false,
+        results: summary.results,
+        results_count: summary.results.length,
+        processing_duration_ms: search.processing_duration_ms || 0,
+      });
+      toast.success(`${summary.results.length} résultats chargés`);
+      return;
+    }
+
+    toast.error('Les résultats de cette recherche ne sont plus disponibles');
+  }, [setCurrentResults]);
+
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
