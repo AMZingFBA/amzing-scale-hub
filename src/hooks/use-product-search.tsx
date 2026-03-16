@@ -326,7 +326,7 @@ export function useProductSearch() {
 
       const { data: record } = await supabase
         .from('product_searches')
-        .select('id, status, error_message, filters_hash, results_count, processing_duration_ms')
+        .select('id, status, error_message, filters_hash, results_count, processing_duration_ms, results_summary')
         .eq('id', searchId)
         .single();
 
@@ -334,13 +334,9 @@ export function useProductSearch() {
       const rec = record as any;
 
       if (rec.status === 'completed') {
-        // Fetch results from the cache via RPC (bypasses RLS)
-        const { data: cacheRows } = await supabase.rpc('bridge_read_cache', {
-          p_filters_hash: rec.filters_hash,
-        });
-
-        const cacheData = Array.isArray(cacheRows) && cacheRows.length > 0 ? cacheRows[0] : null;
-        const results = (cacheData?.results as ProductResult[]) || [];
+        // Read results from results_summary (embedded by bridge in bridge_complete_search)
+        const summary = rec.results_summary as any;
+        const results: ProductResult[] = Array.isArray(summary?.results) ? summary.results : [];
         setCurrentResults(results);
         await loadSearches();
 

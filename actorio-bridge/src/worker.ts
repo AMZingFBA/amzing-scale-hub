@@ -98,11 +98,12 @@ async function processNext(db: any, secret: string) {
       if (filters.monthly_sales_min  !== undefined && r.monthly_sales  < filters.monthly_sales_min)  return false;
       return true;
     });
-    const summary = filtered.length > 0 ? {
+    const summary = {
       avg_roi:    r2(mean(filtered, 'roi')),
       avg_margin: r2(mean(filtered, 'margin')),
       avg_price:  r2(mean(filtered, 'price')),
-    } : null;
+      results:    filtered,
+    };
 
     // Write results to cache
     const expiresAt = new Date(Date.now() + CACHE_TTL_MS).toISOString();
