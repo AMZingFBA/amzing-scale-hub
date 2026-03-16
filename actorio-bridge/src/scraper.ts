@@ -48,6 +48,8 @@ export interface ActorioProduct {
   image_url?: string;
   amazon_price: number;
   supplier_price: number;
+  supplier_price_ht?: boolean;
+  supplier_url?: string;
   profit: number;
   roi: number;
   margin: number;
@@ -58,6 +60,8 @@ export interface ActorioProduct {
   brand?: string;
   supplier?: string;
   competition_level?: string;
+  keepa_url?: string;
+  correspondance?: string;
 }
 
 export interface ScraperResult {
@@ -596,6 +600,36 @@ async function scrapeFromDom(page: Page): Promise<ActorioProduct[]> {
   });
   console.log(`[scraper] table diag: ${JSON.stringify(diag)}`);
 
+  // Extra wait to let async content (Amazon prices, Keepa) load — up to 8s
+  for (let w = 0; w < 4; w++) {
+    await page.waitForTimeout(2000);
+    const hasPrices = await page.evaluate((): boolean => {
+      let table = document.querySelector('table#main-table') as HTMLTableElement | null;
+      if (!table) {
+        let best: HTMLTableElement | null = null;
+        let bestCount = 0;
+        Array.from(document.querySelectorAll('table') as NodeListOf<HTMLTableElement>).forEach(function(t) {
+          const tb = t.tBodies[0];
+          if (tb && tb.rows.length > bestCount) { bestCount = tb.rows.length; best = t; }
+        });
+        table = best;
+      }
+      if (!table) return false;
+      const tbody = (table as HTMLTableElement).tBodies[0];
+      if (!tbody || !tbody.rows[0]) return false;
+      const cells = Array.from((tbody.rows[0] as HTMLTableRowElement).cells) as HTMLTableCellElement[];
+      if (cells.length < 6) return false;
+      // Check if cells[5] (amazon price) has a number
+      const txt = (cells[5] as HTMLElement).innerText ?? '';
+      return /\d/.test(txt);
+    });
+    if (hasPrices) {
+      console.log(`[scraper] Amazon prices loaded after ${(w + 1) * 2}s`);
+      break;
+    }
+    console.log(`[scraper] Waiting for Amazon prices... (${(w + 1) * 2}s)`);
+  }
+
   const rows = await page.evaluate((): any[] => {
     // Shim for esbuild --keep-names: __name() doesn't exist in browser context.
     // Use new Function() so esbuild cannot transform this expression.
@@ -621,6 +655,7 @@ async function scrapeFromDom(page: Page): Promise<ActorioProduct[]> {
       const cells = Array.from(tr.cells) as HTMLTableCellElement[];
       if (cells.length < 8) return;
 
+      // --- col 0: Identifiants (ASIN + EAN) ---
       const col0Html = cells[0].innerHTML ?? '';
       const col0Text = (cells[0] as HTMLElement).innerText ?? '';
       const asinHref = col0Html.match(/\/products\/([A-Z0-9]{10})\b/);
@@ -629,20 +664,41 @@ async function scrapeFromDom(page: Page): Promise<ActorioProduct[]> {
       const eanM = col0Text.match(/\b\d{8,14}\b/);
       const ean  = eanM ? eanM[0] : '';
 
+      // --- col 1: Correspondance / Restrictions ---
+      var correspondance = '';
+      var col1El = cells[1] as HTMLElement;
+      // Look for a percentage (e.g. "85%") or numeric similarity score
+      var corrMatch = (col1El.innerText ?? '').match(/(\d+)\s*%/);
+      if (corrMatch) {
+        correspondance = corrMatch[1] + '%';
+      } else {
+        // Try to get any numeric value from the cell
+        var col1Txt = (col1El.innerText ?? '').trim();
+        if (col1Txt && /\d/.test(col1Txt)) correspondance = col1Txt.substring(0, 30);
+      }
+
+      // --- col 2: Titre ---
       const titleRaw = (cells[2] as HTMLElement).innerText ?? '';
       const title = titleRaw.split('\n').map(function(s) { return s.trim(); })
                              .filter(function(s) { return s.length > 10; })[0] ?? '';
 
+      // --- col 3: Info AMZ (image) ---
       const imgEl = cells[3].querySelector('img') as HTMLImageElement | null;
       const imageUrl = imgEl?.getAttribute('src') ?? '';
 
+      // --- col 4: Fournisseur (supplier name + logo + URL) ---
+      var supAnchor = cells[4].querySelector('a') as HTMLAnchorElement | null;
+      var supplier_url = supAnchor ? (supAnchor.getAttribute('href') ?? '') : '';
+      // Make supplier URL absolute if it's relative
+      if (supplier_url && supplier_url.startsWith('/')) {
+        supplier_url = 'https://app.actorio.com' + supplier_url;
+      }
       const supRaw = (cells[4] as HTMLElement).innerText ?? '';
       const supLines = supRaw.split('\n').map(function(s) { return s.trim(); })
                              .filter(function(s) { return s.length > 0; });
       const supplier = supLines[supLines.length - 1] ?? '';
 
-      // Helper: extract first non-N/A numeric line from a cell.
-      // Wrapped in object property to prevent esbuild __name transform.
+      // Helper: extract first non-N/A numeric line from a cell — first line = searched marketplace.
       var helpers = {
         num: function(el: HTMLElement, stripChars: RegExp): number {
           var lines = el.innerText.split('\n');
@@ -657,48 +713,67 @@ async function scrapeFromDom(page: Page): Promise<ActorioProduct[]> {
         }
       };
 
+      // --- col 5: Prix AMZ (may still be empty if JS hasn't loaded yet) ---
       var amazon_price = helpers.num(cells[5] as HTMLElement, /[€£\s\u00a0]/g);
-      var supplier_price = helpers.num(cells[6] as HTMLElement, /[€£\s\u00a0]/g);
-      var profit  = helpers.num(cells[8] as HTMLElement, /[€£\s\u00a0]/g);
-      var roiRaw  = helpers.num(cells[9] as HTMLElement, /[%\s\u00a0]/g);
-      var roi     = (roiRaw > 0 && roiRaw <= 500) ? roiRaw : 0; // sanity cap
-      var monthly_sales   = helpers.num(cells[10] as HTMLElement, /[\s\u00a0]/g);
-      var monthly_profit  = helpers.num(cells[11] as HTMLElement, /[€£\s\u00a0]/g);
-      var bsr    = helpers.num(cells[13] as HTMLElement, /[^\d]/g);
-      var margin = helpers.num(cells[14] as HTMLElement, /[%\s\u00a0]/g);
+      // Fallback: try data-sort attribute on the cell (Django-tables2 often adds this)
+      if (!amazon_price) {
+        var sortVal = cells[5].getAttribute('data-sort') ?? cells[5].getAttribute('data-order') ?? '';
+        if (sortVal && /^\d/.test(sortVal)) amazon_price = parseFloat(sortVal) || 0;
+      }
 
-      // Legacy vars kept for debug block below
-      var p6  = String(supplier_price);
-      var p8  = String(profit);
-      var p9  = String(roi);
-      var p10 = String(monthly_sales);
-      var p11 = String(monthly_profit);
-      var p13 = String(bsr);
-      var p14 = String(margin);
+      // --- col 6: Prix Fournisseur + HT flag ---
+      var supplier_price = helpers.num(cells[6] as HTMLElement, /[€£\s\u00a0]/g);
+      var supplier_price_ht = /(hors\s+TVA|HT|excl\.?\s*VAT)/i.test((cells[6] as HTMLElement).innerText ?? '');
+
+      // --- col 8: Bénéfice Unitaire (multi-country: first line = searched MP) ---
+      var profit  = helpers.num(cells[8] as HTMLElement, /[€£\s\u00a0]/g);
+
+      // --- col 9: ROI ---
+      var roiRaw  = helpers.num(cells[9] as HTMLElement, /[%\s\u00a0]/g);
+      var roi     = (roiRaw > 0 && roiRaw <= 500) ? roiRaw : 0;
+
+      // --- col 10: Ventes Mensuelles ---
+      var monthly_sales   = helpers.num(cells[10] as HTMLElement, /[\s\u00a0]/g);
+
+      // --- col 11: Bénéfice Mensuel ---
+      var monthly_profit  = helpers.num(cells[11] as HTMLElement, /[€£\s\u00a0]/g);
+
+      // --- col 12: Graphique Keepa ---
+      var keepaImg = cells[12].querySelector('img') as HTMLImageElement | null;
+      var keepa_url = keepaImg ? (keepaImg.getAttribute('src') ?? '') : '';
+      if (!keepa_url) {
+        // Try data-src (lazy loading)
+        keepa_url = (cells[12].querySelector('img[data-src]') as HTMLImageElement | null)?.getAttribute('data-src') ?? '';
+      }
+
+      // --- col 13: BSR ---
+      var bsr    = helpers.num(cells[13] as HTMLElement, /[^\d]/g);
+
+      // --- col 14: Marge ---
+      var margin = helpers.num(cells[14] as HTMLElement, /[%\s\u00a0]/g);
 
       if (!asin && !title) return;
 
-      results.push({ title, asin, ean, image_url: imageUrl, supplier,
+      results.push({
+        title, asin, ean, image_url: imageUrl,
+        supplier, supplier_url, supplier_price, supplier_price_ht,
         amazon_price,
-        supplier_price,
-        profit,
-        roi,
-        monthly_sales,
-        monthly_profit,
-        bsr,
-        margin,
-        _debug: results.length === 0 ? { // log first row only
+        profit, roi, monthly_sales, monthly_profit,
+        bsr, margin,
+        keepa_url, correspondance,
+        _debug: results.length === 0 ? {
           c0: col0Text.substring(0, 40),
-          c5: (cells[5] as HTMLElement).innerText.trim().substring(0, 20),
-          c6: (cells[6] as HTMLElement).innerText.trim().substring(0, 20),
-          c7: (cells[7] as HTMLElement).innerText.trim().substring(0, 20),
-          c8: (cells[8] as HTMLElement).innerText.trim().substring(0, 20),
-          c9: (cells[9] as HTMLElement).innerText.trim().substring(0, 20),
-          c10: (cells[10] as HTMLElement).innerText.trim().substring(0, 20),
-          c11: (cells[11] as HTMLElement).innerText.trim().substring(0, 20),
-          c13: (cells[13] as HTMLElement).innerText.trim().substring(0, 20),
-          c14: (cells[14] as HTMLElement).innerText.trim().substring(0, 20),
+          c1: (cells[1] as HTMLElement).innerText.trim().substring(0, 40),
+          c5_text: (cells[5] as HTMLElement).innerText.trim().substring(0, 40),
+          c5_html: cells[5].innerHTML.substring(0, 100),
+          c6: (cells[6] as HTMLElement).innerText.trim().substring(0, 40),
+          c8: (cells[8] as HTMLElement).innerText.trim().substring(0, 40),
+          c9: (cells[9] as HTMLElement).innerText.trim().substring(0, 40),
+          c10: (cells[10] as HTMLElement).innerText.trim().substring(0, 40),
+          c12_html: cells[12].innerHTML.substring(0, 100),
           total_cells: cells.length,
+          supplier_url_raw: supplier_url.substring(0, 80),
+          keepa_url_raw: keepa_url.substring(0, 80),
         } : undefined,
       });
     });
@@ -708,7 +783,7 @@ async function scrapeFromDom(page: Page): Promise<ActorioProduct[]> {
 
   console.log(`[scraper] DOM scrape: ${rows.length} products extracted`);
   if (rows.length > 0 && (rows[0] as any)._debug) {
-    console.log('[scraper] First row cells:', JSON.stringify((rows[0] as any)._debug, null, 2));
+    console.log('[scraper] First row debug:', JSON.stringify((rows[0] as any)._debug, null, 2));
     rows.forEach(r => { delete (r as any)._debug; });
   }
   return rows as ActorioProduct[];

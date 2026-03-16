@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Package, TrendingUp, DollarSign, BarChart3, ChevronUp, ChevronDown } from 'lucide-react';
+import { Package, TrendingUp, DollarSign, BarChart3, ChevronUp, ChevronDown, ExternalLink } from 'lucide-react';
 import type { ProductResult } from '@/lib/product-search-types';
 
 interface SearchResultsProps {
@@ -12,7 +12,7 @@ interface SearchResultsProps {
   resultsCount?: number;
 }
 
-type SortKey = 'roi' | 'profit' | 'monthly_profit' | 'monthly_sales' | 'price' | 'supplier_price' | 'bsr' | 'margin' | null;
+type SortKey = 'roi' | 'profit' | 'monthly_profit' | 'monthly_sales' | 'price' | 'supplier_price' | null;
 
 function avg(arr: number[]): number {
   const valid = arr.filter(n => n > 0 && isFinite(n));
@@ -22,19 +22,18 @@ function avg(arr: number[]): number {
 
 function fmt2(n: number): string { return (Math.round(n * 100) / 100).toFixed(2); }
 
-function CompetitionBadge({ level }: { level?: string }) {
-  if (!level) return null;
-  const map: Record<string, { cls: string; label: string }> = {
-    low:    { cls: 'bg-green-100 text-green-800 border-green-200',  label: 'Faible' },
-    medium: { cls: 'bg-yellow-100 text-yellow-800 border-yellow-200', label: 'Moy.' },
-    high:   { cls: 'bg-red-100 text-red-800 border-red-200',         label: 'Forte' },
+/** Build the Amazon product URL based on the marketplace field */
+function amazonUrl(asin: string, marketplace?: string): string {
+  const domainMap: Record<string, string> = {
+    'amazon.fr': 'amazon.fr',
+    'amazon.de': 'amazon.de',
+    'amazon.es': 'amazon.es',
+    'amazon.it': 'amazon.it',
+    'amazon.co.uk': 'amazon.co.uk',
+    'amazon.com': 'amazon.com',
   };
-  const v = map[level] ?? map.medium;
-  return (
-    <span className={`inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-medium border ${v.cls}`}>
-      {v.label}
-    </span>
-  );
+  const domain = domainMap[marketplace ?? 'amazon.fr'] ?? 'amazon.fr';
+  return `https://www.${domain}/dp/${asin}`;
 }
 
 export default function SearchResults({ results, cacheHit, processingDuration, resultsCount }: SearchResultsProps) {
@@ -150,23 +149,21 @@ export default function SearchResults({ results, cacheHit, processingDuration, r
           <CardTitle className="text-sm">{sorted.length} résultats</CardTitle>
         </CardHeader>
         <CardContent className="p-0">
-          {/* Scrollable wrapper — horizontal AND vertical */}
           <div className="overflow-x-auto overflow-y-auto max-h-[600px] rounded-b-lg">
-            <Table className="min-w-[1200px] text-xs">
+            <Table className="min-w-[1300px] text-xs">
               <TableHeader className="sticky top-0 bg-background z-10">
                 <TableRow>
                   <TableHead className="w-[220px] whitespace-nowrap">Produit</TableHead>
                   <TableHead className="whitespace-nowrap">ASIN</TableHead>
+                  <TableHead className="whitespace-nowrap">Correspond.</TableHead>
                   <TableHead className="whitespace-nowrap">Fournisseur</TableHead>
                   <SortTh k="supplier_price" label="Prix fourn." right />
                   <SortTh k="price"          label="Prix Amazon" right />
                   <SortTh k="profit"         label="Profit unit." right />
                   <SortTh k="roi"            label="ROI" right />
-                  <SortTh k="margin"         label="Marge" right />
                   <SortTh k="monthly_sales"  label="Ventes/mois" right />
                   <SortTh k="monthly_profit" label="Profit/mois" right />
-                  <SortTh k="bsr"            label="BSR" right />
-                  <TableHead className="whitespace-nowrap">Conc.</TableHead>
+                  <TableHead className="whitespace-nowrap text-center">Keepa 90j</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -181,62 +178,101 @@ export default function SearchResults({ results, cacheHit, processingDuration, r
                         {p.marketplace && <Badge variant="outline" className="text-[9px] h-4 px-1">{p.marketplace}</Badge>}
                       </div>
                     </TableCell>
-                    {/* ASIN */}
+
+                    {/* ASIN — lien vers la marketplace correcte */}
                     <TableCell>
                       {p.asin
                         ? <a
-                            href={`https://www.amazon.fr/dp/${p.asin}`}
+                            href={amazonUrl(p.asin, p.marketplace)}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="font-mono text-[10px] bg-muted px-1 py-0.5 rounded hover:underline text-primary"
-                          >{p.asin}</a>
+                            className="font-mono text-[10px] bg-muted px-1 py-0.5 rounded hover:underline text-primary inline-flex items-center gap-0.5"
+                          >
+                            {p.asin}
+                            <ExternalLink className="w-2.5 h-2.5" />
+                          </a>
                         : <span className="text-muted-foreground">—</span>}
                     </TableCell>
-                    {/* Fournisseur */}
-                    <TableCell>
-                      <Badge variant="secondary" className="text-[10px] h-4 px-1 max-w-[110px] truncate block">
-                        {p.supplier || '—'}
-                      </Badge>
+
+                    {/* Correspondance */}
+                    <TableCell className="text-center">
+                      {p.correspondance
+                        ? <span className="text-[11px] font-semibold text-blue-600">{p.correspondance}</span>
+                        : <span className="text-muted-foreground">—</span>}
                     </TableCell>
+
+                    {/* Fournisseur — lien si disponible */}
+                    <TableCell>
+                      {p.supplier_url
+                        ? <a
+                            href={p.supplier_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-0.5 hover:underline text-primary"
+                          >
+                            <Badge variant="secondary" className="text-[10px] h-4 px-1 max-w-[110px] truncate">
+                              {p.supplier || '—'}
+                            </Badge>
+                            <ExternalLink className="w-2.5 h-2.5 text-primary" />
+                          </a>
+                        : <Badge variant="secondary" className="text-[10px] h-4 px-1 max-w-[110px] truncate block">
+                            {p.supplier || '—'}
+                          </Badge>}
+                    </TableCell>
+
                     {/* Prix fournisseur */}
                     <TableCell className="text-right font-medium">
-                      {p.supplier_price > 0 ? `${fmt2(p.supplier_price)}€` : '—'}
+                      {(p.supplier_price ?? 0) > 0
+                        ? <span className="inline-flex items-center gap-1 justify-end">
+                            {fmt2(p.supplier_price!)}€
+                            {p.supplier_price_ht && (
+                              <span className="text-[9px] text-amber-600 font-normal border border-amber-300 rounded px-0.5">HT</span>
+                            )}
+                          </span>
+                        : '—'}
                     </TableCell>
+
                     {/* Prix Amazon */}
                     <TableCell className="text-right font-medium">
                       {p.price > 0 ? `${fmt2(p.price)}€` : '—'}
                     </TableCell>
+
                     {/* Profit unitaire */}
                     <TableCell className="text-right">
                       <span className={`font-bold ${p.profit >= 5 ? 'text-green-600' : p.profit >= 2 ? 'text-yellow-600' : 'text-red-500'}`}>
                         {p.profit !== 0 ? `${fmt2(p.profit)}€` : '—'}
                       </span>
                     </TableCell>
+
                     {/* ROI */}
                     <TableCell className="text-right">
                       <span className={`font-bold ${p.roi >= 30 ? 'text-green-600' : p.roi >= 15 ? 'text-yellow-600' : 'text-red-500'}`}>
                         {p.roi > 0 ? `${p.roi.toFixed(1)}%` : '—'}
                       </span>
                     </TableCell>
-                    {/* Marge */}
-                    <TableCell className="text-right text-muted-foreground">
-                      {p.margin > 0 ? `${p.margin.toFixed(1)}%` : '—'}
-                    </TableCell>
+
                     {/* Ventes/mois */}
                     <TableCell className="text-right">
                       {p.monthly_sales ? p.monthly_sales.toLocaleString('fr') : '—'}
                     </TableCell>
+
                     {/* Profit/mois */}
                     <TableCell className="text-right font-medium text-purple-600">
                       {p.monthly_profit ? `${fmt2(p.monthly_profit)}€` : '—'}
                     </TableCell>
-                    {/* BSR */}
-                    <TableCell className="text-right text-muted-foreground">
-                      {p.bsr ? p.bsr.toLocaleString('fr') : '—'}
-                    </TableCell>
-                    {/* Concurrence */}
-                    <TableCell>
-                      <CompetitionBadge level={p.competition_level} />
+
+                    {/* Keepa chart 90j */}
+                    <TableCell className="text-center">
+                      {p.keepa_url
+                        ? <a href={p.keepa_url} target="_blank" rel="noopener noreferrer">
+                            <img
+                              src={p.keepa_url}
+                              alt="Keepa"
+                              className="h-10 w-auto rounded border border-border hover:opacity-80 transition-opacity"
+                              loading="lazy"
+                            />
+                          </a>
+                        : <span className="text-muted-foreground">—</span>}
                     </TableCell>
                   </TableRow>
                 ))}

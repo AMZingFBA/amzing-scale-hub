@@ -49,6 +49,10 @@ export interface ProductResult {
   competition_level?: string;
   supplier?: string;
   supplier_price?: number;
+  supplier_price_ht?: boolean;
+  supplier_url?: string;
+  keepa_url?: string;
+  correspondance?: string;
   source: string;
   found_at: string;
 }
