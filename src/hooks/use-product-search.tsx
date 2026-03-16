@@ -394,7 +394,7 @@ export function useProductSearch() {
     } finally {
       setIsSearching(false);
     }
-  }, [user, bridgeAvailable, submitSearchActorio, submitSearchQueue]);
+  }, [user, bridgeAvailable, submitSearchActorio, submitSearchQueue, submitSearchRemote]);
 
   const savePreset = useCallback(async (name: string, filters: SearchFilters) => {
     if (!user) return;
