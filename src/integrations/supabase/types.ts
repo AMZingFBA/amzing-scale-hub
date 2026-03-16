@@ -1033,6 +1033,117 @@ export type Database = {
           },
         ]
       }
+      product_searches: {
+        Row: {
+          id: string
+          user_id: string
+          name: string
+          filters: Json
+          filters_hash: string
+          status: string
+          provider: string
+          results_count: number
+          cache_hit: boolean
+          processing_duration_ms: number | null
+          error_message: string | null
+          results_summary: Json | null
+          created_at: string
+          updated_at: string
+          expires_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          name: string
+          filters?: Json
+          filters_hash: string
+          status?: string
+          provider?: string
+          results_count?: number
+          cache_hit?: boolean
+          processing_duration_ms?: number | null
+          error_message?: string | null
+          results_summary?: Json | null
+          created_at?: string
+          updated_at?: string
+          expires_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          name?: string
+          filters?: Json
+          filters_hash?: string
+          status?: string
+          provider?: string
+          results_count?: number
+          cache_hit?: boolean
+          processing_duration_ms?: number | null
+          error_message?: string | null
+          results_summary?: Json | null
+          created_at?: string
+          updated_at?: string
+          expires_at?: string
+        }
+        Relationships: []
+      }
+      search_presets: {
+        Row: {
+          id: string
+          user_id: string
+          name: string
+          filters: Json
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          name: string
+          filters?: Json
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          name?: string
+          filters?: Json
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      search_results_cache: {
+        Row: {
+          id: string
+          filters_hash: string
+          results: Json
+          provider: string
+          results_count: number
+          created_at: string
+          expires_at: string
+        }
+        Insert: {
+          id?: string
+          filters_hash: string
+          results?: Json
+          provider?: string
+          results_count?: number
+          created_at?: string
+          expires_at?: string
+        }
+        Update: {
+          id?: string
+          filters_hash?: string
+          results?: Json
+          provider?: string
+          results_count?: number
+          created_at?: string
+          expires_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null

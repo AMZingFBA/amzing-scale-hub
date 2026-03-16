@@ -295,6 +295,7 @@ const Dashboard = () => {
                 </AccordionTrigger>
                 <AccordionContent>
                   <div className="grid gap-3 pt-2">
+                    <CategoryItem icon={Search} label="Recherche produits" link="/product-search" />
                     <CategoryItem
                       icon={Search}
                       label="Product Find"

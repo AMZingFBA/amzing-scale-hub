@@ -1,7 +1,7 @@
 project_id = "wvmfzlogijvqcsgablrb"
 
-[auth.external.hibp]
-enabled = true
+# [auth.external.hibp]
+# enabled = true
 
 [functions.send-contact-email]
 verify_jwt = false
@@ -106,4 +106,7 @@ verify_jwt = false
 verify_jwt = false
 
 [functions.sync-ibood-from-sheets]
+verify_jwt = false
+
+[functions.product-search]
 verify_jwt = false

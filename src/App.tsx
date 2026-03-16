@@ -80,6 +80,7 @@ const AffiliateLogin = lazy(() => import("./pages/affiliate/AffiliateLogin"));
 const AffiliateVerify = lazy(() => import("./pages/affiliate/AffiliateVerify"));
 const AffiliateDashboard = lazy(() => import("./pages/affiliate/AffiliateDashboard"));
 const AffiliateAdmin = lazy(() => import("./pages/affiliate/AffiliateAdmin"));
+const ProductSearch = lazy(() => import("./pages/ProductSearch"));
 const MonitorQogita = lazy(() => import("./pages/MonitorQogita"));
 const ProduitsQogita = lazy(() => import("./pages/ProduitsQogita"));
 const ProduitsEany = lazy(() => import("./pages/ProduitsEany"));
@@ -205,6 +206,7 @@ const App = () => (
             <Route path="/affiliate/verify" element={<AffiliateVerify />} />
             <Route path="/affiliate/dashboard" element={<AffiliateDashboard />} />
             <Route path="/affiliate/admin" element={<AffiliateAdmin />} />
+            <Route path="/product-search" element={<ProductSearch />} />
             <Route path="/monitor/qogita" element={<MonitorQogita />} />
             <Route path="/produits-gagnants/produits-qogita" element={<ProduitsQogita />} />
             <Route path="/products/qogita" element={<ProduitsQogita />} />
