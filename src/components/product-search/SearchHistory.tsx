@@ -112,9 +112,22 @@ export default function SearchHistory({ searches, onViewResults }: SearchHistory
                       </div>
                     )}
                   </div>
-                  <span className="text-xs text-muted-foreground whitespace-nowrap">
-                    {formatDistanceToNow(new Date(search.created_at), { addSuffix: true, locale: fr })}
-                  </span>
+                  <div className="flex flex-col items-end gap-1.5 shrink-0">
+                    <span className="text-xs text-muted-foreground whitespace-nowrap">
+                      {formatDistanceToNow(new Date(search.created_at), { addSuffix: true, locale: fr })}
+                    </span>
+                    {search.status === 'completed' && search.results_count > 0 && onViewResults && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="h-7 text-xs gap-1"
+                        onClick={() => onViewResults(search)}
+                      >
+                        <Eye className="w-3 h-3" />
+                        Voir les résultats
+                      </Button>
+                    )}
+                  </div>
                 </div>
               </div>
             ))}
