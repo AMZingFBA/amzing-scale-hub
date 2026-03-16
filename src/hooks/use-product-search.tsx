@@ -188,7 +188,7 @@ export function useProductSearch() {
     const data = await res.json();
 
     if (!data.success) {
-      throw new Error(data.error || 'Erreur bridge Actorio');
+      throw new Error(data.error || 'Erreur serveur de recherche');
     }
 
     const results: ProductResult[] = (data.results || []).map((item: any) => ({
@@ -221,7 +221,7 @@ export function useProductSearch() {
       filters.marketplace || 'amazon.fr',
       filters.suppliers?.slice(0, 3).join(', '),
       filters.roi_min ? `ROI>${filters.roi_min}%` : null,
-    ].filter(Boolean).join(' - ') || 'Recherche Actorio';
+    ].filter(Boolean).join(' - ') || 'Recherche';
 
     await supabase
       .from('product_searches')
@@ -296,7 +296,7 @@ export function useProductSearch() {
       filters.suppliers?.slice(0, 3).join(', '),
       filters.roi_min ? `ROI>${filters.roi_min}%` : null,
       filters.keywords,
-    ].filter(Boolean).join(' - ') || 'Recherche Actorio';
+    ].filter(Boolean).join(' - ') || 'Recherche';
 
     // Insert the search as pending — the bridge will pick it up
     const { data: newSearch, error: insertErr } = await supabase

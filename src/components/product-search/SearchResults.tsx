@@ -136,9 +136,9 @@ export default function SearchResults({ results, cacheHit, processingDuration, r
         <span className="text-muted-foreground">Ventes/mois total : {totalMonthlySales.toLocaleString('fr')}</span>
         <span className="ml-auto flex items-center gap-2">
           {sortKey === null
-            ? <span className="text-[10px] text-primary font-medium">Ordre Actorio • cliquer colonne pour trier</span>
+            ? <span className="text-[10px] text-primary font-medium">Ordre original • cliquer colonne pour trier</span>
             : <button className="text-[10px] underline hover:text-primary" onClick={() => setSortKey(null)}>
-                Réinitialiser (ordre Actorio)
+                Réinitialiser (ordre original)
               </button>
           }
         </span>

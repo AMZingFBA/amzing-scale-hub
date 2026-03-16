@@ -82,7 +82,7 @@ const ProductSearch = () => {
                 variant={bridgeAvailable ? 'default' : 'secondary'}
                 className={`ml-auto text-xs ${bridgeAvailable ? 'bg-green-600' : ''}`}
               >
-                {bridgeAvailable === null ? 'Connexion...' : bridgeAvailable ? 'Actorio Live' : 'Actorio (via serveur)'}
+                {bridgeAvailable === null ? 'Connexion...' : bridgeAvailable ? 'En direct' : 'En ligne'}
               </Badge>
             </div>
 
@@ -111,7 +111,7 @@ const ProductSearch = () => {
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-3"></div>
                 <p className="text-lg font-semibold">Recherche en cours...</p>
                 <p className="text-sm text-muted-foreground mt-1">
-                  Récupération des produits depuis Actorio via le serveur. Cela prend généralement 1 à 2 minutes.
+                  Récupération des produits via notre moteur de recherche. Cela prend généralement 1 à 2 minutes.
                 </p>
               </div>
             )}
