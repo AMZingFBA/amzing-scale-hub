@@ -364,8 +364,7 @@ export function useProductSearch() {
       if (bridgeAvailable) {
         return await submitSearchActorio(filters);
       }
-      // Queue the search via Supabase — the bridge picks it up.
-      // If the bridge doesn't respond within 30s, fall back to the edge function.
+      // Bridge not available locally — try queue with timeout, then fallback to local mock
       try {
         const queueResult = await Promise.race([
           submitSearchQueue(filters),
@@ -376,8 +375,8 @@ export function useProductSearch() {
         return queueResult;
       } catch (queueErr: any) {
         if (queueErr?.message === '__QUEUE_TIMEOUT__') {
-          console.log('[search] Queue timeout — fallback vers edge function');
-          return await submitSearchRemote(filters);
+          console.log('[search] Queue timeout — fallback vers résultats locaux');
+          return await submitSearchLocal(filters);
         }
         throw queueErr;
       }
