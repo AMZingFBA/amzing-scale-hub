@@ -364,19 +364,19 @@ export function useProductSearch() {
       if (bridgeAvailable) {
         return await submitSearchActorio(filters);
       }
-      // Bridge not available locally — try queue with timeout, then fallback to local mock
+      // Queue the search via Supabase — the bridge picks it up (~60s on Hetzner).
+      // Timeout at 150s to give the bridge enough time.
       try {
         const queueResult = await Promise.race([
           submitSearchQueue(filters),
           new Promise<null>((_, reject) =>
-            setTimeout(() => reject(new Error('__QUEUE_TIMEOUT__')), 30_000)
+            setTimeout(() => reject(new Error('__QUEUE_TIMEOUT__')), 150_000)
           ),
         ]);
         return queueResult;
       } catch (queueErr: any) {
         if (queueErr?.message === '__QUEUE_TIMEOUT__') {
-          console.log('[search] Queue timeout — fallback vers résultats locaux');
-          return await submitSearchLocal(filters);
+          throw new Error('La recherche a pris trop de temps. Le serveur est peut-être occupé, réessayez dans quelques instants.');
         }
         throw queueErr;
       }
@@ -386,7 +386,7 @@ export function useProductSearch() {
     } finally {
       setIsSearching(false);
     }
-  }, [user, bridgeAvailable, submitSearchActorio, submitSearchQueue, submitSearchRemote]);
+  }, [user, bridgeAvailable, submitSearchActorio, submitSearchQueue]);
 
   const savePreset = useCallback(async (name: string, filters: SearchFilters) => {
     if (!user) return;
