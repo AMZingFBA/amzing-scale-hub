@@ -7,11 +7,13 @@ import SearchForm from '@/components/product-search/SearchForm';
 import SearchResults from '@/components/product-search/SearchResults';
 import SearchHistory from '@/components/product-search/SearchHistory';
 import { useProductSearch } from '@/hooks/use-product-search';
+import { supabase } from '@/integrations/supabase/client';
 import { Badge } from '@/components/ui/badge';
 import { Search, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useState, useRef, useEffect } from 'react';
-import type { SearchPreset, SearchResponse, SearchFilters } from '@/lib/product-search-types';
+import { useState, useRef, useEffect, useCallback } from 'react';
+import type { SearchPreset, SearchResponse, SearchFilters, ProductSearch as ProductSearchType } from '@/lib/product-search-types';
+import { toast } from 'sonner';
 
 const ProductSearch = () => {
   const { user, isVIP, isLoading } = useAuth();
