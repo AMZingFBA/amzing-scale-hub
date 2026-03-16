@@ -255,10 +255,10 @@ export default function SearchResults({ results, cacheHit, processingDuration, r
 
                     {/* Keepa chart 90j */}
                     <TableCell className="text-center">
-                      {p.keepa_url
-                        ? <a href={p.keepa_url} target="_blank" rel="noopener noreferrer">
+                      {(p.keepa_b64 || p.keepa_url)
+                        ? <a href={p.keepa_url || '#'} target="_blank" rel="noopener noreferrer">
                             <img
-                              src={p.keepa_url}
+                              src={p.keepa_b64 || p.keepa_url}
                               alt="Keepa"
                               className="h-10 w-auto rounded border border-border hover:opacity-80 transition-opacity"
                               loading="lazy"

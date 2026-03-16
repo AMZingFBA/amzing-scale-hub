@@ -329,6 +329,31 @@ export async function search(filters: ActorioFilters, maxResults = 100): Promise
   const startTime = Date.now();
   const page = await context.newPage();
 
+  // Intercept AJAX responses that may contain Amazon prices
+  // Actorio loads prices dynamically via JS after page render
+  const pricesByAsin: Map<string, number> = new Map();
+  page.on('response', async (response) => {
+    try {
+      const url = response.url();
+      const ct = response.headers()['content-type'] ?? '';
+      if (!ct.includes('json')) return;
+      // Only intercept Actorio API calls (skip analytics, fonts, etc.)
+      if (!url.includes('actorio.com') && !url.includes('/api/') && !url.includes('/products/')) return;
+      const body = await response.json().catch(() => null);
+      if (!body) return;
+      // Look for price data keyed by ASIN
+      const items: any[] = Array.isArray(body) ? body : (body.data ?? body.results ?? body.products ?? []);
+      if (!Array.isArray(items) || !items.length) return;
+      let found = 0;
+      for (const item of items) {
+        const asin = item.asin ?? item.ASIN ?? '';
+        const price = item.amazon_price ?? item.competitive_price ?? item.price ?? 0;
+        if (asin && price > 0) { pricesByAsin.set(asin, price); found++; }
+      }
+      if (found > 0) console.log(`[scraper] Intercepted ${found} prices from ${url.substring(0, 80)}`);
+    } catch { /* ignore */ }
+  });
+
   try {
     const baseUrl = buildSearchUrl(filters);
     console.log(`[scraper] Search URL: ${baseUrl}`);
@@ -384,7 +409,7 @@ export async function search(filters: ActorioFilters, maxResults = 100): Promise
         break;
       }
 
-      const pageRows = await scrapeFromDom(page, filters.marketplace ?? 'amazon.fr');
+      const pageRows = await scrapeFromDom(page, filters.marketplace ?? 'amazon.fr', pricesByAsin);
       if (pageRows.length === 0) break;
       allResults.push(...pageRows);
 
@@ -582,7 +607,7 @@ function parseRowObject(row: Record<string, any>): ActorioProduct {
  *   correct per-country value from multi-country cells (c8, c9, c10, c11, c14).
  *   Actorio always renders countries in db_amz_countries order: DE, ES, FR, GB, IT.
  */
-async function scrapeFromDom(page: Page, marketplace: string): Promise<ActorioProduct[]> {
+async function scrapeFromDom(page: Page, marketplace: string, pricesByAsin: Map<string, number> = new Map()): Promise<ActorioProduct[]> {
   // Quick diagnostic: check main-table row and cell counts
   const diag = await page.evaluate((): any => {
     // Try #main-table first, then best-rows table
@@ -640,6 +665,29 @@ async function scrapeFromDom(page: Page, marketplace: string): Promise<ActorioPr
       console.log(`[scraper] Amazon prices loaded after ${(w + 1) * 2}s`);
       break;
     }
+
+    // Also try to extract prices from inline scripts (some Django pages embed JSON data)
+    const scriptPrices = await page.evaluate((): Record<string, number> => {
+      const out: Record<string, number> = {};
+      const scripts = Array.from(document.querySelectorAll('script:not([src])')) as HTMLScriptElement[];
+      for (const s of scripts) {
+        const txt = s.textContent ?? '';
+        // Look for ASIN-like patterns with associated price
+        const matches = txt.matchAll(/"(B0[A-Z0-9]{8})"[^}]{0,80}"(?:amazon_price|competitive_price|price)"\s*:\s*([\d.]+)/g);
+        for (const m of matches) { out[m[1]] = parseFloat(m[2]); }
+        // Also look for dict-like: B0XXXXX: 29.99
+        const matches2 = txt.matchAll(/(B0[A-Z0-9]{8})['":\s]+([\d.]+)/g);
+        for (const m of matches2) { if (parseFloat(m[2]) > 0) out[m[1]] = parseFloat(m[2]); }
+      }
+      return out;
+    });
+    for (const [asin, price] of Object.entries(scriptPrices)) {
+      if (!pricesByAsin.has(asin) && price > 0) pricesByAsin.set(asin, price);
+    }
+    if (Object.keys(scriptPrices).length > 0) {
+      console.log(`[scraper] Found ${Object.keys(scriptPrices).length} prices in inline scripts`);
+    }
+
     console.log(`[scraper] Waiting for Amazon prices... (${(w + 1) * 2}s)`);
   }
 
@@ -860,6 +908,17 @@ async function scrapeFromDom(page: Page, marketplace: string): Promise<ActorioPr
     console.log('[scraper] First row debug:', JSON.stringify((rows[0] as any)._debug, null, 2));
     rows.forEach(r => { delete (r as any)._debug; });
   }
+
+  // Enrich amazon_price from intercepted AJAX responses when DOM value is 0
+  let enriched = 0;
+  for (const row of rows as ActorioProduct[]) {
+    if ((!row.amazon_price || row.amazon_price === 0) && row.asin && pricesByAsin.has(row.asin)) {
+      row.amazon_price = pricesByAsin.get(row.asin)!;
+      enriched++;
+    }
+  }
+  if (enriched > 0) console.log(`[scraper] Enriched ${enriched} products with intercepted Amazon prices`);
+
   return rows as ActorioProduct[];
 }
 

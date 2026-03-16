@@ -53,6 +53,7 @@ export interface ProductResult {
   supplier_url?: string;
   amazon_url?: string;
   keepa_url?: string;
+  keepa_b64?: string;
   correspondance?: string;
   source: string;
   found_at: string;
