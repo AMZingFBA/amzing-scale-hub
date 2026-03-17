@@ -327,11 +327,6 @@ export default function SearchResults({ results, cacheHit, processingDuration, r
     </div>
   );
 }
-  if (!valid.length) return 0;
-  return valid.reduce((s, n) => s + n, 0) / valid.length;
-}
-
-function fmt2(n: number): string { return (Math.round(n * 100) / 100).toFixed(2); }
 
 /** Build the Amazon product URL based on the marketplace field */
 function amazonUrl(asin: string, marketplace?: string): string {
