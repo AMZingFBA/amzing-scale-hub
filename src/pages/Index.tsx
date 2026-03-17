@@ -29,6 +29,7 @@ import { useRegistrationSource } from "@/hooks/use-registration-source";
 import HomeDashboardPreview from "@/components/home/HomeDashboardPreview";
 import HomePreviewSection from "@/components/home/HomePreviewSection";
 import HomeMockups from "@/components/home/HomeMockups";
+import HomeAISearchPromo from "@/components/home/HomeAISearchPromo";
 import PromoCountdown from "@/components/PromoCountdown";
 
 const ServiceCard = ({ 
