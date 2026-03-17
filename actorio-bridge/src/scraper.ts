@@ -212,8 +212,10 @@ function buildSearchUrl(filters: ActorioFilters): string {
   }
 
   // Store: specific supplier list, or store=ALL for all suppliers
-  // EMPTY = placeholder (0 results), no param = might not work, ALL = all suppliers
-  if (filters.suppliers?.length) {
+  // When searching by ASIN/EAN, force store=ALL (listing all suppliers kills the filter)
+  if (filters.asin_list || filters.ean_list) {
+    params.set('store', 'ALL');
+  } else if (filters.suppliers?.length) {
     filters.suppliers.forEach(s => params.append('store', s));
   } else {
     params.set('store', 'ALL');
@@ -398,9 +400,9 @@ export async function search(filters: ActorioFilters, maxResults = 100): Promise
         await page.goto(pageUrl, { waitUntil: 'domcontentloaded', timeout: 30000 });
       }
 
-      // Wait for table rows (up to 20s)
+      // Wait for table rows (up to 10s)
       let loaded = false;
-      for (let i = 0; i < 10; i++) {
+      for (let i = 0; i < 5; i++) {
         await page.waitForTimeout(2000);
         const rowCount = await page.evaluate((): number => {
           const mainTbl = document.querySelector('table#main-table') as HTMLTableElement | null;
@@ -642,65 +644,26 @@ async function scrapeFromDom(page: Page, marketplace: string, pricesByAsin: Map<
   console.log(`[scraper] table diag: ${JSON.stringify(diag)}`);
 
   // Scroll to bottom then back to top — triggers intersection-observer lazy-loads
-  // (Amazon prices and Keepa images are lazy-loaded based on viewport on Actorio)
-  await page.evaluate(() => {
-    window.scrollTo({ top: document.body.scrollHeight });
-  });
-  await page.waitForTimeout(2000);
+  await page.evaluate(() => { window.scrollTo({ top: document.body.scrollHeight }); });
+  await page.waitForTimeout(1500);
   await page.evaluate(() => { window.scrollTo({ top: 0 }); });
 
-  // Wait up to 12s for Amazon prices to appear in c5
-  for (let w = 0; w < 6; w++) {
-    await page.waitForTimeout(2000);
-    const hasPrices = await page.evaluate((): boolean => {
-      let table = document.querySelector('table#main-table') as HTMLTableElement | null;
-      if (!table) {
-        let best: HTMLTableElement | null = null;
-        let bestCount = 0;
-        Array.from(document.querySelectorAll('table') as NodeListOf<HTMLTableElement>).forEach(function(t) {
-          const tb = t.tBodies[0];
-          if (tb && tb.rows.length > bestCount) { bestCount = tb.rows.length; best = t; }
-        });
-        table = best;
-      }
-      if (!table) return false;
-      const tbody = (table as HTMLTableElement).tBodies[0];
-      if (!tbody || !tbody.rows[0]) return false;
-      const cells = Array.from((tbody.rows[0] as HTMLTableRowElement).cells) as HTMLTableCellElement[];
-      if (cells.length < 6) return false;
-      // Check if cells[5] (amazon price) has a number
-      const txt = (cells[5] as HTMLElement).innerText ?? '';
-      const dataOrd = cells[5].getAttribute('data-order') ?? '';
-      return /\d/.test(txt) || /^\d/.test(dataOrd);
-    });
-    if (hasPrices) {
-      console.log(`[scraper] Amazon prices loaded after ${(w + 1) * 2}s`);
-      break;
+  // One-shot: extract any prices embedded in inline scripts (Django sometimes inlines JSON data)
+  const scriptPrices = await page.evaluate((): Record<string, number> => {
+    const out: Record<string, number> = {};
+    const scripts = Array.from(document.querySelectorAll('script:not([src])')) as HTMLScriptElement[];
+    for (const s of scripts) {
+      const txt = s.textContent ?? '';
+      const matches = txt.matchAll(/"(B0[A-Z0-9]{8})"[^}]{0,80}"(?:amazon_price|competitive_price|price)"\s*:\s*([\d.]+)/g);
+      for (const m of matches) { out[m[1]] = parseFloat(m[2]); }
     }
-
-    // Also try to extract prices from inline scripts (some Django pages embed JSON data)
-    const scriptPrices = await page.evaluate((): Record<string, number> => {
-      const out: Record<string, number> = {};
-      const scripts = Array.from(document.querySelectorAll('script:not([src])')) as HTMLScriptElement[];
-      for (const s of scripts) {
-        const txt = s.textContent ?? '';
-        // Look for ASIN-like patterns with associated price
-        const matches = txt.matchAll(/"(B0[A-Z0-9]{8})"[^}]{0,80}"(?:amazon_price|competitive_price|price)"\s*:\s*([\d.]+)/g);
-        for (const m of matches) { out[m[1]] = parseFloat(m[2]); }
-        // Also look for dict-like: B0XXXXX: 29.99
-        const matches2 = txt.matchAll(/(B0[A-Z0-9]{8})['":\s]+([\d.]+)/g);
-        for (const m of matches2) { if (parseFloat(m[2]) > 0) out[m[1]] = parseFloat(m[2]); }
-      }
-      return out;
-    });
-    for (const [asin, price] of Object.entries(scriptPrices)) {
-      if (!pricesByAsin.has(asin) && price > 0) pricesByAsin.set(asin, price);
-    }
-    if (Object.keys(scriptPrices).length > 0) {
-      console.log(`[scraper] Found ${Object.keys(scriptPrices).length} prices in inline scripts`);
-    }
-
-    console.log(`[scraper] Waiting for Amazon prices... (${(w + 1) * 2}s)`);
+    return out;
+  });
+  for (const [asin, price] of Object.entries(scriptPrices)) {
+    if (!pricesByAsin.has(asin) && price > 0) pricesByAsin.set(asin, price);
+  }
+  if (Object.keys(scriptPrices).length > 0) {
+    console.log(`[scraper] Found ${Object.keys(scriptPrices).length} prices in inline scripts`);
   }
 
   const rows = await page.evaluate((mktplace: string): any[] => {
