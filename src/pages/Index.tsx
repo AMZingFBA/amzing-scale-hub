@@ -303,6 +303,9 @@ const Index = () => {
       {/* Mockups - Tous les appareils */}
       <HomeMockups />
 
+      {/* AI Search Promo - Public */}
+      <HomeAISearchPromo />
+
       {/* Guides Amazon FBA - Section SEO - Bold banner style */}
       <section className="py-16 relative overflow-hidden">
         {/* Animated background */}
