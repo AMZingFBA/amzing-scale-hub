@@ -195,6 +195,7 @@ const Dashboard = () => {
 
             <ProductSearchBanner />
 
+            <Accordion type="multiple" className="space-y-4">
               {/* INTRODUCTION */}
               <AccordionItem value="introduction" className="border rounded-lg px-6 bg-card">
                 <AccordionTrigger className="hover:no-underline">
