@@ -10,6 +10,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import CategoryAlerts from "@/components/CategoryAlerts";
 import { RecentUpdates } from "@/components/RecentUpdates";
+import ProductSearchBanner from "@/components/dashboard/ProductSearchBanner";
 import { NotificationBadge } from "@/components/NotificationBadge";
 import { RefreshButton } from "@/components/RefreshButton";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -191,6 +192,8 @@ const Dashboard = () => {
             </div>
 
             <RecentUpdates />
+
+            <ProductSearchBanner />
 
             <Accordion type="multiple" className="space-y-4">
               {/* INTRODUCTION */}
