@@ -29,6 +29,7 @@ import { useRegistrationSource } from "@/hooks/use-registration-source";
 import HomeDashboardPreview from "@/components/home/HomeDashboardPreview";
 import HomePreviewSection from "@/components/home/HomePreviewSection";
 import HomeMockups from "@/components/home/HomeMockups";
+import HomeAISearchPromo from "@/components/home/HomeAISearchPromo";
 import PromoCountdown from "@/components/PromoCountdown";
 
 const ServiceCard = ({ 
@@ -301,6 +302,9 @@ const Index = () => {
 
       {/* Mockups - Tous les appareils */}
       <HomeMockups />
+
+      {/* AI Search Promo - Public */}
+      <HomeAISearchPromo />
 
       {/* Guides Amazon FBA - Section SEO - Bold banner style */}
       <section className="py-16 relative overflow-hidden">
