@@ -328,7 +328,6 @@ export default function SearchResults({ results, cacheHit, processingDuration, r
   );
 }
 
-function avg(arr: number[]): number {
   const valid = arr.filter(n => n > 0 && isFinite(n));
   if (!valid.length) return 0;
   return valid.reduce((s, n) => s + n, 0) / valid.length;
