@@ -1026,7 +1026,7 @@ export const schemas = {
       "@context": "https://schema.org",
       "@type": "Organization",
       "name": "AMZing FBA",
-      "legalName": "N.Z Consulting",
+      "legalName": "AMZing FBA",
       "url": "https://amzingfba.com/",
       "logo": "https://amzingfba.com/logo-amzing.png",
       "description": "AMZing FBA est une plateforme tout-en-un pour réussir sur Amazon FBA : outils, méthode, sourcing et communauté.",
