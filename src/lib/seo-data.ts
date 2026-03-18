@@ -521,7 +521,7 @@ export const schemas = {
     "description": "Formation Amazon FBA complète : méthode pas à pas + moniteurs produits rentables + fournisseurs + communauté. Lance et scale sur Amazon. Sans engagement.",
     "provider": {
       "@type": "Organization",
-      "name": "N.Z Consulting (AMZing FBA)",
+      "name": "AMZing FBA",
       "sameAs": "https://amzingfba.com",
       "url": "https://amzingfba.com"
     },
