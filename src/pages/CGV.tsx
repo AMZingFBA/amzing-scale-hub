@@ -31,7 +31,7 @@ const CGV = () => {
           <h1 className="text-4xl md:text-5xl font-bold text-center mb-4 bg-gradient-to-r from-primary via-purple-500 to-pink-500 bg-clip-text text-transparent">
             Conditions Générales de Vente
           </h1>
-          <p className="text-center text-muted-foreground mb-12">(Édités par N.Z Consulting)</p>
+          <p className="text-center text-muted-foreground mb-12">(Édités par AMZing FBA)</p>
 
           <div className="max-w-4xl mx-auto space-y-6">
             <Card className="border-primary/20 hover:border-primary/40 transition-colors">
