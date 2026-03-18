@@ -11,7 +11,7 @@ const CGV = () => {
     <>
       <SEO 
         title="Conditions Générales de Vente - AMZing FBA"
-        description="Consultez les conditions générales de vente du site et des services AMZing FBA édités par N.Z Consulting."
+        description="Consultez les conditions générales de vente du site et des services AMZing FBA."
         keywords="cgv, conditions générales vente, amzing fba, formations, abonnements"
       />
       <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-primary/5">
@@ -31,7 +31,7 @@ const CGV = () => {
           <h1 className="text-4xl md:text-5xl font-bold text-center mb-4 bg-gradient-to-r from-primary via-purple-500 to-pink-500 bg-clip-text text-transparent">
             Conditions Générales de Vente
           </h1>
-          <p className="text-center text-muted-foreground mb-12">(Édités par N.Z Consulting)</p>
+          <p className="text-center text-muted-foreground mb-12">(Édités par AMZing FBA)</p>
 
           <div className="max-w-4xl mx-auto space-y-6">
             <Card className="border-primary/20 hover:border-primary/40 transition-colors">
@@ -51,7 +51,7 @@ const CGV = () => {
                       <li>outils, ressources et services proposés sous la marque « AMZing FBA »,</li>
                     </ul>
                     <p className="text-muted-foreground leading-relaxed mb-3">
-                      effectuées par N.Z Consulting auprès de clients professionnels ou consommateurs (ci-après le « Client »), via le site internet <a href="https://amzingfba.com" className="text-primary hover:underline">https://amzingfba.com</a> et, le cas échéant, via toute autre interface ou application associée (ci-après le « Site »).
+                      effectuées par AMZing FBA auprès de clients professionnels ou consommateurs (ci-après le « Client »), via le site internet <a href="https://amzingfba.com" className="text-primary hover:underline">https://amzingfba.com</a> et, le cas échéant, via toute autre interface ou application associée (ci-après le « Site »).
                     </p>
                     <p className="text-muted-foreground leading-relaxed mb-3">
                       Les présentes CGV complètent les <Link to="/cgu" className="text-primary hover:underline">Conditions Générales d'Utilisation (CGU)</Link> du Site.
@@ -70,12 +70,7 @@ const CGV = () => {
                       Les services sont proposés par :
                     </p>
                     <div className="bg-background/50 p-4 rounded-lg">
-                      <p className="font-semibold">N.Z Consulting</p>
-                      <p className="text-sm text-muted-foreground">Entreprise individuelle immatriculée au Registre National des Entreprises (RNE)</p>
-                      <p className="text-sm text-muted-foreground">sous le n° SIREN 993 348 929,</p>
-                      <p className="text-sm text-muted-foreground">micro-entreprise relevant du régime spécial BNC,</p>
-                      <p className="text-sm text-muted-foreground">dont l'établissement principal est domicilié au :</p>
-                      <p className="text-sm text-muted-foreground">59 rue de Ponthieu, Bureau 326, 75008 Paris, France.</p>
+                      <p className="font-semibold">AMZing FBA</p>
                       <p className="text-sm text-muted-foreground mt-2 font-semibold">TVA : TVA non applicable, article 293 B du CGI.</p>
                       <p className="text-sm text-muted-foreground mt-2">Adresse électronique de contact : <a href="mailto:contact@amzingfba.com" className="text-primary hover:underline">contact@amzingfba.com</a></p>
                     </div>
@@ -354,9 +349,8 @@ const CGV = () => {
                       Pour toute question relative aux présentes CGV ou aux Services, le Client peut contacter :
                     </p>
                     <div className="bg-background/50 p-4 rounded-lg mt-2">
-                      <p className="font-semibold">N.Z Consulting</p>
+                      <p className="font-semibold">AMZing FBA</p>
                       <p>par e-mail : <a href="mailto:contact@amzingfba.com" className="text-primary hover:underline">contact@amzingfba.com</a></p>
-                      <p>par courrier : 59 rue de Ponthieu, Bureau 326, 75008 Paris, France</p>
                       <p className="mt-2">ou via notre <Link to="/contact" className="text-primary hover:underline">formulaire de contact</Link></p>
                     </div>
                   </section>

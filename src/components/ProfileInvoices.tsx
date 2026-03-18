@@ -94,8 +94,8 @@ const generateInvoiceHTML = (invoice: Invoice): string => {
 <div class="parties">
   <div class="party">
     <h4>Émetteur</h4>
-    <p class="name">N.Z Consulting</p>
-    <p>59 Rue De Ponthieu, Bureau 326<br>75008 Paris, FR<br>amzingfba26@gmail.com<br>SIRET : 99334892900015</p>
+    <p class="name">AMZing FBA</p>
+    <p>contact@amzingfba.com</p>
   </div>
   <div class="party">
     <h4>Client</h4>
@@ -153,7 +153,7 @@ const generateInvoiceHTML = (invoice: Invoice): string => {
     </thead>
     <tbody>
       <tr>
-        <td>N.Z Consulting</td>
+        <td>AMZing FBA</td>
         <td>QNTOFRP1XXX</td>
         <td>FR7616958000019328768276650</td>
         <td>QZATMFX</td>
@@ -163,7 +163,7 @@ const generateInvoiceHTML = (invoice: Invoice): string => {
 </div>
 
 <div class="footer">
-  <p>N.Z Consulting, EI</p>
+  <p>AMZing FBA</p>
   <p>${invoice.invoiceNumber} · 1/1</p>
 </div>
 

@@ -52,11 +52,7 @@ const CGU = () => {
                       édités et exploités par :
                     </p>
                     <div className="bg-background/50 p-4 rounded-lg mt-2">
-                      <p className="font-semibold">N.Z Consulting,</p>
-                      <p className="text-sm text-muted-foreground">entreprise individuelle immatriculée au Registre National des Entreprises (RNE) sous le n° SIREN 993 348 929,</p>
-                      <p className="text-sm text-muted-foreground">micro-entreprise relevant du régime spécial BNC,</p>
-                      <p className="text-sm text-muted-foreground">dont l'établissement principal est domicilié au :</p>
-                      <p className="text-sm text-muted-foreground">59 rue de Ponthieu, Bureau 326, 75008 Paris, France.</p>
+                      <p className="font-semibold">AMZing FBA</p>
                       <p className="text-sm text-muted-foreground mt-2">Adresse électronique de contact : <a href="mailto:contact@amzingfba.com" className="text-primary hover:underline">contact@amzingfba.com</a></p>
                     </div>
                     <p className="text-muted-foreground leading-relaxed mt-4">
@@ -130,7 +126,7 @@ const CGU = () => {
                   <section>
                     <h2 className="text-2xl font-semibold mb-3 text-primary">5. Description du Service</h2>
                     <p className="text-muted-foreground leading-relaxed mb-3">
-                      Le Service AMZing FBA, exploité par N.Z Consulting, a pour objet de proposer notamment, sans que cette liste soit limitative :
+                      Le Service AMZing FBA a pour objet de proposer notamment, sans que cette liste soit limitative :
                     </p>
                     <ul className="list-disc pl-6 space-y-2 text-muted-foreground">
                       <li>des services de conseil, formation et accompagnement dans les domaines du commerce en ligne, de l'e-commerce (notamment Amazon FBA/FBM et marketplaces), du marketing digital, de l'optimisation des ventes, de l'automatisation et du développement d'activités digitales ;</li>

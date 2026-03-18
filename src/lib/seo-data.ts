@@ -488,13 +488,6 @@ export const schemas = {
       "email": "contact@amzingfba.com",
       "availableLanguage": ["French"]
     },
-    "address": {
-      "@type": "PostalAddress",
-      "streetAddress": "59 Rue de Ponthieu",
-      "addressLocality": "Paris",
-      "postalCode": "75008",
-      "addressCountry": "FR"
-    },
     "sameAs": [
       "https://www.instagram.com/amzingfba"
     ]
@@ -508,19 +501,6 @@ export const schemas = {
     "@id": "https://amzingfba.com",
     "url": "https://amzingfba.com",
     "priceRange": "€€",
-    "address": {
-      "@type": "PostalAddress",
-      "streetAddress": "59 Rue de Ponthieu",
-      "addressLocality": "Paris",
-      "addressRegion": "Île-de-France",
-      "postalCode": "75008",
-      "addressCountry": "FR"
-    },
-    "geo": {
-      "@type": "GeoCoordinates",
-      "latitude": 48.8738,
-      "longitude": 2.3104
-    },
     "openingHoursSpecification": {
       "@type": "OpeningHoursSpecification",
       "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
@@ -541,7 +521,7 @@ export const schemas = {
     "description": "Formation Amazon FBA complète : méthode pas à pas + moniteurs produits rentables + fournisseurs + communauté. Lance et scale sur Amazon. Sans engagement.",
     "provider": {
       "@type": "Organization",
-      "name": "N.Z Consulting (AMZing FBA)",
+      "name": "AMZing FBA",
       "sameAs": "https://amzingfba.com",
       "url": "https://amzingfba.com"
     },
@@ -1046,7 +1026,7 @@ export const schemas = {
       "@context": "https://schema.org",
       "@type": "Organization",
       "name": "AMZing FBA",
-      "legalName": "N.Z Consulting",
+      "legalName": "AMZing FBA",
       "url": "https://amzingfba.com/",
       "logo": "https://amzingfba.com/logo-amzing.png",
       "description": "AMZing FBA est une plateforme tout-en-un pour réussir sur Amazon FBA : outils, méthode, sourcing et communauté.",
@@ -1056,13 +1036,6 @@ export const schemas = {
         "contactType": "Customer Service",
         "email": "contact@amzingfba.com",
         "availableLanguage": ["French"]
-      },
-      "address": {
-        "@type": "PostalAddress",
-        "streetAddress": "59 Rue de Ponthieu",
-        "addressLocality": "Paris",
-        "postalCode": "75008",
-        "addressCountry": "FR"
       },
       "sameAs": [
         "https://www.instagram.com/amzingfba"
