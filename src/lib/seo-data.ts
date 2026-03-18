@@ -488,13 +488,6 @@ export const schemas = {
       "email": "contact@amzingfba.com",
       "availableLanguage": ["French"]
     },
-    "address": {
-      "@type": "PostalAddress",
-      "streetAddress": "59 Rue de Ponthieu",
-      "addressLocality": "Paris",
-      "postalCode": "75008",
-      "addressCountry": "FR"
-    },
     "sameAs": [
       "https://www.instagram.com/amzingfba"
     ]
@@ -508,19 +501,6 @@ export const schemas = {
     "@id": "https://amzingfba.com",
     "url": "https://amzingfba.com",
     "priceRange": "€€",
-    "address": {
-      "@type": "PostalAddress",
-      "streetAddress": "59 Rue de Ponthieu",
-      "addressLocality": "Paris",
-      "addressRegion": "Île-de-France",
-      "postalCode": "75008",
-      "addressCountry": "FR"
-    },
-    "geo": {
-      "@type": "GeoCoordinates",
-      "latitude": 48.8738,
-      "longitude": 2.3104
-    },
     "openingHoursSpecification": {
       "@type": "OpeningHoursSpecification",
       "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
