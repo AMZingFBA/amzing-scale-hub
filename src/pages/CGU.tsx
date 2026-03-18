@@ -52,11 +52,7 @@ const CGU = () => {
                       édités et exploités par :
                     </p>
                     <div className="bg-background/50 p-4 rounded-lg mt-2">
-                      <p className="font-semibold">N.Z Consulting,</p>
-                      <p className="text-sm text-muted-foreground">entreprise individuelle immatriculée au Registre National des Entreprises (RNE) sous le n° SIREN 993 348 929,</p>
-                      <p className="text-sm text-muted-foreground">micro-entreprise relevant du régime spécial BNC,</p>
-                      <p className="text-sm text-muted-foreground">dont l'établissement principal est domicilié au :</p>
-                      <p className="text-sm text-muted-foreground">59 rue de Ponthieu, Bureau 326, 75008 Paris, France.</p>
+                      <p className="font-semibold">AMZing FBA</p>
                       <p className="text-sm text-muted-foreground mt-2">Adresse électronique de contact : <a href="mailto:contact@amzingfba.com" className="text-primary hover:underline">contact@amzingfba.com</a></p>
                     </div>
                     <p className="text-muted-foreground leading-relaxed mt-4">
