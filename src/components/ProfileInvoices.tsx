@@ -163,7 +163,7 @@ const generateInvoiceHTML = (invoice: Invoice): string => {
 </div>
 
 <div class="footer">
-  <p>N.Z Consulting, EI</p>
+  <p>AMZing FBA</p>
   <p>${invoice.invoiceNumber} · 1/1</p>
 </div>
 

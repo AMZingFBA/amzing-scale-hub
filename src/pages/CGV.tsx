@@ -349,9 +349,8 @@ const CGV = () => {
                       Pour toute question relative aux présentes CGV ou aux Services, le Client peut contacter :
                     </p>
                     <div className="bg-background/50 p-4 rounded-lg mt-2">
-                      <p className="font-semibold">N.Z Consulting</p>
+                      <p className="font-semibold">AMZing FBA</p>
                       <p>par e-mail : <a href="mailto:contact@amzingfba.com" className="text-primary hover:underline">contact@amzingfba.com</a></p>
-                      <p>par courrier : 59 rue de Ponthieu, Bureau 326, 75008 Paris, France</p>
                       <p className="mt-2">ou via notre <Link to="/contact" className="text-primary hover:underline">formulaire de contact</Link></p>
                     </div>
                   </section>

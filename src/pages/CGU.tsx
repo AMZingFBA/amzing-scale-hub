@@ -126,7 +126,7 @@ const CGU = () => {
                   <section>
                     <h2 className="text-2xl font-semibold mb-3 text-primary">5. Description du Service</h2>
                     <p className="text-muted-foreground leading-relaxed mb-3">
-                      Le Service AMZing FBA, exploité par N.Z Consulting, a pour objet de proposer notamment, sans que cette liste soit limitative :
+                      Le Service AMZing FBA a pour objet de proposer notamment, sans que cette liste soit limitative :
                     </p>
                     <ul className="list-disc pl-6 space-y-2 text-muted-foreground">
                       <li>des services de conseil, formation et accompagnement dans les domaines du commerce en ligne, de l'e-commerce (notamment Amazon FBA/FBM et marketplaces), du marketing digital, de l'optimisation des ventes, de l'automatisation et du développement d'activités digitales ;</li>

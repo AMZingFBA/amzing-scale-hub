@@ -1037,13 +1037,6 @@ export const schemas = {
         "email": "contact@amzingfba.com",
         "availableLanguage": ["French"]
       },
-      "address": {
-        "@type": "PostalAddress",
-        "streetAddress": "59 Rue de Ponthieu",
-        "addressLocality": "Paris",
-        "postalCode": "75008",
-        "addressCountry": "FR"
-      },
       "sameAs": [
         "https://www.instagram.com/amzingfba"
       ]

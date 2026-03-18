@@ -715,7 +715,7 @@ const Index = () => {
                 <div>
                   <h3 className="text-xl font-bold mb-2">Qui est derrière AMZing FBA ?</h3>
                   <p className="text-muted-foreground mb-4">
-                    AMZing FBA est édité par <strong className="text-foreground">N.Z Consulting</strong>, société française. 
+                    AMZing FBA est une société française. 
                     Notre mission : rendre le business Amazon FBA accessible grâce à des outils concrets et une méthode claire.
                   </p>
                   <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
