@@ -11,7 +11,7 @@ const CGV = () => {
     <>
       <SEO 
         title="Conditions Générales de Vente - AMZing FBA"
-        description="Consultez les conditions générales de vente du site et des services AMZing FBA édités par N.Z Consulting."
+        description="Consultez les conditions générales de vente du site et des services AMZing FBA."
         keywords="cgv, conditions générales vente, amzing fba, formations, abonnements"
       />
       <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-primary/5">
