@@ -153,7 +153,7 @@ const generateInvoiceHTML = (invoice: Invoice): string => {
     </thead>
     <tbody>
       <tr>
-        <td>N.Z Consulting</td>
+        <td>AMZing FBA</td>
         <td>QNTOFRP1XXX</td>
         <td>FR7616958000019328768276650</td>
         <td>QZATMFX</td>
