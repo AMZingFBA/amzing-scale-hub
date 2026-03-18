@@ -51,7 +51,7 @@ const CGV = () => {
                       <li>outils, ressources et services proposés sous la marque « AMZing FBA »,</li>
                     </ul>
                     <p className="text-muted-foreground leading-relaxed mb-3">
-                      effectuées par N.Z Consulting auprès de clients professionnels ou consommateurs (ci-après le « Client »), via le site internet <a href="https://amzingfba.com" className="text-primary hover:underline">https://amzingfba.com</a> et, le cas échéant, via toute autre interface ou application associée (ci-après le « Site »).
+                      effectuées par AMZing FBA auprès de clients professionnels ou consommateurs (ci-après le « Client »), via le site internet <a href="https://amzingfba.com" className="text-primary hover:underline">https://amzingfba.com</a> et, le cas échéant, via toute autre interface ou application associée (ci-après le « Site »).
                     </p>
                     <p className="text-muted-foreground leading-relaxed mb-3">
                       Les présentes CGV complètent les <Link to="/cgu" className="text-primary hover:underline">Conditions Générales d'Utilisation (CGU)</Link> du Site.
