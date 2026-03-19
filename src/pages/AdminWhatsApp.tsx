@@ -82,7 +82,7 @@ const AdminWhatsApp = () => {
           const incomingName = msgs.find((m) => m.contact_name && m.direction === "incoming")?.contact_name;
           return {
             phone,
-            contactName: incomingName || phone,
+            contactName: incomingName || formatPhone(phone),
             lastMessage: last.body || `[${last.message_type}]`,
             lastDate: last.created_at,
             unread: msgs.filter((m) => m.direction === "incoming" && m.status === "received").length,
@@ -146,6 +146,17 @@ const AdminWhatsApp = () => {
   const formatTime = (dateStr: string) => {
     const d = new Date(dateStr);
     return d.toLocaleString("fr-FR", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" });
+  };
+
+  const formatPhone = (raw: string) => {
+    const digits = raw.replace(/\D/g, "");
+    // FR: 33601148619 -> +33 6 01 14 86 19
+    if (digits.startsWith("33") && digits.length === 11) {
+      const n = digits.slice(2);
+      return `+33 ${n[0]} ${n.slice(1, 3)} ${n.slice(3, 5)} ${n.slice(5, 7)} ${n.slice(7, 9)}`;
+    }
+    // International: group by 2-3
+    return "+" + digits.replace(/(\d{2})(?=\d)/g, "$1 ");
   };
 
   if (adminLoading || isLoading) {
@@ -229,7 +240,7 @@ const AdminWhatsApp = () => {
                     </div>
                     <div>
                       <CardTitle className="text-lg">{selectedConvo.contactName}</CardTitle>
-                      <p className="text-sm text-muted-foreground">+{selectedConvo.phone}</p>
+                      <p className="text-sm text-muted-foreground">{formatPhone(selectedConvo.phone)}</p>
                     </div>
                   </div>
                 </CardHeader>

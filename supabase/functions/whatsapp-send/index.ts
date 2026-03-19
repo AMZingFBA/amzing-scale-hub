@@ -4,10 +4,14 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
+    "authorization, x-client-info, apikey, content-type, x-admin-key",
 };
 
 const ADMIN_EMAIL = "amzingfba26@gmail.com";
+
+// Le projet principal où l'admin est connecté
+const MAIN_SUPABASE_URL = "https://wvmfzlogijvqcsgablrb.supabase.co";
+const MAIN_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind2bWZ6bG9naWp2cWNzZ2FibHJiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEyNTI3MTYsImV4cCI6MjA3NjgyODcxNn0.4ciuBXzeLQB4RatGnJuXJemQ_w6xr5f8Bhm2SUOzdtY";
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -15,12 +19,7 @@ serve(async (req) => {
   }
 
   try {
-    // Verify the caller is the admin
-    const supabase = createClient(
-      Deno.env.get("SUPABASE_URL") ?? "",
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
-    );
-
+    // Verify the caller is the admin via the MAIN Supabase project
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) {
       return new Response(JSON.stringify({ error: "Non autorisé" }), {
@@ -30,10 +29,13 @@ serve(async (req) => {
     }
 
     const token = authHeader.replace("Bearer ", "");
+
+    // Check against main project where admin is actually logged in
+    const mainSupabase = createClient(MAIN_SUPABASE_URL, MAIN_SUPABASE_ANON_KEY);
     const {
       data: { user },
       error: authError,
-    } = await supabase.auth.getUser(token);
+    } = await mainSupabase.auth.getUser(token);
 
     if (authError || !user || user.email !== ADMIN_EMAIL) {
       return new Response(
@@ -96,7 +98,12 @@ serve(async (req) => {
 
     const wamid = metaData.messages?.[0]?.id || null;
 
-    // Store outgoing message in DB
+    // Store outgoing message in DB (whatsapp project)
+    const supabase = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
+    );
+
     await supabase.from("whatsapp_messages").insert({
       wamid,
       phone: cleanPhone,
