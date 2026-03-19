@@ -137,6 +137,31 @@ const AdminWhatsApp = () => {
 
   const selectedConvo = conversations.find((c) => c.phone === selectedPhone);
 
+  // Marquer les messages incoming comme "read" quand on ouvre la conversation
+  const markAsRead = async (phone: string) => {
+    try {
+      await fetch(
+        `${WHATSAPP_SUPABASE_URL}/rest/v1/whatsapp_messages?phone=eq.${phone}&direction=eq.incoming&status=eq.received`,
+        {
+          method: "PATCH",
+          headers: {
+            apikey: SERVICE_KEY,
+            Authorization: `Bearer ${SERVICE_KEY}`,
+            "Content-Type": "application/json",
+            Prefer: "return=minimal",
+          },
+          body: JSON.stringify({ status: "read" }),
+        }
+      );
+    } catch {}
+  };
+
+  useEffect(() => {
+    if (selectedPhone) {
+      markAsRead(selectedPhone);
+    }
+  }, [selectedPhone]);
+
   const filteredConvos = searchQuery
     ? conversations.filter(
         (c) =>
