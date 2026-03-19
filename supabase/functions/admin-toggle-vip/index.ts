@@ -2,7 +2,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
 Deno.serve(async (req) => {
@@ -19,8 +19,6 @@ Deno.serve(async (req) => {
       });
     }
 
-    const token = authHeader.replace("Bearer ", "");
-
     const supabaseAuth = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_ANON_KEY") ?? "",
@@ -30,15 +28,15 @@ Deno.serve(async (req) => {
       }
     );
 
-    const { data: claimsData, error: claimsError } = await supabaseAuth.auth.getClaims(token);
-    if (claimsError || !claimsData?.claims?.sub) {
+    const { data: userData, error: userError } = await supabaseAuth.auth.getUser();
+    if (userError || !userData?.user) {
       return new Response(JSON.stringify({ error: "Token invalide" }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    const adminId = claimsData.claims.sub;
+    const adminId = userData.user.id;
     const { data: isAdmin } = await supabaseAuth.rpc("has_role", {
       _user_id: adminId,
       _role: "admin",
@@ -52,7 +50,6 @@ Deno.serve(async (req) => {
     }
 
     const { userId, action, expiresAt } = await req.json();
-    // action: "grant" or "revoke"
 
     if (!userId || !action) {
       return new Response(JSON.stringify({ error: "userId et action requis" }), {
@@ -68,12 +65,10 @@ Deno.serve(async (req) => {
     );
 
     if (action === "grant") {
-      // Default: 12 months from now
       const defaultExpiry = new Date();
       defaultExpiry.setMonth(defaultExpiry.getMonth() + 12);
       const finalExpiry = expiresAt || defaultExpiry.toISOString();
 
-      // Upsert subscription to VIP
       const { data: existing } = await supabaseAdmin
         .from("subscriptions")
         .select("id")
@@ -93,7 +88,7 @@ Deno.serve(async (req) => {
           })
           .eq("user_id", userId);
 
-        if (updateError) throw updateError;
+        if (updateError) throw new Error(updateError.message);
       } else {
         const { error: insertError } = await supabaseAdmin
           .from("subscriptions")
@@ -106,7 +101,7 @@ Deno.serve(async (req) => {
             expires_at: finalExpiry,
           });
 
-        if (insertError) throw insertError;
+        if (insertError) throw new Error(insertError.message);
       }
 
       console.log(`[ADMIN-TOGGLE-VIP] VIP granted to ${userId} until ${finalExpiry} by admin ${adminId}`);
@@ -127,7 +122,7 @@ Deno.serve(async (req) => {
         })
         .eq("user_id", userId);
 
-      if (revokeError) throw revokeError;
+      if (revokeError) throw new Error(revokeError.message);
 
       console.log(`[ADMIN-TOGGLE-VIP] VIP revoked for ${userId} by admin ${adminId}`);
 
@@ -142,7 +137,7 @@ Deno.serve(async (req) => {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
+    const message = error instanceof Error ? error.message : JSON.stringify(error);
     console.error("[ADMIN-TOGGLE-VIP] Error:", message);
     return new Response(JSON.stringify({ error: message }), {
       status: 500,
