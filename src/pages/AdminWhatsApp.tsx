@@ -402,7 +402,7 @@ const AdminWhatsApp = () => {
                         style={{ background: "#0b6156", color: "#53bdeb" }}
                       >
                         <Smile className="w-4 h-4" />
-                        D\u00e9couvrir AMZing FBA
+                        AMZing FBA
                       </a>
                     )}
                     <span className="flex items-center justify-end gap-0.5 mt-0.5">
