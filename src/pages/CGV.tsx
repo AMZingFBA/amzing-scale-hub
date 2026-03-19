@@ -70,7 +70,10 @@ const CGV = () => {
                       Les services sont proposés par :
                     </p>
                     <div className="bg-background/50 p-4 rounded-lg">
-                      <p className="font-semibold">AMZing FBA</p>
+                      <p className="font-semibold">N.Z Consulting</p>
+                      <p className="text-sm text-muted-foreground">Marque commerciale : AMZing FBA</p>
+                      <p className="text-sm text-muted-foreground">59 Rue de Ponthieu, 75008 Paris, France</p>
+                      <p className="text-sm text-muted-foreground">SIRET : 993 348 929</p>
                       <p className="text-sm text-muted-foreground mt-2 font-semibold">TVA : TVA non applicable, article 293 B du CGI.</p>
                       <p className="text-sm text-muted-foreground mt-2">Adresse électronique de contact : <a href="mailto:contact@amzingfba.com" className="text-primary hover:underline">contact@amzingfba.com</a></p>
                     </div>
