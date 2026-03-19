@@ -282,7 +282,17 @@ const AdminWhatsApp = () => {
                             : "bg-muted rounded-bl-md"
                         }`}
                       >
-                        <p className="text-sm">{msg.body || `[${msg.message_type}]`}</p>
+                        <p className="text-sm whitespace-pre-wrap">{msg.body || `[${msg.message_type}]`}</p>
+                        {msg.direction === "outgoing" && msg.body && msg.body.includes("bouton ci-dessous") && (
+                          <a
+                            href="https://amzingfba.com"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="mt-2 block text-center bg-white/20 hover:bg-white/30 text-white text-sm font-medium py-2 px-4 rounded-lg border border-white/30 transition-colors"
+                          >
+                            Découvrir AMZing FBA
+                          </a>
+                        )}
                         <p
                           className={`text-xs mt-1 ${
                             msg.direction === "outgoing" ? "text-green-100" : "text-muted-foreground"
