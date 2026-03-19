@@ -647,6 +647,7 @@ const Dashboard = () => {
                       />
                       <CategoryItem icon={Bell} label="gestion des alertes" link="/admin/alerts" />
                       <CategoryItem icon={CreditCard} label="gestion des abonnements" link="/admin/subscriptions" />
+                      <CategoryItem icon={MessageCircle} label="WhatsApp" link="/admin/whatsapp" />
                     </div>
                   </AccordionContent>
                 </AccordionItem>
