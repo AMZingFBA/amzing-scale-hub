@@ -48,7 +48,10 @@ const MentionsLegales = () => {
               <h2 className="text-2xl font-semibold text-foreground mb-4">1. Éditeur du site</h2>
               <p className="text-muted-foreground mb-2">Le site AMZing FBA est édité par :</p>
               <div className="bg-muted/50 p-4 rounded-lg space-y-1 text-foreground">
-                <p><strong>AMZing FBA</strong></p>
+                <p><strong>N.Z Consulting</strong></p>
+                <p>Marque commerciale : AMZing FBA</p>
+                <p>59 Rue de Ponthieu, 75008 Paris, France</p>
+                <p>SIRET : 993 348 929</p>
                 <p>Email : <a href="mailto:contact@amzingfba.com" className="text-primary hover:underline">contact@amzingfba.com</a></p>
               </div>
             </section>
