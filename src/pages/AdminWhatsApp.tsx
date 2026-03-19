@@ -32,6 +32,7 @@ interface Conversation {
   lastDate: string;
   unread: number;
   messages: WhatsAppMessage[];
+  hasIncoming: boolean;
 }
 
 const AdminWhatsApp = () => {
@@ -45,6 +46,7 @@ const AdminWhatsApp = () => {
   const [selectedPhone, setSelectedPhone] = useState<string | null>(null);
   const [reply, setReply] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const [isFirstLoad, setIsFirstLoad] = useState(true);
   const [isSending, setIsSending] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -55,23 +57,36 @@ const AdminWhatsApp = () => {
   }, [isAdmin, adminLoading, navigate]);
 
   const fetchMessages = async () => {
-    setIsLoading(true);
+    if (isFirstLoad) setIsLoading(true);
     try {
-      const res = await fetch(
-        `${WHATSAPP_SUPABASE_URL}/rest/v1/whatsapp_messages?order=created_at.asc&limit=500`,
-        {
-          headers: {
-            apikey: SERVICE_KEY,
-            Authorization: `Bearer ${SERVICE_KEY}`,
-          },
-        }
-      );
-      const data: WhatsAppMessage[] = await res.json();
-      setMessages(data);
+      // Fetch all messages with pagination (Supabase max 1000 per request)
+      const allMessages: WhatsAppMessage[] = [];
+      let offset = 0;
+      const PAGE_SIZE = 1000;
+      let hasMore = true;
+
+      while (hasMore) {
+        const res = await fetch(
+          `${WHATSAPP_SUPABASE_URL}/rest/v1/whatsapp_messages?order=created_at.asc&limit=${PAGE_SIZE}&offset=${offset}`,
+          {
+            headers: {
+              apikey: SERVICE_KEY,
+              Authorization: `Bearer ${SERVICE_KEY}`,
+              Prefer: "count=exact",
+            },
+          }
+        );
+        const data: WhatsAppMessage[] = await res.json();
+        allMessages.push(...data);
+        offset += PAGE_SIZE;
+        hasMore = data.length === PAGE_SIZE;
+      }
+
+      setMessages(allMessages);
 
       // Group by phone number
       const grouped: Record<string, WhatsAppMessage[]> = {};
-      for (const msg of data) {
+      for (const msg of allMessages) {
         if (!grouped[msg.phone]) grouped[msg.phone] = [];
         grouped[msg.phone].push(msg);
       }
@@ -80,22 +95,31 @@ const AdminWhatsApp = () => {
         .map(([phone, msgs]) => {
           const last = msgs[msgs.length - 1];
           const incomingName = msgs.find((m) => m.contact_name && m.direction === "incoming")?.contact_name;
+          const contactName = incomingName || msgs.find((m) => m.contact_name)?.contact_name || formatPhone(phone);
+          const hasIncoming = msgs.some((m) => m.direction === "incoming");
           return {
             phone,
-            contactName: incomingName || formatPhone(phone),
+            contactName,
             lastMessage: last.body || `[${last.message_type}]`,
             lastDate: last.created_at,
             unread: msgs.filter((m) => m.direction === "incoming" && m.status === "received").length,
             messages: msgs,
+            hasIncoming,
           };
         })
-        .sort((a, b) => new Date(b.lastDate).getTime() - new Date(a.lastDate).getTime());
+        // Conversations avec réponses en premier, puis par date
+        .sort((a, b) => {
+          if (a.hasIncoming && !b.hasIncoming) return -1;
+          if (!a.hasIncoming && b.hasIncoming) return 1;
+          return new Date(b.lastDate).getTime() - new Date(a.lastDate).getTime();
+        });
 
       setConversations(convos);
     } catch {
       toast({ variant: "destructive", title: "Erreur", description: "Impossible de charger les messages" });
     } finally {
       setIsLoading(false);
+      setIsFirstLoad(false);
     }
   };
 
