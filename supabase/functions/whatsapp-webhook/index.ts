@@ -42,13 +42,14 @@ serve(async (req) => {
         for (const change of entry.changes || []) {
           const value = change.value;
 
-          // Handle message status updates (sent, delivered, read)
+          // Handle message status updates (sent, delivered, read, failed)
           if (value?.statuses) {
             for (const status of value.statuses) {
               logStep("Status update", {
                 id: status.id,
                 status: status.status,
                 recipient: status.recipient_id,
+                errors: status.errors || undefined,
               });
 
               await supabase

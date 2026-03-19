@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Check, CheckCheck, Clock, Search, Send, Smile } from "lucide-react";
+import { ArrowLeft, Check, CheckCheck, Clock, AlertCircle, Search, Send, Smile } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAdmin } from "@/hooks/use-admin";
 import { useAuth } from "@/hooks/use-auth";
@@ -39,6 +39,8 @@ const StatusIcon = ({ status, direction }: { status: string; direction: string }
       return <CheckCheck className="w-[14px] h-[14px] text-[#8696a0] inline-block ml-1" />;
     case "sent":
       return <Check className="w-[14px] h-[14px] text-[#8696a0] inline-block ml-1" />;
+    case "failed":
+      return <AlertCircle className="w-[14px] h-[14px] text-[#f15c6d] inline-block ml-1" />;
     default:
       return <Clock className="w-3 h-3 text-[#8696a0] inline-block ml-1" />;
   }
