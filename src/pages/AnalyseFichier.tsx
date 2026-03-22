@@ -8,9 +8,16 @@ import { FileSpreadsheet, Loader2 } from 'lucide-react';
 import { useFileAnalysis, DEFAULT_FILTERS } from '@/hooks/use-file-analysis';
 import type { AnalysisFilters } from '@/hooks/use-file-analysis';
 import FileUpload from '@/components/analysis/FileUpload';
+import ColumnPicker from '@/components/analysis/ColumnPicker';
 import FilterForm from '@/components/analysis/FilterForm';
 import AnalysisResults from '@/components/analysis/AnalysisResults';
 import AnalysisHistory from '@/components/analysis/AnalysisHistory';
+
+interface ColumnMapping {
+  asin: string;
+  ean: string;
+  price: string;
+}
 
 const AnalyseFichier = () => {
   const { user, isVIP, isLoading } = useAuth();
@@ -29,6 +36,7 @@ const AnalyseFichier = () => {
 
   const [filters, setFilters] = useState<AnalysisFilters>({ ...DEFAULT_FILTERS });
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [columnMapping, setColumnMapping] = useState<ColumnMapping>({ asin: '__none__', ean: '__none__', price: '__none__' });
   const resultsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -37,11 +45,16 @@ const AnalyseFichier = () => {
     }
   }, [currentResults]);
 
+  const canSubmit = selectedFile && !isUploading &&
+    (columnMapping.asin !== '__none__' || columnMapping.ean !== '__none__') &&
+    columnMapping.price !== '__none__';
+
   const handleSubmit = useCallback(async () => {
-    if (!selectedFile) return;
-    await submitAnalysis(selectedFile, filters);
+    if (!selectedFile || !canSubmit) return;
+    await submitAnalysis(selectedFile, filters, columnMapping);
     setSelectedFile(null);
-  }, [selectedFile, filters, submitAnalysis]);
+    setColumnMapping({ asin: '__none__', ean: '__none__', price: '__none__' });
+  }, [selectedFile, filters, columnMapping, canSubmit, submitAnalysis]);
 
   if (isLoading) return null;
   if (!user) return <Navigate to="/auth" replace />;
@@ -71,6 +84,12 @@ const AnalyseFichier = () => {
               isUploading={isUploading}
             />
 
+            <ColumnPicker
+              file={selectedFile}
+              mapping={columnMapping}
+              onChange={setColumnMapping}
+            />
+
             <FilterForm
               filters={filters}
               onChange={setFilters}
@@ -83,7 +102,7 @@ const AnalyseFichier = () => {
               className="w-full"
               size="lg"
               onClick={handleSubmit}
-              disabled={!selectedFile || isUploading}
+              disabled={!canSubmit}
             >
               {isUploading ? (
                 <>

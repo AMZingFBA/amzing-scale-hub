@@ -127,7 +127,7 @@ export function useFileAnalysis() {
   }, []);
 
   // Upload file and start analysis
-  const submitAnalysis = useCallback(async (file: File, filters: AnalysisFilters) => {
+  const submitAnalysis = useCallback(async (file: File, filters: AnalysisFilters, columnMapping?: { asin: string; ean: string; price: string }) => {
     if (!user) return;
     setIsUploading(true);
 
@@ -140,6 +140,14 @@ export function useFileAnalysis() {
 
       if (uploadError) throw new Error(`Upload failed: ${uploadError.message}`);
 
+      // Build column mapping (only include non-__none__ values)
+      const mapping: Record<string, string> = {};
+      if (columnMapping) {
+        if (columnMapping.asin !== '__none__') mapping.asin = columnMapping.asin;
+        if (columnMapping.ean !== '__none__') mapping.ean = columnMapping.ean;
+        if (columnMapping.price !== '__none__') mapping.price = columnMapping.price;
+      }
+
       // Insert job
       const { error: insertError } = await supabase
         .from('file_analyses')
@@ -148,6 +156,7 @@ export function useFileAnalysis() {
           file_path: filePath,
           file_name: file.name,
           filters: filters as any,
+          column_mapping: Object.keys(mapping).length > 0 ? mapping : null,
           status: 'pending',
         });
 
