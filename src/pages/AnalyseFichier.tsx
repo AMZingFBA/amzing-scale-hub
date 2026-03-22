@@ -63,7 +63,7 @@ const AnalyseFichier = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <main className="container mx-auto px-4 py-8 max-w-6xl">
+      <main className="container mx-auto px-4 pt-24 pb-8 max-w-6xl">
         {/* Header */}
         <div className="flex items-center gap-3 mb-8">
           <FileSpreadsheet className="h-8 w-8 text-primary" />
