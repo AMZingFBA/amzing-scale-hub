@@ -135,7 +135,7 @@ export function useFileAnalysis() {
       // Upload to Storage
       const filePath = `${user.id}/${Date.now()}_${file.name}`;
       const { error: uploadError } = await supabase.storage
-        .from('analysis-files')
+        .from('file-uploads')
         .upload(filePath, file);
 
       if (uploadError) throw new Error(`Upload failed: ${uploadError.message}`);
@@ -200,7 +200,7 @@ export function useFileAnalysis() {
     // Delete file from storage
     const analysis = analyses.find(a => a.id === analysisId);
     if (analysis) {
-      await supabase.storage.from('analysis-files').remove([analysis.file_path]);
+      await supabase.storage.from('file-uploads').remove([analysis.file_path]);
     }
     await supabase.from('file_analyses').delete().eq('id', analysisId);
     if (selectedAnalysisId === analysisId) {
