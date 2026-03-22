@@ -59,6 +59,170 @@ export type Database = {
         }
         Relationships: []
       }
+      analysis_filter_presets: {
+        Row: {
+          id: string
+          user_id: string
+          name: string
+          filters: Json
+          is_default: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          name: string
+          filters?: Json
+          is_default?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          name?: string
+          filters?: Json
+          is_default?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      analysis_results: {
+        Row: {
+          id: string
+          analysis_id: string
+          asin: string | null
+          ean: string | null
+          product_name: string | null
+          buy_price: number | null
+          sell_price: number | null
+          profit_fba: number | null
+          roi_fba: number | null
+          profit_fbm: number | null
+          roi_fbm: number | null
+          bsr: number | null
+          sales_monthly: number | null
+          fba_sellers: number | null
+          fbm_sellers: number | null
+          category: string | null
+          variations: number | null
+          alerts: string | null
+          commission_pct: number | null
+          fba_fee: number | null
+          country_code: string | null
+          amazon_url: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          analysis_id: string
+          asin?: string | null
+          ean?: string | null
+          product_name?: string | null
+          buy_price?: number | null
+          sell_price?: number | null
+          profit_fba?: number | null
+          roi_fba?: number | null
+          profit_fbm?: number | null
+          roi_fbm?: number | null
+          bsr?: number | null
+          sales_monthly?: number | null
+          fba_sellers?: number | null
+          fbm_sellers?: number | null
+          category?: string | null
+          variations?: number | null
+          alerts?: string | null
+          commission_pct?: number | null
+          fba_fee?: number | null
+          country_code?: string | null
+          amazon_url?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          analysis_id?: string
+          asin?: string | null
+          ean?: string | null
+          product_name?: string | null
+          buy_price?: number | null
+          sell_price?: number | null
+          profit_fba?: number | null
+          roi_fba?: number | null
+          profit_fbm?: number | null
+          roi_fbm?: number | null
+          bsr?: number | null
+          sales_monthly?: number | null
+          fba_sellers?: number | null
+          fbm_sellers?: number | null
+          category?: string | null
+          variations?: number | null
+          alerts?: string | null
+          commission_pct?: number | null
+          fba_fee?: number | null
+          country_code?: string | null
+          amazon_url?: string | null
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "analysis_results_analysis_id_fkey"
+            columns: ["analysis_id"]
+            isOneToOne: false
+            referencedRelation: "file_analyses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      file_analyses: {
+        Row: {
+          id: string
+          user_id: string
+          file_path: string
+          file_name: string
+          filters: Json
+          column_mapping: Json | null
+          status: string
+          results_count: number | null
+          total_rows: number | null
+          error_message: string | null
+          processing_duration_ms: number | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          file_path: string
+          file_name: string
+          filters?: Json
+          column_mapping?: Json | null
+          status?: string
+          results_count?: number | null
+          total_rows?: number | null
+          error_message?: string | null
+          processing_duration_ms?: number | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          file_path?: string
+          file_name?: string
+          filters?: Json
+          column_mapping?: Json | null
+          status?: string
+          results_count?: number | null
+          total_rows?: number | null
+          error_message?: string | null
+          processing_duration_ms?: number | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       admin_impersonation_tokens: {
         Row: {
           admin_id: string
