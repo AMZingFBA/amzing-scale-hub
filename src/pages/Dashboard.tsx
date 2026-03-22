@@ -28,6 +28,7 @@ import {
   Settings,
   Eye,
   FileText,
+  FileSpreadsheet,
   Star,
   Calculator,
   Sparkles,
@@ -299,6 +300,7 @@ const Dashboard = () => {
                 <AccordionContent>
                   <div className="grid gap-3 pt-2">
                     <CategoryItem icon={Search} label="Recherche produits" link="/product-search" />
+                    <CategoryItem icon={FileSpreadsheet} label="Analyse de fichier" link="/analyse-fichier" />
                     <CategoryItem
                       icon={Search}
                       label="Product Find"
