@@ -653,7 +653,7 @@ const ProductCard = ({ result, onFavorite, isFavorite }: ProductCardProps) => {
           </div>
         )}
 
-        {/* Keepa Charts — interactive iframe, uses selected country's domain */}
+        {/* Keepa Charts — uses selected country's domain */}
         <div className="border-t">
           <div className="p-4 space-y-3">
             <div className="flex items-center justify-between">
