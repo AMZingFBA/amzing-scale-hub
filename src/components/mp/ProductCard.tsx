@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import {
   Heart, ExternalLink, Package, AlertTriangle, ShoppingCart, Info,
-  Copy, Search, Ruler, Weight, Box, Link2, Globe,
+  Copy, Search, Ruler, Weight, Box, Link2, Globe, Calculator,
 } from 'lucide-react';
 
 interface ProductCardProps {
@@ -93,6 +93,7 @@ const ProductCard = ({ result, onFavorite, isFavorite }: ProductCardProps) => {
   const [buyPrice, setBuyPrice] = useState('');
   const [sellPriceOverride, setSellPriceOverride] = useState('');
   const [fbmCost, setFbmCost] = useState('');
+  const [quantity, setQuantity] = useState('1');
   const alerts = result.alerts ? result.alerts.split(',').map(a => a.trim()).filter(Boolean) : [];
 
   // Use overridden sell price if user typed one, otherwise use API value
@@ -380,6 +381,60 @@ const ProductCard = ({ result, onFavorite, isFavorite }: ProductCardProps) => {
           </div>
         </div>
 
+        {/* Quantity Calculator */}
+        {calc && (
+          <div className="border-t">
+            <div className="p-4">
+              <div className="flex items-center gap-2 mb-3">
+                <Calculator className="h-4 w-4 text-primary" />
+                <span className="text-sm font-semibold">Quantity Calculator</span>
+              </div>
+              <div className="flex items-end gap-3 mb-3">
+                <div>
+                  <label className="text-xs text-muted-foreground block mb-1">Quantity</label>
+                  <Input
+                    type="number" step="1" min="1" placeholder="1"
+                    value={quantity} onChange={(e) => setQuantity(e.target.value)}
+                    className="h-9 text-sm font-mono w-24"
+                  />
+                </div>
+              </div>
+              {(() => {
+                const qty = parseInt(quantity) || 1;
+                const bp = parseFloat(buyPrice) || 0;
+                const totalInvestment = bp * qty;
+                const totalRevenue = effectiveSellPrice * qty;
+                const totalProfitFba = calc.profitFba != null ? calc.profitFba * qty : null;
+                const totalProfitFbm = calc.profitFbm * qty;
+                return (
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+                    <div className="rounded-lg border p-2.5 text-center">
+                      <p className="text-[10px] text-muted-foreground">Investissement</p>
+                      <p className="text-sm font-bold font-mono mt-0.5">{totalInvestment.toFixed(2)}€</p>
+                    </div>
+                    <div className="rounded-lg border p-2.5 text-center">
+                      <p className="text-[10px] text-muted-foreground">CA Total</p>
+                      <p className="text-sm font-bold font-mono mt-0.5">{totalRevenue.toFixed(2)}€</p>
+                    </div>
+                    <div className={`rounded-lg border p-2.5 text-center ${totalProfitFba != null && totalProfitFba >= 0 ? 'border-green-200 bg-green-50/50' : totalProfitFba != null ? 'border-red-200 bg-red-50/50' : ''}`}>
+                      <p className="text-[10px] text-muted-foreground">Profit FBA x{qty}</p>
+                      <p className={`text-sm font-bold font-mono mt-0.5 ${profitColor(totalProfitFba)}`}>
+                        {totalProfitFba != null ? `${totalProfitFba.toFixed(2)}€` : '—'}
+                      </p>
+                    </div>
+                    <div className={`rounded-lg border p-2.5 text-center ${totalProfitFbm >= 0 ? 'border-green-200 bg-green-50/50' : 'border-red-200 bg-red-50/50'}`}>
+                      <p className="text-[10px] text-muted-foreground">Profit FBM x{qty}</p>
+                      <p className={`text-sm font-bold font-mono mt-0.5 ${profitColor(totalProfitFbm)}`}>
+                        {totalProfitFbm.toFixed(2)}€
+                      </p>
+                    </div>
+                  </div>
+                );
+              })()}
+            </div>
+          </div>
+        )}
+
         {/* Offers Table */}
         <div className="border-t">
           <div className="p-4">
@@ -563,17 +618,6 @@ const ProductCard = ({ result, onFavorite, isFavorite }: ProductCardProps) => {
               <img
                 src={`https://graph.keepa.com/pricehistory.png?asin=${result.asin}&domain=${keepaDomain}&salesrank=1&range=90&width=600&height=150`}
                 alt="Keepa Sales Rank"
-                className="w-full rounded border bg-white"
-                loading="lazy"
-              />
-            </div>
-
-            {/* Offer Count */}
-            <div>
-              <p className="text-xs text-muted-foreground mb-1">Offer Count (New)</p>
-              <img
-                src={`https://graph.keepa.com/pricehistory.png?asin=${result.asin}&domain=${keepaDomain}&new=1&fba=1&range=90&width=600&height=150&offers=1`}
-                alt="Keepa Offers"
                 className="w-full rounded border bg-white"
                 loading="lazy"
               />
