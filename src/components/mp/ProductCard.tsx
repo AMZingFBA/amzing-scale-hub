@@ -19,6 +19,7 @@ interface ProductCardProps {
 
 const KEEPA_DOMAIN: Record<string, number> = { FR: 4, UK: 2, DE: 3, ES: 9, IT: 8 };
 const AMAZON_DOMAIN: Record<string, string> = { FR: 'amazon.fr', UK: 'amazon.co.uk', DE: 'amazon.de', ES: 'amazon.es', IT: 'amazon.it' };
+const SC_DOMAIN: Record<string, string> = { FR: 'sellercentral.amazon.fr', UK: 'sellercentral.amazon.co.uk', DE: 'sellercentral.amazon.de', ES: 'sellercentral.amazon.es', IT: 'sellercentral.amazon.it' };
 
 function computeProfit(sellPrice: number, buyPrice: number, fbmCost: number, result: MPResult) {
   if (!buyPrice || buyPrice <= 0 || !sellPrice || sellPrice <= 0) return null;
@@ -652,6 +653,39 @@ const ProductCard = ({ result, onFavorite, isFavorite }: ProductCardProps) => {
             </div>
           </div>
         )}
+
+        {/* Seller Central links */}
+        <div className="border-t">
+          <div className="p-4">
+            <div className="flex items-center gap-2 mb-3">
+              <ExternalLink className="h-4 w-4 text-primary" />
+              <span className="text-sm font-semibold">Seller Central</span>
+              <Badge variant="outline" className="text-[10px] h-4">{selectedCountryLabel}</Badge>
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              {(() => {
+                const sc = SC_DOMAIN[r.country_code] || SC_DOMAIN.FR;
+                return [
+                  { label: 'Revenue Calculator', url: `https://${sc}/hz/fba/profitabilitycalculator/index?asin=${result.asin}` },
+                  { label: 'Product Page', url: `https://${sc}/product-search/search?q=${result.asin}` },
+                  { label: 'Listing / Add to Sell', url: `https://${sc}/abis/listing/syh?asin=${result.asin}` },
+                  { label: 'Inventory', url: `https://${sc}/inventory?search=${result.asin}` },
+                ].map(link => (
+                  <a
+                    key={link.label}
+                    href={link.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 rounded-lg border px-3 py-2 text-xs hover:bg-muted/50 transition-colors"
+                  >
+                    <ExternalLink className="h-3 w-3 text-muted-foreground shrink-0" />
+                    <span className="truncate">{link.label}</span>
+                  </a>
+                ));
+              })()}
+            </div>
+          </div>
+        </div>
 
         {/* Keepa Charts — uses selected country's domain */}
         <div className="border-t">
