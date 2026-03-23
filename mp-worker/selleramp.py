@@ -186,6 +186,10 @@ class SellerAmpClient:
                     'current': cur,
                     'category_name': cat,
                     'bsr': bsr,
+                    'avg': kpl.get('avg', {}),
+                    'avg30': kpl.get('avg30', {}),
+                    'avg90': kpl.get('avg90', {}),
+                    'avg180': kpl.get('avg180', {}),
                 },
             }
         return data_map

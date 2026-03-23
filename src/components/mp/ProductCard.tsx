@@ -12,16 +12,54 @@ import {
 } from 'lucide-react';
 
 /* ── Interactive Keepa Chart Overlay ── */
-function InteractiveKeepaChart({ src, alt, rangeDays, className, yRef, yUnit, ySuffix }: {
+// Compute Keepa chart Y-axis max from real stats data
+function computeYMax(keepaData: any, rangeDays: number, indices: string[], isBsr: boolean): number {
+  if (!keepaData) return 0;
+  // Collect all known values for these indices from current + avg windows
+  const values: number[] = [];
+  const sources = [keepaData.current, keepaData.avg, keepaData.avg30, keepaData.avg90, keepaData.avg180];
+  // Pick the most relevant avg based on selected range
+  const relevantAvg = rangeDays <= 7 ? keepaData.avg30
+    : rangeDays <= 31 ? keepaData.avg30
+    : rangeDays <= 90 ? keepaData.avg90
+    : keepaData.avg180 || keepaData.avg;
+  if (relevantAvg) sources.push(relevantAvg);
+
+  for (const src of sources) {
+    if (!src || typeof src !== 'object') continue;
+    for (const idx of indices) {
+      const v = parseInt(src[idx]);
+      if (v > 0) values.push(v);
+    }
+  }
+  if (values.length === 0) return 0;
+  const maxVal = Math.max(...values);
+  // Keepa adds ~20% headroom above highest value and rounds to nice numbers
+  const raw = (maxVal / 100) * 1.25; // centimes → euros, +25% headroom
+  if (isBsr) {
+    // BSR: round up to nearest power-of-10-ish number
+    const magnitude = Math.pow(10, Math.floor(Math.log10(raw)));
+    return Math.ceil(raw / magnitude) * magnitude;
+  }
+  // Price: round up to next 5 or 10
+  if (raw <= 20) return Math.ceil(raw / 5) * 5;
+  if (raw <= 100) return Math.ceil(raw / 10) * 10;
+  return Math.ceil(raw / 50) * 50;
+}
+
+function InteractiveKeepaChart({ src, alt, rangeDays, className, keepaData, indices, isBsr, unit }: {
   src: string;
   alt: string;
   rangeDays: number;
   className?: string;
-  yRef?: number;
-  yUnit?: string;
-  ySuffix?: string;
+  keepaData?: any;
+  indices: string[];  // Keepa csv indices to consider (e.g. ['0','7','18'] for prices, ['3'] for BSR)
+  isBsr?: boolean;
+  unit?: string;      // "€" or ""
 }) {
   const [hover, setHover] = useState<{ x: number; y: number; pctX: number; pctY: number } | null>(null);
+
+  const yMax = useMemo(() => computeYMax(keepaData, rangeDays, indices, !!isBsr), [keepaData, rangeDays, indices, isBsr]);
 
   const dateLabel = useMemo(() => {
     if (!hover) return '';
@@ -33,23 +71,22 @@ function InteractiveKeepaChart({ src, alt, rangeDays, className, yRef, yUnit, yS
     return pt.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: effectiveRange > 90 ? '2-digit' : undefined });
   }, [hover, rangeDays]);
 
-  // Estimate value on Y axis
   const yLabel = useMemo(() => {
-    if (!hover || !yRef || yRef <= 0) return '';
-    const plotTop = 0.08;
-    const plotBottom = 0.82;
+    if (!hover || yMax <= 0) return '';
+    const plotTop = 0.05;
+    const plotBottom = 0.85;
     if (hover.pctY < plotTop || hover.pctY > plotBottom) return '';
-    // top = max value, bottom = 0
     const valuePct = 1 - (hover.pctY - plotTop) / (plotBottom - plotTop);
-    const estimatedMax = yRef * 2;
-    const value = valuePct * estimatedMax;
+    const value = valuePct * yMax;
     if (value < 0) return '';
-    const u = yUnit || '';
-    const s = ySuffix || '';
-    if (value >= 1000000) return `~${(value / 1000000).toFixed(1)}M${s}`;
-    if (value >= 1000) return `~${u}${Math.round(value).toLocaleString('fr-FR')}${s}`;
-    return `~${u}${value.toFixed(2)}${s}`;
-  }, [hover, yRef, yUnit, ySuffix]);
+    const u = unit || '';
+    if (isBsr) {
+      if (value >= 1000000) return `~${(value / 1000000).toFixed(1)}M`;
+      if (value >= 1000) return `~${Math.round(value).toLocaleString('fr-FR')}`;
+      return `~${Math.round(value)}`;
+    }
+    return `~${value.toFixed(2)}${u}`;
+  }, [hover, yMax, unit, isBsr]);
 
   return (
     <div style={{ position: 'relative', display: 'inline-block', width: '100%' }}>
@@ -816,8 +853,9 @@ const ProductCard = ({ result, onFavorite, isFavorite }: ProductCardProps) => {
                 alt="Keepa Price History + Sales Rank"
                 rangeDays={chartRange}
                 className="w-full rounded border bg-white"
-                yRef={r.sell_price || undefined}
-                yUnit="€"
+                keepaData={result.keepa_data}
+                indices={['0', '7', '18', '10']}
+                unit="€"
               />
             </div>
 
@@ -830,8 +868,9 @@ const ProductCard = ({ result, onFavorite, isFavorite }: ProductCardProps) => {
                 alt="Keepa Sales Rank"
                 rangeDays={chartRange}
                 className="w-full rounded border bg-white"
-                yRef={r.bsr || undefined}
-                ySuffix=" BSR"
+                keepaData={result.keepa_data}
+                indices={['3']}
+                isBsr
               />
             </div>
           </div>
