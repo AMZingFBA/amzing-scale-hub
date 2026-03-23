@@ -13,58 +13,66 @@ interface ProductCardProps {
   isFavorite?: boolean;
 }
 
-// Exact SellerAmp profit formula (GetProfit + CalculateVatDue + GetTotalFees)
+// Exact SellerAmp profit formula (GetProfit + CalculateVatDue + GetTotalFees + getDigitalServicesFee)
 function computeProfit(result: MPResult, buyPrice: number) {
   if (!buyPrice || buyPrice <= 0 || !result.sell_price) return null;
 
   const country = COUNTRY_OPTIONS.find(c => c.code === result.country_code);
   const vatRate = (country?.vat || 1.20) - 1; // 0.20 for FR
+  const dstPct = country?.dst_pct ?? 0.03;
+  const dstOnFba = country?.dst_on_fba ?? true;
   const sell = result.sell_price;
+  const referral = result.commission_eur || sell * ((result.commission_pct || 15) / 100);
+  const fbaFee = result.fba_fee;
+  const closingFee = result.closing_fee || 0;
 
-  // Worker pre-calculates total fees (including DST, FBA fee from fee table)
-  const totalFeesFba = result.total_fees_fba;
-  const totalFeesFbm = result.total_fees_fbm ?? 0;
+  // DST (SellerAmp: getDigitalServicesFee)
+  // FBA DST: (closing + referral + [fba if dst_on_fba]) * dst_pct
+  let dstFba = 0;
+  if (dstPct > 0 && fbaFee != null) {
+    dstFba = (closingFee + referral + (dstOnFba ? fbaFee : 0)) * dstPct;
+  }
+  // FBM DST: (closing + referral) * dst_pct (no FBA fee)
+  const dstFbm = dstPct > 0 ? (closingFee + referral) * dstPct : 0;
+
+  // Total fees
+  let totalFeesFba = null as number | null;
+  if (fbaFee != null) {
+    totalFeesFba = Math.round((closingFee + referral + dstFba + fbaFee) * 100) / 100;
+  }
+  const totalFeesFbm = Math.round((closingFee + referral + dstFbm) * 100) / 100;
 
   // VAT (SellerAmp vat_scheme=3 STANDARD, vat_on_sale=1, vat_on_cost=1)
   const vatOnSale = sell - sell / (1 + vatRate);
   const vatOnCost = buyPrice - buyPrice / (1 + vatRate);
-  const vatOnFees = 0; // useAmazonFeeVatRules20240801=0
-  const vatDue = vatOnSale - vatOnCost - vatOnFees;
+  const vatDue = vatOnSale - vatOnCost;
 
-  // FBM profit: sale - totalFees - cost - vatOnFees - vatDue
-  const profitFbm = Math.round((sell - totalFeesFbm - buyPrice - vatOnFees - vatDue) * 100) / 100;
+  // FBM profit: sale - totalFees - cost - vatDue
+  const profitFbm = Math.round((sell - totalFeesFbm - buyPrice - vatDue) * 100) / 100;
   const roiFbm = Math.round((profitFbm / buyPrice) * 10000) / 100;
 
   // FBA profit
   let profitFba = null as number | null;
   let roiFba = null as number | null;
   if (totalFeesFba != null) {
-    profitFba = Math.round((sell - totalFeesFba - buyPrice - vatOnFees - vatDue) * 100) / 100;
+    profitFba = Math.round((sell - totalFeesFba - buyPrice - vatDue) * 100) / 100;
     roiFba = Math.round((profitFba / buyPrice) * 10000) / 100;
   }
 
-  // Max cost (FBA): find cost where profit = 0
-  // 0 = sell - fees - cost - (vatOnSale - cost + cost/(1+vat)) = sell - fees - vatOnSale - cost/(1+vat)
-  // cost/(1+vat) = sell - fees - vatOnSale => cost = (sell - fees - vatOnSale) * (1+vat)
-  // Simplified: maxCost where vatDue cancels out
+  // Max cost (FBA): profit = 0 => maxCost = sell - fees*(1+vatRate)
   let maxCost = null as number | null;
   if (totalFeesFba != null) {
-    // profit = sell - fees - cost - (sell - sell/(1+v)) + (cost - cost/(1+v))
-    // profit = sell/(1+v) - fees - cost/(1+v)
-    // 0 = sell/(1+v) - fees - maxCost/(1+v)
-    // maxCost = sell - fees*(1+v)
     maxCost = Math.round((sell - totalFeesFba * (1 + vatRate)) * 100) / 100;
   }
 
   const profitMargin = profitFba != null ? Math.round((profitFba / sell) * 10000) / 100 : null;
 
-  // DST fee from worker
-  const dstFee = result.dst_fee || 0;
-
   return {
     profitFba, roiFba, profitFbm, roiFbm,
     totalFeesFba, totalFeesFbm,
-    dstFee, maxCost, profitMargin,
+    dstFba: Math.round(dstFba * 100) / 100,
+    dstFbm: Math.round(dstFbm * 100) / 100,
+    maxCost, profitMargin,
     vatOnSale: Math.round(vatOnSale * 100) / 100,
     vatOnCost: Math.round(vatOnCost * 100) / 100,
     vatDue: Math.round(vatDue * 100) / 100,
@@ -262,9 +270,9 @@ const ProductCard = ({ result, onFavorite, isFavorite }: ProductCardProps) => {
                   { label: 'Prix de vente', value: fmt(result.sell_price) },
                   { label: `Commission (${result.commission_pct || 15}%)`, value: fmt(result.commission_eur) },
                   { label: 'FBA Fee', value: fmt(result.fba_fee) },
-                  { label: 'DST', value: fmt(result.dst_fee) },
+                  { label: 'DST', value: calc ? fmt(calc.dstFba) : '—' },
                   { label: 'Closing Fee', value: fmt(result.closing_fee) },
-                  { label: 'Total Fees (FBA)', value: fmt(result.total_fees_fba), bold: true },
+                  { label: 'Total Fees (FBA)', value: calc ? fmt(calc.totalFeesFba) : '—', bold: true },
                 ].map(item => (
                   <div key={item.label} className={`flex justify-between ${item.bold ? 'font-semibold border-t pt-1.5' : ''}`}>
                     <span className="text-muted-foreground">{item.label}</span>
