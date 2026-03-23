@@ -95,6 +95,7 @@ const ProductCard = ({ result, onFavorite, isFavorite }: ProductCardProps) => {
   const [fbmCost, setFbmCost] = useState('');
   const [quantity, setQuantity] = useState('1');
   const [selectedCountry, setSelectedCountry] = useState(result.country_code);
+  const [chartRange, setChartRange] = useState(90);
 
   // Build effective result based on selected country
   const r = useMemo(() => {
@@ -652,30 +653,58 @@ const ProductCard = ({ result, onFavorite, isFavorite }: ProductCardProps) => {
           </div>
         )}
 
-        {/* Keepa Charts — uses selected country's domain */}
+        {/* Keepa Charts — interactive iframe, uses selected country's domain */}
         <div className="border-t">
           <div className="p-4 space-y-3">
-            <p className="text-sm font-semibold">Keepa Charts — {selectedCountryLabel}</p>
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-semibold">Keepa Charts — {selectedCountryLabel}</p>
+              <div className="flex gap-1">
+                {[
+                  { label: 'Day', value: 1 },
+                  { label: 'Week', value: 7 },
+                  { label: 'Month', value: 31 },
+                  { label: '3M', value: 90 },
+                  { label: 'Year', value: 365 },
+                  { label: 'All', value: 0 },
+                ].map(opt => (
+                  <button
+                    key={opt.value}
+                    onClick={() => setChartRange(opt.value)}
+                    className={`px-2 py-0.5 text-[10px] font-semibold rounded transition-colors ${
+                      chartRange === opt.value
+                        ? 'bg-primary text-primary-foreground'
+                        : 'bg-muted hover:bg-muted/80 text-muted-foreground'
+                    }`}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            </div>
 
-            {/* Price History */}
-            <div>
-              <p className="text-xs text-muted-foreground mb-1">Price History</p>
-              <img
-                src={`https://graph.keepa.com/pricehistory.png?asin=${result.asin}&domain=${keepaDomain}&amazon=1&new=1&fba=1&bb=1&range=90&width=600&height=200`}
-                alt="Keepa Price History"
-                className="w-full rounded border bg-white"
+            {/* Chart 1: Price History + Sales Rank */}
+            <div className="rounded border bg-white overflow-hidden">
+              <iframe
+                key={`price-${keepaDomain}-${chartRange}`}
+                src={`https://keepa.com/iframe_addon.html#${keepaDomain}-0-${result.asin}&amazon=1&new=1&fba=1&bb=1&salesrank=1&fbm=1&range=${chartRange}&w=600&h=250`}
+                className="w-full border-0"
+                style={{ height: '260px' }}
+                title="Keepa Price History"
                 loading="lazy"
+                sandbox="allow-scripts allow-same-origin"
               />
             </div>
 
-            {/* Sales Rank */}
-            <div>
-              <p className="text-xs text-muted-foreground mb-1">Sales Rank (BSR)</p>
-              <img
-                src={`https://graph.keepa.com/pricehistory.png?asin=${result.asin}&domain=${keepaDomain}&salesrank=1&range=90&width=600&height=150`}
-                alt="Keepa Sales Rank"
-                className="w-full rounded border bg-white"
+            {/* Chart 2: Offer Count + Rating + Reviews */}
+            <div className="rounded border bg-white overflow-hidden">
+              <iframe
+                key={`offers-${keepaDomain}-${chartRange}`}
+                src={`https://keepa.com/iframe_addon.html#${keepaDomain}-0-${result.asin}&offers=20&rating=1&range=${chartRange}&w=600&h=200`}
+                className="w-full border-0"
+                style={{ height: '210px' }}
+                title="Keepa Offer Count"
                 loading="lazy"
+                sandbox="allow-scripts allow-same-origin"
               />
             </div>
           </div>
