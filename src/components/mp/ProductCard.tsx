@@ -95,13 +95,14 @@ const ProductCard = ({ result, onFavorite, isFavorite }: ProductCardProps) => {
   const [fbmCost, setFbmCost] = useState('');
   const [quantity, setQuantity] = useState('1');
   const [selectedCountry, setSelectedCountry] = useState(result.country_code);
-  const alerts = result.alerts ? result.alerts.split(',').map(a => a.trim()).filter(Boolean) : [];
+  const alerts = r.alerts ? r.alerts.split(',').map(a => a.trim()).filter(Boolean) : [];
 
   // Build effective result based on selected country
   const r = useMemo(() => {
     if (selectedCountry === result.country_code) return result;
     const euData = result.eu_data?.[selectedCountry];
     if (!euData) return result;
+    const domain = AMAZON_DOMAIN[selectedCountry] || 'amazon.fr';
     return {
       ...result,
       country_code: selectedCountry,
@@ -113,7 +114,13 @@ const ProductCard = ({ result, onFavorite, isFavorite }: ProductCardProps) => {
       bsr: euData.bsr ?? result.bsr,
       sales_monthly: euData.sales_monthly ?? result.sales_monthly,
       fba_sellers: euData.fba_sellers ?? result.fba_sellers,
-      amazon_url: `https://www.${AMAZON_DOMAIN[selectedCountry] || 'amazon.fr'}/dp/${result.asin}`,
+      fbm_sellers: euData.fbm_sellers ?? result.fbm_sellers,
+      amazon_price: euData.amazon_price ?? result.amazon_price,
+      fba_price: euData.fba_price ?? result.fba_price,
+      variations: euData.variations ?? result.variations,
+      alerts: euData.alerts ?? result.alerts,
+      offers: euData.offers ?? result.offers,
+      amazon_url: `https://www.${domain}/dp/${result.asin}`,
     } as MPResult;
   }, [selectedCountry, result]);
 
@@ -487,7 +494,7 @@ const ProductCard = ({ result, onFavorite, isFavorite }: ProductCardProps) => {
               <span className="text-sm font-semibold">Offers</span>
               <Badge variant="outline" className="text-[10px] h-4">{(r.fba_sellers || 0) + (r.fbm_sellers || 0)} total</Badge>
             </div>
-            {result.offers && result.offers.length > 0 ? (
+            {r.offers && r.offers.length > 0 ? (
               <div className="overflow-x-auto">
                 <table className="w-full text-xs">
                   <thead>
@@ -500,7 +507,7 @@ const ProductCard = ({ result, onFavorite, isFavorite }: ProductCardProps) => {
                     </tr>
                   </thead>
                   <tbody>
-                    {result.offers.map((offer, i) => {
+                    {r.offers.map((offer, i) => {
                       // Compute profit for this offer's price if buyPrice is set
                       let offerProfit = null as number | null;
                       let offerRoi = null as number | null;

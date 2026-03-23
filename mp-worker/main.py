@@ -183,7 +183,13 @@ async def process_job(job: dict, sas: SellerAmpClient, sb):
                             'commission_pct': eu_result.get('commission_pct'),
                             'closing_fee': eu_result.get('closing_fee'),
                             'fba_sellers': eu_result.get('fba_sellers'),
+                            'fbm_sellers': eu_result.get('fbm_sellers'),
                             'sales_monthly': eu_result.get('sales_monthly'),
+                            'amazon_price': eu_result.get('amazon_price'),
+                            'fba_price': eu_result.get('fba_price'),
+                            'variations': eu_result.get('variations'),
+                            'alerts': eu_result.get('alerts'),
+                            'offers': eu_result.get('offers', []),
                         }
                 except Exception as e:
                     print(f"  [WARN] EU lookup failed for {eu_cc}: {e}")
@@ -200,7 +206,13 @@ async def process_job(job: dict, sas: SellerAmpClient, sb):
                     'commission_pct': r.get('commission_pct'),
                     'closing_fee': r.get('closing_fee'),
                     'fba_sellers': r.get('fba_sellers'),
+                    'fbm_sellers': r.get('fbm_sellers'),
                     'sales_monthly': r.get('sales_monthly'),
+                    'amazon_price': r.get('amazon_price'),
+                    'fba_price': r.get('fba_price'),
+                    'variations': r.get('variations'),
+                    'alerts': r.get('alerts'),
+                    'offers': r.get('offers', []),
                 }
                 r['eu_data'] = eu
 
