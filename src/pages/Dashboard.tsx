@@ -299,7 +299,7 @@ const Dashboard = () => {
                 </AccordionTrigger>
                 <AccordionContent>
                   <div className="grid gap-3 pt-2">
-                    <CategoryItem icon={Search} label="AMZing MP" link="/amzing-mp" />
+                    <CategoryItem icon={Search} label="AMZing AMP" link="/amzing-mp" />
                     <CategoryItem icon={Search} label="Recherche produits" link="/product-search" />
                     <CategoryItem icon={FileSpreadsheet} label="Analyse de fichier" link="/analyse-fichier" />
                     <CategoryItem

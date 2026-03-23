@@ -6,19 +6,12 @@ import Footer from '@/components/Footer';
 import { useMP } from '@/hooks/use-mp';
 import { Search } from 'lucide-react';
 import SearchBar from '@/components/mp/SearchBar';
-import ProfileSelector from '@/components/mp/ProfileSelector';
-import ProfileEditor from '@/components/mp/ProfileEditor';
 import ProductCard from '@/components/mp/ProductCard';
 import SearchHistory from '@/components/mp/SearchHistory';
 
 const AMZingMP = () => {
   const { user, isVIP, isLoading } = useAuth();
   const {
-    profiles,
-    activeProfileId,
-    setActiveProfileId,
-    saveProfile,
-    deleteProfile,
     lookups,
     currentResults,
     selectedLookupId,
@@ -31,7 +24,6 @@ const AMZingMP = () => {
     removeFavorite,
   } = useMP();
 
-  const [showProfileEditor, setShowProfileEditor] = useState(false);
   const resultsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -54,7 +46,7 @@ const AMZingMP = () => {
         <div className="flex items-center gap-3 mb-8">
           <Search className="h-8 w-8 text-primary" />
           <div>
-            <h1 className="text-2xl font-bold">AMZing MP</h1>
+            <h1 className="text-2xl font-bold">AMZing AMP</h1>
             <p className="text-muted-foreground">
               Recherchez un ASIN ou EAN, visualisez les données produit et calculez votre rentabilité instantanément.
             </p>
@@ -62,19 +54,10 @@ const AMZingMP = () => {
         </div>
 
         <div className="grid lg:grid-cols-3 gap-6">
-          {/* Left: Search + Profile */}
+          {/* Left: Search */}
           <div className="lg:col-span-1 space-y-6">
-            <div className="rounded-lg border bg-card p-4 space-y-4">
-              <ProfileSelector
-                profiles={profiles}
-                activeProfileId={activeProfileId}
-                onSelect={setActiveProfileId}
-                onManage={() => setShowProfileEditor(true)}
-              />
-
-              <div className="border-t pt-4">
-                <SearchBar onSearch={submitLookup} isSearching={isSearching} />
-              </div>
+            <div className="rounded-lg border bg-card p-4">
+              <SearchBar onSearch={submitLookup} isSearching={isSearching} />
             </div>
 
             {/* History */}
@@ -110,14 +93,6 @@ const AMZingMP = () => {
         </div>
       </main>
       <Footer />
-
-      <ProfileEditor
-        open={showProfileEditor}
-        onClose={() => setShowProfileEditor(false)}
-        profiles={profiles}
-        onSave={saveProfile}
-        onDelete={deleteProfile}
-      />
     </div>
   );
 };
