@@ -380,26 +380,81 @@ const ProductCard = ({ result, onFavorite, isFavorite }: ProductCardProps) => {
           </div>
         </div>
 
-        {/* Offers */}
+        {/* Offers Table */}
         <div className="border-t">
           <div className="p-4">
             <div className="flex items-center gap-2 mb-3">
               <ShoppingCart className="h-4 w-4 text-primary" />
               <span className="text-sm font-semibold">Offers</span>
+              <Badge variant="outline" className="text-[10px] h-4">{(result.fba_sellers || 0) + (result.fbm_sellers || 0)} total</Badge>
             </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="rounded-lg border p-3 text-center">
-                <p className="text-[10px] text-muted-foreground mb-1">FBA Sellers</p>
-                <p className="text-2xl font-bold">{result.fba_sellers || 0}</p>
-                {result.fba_price != null && (
-                  <p className="text-xs text-muted-foreground mt-1">Lowest: {fmt(result.fba_price)}</p>
-                )}
+            {result.offers && result.offers.length > 0 ? (
+              <div className="overflow-x-auto">
+                <table className="w-full text-xs">
+                  <thead>
+                    <tr className="border-b">
+                      <th className="text-left py-1.5 pr-2 font-semibold text-muted-foreground">Seller</th>
+                      <th className="text-center py-1.5 px-2 font-semibold text-muted-foreground">Stock</th>
+                      <th className="text-right py-1.5 px-2 font-semibold text-muted-foreground">Price</th>
+                      <th className="text-right py-1.5 px-2 font-semibold text-muted-foreground">Profit</th>
+                      <th className="text-right py-1.5 pl-2 font-semibold text-muted-foreground">ROI</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {result.offers.map((offer, i) => {
+                      // Compute profit for this offer's price if buyPrice is set
+                      let offerProfit = null as number | null;
+                      let offerRoi = null as number | null;
+                      const bp = parseFloat(buyPrice);
+                      if (bp > 0 && offer.total_price > 0) {
+                        const offerCalc = computeProfit(offer.total_price, bp, 0, result);
+                        if (offerCalc) {
+                          offerProfit = offerCalc.profitFba;
+                          offerRoi = offerCalc.roiFba;
+                        }
+                      }
+                      const typeBadgeColor = offer.type === 'AMZ' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
+                        : offer.type === 'FBA' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
+                        : 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200';
+                      return (
+                        <tr key={`${offer.seller_id}-${i}`} className="border-b last:border-0">
+                          <td className="py-1.5 pr-2">
+                            <span className={`inline-block px-1.5 py-0.5 rounded text-[10px] font-bold ${typeBadgeColor}`}>
+                              {offer.type}
+                            </span>
+                          </td>
+                          <td className="text-center py-1.5 px-2 font-mono">{offer.stock}</td>
+                          <td className="text-right py-1.5 px-2 font-mono">
+                            {offer.total_price.toFixed(2)}€
+                            {offer.shipping > 0 && <span className="text-muted-foreground ml-1">(+{offer.shipping.toFixed(2)})</span>}
+                          </td>
+                          <td className={`text-right py-1.5 px-2 font-mono ${profitColor(offerProfit)}`}>
+                            {offerProfit != null ? `${offerProfit.toFixed(2)}€` : '—'}
+                          </td>
+                          <td className={`text-right py-1.5 pl-2 font-mono ${roiColor(offerRoi)}`}>
+                            {offerRoi != null ? `${offerRoi.toFixed(2)}%` : '—'}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
               </div>
-              <div className="rounded-lg border p-3 text-center">
-                <p className="text-[10px] text-muted-foreground mb-1">FBM Sellers</p>
-                <p className="text-2xl font-bold">{result.fbm_sellers || 0}</p>
+            ) : (
+              <div className="grid grid-cols-2 gap-3">
+                <div className="rounded-lg border p-3 text-center">
+                  <p className="text-[10px] text-muted-foreground mb-1">FBA Sellers</p>
+                  <p className="text-2xl font-bold">{result.fba_sellers || 0}</p>
+                  {result.fba_price != null && (
+                    <p className="text-xs text-muted-foreground mt-1">Lowest: {fmt(result.fba_price)}</p>
+                  )}
+                </div>
+                <div className="rounded-lg border p-3 text-center">
+                  <p className="text-[10px] text-muted-foreground mb-1">FBM Sellers</p>
+                  <p className="text-2xl font-bold">{result.fbm_sellers || 0}</p>
+                </div>
               </div>
-            </div>
+            )}
             {result.amazon_price != null && (
               <div className="mt-2 text-xs text-muted-foreground">
                 Amazon direct: {fmt(result.amazon_price)}

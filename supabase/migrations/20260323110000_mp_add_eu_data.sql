@@ -1,5 +1,6 @@
--- Add eu_data JSONB column for European Marketplaces comparison
+-- Add eu_data and offers JSONB columns
 ALTER TABLE mp_lookup_results ADD COLUMN IF NOT EXISTS eu_data JSONB;
+ALTER TABLE mp_lookup_results ADD COLUMN IF NOT EXISTS offers JSONB;
 
 -- Recreate mp_complete with ALL columns including new ones
 CREATE OR REPLACE FUNCTION public.mp_complete(
@@ -31,7 +32,7 @@ BEGIN
       fba_sellers, fbm_sellers, variations, alerts,
       buy_price, country_code, amazon_url, keepa_data,
       weight_g, height_mm, length_mm, width_mm,
-      eu_data
+      eu_data, offers
     ) VALUES (
       p_id,
       (v_result->>'user_id')::UUID,
@@ -68,7 +69,8 @@ BEGIN
       (v_result->>'height_mm')::INTEGER,
       (v_result->>'length_mm')::INTEGER,
       (v_result->>'width_mm')::INTEGER,
-      v_result->'eu_data'
+      v_result->'eu_data',
+      v_result->'offers'
     );
     v_count := v_count + 1;
   END LOOP;

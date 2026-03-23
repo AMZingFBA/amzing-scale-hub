@@ -63,6 +63,16 @@ export interface MPResult {
   length_mm: number | null;
   width_mm: number | null;
   eu_data: Record<string, any> | null;
+  offers: Array<{
+    seller_id: string;
+    type: 'AMZ' | 'FBA' | 'FBM';
+    price: number;
+    shipping: number;
+    total_price: number;
+    stock: number;
+    is_prime: boolean;
+    condition: number;
+  }> | null;
   created_at: string;
 }
 

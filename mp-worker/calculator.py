@@ -109,6 +109,7 @@ def calculate_product(product_data: dict, country_code: str, profile: dict = Non
         'country_code': country_code,
         'amazon_url': f'https://www.{domain}/dp/{asin}',
         'keepa_data': product_data.get('keepa_data'),
+        'offers': product_data.get('offers', []),
         'weight_g': product_data.get('weight_g', 0),
         'height_mm': product_data.get('height_mm', 0),
         'length_mm': product_data.get('length_mm', 0),

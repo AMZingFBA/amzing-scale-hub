@@ -128,6 +128,38 @@ class SellerAmpClient:
             # Product title
             title = kpl.get('title', '') or ''
 
+            # Extract individual seller offers from keepa_offers
+            offers_list = []
+            keepa_offers = kpl.get('keepa_offers', {})
+            if isinstance(keepa_offers, dict):
+                for offer in keepa_offers.get('offers', []):
+                    if not isinstance(offer, dict):
+                        continue
+                    o_price = offer.get('price', 0)
+                    o_shipping = offer.get('shippingPrice', 0)
+                    if isinstance(o_shipping, str):
+                        try: o_shipping = float(o_shipping)
+                        except: o_shipping = 0
+                    # Convert shipping from float euros to centimes if it looks like euros
+                    if isinstance(o_shipping, float) and o_shipping < 100:
+                        o_shipping = int(o_shipping * 100)
+                    total_price = (o_price + (o_shipping if isinstance(o_shipping, (int, float)) else 0))
+                    if total_price <= 0:
+                        continue
+                    seller_type = 'AMZ' if offer.get('isAmazon') else ('FBA' if offer.get('isFBA') else 'FBM')
+                    offers_list.append({
+                        'seller_id': offer.get('sellerId', ''),
+                        'type': seller_type,
+                        'price': o_price / 100,
+                        'shipping': (o_shipping / 100) if isinstance(o_shipping, (int, float)) else 0,
+                        'total_price': total_price / 100,
+                        'stock': offer.get('stock_count', 0) or offer.get('stock_display', 0) or 0,
+                        'is_prime': bool(offer.get('isPrime')),
+                        'condition': offer.get('condition', 1),
+                    })
+            # Sort by total price ascending
+            offers_list.sort(key=lambda x: x['total_price'])
+
             data_map[asin] = {
                 'prix_local': prix / 100,
                 'prix_amz_local': prix_amz / 100 if prix_amz > 0 else None,
@@ -149,6 +181,7 @@ class SellerAmpClient:
                 'image_url': image_url,
                 'title': title,
                 'ean': kpl.get('eanList', [''])[0] if kpl.get('eanList') else '',
+                'offers': offers_list,
                 'keepa_data': {
                     'current': cur,
                     'category_name': cat,
