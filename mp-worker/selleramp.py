@@ -180,7 +180,7 @@ class SellerAmpClient:
                 'width_mm': kpl.get('package_width', 0) or 0,
                 'image_url': image_url,
                 'title': title,
-                'ean': kpl.get('eanList', [''])[0] if kpl.get('eanList') else '',
+                'ean': kpl.get('ean') or (kpl.get('eanList', [''])[0] if kpl.get('eanList') else ''),
                 'offers': offers_list,
                 'keepa_data': {
                     'current': cur,
