@@ -28,7 +28,9 @@ function computeProfit(sellPrice: number, buyPrice: number, fbmCost: number, res
   const dstPct = country?.dst_pct ?? 0.03;
   const dstOnFba = country?.dst_on_fba ?? true;
   const sell = sellPrice;
-  const referral = result.commission_eur || sell * ((result.commission_pct || 15) / 100);
+  // Always recalculate referral from sell price (not from result.commission_eur which is for the main price)
+  const refPct = (result.commission_pct || 15) / 100;
+  const referral = sell * refPct;
   const fbaFee = result.fba_fee;
   const closingFee = result.closing_fee || 0;
 
@@ -417,9 +419,15 @@ const ProductCard = ({ result, onFavorite, isFavorite }: ProductCardProps) => {
                       return (
                         <tr key={`${offer.seller_id}-${i}`} className="border-b last:border-0">
                           <td className="py-1.5 pr-2">
-                            <span className={`inline-block px-1.5 py-0.5 rounded text-[10px] font-bold ${typeBadgeColor}`}>
-                              {offer.type}
-                            </span>
+                            <div className="group relative inline-block">
+                              <span className={`inline-block px-1.5 py-0.5 rounded text-[10px] font-bold cursor-default ${typeBadgeColor}`}>
+                                {offer.type}
+                              </span>
+                              <div className="absolute left-0 bottom-full mb-1 hidden group-hover:block z-10 whitespace-nowrap bg-gray-900 text-white text-[10px] px-2 py-1 rounded shadow-lg">
+                                {offer.type === 'AMZ' ? 'Amazon' : offer.seller_id || 'Unknown'}
+                              </div>
+                            </div>
+                            {offer.is_prime && <span className="ml-1 text-[9px] text-blue-600 font-bold">✓Prime</span>}
                           </td>
                           <td className="text-center py-1.5 px-2 font-mono">{offer.stock}</td>
                           <td className="text-right py-1.5 px-2 font-mono">
