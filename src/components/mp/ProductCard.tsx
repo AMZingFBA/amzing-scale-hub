@@ -18,6 +18,7 @@ interface ProductCardProps {
 }
 
 const KEEPA_DOMAIN: Record<string, number> = { FR: 4, UK: 2, DE: 3, ES: 9, IT: 8 };
+const AMAZON_DOMAIN: Record<string, string> = { FR: 'amazon.fr', UK: 'amazon.co.uk', DE: 'amazon.de', ES: 'amazon.es', IT: 'amazon.it' };
 
 function computeProfit(sellPrice: number, buyPrice: number, fbmCost: number, result: MPResult) {
   if (!buyPrice || buyPrice <= 0 || !sellPrice || sellPrice <= 0) return null;
@@ -206,16 +207,13 @@ const ProductCard = ({ result, onFavorite, isFavorite }: ProductCardProps) => {
         </div>
 
         {/* Quick Info bar */}
-        <div className="grid grid-cols-4 sm:grid-cols-8 gap-px bg-border">
+        <div className="grid grid-cols-5 gap-px bg-border">
           {[
             { label: 'BSR', value: result.bsr?.toLocaleString('fr-FR') || '—' },
             { label: 'Ventes/mois', value: result.sales_monthly?.toString() || '—' },
             { label: 'FBA Sellers', value: result.fba_sellers?.toString() || '0' },
             { label: 'FBM Sellers', value: result.fbm_sellers?.toString() || '0' },
             { label: 'Variations', value: result.variations?.toString() || '0' },
-            { label: 'Commission', value: `${result.commission_pct || 15}%` },
-            { label: 'Poids', value: weightKg ? `${weightKg}kg` : '—' },
-            { label: 'Dimensions', value: dimsStr || '—' },
           ].map(item => (
             <div key={item.label} className="bg-background px-2 py-1.5 text-center">
               <p className="text-[10px] text-muted-foreground leading-none">{item.label}</p>
@@ -505,13 +503,16 @@ const ProductCard = ({ result, onFavorite, isFavorite }: ProductCardProps) => {
                           euRoi = euCalc.roiFba;
                         }
                       }
+                      const euDomain = AMAZON_DOMAIN[cc] || 'amazon.fr';
+                      const euAmazonUrl = `https://www.${euDomain}/dp/${result.asin}`;
                       return (
                         <tr key={cc} className={`border-b last:border-0 ${cc === result.country_code ? 'bg-primary/5 font-semibold' : ''}`}>
                           <td className="py-1.5 pr-2">
-                            <span className="inline-flex items-center gap-1">
+                            <a href={euAmazonUrl} target="_blank" rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1 text-blue-600 hover:underline">
                               {euCountry?.label || cc}
-                              {cc === result.country_code && <Badge variant="outline" className="text-[8px] h-3 px-1">current</Badge>}
-                            </span>
+                              <ExternalLink className="h-2.5 w-2.5" />
+                            </a>
                           </td>
                           <td className="text-right py-1.5 px-2 font-mono">{data.bsr?.toLocaleString('fr-FR') || '—'}</td>
                           <td className="text-right py-1.5 px-2 font-mono">{data.sell_price ? `${data.sell_price.toFixed(2)}€` : '—'}</td>
