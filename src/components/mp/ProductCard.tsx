@@ -12,13 +12,16 @@ import {
 } from 'lucide-react';
 
 /* ── Interactive Keepa Chart Overlay ── */
-function InteractiveKeepaChart({ src, alt, rangeDays, className }: {
+function InteractiveKeepaChart({ src, alt, rangeDays, className, yRef, yUnit, ySuffix }: {
   src: string;
   alt: string;
   rangeDays: number;
   className?: string;
+  yRef?: number;
+  yUnit?: string;
+  ySuffix?: string;
 }) {
-  const [hover, setHover] = useState<{ x: number; y: number; pctX: number } | null>(null);
+  const [hover, setHover] = useState<{ x: number; y: number; pctX: number; pctY: number } | null>(null);
 
   const dateLabel = useMemo(() => {
     if (!hover) return '';
@@ -29,6 +32,24 @@ function InteractiveKeepaChart({ src, alt, rangeDays, className }: {
     const pt = new Date(start.getTime() + plotPct * (now.getTime() - start.getTime()));
     return pt.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: effectiveRange > 90 ? '2-digit' : undefined });
   }, [hover, rangeDays]);
+
+  // Estimate value on Y axis
+  const yLabel = useMemo(() => {
+    if (!hover || !yRef || yRef <= 0) return '';
+    const plotTop = 0.08;
+    const plotBottom = 0.82;
+    if (hover.pctY < plotTop || hover.pctY > plotBottom) return '';
+    // top = max value, bottom = 0
+    const valuePct = 1 - (hover.pctY - plotTop) / (plotBottom - plotTop);
+    const estimatedMax = yRef * 2;
+    const value = valuePct * estimatedMax;
+    if (value < 0) return '';
+    const u = yUnit || '';
+    const s = ySuffix || '';
+    if (value >= 1000000) return `~${(value / 1000000).toFixed(1)}M${s}`;
+    if (value >= 1000) return `~${u}${Math.round(value).toLocaleString('fr-FR')}${s}`;
+    return `~${u}${value.toFixed(2)}${s}`;
+  }, [hover, yRef, yUnit, ySuffix]);
 
   return (
     <div style={{ position: 'relative', display: 'inline-block', width: '100%' }}>
@@ -47,6 +68,7 @@ function InteractiveKeepaChart({ src, alt, rangeDays, className }: {
             x: e.clientX - rect.left,
             y: e.clientY - rect.top,
             pctX: (e.clientX - rect.left) / rect.width,
+            pctY: (e.clientY - rect.top) / rect.height,
           });
         }}
         onMouseLeave={() => setHover(null)}
@@ -67,7 +89,7 @@ function InteractiveKeepaChart({ src, alt, rangeDays, className }: {
               backgroundColor: 'rgba(156,163,175,0.5)',
               pointerEvents: 'none',
             }} />
-            {/* Date tooltip */}
+            {/* Date tooltip (top) */}
             <div style={{
               position: 'absolute',
               left: hover.x, top: 4,
@@ -81,6 +103,22 @@ function InteractiveKeepaChart({ src, alt, rangeDays, className }: {
             }}>
               {dateLabel}
             </div>
+            {/* Y-value tooltip (left) */}
+            {yLabel && (
+              <div style={{
+                position: 'absolute',
+                left: 4, top: hover.y,
+                transform: 'translateY(-50%)',
+                backgroundColor: 'rgba(17,24,39,0.92)',
+                color: '#fff', fontSize: 11, fontFamily: 'monospace',
+                padding: '2px 8px', borderRadius: 4,
+                whiteSpace: 'nowrap',
+                pointerEvents: 'none',
+                boxShadow: '0 2px 6px rgba(0,0,0,0.3)',
+              }}>
+                {yLabel}
+              </div>
+            )}
             {/* Dot */}
             <div style={{
               position: 'absolute',
@@ -778,6 +816,8 @@ const ProductCard = ({ result, onFavorite, isFavorite }: ProductCardProps) => {
                 alt="Keepa Price History + Sales Rank"
                 rangeDays={chartRange}
                 className="w-full rounded border bg-white"
+                yRef={r.sell_price || undefined}
+                yUnit="€"
               />
             </div>
 
@@ -790,6 +830,8 @@ const ProductCard = ({ result, onFavorite, isFavorite }: ProductCardProps) => {
                 alt="Keepa Sales Rank"
                 rangeDays={chartRange}
                 className="w-full rounded border bg-white"
+                yRef={r.bsr || undefined}
+                ySuffix=" BSR"
               />
             </div>
           </div>
