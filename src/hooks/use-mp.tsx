@@ -62,6 +62,7 @@ export interface MPResult {
   height_mm: number | null;
   length_mm: number | null;
   width_mm: number | null;
+  eu_data: Record<string, any> | null;
   created_at: string;
 }
 

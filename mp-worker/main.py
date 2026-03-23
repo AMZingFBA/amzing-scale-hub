@@ -159,6 +159,51 @@ async def process_job(job: dict, sas: SellerAmpClient, sb):
 
             results.append(result)
 
+        # 6b. European Marketplaces — lookup each ASIN on all 5 countries
+        eu_countries = [cc for cc in COUNTRIES if cc != country_code]
+        if results and eu_countries:
+            print(f"  [3b] Looking up {len(results)} ASIN(s) on {len(eu_countries)} other marketplace(s)...")
+            asin_list_for_eu = [r['asin'] for r in results]
+            eu_data_map = {}  # asin -> { CC: {bsr, sell_price, fba_fee, commission_eur, ...} }
+            for eu_cc in eu_countries:
+                eu_country = COUNTRIES[eu_cc]
+                eu_keepa = eu_country['keepa_mp']
+                try:
+                    eu_raw = await sas.lookup_asins(asin_list_for_eu, eu_keepa)
+                    for asin, eu_pd in eu_raw.items():
+                        eu_pd['_asin'] = asin
+                        eu_result = calculate_product(eu_pd, eu_cc, profile)
+                        if asin not in eu_data_map:
+                            eu_data_map[asin] = {}
+                        eu_data_map[asin][eu_cc] = {
+                            'bsr': eu_result.get('bsr'),
+                            'sell_price': eu_result.get('sell_price'),
+                            'fba_fee': eu_result.get('fba_fee'),
+                            'commission_eur': eu_result.get('commission_eur'),
+                            'commission_pct': eu_result.get('commission_pct'),
+                            'closing_fee': eu_result.get('closing_fee'),
+                            'fba_sellers': eu_result.get('fba_sellers'),
+                            'sales_monthly': eu_result.get('sales_monthly'),
+                        }
+                except Exception as e:
+                    print(f"  [WARN] EU lookup failed for {eu_cc}: {e}")
+
+            # Also include the main country in eu_data for each ASIN
+            for r in results:
+                asin = r['asin']
+                eu = eu_data_map.get(asin, {})
+                eu[country_code] = {
+                    'bsr': r.get('bsr'),
+                    'sell_price': r.get('sell_price'),
+                    'fba_fee': r.get('fba_fee'),
+                    'commission_eur': r.get('commission_eur'),
+                    'commission_pct': r.get('commission_pct'),
+                    'closing_fee': r.get('closing_fee'),
+                    'fba_sellers': r.get('fba_sellers'),
+                    'sales_monthly': r.get('sales_monthly'),
+                }
+                r['eu_data'] = eu
+
         # 7. Insert results via RPC
         if results:
             print(f"  [4] Inserting {len(results)} results...")
