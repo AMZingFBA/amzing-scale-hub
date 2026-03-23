@@ -683,28 +683,26 @@ const ProductCard = ({ result, onFavorite, isFavorite }: ProductCardProps) => {
             </div>
 
             {/* Chart 1: Price History + Sales Rank */}
-            <div className="rounded border bg-white overflow-hidden">
-              <iframe
+            <div>
+              <p className="text-xs text-muted-foreground mb-1">Price + Sales Rank</p>
+              <img
                 key={`price-${keepaDomain}-${chartRange}`}
-                src={`https://keepa.com/iframe_addon.html#${keepaDomain}-0-${result.asin}&amazon=1&new=1&fba=1&bb=1&salesrank=1&fbm=1&range=${chartRange}&w=600&h=250`}
-                className="w-full border-0"
-                style={{ height: '260px' }}
-                title="Keepa Price History"
+                src={`https://graph.keepa.com/pricehistory.png?asin=${result.asin}&domain=${keepaDomain}&amazon=1&new=1&fba=1&bb=1&salesrank=1&range=${chartRange || 180}&width=600&height=250`}
+                alt="Keepa Price History + Sales Rank"
+                className="w-full rounded border bg-white"
                 loading="lazy"
-                sandbox="allow-scripts allow-same-origin"
               />
             </div>
 
-            {/* Chart 2: Offer Count + Rating + Reviews */}
-            <div className="rounded border bg-white overflow-hidden">
-              <iframe
-                key={`offers-${keepaDomain}-${chartRange}`}
-                src={`https://keepa.com/iframe_addon.html#${keepaDomain}-0-${result.asin}&offers=20&rating=1&range=${chartRange}&w=600&h=200`}
-                className="w-full border-0"
-                style={{ height: '210px' }}
-                title="Keepa Offer Count"
+            {/* Chart 2: Sales Rank (larger) */}
+            <div>
+              <p className="text-xs text-muted-foreground mb-1">Sales Rank (BSR)</p>
+              <img
+                key={`bsr-${keepaDomain}-${chartRange}`}
+                src={`https://graph.keepa.com/pricehistory.png?asin=${result.asin}&domain=${keepaDomain}&salesrank=1&range=${chartRange || 180}&width=600&height=180`}
+                alt="Keepa Sales Rank"
+                className="w-full rounded border bg-white"
                 loading="lazy"
-                sandbox="allow-scripts allow-same-origin"
               />
             </div>
           </div>
