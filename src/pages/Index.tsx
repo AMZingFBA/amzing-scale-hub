@@ -30,6 +30,7 @@ import HomeDashboardPreview from "@/components/home/HomeDashboardPreview";
 import HomePreviewSection from "@/components/home/HomePreviewSection";
 import HomeMockups from "@/components/home/HomeMockups";
 import HomeAISearchPromo from "@/components/home/HomeAISearchPromo";
+import HomeToolsPromo from "@/components/home/HomeToolsPromo";
 import PromoCountdown from "@/components/PromoCountdown";
 
 const ServiceCard = ({ 
@@ -305,6 +306,9 @@ const Index = () => {
 
       {/* AI Search Promo - Public */}
       <HomeAISearchPromo />
+
+      {/* AMZing AMP + Analyse de Fichier - Promo Tools */}
+      <HomeToolsPromo />
 
       {/* Guides Amazon FBA - Section SEO - Bold banner style */}
       <section className="py-16 relative overflow-hidden">
