@@ -92,6 +92,7 @@ const AdminWhatsApp = lazy(() => import("./pages/AdminWhatsApp"));
 const AmazonToAmazon = lazy(() => import("./pages/AmazonToAmazon"));
 const ProduitsIbood = lazy(() => import("./pages/ProduitsIbood"));
 const ProduitsAuchan = lazy(() => import("./pages/ProduitsAuchan"));
+const AMZingMP = lazy(() => import("./pages/AMZingMP"));
 
 const AndroidApp = lazy(() => import("./pages/AndroidApp"));
 const AmazonFbaDebutant = lazy(() => import("./pages/AmazonFbaDebutant"));
@@ -241,6 +242,7 @@ const App = () => (
             <Route path="/blog" element={<Blog />} />
             <Route path="/blog/:slug" element={<BlogPost />} />
             
+            <Route path="/amzing-mp" element={<AMZingMP />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
