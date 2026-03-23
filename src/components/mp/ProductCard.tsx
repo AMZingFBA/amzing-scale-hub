@@ -5,7 +5,11 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Heart, ExternalLink, Package, Users, AlertTriangle, TrendingUp, TrendingDown, ShoppingCart, Info } from 'lucide-react';
+import { toast } from 'sonner';
+import {
+  Heart, ExternalLink, Package, AlertTriangle, ShoppingCart, Info,
+  Copy, Search, Ruler, Weight, Box, Link2,
+} from 'lucide-react';
 
 interface ProductCardProps {
   result: MPResult;
@@ -13,12 +17,13 @@ interface ProductCardProps {
   isFavorite?: boolean;
 }
 
-// Exact SellerAmp profit formula (GetProfit + CalculateVatDue + GetTotalFees + getDigitalServicesFee)
-function computeProfit(result: MPResult, buyPrice: number) {
+const KEEPA_DOMAIN: Record<string, number> = { FR: 4, UK: 2, DE: 3, ES: 9, IT: 8 };
+
+function computeProfit(result: MPResult, buyPrice: number, fbmCost: number) {
   if (!buyPrice || buyPrice <= 0 || !result.sell_price) return null;
 
   const country = COUNTRY_OPTIONS.find(c => c.code === result.country_code);
-  const vatRate = (country?.vat || 1.20) - 1; // 0.20 for FR
+  const vatRate = (country?.vat || 1.20) - 1;
   const dstPct = country?.dst_pct ?? 0.03;
   const dstOnFba = country?.dst_on_fba ?? true;
   const sell = result.sell_price;
@@ -26,32 +31,30 @@ function computeProfit(result: MPResult, buyPrice: number) {
   const fbaFee = result.fba_fee;
   const closingFee = result.closing_fee || 0;
 
-  // DST (SellerAmp: getDigitalServicesFee)
-  // FBA DST: (closing + referral + [fba if dst_on_fba]) * dst_pct
+  // DST
   let dstFba = 0;
   if (dstPct > 0 && fbaFee != null) {
     dstFba = (closingFee + referral + (dstOnFba ? fbaFee : 0)) * dstPct;
   }
-  // FBM DST: (closing + referral) * dst_pct (no FBA fee)
-  const dstFbm = dstPct > 0 ? (closingFee + referral) * dstPct : 0;
+  const dstFbm = dstPct > 0 ? (closingFee + referral + (dstOnFba && fbmCost > 0 ? fbmCost : 0)) * dstPct : 0;
 
   // Total fees
   let totalFeesFba = null as number | null;
   if (fbaFee != null) {
     totalFeesFba = Math.round((closingFee + referral + dstFba + fbaFee) * 100) / 100;
   }
-  const totalFeesFbm = Math.round((closingFee + referral + dstFbm) * 100) / 100;
+  const totalFeesFbm = Math.round((closingFee + referral + dstFbm + fbmCost) * 100) / 100;
 
-  // VAT (SellerAmp vat_scheme=3 STANDARD, vat_on_sale=1, vat_on_cost=1)
+  // VAT
   const vatOnSale = sell - sell / (1 + vatRate);
   const vatOnCost = buyPrice - buyPrice / (1 + vatRate);
   const vatDue = vatOnSale - vatOnCost;
 
-  // FBM profit: sale - totalFees - cost - vatDue
+  // FBM
   const profitFbm = Math.round((sell - totalFeesFbm - buyPrice - vatDue) * 100) / 100;
   const roiFbm = Math.round((profitFbm / buyPrice) * 10000) / 100;
 
-  // FBA profit
+  // FBA
   let profitFba = null as number | null;
   let roiFba = null as number | null;
   if (totalFeesFba != null) {
@@ -59,7 +62,6 @@ function computeProfit(result: MPResult, buyPrice: number) {
     roiFba = Math.round((profitFba / buyPrice) * 10000) / 100;
   }
 
-  // Max cost (FBA): profit = 0 => maxCost = sell - fees*(1+vatRate)
   let maxCost = null as number | null;
   if (totalFeesFba != null) {
     maxCost = Math.round((sell - totalFeesFba * (1 + vatRate)) * 100) / 100;
@@ -71,7 +73,6 @@ function computeProfit(result: MPResult, buyPrice: number) {
     profitFba, roiFba, profitFbm, roiFbm,
     totalFeesFba, totalFeesFbm,
     dstFba: Math.round(dstFba * 100) / 100,
-    dstFbm: Math.round(dstFbm * 100) / 100,
     maxCost, profitMargin,
     vatOnSale: Math.round(vatOnSale * 100) / 100,
     vatOnCost: Math.round(vatOnCost * 100) / 100,
@@ -79,15 +80,21 @@ function computeProfit(result: MPResult, buyPrice: number) {
   };
 }
 
+function copyText(text: string, label: string) {
+  navigator.clipboard.writeText(text);
+  toast.success(`${label} copié`);
+}
+
 const ProductCard = ({ result, onFavorite, isFavorite }: ProductCardProps) => {
   const [buyPrice, setBuyPrice] = useState('');
+  const [fbmCost, setFbmCost] = useState('');
   const alerts = result.alerts ? result.alerts.split(',').map(a => a.trim()).filter(Boolean) : [];
 
   const calc = useMemo(() => {
     const bp = parseFloat(buyPrice);
     if (!bp || bp <= 0) return null;
-    return computeProfit(result, bp);
-  }, [buyPrice, result]);
+    return computeProfit(result, bp, parseFloat(fbmCost) || 0);
+  }, [buyPrice, fbmCost, result]);
 
   const fmt = (v: number | null | undefined) => v != null ? `${v.toFixed(2)}€` : '—';
   const fmtPct = (v: number | null | undefined) => v != null ? `${v.toFixed(2)}%` : '—';
@@ -104,12 +111,22 @@ const ProductCard = ({ result, onFavorite, isFavorite }: ProductCardProps) => {
     return p >= 0 ? 'text-green-600' : 'text-red-600';
   };
 
+  const keepaDomain = KEEPA_DOMAIN[result.country_code] || 4;
+  const googleUrl = result.product_name
+    ? `https://www.google.com/search?q=${encodeURIComponent(result.product_name)}`
+    : null;
+
+  // Dimensions
+  const weightKg = result.weight_g ? (result.weight_g / 1000).toFixed(2) : null;
+  const dimsStr = (result.length_mm && result.width_mm && result.height_mm)
+    ? `${(result.length_mm / 10).toFixed(1)} x ${(result.width_mm / 10).toFixed(1)} x ${(result.height_mm / 10).toFixed(1)} cm`
+    : null;
+
   return (
     <Card className="overflow-hidden">
       <CardContent className="p-0">
         {/* Top banner: image + title + quick info */}
         <div className="flex gap-4 p-4 pb-3 border-b bg-muted/20">
-          {/* Image */}
           <div className="shrink-0 w-24 h-24 rounded-md overflow-hidden bg-white border flex items-center justify-center">
             {result.image_url ? (
               <img src={result.image_url} alt="" className="w-full h-full object-contain" />
@@ -118,7 +135,6 @@ const ProductCard = ({ result, onFavorite, isFavorite }: ProductCardProps) => {
             )}
           </div>
 
-          {/* Title + identifiers */}
           <div className="flex-1 min-w-0">
             <div className="flex items-start justify-between gap-2">
               <div className="min-w-0">
@@ -136,20 +152,37 @@ const ProductCard = ({ result, onFavorite, isFavorite }: ProductCardProps) => {
                     <Heart className={`h-4 w-4 ${isFavorite ? 'fill-red-500 text-red-500' : ''}`} />
                   </Button>
                 )}
-                {result.amazon_url && (
-                  <Button variant="ghost" size="icon" className="h-7 w-7" asChild>
-                    <a href={result.amazon_url} target="_blank" rel="noopener noreferrer">
-                      <ExternalLink className="h-4 w-4" />
-                    </a>
-                  </Button>
-                )}
               </div>
             </div>
 
-            {/* ASIN + EAN */}
-            <div className="flex flex-wrap gap-x-3 gap-y-0.5 mt-1 text-xs text-muted-foreground font-mono">
-              <span>ASIN: {result.asin}</span>
-              {result.ean && <span>EAN: {result.ean}</span>}
+            {/* ASIN + EAN with copy */}
+            <div className="flex flex-wrap gap-x-2 gap-y-1 mt-1.5">
+              <button onClick={() => copyText(result.asin, 'ASIN')}
+                className="inline-flex items-center gap-1 text-xs font-mono bg-muted px-1.5 py-0.5 rounded hover:bg-muted/80 transition-colors">
+                ASIN: {result.asin} <Copy className="h-3 w-3 text-muted-foreground" />
+              </button>
+              {result.ean && (
+                <button onClick={() => copyText(result.ean!, 'EAN')}
+                  className="inline-flex items-center gap-1 text-xs font-mono bg-muted px-1.5 py-0.5 rounded hover:bg-muted/80 transition-colors">
+                  EAN: {result.ean} <Copy className="h-3 w-3 text-muted-foreground" />
+                </button>
+              )}
+            </div>
+
+            {/* Links: Amazon + Google */}
+            <div className="flex flex-wrap gap-2 mt-1.5">
+              {result.amazon_url && (
+                <a href={result.amazon_url} target="_blank" rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 text-xs text-blue-600 hover:underline">
+                  <Link2 className="h-3 w-3" /> Amazon
+                </a>
+              )}
+              {googleUrl && (
+                <a href={googleUrl} target="_blank" rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 text-xs text-blue-600 hover:underline">
+                  <Search className="h-3 w-3" /> Google
+                </a>
+              )}
             </div>
 
             {/* Alerts */}
@@ -167,7 +200,7 @@ const ProductCard = ({ result, onFavorite, isFavorite }: ProductCardProps) => {
         </div>
 
         {/* Quick Info bar */}
-        <div className="grid grid-cols-4 sm:grid-cols-6 gap-px bg-border">
+        <div className="grid grid-cols-4 sm:grid-cols-8 gap-px bg-border">
           {[
             { label: 'BSR', value: result.bsr?.toLocaleString('fr-FR') || '—' },
             { label: 'Ventes/mois', value: result.sales_monthly?.toString() || '—' },
@@ -175,13 +208,37 @@ const ProductCard = ({ result, onFavorite, isFavorite }: ProductCardProps) => {
             { label: 'FBM Sellers', value: result.fbm_sellers?.toString() || '0' },
             { label: 'Variations', value: result.variations?.toString() || '0' },
             { label: 'Commission', value: `${result.commission_pct || 15}%` },
+            { label: 'Poids', value: weightKg ? `${weightKg}kg` : '—' },
+            { label: 'Dimensions', value: dimsStr ? dimsStr.split(' x ')[0] + '...' : '—' },
           ].map(item => (
             <div key={item.label} className="bg-background px-2 py-1.5 text-center">
               <p className="text-[10px] text-muted-foreground leading-none">{item.label}</p>
-              <p className="text-xs font-semibold mt-0.5">{item.value}</p>
+              <p className="text-xs font-semibold mt-0.5 truncate">{item.value}</p>
             </div>
           ))}
         </div>
+
+        {/* Dimensions detail */}
+        {(weightKg || dimsStr) && (
+          <div className="flex flex-wrap gap-4 px-4 py-2 border-b text-xs text-muted-foreground bg-muted/10">
+            {weightKg && (
+              <span className="inline-flex items-center gap-1">
+                <Weight className="h-3 w-3" /> {weightKg} kg
+              </span>
+            )}
+            {dimsStr && (
+              <span className="inline-flex items-center gap-1">
+                <Ruler className="h-3 w-3" /> {dimsStr}
+              </span>
+            )}
+            {result.length_mm && result.width_mm && result.height_mm && (
+              <span className="inline-flex items-center gap-1">
+                <Box className="h-3 w-3" />
+                {((result.length_mm / 10) * (result.width_mm / 10) * (result.height_mm / 10) / 5000).toFixed(2)} kg dim.
+              </span>
+            )}
+          </div>
+        )}
 
         {/* Profit Calculator */}
         <div className="p-4">
@@ -191,26 +248,30 @@ const ProductCard = ({ result, onFavorite, isFavorite }: ProductCardProps) => {
           </div>
 
           <div className="grid sm:grid-cols-2 gap-4">
-            {/* Left: Cost + Sale inputs */}
+            {/* Left: Inputs + Results */}
             <div className="space-y-3">
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-3 gap-2">
                 <div>
-                  <label className="text-xs text-muted-foreground block mb-1">Prix d'achat (Cost)</label>
+                  <label className="text-xs text-muted-foreground block mb-1">Cost (TTC)</label>
                   <Input
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    placeholder="0.00 €"
-                    value={buyPrice}
-                    onChange={(e) => setBuyPrice(e.target.value)}
+                    type="number" step="0.01" min="0" placeholder="0.00€"
+                    value={buyPrice} onChange={(e) => setBuyPrice(e.target.value)}
                     className="h-9 text-sm font-mono"
                   />
                 </div>
                 <div>
-                  <label className="text-xs text-muted-foreground block mb-1">Prix de vente</label>
-                  <div className="h-9 flex items-center px-3 rounded-md border bg-muted/30 text-sm font-mono">
+                  <label className="text-xs text-muted-foreground block mb-1">Sale Price</label>
+                  <div className="h-9 flex items-center px-2 rounded-md border bg-muted/30 text-sm font-mono">
                     {fmt(result.sell_price)}
                   </div>
+                </div>
+                <div>
+                  <label className="text-xs text-muted-foreground block mb-1">FBM Ship</label>
+                  <Input
+                    type="number" step="0.01" min="0" placeholder="0.00€"
+                    value={fbmCost} onChange={(e) => setFbmCost(e.target.value)}
+                    className="h-9 text-sm font-mono"
+                  />
                 </div>
               </div>
 
@@ -263,11 +324,11 @@ const ProductCard = ({ result, onFavorite, isFavorite }: ProductCardProps) => {
             <div className="space-y-2 text-xs">
               <div className="flex items-center gap-1 mb-2">
                 <Info className="h-3.5 w-3.5 text-muted-foreground" />
-                <span className="text-xs font-semibold text-muted-foreground">Détail Fees</span>
+                <span className="text-xs font-semibold text-muted-foreground">Fee Breakdown</span>
               </div>
               <div className="space-y-1.5">
                 {[
-                  { label: 'Prix de vente', value: fmt(result.sell_price) },
+                  { label: 'Sale Price', value: fmt(result.sell_price) },
                   { label: `Commission (${result.commission_pct || 15}%)`, value: fmt(result.commission_eur) },
                   { label: 'FBA Fee', value: fmt(result.fba_fee) },
                   { label: 'DST', value: calc ? fmt(calc.dstFba) : '—' },
@@ -305,6 +366,46 @@ const ProductCard = ({ result, onFavorite, isFavorite }: ProductCardProps) => {
                   </div>
                 </div>
               )}
+            </div>
+          </div>
+        </div>
+
+        {/* Keepa Charts */}
+        <div className="border-t">
+          <div className="p-4 space-y-3">
+            <p className="text-sm font-semibold">Keepa Charts</p>
+
+            {/* Price History */}
+            <div>
+              <p className="text-xs text-muted-foreground mb-1">Price History</p>
+              <img
+                src={`https://graph.keepa.com/pricehistory.png?asin=${result.asin}&domain=${keepaDomain}&amazon=1&new=1&fba=1&bb=1&range=90&width=600&height=200`}
+                alt="Keepa Price History"
+                className="w-full rounded border bg-white"
+                loading="lazy"
+              />
+            </div>
+
+            {/* Sales Rank */}
+            <div>
+              <p className="text-xs text-muted-foreground mb-1">Sales Rank (BSR)</p>
+              <img
+                src={`https://graph.keepa.com/pricehistory.png?asin=${result.asin}&domain=${keepaDomain}&salesrank=1&range=90&width=600&height=150`}
+                alt="Keepa Sales Rank"
+                className="w-full rounded border bg-white"
+                loading="lazy"
+              />
+            </div>
+
+            {/* Offer Count */}
+            <div>
+              <p className="text-xs text-muted-foreground mb-1">Offer Count (New)</p>
+              <img
+                src={`https://graph.keepa.com/pricehistory.png?asin=${result.asin}&domain=${keepaDomain}&new=1&fba=1&range=90&width=600&height=150&offers=1`}
+                alt="Keepa Offers"
+                className="w-full rounded border bg-white"
+                loading="lazy"
+              />
             </div>
           </div>
         </div>

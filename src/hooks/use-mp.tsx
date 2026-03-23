@@ -58,6 +58,10 @@ export interface MPResult {
   country_code: string;
   amazon_url: string | null;
   keepa_data: any;
+  weight_g: number | null;
+  height_mm: number | null;
+  length_mm: number | null;
+  width_mm: number | null;
   created_at: string;
 }
 
