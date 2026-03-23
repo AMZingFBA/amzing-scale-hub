@@ -503,23 +503,25 @@ const ProductCard = ({ result, onFavorite, isFavorite }: ProductCardProps) => {
                       <th className="text-left py-1.5 pr-2 font-semibold text-muted-foreground">Seller</th>
                       <th className="text-center py-1.5 px-2 font-semibold text-muted-foreground">Stock</th>
                       <th className="text-right py-1.5 px-2 font-semibold text-muted-foreground">Price</th>
-                      <th className="text-right py-1.5 px-2 font-semibold text-muted-foreground">Profit</th>
-                      <th className="text-right py-1.5 pl-2 font-semibold text-muted-foreground">ROI</th>
+                      <th className="text-right py-1.5 px-2 font-semibold text-muted-foreground">Net</th>
+                      <th className="text-right py-1.5 pl-2 font-semibold text-muted-foreground">Margin</th>
                     </tr>
                   </thead>
                   <tbody>
                     {r.offers.map((offer, i) => {
-                      // Compute profit for this offer's price if buyPrice is set
-                      let offerProfit = null as number | null;
-                      let offerRoi = null as number | null;
-                      const bp = parseFloat(buyPrice);
-                      if (bp > 0 && offer.total_price > 0) {
-                        const offerCalc = computeProfit(offer.total_price, bp, 0, r);
-                        if (offerCalc) {
-                          offerProfit = offerCalc.profitFba;
-                          offerRoi = offerCalc.roiFba;
-                        }
-                      }
+                      // Compute seller's net payout: sell price minus Amazon fees
+                      const sell = offer.total_price;
+                      const country = COUNTRY_OPTIONS.find(c => c.code === r.country_code);
+                      const dstPct = country?.dst_pct ?? 0.03;
+                      const dstOnFba = country?.dst_on_fba ?? true;
+                      const refPct = (r.commission_pct || 15) / 100;
+                      const referral = sell * refPct;
+                      const fbaFee = r.fba_fee || 0;
+                      const closingFee = r.closing_fee || 0;
+                      const dst = dstPct > 0 ? (closingFee + referral + (dstOnFba ? fbaFee : 0)) * dstPct : 0;
+                      const totalFees = closingFee + referral + dst + fbaFee;
+                      const net = Math.round((sell - totalFees) * 100) / 100;
+                      const margin = sell > 0 ? Math.round((net / sell) * 10000) / 100 : 0;
                       const typeBadgeColor = offer.type === 'AMZ' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
                         : offer.type === 'FBA' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
                         : 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200';
@@ -541,11 +543,11 @@ const ProductCard = ({ result, onFavorite, isFavorite }: ProductCardProps) => {
                             {offer.total_price.toFixed(2)}€
                             {offer.shipping > 0 && <span className="text-muted-foreground ml-1">(+{offer.shipping.toFixed(2)})</span>}
                           </td>
-                          <td className={`text-right py-1.5 px-2 font-mono ${profitColor(offerProfit)}`}>
-                            {offerProfit != null ? `${offerProfit.toFixed(2)}€` : '—'}
+                          <td className={`text-right py-1.5 px-2 font-mono ${net >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                            {net.toFixed(2)}€
                           </td>
-                          <td className={`text-right py-1.5 pl-2 font-mono ${roiColor(offerRoi)}`}>
-                            {offerRoi != null ? `${offerRoi.toFixed(2)}%` : '—'}
+                          <td className={`text-right py-1.5 pl-2 font-mono ${margin >= 30 ? 'text-green-600' : margin >= 10 ? 'text-yellow-600' : 'text-red-600'}`}>
+                            {margin.toFixed(1)}%
                           </td>
                         </tr>
                       );
