@@ -43,6 +43,9 @@ export interface MPResult {
   commission_pct: number | null;
   commission_eur: number | null;
   closing_fee: number | null;
+  dst_fee: number | null;
+  total_fees_fba: number | null;
+  total_fees_fbm: number | null;
   profit_fba: number | null;
   roi_fba: number | null;
   profit_fbm: number | null;
@@ -69,11 +72,11 @@ export interface MPFavorite {
 }
 
 const COUNTRY_OPTIONS = [
-  { code: 'FR', label: 'France', vat: 1.20 },
-  { code: 'UK', label: 'UK', vat: 1.20 },
-  { code: 'DE', label: 'Allemagne', vat: 1.19 },
-  { code: 'ES', label: 'Espagne', vat: 1.21 },
-  { code: 'IT', label: 'Italie', vat: 1.22 },
+  { code: 'FR', label: 'France', vat: 1.20, dst_pct: 0.03, dst_on_fba: true },
+  { code: 'UK', label: 'UK', vat: 1.20, dst_pct: 0.02, dst_on_fba: true },
+  { code: 'DE', label: 'Allemagne', vat: 1.19, dst_pct: 0.0, dst_on_fba: false },
+  { code: 'ES', label: 'Espagne', vat: 1.21, dst_pct: 0.03, dst_on_fba: false },
+  { code: 'IT', label: 'Italie', vat: 1.22, dst_pct: 0.03, dst_on_fba: false },
 ];
 
 export { COUNTRY_OPTIONS };

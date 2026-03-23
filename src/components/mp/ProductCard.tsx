@@ -13,56 +13,61 @@ interface ProductCardProps {
   isFavorite?: boolean;
 }
 
-// Fee reconstruction from stored result
+// Exact SellerAmp profit formula (GetProfit + CalculateVatDue + GetTotalFees)
 function computeProfit(result: MPResult, buyPrice: number) {
   if (!buyPrice || buyPrice <= 0 || !result.sell_price) return null;
 
   const country = COUNTRY_OPTIONS.find(c => c.code === result.country_code);
-  const vat = country?.vat || 1.20;
-  const sellEur = result.sell_price;
-  const commPct = (result.commission_pct || 15) / 100;
-  const dstPct = 0.03;
-  const closingFee = result.closing_fee || 0;
-  const fbaFee = result.fba_fee;
+  const vatRate = (country?.vat || 1.20) - 1; // 0.20 for FR
+  const sell = result.sell_price;
 
-  const commDst = Math.round(sellEur * commPct * (1 + dstPct) * 100) / 100;
-  const margeHt = (sellEur - buyPrice) / vat;
+  // Worker pre-calculates total fees (including DST, FBA fee from fee table)
+  const totalFeesFba = result.total_fees_fba;
+  const totalFeesFbm = result.total_fees_fbm ?? 0;
 
-  // FBM
-  const feesFbm = commDst + closingFee;
-  const profitFbm = Math.round((margeHt - feesFbm) * 100) / 100;
+  // VAT (SellerAmp vat_scheme=3 STANDARD, vat_on_sale=1, vat_on_cost=1)
+  const vatOnSale = sell - sell / (1 + vatRate);
+  const vatOnCost = buyPrice - buyPrice / (1 + vatRate);
+  const vatOnFees = 0; // useAmazonFeeVatRules20240801=0
+  const vatDue = vatOnSale - vatOnCost - vatOnFees;
+
+  // FBM profit: sale - totalFees - cost - vatOnFees - vatDue
+  const profitFbm = Math.round((sell - totalFeesFbm - buyPrice - vatOnFees - vatDue) * 100) / 100;
   const roiFbm = Math.round((profitFbm / buyPrice) * 10000) / 100;
 
-  // FBA
+  // FBA profit
   let profitFba = null as number | null;
   let roiFba = null as number | null;
-  let totalFeesFba = null as number | null;
-  if (fbaFee != null) {
-    const fbaDst = Math.round(fbaFee * dstPct * 100) / 100;
-    totalFeesFba = commDst + fbaFee + fbaDst + closingFee;
-    profitFba = Math.round((margeHt - totalFeesFba) * 100) / 100;
+  if (totalFeesFba != null) {
+    profitFba = Math.round((sell - totalFeesFba - buyPrice - vatOnFees - vatDue) * 100) / 100;
     roiFba = Math.round((profitFba / buyPrice) * 10000) / 100;
   }
 
-  // Max cost (FBA): profit = 0 => maxCost = sellEur - feesFba * vat
+  // Max cost (FBA): find cost where profit = 0
+  // 0 = sell - fees - cost - (vatOnSale - cost + cost/(1+vat)) = sell - fees - vatOnSale - cost/(1+vat)
+  // cost/(1+vat) = sell - fees - vatOnSale => cost = (sell - fees - vatOnSale) * (1+vat)
+  // Simplified: maxCost where vatDue cancels out
   let maxCost = null as number | null;
   if (totalFeesFba != null) {
-    maxCost = Math.round((sellEur - totalFeesFba * vat) * 100) / 100;
+    // profit = sell - fees - cost - (sell - sell/(1+v)) + (cost - cost/(1+v))
+    // profit = sell/(1+v) - fees - cost/(1+v)
+    // 0 = sell/(1+v) - fees - maxCost/(1+v)
+    // maxCost = sell - fees*(1+v)
+    maxCost = Math.round((sell - totalFeesFba * (1 + vatRate)) * 100) / 100;
   }
 
-  // Breakeven (FBA): sell price where profit = 0 at current buy price
-  let breakeven = null as number | null;
-  if (totalFeesFba != null) {
-    breakeven = Math.round((buyPrice + totalFeesFba * vat) * 100) / 100;
-  }
+  const profitMargin = profitFba != null ? Math.round((profitFba / sell) * 10000) / 100 : null;
 
-  const vatOnFees = totalFeesFba != null ? Math.round(totalFeesFba * (vat - 1) * 100) / 100 : null;
-  const profitMargin = profitFba != null ? Math.round((profitFba / sellEur) * 10000) / 100 : null;
+  // DST fee from worker
+  const dstFee = result.dst_fee || 0;
 
   return {
     profitFba, roiFba, profitFbm, roiFbm,
-    totalFeesFba, feesFbm: commDst + closingFee,
-    commDst, maxCost, breakeven, vatOnFees, profitMargin,
+    totalFeesFba, totalFeesFbm,
+    dstFee, maxCost, profitMargin,
+    vatOnSale: Math.round(vatOnSale * 100) / 100,
+    vatOnCost: Math.round(vatOnCost * 100) / 100,
+    vatDue: Math.round(vatDue * 100) / 100,
   };
 }
 
@@ -255,11 +260,11 @@ const ProductCard = ({ result, onFavorite, isFavorite }: ProductCardProps) => {
               <div className="space-y-1.5">
                 {[
                   { label: 'Prix de vente', value: fmt(result.sell_price) },
-                  { label: `Commission (${result.commission_pct || 15}% + DST)`, value: calc ? fmt(calc.commDst) : '—' },
+                  { label: `Commission (${result.commission_pct || 15}%)`, value: fmt(result.commission_eur) },
                   { label: 'FBA Fee', value: fmt(result.fba_fee) },
+                  { label: 'DST', value: fmt(result.dst_fee) },
                   { label: 'Closing Fee', value: fmt(result.closing_fee) },
-                  { label: 'Total Fees (FBA)', value: calc ? fmt(calc.totalFeesFba) : '—', bold: true },
-                  { label: 'TVA sur Fees', value: calc ? fmt(calc.vatOnFees) : '—' },
+                  { label: 'Total Fees (FBA)', value: fmt(result.total_fees_fba), bold: true },
                 ].map(item => (
                   <div key={item.label} className={`flex justify-between ${item.bold ? 'font-semibold border-t pt-1.5' : ''}`}>
                     <span className="text-muted-foreground">{item.label}</span>
@@ -271,12 +276,20 @@ const ProductCard = ({ result, onFavorite, isFavorite }: ProductCardProps) => {
               {calc && (
                 <div className="mt-3 pt-2 border-t space-y-1.5">
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Max Cost (FBA)</span>
-                    <span className="font-mono font-semibold text-green-600">{fmt(calc.maxCost)}</span>
+                    <span className="text-muted-foreground">VAT on Sale</span>
+                    <span className="font-mono">{fmt(calc.vatOnSale)}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Breakeven Sale</span>
-                    <span className="font-mono">{fmt(calc.breakeven)}</span>
+                    <span className="text-muted-foreground">VAT on Cost</span>
+                    <span className="font-mono">-{fmt(calc.vatOnCost)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">VAT Due</span>
+                    <span className="font-mono font-semibold">{fmt(calc.vatDue)}</span>
+                  </div>
+                  <div className="flex justify-between border-t pt-1.5">
+                    <span className="text-muted-foreground">Max Cost (FBA)</span>
+                    <span className="font-mono font-semibold text-green-600">{fmt(calc.maxCost)}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Profit Margin</span>
