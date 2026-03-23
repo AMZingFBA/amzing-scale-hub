@@ -118,13 +118,12 @@ class SellerAmpClient:
             if kpl.get('meltable'): alerts.append('Meltable')
             if kpl.get('oversize'): alerts.append('Oversize')
 
-            # Image URL from Keepa
-            image_url = None
-            img_list = kpl.get('imagesCSV', '')
-            if img_list:
-                first_img = str(img_list).split(',')[0].strip()
-                if first_img:
-                    image_url = f"https://images-na.ssl-images-amazon.com/images/I/{first_img}"
+            # Image URL
+            image_url = kpl.get('product_image') or None
+            if not image_url:
+                images = kpl.get('images', [])
+                if images and isinstance(images, list):
+                    image_url = images[0]
 
             # Product title
             title = kpl.get('title', '') or ''
@@ -157,6 +156,41 @@ class SellerAmpClient:
                 },
             }
         return data_map
+
+    async def resolve_ean(self, ean: str) -> str | None:
+        """Resolve an EAN to an ASIN via SellerAmp's own lookup page."""
+        url = f'{SAS_BASE}/sas/lookup?SasLookup%5Bsearch_term%5D={ean}'
+        try:
+            async with self.session.get(url, timeout=aiohttp.ClientTimeout(total=15)) as resp:
+                html = await resp.text()
+            # SellerAmp returns the ASIN in JSON format in the page
+            matches = re.findall(r'"asin"\s*:\s*"(B[A-Z0-9]{9})"', html)
+            if matches:
+                return matches[0]
+            # Fallback: any B0... ASIN pattern
+            b0_matches = re.findall(r'\bB0[A-Z0-9]{8}\b', html)
+            if b0_matches:
+                return b0_matches[0]
+        except Exception as e:
+            print(f"    [WARN] EAN resolve failed for {ean}: {e}")
+        return None
+
+    async def resolve_eans(self, eans: list[str]) -> dict:
+        """Resolve multiple EANs to ASINs. Returns dict[ean -> asin]."""
+        sem = asyncio.Semaphore(3)
+        results = {}
+
+        async def resolve(ean):
+            async with sem:
+                asin = await self.resolve_ean(ean)
+                if asin:
+                    results[ean] = asin
+                    print(f"    EAN {ean} -> {asin}")
+                else:
+                    print(f"    EAN {ean} -> not found")
+
+        await asyncio.gather(*[resolve(e) for e in eans])
+        return results
 
     async def lookup_asins(self, asin_list: list[str], keepa_mp: int) -> dict:
         """Lookup all ASINs with concurrency control. Returns merged dict[asin -> data]."""

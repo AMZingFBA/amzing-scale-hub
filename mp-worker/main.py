@@ -6,6 +6,7 @@ Runs 24/7 on Hetzner server.
 """
 import asyncio
 import os
+import re
 import time
 import traceback
 
@@ -60,6 +61,34 @@ async def process_job(job: dict, sas: SellerAmpClient, sb):
 
         print(f"  [1] Looking up {len(items)} item(s) on {country['name']}...")
 
+        # 1b. Separate ASINs from EANs and resolve EANs
+        asins = []
+        ean_to_asin = {}
+        eans_to_resolve = []
+        for item in items:
+            if re.match(r'^B[A-Z0-9]{9}$', item):
+                asins.append(item)
+            elif re.match(r'^\d{8,13}$', item):
+                eans_to_resolve.append(item)
+            else:
+                # Treat unknown format as ASIN attempt
+                asins.append(item)
+
+        if eans_to_resolve:
+            print(f"  [1b] Resolving {len(eans_to_resolve)} EAN(s) to ASIN via SellerAmp...")
+            ean_to_asin = await sas.resolve_eans(eans_to_resolve)
+            for ean, asin in ean_to_asin.items():
+                asins.append(asin)
+
+            not_found = [e for e in eans_to_resolve if e not in ean_to_asin]
+            if not_found:
+                print(f"  [WARN] EANs not found: {', '.join(not_found)}")
+
+        if not asins:
+            raise ValueError(f"Could not resolve any ASIN from input: {job['query_input'][:100]}")
+
+        items = asins
+
         # 2. Check cache for each ASIN
         cached = {}
         to_fetch = []
@@ -111,10 +140,15 @@ async def process_job(job: dict, sas: SellerAmpClient, sb):
                 pass
 
         # 6. Calculate for each ASIN
+        # Build reverse EAN map for enrichment
+        asin_to_ean = {v: k for k, v in ean_to_asin.items()}
         print(f"  [3] Calculating profit/ROI for {len(all_data)} products...")
         results = []
         for asin, product_data in all_data.items():
             product_data['_asin'] = asin
+            # If this ASIN came from an EAN resolution, add the input EAN
+            if asin in asin_to_ean and not product_data.get('ean'):
+                product_data['ean'] = asin_to_ean[asin]
             result = calculate_product(product_data, country_code, profile)
             result['user_id'] = user_id
 

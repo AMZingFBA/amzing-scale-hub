@@ -1,8 +1,11 @@
+import { useState, useMemo } from 'react';
 import type { MPResult } from '@/hooks/use-mp';
+import { COUNTRY_OPTIONS } from '@/hooks/use-mp';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Heart, ExternalLink, TrendingUp, TrendingDown, Package, Users, BarChart3, AlertTriangle } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Heart, ExternalLink, Package, Users, AlertTriangle, TrendingUp, TrendingDown, ShoppingCart, Info } from 'lucide-react';
 
 interface ProductCardProps {
   result: MPResult;
@@ -10,57 +13,113 @@ interface ProductCardProps {
   isFavorite?: boolean;
 }
 
+// Fee reconstruction from stored result
+function computeProfit(result: MPResult, buyPrice: number) {
+  if (!buyPrice || buyPrice <= 0 || !result.sell_price) return null;
+
+  const country = COUNTRY_OPTIONS.find(c => c.code === result.country_code);
+  const vat = country?.vat || 1.20;
+  const sellEur = result.sell_price;
+  const commPct = (result.commission_pct || 15) / 100;
+  const dstPct = 0.03;
+  const closingFee = result.closing_fee || 0;
+  const fbaFee = result.fba_fee;
+
+  const commDst = Math.round(sellEur * commPct * (1 + dstPct) * 100) / 100;
+  const margeHt = (sellEur - buyPrice) / vat;
+
+  // FBM
+  const feesFbm = commDst + closingFee;
+  const profitFbm = Math.round((margeHt - feesFbm) * 100) / 100;
+  const roiFbm = Math.round((profitFbm / buyPrice) * 10000) / 100;
+
+  // FBA
+  let profitFba = null as number | null;
+  let roiFba = null as number | null;
+  let totalFeesFba = null as number | null;
+  if (fbaFee != null) {
+    const fbaDst = Math.round(fbaFee * dstPct * 100) / 100;
+    totalFeesFba = commDst + fbaFee + fbaDst + closingFee;
+    profitFba = Math.round((margeHt - totalFeesFba) * 100) / 100;
+    roiFba = Math.round((profitFba / buyPrice) * 10000) / 100;
+  }
+
+  // Max cost (FBA): profit = 0 => maxCost = sellEur - feesFba * vat
+  let maxCost = null as number | null;
+  if (totalFeesFba != null) {
+    maxCost = Math.round((sellEur - totalFeesFba * vat) * 100) / 100;
+  }
+
+  // Breakeven (FBA): sell price where profit = 0 at current buy price
+  let breakeven = null as number | null;
+  if (totalFeesFba != null) {
+    breakeven = Math.round((buyPrice + totalFeesFba * vat) * 100) / 100;
+  }
+
+  const vatOnFees = totalFeesFba != null ? Math.round(totalFeesFba * (vat - 1) * 100) / 100 : null;
+  const profitMargin = profitFba != null ? Math.round((profitFba / sellEur) * 10000) / 100 : null;
+
+  return {
+    profitFba, roiFba, profitFbm, roiFbm,
+    totalFeesFba, feesFbm: commDst + closingFee,
+    commDst, maxCost, breakeven, vatOnFees, profitMargin,
+  };
+}
+
 const ProductCard = ({ result, onFavorite, isFavorite }: ProductCardProps) => {
-  const roiFba = result.roi_fba;
-  const roiFbm = result.roi_fbm;
+  const [buyPrice, setBuyPrice] = useState('');
   const alerts = result.alerts ? result.alerts.split(',').map(a => a.trim()).filter(Boolean) : [];
 
-  const formatPrice = (price: number | null) => {
-    if (price === null || price === undefined) return '—';
-    return `${price.toFixed(2)} €`;
+  const calc = useMemo(() => {
+    const bp = parseFloat(buyPrice);
+    if (!bp || bp <= 0) return null;
+    return computeProfit(result, bp);
+  }, [buyPrice, result]);
+
+  const fmt = (v: number | null | undefined) => v != null ? `${v.toFixed(2)}€` : '—';
+  const fmtPct = (v: number | null | undefined) => v != null ? `${v.toFixed(2)}%` : '—';
+
+  const roiColor = (roi: number | null | undefined) => {
+    if (roi == null) return '';
+    if (roi >= 30) return 'text-green-600';
+    if (roi >= 10) return 'text-yellow-600';
+    return 'text-red-600';
   };
 
-  const formatPercent = (val: number | null) => {
-    if (val === null || val === undefined) return '—';
-    return `${val.toFixed(1)}%`;
-  };
-
-  const getRoiColor = (roi: number | null) => {
-    if (roi === null || roi === undefined) return 'text-muted-foreground';
-    if (roi >= 30) return 'text-green-500';
-    if (roi >= 10) return 'text-yellow-500';
-    return 'text-red-500';
+  const profitColor = (p: number | null | undefined) => {
+    if (p == null) return '';
+    return p >= 0 ? 'text-green-600' : 'text-red-600';
   };
 
   return (
     <Card className="overflow-hidden">
-      <CardContent className="p-4">
-        <div className="flex gap-4">
+      <CardContent className="p-0">
+        {/* Top banner: image + title + quick info */}
+        <div className="flex gap-4 p-4 pb-3 border-b bg-muted/20">
           {/* Image */}
-          <div className="shrink-0 w-20 h-20 rounded-md overflow-hidden bg-muted flex items-center justify-center">
+          <div className="shrink-0 w-24 h-24 rounded-md overflow-hidden bg-white border flex items-center justify-center">
             {result.image_url ? (
-              <img src={result.image_url} alt={result.product_name || result.asin} className="w-full h-full object-contain" />
+              <img src={result.image_url} alt="" className="w-full h-full object-contain" />
             ) : (
-              <Package className="h-8 w-8 text-muted-foreground" />
+              <Package className="h-10 w-10 text-muted-foreground/40" />
             )}
           </div>
 
-          {/* Info */}
+          {/* Title + identifiers */}
           <div className="flex-1 min-w-0">
-            {/* Title + ASIN */}
             <div className="flex items-start justify-between gap-2">
               <div className="min-w-0">
-                <p className="font-medium text-sm truncate">{result.product_name || result.asin}</p>
-                <p className="text-xs text-muted-foreground font-mono">{result.asin}</p>
+                <p className="font-semibold text-sm leading-tight line-clamp-2">
+                  {result.product_name || result.asin}
+                </p>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  {result.category || '—'}
+                </p>
               </div>
               <div className="flex gap-1 shrink-0">
                 {onFavorite && (
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-7 w-7"
-                    onClick={() => onFavorite(result.asin, result.country_code, result.product_name || undefined, result.image_url || undefined)}
-                  >
+                  <Button variant="ghost" size="icon" className="h-7 w-7"
+                    onClick={() => onFavorite(result.asin, result.country_code, result.product_name || undefined, result.image_url || undefined)}>
                     <Heart className={`h-4 w-4 ${isFavorite ? 'fill-red-500 text-red-500' : ''}`} />
                   </Button>
                 )}
@@ -74,98 +133,157 @@ const ProductCard = ({ result, onFavorite, isFavorite }: ProductCardProps) => {
               </div>
             </div>
 
+            {/* ASIN + EAN */}
+            <div className="flex flex-wrap gap-x-3 gap-y-0.5 mt-1 text-xs text-muted-foreground font-mono">
+              <span>ASIN: {result.asin}</span>
+              {result.ean && <span>EAN: {result.ean}</span>}
+            </div>
+
             {/* Alerts */}
             {alerts.length > 0 && (
-              <div className="flex flex-wrap gap-1 mt-1">
+              <div className="flex flex-wrap gap-1 mt-1.5">
                 {alerts.map(alert => (
-                  <Badge key={alert} variant="destructive" className="text-xs py-0 px-1.5">
-                    <AlertTriangle className="h-3 w-3 mr-0.5" />
+                  <Badge key={alert} variant="destructive" className="text-[10px] py-0 px-1.5 h-4">
+                    <AlertTriangle className="h-2.5 w-2.5 mr-0.5" />
                     {alert}
                   </Badge>
                 ))}
               </div>
             )}
+          </div>
+        </div>
 
-            {/* Price + Key metrics */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-3">
-              <div>
-                <p className="text-xs text-muted-foreground">Prix vente</p>
-                <p className="font-semibold text-sm">{formatPrice(result.sell_price)}</p>
+        {/* Quick Info bar */}
+        <div className="grid grid-cols-4 sm:grid-cols-6 gap-px bg-border">
+          {[
+            { label: 'BSR', value: result.bsr?.toLocaleString('fr-FR') || '—' },
+            { label: 'Ventes/mois', value: result.sales_monthly?.toString() || '—' },
+            { label: 'FBA Sellers', value: result.fba_sellers?.toString() || '0' },
+            { label: 'FBM Sellers', value: result.fbm_sellers?.toString() || '0' },
+            { label: 'Variations', value: result.variations?.toString() || '0' },
+            { label: 'Commission', value: `${result.commission_pct || 15}%` },
+          ].map(item => (
+            <div key={item.label} className="bg-background px-2 py-1.5 text-center">
+              <p className="text-[10px] text-muted-foreground leading-none">{item.label}</p>
+              <p className="text-xs font-semibold mt-0.5">{item.value}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* Profit Calculator */}
+        <div className="p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <ShoppingCart className="h-4 w-4 text-primary" />
+            <span className="text-sm font-semibold">Profit Calculator</span>
+          </div>
+
+          <div className="grid sm:grid-cols-2 gap-4">
+            {/* Left: Cost + Sale inputs */}
+            <div className="space-y-3">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs text-muted-foreground block mb-1">Prix d'achat (Cost)</label>
+                  <Input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    placeholder="0.00 €"
+                    value={buyPrice}
+                    onChange={(e) => setBuyPrice(e.target.value)}
+                    className="h-9 text-sm font-mono"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs text-muted-foreground block mb-1">Prix de vente</label>
+                  <div className="h-9 flex items-center px-3 rounded-md border bg-muted/30 text-sm font-mono">
+                    {fmt(result.sell_price)}
+                  </div>
+                </div>
               </div>
-              <div>
-                <p className="text-xs text-muted-foreground">BSR</p>
-                <p className="font-semibold text-sm flex items-center gap-1">
-                  <BarChart3 className="h-3 w-3" />
-                  {result.bsr?.toLocaleString() || '—'}
-                </p>
+
+              {/* FBA result */}
+              <div className={`rounded-lg border p-3 ${calc?.profitFba != null && calc.profitFba >= 0 ? 'border-green-200 bg-green-50/50 dark:bg-green-950/20' : calc?.profitFba != null ? 'border-red-200 bg-red-50/50 dark:bg-red-950/20' : ''}`}>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-semibold">FBA</span>
+                  <Badge variant="outline" className="text-[10px] h-4">{result.fba_sellers || 0} sellers</Badge>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <p className="text-[10px] text-muted-foreground">Profit</p>
+                    <p className={`text-lg font-bold ${profitColor(calc?.profitFba)}`}>
+                      {calc ? fmt(calc.profitFba) : '—'}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-muted-foreground">ROI</p>
+                    <p className={`text-lg font-bold ${roiColor(calc?.roiFba)}`}>
+                      {calc ? fmtPct(calc.roiFba) : '—'}
+                    </p>
+                  </div>
+                </div>
               </div>
-              <div>
-                <p className="text-xs text-muted-foreground">Ventes/mois</p>
-                <p className="font-semibold text-sm">{result.sales_monthly ?? '—'}</p>
-              </div>
-              <div>
-                <p className="text-xs text-muted-foreground">Catégorie</p>
-                <p className="font-semibold text-sm truncate" title={result.category || ''}>
-                  {result.category || '—'}
-                </p>
+
+              {/* FBM result */}
+              <div className={`rounded-lg border p-3 ${calc?.profitFbm != null && calc.profitFbm >= 0 ? 'border-green-200 bg-green-50/50 dark:bg-green-950/20' : calc?.profitFbm != null ? 'border-red-200 bg-red-50/50 dark:bg-red-950/20' : ''}`}>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-semibold">FBM</span>
+                  <Badge variant="outline" className="text-[10px] h-4">{result.fbm_sellers || 0} sellers</Badge>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <p className="text-[10px] text-muted-foreground">Profit</p>
+                    <p className={`text-lg font-bold ${profitColor(calc?.profitFbm)}`}>
+                      {calc ? fmt(calc.profitFbm) : '—'}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-muted-foreground">ROI</p>
+                    <p className={`text-lg font-bold ${roiColor(calc?.roiFbm)}`}>
+                      {calc ? fmtPct(calc.roiFbm) : '—'}
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
 
-            {/* FBA / FBM */}
-            <div className="grid grid-cols-2 gap-3 mt-3">
-              <div className="rounded-md bg-muted/50 p-2">
-                <p className="text-xs font-medium mb-1">FBA</p>
-                <div className="flex items-center gap-2">
-                  {roiFba !== null && roiFba !== undefined ? (
-                    <>
-                      {roiFba >= 0 ? <TrendingUp className="h-3.5 w-3.5 text-green-500" /> : <TrendingDown className="h-3.5 w-3.5 text-red-500" />}
-                      <span className={`font-bold text-sm ${getRoiColor(roiFba)}`}>{formatPercent(roiFba)}</span>
-                    </>
-                  ) : (
-                    <span className="text-xs text-muted-foreground">—</span>
-                  )}
-                  {result.profit_fba !== null && result.profit_fba !== undefined && (
-                    <span className="text-xs text-muted-foreground ml-auto">{formatPrice(result.profit_fba)}</span>
-                  )}
-                </div>
-                <div className="flex items-center gap-1 mt-1 text-xs text-muted-foreground">
-                  <Users className="h-3 w-3" />
-                  <span>{result.fba_sellers ?? 0} vendeurs</span>
-                  {result.fba_fee !== null && result.fba_fee !== undefined && (
-                    <span className="ml-auto">Fee: {formatPrice(result.fba_fee)}</span>
-                  )}
-                </div>
+            {/* Right: Fees detail */}
+            <div className="space-y-2 text-xs">
+              <div className="flex items-center gap-1 mb-2">
+                <Info className="h-3.5 w-3.5 text-muted-foreground" />
+                <span className="text-xs font-semibold text-muted-foreground">Détail Fees</span>
+              </div>
+              <div className="space-y-1.5">
+                {[
+                  { label: 'Prix de vente', value: fmt(result.sell_price) },
+                  { label: `Commission (${result.commission_pct || 15}% + DST)`, value: calc ? fmt(calc.commDst) : '—' },
+                  { label: 'FBA Fee', value: fmt(result.fba_fee) },
+                  { label: 'Closing Fee', value: fmt(result.closing_fee) },
+                  { label: 'Total Fees (FBA)', value: calc ? fmt(calc.totalFeesFba) : '—', bold: true },
+                  { label: 'TVA sur Fees', value: calc ? fmt(calc.vatOnFees) : '—' },
+                ].map(item => (
+                  <div key={item.label} className={`flex justify-between ${item.bold ? 'font-semibold border-t pt-1.5' : ''}`}>
+                    <span className="text-muted-foreground">{item.label}</span>
+                    <span className="font-mono">{item.value}</span>
+                  </div>
+                ))}
               </div>
 
-              <div className="rounded-md bg-muted/50 p-2">
-                <p className="text-xs font-medium mb-1">FBM</p>
-                <div className="flex items-center gap-2">
-                  {roiFbm !== null && roiFbm !== undefined ? (
-                    <>
-                      {roiFbm >= 0 ? <TrendingUp className="h-3.5 w-3.5 text-green-500" /> : <TrendingDown className="h-3.5 w-3.5 text-red-500" />}
-                      <span className={`font-bold text-sm ${getRoiColor(roiFbm)}`}>{formatPercent(roiFbm)}</span>
-                    </>
-                  ) : (
-                    <span className="text-xs text-muted-foreground">—</span>
-                  )}
-                  {result.profit_fbm !== null && result.profit_fbm !== undefined && (
-                    <span className="text-xs text-muted-foreground ml-auto">{formatPrice(result.profit_fbm)}</span>
-                  )}
+              {calc && (
+                <div className="mt-3 pt-2 border-t space-y-1.5">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Max Cost (FBA)</span>
+                    <span className="font-mono font-semibold text-green-600">{fmt(calc.maxCost)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Breakeven Sale</span>
+                    <span className="font-mono">{fmt(calc.breakeven)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Profit Margin</span>
+                    <span className="font-mono">{fmtPct(calc.profitMargin)}</span>
+                  </div>
                 </div>
-                <div className="flex items-center gap-1 mt-1 text-xs text-muted-foreground">
-                  <Users className="h-3 w-3" />
-                  <span>{result.fbm_sellers ?? 0} vendeurs</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Additional info */}
-            <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground">
-              <span>Commission: {formatPercent(result.commission_pct)}</span>
-              {result.variations !== null && result.variations !== undefined && result.variations > 0 && (
-                <span>{result.variations} variations</span>
               )}
-              {result.ean && <span className="font-mono">EAN: {result.ean}</span>}
             </div>
           </div>
         </div>
