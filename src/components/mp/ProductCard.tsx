@@ -11,6 +11,93 @@ import {
   Copy, Search, Ruler, Weight, Box, Link2, Globe, Calculator,
 } from 'lucide-react';
 
+/* ── Interactive Keepa Chart Overlay ── */
+function InteractiveKeepaChart({ src, alt, rangeDays, className }: {
+  src: string;
+  alt: string;
+  rangeDays: number;
+  className?: string;
+}) {
+  const [hover, setHover] = useState<{ x: number; y: number; pctX: number } | null>(null);
+
+  const dateLabel = useMemo(() => {
+    if (!hover) return '';
+    const plotPct = Math.max(0, Math.min(1, (hover.pctX - 0.05) / 0.9));
+    const effectiveRange = rangeDays || 365;
+    const now = new Date();
+    const start = new Date(now.getTime() - effectiveRange * 86400000);
+    const pt = new Date(start.getTime() + plotPct * (now.getTime() - start.getTime()));
+    return pt.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: effectiveRange > 90 ? '2-digit' : undefined });
+  }, [hover, rangeDays]);
+
+  return (
+    <div style={{ position: 'relative', display: 'inline-block', width: '100%' }}>
+      <img src={src} alt={alt} className={className} loading="lazy" draggable={false} />
+      {/* Overlay: captures mouse, renders crosshair as children */}
+      <div
+        style={{
+          position: 'absolute',
+          top: 0, left: 0, right: 0, bottom: 0,
+          zIndex: 10,
+          cursor: 'crosshair',
+        }}
+        onMouseMove={(e) => {
+          const rect = e.currentTarget.getBoundingClientRect();
+          setHover({
+            x: e.clientX - rect.left,
+            y: e.clientY - rect.top,
+            pctX: (e.clientX - rect.left) / rect.width,
+          });
+        }}
+        onMouseLeave={() => setHover(null)}
+      >
+        {hover && (
+          <>
+            {/* Vertical line */}
+            <div style={{
+              position: 'absolute', top: 0, bottom: 0,
+              left: hover.x, width: 1,
+              backgroundColor: 'rgba(55,65,81,0.7)',
+              pointerEvents: 'none',
+            }} />
+            {/* Horizontal line */}
+            <div style={{
+              position: 'absolute', left: 0, right: 0,
+              top: hover.y, height: 1,
+              backgroundColor: 'rgba(156,163,175,0.5)',
+              pointerEvents: 'none',
+            }} />
+            {/* Date tooltip */}
+            <div style={{
+              position: 'absolute',
+              left: hover.x, top: 4,
+              transform: 'translateX(-50%)',
+              backgroundColor: 'rgba(17,24,39,0.92)',
+              color: '#fff', fontSize: 11, fontFamily: 'monospace',
+              padding: '2px 8px', borderRadius: 4,
+              whiteSpace: 'nowrap',
+              pointerEvents: 'none',
+              boxShadow: '0 2px 6px rgba(0,0,0,0.3)',
+            }}>
+              {dateLabel}
+            </div>
+            {/* Dot */}
+            <div style={{
+              position: 'absolute',
+              left: hover.x - 5, top: hover.y - 5,
+              width: 10, height: 10, borderRadius: '50%',
+              backgroundColor: '#6366f1',
+              border: '2px solid white',
+              boxShadow: '0 1px 4px rgba(0,0,0,0.4)',
+              pointerEvents: 'none',
+            }} />
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
 interface ProductCardProps {
   result: MPResult;
   onFavorite?: (asin: string, countryCode: string, productName?: string, imageUrl?: string) => void;
@@ -685,24 +772,24 @@ const ProductCard = ({ result, onFavorite, isFavorite }: ProductCardProps) => {
             {/* Chart 1: Price History + Sales Rank */}
             <div>
               <p className="text-xs text-muted-foreground mb-1">Price + Sales Rank</p>
-              <img
+              <InteractiveKeepaChart
                 key={`price-${keepaDomain}-${chartRange}`}
                 src={`https://graph.keepa.com/pricehistory.png?asin=${result.asin}&domain=${keepaDomain}&amazon=1&new=1&fba=1&bb=1&salesrank=1&range=${chartRange || 180}&width=600&height=250`}
                 alt="Keepa Price History + Sales Rank"
+                rangeDays={chartRange}
                 className="w-full rounded border bg-white"
-                loading="lazy"
               />
             </div>
 
             {/* Chart 2: Sales Rank (larger) */}
             <div>
               <p className="text-xs text-muted-foreground mb-1">Sales Rank (BSR)</p>
-              <img
+              <InteractiveKeepaChart
                 key={`bsr-${keepaDomain}-${chartRange}`}
                 src={`https://graph.keepa.com/pricehistory.png?asin=${result.asin}&domain=${keepaDomain}&salesrank=1&range=${chartRange || 180}&width=600&height=180`}
                 alt="Keepa Sales Rank"
+                rangeDays={chartRange}
                 className="w-full rounded border bg-white"
-                loading="lazy"
               />
             </div>
           </div>
