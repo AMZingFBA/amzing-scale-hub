@@ -95,7 +95,6 @@ const ProductCard = ({ result, onFavorite, isFavorite }: ProductCardProps) => {
   const [fbmCost, setFbmCost] = useState('');
   const [quantity, setQuantity] = useState('1');
   const [selectedCountry, setSelectedCountry] = useState(result.country_code);
-  const alerts = r.alerts ? r.alerts.split(',').map(a => a.trim()).filter(Boolean) : [];
 
   // Build effective result based on selected country
   const r = useMemo(() => {
@@ -123,6 +122,8 @@ const ProductCard = ({ result, onFavorite, isFavorite }: ProductCardProps) => {
       amazon_url: `https://www.${domain}/dp/${result.asin}`,
     } as MPResult;
   }, [selectedCountry, result]);
+
+  const alerts = r.alerts ? r.alerts.split(',').map(a => a.trim()).filter(Boolean) : [];
 
   // Use overridden sell price if user typed one, otherwise use effective result's value
   const effectiveSellPrice = sellPriceOverride ? parseFloat(sellPriceOverride) : (r.sell_price || 0);
