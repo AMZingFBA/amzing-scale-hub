@@ -111,7 +111,7 @@ const AdminFailedPayments = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <SEO title="Admin - Impayés" />
+      <SEO title="Admin - Impayés" description="Gestion des impayés et recouvrement" />
       <Navbar />
       <div className="container mx-auto px-4 py-8 pt-24">
         <div className="flex items-center justify-between mb-6">
