@@ -139,6 +139,7 @@ async function submitToRubypayeur(data: {
   email: string;
   full_name: string;
   phone?: string;
+  siren?: string;
   amount: number;
   invoiceNumber: string;
   invoiceDate: string;
