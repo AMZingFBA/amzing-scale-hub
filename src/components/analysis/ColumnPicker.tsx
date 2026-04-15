@@ -62,9 +62,9 @@ export default function ColumnPicker({ file, mapping, onChange }: ColumnPickerPr
         const data = XLSX.utils.sheet_to_json<Record<string, string>>(ws, { header: 1 });
         if (data.length === 0) return;
 
-        cols = (data[0] as any[]).map((h: any) => String(h || '').trim());
+        cols = (data[0] as unknown as any[]).map((h: any) => String(h || '').trim());
         for (let i = 1; i < Math.min(data.length, 6); i++) {
-          const vals = data[i] as any[];
+          const vals = data[i] as unknown as any[];
           const row: Record<string, string> = {};
           cols.forEach((c, j) => { row[c] = String(vals?.[j] ?? ''); });
           rows.push(row);
