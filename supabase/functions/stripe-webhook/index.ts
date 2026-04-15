@@ -947,14 +947,25 @@ serve(async (req) => {
         return new Response(JSON.stringify({ received: true }), { status: 200, headers: { "Content-Type": "application/json" } });
       }
 
-      // Keep VIP during engagement period
+      // Check if this user has EVER been VIP (had a real subscription)
       const { data: existingSub } = await supabaseClient
         .from("subscriptions")
-        .select("expires_at")
+        .select("expires_at, plan_type, stripe_subscription_id")
         .eq("user_id", profile.id)
         .single();
 
       const now = new Date();
+      const hasEverBeenVip = existingSub && (
+        existingSub.plan_type === 'vip' || 
+        existingSub.stripe_subscription_id != null
+      );
+
+      // If user was never VIP, this is just a failed first payment attempt — skip recovery
+      if (!hasEverBeenVip) {
+        logStep("⏭️ Skipping recovery — user was never VIP, just a failed first payment", { email: customerEmail });
+        return new Response(JSON.stringify({ received: true }), { status: 200, headers: { "Content-Type": "application/json" } });
+      }
+
       const existingExpiry = existingSub?.expires_at ? new Date(existingSub.expires_at) : null;
 
       if (existingExpiry && existingExpiry > now) {
