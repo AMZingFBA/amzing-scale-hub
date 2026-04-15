@@ -406,6 +406,11 @@ async function submitToRubypayeur(data: {
           clientName: data.full_name,
           clientEmail: data.email,
           clientSiren: data.siren,
+          clientCompanyName: data.company_name,
+          clientAddress: data.billing_address,
+          clientCity: data.billing_city,
+          clientCountry: data.billing_country,
+          clientTvaNumber: data.tva_number,
           amount: data.amount,
         });
         const pdfFile = new File([pdfBytes], `facture-${data.invoiceNumber}.pdf`, { type: 'application/pdf' });
