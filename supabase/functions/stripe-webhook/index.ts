@@ -139,6 +139,7 @@ async function submitToRubypayeur(data: {
   email: string;
   full_name: string;
   phone?: string;
+  siren?: string;
   amount: number;
   invoiceNumber: string;
   invoiceDate: string;
@@ -181,8 +182,8 @@ async function submitToRubypayeur(data: {
     const lastName = nameParts.slice(1).join(' ') || 'Inconnu';
 
     const formData = new FormData();
-    // Debtor info - use a placeholder SIREN (will be reviewed by Rubypayeur)
-    formData.append('debt[siren]', '000000000');
+    // Debtor info - use SIREN from profile if available
+    formData.append('debt[siren]', data.siren || '000000000');
     formData.append('debt[gender]', 'male');
     formData.append('debt[first_name]', firstName);
     formData.append('debt[last_name]', lastName);
@@ -645,7 +646,7 @@ serve(async (req) => {
 
       const { data: profile } = await supabaseClient
         .from("profiles")
-        .select("id, full_name, phone")
+        .select("id, full_name, phone, siren")
         .eq("email", customerEmail)
         .single();
 
@@ -757,6 +758,7 @@ serve(async (req) => {
         email: customerEmail,
         full_name: profile.full_name || 'Client',
         phone: profile.phone || undefined,
+        siren: profile.siren || undefined,
         amount,
         invoiceNumber: invoice.number || invoice.id,
         invoiceDate,

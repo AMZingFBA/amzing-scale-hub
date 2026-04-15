@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import OptimizedImage from "@/components/OptimizedImage";
 import logo from "@/assets/logo.png";
 import { Mail, Lock, User, Phone, Package, TrendingUp, BarChart3, CheckCircle2, AlertCircle } from "lucide-react";
+import CompanyLookup from "@/components/CompanyLookup";
 import { Capacitor } from "@capacitor/core";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { supabase } from "@/integrations/supabase/client";
@@ -28,6 +29,8 @@ export default function Auth() {
     fullName: '',
     nickname: '',
     phone: '',
+    siren: '',
+    companyName: '',
   });
   const [verificationCode, setVerificationCode] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -186,7 +189,7 @@ export default function Auth() {
     }
 
     // Save signup data
-    setSignupData({ email, password, fullName, nickname, phone });
+    setSignupData({ email, password, fullName, nickname, phone, siren: signupData.siren, companyName: signupData.companyName });
 
     try {
       // Use direct fetch for better error handling
@@ -259,6 +262,8 @@ export default function Auth() {
             fullName: signupData.fullName,
             nickname: signupData.nickname,
             phone: signupData.phone,
+            siren: signupData.siren || null,
+            companyName: signupData.companyName || null,
             referralCode: referralCode || null,
             registrationSource: getRegistrationSource(),
           }),
@@ -511,6 +516,13 @@ export default function Auth() {
                           className="pl-10 transition-all duration-300 focus:ring-2 focus:ring-primary/20 focus:shadow-[0_0_12px_rgba(255,186,73,0.5)] hover:border-primary/50"
                         />
                       </div>
+                    </div>
+
+                    <div className="animate-slide-in-up" style={{ animationDelay: "175ms" }}>
+                      <CompanyLookup
+                        onSelect={(siren, companyName) => setSignupData(prev => ({ ...prev, siren, companyName }))}
+                        disabled={isLoading}
+                      />
                     </div>
 
                     <div className="space-y-2 animate-slide-in-up" style={{ animationDelay: "200ms" }}>

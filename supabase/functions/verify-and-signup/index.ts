@@ -13,6 +13,8 @@ interface SignupRequest {
   fullName: string;
   nickname: string;
   phone: string;
+  siren?: string;
+  companyName?: string;
   referralCode?: string;
   registrationSource?: string;
 }
@@ -23,7 +25,7 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { code, email, password, fullName, nickname, phone, referralCode, registrationSource }: SignupRequest = await req.json();
+    const { code, email, password, fullName, nickname, phone, siren, companyName, referralCode, registrationSource }: SignupRequest = await req.json();
 
     console.log("=== SIGNUP VERIFICATION REQUEST ===");
     console.log("Email:", email);
@@ -84,6 +86,8 @@ const handler = async (req: Request): Promise<Response> => {
         full_name: fullName,
         nickname,
         phone,
+        siren: siren || null,
+        company_name: companyName || null,
         referral_code: referralCode || null,
         registration_source: finalSource,
       },
@@ -103,6 +107,15 @@ const handler = async (req: Request): Promise<Response> => {
       .from("verification_codes")
       .update({ used: true, user_id: authData.user.id })
       .eq("id", verificationData.id);
+
+    // Update profile with SIREN and company name if provided
+    if (siren || companyName) {
+      await supabaseAdmin
+        .from("profiles")
+        .update({ siren: siren || null, company_name: companyName || null })
+        .eq("id", authData.user.id);
+      console.log("Profile updated with SIREN:", siren, "Company:", companyName);
+    }
 
     console.log("User created successfully:", authData.user.id);
     if (referralCode) {
