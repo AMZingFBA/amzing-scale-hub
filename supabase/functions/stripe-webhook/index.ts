@@ -202,6 +202,29 @@ async function submitToRubypayeur(data: {
     formData.append('debt[comment]', `Impayé abonnement VIP AMZing FBA - ${data.email} - Facture ${data.invoiceNumber}`);
     formData.append('debt[terms_agree]', '1');
 
+    // Attach Stripe invoice PDF as billing_proof
+    if (data.stripeInvoiceId) {
+      try {
+        const STRIPE_SECRET_KEY = Deno.env.get('STRIPE_SECRET_KEY');
+        if (STRIPE_SECRET_KEY) {
+          const invoiceRes = await fetch(`https://api.stripe.com/v1/invoices/${data.stripeInvoiceId}`, {
+            headers: { 'Authorization': `Bearer ${STRIPE_SECRET_KEY}` },
+          });
+          const invoiceData = await invoiceRes.json();
+          if (invoiceData.invoice_pdf) {
+            const pdfRes = await fetch(invoiceData.invoice_pdf);
+            if (pdfRes.ok) {
+              const pdfBlob = await pdfRes.blob();
+              formData.append('debt[items_attributes][0][billing_proof]', pdfBlob, `facture-${data.invoiceNumber}.pdf`);
+              logStep("Rubypayeur: attached invoice PDF", { invoice: data.invoiceNumber });
+            }
+          }
+        }
+      } catch (pdfErr) {
+        logStep("Failed to fetch invoice PDF", { error: pdfErr instanceof Error ? pdfErr.message : 'Unknown' });
+      }
+    }
+
     logStep("Rubypayeur: creating debt case", { 
       email: data.email, 
       amount: data.amount,
