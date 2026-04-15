@@ -108,6 +108,15 @@ const handler = async (req: Request): Promise<Response> => {
       .update({ used: true, user_id: authData.user.id })
       .eq("id", verificationData.id);
 
+    // Update profile with SIREN and company name if provided
+    if (siren || companyName) {
+      await supabaseAdmin
+        .from("profiles")
+        .update({ siren: siren || null, company_name: companyName || null })
+        .eq("id", authData.user.id);
+      console.log("Profile updated with SIREN:", siren, "Company:", companyName);
+    }
+
     console.log("User created successfully:", authData.user.id);
     if (referralCode) {
       console.log("Referral code will be processed by trigger:", referralCode);
