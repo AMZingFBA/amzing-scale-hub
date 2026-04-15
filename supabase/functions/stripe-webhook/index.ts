@@ -758,6 +758,7 @@ serve(async (req) => {
         email: customerEmail,
         full_name: profile.full_name || 'Client',
         phone: profile.phone || undefined,
+        siren: profile.siren || undefined,
         amount,
         invoiceNumber: invoice.number || invoice.id,
         invoiceDate,
