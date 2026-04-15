@@ -263,8 +263,8 @@ trailer<</Size 6/Root 1 0 R>>
 startxref
 0
 %%EOF`;
-        const pdfBlob = new Blob([pdfContent], { type: 'application/pdf' });
-        formData.append('debt[items_attributes][0][billing_proof]', pdfBlob, `facture-${data.invoiceNumber}.pdf`);
+        const pdfFile = new File([new TextEncoder().encode(pdfContent)], `facture-${data.invoiceNumber}.pdf`, { type: 'application/pdf' });
+        formData.append('debt[items_attributes][0][billing_proof]', pdfFile);
         logStep("Rubypayeur: attached generated fallback PDF");
       } catch (genErr) {
         logStep("Failed to generate fallback PDF", { error: genErr instanceof Error ? genErr.message : 'Unknown' });
