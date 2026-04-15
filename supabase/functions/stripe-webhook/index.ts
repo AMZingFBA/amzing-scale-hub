@@ -1035,7 +1035,8 @@ serve(async (req) => {
       const emailSent = await sendPaymentFailedEmail(
         customerEmail, 
         profile.full_name || '', 
-        now.toISOString()
+        now.toISOString(),
+        invoice.customer as string
       );
 
       if (emailSent) {
