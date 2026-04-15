@@ -89,6 +89,7 @@ const AdminAirtableContacts = lazy(() => import("./pages/AdminAirtableContacts")
 const AdminAirtableUsers = lazy(() => import("./pages/AdminAirtableUsers"));
 const AdminSubscriptions = lazy(() => import("./pages/AdminSubscriptions"));
 const AdminWhatsApp = lazy(() => import("./pages/AdminWhatsApp"));
+const AdminFailedPayments = lazy(() => import("./pages/AdminFailedPayments"));
 const AmazonToAmazon = lazy(() => import("./pages/AmazonToAmazon"));
 const ProduitsIbood = lazy(() => import("./pages/ProduitsIbood"));
 const ProduitsAuchan = lazy(() => import("./pages/ProduitsAuchan"));
@@ -219,6 +220,7 @@ const App = () => (
             <Route path="/admin/airtable-users" element={<AdminAirtableUsers />} />
             <Route path="/admin/subscriptions" element={<AdminSubscriptions />} />
             <Route path="/admin/whatsapp" element={<AdminWhatsApp />} />
+            <Route path="/admin/failed-payments" element={<AdminFailedPayments />} />
             
             <Route path="/android" element={<AndroidApp />} />
             <Route path="/amazon-fba-debutant" element={<AmazonFbaDebutant />} />

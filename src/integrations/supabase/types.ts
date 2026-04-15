@@ -825,6 +825,84 @@ export type Database = {
         }
         Relationships: []
       }
+      failed_payments: {
+        Row: {
+          amount: number
+          attempt_count: number
+          created_at: string
+          currency: string
+          email: string
+          email_sent: boolean
+          email_sent_at: string | null
+          failure_reason: string | null
+          full_name: string | null
+          id: string
+          notes: string | null
+          phone: string | null
+          resolved: boolean
+          resolved_at: string | null
+          rubypayeur_ref: string | null
+          rubypayeur_status: string | null
+          rubypayeur_submitted: boolean
+          rubypayeur_submitted_at: string | null
+          stripe_customer_id: string | null
+          stripe_invoice_id: string | null
+          stripe_subscription_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount?: number
+          attempt_count?: number
+          created_at?: string
+          currency?: string
+          email: string
+          email_sent?: boolean
+          email_sent_at?: string | null
+          failure_reason?: string | null
+          full_name?: string | null
+          id?: string
+          notes?: string | null
+          phone?: string | null
+          resolved?: boolean
+          resolved_at?: string | null
+          rubypayeur_ref?: string | null
+          rubypayeur_status?: string | null
+          rubypayeur_submitted?: boolean
+          rubypayeur_submitted_at?: string | null
+          stripe_customer_id?: string | null
+          stripe_invoice_id?: string | null
+          stripe_subscription_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          attempt_count?: number
+          created_at?: string
+          currency?: string
+          email?: string
+          email_sent?: boolean
+          email_sent_at?: string | null
+          failure_reason?: string | null
+          full_name?: string | null
+          id?: string
+          notes?: string | null
+          phone?: string | null
+          resolved?: boolean
+          resolved_at?: string | null
+          rubypayeur_ref?: string | null
+          rubypayeur_status?: string | null
+          rubypayeur_submitted?: boolean
+          rubypayeur_submitted_at?: string | null
+          stripe_customer_id?: string | null
+          stripe_invoice_id?: string | null
+          stripe_subscription_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       file_analyses: {
         Row: {
           column_mapping: Json | null
