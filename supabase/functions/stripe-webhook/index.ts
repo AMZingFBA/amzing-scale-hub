@@ -181,20 +181,40 @@ function generateProfessionalInvoicePdf(data: {
   lines.push(`0.85 0.85 0.85 RG 0.5 w 50 ${y} m 560 ${y} l S`);
   y -= 25;
 
+  // Emitter (left) / Client (right)
   lines.push(`BT /F1 11 Tf 50 ${y} Td (EI - Zaghdoun Noa / N.Z Consulting) Tj ET`);
-  lines.push(`BT /F1 11 Tf 310 ${y} Td (${esc(data.clientName)}) Tj ET`);
+  const clientHeader = data.clientCompanyName || data.clientName;
+  lines.push(`BT /F1 11 Tf 310 ${y} Td (${esc(clientHeader)}) Tj ET`);
   y -= 16;
   lines.push(`BT /F2 9 Tf 50 ${y} Td (59 Rue De Ponthieu, Bureau 326) Tj ET`);
-  lines.push(`BT /F2 9 Tf 310 ${y} Td (${esc(data.clientEmail)}) Tj ET`);
-  y -= 14;
-  lines.push(`BT /F2 9 Tf 50 ${y} Td (75008 Paris, FR) Tj ET`);
-  if (data.clientSiren) {
-    lines.push(`BT /F2 9 Tf 310 ${y} Td (SIREN: ${esc(data.clientSiren)}) Tj ET`);
+  if (data.clientCompanyName && data.clientName) {
+    lines.push(`BT /F2 9 Tf 310 ${y} Td (${esc(data.clientName)}) Tj ET`);
+    y -= 14;
+    lines.push(`BT /F2 9 Tf 50 ${y} Td (75008 Paris, FR) Tj ET`);
+  } else {
+    y -= 14;
+    lines.push(`BT /F2 9 Tf 50 ${y} Td (75008 Paris, FR) Tj ET`);
+  }
+  if (data.clientAddress) {
+    lines.push(`BT /F2 9 Tf 310 ${y} Td (${esc(data.clientAddress)}) Tj ET`);
+    y -= 14;
+  } else {
+    y -= 14;
+  }
+  lines.push(`BT /F2 9 Tf 50 ${y} Td (amzingfba26@gmail.com) Tj ET`);
+  if (data.clientCity) {
+    lines.push(`BT /F2 9 Tf 310 ${y} Td (${esc(data.clientCity)}${data.clientCountry ? ', ' + data.clientCountry : ''}) Tj ET`);
   }
   y -= 14;
-  lines.push(`BT /F2 9 Tf 50 ${y} Td (amzingfba26@gmail.com) Tj ET`);
-  y -= 14;
   lines.push(`BT /F2 9 Tf 50 ${y} Td (SIRET: 99334892900015) Tj ET`);
+  if (data.clientSiren) {
+    lines.push(`BT /F2 9 Tf 310 ${y} Td (${esc(data.clientSiren)}) Tj ET`);
+  }
+  y -= 14;
+  if (data.clientTvaNumber) {
+    lines.push(`BT /F2 9 Tf 310 ${y} Td (${esc('Num\\351ro de TVA: ' + data.clientTvaNumber)}) Tj ET`);
+  }
+  lines.push(`BT /F2 9 Tf 310 ${y + (data.clientTvaNumber ? -14 : 0)} Td (${esc(data.clientEmail)}) Tj ET`);
   y -= 35;
 
   const tableTop = y;
