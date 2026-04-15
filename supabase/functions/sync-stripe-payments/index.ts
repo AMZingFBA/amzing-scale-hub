@@ -447,6 +447,16 @@ async function submitToRubypayeur(data: {
       }
     }
 
+    // Attach CGV PDF as additional document
+    try {
+      const cgvPdfBytes = generateCgvPdf();
+      const cgvFile = new File([cgvPdfBytes], 'CGV-AMZing-FBA.pdf', { type: 'application/pdf' });
+      formData.append('debt[document]', cgvFile, 'CGV-AMZing-FBA.pdf');
+      console.log(`[SYNC-STRIPE] Rubypayeur: attached CGV PDF (${cgvFile.size} bytes)`);
+    } catch (cgvErr) {
+      console.error("[SYNC-STRIPE] Failed to generate CGV PDF:", cgvErr);
+    }
+
     console.log(`[SYNC-STRIPE] Rubypayeur: creating debt case for ${data.email}, amount: ${data.amount}€`);
 
     const debtResponse = await fetch('https://rubypayeur.com/api/debts', {
