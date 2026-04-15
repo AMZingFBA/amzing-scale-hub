@@ -28,6 +28,8 @@ export default function Auth() {
     fullName: '',
     nickname: '',
     phone: '',
+    siren: '',
+    companyName: '',
   });
   const [verificationCode, setVerificationCode] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -186,7 +188,7 @@ export default function Auth() {
     }
 
     // Save signup data
-    setSignupData({ email, password, fullName, nickname, phone });
+    setSignupData({ email, password, fullName, nickname, phone, siren: signupData.siren, companyName: signupData.companyName });
 
     try {
       // Use direct fetch for better error handling
@@ -259,6 +261,8 @@ export default function Auth() {
             fullName: signupData.fullName,
             nickname: signupData.nickname,
             phone: signupData.phone,
+            siren: signupData.siren || null,
+            companyName: signupData.companyName || null,
             referralCode: referralCode || null,
             registrationSource: getRegistrationSource(),
           }),
