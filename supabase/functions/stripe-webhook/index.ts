@@ -133,6 +133,150 @@ async function syncUserToAirtable(userData: {
 }
 
 // ============================================================
+// Generate professional invoice PDF matching company template
+// ============================================================
+function generateProfessionalInvoicePdf(data: {
+  invoiceNumber: string;
+  invoiceDate: string;
+  dueDate: string;
+  clientName: string;
+  clientEmail: string;
+  clientSiren?: string;
+  amount: number;
+}): Uint8Array {
+  const esc = (s: string) => s.replace(/\\/g, '\\\\').replace(/\(/g, '\\(').replace(/\)/g, '\\)');
+  const formatDate = (d: string) => {
+    try {
+      const parts = d.split('-');
+      if (parts.length === 3) return `${parts[2]}/${parts[1]}/${parts[0]}`;
+      return d;
+    } catch { return d; }
+  };
+
+  const fmtDate = formatDate(data.invoiceDate);
+  const fmtDue = formatDate(data.dueDate);
+  const amountStr = data.amount.toFixed(2).replace('.', ',');
+
+  const lines: string[] = [];
+  let y = 750;
+
+  lines.push(`BT /F1 28 Tf 50 ${y} Td (Facture) Tj ET`);
+  y -= 40;
+
+  lines.push(`BT /F1 10 Tf 50 ${y} Td (${esc(`Num\\351ro de facture`)}) Tj ET`);
+  lines.push(`BT /F2 10 Tf 220 ${y} Td (${esc(data.invoiceNumber)}) Tj ET`);
+  y -= 16;
+  lines.push(`BT /F1 10 Tf 50 ${y} Td (Date d'\\351mission) Tj ET`);
+  lines.push(`BT /F2 10 Tf 220 ${y} Td (${esc(fmtDate)}) Tj ET`);
+  y -= 16;
+  lines.push(`BT /F1 10 Tf 50 ${y} Td (Date d'\\351ch\\351ance) Tj ET`);
+  lines.push(`BT /F2 10 Tf 220 ${y} Td (${esc(fmtDue)}) Tj ET`);
+  y -= 30;
+
+  lines.push(`0.85 0.85 0.85 RG 0.5 w 50 ${y} m 560 ${y} l S`);
+  y -= 25;
+
+  lines.push(`BT /F1 11 Tf 50 ${y} Td (EI - Zaghdoun Noa / N.Z Consulting) Tj ET`);
+  lines.push(`BT /F1 11 Tf 310 ${y} Td (${esc(data.clientName)}) Tj ET`);
+  y -= 16;
+  lines.push(`BT /F2 9 Tf 50 ${y} Td (59 Rue De Ponthieu, Bureau 326) Tj ET`);
+  lines.push(`BT /F2 9 Tf 310 ${y} Td (${esc(data.clientEmail)}) Tj ET`);
+  y -= 14;
+  lines.push(`BT /F2 9 Tf 50 ${y} Td (75008 Paris, FR) Tj ET`);
+  if (data.clientSiren) {
+    lines.push(`BT /F2 9 Tf 310 ${y} Td (SIREN: ${esc(data.clientSiren)}) Tj ET`);
+  }
+  y -= 14;
+  lines.push(`BT /F2 9 Tf 50 ${y} Td (amzingfba26@gmail.com) Tj ET`);
+  y -= 14;
+  lines.push(`BT /F2 9 Tf 50 ${y} Td (SIRET: 99334892900015) Tj ET`);
+  y -= 35;
+
+  const tableTop = y;
+  lines.push(`0.93 0.93 0.93 rg 50 ${y - 4} 510 20 re f`);
+  lines.push(`0 0 0 rg`);
+  lines.push(`BT /F1 9 Tf 55 ${y} Td (Description) Tj ET`);
+  lines.push(`BT /F1 9 Tf 310 ${y} Td (Qt\\351) Tj ET`);
+  lines.push(`BT /F1 9 Tf 360 ${y} Td (Prix unitaire) Tj ET`);
+  lines.push(`BT /F1 9 Tf 445 ${y} Td (TVA \\(%\\)) Tj ET`);
+  lines.push(`BT /F1 9 Tf 510 ${y} Td (Total HT) Tj ET`);
+  y -= 25;
+
+  lines.push(`BT /F2 9 Tf 55 ${y} Td (VIP - AMZING FBA) Tj ET`);
+  lines.push(`BT /F2 9 Tf 318 ${y} Td (1) Tj ET`);
+  lines.push(`BT /F2 9 Tf 360 ${y} Td (${esc(amountStr)} \\200) Tj ET`);
+  lines.push(`BT /F2 9 Tf 455 ${y} Td (0 %) Tj ET`);
+  lines.push(`BT /F2 9 Tf 510 ${y} Td (${esc(amountStr)} \\200) Tj ET`);
+  y -= 20;
+
+  lines.push(`0.85 0.85 0.85 RG 0.5 w 50 ${y} m 560 ${y} l S`);
+  y -= 20;
+
+  lines.push(`BT /F1 9 Tf 360 ${y} Td (Total HT) Tj ET`);
+  lines.push(`BT /F2 9 Tf 510 ${y} Td (${esc(amountStr)} \\200) Tj ET`);
+  y -= 18;
+  lines.push(`BT /F1 9 Tf 360 ${y} Td (Montant total de la TVA) Tj ET`);
+  lines.push(`BT /F2 9 Tf 510 ${y} Td (0,00 \\200) Tj ET`);
+  y -= 18;
+  lines.push(`0.85 0.85 0.85 RG 0.5 w 360 ${y + 14} m 560 ${y + 14} l S`);
+  lines.push(`BT /F1 10 Tf 360 ${y} Td (Total TTC) Tj ET`);
+  lines.push(`BT /F1 10 Tf 510 ${y} Td (${esc(amountStr)} \\200) Tj ET`);
+  y -= 35;
+
+  lines.push(`BT /F2 8 Tf 50 ${y} Td (TVA non applicable, art. 293 B du CGI) Tj ET`);
+  y -= 20;
+  lines.push(`BT /F2 7 Tf 50 ${y} Td (Pas d'escompte accord\\351 pour paiement anticip\\351.) Tj ET`);
+  y -= 12;
+  lines.push(`BT /F2 7 Tf 50 ${y} Td (En cas de non-paiement \\340 la date d'\\351ch\\351ance, des p\\351nalit\\351s calcul\\351es \\340 trois fois le taux) Tj ET`);
+  y -= 12;
+  lines.push(`BT /F2 7 Tf 50 ${y} Td (d'int\\351r\\352t l\\351gal seront appliqu\\351es.) Tj ET`);
+  y -= 12;
+  lines.push(`BT /F2 7 Tf 50 ${y} Td (Tout retard de paiement entra\\356nera une indemnit\\351 forfaitaire pour frais de recouvrement de 40\\200.) Tj ET`);
+  y -= 40;
+
+  lines.push(`0.93 0.93 0.93 rg 50 ${y - 4} 510 20 re f`);
+  lines.push(`0 0 0 rg`);
+  lines.push(`BT /F1 10 Tf 55 ${y} Td (D\\351tails du paiement) Tj ET`);
+  y -= 22;
+  lines.push(`BT /F1 9 Tf 55 ${y} Td (Nom du b\\351n\\351ficiaire) Tj ET`);
+  lines.push(`BT /F2 9 Tf 220 ${y} Td (EI - Zaghdoun Noa / N.Z Consulting) Tj ET`);
+  y -= 15;
+  lines.push(`BT /F1 9 Tf 55 ${y} Td (BIC) Tj ET`);
+  lines.push(`BT /F2 9 Tf 220 ${y} Td (QNTOFRP1XXX) Tj ET`);
+  y -= 15;
+  lines.push(`BT /F1 9 Tf 55 ${y} Td (IBAN) Tj ET`);
+  lines.push(`BT /F2 9 Tf 220 ${y} Td (FR7616958000019328768276650) Tj ET`);
+  y -= 15;
+  lines.push(`BT /F1 9 Tf 55 ${y} Td (R\\351f\\351rence) Tj ET`);
+  lines.push(`BT /F2 9 Tf 220 ${y} Td (${esc(data.invoiceNumber)}) Tj ET`);
+  y -= 30;
+
+  lines.push(`0.85 0.85 0.85 RG 0.5 w 50 ${y} m 560 ${y} l S`);
+  y -= 15;
+  lines.push(`BT /F2 8 Tf 50 ${y} Td (EI - Zaghdoun Noa / N.Z Consulting, EI) Tj ET`);
+  lines.push(`BT /F2 8 Tf 460 ${y} Td (${esc(data.invoiceNumber)} \\267 1/1) Tj ET`);
+
+  const streamContent = lines.join('\n');
+  const streamLen = new TextEncoder().encode(streamContent).length;
+
+  const obj1 = '1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n';
+  const obj2 = '2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n';
+  const obj3 = `3 0 obj\n<< /Type /Page /MediaBox [0 0 612 792] /Parent 2 0 R /Resources << /Font << /F1 4 0 R /F2 5 0 R >> >> /Contents 6 0 R >>\nendobj\n`;
+  const obj4 = '4 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>\nendobj\n';
+  const obj5 = '5 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>\nendobj\n';
+  const obj6 = `6 0 obj\n<< /Length ${streamLen} >>\nstream\n${streamContent}\nendstream\nendobj\n`;
+
+  const pdfBody = '%PDF-1.4\n' + obj1 + obj2 + obj3 + obj4 + obj5 + obj6;
+  const bodyBytes = new TextEncoder().encode(pdfBody);
+
+  const xrefOffset = bodyBytes.length;
+  const xref = `xref\n0 7\n0000000000 65535 f \n`;
+  const trailer = `trailer\n<< /Size 7 /Root 1 0 R >>\nstartxref\n${xrefOffset}\n%%EOF`;
+
+  return new TextEncoder().encode(pdfBody + xref + trailer);
+}
+
+// ============================================================
 // RUBYPAYEUR: Auto-submit failed payment for debt collection
 // ============================================================
 async function submitToRubypayeur(data: {
@@ -227,50 +371,23 @@ async function submitToRubypayeur(data: {
       }
     }
 
-    // Fallback: generate a simple text-based PDF if no Stripe PDF available
+    // Fallback: generate a professional invoice PDF matching company template
     if (!pdfAttached) {
       try {
-        const lines = [
-          `FACTURE - ${data.invoiceNumber}`,
-          `Date: ${data.invoiceDate}`,
-          ``,
-          `N.Z Consulting (AMZing FBA)`,
-          `59 Rue de Ponthieu, 75008 Paris`,
-          ``,
-          `Client: ${data.full_name}`,
-          `Email: ${data.email}`,
-          `SIREN: ${data.siren || 'N/A'}`,
-          ``,
-          `Abonnement VIP AMZing FBA`,
-          `Montant: ${data.amount.toFixed(2)} EUR`,
-          `Echeance: ${data.dueDate}`,
-          `Statut: IMPAYE`,
-        ];
-        const streamLines = lines.map((l, i) =>
-          `BT /F1 12 Tf 50 ${700 - i * 20} Td (${l.replace(/\\/g, '\\\\').replace(/\(/g, '\\(').replace(/\)/g, '\\)')}) Tj ET`
-        );
-        const streamContent = streamLines.join('\n');
-        const streamLen = new TextEncoder().encode(streamContent).length;
-
-        const obj1 = '1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n';
-        const obj2 = '2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n';
-        const obj3 = '3 0 obj\n<< /Type /Page /MediaBox [0 0 612 792] /Parent 2 0 R /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>\nendobj\n';
-        const obj4 = '4 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>\nendobj\n';
-        const obj5 = `5 0 obj\n<< /Length ${streamLen} >>\nstream\n${streamContent}\nendstream\nendobj\n`;
-
-        const body = '%PDF-1.4\n' + obj1 + obj2 + obj3 + obj4 + obj5;
-        const bodyBytes = new TextEncoder().encode(body);
-
-        const xrefOffset = bodyBytes.length;
-        const xref = `xref\n0 6\n0000000000 65535 f \n`;
-        const trailer = `trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n${xrefOffset}\n%%EOF`;
-
-        const fullPdf = body + xref + trailer;
-        const pdfFile = new File([new TextEncoder().encode(fullPdf)], `facture-${data.invoiceNumber}.pdf`, { type: 'application/pdf' });
+        const pdfBytes = generateProfessionalInvoicePdf({
+          invoiceNumber: data.invoiceNumber,
+          invoiceDate: data.invoiceDate,
+          dueDate: data.dueDate,
+          clientName: data.full_name,
+          clientEmail: data.email,
+          clientSiren: data.siren,
+          amount: data.amount,
+        });
+        const pdfFile = new File([pdfBytes], `facture-${data.invoiceNumber}.pdf`, { type: 'application/pdf' });
         formData.append('debt[items_attributes][0][billing_proof]', pdfFile);
-        logStep("Rubypayeur: attached generated fallback PDF", { size: pdfFile.size });
+        logStep("Rubypayeur: attached professional invoice PDF", { size: pdfFile.size });
       } catch (genErr) {
-        logStep("Failed to generate fallback PDF", { error: genErr instanceof Error ? genErr.message : 'Unknown' });
+        logStep("Failed to generate invoice PDF", { error: genErr instanceof Error ? genErr.message : 'Unknown' });
       }
     }
 
