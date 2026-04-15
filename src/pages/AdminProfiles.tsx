@@ -3,13 +3,15 @@ import { useAuth } from '@/hooks/use-auth';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { Loader2, Users, Mail, Phone, UserCircle, ArrowLeft, Search, Calendar, MessageCircle, Crown, Shield, Filter, ChevronLeft, ChevronRight, Clock, AlertCircle, Trash2, Copy, CheckCircle, RefreshCw, Eye, Bell, BellOff, Activity, Wifi, WifiOff, UserPlus, UserMinus } from 'lucide-react';
+import { Loader2, Users, Mail, Phone, UserCircle, ArrowLeft, Search, Calendar, MessageCircle, Crown, Shield, Filter, ChevronLeft, ChevronRight, Clock, AlertCircle, Trash2, Copy, CheckCircle, RefreshCw, Eye, Bell, BellOff, Activity, Wifi, WifiOff, UserPlus, UserMinus, Building2, Pencil } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import CompanyLookup from '@/components/CompanyLookup';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import ScrollToTop from '@/components/ScrollToTop';
@@ -24,6 +26,8 @@ interface ProfileData {
   avatar_url: string | null;
   created_at: string;
   updated_at: string;
+  siren?: string | null;
+  company_name?: string | null;
   subscription?: {
     plan_type: string;
     status: string;
@@ -52,7 +56,10 @@ const AdminProfiles = () => {
   const [syncing, setSyncing] = useState(false);
   const [generatingLink, setGeneratingLink] = useState<string | null>(null);
   const [togglingVip, setTogglingVip] = useState<string | null>(null);
-
+  const [editingSirenProfile, setEditingSirenProfile] = useState<ProfileData | null>(null);
+  const [editSiren, setEditSiren] = useState('');
+  const [editCompanyName, setEditCompanyName] = useState('');
+  const [savingSiren, setSavingSiren] = useState(false);
   useEffect(() => {
     if (!user) {
       navigate('/auth');
