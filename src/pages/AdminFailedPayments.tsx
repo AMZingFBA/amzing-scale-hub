@@ -27,6 +27,7 @@ interface FailedPayment {
   email_sent: boolean;
   email_sent_at: string | null;
   rubypayeur_submitted: boolean;
+  rubypayeur_submitted_at: string | null;
   rubypayeur_ref: string | null;
   rubypayeur_status: string | null;
   resolved: boolean;
