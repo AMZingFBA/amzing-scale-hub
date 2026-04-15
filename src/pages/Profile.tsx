@@ -12,6 +12,7 @@ import { Label } from '@/components/ui/label';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { ArrowLeft, User, Mail, Phone, Edit2, Save, Loader2, Lock, Shield } from 'lucide-react';
+import CompanyLookup from '@/components/CompanyLookup';
 import { ProfileInvoices } from '@/components/ProfileInvoices';
 import { useToast } from '@/hooks/use-toast';
 import { NotificationSettings } from '@/components/NotificationSettings';
@@ -22,6 +23,8 @@ interface ProfileData {
   phone: string | null;
   avatar_url: string | null;
   email: string;
+  siren: string | null;
+  company_name: string | null;
 }
 
 const Profile = () => {
@@ -52,6 +55,8 @@ const Profile = () => {
     phone: '',
     avatar_url: '',
     email: '',
+    siren: '',
+    company_name: '',
   });
   const isNativeApp = Capacitor.isNativePlatform();
 
@@ -113,6 +118,8 @@ const Profile = () => {
           phone: data.phone || '',
           avatar_url: data.avatar_url || '',
           email: data.email || user.email || '',
+          siren: (data as any).siren || '',
+          company_name: (data as any).company_name || '',
         });
       } else {
         // Create profile if it doesn't exist
@@ -133,6 +140,8 @@ const Profile = () => {
           phone: '',
           avatar_url: '',
           email: user.email || '',
+          siren: '',
+          company_name: '',
         });
       }
     } catch (error) {
@@ -158,7 +167,9 @@ const Profile = () => {
           full_name: profileData.full_name || null,
           nickname: profileData.nickname || null,
           phone: profileData.phone || null,
-        })
+          siren: profileData.siren || null,
+          company_name: profileData.company_name || null,
+        } as any)
         .eq('id', user.id);
 
       if (error) throw error;
