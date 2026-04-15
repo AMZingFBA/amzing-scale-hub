@@ -102,6 +102,43 @@ const AdminFailedPayments = () => {
     return <Badge className="bg-red-500/20 text-red-400 border-red-500/30">🔴 Impayé</Badge>;
   };
 
+  const PipelineSteps = ({ payment }: { payment: FailedPayment }) => {
+    const steps = [
+      { label: "Paiement échoué", icon: "❌", done: true, date: payment.created_at },
+      { label: "Email relance", icon: "📧", done: payment.email_sent, date: payment.email_sent_at },
+      { label: "Envoyé Rubypayeur", icon: "📤", done: payment.rubypayeur_submitted, date: payment.rubypayeur_submitted_at },
+      { label: "Réf. Rubypayeur", icon: "🏦", done: !!payment.rubypayeur_ref, date: null },
+      { label: "Résolu", icon: "✅", done: payment.resolved, date: payment.resolved_at },
+    ];
+
+    return (
+      <div className="flex items-center gap-1 flex-wrap">
+        {steps.map((step, i) => (
+          <div key={i} className="flex items-center gap-1">
+            <div className={`flex flex-col items-center ${step.done ? '' : 'opacity-30'}`}>
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm ${
+                step.done 
+                  ? 'bg-green-500/20 border border-green-500/40' 
+                  : 'bg-muted border border-border'
+              }`}>
+                {step.icon}
+              </div>
+              <span className="text-[10px] text-muted-foreground mt-0.5 text-center max-w-[60px] leading-tight">{step.label}</span>
+              {step.done && step.date && (
+                <span className="text-[9px] text-muted-foreground">
+                  {new Date(step.date).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' })}
+                </span>
+              )}
+            </div>
+            {i < steps.length - 1 && (
+              <div className={`w-4 h-0.5 mb-6 ${steps[i + 1].done ? 'bg-green-500/40' : 'bg-border'}`} />
+            )}
+          </div>
+        ))}
+      </div>
+    );
+  };
+
   const unresolvedCount = payments.filter(p => !p.resolved).length;
   const totalAmount = payments.filter(p => !p.resolved).reduce((sum, p) => sum + p.amount, 0);
   const rubypayeurCount = payments.filter(p => p.rubypayeur_submitted && !p.resolved).length;
