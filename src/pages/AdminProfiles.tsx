@@ -285,6 +285,25 @@ const AdminProfiles = () => {
       setTogglingVip(null);
     }
   };
+  const handleSaveSiren = async () => {
+    if (!editingSirenProfile) return;
+    try {
+      setSavingSiren(true);
+      const { error } = await supabase
+        .from('profiles')
+        .update({ siren: editSiren || null, company_name: editCompanyName || null })
+        .eq('id', editingSirenProfile.id);
+      if (error) throw error;
+      toast.success('SIREN mis à jour');
+      setEditingSirenProfile(null);
+      await loadProfiles();
+    } catch (error: any) {
+      console.error('Error updating SIREN:', error);
+      toast.error('Erreur lors de la mise à jour du SIREN');
+    } finally {
+      setSavingSiren(false);
+    }
+  };
 
   const now = new Date();
 
