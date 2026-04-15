@@ -1086,8 +1086,8 @@ const AdminProfiles = () => {
                 setEditSiren(siren);
                 setEditCompanyName(companyName);
               }}
-              initialSiren={editSiren}
-              initialCompanyName={editCompanyName}
+              defaultSiren={editSiren}
+              defaultCompanyName={editCompanyName}
             />
             <div className="flex justify-end gap-2">
               <Button variant="outline" onClick={() => setEditingSirenProfile(null)}>
