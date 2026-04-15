@@ -275,6 +275,63 @@ function generateProfessionalInvoicePdf(data: {
 }
 
 // ============================================================
+// Generate CGV PDF (Conditions Générales de Vente)
+// ============================================================
+function generateCgvPdf(): Uint8Array {
+  const p1: string[] = [];
+  let y = 750;
+  p1.push(`BT /F1 22 Tf 50 ${y} Td (Conditions G\\351n\\351rales de Vente) Tj ET`); y -= 25;
+  p1.push(`BT /F2 9 Tf 50 ${y} Td (AMZing FBA \\267 N.Z Consulting \\267 Derni\\350re mise \\340 jour : 25 novembre 2025) Tj ET`); y -= 30;
+  p1.push(`BT /F1 12 Tf 50 ${y} Td (1. Champ d'application) Tj ET`); y -= 16;
+  p1.push(`BT /F2 9 Tf 50 ${y} Td (Les pr\\351sentes CGV s'appliquent \\340 l'ensemble des ventes de formations en ligne, programmes) Tj ET`); y -= 13;
+  p1.push(`BT /F2 9 Tf 50 ${y} Td (d'accompagnement, abonnements, acc\\350s membres et contenus num\\351riques propos\\351s par AMZing FBA.) Tj ET`); y -= 13;
+  p1.push(`BT /F2 9 Tf 50 ${y} Td (Toute commande implique l'acceptation pleine et enti\\350re des pr\\351sentes CGV par le Client.) Tj ET`); y -= 22;
+  p1.push(`BT /F1 12 Tf 50 ${y} Td (2. Identification du vendeur) Tj ET`); y -= 16;
+  p1.push(`BT /F2 9 Tf 50 ${y} Td (N.Z Consulting \\267 Marque commerciale : AMZing FBA) Tj ET`); y -= 13;
+  p1.push(`BT /F2 9 Tf 50 ${y} Td (59 Rue de Ponthieu, 75008 Paris, France \\267 SIRET : 993 348 929 00015) Tj ET`); y -= 13;
+  p1.push(`BT /F2 9 Tf 50 ${y} Td (TVA non applicable, article 293 B du CGI \\267 Contact : contact@amzingfba.com) Tj ET`); y -= 22;
+  p1.push(`BT /F1 12 Tf 50 ${y} Td (5. Cr\\351ation de compte et acceptation des CGV) Tj ET`); y -= 16;
+  p1.push(`BT /F2 9 Tf 50 ${y} Td (Le Client accepte express\\351ment les CGV en cochant la case pr\\351vue \\340 cet effet lors de la cr\\351ation) Tj ET`); y -= 13;
+  p1.push(`BT /F2 9 Tf 50 ${y} Td (de son compte ou de la passation de sa commande. Cette acceptation est irr\\351vocable.) Tj ET`); y -= 22;
+  p1.push(`BT /F1 12 Tf 50 ${y} Td (6. Services propos\\351s et tarifs) Tj ET`); y -= 16;
+  p1.push(`BT /F2 9 Tf 50 ${y} Td (Abonnement VIP : acc\\350s \\340 l'ensemble des outils, alertes, formations et ressources AMZing FBA.) Tj ET`); y -= 13;
+  p1.push(`BT /F2 9 Tf 50 ${y} Td (Tarif : 700 \\200 \\(paiement annuel\\) ou 770 \\200 \\(12 mensualit\\351s de 64,16 \\200\\).) Tj ET`); y -= 13;
+  p1.push(`BT /F2 9 Tf 50 ${y} Td (L'engagement est ferme pour une dur\\351e de 12 mois. Aucun remboursement partiel ne sera accord\\351.) Tj ET`); y -= 22;
+  p1.push(`BT /F1 12 Tf 50 ${y} Td (7. Modalit\\351s de paiement) Tj ET`); y -= 16;
+  p1.push(`BT /F2 9 Tf 50 ${y} Td (Le paiement s'effectue par carte bancaire via la plateforme s\\351curis\\351e Stripe.) Tj ET`); y -= 13;
+  p1.push(`BT /F2 9 Tf 50 ${y} Td (En cas de facilit\\351 de paiement, le Client s'engage \\340 honorer l'int\\351gralit\\351 des 12 mensualit\\351s.) Tj ET`); y -= 22;
+  p1.push(`BT /F1 12 Tf 50 ${y} Td (8. Dur\\351e de l'engagement et r\\351siliation) Tj ET`); y -= 16;
+  p1.push(`BT /F2 9 Tf 50 ${y} Td (L'abonnement est souscrit pour une dur\\351e ferme et d\\351finitive de 12 mois.) Tj ET`); y -= 13;
+  p1.push(`BT /F2 9 Tf 50 ${y} Td (En cas d'annulation anticip\\351e, les mensualit\\351s restantes demeurent exigibles.) Tj ET`); y -= 13;
+  p1.push(`BT /F2 9 Tf 50 ${y} Td (Le Client ne peut se pr\\351valoir d'aucun droit \\340 remboursement pour la p\\351riode non \\351chue.) Tj ET`); y -= 22;
+  p1.push(`BT /F1 12 Tf 50 ${y} Td (10. Impay\\351s et recouvrement) Tj ET`); y -= 16;
+  p1.push(`BT /F2 9 Tf 50 ${y} Td (En cas de d\\351faut de paiement, des p\\351nalit\\351s de retard seront appliqu\\351es au taux de trois fois) Tj ET`); y -= 13;
+  p1.push(`BT /F2 9 Tf 50 ${y} Td (le taux d'int\\351r\\352t l\\351gal, major\\351es d'une indemnit\\351 forfaitaire de 40 \\200 pour frais de recouvrement.) Tj ET`); y -= 13;
+  p1.push(`BT /F2 9 Tf 50 ${y} Td (Le dossier pourra \\352tre transmis \\340 un organisme de recouvrement \\(Rubypayeur\\).) Tj ET`); y -= 22;
+  p1.push(`BT /F1 12 Tf 50 ${y} Td (12. Droit de r\\351tractation) Tj ET`); y -= 16;
+  p1.push(`BT /F2 9 Tf 50 ${y} Td (Conform\\351ment \\340 l'article L.221-28, le Client renonce express\\351ment \\340 son droit de r\\351tractation) Tj ET`); y -= 13;
+  p1.push(`BT /F2 9 Tf 50 ${y} Td (d\\350s lors que l'acc\\350s aux contenus num\\351riques a \\351t\\351 activ\\351.) Tj ET`); y -= 22;
+  p1.push(`BT /F1 12 Tf 50 ${y} Td (15. Droit applicable) Tj ET`); y -= 16;
+  p1.push(`BT /F2 9 Tf 50 ${y} Td (Les pr\\351sentes CGV sont r\\351gies par le droit fran\\347ais. Tribunaux de Paris comp\\351tents.) Tj ET`); y -= 30;
+  p1.push(`BT /F2 8 Tf 50 ${y} Td (Document g\\351n\\351r\\351 automatiquement \\267 CGV compl\\350tes sur https://amzingfba.com/cgv) Tj ET`);
+
+  const streamContent = p1.join('\n');
+  const streamLen = new TextEncoder().encode(streamContent).length;
+  const obj1 = '1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n';
+  const obj2 = '2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n';
+  const obj3 = `3 0 obj\n<< /Type /Page /MediaBox [0 0 612 792] /Parent 2 0 R /Resources << /Font << /F1 4 0 R /F2 5 0 R >> >> /Contents 6 0 R >>\nendobj\n`;
+  const obj4 = '4 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>\nendobj\n';
+  const obj5 = '5 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>\nendobj\n';
+  const obj6 = `6 0 obj\n<< /Length ${streamLen} >>\nstream\n${streamContent}\nendstream\nendobj\n`;
+  const pdfBody = '%PDF-1.4\n' + obj1 + obj2 + obj3 + obj4 + obj5 + obj6;
+  const bodyBytes = new TextEncoder().encode(pdfBody);
+  const xrefOffset = bodyBytes.length;
+  const xref = `xref\n0 7\n0000000000 65535 f \n`;
+  const trailer = `trailer\n<< /Size 7 /Root 1 0 R >>\nstartxref\n${xrefOffset}\n%%EOF`;
+  return new TextEncoder().encode(pdfBody + xref + trailer);
+}
+
+// ============================================================
 // Submit to Rubypayeur for debt collection (same as stripe-webhook)
 // ============================================================
 async function submitToRubypayeur(data: {
@@ -388,6 +445,16 @@ async function submitToRubypayeur(data: {
       } catch (genErr) {
         console.error("[SYNC-STRIPE] Failed to generate invoice PDF:", genErr);
       }
+    }
+
+    // Attach CGV PDF as additional document
+    try {
+      const cgvPdfBytes = generateCgvPdf();
+      const cgvFile = new File([cgvPdfBytes], 'CGV-AMZing-FBA.pdf', { type: 'application/pdf' });
+      formData.append('debt[document]', cgvFile, 'CGV-AMZing-FBA.pdf');
+      console.log(`[SYNC-STRIPE] Rubypayeur: attached CGV PDF (${cgvFile.size} bytes)`);
+    } catch (cgvErr) {
+      console.error("[SYNC-STRIPE] Failed to generate CGV PDF:", cgvErr);
     }
 
     console.log(`[SYNC-STRIPE] Rubypayeur: creating debt case for ${data.email}, amount: ${data.amount}€`);
