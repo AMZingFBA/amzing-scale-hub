@@ -646,7 +646,7 @@ serve(async (req) => {
 
       const { data: profile } = await supabaseClient
         .from("profiles")
-        .select("id, full_name, phone")
+        .select("id, full_name, phone, siren")
         .eq("email", customerEmail)
         .single();
 
