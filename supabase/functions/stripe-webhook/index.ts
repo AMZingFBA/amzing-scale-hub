@@ -309,6 +309,11 @@ async function submitToRubypayeur(data: {
   full_name: string;
   phone?: string;
   siren?: string;
+  company_name?: string;
+  billing_address?: string;
+  billing_city?: string;
+  billing_country?: string;
+  tva_number?: string;
   amount: number;
   invoiceNumber: string;
   invoiceDate: string;
