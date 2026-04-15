@@ -760,6 +760,34 @@ const AdminProfiles = () => {
                               </div>
                             </TableCell>
                             <TableCell>
+                              <div className="flex items-center gap-2">
+                                <div className="min-w-0">
+                                  {profile.siren ? (
+                                    <div>
+                                      <div className="text-sm font-mono">{profile.siren}</div>
+                                      {profile.company_name && (
+                                        <div className="text-xs text-muted-foreground truncate max-w-[150px]">{profile.company_name}</div>
+                                      )}
+                                    </div>
+                                  ) : (
+                                    <span className="text-xs text-muted-foreground italic">Non renseigné</span>
+                                  )}
+                                </div>
+                                <Button
+                                  size="icon"
+                                  variant="ghost"
+                                  className="h-7 w-7 shrink-0"
+                                  onClick={() => {
+                                    setEditingSirenProfile(profile);
+                                    setEditSiren(profile.siren || '');
+                                    setEditCompanyName(profile.company_name || '');
+                                  }}
+                                >
+                                  <Pencil className="w-3 h-3" />
+                                </Button>
+                              </div>
+                            </TableCell>
+                            <TableCell>
                               {(() => {
                                 const activity = getActivityStatus(profile.last_sign_in_at);
                                 const ActivityIcon = activity.icon;
@@ -1042,6 +1070,38 @@ const AdminProfiles = () => {
           </Card>
         </div>
       </main>
+
+      {/* Dialog édition SIREN */}
+      <Dialog open={!!editingSirenProfile} onOpenChange={(open) => !open && setEditingSirenProfile(null)}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Building2 className="w-5 h-5" />
+              Modifier le SIREN — {editingSirenProfile?.full_name}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <CompanyLookup
+              onSelect={(siren, companyName) => {
+                setEditSiren(siren);
+                setEditCompanyName(companyName);
+              }}
+              initialSiren={editSiren}
+              initialCompanyName={editCompanyName}
+            />
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setEditingSirenProfile(null)}>
+                Annuler
+              </Button>
+              <Button onClick={handleSaveSiren} disabled={savingSiren}>
+                {savingSiren ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+                Enregistrer
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       <Footer />
     </div>
   );
