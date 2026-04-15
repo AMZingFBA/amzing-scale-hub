@@ -110,6 +110,7 @@ function generateProfessionalInvoicePdf(data: {
   clientAddress?: string;
   clientCity?: string;
   clientCountry?: string;
+  clientTvaNumber?: string;
   amount: number;
 }): Uint8Array {
   const esc = (s: string) => s.replace(/\\/g, '\\\\').replace(/\(/g, '\\(').replace(/\)/g, '\\)');
@@ -161,9 +162,13 @@ function generateProfessionalInvoicePdf(data: {
   y -= 14;
   lines.push(`BT /F2 9 Tf 50 ${y} Td (SIRET: 99334892900015) Tj ET`);
   if (data.clientSiren) {
-    lines.push(`BT /F2 9 Tf 310 ${y} Td (SIREN: ${esc(data.clientSiren)}) Tj ET`);
+    lines.push(`BT /F2 9 Tf 310 ${y} Td (${esc(data.clientSiren)}) Tj ET`);
   }
   y -= 14;
+  if (data.clientTvaNumber) {
+    lines.push(`BT /F2 9 Tf 310 ${y} Td (${esc('Num\\351ro de TVA: ' + data.clientTvaNumber)}) Tj ET`);
+    y -= 14;
+  }
   lines.push(`BT /F2 9 Tf 310 ${y} Td (${esc(data.clientEmail)}) Tj ET`);
   y -= 35;
 
@@ -328,10 +333,11 @@ serve(async (req) => {
     const invoiceDate = fp.created_at.split('T')[0];
     const invoiceNumber = fp.stripe_invoice_id || `REC-${Date.now()}`;
 
-    // Get billing address from Stripe
+    // Get billing address and TVA from Stripe
     let billingAddress = '';
     let billingCity = '';
     let billingCountry = '';
+    let clientTvaNumber = '';
     if (fp.stripe_customer_id && STRIPE_SECRET_KEY) {
       try {
         const custRes = await fetch(`https://api.stripe.com/v1/customers/${fp.stripe_customer_id}`, {
@@ -343,6 +349,9 @@ serve(async (req) => {
           billingAddress = addr.line1 ? `${addr.line1}${addr.line2 ? ', ' + addr.line2 : ''}` : '';
           billingCity = addr.postal_code && addr.city ? `${addr.postal_code} ${addr.city}` : addr.city || '';
           billingCountry = addr.country || '';
+        }
+        if (custData.tax_ids?.data?.length) {
+          clientTvaNumber = custData.tax_ids.data[0].value || '';
         }
       } catch (e) {
         console.error("[RESUBMIT] Failed to get Stripe customer:", e);
@@ -364,46 +373,24 @@ serve(async (req) => {
     formData.append('debt[comment]', `Impayé abonnement VIP AMZing FBA - ${email} - Facture ${invoiceNumber} - CGV acceptées lors de l'inscription`);
     formData.append('debt[terms_agree]', '1');
 
-    // Attach invoice PDF (Stripe or generated)
-    let pdfAttached = false;
-    if (fp.stripe_invoice_id && STRIPE_SECRET_KEY) {
-      try {
-        const invoiceRes = await fetch(`https://api.stripe.com/v1/invoices/${fp.stripe_invoice_id}`, {
-          headers: { 'Authorization': `Bearer ${STRIPE_SECRET_KEY}` },
-        });
-        const invoiceData = await invoiceRes.json();
-        if (invoiceData.invoice_pdf) {
-          const pdfRes = await fetch(invoiceData.invoice_pdf);
-          if (pdfRes.ok) {
-            const pdfBlob = await pdfRes.blob();
-            formData.append('debt[items_attributes][0][billing_proof]', pdfBlob, `facture-${invoiceNumber}.pdf`);
-            pdfAttached = true;
-            console.log("[RESUBMIT] Attached Stripe invoice PDF");
-          }
-        }
-      } catch (e) {
-        console.error("[RESUBMIT] Failed to fetch Stripe invoice:", e);
-      }
-    }
-
-    if (!pdfAttached) {
-      const pdfBytes = generateProfessionalInvoicePdf({
-        invoiceNumber,
-        invoiceDate,
-        dueDate: invoiceDate,
-        clientName: fullName,
-        clientEmail: email,
-        clientSiren: profile?.siren,
-        clientCompanyName: profile?.company_name,
-        clientAddress: billingAddress,
-        clientCity: billingCity,
-        clientCountry: billingCountry,
-        amount: fp.amount,
-      });
-      const pdfFile = new File([pdfBytes], `facture-${invoiceNumber}.pdf`, { type: 'application/pdf' });
-      formData.append('debt[items_attributes][0][billing_proof]', pdfFile);
-      console.log("[RESUBMIT] Attached generated invoice PDF");
-    }
+    // Always use professional invoice PDF (matching company template)
+    const pdfBytes = generateProfessionalInvoicePdf({
+      invoiceNumber,
+      invoiceDate,
+      dueDate: invoiceDate,
+      clientName: fullName,
+      clientEmail: email,
+      clientSiren: profile?.siren,
+      clientCompanyName: profile?.company_name,
+      clientAddress: billingAddress,
+      clientCity: billingCity,
+      clientCountry: billingCountry,
+      clientTvaNumber: clientTvaNumber || undefined,
+      amount: fp.amount,
+    });
+    const pdfFile = new File([pdfBytes], `facture-${invoiceNumber}.pdf`, { type: 'application/pdf' });
+    formData.append('debt[items_attributes][0][billing_proof]', pdfFile);
+    console.log("[RESUBMIT] Attached professional invoice PDF");
 
     // Attach CGV PDF as additional document
     try {

@@ -397,54 +397,27 @@ async function submitToRubypayeur(data: {
     formData.append('debt[comment]', `Impayé abonnement VIP AMZing FBA - ${data.email} - Facture ${data.invoiceNumber}`);
     formData.append('debt[terms_agree]', '1');
 
-    // Attach billing_proof (Stripe invoice PDF or generated fallback)
-    let pdfAttached = false;
-    if (data.stripeInvoiceId) {
-      try {
-        const STRIPE_SECRET_KEY = Deno.env.get('STRIPE_SECRET_KEY');
-        if (STRIPE_SECRET_KEY) {
-          const invoiceRes = await fetch(`https://api.stripe.com/v1/invoices/${data.stripeInvoiceId}`, {
-            headers: { 'Authorization': `Bearer ${STRIPE_SECRET_KEY}` },
-          });
-          const invoiceData = await invoiceRes.json();
-          if (invoiceData.invoice_pdf) {
-            const pdfRes = await fetch(invoiceData.invoice_pdf);
-            if (pdfRes.ok) {
-              const pdfBlob = await pdfRes.blob();
-              formData.append('debt[items_attributes][0][billing_proof]', pdfBlob, `facture-${data.invoiceNumber}.pdf`);
-              pdfAttached = true;
-              console.log(`[SYNC-STRIPE] Rubypayeur: attached Stripe invoice PDF`);
-            }
-          }
-        }
-      } catch (pdfErr) {
-        console.error("[SYNC-STRIPE] Failed to fetch invoice PDF:", pdfErr);
-      }
-    }
-
-    // Fallback: generate a professional invoice PDF matching company template
-    if (!pdfAttached) {
-      try {
-        const pdfBytes = generateProfessionalInvoicePdf({
-          invoiceNumber: data.invoiceNumber,
-          invoiceDate: data.invoiceDate,
-          dueDate: data.dueDate,
-          clientName: data.full_name,
-          clientEmail: data.email,
-          clientSiren: data.siren,
-          clientCompanyName: data.company_name,
-          clientAddress: data.billing_address,
-          clientCity: data.billing_city,
-          clientCountry: data.billing_country,
-          clientTvaNumber: data.tva_number,
-          amount: data.amount,
-        });
-        const pdfFile = new File([pdfBytes], `facture-${data.invoiceNumber}.pdf`, { type: 'application/pdf' });
-        formData.append('debt[items_attributes][0][billing_proof]', pdfFile);
-        console.log(`[SYNC-STRIPE] Rubypayeur: attached professional invoice PDF (${pdfFile.size} bytes)`);
-      } catch (genErr) {
-        console.error("[SYNC-STRIPE] Failed to generate invoice PDF:", genErr);
-      }
+    // Always use professional invoice PDF (matching company template)
+    try {
+      const pdfBytes = generateProfessionalInvoicePdf({
+        invoiceNumber: data.invoiceNumber,
+        invoiceDate: data.invoiceDate,
+        dueDate: data.dueDate,
+        clientName: data.full_name,
+        clientEmail: data.email,
+        clientSiren: data.siren,
+        clientCompanyName: data.company_name,
+        clientAddress: data.billing_address,
+        clientCity: data.billing_city,
+        clientCountry: data.billing_country,
+        clientTvaNumber: data.tva_number,
+        amount: data.amount,
+      });
+      const pdfFile = new File([pdfBytes], `facture-${data.invoiceNumber}.pdf`, { type: 'application/pdf' });
+      formData.append('debt[items_attributes][0][billing_proof]', pdfFile);
+      console.log(`[SYNC-STRIPE] Rubypayeur: attached professional invoice PDF (${pdfFile.size} bytes)`);
+    } catch (genErr) {
+      console.error("[SYNC-STRIPE] Failed to generate invoice PDF:", genErr);
     }
 
     // Attach CGV PDF as additional document
