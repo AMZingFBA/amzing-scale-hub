@@ -435,7 +435,7 @@ async function submitToRubypayeur(data: {
 // Automated recovery: create failed_payment + email + Rubypayeur
 // ============================================================
 async function runAutomatedRecovery(
-  profile: { id: string; email: string; full_name: string | null; phone?: string | null; siren?: string | null },
+  profile: { id: string; email: string; full_name: string | null; phone?: string | null; siren?: string | null; company_name?: string | null },
   customer: Stripe.Customer,
   failedPayments: Stripe.PaymentIntent[],
   subscriptions: Stripe.Subscription[],
@@ -526,11 +526,21 @@ async function runAutomatedRecovery(
       ? new Date(lastFailedPI.created * 1000).toISOString().split('T')[0]
       : now.toISOString().split('T')[0];
 
+    // Extract billing address from Stripe customer
+    const addr = customer.address;
+    const billingAddress = addr?.line1 ? `${addr.line1}${addr.line2 ? ', ' + addr.line2 : ''}` : undefined;
+    const billingCity = addr?.postal_code && addr?.city ? `${addr.postal_code} ${addr.city}` : addr?.city || undefined;
+    const billingCountry = addr?.country || undefined;
+
     const rubypayeurRef = await submitToRubypayeur({
       email,
       full_name: profile.full_name || 'Client',
       phone: profile.phone || undefined,
       siren: profile.siren || undefined,
+      company_name: profile.company_name || customer.name || undefined,
+      billing_address: billingAddress,
+      billing_city: billingCity,
+      billing_country: billingCountry,
       amount,
       invoiceNumber: stripeInvoiceId || `SYNC-${now.getTime()}`,
       invoiceDate,
