@@ -181,8 +181,8 @@ async function submitToRubypayeur(data: {
     const lastName = nameParts.slice(1).join(' ') || 'Inconnu';
 
     const formData = new FormData();
-    // Debtor info - use a placeholder SIREN (will be reviewed by Rubypayeur)
-    formData.append('debt[siren]', '000000000');
+    // Debtor info - use SIREN from profile if available
+    formData.append('debt[siren]', data.siren || '000000000');
     formData.append('debt[gender]', 'male');
     formData.append('debt[first_name]', firstName);
     formData.append('debt[last_name]', lastName);

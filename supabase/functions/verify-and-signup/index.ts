@@ -13,6 +13,8 @@ interface SignupRequest {
   fullName: string;
   nickname: string;
   phone: string;
+  siren?: string;
+  companyName?: string;
   referralCode?: string;
   registrationSource?: string;
 }
@@ -23,7 +25,7 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { code, email, password, fullName, nickname, phone, referralCode, registrationSource }: SignupRequest = await req.json();
+    const { code, email, password, fullName, nickname, phone, siren, companyName, referralCode, registrationSource }: SignupRequest = await req.json();
 
     console.log("=== SIGNUP VERIFICATION REQUEST ===");
     console.log("Email:", email);
@@ -84,6 +86,8 @@ const handler = async (req: Request): Promise<Response> => {
         full_name: fullName,
         nickname,
         phone,
+        siren: siren || null,
+        company_name: companyName || null,
         referral_code: referralCode || null,
         registration_source: finalSource,
       },
