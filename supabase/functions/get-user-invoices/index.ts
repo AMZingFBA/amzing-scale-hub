@@ -52,7 +52,7 @@ serve(async (req) => {
     // Get user profile for invoice details
     const { data: profile } = await adminClient
       .from("profiles")
-      .select("full_name, email, phone")
+      .select("full_name, email, phone, siren, company_name")
       .eq("id", user.id)
       .single();
 
@@ -129,6 +129,8 @@ serve(async (req) => {
           discountDescription,
           customerName: billingName || profile?.full_name || user.email,
           customerEmail: profile?.email || user.email,
+          customerSiren: profile?.siren || '',
+          customerCompanyName: profile?.company_name || '',
           customerAddress: billingAddress ? [
             billingAddress.line1,
             billingAddress.line2,
