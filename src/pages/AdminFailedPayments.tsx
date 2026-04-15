@@ -111,7 +111,7 @@ const AdminFailedPayments = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <SEO title="Admin - Impayés" noindex />
+      <SEO title="Admin - Impayés" />
       <Navbar />
       <div className="container mx-auto px-4 py-8 pt-24">
         <div className="flex items-center justify-between mb-6">
@@ -278,7 +278,7 @@ const AdminFailedPayments = () => {
           </CardContent>
         </Card>
 
-        {payment.length > 0 && (
+        {payments.length > 0 && (
           <p className="text-xs text-muted-foreground mt-4 text-center">
             Les impayés sont automatiquement enregistrés, un email de relance est envoyé et le dossier est soumis à Rubypayeur.
           </p>
