@@ -202,7 +202,8 @@ async function submitToRubypayeur(data: {
     formData.append('debt[comment]', `Impayé abonnement VIP AMZing FBA - ${data.email} - Facture ${data.invoiceNumber}`);
     formData.append('debt[terms_agree]', '1');
 
-    // Attach Stripe invoice PDF as billing_proof
+    // Attach billing_proof (Stripe invoice PDF or generated fallback)
+    let pdfAttached = false;
     if (data.stripeInvoiceId) {
       try {
         const STRIPE_SECRET_KEY = Deno.env.get('STRIPE_SECRET_KEY');
@@ -216,12 +217,57 @@ async function submitToRubypayeur(data: {
             if (pdfRes.ok) {
               const pdfBlob = await pdfRes.blob();
               formData.append('debt[items_attributes][0][billing_proof]', pdfBlob, `facture-${data.invoiceNumber}.pdf`);
-              logStep("Rubypayeur: attached invoice PDF", { invoice: data.invoiceNumber });
+              pdfAttached = true;
+              logStep("Rubypayeur: attached Stripe invoice PDF");
             }
           }
         }
       } catch (pdfErr) {
         logStep("Failed to fetch invoice PDF", { error: pdfErr instanceof Error ? pdfErr.message : 'Unknown' });
+      }
+    }
+
+    // Fallback: generate a simple text-based PDF if no Stripe PDF available
+    if (!pdfAttached) {
+      try {
+        const textContent = [
+          `FACTURE - ${data.invoiceNumber}`,
+          `Date: ${data.invoiceDate}`,
+          ``,
+          `N.Z Consulting (AMZing FBA)`,
+          `59 Rue de Ponthieu, 75008 Paris`,
+          ``,
+          `Client: ${data.full_name}`,
+          `Email: ${data.email}`,
+          `SIREN: ${data.siren || 'N/A'}`,
+          ``,
+          `Abonnement VIP AMZing FBA`,
+          `Montant: ${data.amount.toFixed(2)} EUR`,
+          `Date d'échéance: ${data.dueDate}`,
+          `Statut: IMPAYE`,
+        ].join('\n');
+
+        const pdfContent = `%PDF-1.4
+1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj
+2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj
+3 0 obj<</Type/Page/MediaBox[0 0 612 792]/Parent 2 0 R/Resources<</Font<</F1 4 0 R>>>>/Contents 5 0 R>>endobj
+4 0 obj<</Type/Font/Subtype/Type1/BaseFont/Helvetica>>endobj
+5 0 obj<</Length ${textContent.split('\n').map((l, i) => `BT /F1 12 Tf 50 ${700 - i * 20} Td (${l.replace(/[()\\]/g, '\\$&')}) Tj ET`).join('\n').length}>>
+stream
+${textContent.split('\n').map((l, i) => `BT /F1 12 Tf 50 ${700 - i * 20} Td (${l.replace(/[()\\]/g, '\\$&')}) Tj ET`).join('\n')}
+endstream
+endobj
+xref
+0 6
+trailer<</Size 6/Root 1 0 R>>
+startxref
+0
+%%EOF`;
+        const pdfBlob = new Blob([pdfContent], { type: 'application/pdf' });
+        formData.append('debt[items_attributes][0][billing_proof]', pdfBlob, `facture-${data.invoiceNumber}.pdf`);
+        logStep("Rubypayeur: attached generated fallback PDF");
+      } catch (genErr) {
+        logStep("Failed to generate fallback PDF", { error: genErr instanceof Error ? genErr.message : 'Unknown' });
       }
     }
 
