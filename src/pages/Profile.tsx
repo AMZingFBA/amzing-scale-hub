@@ -869,6 +869,15 @@ const Profile = () => {
                 </div>
               </div>
 
+              <div className="space-y-2 pt-4 border-t">
+                <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Informations société</h3>
+                <CompanyLookup
+                  onSelect={(siren, companyName) => setProfileData(prev => ({ ...prev, siren, company_name: companyName }))}
+                  defaultSiren={profileData.siren || ''}
+                  defaultCompanyName={profileData.company_name || ''}
+                />
+              </div>
+
               <div className="space-y-2">
                 <Label>
                   <Lock className="w-4 h-4 inline mr-2" />
