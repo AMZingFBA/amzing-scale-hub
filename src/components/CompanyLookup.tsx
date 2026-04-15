@@ -28,7 +28,7 @@ export default function CompanyLookup({ onSelect, defaultSiren = '', defaultComp
   const [selectedCompany, setSelectedCompany] = useState<Company | null>(
     defaultSiren ? { siren: defaultSiren, nom_complet: defaultCompanyName } : null
   );
-  const debounceRef = useRef<NodeJS.Timeout | null>(null);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Close dropdown on outside click
