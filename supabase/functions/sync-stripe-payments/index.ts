@@ -320,6 +320,7 @@ async function runAutomatedRecovery(
       invoiceDate,
       dueDate: invoiceDate,
       failedPaymentId,
+      stripeInvoiceId: stripeInvoiceId || undefined,
     }, supabaseAdmin);
 
     if (rubypayeurRef) {
