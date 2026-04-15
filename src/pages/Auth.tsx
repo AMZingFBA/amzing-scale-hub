@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import OptimizedImage from "@/components/OptimizedImage";
 import logo from "@/assets/logo.png";
 import { Mail, Lock, User, Phone, Package, TrendingUp, BarChart3, CheckCircle2, AlertCircle } from "lucide-react";
+import CompanyLookup from "@/components/CompanyLookup";
 import { Capacitor } from "@capacitor/core";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { supabase } from "@/integrations/supabase/client";
