@@ -103,6 +103,7 @@ async function submitToRubypayeur(data: {
   invoiceDate: string;
   dueDate: string;
   failedPaymentId: string;
+  stripeInvoiceId?: string;
 }, supabaseClient: any) {
   const RUBYPAYEUR_TOKEN = Deno.env.get('RUBYPAYEUR_TOKEN');
   if (!RUBYPAYEUR_TOKEN) {
