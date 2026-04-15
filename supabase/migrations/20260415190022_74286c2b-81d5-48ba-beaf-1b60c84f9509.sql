@@ -1,0 +1,1 @@
+DELETE FROM failed_payments WHERE email = 'amgharplus777@gmail.com';
