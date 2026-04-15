@@ -688,6 +688,7 @@ const AdminProfiles = () => {
                         <TableRow>
                           <TableHead>Utilisateur</TableHead>
                           <TableHead>Contact</TableHead>
+                          <TableHead>SIREN / Société</TableHead>
                           <TableHead>Activité</TableHead>
                           <TableHead>Notifications</TableHead>
                           <TableHead>Abonnement</TableHead>
