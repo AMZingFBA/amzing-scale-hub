@@ -3,13 +3,15 @@ import { useAuth } from '@/hooks/use-auth';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { Loader2, Users, Mail, Phone, UserCircle, ArrowLeft, Search, Calendar, MessageCircle, Crown, Shield, Filter, ChevronLeft, ChevronRight, Clock, AlertCircle, Trash2, Copy, CheckCircle, RefreshCw, Eye, Bell, BellOff, Activity, Wifi, WifiOff, UserPlus, UserMinus } from 'lucide-react';
+import { Loader2, Users, Mail, Phone, UserCircle, ArrowLeft, Search, Calendar, MessageCircle, Crown, Shield, Filter, ChevronLeft, ChevronRight, Clock, AlertCircle, Trash2, Copy, CheckCircle, RefreshCw, Eye, Bell, BellOff, Activity, Wifi, WifiOff, UserPlus, UserMinus, Building2, Pencil } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import CompanyLookup from '@/components/CompanyLookup';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import ScrollToTop from '@/components/ScrollToTop';
@@ -24,6 +26,8 @@ interface ProfileData {
   avatar_url: string | null;
   created_at: string;
   updated_at: string;
+  siren?: string | null;
+  company_name?: string | null;
   subscription?: {
     plan_type: string;
     status: string;
@@ -52,7 +56,10 @@ const AdminProfiles = () => {
   const [syncing, setSyncing] = useState(false);
   const [generatingLink, setGeneratingLink] = useState<string | null>(null);
   const [togglingVip, setTogglingVip] = useState<string | null>(null);
-
+  const [editingSirenProfile, setEditingSirenProfile] = useState<ProfileData | null>(null);
+  const [editSiren, setEditSiren] = useState('');
+  const [editCompanyName, setEditCompanyName] = useState('');
+  const [savingSiren, setSavingSiren] = useState(false);
   useEffect(() => {
     if (!user) {
       navigate('/auth');
@@ -276,6 +283,25 @@ const AdminProfiles = () => {
       toast.error(error.message || 'Erreur lors de la modification du VIP');
     } finally {
       setTogglingVip(null);
+    }
+  };
+  const handleSaveSiren = async () => {
+    if (!editingSirenProfile) return;
+    try {
+      setSavingSiren(true);
+      const { error } = await supabase
+        .from('profiles')
+        .update({ siren: editSiren || null, company_name: editCompanyName || null })
+        .eq('id', editingSirenProfile.id);
+      if (error) throw error;
+      toast.success('SIREN mis à jour');
+      setEditingSirenProfile(null);
+      await loadProfiles();
+    } catch (error: any) {
+      console.error('Error updating SIREN:', error);
+      toast.error('Erreur lors de la mise à jour du SIREN');
+    } finally {
+      setSavingSiren(false);
     }
   };
 
@@ -662,6 +688,7 @@ const AdminProfiles = () => {
                         <TableRow>
                           <TableHead>Utilisateur</TableHead>
                           <TableHead>Contact</TableHead>
+                          <TableHead>SIREN / Société</TableHead>
                           <TableHead>Activité</TableHead>
                           <TableHead>Notifications</TableHead>
                           <TableHead>Abonnement</TableHead>
@@ -730,6 +757,34 @@ const AdminProfiles = () => {
                                     <span className="text-muted-foreground italic text-xs">Non renseigné</span>
                                   )}
                                 </div>
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex items-center gap-2">
+                                <div className="min-w-0">
+                                  {profile.siren ? (
+                                    <div>
+                                      <div className="text-sm font-mono">{profile.siren}</div>
+                                      {profile.company_name && (
+                                        <div className="text-xs text-muted-foreground truncate max-w-[150px]">{profile.company_name}</div>
+                                      )}
+                                    </div>
+                                  ) : (
+                                    <span className="text-xs text-muted-foreground italic">Non renseigné</span>
+                                  )}
+                                </div>
+                                <Button
+                                  size="icon"
+                                  variant="ghost"
+                                  className="h-7 w-7 shrink-0"
+                                  onClick={() => {
+                                    setEditingSirenProfile(profile);
+                                    setEditSiren(profile.siren || '');
+                                    setEditCompanyName(profile.company_name || '');
+                                  }}
+                                >
+                                  <Pencil className="w-3 h-3" />
+                                </Button>
                               </div>
                             </TableCell>
                             <TableCell>
@@ -1015,6 +1070,39 @@ const AdminProfiles = () => {
           </Card>
         </div>
       </main>
+
+      {/* Dialog édition SIREN */}
+      <Dialog open={!!editingSirenProfile} onOpenChange={(open) => !open && setEditingSirenProfile(null)}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Building2 className="w-5 h-5" />
+              Modifier le SIREN — {editingSirenProfile?.full_name}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <CompanyLookup
+              key={editingSirenProfile?.id}
+              onSelect={(siren, companyName) => {
+                setEditSiren(siren);
+                setEditCompanyName(companyName);
+              }}
+              defaultSiren={editSiren}
+              defaultCompanyName={editCompanyName}
+            />
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setEditingSirenProfile(null)}>
+                Annuler
+              </Button>
+              <Button onClick={handleSaveSiren} disabled={savingSiren}>
+                {savingSiren ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+                Enregistrer
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       <Footer />
     </div>
   );
