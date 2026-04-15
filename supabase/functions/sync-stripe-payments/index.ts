@@ -100,6 +100,11 @@ function generateProfessionalInvoicePdf(data: {
   clientName: string;
   clientEmail: string;
   clientSiren?: string;
+  clientCompanyName?: string;
+  clientAddress?: string;
+  clientCity?: string;
+  clientCountry?: string;
+  clientTvaNumber?: string;
   amount: number;
 }): Uint8Array {
   const esc = (s: string) => s.replace(/\\/g, '\\\\').replace(/\(/g, '\\(').replace(/\)/g, '\\)');
