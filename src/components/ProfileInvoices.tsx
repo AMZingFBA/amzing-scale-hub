@@ -21,6 +21,8 @@ interface Invoice {
   customerName: string;
   customerEmail: string;
   customerAddress: string;
+  customerSiren?: string;
+  customerCompanyName?: string;
 }
 
 const generateInvoiceHTML = (invoice: Invoice): string => {
@@ -99,6 +101,8 @@ const generateInvoiceHTML = (invoice: Invoice): string => {
   </div>
   <div class="party">
     <h4>Client</h4>
+    ${invoice.customerCompanyName ? `<p class="name">${invoice.customerCompanyName}</p>` : ''}
+    ${invoice.customerSiren ? `<p>SIREN : ${invoice.customerSiren}</p>` : ''}
     <p class="name">${invoice.customerName}</p>
     <p>${invoice.customerAddress ? invoice.customerAddress + '<br>' : ''}${invoice.customerEmail}</p>
   </div>
