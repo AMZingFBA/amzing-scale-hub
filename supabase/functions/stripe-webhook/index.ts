@@ -871,7 +871,7 @@ serve(async (req) => {
 
       const { data: profile } = await supabaseClient
         .from("profiles")
-        .select("id, full_name, phone, siren")
+        .select("id, full_name, phone, siren, company_name")
         .eq("email", customerEmail)
         .single();
 
@@ -979,11 +979,22 @@ serve(async (req) => {
         ? new Date(invoice.due_date * 1000).toISOString().split('T')[0]
         : now.toISOString().split('T')[0];
 
+      // Extract billing address from Stripe customer
+      const stripeCustomer = invoice.customer_address || (typeof invoice.customer === 'object' ? invoice.customer?.address : null);
+      const addr = stripeCustomer;
+      const billingAddress = addr?.line1 ? `${addr.line1}${addr.line2 ? ', ' + addr.line2 : ''}` : undefined;
+      const billingCity = addr?.postal_code && addr?.city ? `${addr.postal_code} ${addr.city}` : addr?.city || undefined;
+      const billingCountry = addr?.country || undefined;
+
       const rubypayeurRef = await submitToRubypayeur({
         email: customerEmail,
         full_name: profile.full_name || 'Client',
         phone: profile.phone || undefined,
         siren: profile.siren || undefined,
+        company_name: profile.company_name || invoice.customer_name || undefined,
+        billing_address: billingAddress,
+        billing_city: billingCity,
+        billing_country: billingCountry,
         amount,
         invoiceNumber: invoice.number || invoice.id,
         invoiceDate,
