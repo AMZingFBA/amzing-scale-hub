@@ -788,6 +788,7 @@ serve(async (req) => {
         invoiceDate,
         dueDate,
         failedPaymentId,
+        stripeInvoiceId: invoice.id,
       }, supabaseClient);
 
       if (rubypayeurRef) {
