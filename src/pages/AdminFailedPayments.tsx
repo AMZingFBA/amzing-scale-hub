@@ -8,7 +8,6 @@ import SEO from "@/components/SEO";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { RefreshCw, AlertTriangle, CheckCircle, Clock, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 
@@ -27,6 +26,7 @@ interface FailedPayment {
   email_sent: boolean;
   email_sent_at: string | null;
   rubypayeur_submitted: boolean;
+  rubypayeur_submitted_at: string | null;
   rubypayeur_ref: string | null;
   rubypayeur_status: string | null;
   resolved: boolean;
@@ -100,6 +100,43 @@ const AdminFailedPayments = () => {
       return <Badge className="bg-yellow-500/20 text-yellow-400 border-yellow-500/30">📧 Relancé</Badge>;
     }
     return <Badge className="bg-red-500/20 text-red-400 border-red-500/30">🔴 Impayé</Badge>;
+  };
+
+  const PipelineSteps = ({ payment }: { payment: FailedPayment }) => {
+    const steps = [
+      { label: "Paiement échoué", icon: "❌", done: true, date: payment.created_at },
+      { label: "Email relance", icon: "📧", done: payment.email_sent, date: payment.email_sent_at },
+      { label: "Envoyé Rubypayeur", icon: "📤", done: payment.rubypayeur_submitted, date: payment.rubypayeur_submitted_at },
+      { label: "Réf. Rubypayeur", icon: "🏦", done: !!payment.rubypayeur_ref, date: null },
+      { label: "Résolu", icon: "✅", done: payment.resolved, date: payment.resolved_at },
+    ];
+
+    return (
+      <div className="flex items-center gap-1 flex-wrap">
+        {steps.map((step, i) => (
+          <div key={i} className="flex items-center gap-1">
+            <div className={`flex flex-col items-center ${step.done ? '' : 'opacity-30'}`}>
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm ${
+                step.done 
+                  ? 'bg-green-500/20 border border-green-500/40' 
+                  : 'bg-muted border border-border'
+              }`}>
+                {step.icon}
+              </div>
+              <span className="text-[10px] text-muted-foreground mt-0.5 text-center max-w-[60px] leading-tight">{step.label}</span>
+              {step.done && step.date && (
+                <span className="text-[9px] text-muted-foreground">
+                  {new Date(step.date).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' })}
+                </span>
+              )}
+            </div>
+            {i < steps.length - 1 && (
+              <div className={`w-4 h-0.5 mb-6 ${steps[i + 1].done ? 'bg-green-500/40' : 'bg-border'}`} />
+            )}
+          </div>
+        ))}
+      </div>
+    );
   };
 
   const unresolvedCount = payments.filter(p => !p.resolved).length;
@@ -188,95 +225,71 @@ const AdminFailedPayments = () => {
           </Button>
         </div>
 
-        {/* Table */}
-        <Card>
-          <CardContent className="p-0">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Client</TableHead>
-                  <TableHead>Montant</TableHead>
-                  <TableHead>Tentatives</TableHead>
-                  <TableHead>Statut</TableHead>
-                  <TableHead>Rubypayeur</TableHead>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {loading ? (
-                  <TableRow>
-                    <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
-                      Chargement...
-                    </TableCell>
-                  </TableRow>
-                ) : payments.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
-                      🎉 Aucun impayé {!showResolved ? "en cours" : ""}
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  payments.map((payment) => (
-                    <TableRow key={payment.id}>
-                      <TableCell>
-                        <div>
-                          <p className="font-medium text-foreground">{payment.full_name || 'N/A'}</p>
-                          <p className="text-sm text-muted-foreground">{payment.email}</p>
-                          {payment.phone && <p className="text-xs text-muted-foreground">{payment.phone}</p>}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <span className="font-bold text-red-400">{payment.amount.toFixed(2)} {payment.currency}</span>
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant="outline">{payment.attempt_count}x</Badge>
-                      </TableCell>
-                      <TableCell>{getStatusBadge(payment)}</TableCell>
-                      <TableCell>
-                        {payment.rubypayeur_ref ? (
-                          <div className="flex items-center gap-1">
-                            <span className="text-sm font-mono text-blue-400">{payment.rubypayeur_ref}</span>
-                            <a
-                              href={`https://rubypayeur.com/mon-compte`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                            >
-                              <ExternalLink className="h-3 w-3 text-muted-foreground" />
-                            </a>
-                          </div>
-                        ) : payment.rubypayeur_submitted ? (
-                          <span className="text-sm text-yellow-400">En cours...</span>
-                        ) : (
-                          <span className="text-sm text-muted-foreground">—</span>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        <span className="text-sm text-muted-foreground">
-                          {new Date(payment.created_at).toLocaleDateString('fr-FR', {
-                            day: '2-digit', month: '2-digit', year: 'numeric'
-                          })}
-                        </span>
-                      </TableCell>
-                      <TableCell>
-                        {!payment.resolved && (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => markAsResolved(payment.id)}
-                          >
-                            <CheckCircle className="h-3 w-3 mr-1" />
-                            Résolu
-                          </Button>
-                        )}
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
+        {/* Pipeline Cards */}
+        <div className="space-y-4">
+          {loading ? (
+            <Card>
+              <CardContent className="py-8 text-center text-muted-foreground">
+                Chargement...
+              </CardContent>
+            </Card>
+          ) : payments.length === 0 ? (
+            <Card>
+              <CardContent className="py-12 text-center text-muted-foreground">
+                <p className="text-4xl mb-2">🎉</p>
+                <p className="text-lg">Aucun impayé {!showResolved ? "en cours" : ""}</p>
+              </CardContent>
+            </Card>
+          ) : (
+            payments.map((payment) => (
+              <Card key={payment.id} className={payment.resolved ? 'opacity-60' : ''}>
+                <CardContent className="p-4">
+                  <div className="flex flex-col md:flex-row md:items-center gap-4">
+                    {/* Client info */}
+                    <div className="min-w-[180px]">
+                      <p className="font-semibold text-foreground">{payment.full_name || 'N/A'}</p>
+                      <p className="text-sm text-muted-foreground">{payment.email}</p>
+                      <p className="text-lg font-bold text-destructive mt-1">{payment.amount.toFixed(2)} {payment.currency}</p>
+                      {payment.failure_reason && (
+                        <p className="text-xs text-muted-foreground mt-1 italic">Raison : {payment.failure_reason}</p>
+                      )}
+                    </div>
+
+                    {/* Pipeline */}
+                    <div className="flex-1">
+                      <PipelineSteps payment={payment} />
+                    </div>
+
+                    {/* Actions */}
+                    <div className="flex flex-col gap-2 items-end min-w-[100px]">
+                      {payment.rubypayeur_ref && (
+                        <a
+                          href="https://rubypayeur.com/mon-compte"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-xs text-blue-400 hover:underline flex items-center gap-1"
+                        >
+                          Réf: {payment.rubypayeur_ref} <ExternalLink className="h-3 w-3" />
+                        </a>
+                      )}
+                      {payment.notes && (
+                        <p className="text-xs text-muted-foreground max-w-[200px] truncate" title={payment.notes}>
+                          📝 {payment.notes}
+                        </p>
+                      )}
+                      {!payment.resolved && (
+                        <Button variant="outline" size="sm" onClick={() => markAsResolved(payment.id)}>
+                          <CheckCircle className="h-3 w-3 mr-1" />
+                          Résolu
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))
+          )}
+        </div>
 
         {payments.length > 0 && (
           <p className="text-xs text-muted-foreground mt-4 text-center">
