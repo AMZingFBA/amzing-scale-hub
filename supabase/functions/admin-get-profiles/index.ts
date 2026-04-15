@@ -67,7 +67,7 @@ Deno.serve(async (req) => {
     ] = await Promise.all([
       supabaseAdmin
         .from("profiles")
-        .select("id, full_name, email, phone, nickname, avatar_url, created_at, updated_at")
+        .select("id, full_name, email, phone, nickname, avatar_url, created_at, updated_at, siren, company_name")
         .order("created_at", { ascending: false }),
       supabaseAdmin
         .from("subscriptions")
