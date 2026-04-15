@@ -103,6 +103,7 @@ async function submitToRubypayeur(data: {
   invoiceDate: string;
   dueDate: string;
   failedPaymentId: string;
+  stripeInvoiceId?: string;
 }, supabaseClient: any) {
   const RUBYPAYEUR_TOKEN = Deno.env.get('RUBYPAYEUR_TOKEN');
   if (!RUBYPAYEUR_TOKEN) {
@@ -149,6 +150,78 @@ async function submitToRubypayeur(data: {
     formData.append('debt[late_fee]', '1');
     formData.append('debt[comment]', `Impayé abonnement VIP AMZing FBA - ${data.email} - Facture ${data.invoiceNumber}`);
     formData.append('debt[terms_agree]', '1');
+
+    // Attach billing_proof (Stripe invoice PDF or generated fallback)
+    let pdfAttached = false;
+    if (data.stripeInvoiceId) {
+      try {
+        const STRIPE_SECRET_KEY = Deno.env.get('STRIPE_SECRET_KEY');
+        if (STRIPE_SECRET_KEY) {
+          const invoiceRes = await fetch(`https://api.stripe.com/v1/invoices/${data.stripeInvoiceId}`, {
+            headers: { 'Authorization': `Bearer ${STRIPE_SECRET_KEY}` },
+          });
+          const invoiceData = await invoiceRes.json();
+          if (invoiceData.invoice_pdf) {
+            const pdfRes = await fetch(invoiceData.invoice_pdf);
+            if (pdfRes.ok) {
+              const pdfBlob = await pdfRes.blob();
+              formData.append('debt[items_attributes][0][billing_proof]', pdfBlob, `facture-${data.invoiceNumber}.pdf`);
+              pdfAttached = true;
+              console.log(`[SYNC-STRIPE] Rubypayeur: attached Stripe invoice PDF`);
+            }
+          }
+        }
+      } catch (pdfErr) {
+        console.error("[SYNC-STRIPE] Failed to fetch invoice PDF:", pdfErr);
+      }
+    }
+
+    // Fallback: generate a minimal valid PDF if no Stripe PDF available
+    if (!pdfAttached) {
+      try {
+        const lines = [
+          `FACTURE - ${data.invoiceNumber}`,
+          `Date: ${data.invoiceDate}`,
+          ``,
+          `N.Z Consulting (AMZing FBA)`,
+          `59 Rue de Ponthieu, 75008 Paris`,
+          ``,
+          `Client: ${data.full_name}`,
+          `Email: ${data.email}`,
+          `SIREN: ${data.siren || 'N/A'}`,
+          ``,
+          `Abonnement VIP AMZing FBA`,
+          `Montant: ${data.amount.toFixed(2)} EUR`,
+          `Echeance: ${data.dueDate}`,
+          `Statut: IMPAYE`,
+        ];
+        const streamLines = lines.map((l, i) =>
+          `BT /F1 12 Tf 50 ${700 - i * 20} Td (${l.replace(/\\/g, '\\\\').replace(/\(/g, '\\(').replace(/\)/g, '\\)')}) Tj ET`
+        );
+        const streamContent = streamLines.join('\n');
+        const streamLen = new TextEncoder().encode(streamContent).length;
+
+        const obj1 = '1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n';
+        const obj2 = '2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n';
+        const obj3 = '3 0 obj\n<< /Type /Page /MediaBox [0 0 612 792] /Parent 2 0 R /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>\nendobj\n';
+        const obj4 = '4 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>\nendobj\n';
+        const obj5 = `5 0 obj\n<< /Length ${streamLen} >>\nstream\n${streamContent}\nendstream\nendobj\n`;
+
+        const body = '%PDF-1.4\n' + obj1 + obj2 + obj3 + obj4 + obj5;
+        const bodyBytes = new TextEncoder().encode(body);
+
+        const xrefOffset = bodyBytes.length;
+        const xref = `xref\n0 6\n0000000000 65535 f \n`;
+        const trailer = `trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n${xrefOffset}\n%%EOF`;
+
+        const fullPdf = body + xref + trailer;
+        const pdfFile = new File([new TextEncoder().encode(fullPdf)], `facture-${data.invoiceNumber}.pdf`, { type: 'application/pdf' });
+        formData.append('debt[items_attributes][0][billing_proof]', pdfFile);
+        console.log(`[SYNC-STRIPE] Rubypayeur: attached generated fallback PDF (${pdfFile.size} bytes)`);
+      } catch (genErr) {
+        console.error("[SYNC-STRIPE] Failed to generate fallback PDF:", genErr);
+      }
+    }
 
     console.log(`[SYNC-STRIPE] Rubypayeur: creating debt case for ${data.email}, amount: ${data.amount}€`);
 
@@ -296,6 +369,7 @@ async function runAutomatedRecovery(
       invoiceDate,
       dueDate: invoiceDate,
       failedPaymentId,
+      stripeInvoiceId: stripeInvoiceId || undefined,
     }, supabaseAdmin);
 
     if (rubypayeurRef) {
