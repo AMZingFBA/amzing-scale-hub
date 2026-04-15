@@ -176,10 +176,10 @@ async function submitToRubypayeur(data: {
       }
     }
 
-    // Fallback: generate a simple text-based PDF if no Stripe PDF available
+    // Fallback: generate a minimal valid PDF if no Stripe PDF available
     if (!pdfAttached) {
       try {
-        const textContent = [
+        const lines = [
           `FACTURE - ${data.invoiceNumber}`,
           `Date: ${data.invoiceDate}`,
           ``,
@@ -192,30 +192,32 @@ async function submitToRubypayeur(data: {
           ``,
           `Abonnement VIP AMZing FBA`,
           `Montant: ${data.amount.toFixed(2)} EUR`,
-          `Date d'échéance: ${data.dueDate}`,
+          `Echeance: ${data.dueDate}`,
           `Statut: IMPAYE`,
-        ].join('\n');
+        ];
+        const streamLines = lines.map((l, i) =>
+          `BT /F1 12 Tf 50 ${700 - i * 20} Td (${l.replace(/\\/g, '\\\\').replace(/\(/g, '\\(').replace(/\)/g, '\\)')}) Tj ET`
+        );
+        const streamContent = streamLines.join('\n');
+        const streamLen = new TextEncoder().encode(streamContent).length;
 
-        // Minimal valid PDF with the invoice text
-        const pdfContent = `%PDF-1.4
-1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj
-2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj
-3 0 obj<</Type/Page/MediaBox[0 0 612 792]/Parent 2 0 R/Resources<</Font<</F1 4 0 R>>>>/Contents 5 0 R>>endobj
-4 0 obj<</Type/Font/Subtype/Type1/BaseFont/Helvetica>>endobj
-5 0 obj<</Length ${textContent.split('\n').map((l, i) => `BT /F1 12 Tf 50 ${700 - i * 20} Td (${l.replace(/[()\\]/g, '\\$&')}) Tj ET`).join('\n').length}>>
-stream
-${textContent.split('\n').map((l, i) => `BT /F1 12 Tf 50 ${700 - i * 20} Td (${l.replace(/[()\\]/g, '\\$&')}) Tj ET`).join('\n')}
-endstream
-endobj
-xref
-0 6
-trailer<</Size 6/Root 1 0 R>>
-startxref
-0
-%%EOF`;
-        const pdfFile = new File([new TextEncoder().encode(pdfContent)], `facture-${data.invoiceNumber}.pdf`, { type: 'application/pdf' });
+        const obj1 = '1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n';
+        const obj2 = '2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n';
+        const obj3 = '3 0 obj\n<< /Type /Page /MediaBox [0 0 612 792] /Parent 2 0 R /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>\nendobj\n';
+        const obj4 = '4 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>\nendobj\n';
+        const obj5 = `5 0 obj\n<< /Length ${streamLen} >>\nstream\n${streamContent}\nendstream\nendobj\n`;
+
+        const body = '%PDF-1.4\n' + obj1 + obj2 + obj3 + obj4 + obj5;
+        const bodyBytes = new TextEncoder().encode(body);
+
+        const xrefOffset = bodyBytes.length;
+        const xref = `xref\n0 6\n0000000000 65535 f \n`;
+        const trailer = `trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n${xrefOffset}\n%%EOF`;
+
+        const fullPdf = body + xref + trailer;
+        const pdfFile = new File([new TextEncoder().encode(fullPdf)], `facture-${data.invoiceNumber}.pdf`, { type: 'application/pdf' });
         formData.append('debt[items_attributes][0][billing_proof]', pdfFile);
-        console.log(`[SYNC-STRIPE] Rubypayeur: attached generated fallback PDF`);
+        console.log(`[SYNC-STRIPE] Rubypayeur: attached generated fallback PDF (${pdfFile.size} bytes)`);
       } catch (genErr) {
         console.error("[SYNC-STRIPE] Failed to generate fallback PDF:", genErr);
       }
