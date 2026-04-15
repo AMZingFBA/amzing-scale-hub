@@ -1082,6 +1082,7 @@ const AdminProfiles = () => {
           </DialogHeader>
           <div className="space-y-4">
             <CompanyLookup
+              key={editingSirenProfile?.id}
               onSelect={(siren, companyName) => {
                 setEditSiren(siren);
                 setEditCompanyName(companyName);
