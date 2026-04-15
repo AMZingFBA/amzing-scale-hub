@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { Resend } from "https://esm.sh/resend@4.0.0";
+import Stripe from "https://esm.sh/stripe@18.5.0";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
@@ -12,6 +13,7 @@ interface PaymentFailedRequest {
   email: string;
   full_name: string;
   expires_at: string;
+  stripe_customer_id?: string;
 }
 
 serve(async (req) => {
@@ -20,9 +22,9 @@ serve(async (req) => {
   }
 
   try {
-    const { email, full_name, expires_at }: PaymentFailedRequest = await req.json();
+    const { email, full_name, expires_at, stripe_customer_id }: PaymentFailedRequest = await req.json();
     
-    console.log(`[PAYMENT-FAILED-EMAIL] Sending email to ${email}`);
+    console.log(`[PAYMENT-FAILED-EMAIL] Sending email to ${email}, stripe_customer_id: ${stripe_customer_id}`);
 
     const expiresDate = new Date(expires_at);
     const formattedDate = expiresDate.toLocaleDateString('fr-FR', {
@@ -30,6 +32,35 @@ serve(async (req) => {
       month: 'long',
       year: 'numeric'
     });
+
+    // Generate Stripe Customer Portal link for payment method update
+    let paymentUpdateUrl = "https://amzingfba.com/tarifs"; // fallback
+    const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
+    
+    if (stripeKey && stripe_customer_id) {
+      try {
+        const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
+        const portalSession = await stripe.billingPortal.sessions.create({
+          customer: stripe_customer_id,
+          return_url: "https://amzingfba.com/tarifs",
+          flow_data: {
+            type: "payment_method_update",
+            after_completion: {
+              type: "redirect",
+              redirect: {
+                return_url: "https://amzingfba.com/tarifs",
+              },
+            },
+          },
+        });
+        paymentUpdateUrl = portalSession.url;
+        console.log(`[PAYMENT-FAILED-EMAIL] Generated Stripe portal URL for ${email}`);
+      } catch (portalError: any) {
+        console.error(`[PAYMENT-FAILED-EMAIL] Failed to create portal session, using fallback URL:`, portalError.message);
+      }
+    } else {
+      console.warn(`[PAYMENT-FAILED-EMAIL] No stripe_customer_id or STRIPE_SECRET_KEY, using fallback URL`);
+    }
 
     const emailResponse = await resend.emails.send({
       from: "AMZing FBA <contact@amzingfba.com>",
@@ -50,7 +81,7 @@ Raisons possibles :
 - Problème technique avec votre banque
 
 Action requise :
-Pour continuer à profiter de votre abonnement VIP et accéder à tous nos services premium, veuillez mettre à jour votre moyen de paiement en vous connectant à votre compte.
+Pour continuer à profiter de votre abonnement VIP et accéder à tous nos services premium, veuillez mettre à jour votre moyen de paiement en cliquant sur ce lien : ${paymentUpdateUrl}
 
 Si vous avez des questions ou besoin d'aide, n'hésitez pas à nous contacter via le support.
 
@@ -185,7 +216,7 @@ Se désabonner des emails : https://www.amzingfba.com/
                 <p>Pour continuer à profiter de votre abonnement VIP et accéder à tous nos services premium, veuillez mettre à jour votre moyen de paiement.</p>
                 
                 <div style="text-align: center;">
-                  <a href="https://amzingfba.com/tarifs" class="button">
+                  <a href="${paymentUpdateUrl}" class="button">
                     Mettre à jour mon paiement
                   </a>
                 </div>

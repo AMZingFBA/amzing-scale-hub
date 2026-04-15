@@ -518,7 +518,7 @@ async function submitToRubypayeur(data: {
 }
 
 // Send payment failed email via Resend
-async function sendPaymentFailedEmail(email: string, fullName: string, failedDate: string) {
+async function sendPaymentFailedEmail(email: string, fullName: string, failedDate: string, stripeCustomerId?: string) {
   try {
     const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY');
     if (!RESEND_API_KEY) {
@@ -529,6 +529,30 @@ async function sendPaymentFailedEmail(email: string, fullName: string, failedDat
     const formattedDate = new Date(failedDate).toLocaleDateString('fr-FR', {
       day: 'numeric', month: 'long', year: 'numeric'
     });
+
+    // Generate Stripe Customer Portal link for payment method update
+    let paymentUpdateUrl = "https://amzingfba.com/tarifs"; // fallback
+    if (stripeCustomerId) {
+      try {
+        const portalSession = await stripe.billingPortal.sessions.create({
+          customer: stripeCustomerId,
+          return_url: "https://amzingfba.com/tarifs",
+          flow_data: {
+            type: "payment_method_update",
+            after_completion: {
+              type: "redirect",
+              redirect: {
+                return_url: "https://amzingfba.com/tarifs",
+              },
+            },
+          },
+        });
+        paymentUpdateUrl = portalSession.url;
+        logStep("Generated Stripe portal URL for payment update", { email });
+      } catch (portalError) {
+        logStep("Failed to create portal session, using fallback URL", { error: portalError instanceof Error ? portalError.message : 'Unknown' });
+      }
+    }
 
     const response = await fetch('https://api.resend.com/emails', {
       method: 'POST',
@@ -575,7 +599,7 @@ async function sendPaymentFailedEmail(email: string, fullName: string, failedDat
                 <p><strong>Action requise :</strong></p>
                 <p>Pour continuer à profiter de votre abonnement VIP, veuillez mettre à jour votre moyen de paiement.</p>
                 <div style="text-align:center;">
-                  <a href="https://amzingfba.com/tarifs" class="button">Mettre à jour mon paiement</a>
+                  <a href="${paymentUpdateUrl}" class="button">Mettre à jour mon paiement</a>
                 </div>
                 <p style="margin-top:30px;">⚠️ <strong>Sans régularisation, votre dossier sera automatiquement transmis à notre partenaire de recouvrement.</strong></p>
                 <p style="margin-top:25px;">Cordialement,<br><strong>L'équipe AMZing FBA</strong></p>
@@ -1011,7 +1035,8 @@ serve(async (req) => {
       const emailSent = await sendPaymentFailedEmail(
         customerEmail, 
         profile.full_name || '', 
-        now.toISOString()
+        now.toISOString(),
+        invoice.customer as string
       );
 
       if (emailSent) {
