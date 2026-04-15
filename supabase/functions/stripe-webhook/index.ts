@@ -483,6 +483,16 @@ async function submitToRubypayeur(data: {
       }
     }
 
+    // Attach CGV PDF as additional document
+    try {
+      const cgvPdfBytes = generateCgvPdf();
+      const cgvFile = new File([cgvPdfBytes], 'CGV-AMZing-FBA.pdf', { type: 'application/pdf' });
+      formData.append('debt[document]', cgvFile, 'CGV-AMZing-FBA.pdf');
+      logStep("Rubypayeur: attached CGV PDF", { size: cgvFile.size });
+    } catch (cgvErr) {
+      logStep("Failed to generate CGV PDF", { error: cgvErr instanceof Error ? cgvErr.message : 'Unknown' });
+    }
+
     logStep("Rubypayeur: creating debt case", { 
       email: data.email, 
       amount: data.amount,
