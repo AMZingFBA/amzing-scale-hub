@@ -59,6 +59,48 @@ export type Database = {
         }
         Relationships: []
       }
+      admin_deletion_logs: {
+        Row: {
+          admin_email: string
+          admin_id: string
+          created_at: string
+          deleted_user_email: string
+          deleted_user_id: string
+          deleted_user_name: string | null
+          deleted_user_phone: string | null
+          deleted_user_plan: string | null
+          deleted_user_stripe_customer_id: string | null
+          id: string
+          reason: string | null
+        }
+        Insert: {
+          admin_email: string
+          admin_id: string
+          created_at?: string
+          deleted_user_email: string
+          deleted_user_id: string
+          deleted_user_name?: string | null
+          deleted_user_phone?: string | null
+          deleted_user_plan?: string | null
+          deleted_user_stripe_customer_id?: string | null
+          id?: string
+          reason?: string | null
+        }
+        Update: {
+          admin_email?: string
+          admin_id?: string
+          created_at?: string
+          deleted_user_email?: string
+          deleted_user_id?: string
+          deleted_user_name?: string | null
+          deleted_user_phone?: string | null
+          deleted_user_plan?: string | null
+          deleted_user_stripe_customer_id?: string | null
+          id?: string
+          reason?: string | null
+        }
+        Relationships: []
+      }
       admin_impersonation_tokens: {
         Row: {
           admin_id: string
