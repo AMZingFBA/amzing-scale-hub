@@ -518,6 +518,13 @@ export default function Auth() {
                       </div>
                     </div>
 
+                    <div className="animate-slide-in-up" style={{ animationDelay: "175ms" }}>
+                      <CompanyLookup
+                        onSelect={(siren, companyName) => setSignupData(prev => ({ ...prev, siren, companyName }))}
+                        disabled={isLoading}
+                      />
+                    </div>
+
                     <div className="space-y-2 animate-slide-in-up" style={{ animationDelay: "200ms" }}>
                       <Label htmlFor="signup-email">Email</Label>
                       {suitePaymentEmail && (
