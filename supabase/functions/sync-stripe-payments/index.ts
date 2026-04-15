@@ -580,7 +580,7 @@ serve(async (req) => {
     // Get all profiles with their subscriptions
     const { data: profiles, error: profilesError } = await supabaseAdmin
       .from("profiles")
-      .select("id, email, full_name, phone, siren");
+      .select("id, email, full_name, phone, siren, company_name");
 
     if (profilesError) throw profilesError;
     
