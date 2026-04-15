@@ -1,4 +1,4 @@
-const AIRTABLE_CONTACTS_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/airtable-contacts`;
+import { supabase } from "@/integrations/supabase/client";
 
 export interface AirtableContact {
   id: string;
@@ -39,23 +39,18 @@ const mapRecordToContact = (record: AirtableRecord): AirtableContact => ({
 });
 
 export async function fetchContacts(view?: string): Promise<AirtableContact[]> {
-  const response = await fetch(AIRTABLE_CONTACTS_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ action: "fetch", view }),
+  const { data, error } = await supabase.functions.invoke('airtable-contacts', {
+    body: { action: 'fetch', view },
   });
 
-  const data = await response.json();
-  if (!response.ok) throw new Error(data.error || 'Failed to fetch contacts');
+  if (error) throw new Error(error.message);
   return (data.records || []).map(mapRecordToContact);
 }
 
 export async function createContact(contact: Omit<AirtableContact, 'id'>): Promise<AirtableContact> {
-  const response = await fetch(AIRTABLE_CONTACTS_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      action: "create",
+  const { data, error } = await supabase.functions.invoke('airtable-contacts', {
+    body: {
+      action: 'create',
       data: {
         Email: contact.email,
         Prénom: contact.prenom,
@@ -64,11 +59,10 @@ export async function createContact(contact: Omit<AirtableContact, 'id'>): Promi
         "Type d'email": contact.typeEmail,
         "Statut d'envoi": contact.statutEnvoi || 'À envoyer',
       },
-    }),
+    },
   });
 
-  const data = await response.json();
-  if (!response.ok) throw new Error(data.error || 'Failed to create contact');
+  if (error) throw new Error(error.message);
   return mapRecordToContact(data.records[0]);
 }
 
@@ -83,28 +77,20 @@ export async function updateContact(recordId: string, updates: Partial<AirtableC
   if (updates.dernierEnvoi) fields["Dernier envoi"] = updates.dernierEnvoi;
   if (updates.idMake) fields["ID Make"] = updates.idMake;
 
-  const response = await fetch(AIRTABLE_CONTACTS_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ action: "update", recordId, data: fields }),
+  const { data, error } = await supabase.functions.invoke('airtable-contacts', {
+    body: { action: 'update', recordId, data: fields },
   });
 
-  const data = await response.json();
-  if (!response.ok) throw new Error(data.error || 'Failed to update contact');
+  if (error) throw new Error(error.message);
   return mapRecordToContact(data);
 }
 
 export async function deleteContact(recordId: string): Promise<void> {
-  const response = await fetch(AIRTABLE_CONTACTS_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ action: "delete", recordId }),
+  const { error } = await supabase.functions.invoke('airtable-contacts', {
+    body: { action: 'delete', recordId },
   });
 
-  if (!response.ok) {
-    const data = await response.json();
-    throw new Error(data.error || 'Failed to delete contact');
-  }
+  if (error) throw new Error(error.message);
 }
 
 export async function fetchContactsToSend(): Promise<AirtableContact[]> {
