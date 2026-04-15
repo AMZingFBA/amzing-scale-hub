@@ -91,6 +91,41 @@ serve(async (req) => {
 
     logStep("Target user found", { userId, email: targetUser.user.email });
 
+    // Récupérer les infos du profil et de l'abonnement AVANT suppression pour le log
+    const { data: profileData } = await supabaseAdmin
+      .from('profiles')
+      .select('email, full_name, phone')
+      .eq('id', userId)
+      .single();
+
+    const { data: subData } = await supabaseAdmin
+      .from('subscriptions')
+      .select('plan_type, stripe_customer_id')
+      .eq('user_id', userId)
+      .single();
+
+    // Récupérer l'email de l'admin
+    const { data: adminProfile } = await supabaseAdmin
+      .from('profiles')
+      .select('email')
+      .eq('id', adminUser.id)
+      .single();
+
+    // Logger la suppression AVANT de supprimer les données
+    await supabaseAdmin
+      .from('admin_deletion_logs')
+      .insert({
+        deleted_user_id: userId,
+        deleted_user_email: profileData?.email || targetUser.user.email || 'unknown',
+        deleted_user_name: profileData?.full_name || null,
+        deleted_user_phone: profileData?.phone || null,
+        deleted_user_plan: subData?.plan_type || null,
+        deleted_user_stripe_customer_id: subData?.stripe_customer_id || null,
+        admin_id: adminUser.id,
+        admin_email: adminProfile?.email || adminUser.email || 'unknown',
+      });
+    logStep("Deletion logged to admin_deletion_logs");
+
     // Supprimer toutes les données associées à l'utilisateur
     
     // Supprimer les préférences de notifications
