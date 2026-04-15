@@ -59,170 +59,6 @@ export type Database = {
         }
         Relationships: []
       }
-      analysis_filter_presets: {
-        Row: {
-          id: string
-          user_id: string
-          name: string
-          filters: Json
-          is_default: boolean
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id?: string
-          user_id: string
-          name: string
-          filters?: Json
-          is_default?: boolean
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          id?: string
-          user_id?: string
-          name?: string
-          filters?: Json
-          is_default?: boolean
-          created_at?: string
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      analysis_results: {
-        Row: {
-          id: string
-          analysis_id: string
-          asin: string | null
-          ean: string | null
-          product_name: string | null
-          buy_price: number | null
-          sell_price: number | null
-          profit_fba: number | null
-          roi_fba: number | null
-          profit_fbm: number | null
-          roi_fbm: number | null
-          bsr: number | null
-          sales_monthly: number | null
-          fba_sellers: number | null
-          fbm_sellers: number | null
-          category: string | null
-          variations: number | null
-          alerts: string | null
-          commission_pct: number | null
-          fba_fee: number | null
-          country_code: string | null
-          amazon_url: string | null
-          created_at: string
-        }
-        Insert: {
-          id?: string
-          analysis_id: string
-          asin?: string | null
-          ean?: string | null
-          product_name?: string | null
-          buy_price?: number | null
-          sell_price?: number | null
-          profit_fba?: number | null
-          roi_fba?: number | null
-          profit_fbm?: number | null
-          roi_fbm?: number | null
-          bsr?: number | null
-          sales_monthly?: number | null
-          fba_sellers?: number | null
-          fbm_sellers?: number | null
-          category?: string | null
-          variations?: number | null
-          alerts?: string | null
-          commission_pct?: number | null
-          fba_fee?: number | null
-          country_code?: string | null
-          amazon_url?: string | null
-          created_at?: string
-        }
-        Update: {
-          id?: string
-          analysis_id?: string
-          asin?: string | null
-          ean?: string | null
-          product_name?: string | null
-          buy_price?: number | null
-          sell_price?: number | null
-          profit_fba?: number | null
-          roi_fba?: number | null
-          profit_fbm?: number | null
-          roi_fbm?: number | null
-          bsr?: number | null
-          sales_monthly?: number | null
-          fba_sellers?: number | null
-          fbm_sellers?: number | null
-          category?: string | null
-          variations?: number | null
-          alerts?: string | null
-          commission_pct?: number | null
-          fba_fee?: number | null
-          country_code?: string | null
-          amazon_url?: string | null
-          created_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "analysis_results_analysis_id_fkey"
-            columns: ["analysis_id"]
-            isOneToOne: false
-            referencedRelation: "file_analyses"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      file_analyses: {
-        Row: {
-          id: string
-          user_id: string
-          file_path: string
-          file_name: string
-          filters: Json
-          column_mapping: Json | null
-          status: string
-          results_count: number | null
-          total_rows: number | null
-          error_message: string | null
-          processing_duration_ms: number | null
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id?: string
-          user_id: string
-          file_path: string
-          file_name: string
-          filters?: Json
-          column_mapping?: Json | null
-          status?: string
-          results_count?: number | null
-          total_rows?: number | null
-          error_message?: string | null
-          processing_duration_ms?: number | null
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          id?: string
-          user_id?: string
-          file_path?: string
-          file_name?: string
-          filters?: Json
-          column_mapping?: Json | null
-          status?: string
-          results_count?: number | null
-          total_rows?: number | null
-          error_message?: string | null
-          processing_duration_ms?: number | null
-          created_at?: string
-          updated_at?: string
-        }
-        Relationships: []
-      }
       admin_impersonation_tokens: {
         Row: {
           admin_id: string
@@ -424,6 +260,122 @@ export type Database = {
             columns: ["alert_id"]
             isOneToOne: false
             referencedRelation: "admin_alerts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      analysis_filter_presets: {
+        Row: {
+          created_at: string | null
+          filters: Json
+          id: string
+          is_default: boolean | null
+          name: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          filters?: Json
+          id?: string
+          is_default?: boolean | null
+          name: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          filters?: Json
+          id?: string
+          is_default?: boolean | null
+          name?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      analysis_results: {
+        Row: {
+          alerts: string | null
+          amazon_url: string | null
+          analysis_id: string
+          asin: string | null
+          bsr: number | null
+          buy_price: number | null
+          category: string | null
+          commission_pct: number | null
+          country_code: string | null
+          created_at: string | null
+          ean: string | null
+          fba_fee: number | null
+          fba_sellers: number | null
+          fbm_sellers: number | null
+          id: string
+          product_name: string | null
+          profit_fba: number | null
+          profit_fbm: number | null
+          roi_fba: number | null
+          roi_fbm: number | null
+          sales_monthly: number | null
+          sell_price: number | null
+          variations: number | null
+        }
+        Insert: {
+          alerts?: string | null
+          amazon_url?: string | null
+          analysis_id: string
+          asin?: string | null
+          bsr?: number | null
+          buy_price?: number | null
+          category?: string | null
+          commission_pct?: number | null
+          country_code?: string | null
+          created_at?: string | null
+          ean?: string | null
+          fba_fee?: number | null
+          fba_sellers?: number | null
+          fbm_sellers?: number | null
+          id?: string
+          product_name?: string | null
+          profit_fba?: number | null
+          profit_fbm?: number | null
+          roi_fba?: number | null
+          roi_fbm?: number | null
+          sales_monthly?: number | null
+          sell_price?: number | null
+          variations?: number | null
+        }
+        Update: {
+          alerts?: string | null
+          amazon_url?: string | null
+          analysis_id?: string
+          asin?: string | null
+          bsr?: number | null
+          buy_price?: number | null
+          category?: string | null
+          commission_pct?: number | null
+          country_code?: string | null
+          created_at?: string | null
+          ean?: string | null
+          fba_fee?: number | null
+          fba_sellers?: number | null
+          fbm_sellers?: number | null
+          id?: string
+          product_name?: string | null
+          profit_fba?: number | null
+          profit_fbm?: number | null
+          roi_fba?: number | null
+          roi_fbm?: number | null
+          sales_monthly?: number | null
+          sell_price?: number | null
+          variations?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "analysis_results_analysis_id_fkey"
+            columns: ["analysis_id"]
+            isOneToOne: false
+            referencedRelation: "file_analyses"
             referencedColumns: ["id"]
           },
         ]
@@ -873,6 +825,54 @@ export type Database = {
         }
         Relationships: []
       }
+      file_analyses: {
+        Row: {
+          column_mapping: Json | null
+          created_at: string | null
+          error_message: string | null
+          file_name: string
+          file_path: string
+          filters: Json
+          id: string
+          processing_duration_ms: number | null
+          results_count: number | null
+          status: string
+          total_rows: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          column_mapping?: Json | null
+          created_at?: string | null
+          error_message?: string | null
+          file_name: string
+          file_path: string
+          filters?: Json
+          id?: string
+          processing_duration_ms?: number | null
+          results_count?: number | null
+          status?: string
+          total_rows?: number | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          column_mapping?: Json | null
+          created_at?: string | null
+          error_message?: string | null
+          file_name?: string
+          file_path?: string
+          filters?: Json
+          id?: string
+          processing_duration_ms?: number | null
+          results_count?: number | null
+          status?: string
+          total_rows?: number | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       marketplace_buy_requests: {
         Row: {
           asin: string | null
@@ -1041,6 +1041,292 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      mp_favorites: {
+        Row: {
+          asin: string
+          country_code: string
+          created_at: string
+          id: string
+          image_url: string | null
+          notes: string | null
+          product_name: string | null
+          user_id: string
+        }
+        Insert: {
+          asin: string
+          country_code?: string
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          notes?: string | null
+          product_name?: string | null
+          user_id: string
+        }
+        Update: {
+          asin?: string
+          country_code?: string
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          notes?: string | null
+          product_name?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      mp_lookup_results: {
+        Row: {
+          alerts: string | null
+          amazon_price: number | null
+          amazon_url: string | null
+          asin: string
+          bsr: number | null
+          buy_price: number | null
+          category: string | null
+          closing_fee: number | null
+          commission_eur: number | null
+          commission_pct: number | null
+          country_code: string
+          created_at: string
+          dst_fee: number | null
+          ean: string | null
+          eu_data: Json | null
+          fba_fee: number | null
+          fba_price: number | null
+          fba_sellers: number | null
+          fbm_sellers: number | null
+          height_mm: number | null
+          id: string
+          image_url: string | null
+          keepa_data: Json | null
+          length_mm: number | null
+          lookup_id: string
+          offers: Json | null
+          product_name: string | null
+          profit_fba: number | null
+          profit_fbm: number | null
+          roi_fba: number | null
+          roi_fbm: number | null
+          sales_monthly: number | null
+          sell_price: number | null
+          total_fees_fba: number | null
+          total_fees_fbm: number | null
+          user_id: string
+          variations: number | null
+          weight_g: number | null
+          width_mm: number | null
+        }
+        Insert: {
+          alerts?: string | null
+          amazon_price?: number | null
+          amazon_url?: string | null
+          asin: string
+          bsr?: number | null
+          buy_price?: number | null
+          category?: string | null
+          closing_fee?: number | null
+          commission_eur?: number | null
+          commission_pct?: number | null
+          country_code: string
+          created_at?: string
+          dst_fee?: number | null
+          ean?: string | null
+          eu_data?: Json | null
+          fba_fee?: number | null
+          fba_price?: number | null
+          fba_sellers?: number | null
+          fbm_sellers?: number | null
+          height_mm?: number | null
+          id?: string
+          image_url?: string | null
+          keepa_data?: Json | null
+          length_mm?: number | null
+          lookup_id: string
+          offers?: Json | null
+          product_name?: string | null
+          profit_fba?: number | null
+          profit_fbm?: number | null
+          roi_fba?: number | null
+          roi_fbm?: number | null
+          sales_monthly?: number | null
+          sell_price?: number | null
+          total_fees_fba?: number | null
+          total_fees_fbm?: number | null
+          user_id: string
+          variations?: number | null
+          weight_g?: number | null
+          width_mm?: number | null
+        }
+        Update: {
+          alerts?: string | null
+          amazon_price?: number | null
+          amazon_url?: string | null
+          asin?: string
+          bsr?: number | null
+          buy_price?: number | null
+          category?: string | null
+          closing_fee?: number | null
+          commission_eur?: number | null
+          commission_pct?: number | null
+          country_code?: string
+          created_at?: string
+          dst_fee?: number | null
+          ean?: string | null
+          eu_data?: Json | null
+          fba_fee?: number | null
+          fba_price?: number | null
+          fba_sellers?: number | null
+          fbm_sellers?: number | null
+          height_mm?: number | null
+          id?: string
+          image_url?: string | null
+          keepa_data?: Json | null
+          length_mm?: number | null
+          lookup_id?: string
+          offers?: Json | null
+          product_name?: string | null
+          profit_fba?: number | null
+          profit_fbm?: number | null
+          roi_fba?: number | null
+          roi_fbm?: number | null
+          sales_monthly?: number | null
+          sell_price?: number | null
+          total_fees_fba?: number | null
+          total_fees_fbm?: number | null
+          user_id?: string
+          variations?: number | null
+          weight_g?: number | null
+          width_mm?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mp_lookup_results_lookup_id_fkey"
+            columns: ["lookup_id"]
+            isOneToOne: false
+            referencedRelation: "mp_lookups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mp_lookups: {
+        Row: {
+          country_code: string
+          created_at: string
+          error_message: string | null
+          id: string
+          processing_ms: number | null
+          profile_id: string | null
+          query_input: string
+          query_type: string
+          results_count: number | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          country_code?: string
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          processing_ms?: number | null
+          profile_id?: string | null
+          query_input: string
+          query_type?: string
+          results_count?: number | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          country_code?: string
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          processing_ms?: number | null
+          profile_id?: string | null
+          query_input?: string
+          query_type?: string
+          results_count?: number | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mp_lookups_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "mp_settings_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mp_product_cache: {
+        Row: {
+          asin: string
+          country_code: string
+          fetched_at: string
+          id: string
+          raw_data: Json
+        }
+        Insert: {
+          asin: string
+          country_code: string
+          fetched_at?: string
+          id?: string
+          raw_data: Json
+        }
+        Update: {
+          asin?: string
+          country_code?: string
+          fetched_at?: string
+          id?: string
+          raw_data?: Json
+        }
+        Relationships: []
+      }
+      mp_settings_profiles: {
+        Row: {
+          country_code: string
+          created_at: string
+          custom_margin: number
+          id: string
+          inbound_cost: number
+          is_default: boolean
+          name: string
+          prep_cost: number
+          updated_at: string
+          user_id: string
+          vat_rate: number
+        }
+        Insert: {
+          country_code?: string
+          created_at?: string
+          custom_margin?: number
+          id?: string
+          inbound_cost?: number
+          is_default?: boolean
+          name?: string
+          prep_cost?: number
+          updated_at?: string
+          user_id: string
+          vat_rate?: number
+        }
+        Update: {
+          country_code?: string
+          created_at?: string
+          custom_margin?: number
+          id?: string
+          inbound_cost?: number
+          is_default?: boolean
+          name?: string
+          prep_cost?: number
+          updated_at?: string
+          user_id?: string
+          vat_rate?: number
+        }
+        Relationships: []
       }
       notification_preferences: {
         Row: {
@@ -1799,6 +2085,49 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      analysis_claim_next: {
+        Args: { p_secret: string }
+        Returns: {
+          column_mapping: Json | null
+          created_at: string | null
+          error_message: string | null
+          file_name: string
+          file_path: string
+          filters: Json
+          id: string
+          processing_duration_ms: number | null
+          results_count: number | null
+          status: string
+          total_rows: number | null
+          updated_at: string | null
+          user_id: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "file_analyses"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      analysis_complete: {
+        Args: {
+          p_count: number
+          p_duration_ms: number
+          p_id: string
+          p_mapping: Json
+          p_secret: string
+          p_total: number
+        }
+        Returns: undefined
+      }
+      analysis_fail: {
+        Args: { p_error: string; p_id: string; p_secret: string }
+        Returns: undefined
+      }
+      analysis_insert_results: {
+        Args: { p_analysis_id: string; p_results: Json; p_secret: string }
+        Returns: undefined
+      }
       bridge_claim_next_search: {
         Args: { p_secret: string }
         Returns: {
@@ -1931,6 +2260,60 @@ export type Database = {
       }
       mark_ticket_messages_as_read: {
         Args: { ticket_id_param: string }
+        Returns: undefined
+      }
+      mp_claim_next: {
+        Args: { p_secret: string }
+        Returns: {
+          country_code: string
+          created_at: string
+          error_message: string | null
+          id: string
+          processing_ms: number | null
+          profile_id: string | null
+          query_input: string
+          query_type: string
+          results_count: number | null
+          status: string
+          updated_at: string
+          user_id: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "mp_lookups"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      mp_complete: {
+        Args: {
+          p_id: string
+          p_processing_ms: number
+          p_results: Json
+          p_secret: string
+        }
+        Returns: undefined
+      }
+      mp_fail: {
+        Args: { p_error: string; p_id: string; p_secret: string }
+        Returns: undefined
+      }
+      mp_get_cache: {
+        Args: {
+          p_asin: string
+          p_country_code: string
+          p_max_age_hours: number
+          p_secret: string
+        }
+        Returns: Json
+      }
+      mp_upsert_cache: {
+        Args: {
+          p_asin: string
+          p_country_code: string
+          p_raw_data: Json
+          p_secret: string
+        }
         Returns: undefined
       }
       reset_user_badge: { Args: { user_id_param: string }; Returns: undefined }
