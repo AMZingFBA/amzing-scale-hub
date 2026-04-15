@@ -162,9 +162,13 @@ function generateProfessionalInvoicePdf(data: {
   y -= 14;
   lines.push(`BT /F2 9 Tf 50 ${y} Td (SIRET: 99334892900015) Tj ET`);
   if (data.clientSiren) {
-    lines.push(`BT /F2 9 Tf 310 ${y} Td (SIREN: ${esc(data.clientSiren)}) Tj ET`);
+    lines.push(`BT /F2 9 Tf 310 ${y} Td (${esc(data.clientSiren)}) Tj ET`);
   }
   y -= 14;
+  if (data.clientTvaNumber) {
+    lines.push(`BT /F2 9 Tf 310 ${y} Td (${esc('Num\\351ro de TVA: ' + data.clientTvaNumber)}) Tj ET`);
+    y -= 14;
+  }
   lines.push(`BT /F2 9 Tf 310 ${y} Td (${esc(data.clientEmail)}) Tj ET`);
   y -= 35;
 
