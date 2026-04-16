@@ -343,6 +343,7 @@ const Support = () => {
               </DialogContent>
               </Dialog>
             )}
+            </div>
           </div>
 
           {tickets.length === 0 ? (
