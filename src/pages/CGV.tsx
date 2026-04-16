@@ -141,6 +141,23 @@ const CGV = () => {
                       Aucun abonnement mensuel autonome n'est proposé.
                     </p>
 
+                    <h3 className="text-xl font-semibold mb-2 mt-4">6.2.1 Offre d'essai</h3>
+                    <p className="text-muted-foreground leading-relaxed mb-3">
+                      À titre exceptionnel, le Prestataire peut proposer une offre d'essai d'une durée maximale d'un (1) mois.
+                    </p>
+                    <p className="text-muted-foreground leading-relaxed mb-3">
+                      Cette offre d'essai ne constitue pas un abonnement mensuel autonome.
+                    </p>
+                    <p className="text-muted-foreground leading-relaxed mb-3">
+                      Sauf résiliation expresse par le Client avant l'expiration de la période d'essai, la souscription se transforme automatiquement en abonnement annuel ferme de douze (12) mois, payable selon les modalités choisies lors de la commande.
+                    </p>
+                    <p className="text-muted-foreground leading-relaxed mb-3">
+                      Le Client reconnaît et accepte expressément que l'absence de résiliation pendant la période d'essai vaut engagement pour la durée annuelle de douze (12) mois.
+                    </p>
+                    <p className="text-muted-foreground leading-relaxed mb-3">
+                      L'offre d'essai n'est valable que lorsqu'elle a été expressément accordée par le Prestataire et formalisée par e-mail ou par tout autre écrit ou support durable permettant d'en conserver la preuve. À défaut d'un tel écrit, aucune période d'essai ne peut être invoquée par le Client.
+                    </p>
+
                     <h3 className="text-xl font-semibold mb-2 mt-4">6.3 Coaching et accompagnement individualisé</h3>
                     <p className="text-muted-foreground leading-relaxed">
                       Les prestations de coaching ou de conseil sont fournies selon les modalités indiquées sur la page de vente. Les conseils fournis sont de nature générale et pédagogique et ne constituent en aucun cas un conseil juridique, fiscal, comptable ou financier personnalisé, ni une promesse ou garantie de résultat.
@@ -176,8 +193,11 @@ const CGV = () => {
                     </p>
 
                     <h3 className="text-xl font-semibold mb-2 mt-4">8.2 Vérification des erreurs</h3>
-                    <p className="text-muted-foreground leading-relaxed">
+                    <p className="text-muted-foreground leading-relaxed mb-3">
                       Le Client peut corriger toute erreur avant validation définitive de la commande.
+                    </p>
+                    <p className="text-muted-foreground leading-relaxed">
+                      En cas d'offre d'essai, la validation de la commande emporte acceptation expresse du mécanisme de transformation automatique en abonnement annuel ferme de douze (12) mois, sauf résiliation dans le délai prévu à l'article 6.2.1.
                     </p>
                   </section>
 
@@ -198,8 +218,11 @@ const CGV = () => {
                     <p className="text-muted-foreground leading-relaxed mb-3">
                       Le paiement échelonné ne constitue en aucun cas un abonnement mensuel, mais un échelonnement du prix annuel total, lequel demeure intégralement dû dès la souscription.
                     </p>
-                    <p className="text-muted-foreground leading-relaxed">
+                    <p className="text-muted-foreground leading-relaxed mb-3">
                       Le Client reconnaît que la facilité de paiement constitue un engagement de paiement irrévocable portant sur l'intégralité du prix annuel, et autorise expressément le Prestataire (ou son prestataire de paiement) à procéder aux prélèvements/encaissements des échéances, conformément au plan choisi.
+                    </p>
+                    <p className="text-muted-foreground leading-relaxed">
+                      En cas d'offre d'essai expressément accordée dans les conditions prévues à l'article 6.2.1, l'absence de résiliation avant la fin de la période d'essai entraîne automatiquement la poursuite du contrat sous la forme d'un abonnement annuel ferme de douze (12) mois et rend exigibles les échéances correspondantes.
                     </p>
 
                     <h3 className="text-xl font-semibold mb-2 mt-4">9.2 Engagement ferme – Paiement intégral dû</h3>
@@ -241,6 +264,9 @@ const CGV = () => {
 
                   <section>
                     <h2 className="text-2xl font-semibold mb-3 text-primary">10. Résiliation</h2>
+                    <p className="text-muted-foreground leading-relaxed mb-3">
+                      En cas d'offre d'essai, le Client peut mettre fin à la souscription uniquement pendant la période d'essai prévue et selon les modalités communiquées par le Prestataire. À défaut de résiliation dans ce délai, l'engagement annuel ferme de douze (12) mois s'applique automatiquement.
+                    </p>
                     
                     <h3 className="text-xl font-semibold mb-2">10.1 Résiliation par le Client</h3>
                     <p className="text-muted-foreground leading-relaxed mb-3">
