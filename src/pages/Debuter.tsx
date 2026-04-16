@@ -443,15 +443,46 @@ const Debuter = () => {
                           </div>
                         </button>
                       </Link>
-                      <a href="https://systeme.io/dashboard/share?hash=547932924ce9666693f6a671df31f5d1ff9884&type=course" target="_blank" rel="noopener noreferrer">
-                        <button className="w-full border border-primary hover:bg-primary/10 py-4 rounded-lg transition-colors">
-                          <div className="flex flex-col items-start gap-1 w-full px-4">
-                            <span className="font-semibold">🎓 Formation complète</span>
-                            <span className="text-xs text-muted-foreground">Accéder à la formation Amazon FBA</span>
-                          </div>
-                        </button>
-                      </a>
                     </div>
+                  </CardContent>
+                </Card>
+              </section>
+
+              {/* Step 8: Formation */}
+              <section 
+                ref={step7Anim.ref}
+                className={cn(
+                  "transition-all duration-700",
+                  step7Anim.isVisible ? "opacity-100 scale-100" : "opacity-0 scale-95"
+                )}
+              >
+                <Card className="border-primary/30 bg-gradient-to-br from-primary/10 to-primary/5">
+                  <CardHeader>
+                    <div className="flex items-start gap-4">
+                      <div className="p-3 rounded-xl bg-primary text-white text-2xl font-bold shadow-lg">8</div>
+                      <div className="flex-1">
+                        <CardTitle className="text-2xl flex items-center gap-2 mb-2">
+                          <BookOpen className="w-6 h-6 text-primary" />
+                          Formation complète
+                        </CardTitle>
+                        <CardDescription className="text-base">
+                          Apprends Amazon FBA de A à Z
+                        </CardDescription>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <p className="text-lg">
+                      Accède à notre formation complète pour maîtriser chaque aspect d'Amazon FBA : sourcing, logistique, optimisation et stratégies avancées.
+                    </p>
+                    <a href="https://systeme.io/dashboard/share?hash=547932924ce9666693f6a671df31f5d1ff9884&type=course" target="_blank" rel="noopener noreferrer">
+                      <button className="w-full border border-primary hover:bg-primary/10 py-4 rounded-lg transition-colors">
+                        <div className="flex flex-col items-center gap-1 w-full px-4">
+                          <span className="font-semibold text-lg">🎓 Accéder à la formation</span>
+                          <span className="text-xs text-muted-foreground">Formation Amazon FBA complète</span>
+                        </div>
+                      </button>
+                    </a>
                   </CardContent>
                 </Card>
               </section>
