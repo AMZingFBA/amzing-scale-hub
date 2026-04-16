@@ -9,7 +9,7 @@ import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, Plus, MessageSquare, ArrowLeft } from 'lucide-react';
+import { Loader2, Plus, MessageSquare, ArrowLeft, GraduationCap } from 'lucide-react';
 import { Capacitor } from '@capacitor/core';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
@@ -249,7 +249,18 @@ const Support = () => {
                 </p>
               </div>
             </div>
-            {!isAdmin && (
+            <div className="flex gap-2 flex-wrap">
+              {!isAdmin && (
+                <Button
+                  variant="outline"
+                  onClick={() => navigate('/cours-particulier')}
+                  className="gap-2"
+                >
+                  <GraduationCap className="w-4 h-4" />
+                  Cours particulier
+                </Button>
+              )}
+              {!isAdmin && (
               <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
                 <DialogTrigger asChild>
                   <Button>
