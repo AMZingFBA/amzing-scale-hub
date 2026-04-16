@@ -367,6 +367,7 @@ const Ticket = () => {
                       {ticket.category === 'marketplace' && '🛒 Marketplace'}
                       {ticket.category === 'avis' && '⭐ Avis'}
                       {ticket.category === 'autre' && '💬 Autre'}
+                      {ticket.category === 'cours_particulier' && '🎓 Cours particulier'}
                     </Badge>
                   )}
                   <Badge>{ticket?.priority}</Badge>
