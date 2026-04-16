@@ -406,6 +406,7 @@ const Support = () => {
                                 {ticket.category === 'marketplace' && '🛒 Marketplace'}
                                 {ticket.category === 'avis' && '⭐ Avis'}
                                 {ticket.category === 'autre' && '💬 Autre'}
+                                {ticket.category === 'cours_particulier' && '🎓 Cours particulier'}
                               </Badge>
                             )}
                             {unreadCounts[ticket.id] > 0 && (
@@ -459,6 +460,7 @@ const Support = () => {
                                 {ticket.category === 'marketplace' && '🛒 Marketplace'}
                                 {ticket.category === 'avis' && '⭐ Avis'}
                                 {ticket.category === 'autre' && '💬 Autre'}
+                                {ticket.category === 'cours_particulier' && '🎓 Cours particulier'}
                               </Badge>
                             )}
                           </div>
