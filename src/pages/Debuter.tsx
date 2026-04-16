@@ -443,6 +443,14 @@ const Debuter = () => {
                           </div>
                         </button>
                       </Link>
+                      <a href="https://systeme.io/dashboard/share?hash=547932924ce9666693f6a671df31f5d1ff9884&type=course" target="_blank" rel="noopener noreferrer">
+                        <button className="w-full border border-primary hover:bg-primary/10 py-4 rounded-lg transition-colors">
+                          <div className="flex flex-col items-start gap-1 w-full px-4">
+                            <span className="font-semibold">🎓 Formation complète</span>
+                            <span className="text-xs text-muted-foreground">Accéder à la formation Amazon FBA</span>
+                          </div>
+                        </button>
+                      </a>
                     </div>
                   </CardContent>
                 </Card>
