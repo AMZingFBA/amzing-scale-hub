@@ -486,6 +486,39 @@ const Debuter = () => {
                   </CardContent>
                 </Card>
               </section>
+
+              {/* Step 9: Cours particulier */}
+              <section className="transition-all duration-700">
+                <Card className="border-amber-500/30 bg-gradient-to-br from-amber-500/10 to-orange-500/5">
+                  <CardHeader>
+                    <div className="flex items-start gap-4">
+                      <div className="p-3 rounded-xl bg-amber-500 text-white text-2xl font-bold shadow-lg">9</div>
+                      <div className="flex-1">
+                        <CardTitle className="text-2xl flex items-center gap-2 mb-2">
+                          <Users className="w-6 h-6 text-amber-500" />
+                          Cours particulier
+                        </CardTitle>
+                        <CardDescription className="text-base">
+                          Un accompagnement individuel sur-mesure
+                        </CardDescription>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <p className="text-lg">
+                      Réserve un créneau pour un cours individuel avec un expert. Pose tes questions, obtiens des réponses personnalisées et progresse plus vite.
+                    </p>
+                    <Link to="/cours-particulier">
+                      <button className="w-full border border-amber-500 hover:bg-amber-500/10 py-4 rounded-lg transition-colors">
+                        <div className="flex flex-col items-center gap-1 w-full px-4">
+                          <span className="font-semibold text-lg">📅 Réserver un cours</span>
+                          <span className="text-xs text-muted-foreground">Accompagnement individuel personnalisé</span>
+                        </div>
+                      </button>
+                    </Link>
+                  </CardContent>
+                </Card>
+              </section>
             </div>
           </div>
         </div>
