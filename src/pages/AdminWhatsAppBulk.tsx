@@ -329,27 +329,27 @@ const AdminWhatsAppBulk = () => {
       </div>
 
       <div className="max-w-5xl mx-auto p-4 space-y-4">
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept=".csv,.xlsx,.xls,.txt"
+          className="hidden"
+          onChange={handleFileInputChange}
+        />
+
         {/* Upload Zone */}
         {contacts.length === 0 ? (
-          <>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept=".csv,.xlsx,.xls,.txt"
-              className="hidden"
-              onChange={handleFileInputChange}
-            />
-            <div
-              onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
-              onDragLeave={() => setDragOver(false)}
-              onDrop={handleDrop}
-              className="border-2 border-dashed rounded-xl p-12 text-center transition-all cursor-pointer"
-              style={{
-                borderColor: dragOver ? "#00a884" : "#233138",
-                background: dragOver ? "#1a2e35" : "#0b141a",
-              }}
-              onClick={() => fileInputRef.current?.click()}
-            >
+          <div
+            onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+            onDragLeave={() => setDragOver(false)}
+            onDrop={handleDrop}
+            className="border-2 border-dashed rounded-xl p-12 text-center transition-all cursor-pointer"
+            style={{
+              borderColor: dragOver ? "#00a884" : "#233138",
+              background: dragOver ? "#1a2e35" : "#0b141a",
+            }}
+            onClick={() => fileInputRef.current?.click()}
+          >
             <Upload className="w-12 h-12 mx-auto mb-4" style={{ color: "#00a884" }} />
             <h3 className="text-xl font-medium mb-2">Importez votre fichier</h3>
             <p className="text-sm mb-1" style={{ color: "#8696a0" }}>
@@ -358,9 +358,9 @@ const AdminWhatsAppBulk = () => {
             <p className="text-xs" style={{ color: "#8696a0" }}>
               Formats supportés : CSV, XLSX, XLS — Le numéro de téléphone et le nom de société seront détectés automatiquement
             </p>
-            </div>
-          </>
+          </div>
         ) : (
+          <>
           <>
             {/* File info + Column mapping */}
             <div className="rounded-xl p-4 space-y-3" style={{ background: "#202c33" }}>
