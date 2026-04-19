@@ -344,7 +344,7 @@ export default function AdminWhatsAppCRM() {
         {/* Sidebar Header */}
         <div className="flex items-center justify-between px-4 py-3 bg-[#f0f2f5] border-b border-gray-200">
           <div className="flex items-center gap-3">
-            <Link to="/admin/whatsapp-crm" className="p-1.5 rounded-full hover:bg-gray-300/50 transition-colors">
+            <Link to="/dashboard" className="p-1.5 rounded-full hover:bg-gray-300/50 transition-colors">
               <ArrowLeft className="w-5 h-5 text-gray-600" />
             </Link>
             <h1 className="text-base font-semibold text-gray-800">WhatsApp CRM</h1>
