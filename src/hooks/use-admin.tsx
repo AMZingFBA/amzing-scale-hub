@@ -8,35 +8,57 @@ export const useAdmin = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    let isMounted = true;
+
     const checkAdminStatus = async () => {
       if (!user) {
+        if (!isMounted) return;
         setIsAdmin(false);
         setIsLoading(false);
         return;
       }
 
+      if (isMounted) {
+        setIsLoading(true);
+      }
+
       try {
-        const { data, error } = await supabase
-          .from('user_roles')
-          .select('role')
-          .eq('user_id', user.id)
-          .eq('role', 'admin')
-          .single();
+        const result = await Promise.race([
+          supabase
+            .from('user_roles')
+            .select('role')
+            .eq('user_id', user.id)
+            .eq('role', 'admin')
+            .maybeSingle(),
+          new Promise<never>((_, reject) =>
+            setTimeout(() => reject(new Error('admin-check-timeout')), 5000)
+          ),
+        ]);
+
+        const { data, error } = result;
 
         if (error && error.code !== 'PGRST116') {
           console.error('Error checking admin status:', error);
         }
 
+        if (!isMounted) return;
         setIsAdmin(!!data);
       } catch (error) {
         console.error('Error checking admin status:', error);
+        if (!isMounted) return;
         setIsAdmin(false);
       } finally {
-        setIsLoading(false);
+        if (isMounted) {
+          setIsLoading(false);
+        }
       }
     };
 
     checkAdminStatus();
+
+    return () => {
+      isMounted = false;
+    };
   }, [user]);
 
   return { isAdmin, isLoading };
