@@ -168,6 +168,15 @@ export default function AdminWhatsAppCRM() {
     setConversations(prev => prev.map(c => c.id === convId ? { ...c, unread_count: 0 } : c));
   }, []);
 
+  // ============ FETCH CONTACT TAGS ============
+  const fetchContactTags = useCallback(async (contactId: string) => {
+    const { data } = await waSupabase
+      .from("contact_tag_links")
+      .select("tag_id")
+      .eq("contact_id", contactId);
+    setContactTagIds(data ? data.map((d: { tag_id: string }) => d.tag_id) : []);
+  }, []);
+
   // ============ FETCH TAGS ============
   useEffect(() => {
     waSupabase.from("contact_tags").select("*").then(({ data }) => {
@@ -326,15 +335,6 @@ export default function AdminWhatsAppCRM() {
     setActiveContact(prev => prev ? { ...prev, notes_internal: notesText } : null);
     setEditingNotes(false);
   };
-
-  // ============ FETCH CONTACT TAGS ============
-  const fetchContactTags = useCallback(async (contactId: string) => {
-    const { data } = await waSupabase
-      .from("contact_tag_links")
-      .select("tag_id")
-      .eq("contact_id", contactId);
-    setContactTagIds(data ? data.map((d: { tag_id: string }) => d.tag_id) : []);
-  }, []);
 
   // ============ TOGGLE TAG ============
   const toggleTag = async (tagId: string) => {
