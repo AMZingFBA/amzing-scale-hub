@@ -155,12 +155,21 @@ const AdminWhatsAppBulk = () => {
     } else if (ext === "xlsx" || ext === "xls") {
       const reader = new FileReader();
       reader.onload = (e) => {
-        const wb = XLSX.read(e.target?.result, { type: "binary" });
-        const ws = wb.Sheets[wb.SheetNames[0]];
-        const rows = XLSX.utils.sheet_to_json<Record<string, string>>(ws, { defval: "" });
-        processData(rows, file.name);
+        try {
+          const data = new Uint8Array(e.target?.result as ArrayBuffer);
+          const wb = XLSX.read(data, { type: "array" });
+          const ws = wb.Sheets[wb.SheetNames[0]];
+          const rows = XLSX.utils.sheet_to_json<Record<string, string>>(ws, { defval: "", raw: false });
+          processData(rows, file.name);
+        } catch (err: any) {
+          console.error("XLSX parse error:", err);
+          toast({ variant: "destructive", title: "Erreur de lecture", description: err?.message || "Impossible de lire le fichier Excel" });
+        }
       };
-      reader.readAsBinaryString(file);
+      reader.onerror = () => {
+        toast({ variant: "destructive", title: "Erreur", description: "Impossible de lire le fichier" });
+      };
+      reader.readAsArrayBuffer(file);
     } else {
       toast({ variant: "destructive", title: "Format non supporté", description: "Utilisez .csv, .xlsx ou .xls" });
     }
