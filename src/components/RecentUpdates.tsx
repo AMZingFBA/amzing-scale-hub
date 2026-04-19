@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Card } from '@/components/ui/card';
 import { Bell, ExternalLink } from 'lucide-react';
@@ -109,25 +109,29 @@ export const RecentUpdates = () => {
   const { toast } = useToast();
   const [updates, setUpdates] = useState<RecentUpdate[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     const fetchRecentUpdates = async () => {
       if (!user) return;
 
       try {
-        // Fetch admin alerts
-        const { data: adminAlerts } = await supabase
-          .from('admin_alerts')
-          .select('id, title, category, subcategory, created_at, link_url')
-          .order('created_at', { ascending: false })
-          .limit(5);
+        // Fetch admin alerts and product alerts in parallel
+        const [adminRes, productRes] = await Promise.all([
+          supabase
+            .from('admin_alerts')
+            .select('id, title, category, subcategory, created_at, link_url')
+            .order('created_at', { ascending: false })
+            .limit(5),
+          supabase
+            .from('product_find_alerts')
+            .select('id, product_title, source_name, created_at, source_url')
+            .order('created_at', { ascending: false })
+            .limit(5),
+        ]);
 
-        // Fetch product find alerts
-        const { data: productAlerts } = await supabase
-          .from('product_find_alerts')
-          .select('id, product_title, source_name, created_at, source_url')
-          .order('created_at', { ascending: false })
-          .limit(5);
+        const adminAlerts = adminRes.data;
+        const productAlerts = productRes.data;
 
         const allUpdates: RecentUpdate[] = [];
 
@@ -191,22 +195,24 @@ export const RecentUpdates = () => {
 
     fetchRecentUpdates();
 
-    // Subscribe to new alerts
+    // Subscribe to admin alerts inserts only (product_find_alerts is synced
+    // every 30min in batch, so debounce avoids fetch storms).
+    const debouncedFetch = () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+      debounceRef.current = setTimeout(() => fetchRecentUpdates(), 5000);
+    };
+
     const channel = supabase
       .channel('recent-updates')
       .on(
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'admin_alerts' },
-        () => fetchRecentUpdates()
-      )
-      .on(
-        'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'product_find_alerts' },
-        () => fetchRecentUpdates()
+        () => debouncedFetch()
       )
       .subscribe();
 
     return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
       supabase.removeChannel(channel);
     };
   }, [user]);
