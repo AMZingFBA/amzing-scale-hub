@@ -255,7 +255,7 @@ const AdminWhatsApp = () => {
             </span>
           </div>
           <button
-            onClick={() => navigate("/admin/whatsapp-bulk")}
+            onClick={() => navigate("/admin/whatsapp-crm")}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-opacity hover:opacity-80"
             style={{ background: "#00a884", color: "#111b21" }}
           >
