@@ -28,19 +28,42 @@ interface SendResult {
 type SendStatus = "idle" | "sending" | "done";
 
 // Auto-detect which column contains phone numbers
+function normalizeHeader(value: string): string {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+}
+
 function detectPhoneColumn(headers: string[], rows: Record<string, string>[]): string | null {
-  // Priority: exact match on known phone header names
-  const phoneHeaders = ["phone", "telephone", "téléphone", "tel", "numero", "numéro", "mobile", "whatsapp", "num", "phone_number", "phonenumber"];
-  for (const h of headers) {
-    if (phoneHeaders.includes(h.toLowerCase().trim())) return h;
+  const normalizedHeaders = headers.map((h) => ({ original: h, normalized: normalizeHeader(h) }));
+  const phoneMatchers = [
+    "phone",
+    "telephone",
+    "numero telephone",
+    "numero de telephone",
+    "num telephone",
+    "mobile",
+    "whatsapp",
+    "phone number",
+    "numero",
+    "tel",
+  ];
+
+  for (const header of normalizedHeaders) {
+    if (phoneMatchers.some((matcher) => header.normalized === matcher || header.normalized.includes(matcher))) {
+      return header.original;
+    }
   }
-  // Fallback: find column where most values look like phone numbers
+
   let bestCol = "";
   let bestScore = 0;
   for (const h of headers) {
     let score = 0;
     for (const row of rows.slice(0, 20)) {
-      const val = (row[h] || "").replace(/[\s\-\.\(\)]/g, "");
+      const val = String(row[h] || "").replace(/[\s\-\.\(\)]/g, "");
       if (/^\+?\d{8,15}$/.test(val)) score++;
     }
     if (score > bestScore) {
@@ -48,18 +71,19 @@ function detectPhoneColumn(headers: string[], rows: Record<string, string>[]): s
       bestCol = h;
     }
   }
-  return bestScore >= 3 ? bestCol : null;
+  return bestScore >= 2 ? bestCol : null;
 }
 
 // Auto-detect company/name column
 function detectCompanyColumn(headers: string[], _rows: Record<string, string>[]): string | null {
   const companyHeaders = [
-    "company", "entreprise", "société", "societe", "nom", "name", "business",
-    "raison_sociale", "raison sociale", "enseigne", "marque", "brand",
-    "nom_entreprise", "nom entreprise", "company_name",
+    "company", "entreprise", "societe", "nom", "name", "business",
+    "raison sociale", "enseigne", "marque", "brand",
+    "nom entreprise", "company name", "societe", "society",
   ];
   for (const h of headers) {
-    if (companyHeaders.includes(h.toLowerCase().trim())) return h;
+    const normalized = normalizeHeader(h);
+    if (companyHeaders.some((keyword) => normalized === keyword || normalized.includes(keyword))) return h;
   }
   return null;
 }
