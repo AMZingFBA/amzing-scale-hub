@@ -105,6 +105,7 @@ const AdminWhatsAppBulk = () => {
   const { toast } = useToast();
   const { isAdmin, isLoading: adminLoading } = useAdmin();
   const { session } = useAuth();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [contacts, setContacts] = useState<ContactRow[]>([]);
   const [headers, setHeaders] = useState<string[]>([]);
@@ -222,6 +223,12 @@ const AdminWhatsAppBulk = () => {
     }
   }, [processData, toast]);
 
+  const handleFileInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) handleFile(file);
+    e.target.value = "";
+  }, [handleFile]);
+
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
     setDragOver(false);
@@ -324,26 +331,25 @@ const AdminWhatsAppBulk = () => {
       <div className="max-w-5xl mx-auto p-4 space-y-4">
         {/* Upload Zone */}
         {contacts.length === 0 ? (
-          <div
-            onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
-            onDragLeave={() => setDragOver(false)}
-            onDrop={handleDrop}
-            className="border-2 border-dashed rounded-xl p-12 text-center transition-all cursor-pointer"
-            style={{
-              borderColor: dragOver ? "#00a884" : "#233138",
-              background: dragOver ? "#1a2e35" : "#0b141a",
-            }}
-            onClick={() => {
-              const input = document.createElement("input");
-              input.type = "file";
-              input.accept = ".csv,.xlsx,.xls,.txt";
-              input.onchange = (e) => {
-                const f = (e.target as HTMLInputElement).files?.[0];
-                if (f) handleFile(f);
-              };
-              input.click();
-            }}
-          >
+          <>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".csv,.xlsx,.xls,.txt"
+              className="hidden"
+              onChange={handleFileInputChange}
+            />
+            <div
+              onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+              onDragLeave={() => setDragOver(false)}
+              onDrop={handleDrop}
+              className="border-2 border-dashed rounded-xl p-12 text-center transition-all cursor-pointer"
+              style={{
+                borderColor: dragOver ? "#00a884" : "#233138",
+                background: dragOver ? "#1a2e35" : "#0b141a",
+              }}
+              onClick={() => fileInputRef.current?.click()}
+            >
             <Upload className="w-12 h-12 mx-auto mb-4" style={{ color: "#00a884" }} />
             <h3 className="text-xl font-medium mb-2">Importez votre fichier</h3>
             <p className="text-sm mb-1" style={{ color: "#8696a0" }}>
