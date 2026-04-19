@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import ScrollToTop from "./components/ScrollToTop";
 import { AuthProvider } from "./hooks/use-auth";
 import { PushNotificationsProvider } from "./components/PushNotificationsProvider";
@@ -88,7 +88,7 @@ const ProduitsEany = lazy(() => import("./pages/ProduitsEany"));
 const AdminAirtableContacts = lazy(() => import("./pages/AdminAirtableContacts"));
 const AdminAirtableUsers = lazy(() => import("./pages/AdminAirtableUsers"));
 const AdminSubscriptions = lazy(() => import("./pages/AdminSubscriptions"));
-const AdminWhatsApp = lazy(() => import("./pages/AdminWhatsApp"));
+
 const AdminFailedPayments = lazy(() => import("./pages/AdminFailedPayments"));
 const AdminWhatsAppBulk = lazy(() => import("./pages/AdminWhatsAppBulk"));
 const AdminWhatsAppCRM = lazy(() => import("./pages/AdminWhatsAppCRM"));
@@ -222,7 +222,7 @@ const App = () => (
             <Route path="/admin/airtable-contacts" element={<AdminAirtableContacts />} />
             <Route path="/admin/airtable-users" element={<AdminAirtableUsers />} />
             <Route path="/admin/subscriptions" element={<AdminSubscriptions />} />
-            <Route path="/admin/whatsapp" element={<AdminWhatsApp />} />
+            <Route path="/admin/whatsapp" element={<Navigate to="/admin/whatsapp-crm" replace />} />
             <Route path="/admin/failed-payments" element={<AdminFailedPayments />} />
             <Route path="/admin/whatsapp-bulk" element={<AdminWhatsAppBulk />} />
             <Route path="/admin/whatsapp-crm" element={<AdminWhatsAppCRM />} />

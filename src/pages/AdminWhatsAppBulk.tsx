@@ -254,7 +254,7 @@ const AdminWhatsAppBulk = () => {
     <div className="min-h-screen" style={{ background: "#111b21", color: "#e9edef" }}>
       {/* Header */}
       <div className="flex items-center gap-3 px-4 py-3 sticky top-0 z-10" style={{ background: "#202c33", borderBottom: "1px solid #233138" }}>
-        <button onClick={() => navigate("/admin/whatsapp")} className="hover:opacity-70">
+        <button onClick={() => navigate("/admin/whatsapp-crm")} className="hover:opacity-70">
           <ArrowLeft className="w-5 h-5" style={{ color: "#aebac1" }} />
         </button>
         <FileSpreadsheet className="w-5 h-5" style={{ color: "#00a884" }} />
