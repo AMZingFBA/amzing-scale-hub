@@ -266,31 +266,66 @@ const AdminWhatsAppBulk = () => {
     setSendStatus("sending");
     setResults([]);
 
-    try {
-      const res = await fetch(`${WHATSAPP_SUPABASE_URL}/functions/v1/bulk-send`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          contacts: contacts.map((c) => ({ phone: c.phone, company: c.company })),
-          template_name: templateName,
-          template_language: templateLang,
-        }),
-      });
+    const BATCH_SIZE = 18; // ~18 contacts per batch to stay under 150s Edge Function timeout
+    const allResults: SendResult[] = [];
+    const batches = [];
 
-      const data = await res.json();
-      if (data.results) setResults(data.results);
-      setSendStatus("done");
-
-      toast({
-        title: "Envoi terminé",
-        description: `${data.sent || 0} envoyés, ${data.failed || 0} échoués`,
-      });
-    } catch (err: any) {
-      toast({ variant: "destructive", title: "Erreur", description: err.message });
-      setSendStatus("done");
+    // Split contacts into batches
+    for (let i = 0; i < contacts.length; i += BATCH_SIZE) {
+      batches.push(contacts.slice(i, i + BATCH_SIZE));
     }
+
+    let totalSent = 0;
+    let totalFailed = 0;
+
+    for (let b = 0; b < batches.length; b++) {
+      const batch = batches[b];
+
+      try {
+        const res = await fetch(`${WHATSAPP_SUPABASE_URL}/functions/v1/bulk-send`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            contacts: batch.map((c) => ({ phone: c.phone, company: c.company })),
+            template_name: templateName,
+            template_language: templateLang,
+          }),
+        });
+
+        const data = await res.json();
+        if (data.results) {
+          allResults.push(...data.results);
+          setResults([...allResults]);
+        }
+        totalSent += data.sent || 0;
+        totalFailed += data.failed || 0;
+
+        toast({
+          title: `Batch ${b + 1}/${batches.length} terminé`,
+          description: `${totalSent} envoyés, ${totalFailed} échoués sur ${contacts.length}`,
+        });
+      } catch (err: any) {
+        // Mark remaining batch contacts as failed
+        batch.forEach((c) => {
+          allResults.push({ phone: c.phone, company: c.company, success: false, error: err.message });
+        });
+        setResults([...allResults]);
+        totalFailed += batch.length;
+      }
+
+      // Small pause between batches to let Edge Functions cool down
+      if (b < batches.length - 1) {
+        await new Promise((r) => setTimeout(r, 2000));
+      }
+    }
+
+    setSendStatus("done");
+    toast({
+      title: "Envoi terminé",
+      description: `${totalSent} envoyés, ${totalFailed} échoués sur ${contacts.length}`,
+    });
   };
 
   const filteredContacts = search
@@ -460,7 +495,7 @@ const AdminWhatsAppBulk = () => {
               <div className="flex items-start gap-2 mt-3 p-2 rounded-lg" style={{ background: "#1a2e35" }}>
                 <Clock className="w-4 h-4 mt-0.5 flex-shrink-0" style={{ color: "#00a884" }} />
                 <p className="text-xs" style={{ color: "#8696a0" }}>
-                  Délai de 6.5s entre chaque envoi (limite Meta). Temps estimé : <strong style={{ color: "#e9edef" }}>~{Math.ceil(contacts.length * 6.5 / 60)} min</strong> pour {contacts.length} messages.
+                  Délai de 6.5s entre chaque envoi (limite Meta). Envoi par batch de 18. Temps estimé : <strong style={{ color: "#e9edef" }}>~{Math.ceil(contacts.length * 7 / 60)} min</strong> pour {contacts.length} messages.
                 </p>
               </div>
             </div>
@@ -560,7 +595,7 @@ const AdminWhatsAppBulk = () => {
               ) : sendStatus === "sending" ? (
                 <div className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl" style={{ background: "#233138" }}>
                   <Loader2 className="w-5 h-5 animate-spin" style={{ color: "#00a884" }} />
-                  <span className="text-sm">Envoi en cours... (≈{Math.ceil(contacts.length * 6.5 / 60)} min)</span>
+                  <span className="text-sm">Envoi en cours... ({results.length}/{contacts.length} traités, ≈{Math.ceil((contacts.length - results.length) * 7 / 60)} min restantes)</span>
                 </div>
               ) : (
                 <button
