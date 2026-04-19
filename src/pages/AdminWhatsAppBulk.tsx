@@ -361,7 +361,6 @@ const AdminWhatsAppBulk = () => {
           </div>
         ) : (
           <>
-          <>
             {/* File info + Column mapping */}
             <div className="rounded-xl p-4 space-y-3" style={{ background: "#202c33" }}>
               <div className="flex items-center justify-between">
