@@ -136,6 +136,8 @@ export default function AdminWhatsAppCRM() {
   const [creatingConv, setCreatingConv] = useState(false);
   const [editingNotes, setEditingNotes] = useState(false);
   const [notesText, setNotesText] = useState("");
+  const [contactTagIds, setContactTagIds] = useState<string[]>([]);
+  const [statusFilter, setStatusFilter] = useState<string>("all");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const channelRef = useRef<RealtimeChannel | null>(null);
@@ -216,8 +218,9 @@ export default function AdminWhatsAppCRM() {
     setActiveContact(conv.contacts as Contact || null);
     setShowContactPanel(false);
     fetchMessages(conv.id);
+    if (conv.contacts?.id) fetchContactTags(conv.contacts.id);
     setTimeout(() => textareaRef.current?.focus(), 100);
-  }, [fetchMessages]);
+  }, [fetchMessages, fetchContactTags]);
 
   // ============ SEND MESSAGE ============
   const handleSend = async () => {
@@ -324,8 +327,42 @@ export default function AdminWhatsAppCRM() {
     setEditingNotes(false);
   };
 
+  // ============ FETCH CONTACT TAGS ============
+  const fetchContactTags = useCallback(async (contactId: string) => {
+    const { data } = await waSupabase
+      .from("contact_tag_links")
+      .select("tag_id")
+      .eq("contact_id", contactId);
+    setContactTagIds(data ? data.map((d: { tag_id: string }) => d.tag_id) : []);
+  }, []);
+
+  // ============ TOGGLE TAG ============
+  const toggleTag = async (tagId: string) => {
+    if (!activeContact) return;
+    const isAssigned = contactTagIds.includes(tagId);
+    if (isAssigned) {
+      await waSupabase.from("contact_tag_links").delete()
+        .eq("contact_id", activeContact.id).eq("tag_id", tagId);
+      setContactTagIds(prev => prev.filter(id => id !== tagId));
+    } else {
+      await waSupabase.from("contact_tag_links").insert({ contact_id: activeContact.id, tag_id: tagId });
+      setContactTagIds(prev => [...prev, tagId]);
+    }
+  };
+
+  // ============ CHANGE STATUS ============
+  const changeStatus = async (newStatus: string) => {
+    if (!activeContact) return;
+    await waSupabase.from("contacts").update({ status: newStatus }).eq("id", activeContact.id);
+    setActiveContact(prev => prev ? { ...prev, status: newStatus } : null);
+    setConversations(prev => prev.map(c =>
+      c.contact_id === activeContact.id ? { ...c, contacts: { ...c.contacts!, status: newStatus } } : c
+    ));
+  };
+
   // ============ FILTER ============
   const filtered = conversations.filter(c => {
+    if (statusFilter !== "all" && c.contacts?.status !== statusFilter) return false;
     if (!search) return true;
     const q = search.toLowerCase();
     const name = (c.contacts?.display_name || "").toLowerCase();
@@ -368,6 +405,26 @@ export default function AdminWhatsAppCRM() {
               className="w-full pl-10 pr-8 py-1.5 bg-white rounded-lg text-sm border-none focus:outline-none focus:ring-1 focus:ring-[#00a884]" />
             {search && <button onClick={() => setSearch("")} className="absolute right-2 top-1/2 -translate-y-1/2"><X className="w-4 h-4 text-gray-400" /></button>}
           </div>
+          {/* Status filter */}
+          <div className="flex gap-1 mt-2 overflow-x-auto pb-1">
+            {[
+              { value: "all", label: "Tous", bg: "#e5e7eb", text: "#374151" },
+              { value: "prospect", label: "Prospect", bg: "#f3f4f6", text: "#6b7280" },
+              { value: "lead", label: "Lead", bg: "#dbeafe", text: "#1d4ed8" },
+              { value: "client", label: "Client", bg: "#dcfce7", text: "#15803d" },
+              { value: "vip", label: "VIP", bg: "#fef3c7", text: "#b45309" },
+              { value: "archived", label: "Archivé", bg: "#fecaca", text: "#dc2626" },
+            ].map(s => (
+              <button key={s.value} onClick={() => setStatusFilter(s.value)}
+                className="text-[10px] px-2 py-0.5 rounded-full font-medium whitespace-nowrap transition-all"
+                style={{
+                  backgroundColor: statusFilter === s.value ? s.text : s.bg,
+                  color: statusFilter === s.value ? "white" : s.text,
+                }}>
+                {s.label}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Conversation List */}
@@ -388,9 +445,19 @@ export default function AdminWhatsAppCRM() {
                   <Avatar name={contact?.display_name} id={conv.id} />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">
-                      <span className="text-[15px] font-medium text-gray-900 truncate">
-                        {contact?.display_name || formatPhoneDisplay(contact?.phone_e164 || "")}
-                      </span>
+                      <div className="flex items-center gap-1.5 min-w-0">
+                        <span className="text-[15px] font-medium text-gray-900 truncate">
+                          {contact?.display_name || formatPhoneDisplay(contact?.phone_e164 || "")}
+                        </span>
+                        {contact?.status && contact.status !== "prospect" && (
+                          <span className="text-[9px] px-1.5 py-px rounded-full font-medium flex-shrink-0" style={{
+                            backgroundColor: contact.status === "lead" ? "#dbeafe" : contact.status === "client" ? "#dcfce7" : contact.status === "vip" ? "#fef3c7" : contact.status === "archived" ? "#fecaca" : "#f3f4f6",
+                            color: contact.status === "lead" ? "#1d4ed8" : contact.status === "client" ? "#15803d" : contact.status === "vip" ? "#b45309" : contact.status === "archived" ? "#dc2626" : "#6b7280",
+                          }}>
+                            {contact.status}
+                          </span>
+                        )}
+                      </div>
                       <span className={`text-[11px] flex-shrink-0 ${conv.unread_count > 0 ? "text-[#00a884] font-medium" : "text-gray-500"}`}>
                         {formatDate(conv.last_message_at)}
                       </span>
@@ -557,13 +624,30 @@ export default function AdminWhatsAppCRM() {
               <Phone className="w-3.5 h-3.5" />
               {formatPhoneDisplay(activeContact.phone_e164)}
             </p>
-            <span className={`mt-2 text-[11px] px-2.5 py-0.5 rounded-full font-medium ${activeContact.status === "client" ? "bg-green-100 text-green-700" :
-              activeContact.status === "vip" ? "bg-amber-100 text-amber-700" :
-                activeContact.status === "lead" ? "bg-blue-100 text-blue-700" :
-                  "bg-gray-100 text-gray-600"
-              }`}>
-              {activeContact.status}
-            </span>
+          </div>
+
+          {/* Status */}
+          <div className="px-4 py-4 border-b border-gray-100">
+            <h4 className="text-[12px] font-semibold text-gray-500 uppercase mb-2">Statut</h4>
+            <div className="flex flex-wrap gap-1.5">
+              {[
+                { value: "prospect", label: "Prospect", bg: "#f3f4f6", text: "#6b7280" },
+                { value: "lead", label: "Lead", bg: "#dbeafe", text: "#1d4ed8" },
+                { value: "client", label: "Client", bg: "#dcfce7", text: "#15803d" },
+                { value: "vip", label: "VIP", bg: "#fef3c7", text: "#b45309" },
+                { value: "archived", label: "Archivé", bg: "#fecaca", text: "#dc2626" },
+              ].map(s => (
+                <button key={s.value} onClick={() => changeStatus(s.value)}
+                  className="text-[11px] px-2.5 py-1 rounded-full font-medium transition-all border-2"
+                  style={{
+                    backgroundColor: activeContact.status === s.value ? s.text : s.bg,
+                    color: activeContact.status === s.value ? "white" : s.text,
+                    borderColor: activeContact.status === s.value ? s.text : "transparent",
+                  }}>
+                  {s.label}
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* Tags */}
@@ -572,12 +656,20 @@ export default function AdminWhatsAppCRM() {
               <Tag className="w-3.5 h-3.5" /> Tags
             </h4>
             <div className="flex flex-wrap gap-1.5">
-              {tags.map(tag => (
-                <span key={tag.id} className="text-[11px] px-2 py-0.5 rounded-full text-white font-medium"
-                  style={{ backgroundColor: tag.color }}>
-                  {tag.name}
-                </span>
-              ))}
+              {tags.map(tag => {
+                const isAssigned = contactTagIds.includes(tag.id);
+                return (
+                  <button key={tag.id} onClick={() => toggleTag(tag.id)}
+                    className="text-[11px] px-2 py-0.5 rounded-full font-medium transition-all border-2"
+                    style={{
+                      backgroundColor: isAssigned ? tag.color : "transparent",
+                      color: isAssigned ? "white" : tag.color,
+                      borderColor: tag.color,
+                    }}>
+                    {tag.name}
+                  </button>
+                );
+              })}
             </div>
           </div>
 
