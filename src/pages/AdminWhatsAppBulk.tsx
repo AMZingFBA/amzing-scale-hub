@@ -358,7 +358,8 @@ const AdminWhatsAppBulk = () => {
             <p className="text-xs" style={{ color: "#8696a0" }}>
               Formats supportés : CSV, XLSX, XLS — Le numéro de téléphone et le nom de société seront détectés automatiquement
             </p>
-          </div>
+            </div>
+          </>
         ) : (
           <>
             {/* File info + Column mapping */}
