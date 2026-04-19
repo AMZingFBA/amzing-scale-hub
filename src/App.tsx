@@ -9,6 +9,7 @@ import { AuthProvider } from "./hooks/use-auth";
 import { PushNotificationsProvider } from "./components/PushNotificationsProvider";
 import { StoreProvider } from "./components/StoreProvider";
 import ImpersonationBar from "./components/ImpersonationBar";
+import { WhatsAppNotificationBanner } from "./components/WhatsAppNotificationBanner";
 
 // Pages critiques chargées immédiatement
 import Index from "./pages/Index";
@@ -136,6 +137,7 @@ const App = () => (
             <PushNotificationsProvider>
               <ScrollToTop />
               <ImpersonationBar />
+              <WhatsAppNotificationBanner />
               <Suspense fallback={<PageLoader />}>
             <Routes>
             <Route path="/" element={<Index />} />
