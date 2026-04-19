@@ -118,6 +118,17 @@ const AdminWhatsAppBulk = () => {
   const [results, setResults] = useState<SendResult[]>([]);
   const [search, setSearch] = useState("");
   const [dragOver, setDragOver] = useState(false);
+  const [logs, setLogs] = useState<string[]>([]);
+  const logsEndRef = useRef<HTMLDivElement>(null);
+
+  const addLog = (msg: string) => {
+    const time = new Date().toLocaleTimeString("fr-FR");
+    setLogs((prev) => [...prev, `[${time}] ${msg}`]);
+  };
+
+  useEffect(() => {
+    logsEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [logs]);
 
   useEffect(() => {
     if (!adminLoading && !isAdmin) navigate("/");
@@ -265,14 +276,20 @@ const AdminWhatsAppBulk = () => {
 
     setSendStatus("sending");
     setResults([]);
+    setLogs([]);
 
     const allResults: SendResult[] = [];
     let totalSent = 0;
     let totalFailed = 0;
 
+    addLog(`🚀 Démarrage envoi de ${contacts.length} contacts — template: ${templateName}`);
+
     // Send one contact at a time — no batch timeout issues
     for (let i = 0; i < contacts.length; i++) {
       const contact = contacts[i];
+      const label = contact.company || contact.phone;
+
+      addLog(`📤 [${i + 1}/${contacts.length}] Envoi à ${label} (+${contact.phone})...`);
 
       try {
         const res = await fetch(`${WHATSAPP_SUPABASE_URL}/functions/v1/bulk-send`, {
@@ -288,8 +305,15 @@ const AdminWhatsAppBulk = () => {
         const data = await res.json();
         if (data.results?.[0]) {
           allResults.push(data.results[0]);
+          if (data.results[0].success) {
+            addLog(`✅ [${i + 1}/${contacts.length}] ${label} — envoyé`);
+          } else {
+            addLog(`❌ [${i + 1}/${contacts.length}] ${label} — ÉCHEC: ${data.results[0].error}`);
+          }
         } else {
-          allResults.push({ phone: contact.phone, company: contact.company, success: false, error: data.error || "Unknown error" });
+          const errMsg = data.error || "Unknown error";
+          allResults.push({ phone: contact.phone, company: contact.company, success: false, error: errMsg });
+          addLog(`❌ [${i + 1}/${contacts.length}] ${label} — ERREUR: ${errMsg}`);
         }
         totalSent += data.sent || 0;
         totalFailed += data.failed || 0;
@@ -297,6 +321,7 @@ const AdminWhatsAppBulk = () => {
         console.error(`Contact ${i + 1} failed:`, err);
         allResults.push({ phone: contact.phone, company: contact.company, success: false, error: err.message });
         totalFailed += 1;
+        addLog(`🔥 [${i + 1}/${contacts.length}] ${label} — CRASH: ${err.message}`);
       }
 
       setResults([...allResults]);
@@ -311,10 +336,12 @@ const AdminWhatsAppBulk = () => {
 
       // Wait 6.5s between messages (Meta rate limit) — skip after last
       if (i < contacts.length - 1) {
+        addLog(`⏳ Attente 6.5s (limite Meta)...`);
         await new Promise((r) => setTimeout(r, 6500));
       }
     }
 
+    addLog(`🏁 TERMINÉ — ${totalSent} envoyés, ${totalFailed} échoués sur ${contacts.length}`);
     setSendStatus("done");
     toast({
       title: "Envoi terminé",
@@ -401,7 +428,7 @@ const AdminWhatsAppBulk = () => {
                   </span>
                 </div>
                 <button
-                  onClick={() => { setContacts([]); setHeaders([]); setFileName(""); setResults([]); setSendStatus("idle"); }}
+                  onClick={() => { setContacts([]); setHeaders([]); setFileName(""); setResults([]); setLogs([]); setSendStatus("idle"); }}
                   className="text-xs flex items-center gap-1 px-2 py-1 rounded hover:opacity-80"
                   style={{ color: "#f15c6d" }}
                 >
@@ -574,6 +601,24 @@ const AdminWhatsAppBulk = () => {
               </div>
             )}
 
+            {/* Live logs */}
+            {logs.length > 0 && (
+              <div className="rounded-xl overflow-hidden" style={{ background: "#0b141a", border: "1px solid #233138" }}>
+                <div className="px-4 py-2 flex items-center justify-between" style={{ background: "#1a2e35", borderBottom: "1px solid #233138" }}>
+                  <span className="text-xs font-medium" style={{ color: "#00a884" }}>📋 Logs en direct</span>
+                  <span className="text-[10px]" style={{ color: "#8696a0" }}>{logs.length} entrées</span>
+                </div>
+                <div className="max-h-[300px] overflow-y-auto p-3 font-mono text-[11px] leading-5" style={{ color: "#8696a0" }}>
+                  {logs.map((log, i) => (
+                    <div key={i} style={{ color: log.includes("✅") ? "#00a884" : log.includes("❌") || log.includes("🔥") ? "#f15c6d" : log.includes("🚀") || log.includes("🏁") ? "#53bdeb" : "#8696a0" }}>
+                      {log}
+                    </div>
+                  ))}
+                  <div ref={logsEndRef} />
+                </div>
+              </div>
+            )}
+
             {/* Send button */}
             <div className="flex gap-3">
               {sendStatus === "idle" ? (
@@ -593,7 +638,7 @@ const AdminWhatsAppBulk = () => {
                 </div>
               ) : (
                 <button
-                  onClick={() => { setContacts([]); setHeaders([]); setFileName(""); setResults([]); setSendStatus("idle"); }}
+                  onClick={() => { setContacts([]); setHeaders([]); setFileName(""); setResults([]); setLogs([]); setSendStatus("idle"); }}
                   className="flex-1 py-3 rounded-xl font-medium text-sm"
                   style={{ background: "#233138", color: "#e9edef" }}
                 >
