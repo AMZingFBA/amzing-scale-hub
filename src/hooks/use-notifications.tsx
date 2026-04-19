@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './use-auth';
+import { useAdmin } from './use-admin';
 
 interface SubcategoryNotifications {
   [subcategory: string]: number;
@@ -17,11 +18,17 @@ interface NotificationCounts {
 
 export const useNotifications = () => {
   const { user } = useAuth();
+  const { isAdmin, isLoading: isAdminLoading } = useAdmin();
   const [notifications, setNotifications] = useState<NotificationCounts>({});
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchNotifications = async () => {
     if (!user) return;
+    // Skip for admins: badges are hidden in the UI, no need to query
+    if (isAdmin) {
+      setIsLoading(false);
+      return;
+    }
 
     console.log('🔍 Fetching notifications for user:', user.id);
 
@@ -104,6 +111,12 @@ export const useNotifications = () => {
       setIsLoading(false);
       return;
     }
+    // Wait for admin status before deciding whether to subscribe
+    if (isAdminLoading) return;
+    if (isAdmin) {
+      setIsLoading(false);
+      return;
+    }
 
     fetchNotifications();
 
@@ -154,7 +167,7 @@ export const useNotifications = () => {
       if (debounceRef.current) clearTimeout(debounceRef.current);
       supabase.removeChannel(channel);
     };
-  }, [user, debouncedFetch]);
+  }, [user, isAdmin, isAdminLoading, debouncedFetch]);
 
   // Note: Le reset du badge se fait UNIQUEMENT dans use-push-notifications.tsx
   // quand l'utilisateur CLIQUE sur une notification, pas automatiquement à l'ouverture
