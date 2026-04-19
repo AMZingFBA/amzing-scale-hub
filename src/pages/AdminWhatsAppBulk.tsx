@@ -10,7 +10,7 @@ import { useAuth } from "@/hooks/use-auth";
 import Papa from "papaparse";
 import * as XLSX from "xlsx";
 
-const WHATSAPP_SUPABASE_URL = "https://bxynpsxxalxcchewxmvf.supabase.co";
+const WHATSAPP_SUPABASE_URL = "https://qyizaluzwueymavidxic.supabase.co";
 
 interface ContactRow {
   phone: string;
@@ -204,7 +204,7 @@ const AdminWhatsAppBulk = () => {
     setResults([]);
 
     try {
-      const res = await fetch(`${WHATSAPP_SUPABASE_URL}/functions/v1/whatsapp-bulk-send`, {
+      const res = await fetch(`${WHATSAPP_SUPABASE_URL}/functions/v1/bulk-send`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
