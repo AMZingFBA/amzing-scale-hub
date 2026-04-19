@@ -216,7 +216,7 @@ export function useMP() {
     }
   }, []);
 
-  // Submit a new lookup
+  // Submit a new lookup — calls Edge Function directly (no Hetzner worker needed)
   const submitLookup = useCallback(async (queryInput: string, countryCode?: string) => {
     if (!user) return;
     setIsSearching(true);
@@ -224,31 +224,28 @@ export function useMP() {
     try {
       const profile = profiles.find(p => p.id === activeProfileId);
       const country = countryCode || profile?.country_code || 'FR';
-      const items = queryInput.split(/[,\n]/).map(s => s.trim()).filter(Boolean);
-      const queryType = items.length > 1 ? 'batch' : 'single';
 
-      const { data, error } = await supabase
-        .from('mp_lookups')
-        .insert({
-          user_id: user.id,
-          profile_id: activeProfileId,
-          query_type: queryType,
-          query_input: queryInput.trim(),
-          country_code: country,
-          status: 'pending',
-        } as any)
-        .select()
-        .single();
+      toast.info('Recherche en cours…');
+
+      const { data, error } = await supabase.functions.invoke('mp-lookup', {
+        body: {
+          queryInput: queryInput.trim(),
+          countryCode: country,
+          profileId: activeProfileId || null,
+        },
+      });
 
       if (error) throw new Error(error.message);
-      toast.success('Recherche lancée...');
+      if (data?.error) throw new Error(data.error);
+
       await loadLookups();
+      if (data?.lookup_id) await loadResults(data.lookup_id);
     } catch (err: any) {
-      toast.error(err.message);
+      toast.error(err.message || 'Erreur lors de la recherche');
     } finally {
       setIsSearching(false);
     }
-  }, [user, profiles, activeProfileId, loadLookups]);
+  }, [user, profiles, activeProfileId, loadLookups, loadResults]);
 
   // Delete lookup
   const deleteLookup = useCallback(async (lookupId: string) => {

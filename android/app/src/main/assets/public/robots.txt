@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /dashboard
+Disallow: /profile
+Disallow: /auth
+Disallow: /reset-password
+Disallow: /ticket/
+
+# Sitemap
+Sitemap: https://amzingfba.com/sitemap.xml

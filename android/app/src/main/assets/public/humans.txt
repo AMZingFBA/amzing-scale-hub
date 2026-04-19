@@ -1,0 +1,21 @@
+/* TEAM */
+Founder & CEO: Noa Zaghdoun
+Contact: contact@amzingfba.com
+Location: Paris, France
+
+/* SITE */
+Standards: HTML5, CSS3, JavaScript ES6+
+Components: React, TypeScript, Tailwind CSS
+Software: Visual Studio Code, Git, Vite
+
+/* THANKS */
+Font: Google Fonts
+Icons: Lucide React
+Hosting: OVH
+Database: Supabase
+
+/* SITE INFORMATION */
+Last update: 2025/01
+Language: Français / French
+Doctype: HTML5
+IDE: Visual Studio Code

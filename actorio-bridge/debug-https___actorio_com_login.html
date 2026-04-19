@@ -1,0 +1,122 @@
+
+	<script>
+document.body.className = document.body.className.replace('no-js','js');
+</script>
+
+				<h1 class="screen-reader-text">Log In</h1>
+			<div id="login">
+		<h1 role="presentation" class="wp-login-logo"><a href="https://en-gb.wordpress.org/">Powered by WordPress</a></h1>
+	
+		<form name="loginform" id="loginform" action="https://actorio.com/wp-login.php" method="post">
+			<p>
+				<label for="user_login">Username or Email Address</label>
+				<input type="text" name="log" id="user_login" class="input" value="" size="20" autocapitalize="off" autocomplete="username" required="required" style="">
+			<input type="hidden" name="wfls-email-verification" id="wfls-email-verification" value="" style=""></p>
+
+			<div class="user-pass-wrap">
+				<label for="user_pass">Password</label>
+				<div class="wp-pwd">
+					<input type="password" name="pwd" id="user_pass" class="input password-input" value="" size="20" autocomplete="current-password" spellcheck="false" required="required" style="">
+					<button type="button" class="button button-secondary wp-hide-pw hide-if-no-js" data-toggle="0" aria-label="Show password">
+						<span class="dashicons dashicons-visibility" aria-hidden="true"></span>
+					</button>
+				<div id="caps-warning" class="caps-warning"><span class="caps-icon" aria-hidden="true"><svg viewBox="0 0 24 26" xmlns="http://www.w3.org/2000/svg" fill="#3c434a" stroke="#3c434a" stroke-width="0.5"><path d="M12 5L19 15H16V19H8V15H5L12 5Z"></path><rect x="8" y="21" width="8" height="1.5" rx="0.75"></rect></svg></span><span class="caps-warning-text">Caps lock is on.</span></div></div>
+			</div>
+						<p class="forgetmenot"><input name="rememberme" type="checkbox" id="rememberme" value="forever" style=""> <label for="rememberme">Remember Me</label></p>
+			<p class="submit">
+				<input type="submit" name="wp-submit" id="wp-submit" class="button button-primary button-large" value="Log In" style="">
+									<input type="hidden" name="redirect_to" value="https://actorio.com/wp-admin/" style="">
+									<input type="hidden" name="testcookie" value="1" style="">
+			</p>
+		</form>
+
+					<p id="nav">
+				<a class="wp-login-lost-password" href="https://actorio.com/wp-login.php?action=lostpassword">Lost your password?</a>			</p>
+			<script>
+function wp_attempt_focus() {setTimeout( function() {try {d = document.getElementById( "user_login" );d.focus(); d.select();} catch( er ) {}}, 200);}
+wp_attempt_focus();
+if ( typeof wpOnload === 'function' ) { wpOnload() }
+</script>
+		<p id="backtoblog">
+			<a href="https://actorio.com/">← Go to Actorio</a>		</p>
+		<div class="privacy-policy-page-link"><a class="privacy-policy-link" href="https://actorio.com/privacy-policy/" rel="privacy-policy">Privacy Policy</a></div>	</div>
+				<div class="language-switcher">
+				<form id="language-switcher" method="get">
+
+					<label for="language-switcher-locales">
+						<span class="dashicons dashicons-translation" aria-hidden="true"></span>
+						<span class="screen-reader-text">
+							Language						</span>
+					</label>
+
+					<select name="wp_lang" id="language-switcher-locales"><option value="en_US" lang="en" data-installed="1">English (United States)</option>
+<option value="de_DE" lang="de" data-installed="1">Deutsch</option>
+<option value="en_GB" lang="en" selected="selected" data-installed="1">English (UK)</option>
+<option value="es_ES" lang="es" data-installed="1">Español</option>
+<option value="fr_FR" lang="fr" data-installed="1">Français</option>
+<option value="it_IT" lang="it" data-installed="1">Italiano</option></select>
+					
+					
+					
+						<input type="submit" class="button" value="Change" style="">
+
+					</form>
+				</div>
+			
+	<script src="https://actorio.com/wp-includes/js/clipboard.min.js?ver=2.0.11" id="clipboard-js"></script>
+<script id="zxcvbn-async-js-extra">
+var _zxcvbnSettings = {"src":"https://actorio.com/wp-includes/js/zxcvbn.min.js"};
+//# sourceURL=zxcvbn-async-js-extra
+</script>
+<script src="https://actorio.com/wp-includes/js/zxcvbn-async.min.js?ver=1.0" id="zxcvbn-async-js"></script>
+<script src="https://actorio.com/wp-includes/js/dist/hooks.min.js?ver=dd5603f07f9220ed27f1" id="wp-hooks-js"></script>
+<script src="https://actorio.com/wp-includes/js/dist/i18n.min.js?ver=c26c3dc7bed366793375" id="wp-i18n-js"></script>
+<script id="wp-i18n-js-after">
+wp.i18n.setLocaleData( { 'text direction\u0004ltr': [ 'ltr' ] } );
+//# sourceURL=wp-i18n-js-after
+</script>
+<script id="password-strength-meter-js-extra">
+var pwsL10n = {"unknown":"Password strength unknown","short":"Very weak","bad":"Weak","good":"Medium","strong":"Strong","mismatch":"Mismatch"};
+//# sourceURL=password-strength-meter-js-extra
+</script>
+<script id="password-strength-meter-js-translations">
+( function( domain, translations ) {
+	var localeData = translations.locale_data[ domain ] || translations.locale_data.messages;
+	localeData[""].domain = domain;
+	wp.i18n.setLocaleData( localeData, domain );
+} )( "default", {"translation-revision-date":"2025-12-30 11:47:57+0000","generator":"GlotPress\/4.0.3","domain":"messages","locale_data":{"messages":{"":{"domain":"messages","plural-forms":"nplurals=2; plural=n != 1;","lang":"en_GB"},"%1$s is deprecated since version %2$s! Use %3$s instead. Please consider writing more inclusive code.":["%1$s is deprecated since version %2$s! Use %3$s instead. Please consider writing more inclusive code."]}},"comment":{"reference":"wp-admin\/js\/password-strength-meter.js"}} );
+//# sourceURL=password-strength-meter-js-translations
+</script>
+<script src="https://actorio.com/wp-admin/js/password-strength-meter.min.js?ver=6.9.4" id="password-strength-meter-js"></script>
+<script src="https://actorio.com/wp-includes/js/underscore.min.js?ver=1.13.7" id="underscore-js"></script>
+<script id="wp-util-js-extra">
+var _wpUtilSettings = {"ajax":{"url":"/wp-admin/admin-ajax.php"}};
+//# sourceURL=wp-util-js-extra
+</script>
+<script src="https://actorio.com/wp-includes/js/wp-util.min.js?ver=6.9.4" id="wp-util-js"></script>
+<script src="https://actorio.com/wp-includes/js/dist/dom-ready.min.js?ver=f77871ff7694fffea381" id="wp-dom-ready-js"></script>
+<script id="wp-a11y-js-translations">
+( function( domain, translations ) {
+	var localeData = translations.locale_data[ domain ] || translations.locale_data.messages;
+	localeData[""].domain = domain;
+	wp.i18n.setLocaleData( localeData, domain );
+} )( "default", {"translation-revision-date":"2025-12-15 12:18:56+0000","generator":"GlotPress\/4.0.3","domain":"messages","locale_data":{"messages":{"":{"domain":"messages","plural-forms":"nplurals=2; plural=n != 1;","lang":"en_GB"},"Notifications":["Notifications"]}},"comment":{"reference":"wp-includes\/js\/dist\/a11y.js"}} );
+//# sourceURL=wp-a11y-js-translations
+</script>
+<script src="https://actorio.com/wp-includes/js/dist/a11y.min.js?ver=cb460b4676c94bd228ed" id="wp-a11y-js"></script>
+<script id="user-profile-js-extra">
+var userProfileL10n = {"user_id":"0","nonce":"29e1566164"};
+//# sourceURL=user-profile-js-extra
+</script>
+<script id="user-profile-js-translations">
+( function( domain, translations ) {
+	var localeData = translations.locale_data[ domain ] || translations.locale_data.messages;
+	localeData[""].domain = domain;
+	wp.i18n.setLocaleData( localeData, domain );
+} )( "default", {"translation-revision-date":"2025-12-30 11:47:57+0000","generator":"GlotPress\/4.0.3","domain":"messages","locale_data":{"messages":{"":{"domain":"messages","plural-forms":"nplurals=2; plural=n != 1;","lang":"en_GB"},"Caps lock is on.":["Caps lock is on."],"Application password has been copied to your clipboard.":["Application password has been copied to your clipboard."],"Your new password has not been saved.":["Your new password has not been saved."],"Confirm use of weak password":["Confirm use of weak password"],"Hide password":["Hide password"],"Show password":["Show password"],"Hide":["Hide"],"Show":["Show"],"The changes you made will be lost if you navigate away from this page.":["The changes you made will be lost if you navigate away from this page."]}},"comment":{"reference":"wp-admin\/js\/user-profile.js"}} );
+//# sourceURL=user-profile-js-translations
+</script>
+<script src="https://actorio.com/wp-admin/js/user-profile.min.js?ver=6.9.4" id="user-profile-js"></script>
+	
+	
+	<p id="a11y-speak-intro-text" class="a11y-speak-intro-text" style="position:absolute;margin:-1px;padding:0;height:1px;width:1px;overflow:hidden;clip-path:inset(50%);border:0;word-wrap:normal !important;" hidden="">Notifications</p><div id="a11y-speak-assertive" class="a11y-speak-region" style="position:absolute;margin:-1px;padding:0;height:1px;width:1px;overflow:hidden;clip-path:inset(50%);border:0;word-wrap:normal !important;" aria-live="assertive" aria-relevant="additions text" aria-atomic="true"></div><div id="a11y-speak-polite" class="a11y-speak-region" style="position:absolute;margin:-1px;padding:0;height:1px;width:1px;overflow:hidden;clip-path:inset(50%);border:0;word-wrap:normal !important;" aria-live="polite" aria-relevant="additions text" aria-atomic="true"></div>

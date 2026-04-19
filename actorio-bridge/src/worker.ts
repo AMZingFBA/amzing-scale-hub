@@ -57,7 +57,7 @@ async function processNext(db: any, secret: string) {
 
   try {
     const filters = record.filters as ActorioFilters;
-    const scraperResult = await search(filters, 300);
+    const scraperResult = await search(filters);
 
     // Map Actorio fields → ProductResult shape expected by the frontend
     const mp = filters.marketplace ?? 'amazon.fr';

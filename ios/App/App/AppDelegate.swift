@@ -32,6 +32,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             }
         }
         
+        // CRITICAL: Create window and load ViewController
+        window = UIWindow(frame: UIScreen.main.bounds)
+        window?.rootViewController = ViewController()
+        window?.makeKeyAndVisible()
+        print("✅ Window and ViewController initialized")
+        
         return true
     }
 

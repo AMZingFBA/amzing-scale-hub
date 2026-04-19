@@ -104,6 +104,11 @@ export async function initBrowser(headless = true): Promise<void> {
     storageState,
   });
 
+  // esbuild/tsx wraps named functions with __name() — inject global shim for browser context
+  await context.addInitScript(() => {
+    (globalThis as any).__name = (fn: any) => fn;
+  });
+
   // If we have a saved session, check if it's still valid
   if (storageState) {
     const probe = await context.newPage();
@@ -324,7 +329,7 @@ async function fillFilters(page: Page, filters: ActorioFilters): Promise<void> {
  * The user confirmed this URL format works: Actorio honors GET params.
  * Pagination uses Django's &page=N appended to the same URL.
  */
-export async function search(filters: ActorioFilters, maxResults = 100): Promise<ScraperResult> {
+export async function search(filters: ActorioFilters, maxResults = Infinity): Promise<ScraperResult> {
   if (!context) throw new Error('Browser not initialized');
   if (!isLoggedIn) throw new Error('Not logged in');
 
@@ -375,8 +380,9 @@ export async function search(filters: ActorioFilters, maxResults = 100): Promise
     const allResults: ActorioProduct[] = [];
     let pageNum = 1;
     let totalCount = 0;
+    const MAX_PAGES = 500; // Safety cap: Actorio rarely has >500 pages of real filtered results
 
-    while (allResults.length < maxResults) {
+    while (allResults.length < maxResults && pageNum <= MAX_PAGES) {
       const pageUrl = pageNum === 1 ? baseUrl : `${baseUrl}&page=${pageNum}`;
       console.log(`[scraper] Loading page ${pageNum}: ${pageUrl}`);
       await page.goto(pageUrl, { waitUntil: 'domcontentloaded', timeout: 30000 });
@@ -430,33 +436,54 @@ export async function search(filters: ActorioFilters, maxResults = 100): Promise
       const paginationInfo = await page.evaluate(
         (params: { currentPage: number; pageSize: number }): { total: number; maxPage: number } => {
           const body = document.body?.innerText ?? '';
+          // Try various result count patterns
           const totalMatch = body.match(/sur\s+([\d\s]+)\s+résultat/i)
-            ?? body.match(/of\s+([\d\s]+)\s+result/i);
+            ?? body.match(/of\s+([\d\s]+)\s+result/i)
+            ?? body.match(/([\d\s]+)\s+résultat/i)
+            ?? body.match(/([\d\s]+)\s+result/i);
           const total = totalMatch ? parseInt(totalMatch[1].replace(/\s/g, '')) : 0;
 
-          // Max page from visible pagination links
-          const pageLinks = Array.from(document.querySelectorAll('a[href*="page="]')) as HTMLAnchorElement[];
-          const maxPageFromLinks = pageLinks.reduce(function(mx, a) {
-            const m = a.href.match(/[?&]page=(\d+)/);
-            return m ? Math.max(mx, parseInt(m[1])) : mx;
-          }, params.currentPage);
+          // Also try #result_count element
+          var resultCountEl = document.querySelector('#result_count, .result-count, [id*="result_count"]');
+          var elTotal = 0;
+          if (resultCountEl) {
+            var rcText = resultCountEl.textContent ?? '';
+            var rcMatch = rcText.match(/([\d\s]+)/);
+            if (rcMatch) elTotal = parseInt(rcMatch[1].replace(/\s/g, '')) || 0;
+          }
+          var finalTotal = total || elTotal;
 
-          // Max page computed from total ÷ pageSize (more reliable — pagination widget
-          // may only show a window of 8 page numbers even if there are more pages)
-          const maxPageFromTotal = (total > 0 && params.pageSize > 0)
-            ? Math.ceil(total / params.pageSize)
+          // Max page: only use pagination links that are within visible nav (not all hrefs)
+          const paginationNav = document.querySelector('.pagination, nav[aria-label*="page"], ul.pagination') as HTMLElement | null;
+          var maxPageFromLinks = params.currentPage;
+          if (paginationNav) {
+            const pageLinks = Array.from(paginationNav.querySelectorAll('a[href*="page="]')) as HTMLAnchorElement[];
+            maxPageFromLinks = pageLinks.reduce(function(mx, a) {
+              const m = a.href.match(/[?&]page=(\d+)/);
+              return m ? Math.max(mx, parseInt(m[1])) : mx;
+            }, params.currentPage);
+          }
+
+          const maxPageFromTotal = (finalTotal > 0 && params.pageSize > 0)
+            ? Math.ceil(finalTotal / params.pageSize)
             : maxPageFromLinks;
 
           const maxPage = Math.max(maxPageFromLinks, maxPageFromTotal);
-          return { total, maxPage };
+          return { total: finalTotal, maxPage };
         },
         { currentPage: pageNum, pageSize: pageRows.length }
       );
 
       if (totalCount === 0 && paginationInfo.total > 0) totalCount = paginationInfo.total;
-      console.log(`[scraper] Page ${pageNum}/${paginationInfo.maxPage} | fetched ${allResults.length} | total=${paginationInfo.total}`);
+      console.log(`[scraper] Page ${pageNum} | fetched ${allResults.length} | total=${paginationInfo.total}`);
 
-      if (pageNum >= paginationInfo.maxPage || allResults.length >= maxResults) break;
+      // Stop conditions:
+      // 1. Incomplete page (fewer rows than expected = last page)
+      // 2. Reached maxResults
+      // 3. pageNum >= real maxPage (only trust if maxPage is reasonable, < MAX_PAGES)
+      const isLastPage = pageRows.length < 20;
+      if (isLastPage || allResults.length >= maxResults) break;
+      if (paginationInfo.maxPage <= MAX_PAGES && pageNum >= paginationInfo.maxPage) break;
       pageNum++;
     }
 
@@ -806,42 +833,52 @@ async function scrapeFromDom(page: Page, marketplace: string, pricesByAsin: Map<
       // Tentative 1: chercher dans la tr.[CC] de countries-table → tous attributs data-* + tooltips
       var countryRow5 = cells[5].querySelector('tr.' + countryCode) as HTMLElement | null;
       if (countryRow5) {
-        // data-* sur les <td> de cette ligne
-        var c5tds = Array.from(countryRow5.querySelectorAll('td')) as HTMLElement[];
-        for (var c5td of c5tds) {
-          for (var da of ['data-sort', 'data-order', 'data-value', 'data-price']) {
-            var dav = c5td.getAttribute(da) ?? '';
-            if (dav && /^\d/.test(dav)) { amazon_price = parseFloat(dav) || 0; break; }
-          }
-          if (amazon_price) break;
-        }
-        // data-tooltip / aria-label / title / data-content sur tous les spans
-        if (!amazon_price) {
-          var buyboxSpans = Array.from(countryRow5.querySelectorAll('span')) as HTMLElement[];
-          for (var bs of buyboxSpans) {
-            var tt = bs.getAttribute('data-tooltip') ?? bs.getAttribute('aria-label')
-              ?? bs.getAttribute('title') ?? bs.getAttribute('data-content') ?? '';
-            if (tt && /\d/.test(tt)) {
-              var pm = tt.match(/[\d]+[.,][\d]+|[\d]+/);
-              if (pm) { amazon_price = parseFloat(pm[0].replace(',', '.')) || 0; break; }
-            }
-            if (!amazon_price) {
-              var st = bs.innerText.replace(/[€£\s\u00a0]/g, '').replace(',', '.').trim();
-              if (/^\d+(\.\d+)?$/.test(st)) { amazon_price = parseFloat(st) || 0; break; }
-            }
+        // Tentative 1: input placeholder (Actorio renders price as placeholder on the input)
+        // e.g. <input ... placeholder="249.90" id="amz_price_input_FR_...">
+        var priceInput = countryRow5.querySelector('input[id^="amz_price_input_' + countryCode + '"]') as HTMLInputElement | null;
+        if (!priceInput) priceInput = countryRow5.querySelector('input.pricebox') as HTMLInputElement | null;
+        if (priceInput) {
+          var phVal = priceInput.getAttribute('placeholder') ?? '';
+          if (phVal && /^\d/.test(phVal)) amazon_price = parseFloat(phVal.replace(',', '.')) || 0;
+          // Also check actual input value (user may have overridden)
+          if (!amazon_price && priceInput.value && /^\d/.test(priceInput.value)) {
+            amazon_price = parseFloat(priceInput.value.replace(',', '.')) || 0;
           }
         }
-        // innerText de la ligne (dernier recours)
+        // Tentative 2: Buy Box tooltip text "Buy Box249.9 €" inside .buybox-tooltiptext
         if (!amazon_price) {
-          var rowNums5 = countryRow5.innerText.replace(/[€£\s\u00a0]/g, '').replace(',', '.').match(/\d+\.\d+|\d{2,}/g) ?? [];
-          if (rowNums5.length > 0) amazon_price = parseFloat(rowNums5[0]) || 0;
+          var tooltipSpan = countryRow5.querySelector('.buybox-tooltiptext') as HTMLElement | null;
+          if (tooltipSpan) {
+            var ttText = tooltipSpan.innerText ?? '';
+            var bbMatch = ttText.match(/Buy\s*Box\s*([\d.,]+)/i);
+            if (bbMatch) amazon_price = parseFloat(bbMatch[1].replace(',', '.')) || 0;
+          }
+        }
+        // Tentative 3: data-* attributes on td elements
+        if (!amazon_price) {
+          var c5tds = Array.from(countryRow5.querySelectorAll('td')) as HTMLElement[];
+          for (var c5td of c5tds) {
+            for (var da of ['data-sort', 'data-order', 'data-value', 'data-price']) {
+              var dav = c5td.getAttribute(da) ?? '';
+              if (dav && /^\d/.test(dav)) { amazon_price = parseFloat(dav) || 0; break; }
+            }
+            if (amazon_price) break;
+          }
         }
       }
-      // Tentative 2: numCountry (fallback général)
+      // Tentative 4: any input with matching country code anywhere in c5
+      if (!amazon_price) {
+        var anyInput = cells[5].querySelector('input[id*="_' + countryCode + '_"]') as HTMLInputElement | null;
+        if (anyInput) {
+          var anyPh = anyInput.getAttribute('placeholder') ?? '';
+          if (anyPh && /^\d/.test(anyPh)) amazon_price = parseFloat(anyPh.replace(',', '.')) || 0;
+        }
+      }
+      // Tentative 5: numCountry fallback
       if (!amazon_price) {
         amazon_price = helpers.numCountry(cells[5] as HTMLElement, /[€£\s\u00a0]/g, countryIdx);
       }
-      // Tentative 3: data-sort/data-order sur la cellule td principale
+      // Tentative 6: data-sort/data-order on main td
       if (!amazon_price) {
         var sortVal = cells[5].getAttribute('data-sort') ?? cells[5].getAttribute('data-order') ?? '';
         if (sortVal && /^\d/.test(sortVal)) amazon_price = parseFloat(sortVal) || 0;

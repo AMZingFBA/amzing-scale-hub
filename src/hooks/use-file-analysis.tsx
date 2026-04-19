@@ -148,28 +148,31 @@ export function useFileAnalysis() {
         if (columnMapping.price !== '__none__') mapping.price = columnMapping.price;
       }
 
-      // Insert job
-      const { error: insertError } = await supabase
-        .from('file_analyses')
-        .insert({
-          user_id: user.id,
-          file_path: filePath,
-          file_name: file.name,
-          filters: filters as any,
-          column_mapping: Object.keys(mapping).length > 0 ? mapping : null,
-          status: 'pending',
-        });
+      // Run analysis directly in Supabase Edge Function (no external Hetzner worker dependency)
+      toast.info('Analyse en cours...');
+      const { data, error: fnError } = await supabase.functions.invoke('analysis-run', {
+        body: {
+          filePath,
+          fileName: file.name,
+          filters,
+          columnMapping: Object.keys(mapping).length > 0 ? mapping : null,
+        },
+      });
 
-      if (insertError) throw new Error(`Job creation failed: ${insertError.message}`);
+      if (fnError) throw new Error(`Analyse échouée: ${fnError.message}`);
+      if (data?.error) throw new Error(data.error);
 
-      toast.success('Fichier envoyé ! Analyse en cours...');
+      toast.success('Analyse terminée');
       await loadAnalyses();
+      if (data?.analysisId) {
+        await loadResults(data.analysisId);
+      }
     } catch (err: any) {
       toast.error(err.message);
     } finally {
       setIsUploading(false);
     }
-  }, [user, loadAnalyses]);
+  }, [user, loadAnalyses, loadResults]);
 
   // Save filter preset
   const savePreset = useCallback(async (name: string, filters: AnalysisFilters) => {

@@ -1,0 +1,3078 @@
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+	<link rel="icon" type="image/x-icon" href="/favicon.ico">
+	
+	
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+	<link rel="preconnect" href="https://fonts.gstatic.com">
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins&display=swap">
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito+Sans&display=swap">
+	
+		 
+	<link rel="stylesheet" href="https://static.actorio.com/fonts/Texgyreadventor/css/Texgyreadventor.679b8dc26806.css">
+	<link rel="stylesheet" href="https://static.actorio.com/css/style.f785ff04d43f.css?v=48">
+	
+	
+	<link rel="stylesheet" type="text/css" href="https://static.actorio.com/django_tables2/themes/paleblue/css/screen.22ce28158e77.css" />
+	<link rel="stylesheet" type="text/css" href="https://static.actorio.com/multiselect-dropdown/css/multiselect-dropdown.3c44f06858d3.css" />
+	<link rel="stylesheet" type="text/css" href="https://static.actorio.com/ecommercer/css/product_search_variables.1c841c4cc192.css" />
+	<link rel="stylesheet" type="text/css" href="https://static.actorio.com/ecommercer/css/product_search.951d209481b6.css" />
+	<link rel="stylesheet" type="text/css" href="https://static.actorio.com/ecommercer/css/weee-lookup-modal.b4c0b8b5a163.css" />
+
+	
+	
+<title>Actorio Web App - Product Search</title>
+   
+</head>
+
+
+<body onload="init()">
+  
+
+
+
+<span id="email" hidden>amzingfba26@gmail.com</span>
+<span id="phone_number" hidden>+33601148619</span>
+
+<input type="checkbox" id="enable_debugger"  hidden>
+<nav class="navbar navbar-expand-lg navbar-light bg-light ">
+	<a class="navbar-brand" href="/"><img loading="lazy" height="42" src="https://static.actorio.com/images/actorio-logo.c315ee7135dc.png"></a>
+	<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+		<span class="navbar-toggler-icon"></span>
+	</button>
+	<div class="collapse navbar-collapse" id="navbarSupportedContent">
+		<ul class="navbar-nav mr-auto">
+			<li class="dropdown nav-item">
+				<!-- <a href="#" class="dropdown-toggle nav-link" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa-fw fas fa-flask"></i>&nbsp;Analyser Produits<span class="caret"></span></a> -->
+				<!-- <ul class="dropdown-menu"> -->
+					
+					<li class="nav-item active">
+						<a class="nav-link" href="/products/search/"><i class="fa-fw fas fa-search"></i>&nbsp;Recherche Produits</a>
+					</li>
+					<li class="nav-item ">
+						<a class="nav-link" href="/products/favorites/"><i class="fa-fw fas fa-heart"></i>&nbsp;Mes Favoris</a>
+					</li>
+					
+					
+					<li class="nav-item ">
+						<a class="nav-link" href="/products/reverse_search/"><i class="fa-fw fa-solid fa-mask"></i>&nbsp;Recherche Inversée</a>
+					</li>
+					
+					
+					
+					<li class="nav-item ">
+						<a class="nav-link" href="/products/amazon_search/"><i class="fa-fw fa-solid fa-arrow-right-arrow-left"></i>&nbsp;Amazon Flip</a>
+					</li>
+					
+					
+					
+					<li class="nav-item ">
+						<a class="nav-link" href="/products/upload/"><i class="fa-fw fa-solid fa-file-arrow-up"></i>&nbsp;Importer Catalogue</a>
+					</li>
+					
+				<!-- </ul> -->
+			</li>
+			
+							
+		</ul>
+		<ul class="nav navbar-nav navbar-right" style="align-items: baseline;">
+			
+			<li class="dropdown nav-item">
+				
+				
+				<a href="#" class="dropdown-toggle nav-link" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+					<img loading="lazy" src="https://static.actorio.com/images/flags/FR.svg" width="20">
+					
+						
+					
+						
+					
+						
+						Français
+						
+					
+						
+					
+						
+					
+					<span class="caret"></span>
+				</a>
+				<ul class="dropdown-menu dropdown-menu-right" id="language-list">
+					
+					<li class="nav-item">
+						<a href="javascript:change_language('en-gb')" class="nav-link">
+							<img loading="lazy" src="https://static.actorio.com/images/flags/EN-GB.svg" width="20">
+							English
+						</a>
+					</li>
+					
+					<li class="nav-item">
+						<a href="javascript:change_language('es')" class="nav-link">
+							<img loading="lazy" src="https://static.actorio.com/images/flags/ES.svg" width="20">
+							Español
+						</a>
+					</li>
+					
+					<li class="nav-item">
+						<a href="javascript:change_language('fr')" class="nav-link">
+							<img loading="lazy" src="https://static.actorio.com/images/flags/FR.svg" width="20">
+							Français
+						</a>
+					</li>
+					
+					<li class="nav-item">
+						<a href="javascript:change_language('it')" class="nav-link">
+							<img loading="lazy" src="https://static.actorio.com/images/flags/IT.svg" width="20">
+							Italiano
+						</a>
+					</li>
+					
+					<li class="nav-item">
+						<a href="javascript:change_language('de')" class="nav-link">
+							<img loading="lazy" src="https://static.actorio.com/images/flags/DE.svg" width="20">
+							Deutsch
+						</a>
+					</li>
+					
+				</ul>
+			</li>
+			<li class="dropdown nav-item">
+				<a href="#" class="dropdown-toggle nav-link" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa-fw fa-solid fa-circle-question"></i></i>&nbsp;Aide<span class="caret"></span></a>
+				<ul class="dropdown-menu dropdown-menu-right">
+					<li class="nav-item"><a class="nav-link" href="https://actorio.com/fr/tutoriels/" target="_blank"><i class="fa-fw fas fa-graduation-cap"></i>&nbsp;Tutoriels</a></li>
+					<li class="nav-item"><a class="nav-link" href="https://actorio.com/entrainement/" target="_blank"><i class="fa-fw fa-solid fa-solid fa-comments"></i></i>&nbsp;Coaching</a></li>
+					<li class="nav-item"><a class="nav-link" href="https://actorio.com/fr/contactez-nous/" target="_blank"><i class="fa-fw fa-solid fa-envelope"></i></i>&nbsp;Contactez-nous</a></li>
+					<!--li class="nav-item"><a class="nav-link" href="https://actorio.com/1on1/" target="_blank"><i class="fa-solid fa-comments"></i>&nbsp;Coaching</a></li-->
+				</ul>
+			</li>
+			<li class="dropdown nav-item">
+				<a href="#" class="dropdown-toggle nav-link" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><img loading="lazy" src="https://static.actorio.com/images/actorio-icon.232afae1dab9.png" height="30"><span class="caret"></span></a>
+				<ul class="dropdown-menu dropdown-menu-right" style="padding: 0;">
+					<li class="nav-item" style="background-color: #F4F7FA; padding:8px;"><span>Utilisateur</span><br><span style="color:#2468B1;font-size:1.5em;">Noa</span></li>
+					<li class="nav-item"><a class="nav-link" href="/products/user_config/?next=/products/search/"><i class="fa-fw fas fa-cog"></i>&nbsp;Paramètres</a></li>   
+				<li class="nav-item"><a class="nav-link" href="/subscriptions/user_stores/"><i class="fa-fw fas fa-store"></i>&nbsp;Mes Fournisseurs</a></li>
+					
+					<li class="nav-item"><a class="nav-link" href="/subscriptions/"><i class="fa-fw fa-solid fa-briefcase"></i>&nbsp;Abonnements</a></li>
+					<li class="nav-item"><a class="nav-link" target="_blank" href="/subscriptions/portal/"><i class="fa-fw fas fa-file-invoice"></i>&nbsp;Facturation&nbsp;<i class="fa-fw fas fa-external-link-alt fa-xs"></i></a></li>
+					
+					<li class="nav-item" style="border-top: 1px solid #2468B1;"><a class="nav-link" href="/accounts/logout/"><i class="fa-fw fas fa-sign-out-alt"></i>&nbsp;Se Déconnecter</a></li>
+				</ul>
+			</li>
+		</ul>
+	</div>
+</nav>
+
+
+
+
+
+
+
+<div id="loading" class="loading">Loading&#8230;</div>
+<div id="long-loading" hidden>
+	<div class="loader-container">
+		<div class="loading-label">Votre recherche peut prendre un certain temps, veuillez patienter...</div>
+		<div class="loading-progress-bar">
+			<div class="loading-progress"></div>
+		</div>
+		
+	</div>
+</div>
+
+<div class="modal fade" id="modal-tutorial" tabindex="-1" role="dialog" aria-labelledby="modal-tutorial" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document" style="min-width:500px;max-width:1000px;margin:auto;width:90%;">
+		<div class="modal-content">
+			<div class="modal-header justify-content-center border-0" style="z-index:10;padding-bottom:0;">
+				<h2 style="text-align: center;">TUTORIEL RECHERCHE PRODUITS</h2>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<div class="embed-responsive embed-responsive-16by9">
+                    <iframe id="tutorial-video" class="embed-responsive-item" width="560" height="315" src="https://www.youtube.com/embed/-r556wEojs8" loading="lazy" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
+                </div>
+			</div>
+		</div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalAdvancedFilters" tabindex="-1" role="dialog" aria-labelledby="modalAdvancedFilters" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+		<div class="modal-content">
+			<div class="modal-header justify-content-center border-0" style="z-index:10;">
+				&nbsp;
+			</div>
+			<div class="modal-body text-center">
+				<h3 style="margin-top: -50px;"><i class="fa-solid fa-triangle-exclamation" style="color:orange;"></i>&nbsp;AVERTISSEMENT&nbsp;<i class="fa-solid fa-triangle-exclamation" style="color:orange;"></i></h3>
+				<br>
+				<h5><b>Les filtres avancés sont destinés aux vendeurs expérimentés</b></h5>
+				<h5>Êtes-vous sûr de vouloir faire cela ?</h5>
+			</div>
+			<div class="modal-footer justify-content-center border-0">
+				<button type="button" class="btn btn-ec" data-dismiss="modal" onclick="confirmAdvancedFiltersSelection()"><i class="fa-solid fa-check fa-lg"></i>&nbsp;CONFIRMER</button>
+				<button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="cancelAdvancedFiltersSelection()"><i class="fa-solid fa-xmark fa-lg"></i>&nbsp;ANNULER</button>
+			</div>
+		</div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalMarketplace" tabindex="-1" role="dialog" aria-labelledby="modalMarketplace" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+		<div class="modal-content">
+			<div class="modal-header justify-content-center border-0" style="z-index:10;">
+				&nbsp;
+			</div>
+			<div class="modal-body text-center">
+				<h3 style="margin-top: -50px;"><i class="fa-solid fa-triangle-exclamation" style="color:orange;"></i>&nbsp;AVERTISSEMENT&nbsp;<i class="fa-solid fa-triangle-exclamation" style="color:orange;"></i></h3>
+				<br>
+				<h5><b>La sélection d'un marketplace Amazon spécifique filtrera de nombreuses opportunités rentables !</b></h5>
+				<br>
+				<p style="text-align: justify;">
+					Vous pouvez vendre sur tous les marketplace Amazon même si vous ne déclarez la TVA que sur une seule.*
+					<br>
+					<span style="font-size:0.7em;">*Veuillez consulter un comptable pour comprendre les détails fiscaux.</span>
+				</p>
+				<h5>Êtes-vous sûr de vouloir faire cela ?</h5>
+			</div>
+			<div class="modal-footer justify-content-center border-0">
+				<button type="button" class="btn btn-ec" data-dismiss="modal"><i class="fa-solid fa-check fa-lg"></i>&nbsp;CONFIRMER</button>
+				<button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="cancelMarketplaceSelection()"><i class="fa-solid fa-xmark fa-lg"></i>&nbsp;ANNULER</button>
+			</div>
+		</div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalStore" tabindex="-1" role="dialog" aria-labelledby="modalStore" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+		<div class="modal-content">
+			<div class="modal-header justify-content-center border-0" style="z-index:10;">
+				&nbsp;
+			</div>
+			<div class="modal-body text-center">
+				<h3 style="margin-top: -50px;"><i class="fa-solid fa-triangle-exclamation" style="color:orange;"></i>&nbsp;AVERTISSEMENT&nbsp;<i class="fa-solid fa-triangle-exclamation" style="color:orange;"></i></h3>
+				<br>
+				<h5><b>Lorsque vous choisissez TOUS les fournisseurs, vous risquez d’obtenir en plus des correspondances de mauvaise qualité.</b></h5>
+				<p style="text-align: justify;">Nous vous recommandons de ne choisir que quelques fournisseurs pour de meilleurs résultats.</p>
+				<h5>Êtes-vous sûr de vouloir faire cela ?</h5>
+			</div>
+			<div class="modal-footer justify-content-center border-0">
+				<button type="button" class="btn btn-ec" data-dismiss="modal"><i class="fa-solid fa-check fa-lg"></i>&nbsp;CONFIRMER</button>
+				<button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="cancelStoreSelection()"><i class="fa-solid fa-xmark fa-lg"></i>&nbsp;ANNULER</button>
+			</div>
+		</div>
+    </div>
+</div>
+
+<div class="modal fade" id="modal-display-preferences" tabindex="-1" role="dialog" aria-labelledby="modal-display-preferences" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document" style="min-width: 800px;">
+		<div class="modal-content">
+			<div class="modal-header justify-content-center border-0" style="z-index:10;padding-bottom: 0;">
+				<h2 style="text-align: center;">PRÉFÉRENCES D'AFFICHAGE</h2>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body text-center">
+				<table class="settings-box text-left">
+					<tr>
+						<td>
+							<span style="display:inline-block">
+								<span class="info-tooltipped">
+									<span>
+										Exclure Produits en Liste Noire
+										<i class="far fa-question-circle"></i>
+									</span>
+									<span class="info-tooltiptext">Exclure les produits de la liste noire des résultats de recherche</span>
+								</span>
+								<br>
+								<div class="icon-switch">
+									<i class="fa-solid fa-eye-slash fa-xl icon-switch-icon" style="margin:12px 0;"></i>
+									<label class="switch">
+										<input type="checkbox" name="hide_suppressed_products" onchange="toggleHideSuppressed()" id="hide_supressed" required>
+										<span class="slider"></span>
+									</label>
+									<!--div id="hide_suppressed_feed" class="loader loader-small" hidden></div-->
+								</div>
+								<br>
+							</span>
+							<span style="display:inline-block">
+								
+								<span class="info-tooltipped">
+									<span style="white-space:nowrap;">
+										Echelle Keepa
+										<i class="far fa-question-circle"></i>
+									</span>
+									<span class="info-tooltiptext">Période de echelle de vignettes de Keepa</span>
+								</span>
+								<br>
+								<select name="keepa_range" onchange="toggleKeepaRange()" id="keepa_range" class="form-control choice-select">
+  <option value="30">30 days</option>
+
+  <option value="90" selected>90 days</option>
+
+  <option value="180">180 days</option>
+
+</select>
+							</span>
+						</td>
+						<td>
+							<span class="info-tooltipped">
+								<span style="white-space:nowrap;">
+									Marketplace Visibles
+									<i class="far fa-question-circle"></i>
+								</span>
+								<span class="info-tooltiptext">Afficher/masquer les marketplace Amazon</span>
+							</span>
+							<br>
+							
+							 
+							<div id="display_mkt_container_DE" class="icon-switch">
+								<img loading="lazy" class="icon-switch-icon" src="https://static.actorio.com/images/flags/DE.151a01acd435.svg" />
+								<label class="switch">
+									<input type="checkbox" name="display_DE" onchange="toggleMarketplace(&#x27;DE&#x27;)" id="display_DE" class="display_mkt" required checked>
+									<span class="slider"></span>
+								</label>
+							</div>
+							<br><br>
+							
+							
+							
+							 
+							<div id="display_mkt_container_ES" class="icon-switch">
+								<img loading="lazy" class="icon-switch-icon" src="https://static.actorio.com/images/flags/ES.dc664854e7e8.svg" />
+								<label class="switch">
+									<input type="checkbox" name="display_ES" onchange="toggleMarketplace(&#x27;ES&#x27;)" id="display_ES" class="display_mkt" required checked>
+									<span class="slider"></span>
+								</label>
+							</div>
+							<br><br>
+							
+							
+							
+							 
+							<div id="display_mkt_container_FR" class="icon-switch">
+								<img loading="lazy" class="icon-switch-icon" src="https://static.actorio.com/images/flags/FR.0166628f5d9a.svg" />
+								<label class="switch">
+									<input type="checkbox" name="display_FR" onchange="toggleMarketplace(&#x27;FR&#x27;)" id="display_FR" class="display_mkt" required checked>
+									<span class="slider"></span>
+								</label>
+							</div>
+							<br><br>
+							
+							
+							
+							 
+							<div id="display_mkt_container_GB" class="icon-switch">
+								<img loading="lazy" class="icon-switch-icon" src="https://static.actorio.com/images/flags/GB.374ffde57748.svg" />
+								<label class="switch">
+									<input type="checkbox" name="display_GB" onchange="toggleMarketplace(&#x27;GB&#x27;)" id="display_GB" class="display_mkt" required checked>
+									<span class="slider"></span>
+								</label>
+							</div>
+							<br><br>
+							
+							
+							
+							 
+							<div id="display_mkt_container_IT" class="icon-switch">
+								<img loading="lazy" class="icon-switch-icon" src="https://static.actorio.com/images/flags/IT.e095369ee2d3.svg" />
+								<label class="switch">
+									<input type="checkbox" name="display_IT" onchange="toggleMarketplace(&#x27;IT&#x27;)" id="display_IT" class="display_mkt" required checked>
+									<span class="slider"></span>
+								</label>
+							</div>
+							<br><br>
+							
+							<hr>
+							
+							
+							
+							 
+							<div id="display_mkt_container_BE" class="icon-switch">
+								<img loading="lazy" class="icon-switch-icon" src="https://static.actorio.com/images/flags/BE.0127ff81afd7.svg" />
+								<label class="switch">
+									<input type="checkbox" name="display_BE" onchange="toggleMarketplace(&#x27;BE&#x27;)" id="display_BE" class="display_mkt" required checked>
+									<span class="slider"></span>
+								</label>
+							</div>
+							<br><br>
+							
+							
+							
+							 
+							<div id="display_mkt_container_NL" class="icon-switch">
+								<img loading="lazy" class="icon-switch-icon" src="https://static.actorio.com/images/flags/NL.0de7e9306e3a.svg" />
+								<label class="switch">
+									<input type="checkbox" name="display_NL" onchange="toggleMarketplace(&#x27;NL&#x27;)" id="display_NL" class="display_mkt" required checked>
+									<span class="slider"></span>
+								</label>
+							</div>
+							<br><br>
+							
+							
+							
+							 
+							<div id="display_mkt_container_PL" class="icon-switch">
+								<img loading="lazy" class="icon-switch-icon" src="https://static.actorio.com/images/flags/PL.ed9d5529ee96.svg" />
+								<label class="switch">
+									<input type="checkbox" name="display_PL" onchange="toggleMarketplace(&#x27;PL&#x27;)" id="display_PL" class="display_mkt" required checked>
+									<span class="slider"></span>
+								</label>
+							</div>
+							<br><br>
+							
+							
+							
+							 
+							<div id="display_mkt_container_SE" class="icon-switch">
+								<img loading="lazy" class="icon-switch-icon" src="https://static.actorio.com/images/flags/SE.d46dbac2c35d.svg" />
+								<label class="switch">
+									<input type="checkbox" name="display_SE" onchange="toggleMarketplace(&#x27;SE&#x27;)" id="display_SE" class="display_mkt" required checked>
+									<span class="slider"></span>
+								</label>
+							</div>
+							<br><br>
+							
+							
+							
+							 
+							<div id="display_mkt_container_IE" class="icon-switch">
+								<img loading="lazy" class="icon-switch-icon" src="https://static.actorio.com/images/flags/IE.6e799aa637da.svg" />
+								<label class="switch">
+									<input type="checkbox" name="display_IE" onchange="toggleMarketplace(&#x27;IE&#x27;)" id="display_IE" class="display_mkt" required checked>
+									<span class="slider"></span>
+								</label>
+							</div>
+							<br><br>
+							
+							
+							
+							 
+							<div id="display_mkt_container_TR" class="icon-switch">
+								<img loading="lazy" class="icon-switch-icon" src="https://static.actorio.com/images/flags/TR.2353c1a4b796.svg" />
+								<label class="switch">
+									<input type="checkbox" name="display_TR" onchange="toggleMarketplace(&#x27;TR&#x27;)" id="display_TR" class="display_mkt" required checked>
+									<span class="slider"></span>
+								</label>
+							</div>
+							<br><br>
+							
+							
+							
+						</td>
+						<td style="min-width:290px">
+							<span class="info-tooltipped">
+								<span style="white-space:nowrap;">
+									
+									Affichage des Colonnes
+									<br>
+									(Recherche Produits)
+									
+									<i class="far fa-question-circle"></i>
+								</span>
+								<span class="info-tooltiptext">Afficher/masquer et trier les colonnes</span>
+							</span>
+							<ul id="display-item-container" class="drag-sort-enable navbar-light">
+								<li><span class="navbar-toggler-icon"></span> <label><input type="checkbox" class="display-item" name="identifiers" onchange="updateColumnDisplay();saveColumnDisplay()" checked/> Identifiants</label></li>
+								<li><span class="navbar-toggler-icon"></span> <label><input type="checkbox" class="display-item" name="restricted" onchange="updateColumnDisplay();saveColumnDisplay()" checked/> Restrictions</label></li>
+								<li><span class="navbar-toggler-icon"></span> <label><input type="checkbox" class="display-item" name="amazon_title" onchange="updateColumnDisplay();saveColumnDisplay()" checked/> Titre AMZ</label></li>
+								<li><span class="navbar-toggler-icon"></span> <label><input type="checkbox" class="display-item" name="amazon_image" onchange="updateColumnDisplay();saveColumnDisplay()" checked/> Info AMZ</label></li>
+								<li><span class="navbar-toggler-icon"></span> <label><input type="checkbox" class="display-item" name="store_image" onchange="updateColumnDisplay();saveColumnDisplay()" checked/> Info Fournisseur</label></li>
+								<li><span class="navbar-toggler-icon"></span> <label><input type="checkbox" class="display-item" name="amazon_price" onchange="updateColumnDisplay();saveColumnDisplay()" checked/> Prix AMZ Actuel</label></li>
+								<li><span class="navbar-toggler-icon"></span> <label><input type="checkbox" class="display-item" name="active_amazon_price" onchange="updateColumnDisplay();saveColumnDisplay()" checked/> Prix AMZ Stable</label></li>
+								<li><span class="navbar-toggler-icon"></span> <label><input type="checkbox" class="display-item" name="store_price" onchange="updateColumnDisplay();saveColumnDisplay()" checked/> Prix Fournisseur</label></li>
+								<li><span class="navbar-toggler-icon"></span> <label><input type="checkbox" class="display-item" name="sellers" onchange="updateColumnDisplay();saveColumnDisplay()" checked/> Vendeurs AMZ</label></li>
+								<li><span class="navbar-toggler-icon"></span> <label><input type="checkbox" class="display-item" name="sales_rank" onchange="updateColumnDisplay();saveColumnDisplay()"/> AMZ BSR</label></li>
+								<li><span class="navbar-toggler-icon"></span> <label><input type="checkbox" class="display-item" name="profit" onchange="updateColumnDisplay();saveColumnDisplay()" checked/> Bénéfice Unitaire</label></li>
+								<li><span class="navbar-toggler-icon"></span> <label><input type="checkbox" class="display-item" name="roi" onchange="updateColumnDisplay();saveColumnDisplay()" checked/> RoI Unitaire</label></li>
+								<li><span class="navbar-toggler-icon"></span> <label><input type="checkbox" class="display-item" name="margin" onchange="updateColumnDisplay();saveColumnDisplay()"/> Marge Unitaire</label></li>
+								<li><span class="navbar-toggler-icon"></span> <label><input type="checkbox" class="display-item" name="sales_month" onchange="updateColumnDisplay();saveColumnDisplay()" checked/> Ventes Mensuelles</label></li>
+								<li><span class="navbar-toggler-icon"></span> <label><input type="checkbox" class="display-item" name="profit_month" onchange="updateColumnDisplay();saveColumnDisplay()" checked/> Bénéfice Mensuel</label></li>
+								<li><span class="navbar-toggler-icon"></span> <label><input type="checkbox" class="display-item" name="keepa_graph" onchange="updateColumnDisplay();saveColumnDisplay()" checked/> Graphique Keepa</label></li>
+							</ul>
+							<button type="button" id="reset-column-display" class="btn btn-secondary filter-button" onclick="resetColumnDisplay()">
+								<i class="fa-solid fa-rotate-left"></i>&nbsp;RÉINITIALISER
+							</button>
+						</td>
+					</tr>
+				</table>
+			</div>
+		</div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalSaveFilters" tabindex="-1" role="dialog" aria-labelledby="modalSaveFilters" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+		<div class="modal-content">
+			<div class="modal-header justify-content-center border-0" style="z-index:10;">
+				<h2 style="text-align: center;">ENREGISTRER FILTRES DE RECHERCHE</h2>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body text-left">
+				<label  class="filter-label" style="width: 100%;">Nom du Filtre
+					<input type="text" class="form-control long-input" maxlength="30" id="search-filter-name" oninput="inputRegex(this, /[^a-zA-Z0-9-_()€£%*/\s]/gi);checkSearchFilters()" style="font-size:1.5em;">
+				</label>
+			</div>
+			<div class="modal-footer justify-content-center border-0">
+				<button type="button" class="btn btn-ec" data-dismiss="modal" onclick="saveSearchFilters()" id="save-search-filters" disabled><i class="fa-solid fa-floppy-disk fa-lg"></i></i>&nbsp;SAUVEGARDER</button>
+				<button type="button" class="btn btn-secondary" data-dismiss="modal" ><i class="fa-solid fa-xmark fa-lg"></i>&nbsp;ANNULER</button>
+			</div>
+		</div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalEditFilters" tabindex="-1" role="dialog" aria-labelledby="modalEditFilters" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+		<div class="modal-content">
+			<div class="modal-header justify-content-center border-0" style="z-index:10;">
+				<h2 style="text-align: center;">FILTRES DE RECHERCHE</h2>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body text-center">
+				<table class="paleblue elegant-table" id="saved-filters">
+					<tr>
+						<td>
+							Aucun filtre enregistré
+						</td>
+					</tr>
+				</table>
+			</div>
+			<div class="modal-footer justify-content-center border-0">
+				<button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-xmark fa-lg"></i>&nbsp;ANNULER</button>
+			</div>
+		</div>
+    </div>
+</div>
+
+<div id="alert_spapi_keys" class="alert alert-warning alert-dismissible fade show" role="alert" style="display: none;">
+	<span id="alert_message_spapi_keys">
+		Une connexion API Amazon est requise pour activer la mise à jour des informations Amazon en temps réel.
+		<a href="/products/user_config/?next=/products/search/">Configurer l'API Amazon</a>
+	</span>
+</div>
+<div id="alert_browser" class="alert alert-warning alert-dismissible fade show" role="alert" style="display: none;">
+	<span>
+		La fonctionnalité complète n’est prise en charge que dans les navigateurs Google Chrome ou Microsoft Edge.
+	</span>
+	<button id="alert_browser_close" type="button" class="close" data-dismiss="alert" aria-label="Close">
+		<span aria-hidden="true">&times;</span>
+	</button>
+</div>
+<div id="alert_extension" class="alert alert-warning alert-dismissible fade show" role="alert" style="display: none;">
+	<span id="alert_message_extension">
+		Pour accéder à toutes les fonctionnalités, veuillez installer l’Extension Actorio.
+		<a id="chrome_extension_link" href="https://chrome.google.com/webstore/detail/actorio/ofakjaihobggiigdhbmnbdnaoddapgla" target="_blank" hidden>Installer l'extension Google Chrome de Actorio</a>
+		<a id="edge_extension_link" href="https://microsoftedge.microsoft.com/addons/detail/dmfdgpcmkjbapjofddbbjlodlmgcgdcf" target="_blank" hidden>Installer l'extension Microsoft Edge de Actorio</a>
+	</span>
+	<button id="alert_extension_close" type="button" class="close" data-dismiss="alert" aria-label="Close">
+		<span aria-hidden="true">&times;</span>
+	</button>
+</div>
+<div id="alert_custom" class="alert alert-warning alert-dismissible fade show" role="alert" style="display: none;">
+	<span id="alert_message_custom"></span>
+	<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+		<span aria-hidden="true">&times;</span>
+	</button>
+</div>
+
+<input type="text" id="total_results_original" value="0" hidden>
+<input type="text" id="amz_request_semaphore" hidden>
+<input type="checkbox" id="disable_warnings" hidden>
+<input type="text" id="xrates" value="{&quot;EUR&quot;: {&quot;GBP&quot;: &quot;0.86321&quot;, &quot;SEK&quot;: &quot;10.81230&quot;, &quot;PLN&quot;: &quot;4.27318&quot;, &quot;CZK&quot;: &quot;24.46656&quot;, &quot;HUF&quot;: &quot;392.76688&quot;, &quot;TRY&quot;: &quot;50.53500&quot;, &quot;DKK&quot;: &quot;7.47206&quot;, &quot;RON&quot;: &quot;5.10280&quot;}, &quot;GBP&quot;: {&quot;EUR&quot;: &quot;1.15846&quot;, &quot;SEK&quot;: &quot;12.52564&quot;, &quot;PLN&quot;: &quot;4.95031&quot;, &quot;CZK&quot;: &quot;28.34357&quot;, &quot;HUF&quot;: &quot;455.00505&quot;, &quot;TRY&quot;: &quot;58.54284&quot;, &quot;DKK&quot;: &quot;8.65609&quot;, &quot;RON&quot;: &quot;5.91140&quot;}, &quot;SEK&quot;: {&quot;EUR&quot;: &quot;0.09249&quot;, &quot;GBP&quot;: &quot;0.07984&quot;, &quot;PLN&quot;: &quot;0.39521&quot;, &quot;CZK&quot;: &quot;2.26285&quot;, &quot;HUF&quot;: &quot;36.32591&quot;, &quot;TRY&quot;: &quot;4.67384&quot;, &quot;DKK&quot;: &quot;0.69107&quot;, &quot;RON&quot;: &quot;0.47194&quot;}, &quot;PLN&quot;: {&quot;EUR&quot;: &quot;0.23402&quot;, &quot;GBP&quot;: &quot;0.20201&quot;, &quot;SEK&quot;: &quot;2.53027&quot;, &quot;CZK&quot;: &quot;5.72561&quot;, &quot;HUF&quot;: &quot;91.91441&quot;, &quot;TRY&quot;: &quot;11.82609&quot;, &quot;DKK&quot;: &quot;1.74859&quot;, &quot;RON&quot;: &quot;1.19415&quot;}, &quot;CZK&quot;: {&quot;EUR&quot;: &quot;0.04087&quot;, &quot;GBP&quot;: &quot;0.03528&quot;, &quot;SEK&quot;: &quot;0.44192&quot;, &quot;PLN&quot;: &quot;0.17465&quot;, &quot;HUF&quot;: &quot;16.05320&quot;, &quot;TRY&quot;: &quot;2.06547&quot;, &quot;DKK&quot;: &quot;0.30540&quot;, &quot;RON&quot;: &quot;0.20856&quot;}, &quot;HUF&quot;: {&quot;EUR&quot;: &quot;0.00255&quot;, &quot;GBP&quot;: &quot;0.00220&quot;, &quot;SEK&quot;: &quot;0.02753&quot;, &quot;PLN&quot;: &quot;0.01088&quot;, &quot;CZK&quot;: &quot;0.06229&quot;, &quot;TRY&quot;: &quot;0.12866&quot;, &quot;DKK&quot;: &quot;0.01902&quot;, &quot;RON&quot;: &quot;0.01299&quot;}, &quot;TRY&quot;: {&quot;EUR&quot;: &quot;0.01979&quot;, &quot;GBP&quot;: &quot;0.01708&quot;, &quot;SEK&quot;: &quot;0.21396&quot;, &quot;PLN&quot;: &quot;0.08456&quot;, &quot;CZK&quot;: &quot;0.48415&quot;, &quot;HUF&quot;: &quot;7.77217&quot;, &quot;DKK&quot;: &quot;0.14786&quot;, &quot;RON&quot;: &quot;0.10098&quot;}, &quot;DKK&quot;: {&quot;EUR&quot;: &quot;0.13383&quot;, &quot;GBP&quot;: &quot;0.11553&quot;, &quot;SEK&quot;: &quot;1.44703&quot;, &quot;PLN&quot;: &quot;0.57189&quot;, &quot;CZK&quot;: &quot;3.27441&quot;, &quot;HUF&quot;: &quot;52.56475&quot;, &quot;TRY&quot;: &quot;6.76320&quot;, &quot;RON&quot;: &quot;0.68292&quot;}, &quot;RON&quot;: {&quot;EUR&quot;: &quot;0.19597&quot;, &quot;GBP&quot;: &quot;0.16917&quot;, &quot;SEK&quot;: &quot;2.11890&quot;, &quot;PLN&quot;: &quot;0.83742&quot;, &quot;CZK&quot;: &quot;4.79473&quot;, &quot;HUF&quot;: &quot;76.97080&quot;, &quot;TRY&quot;: &quot;9.90338&quot;, &quot;DKK&quot;: &quot;1.46431&quot;}, &quot;USD&quot;: {}}" hidden>
+<input type="text" id="user_config" value="{&quot;currency&quot;: &quot;EUR&quot;, &quot;location&quot;: null, &quot;pro_selling_plan&quot;: true, &quot;fulfillment_type&quot;: &quot;FBA&quot;, &quot;mci_de&quot;: true, &quot;mci_es&quot;: true, &quot;mci_fr&quot;: true, &quot;mci_gb&quot;: true, &quot;mci_it&quot;: true, &quot;mci_pl&quot;: true, &quot;mci_se&quot;: true, &quot;mci_ie&quot;: true, &quot;mci_tr&quot;: true, &quot;vat_exempt&quot;: null, &quot;recargo&quot;: null, &quot;csv_quota&quot;: 100000, &quot;default_min_profit&quot;: null, &quot;default_min_roi&quot;: null, &quot;default_min_profit_month&quot;: null, &quot;default_min_sales_30_days&quot;: null, &quot;seller_id&quot;: null, &quot;keepa_api_key&quot;: null}" hidden>
+<input type="text" id="selected_seller" value="None" hidden>
+<input type="checkbox" id="chrome_extension_installed" hidden>
+<input type="checkbox" id="chrome_extension_connected" hidden>
+<input type="text" id="amazon_api_endpoint" value="https://api.actorio.com/amazon_spapi/" hidden>
+<input type="text" id="restrictions_api_endpoint" value="https://api.actorio.com/restrictions_spapi/" hidden>
+<input type="text" id="amz_countries" value="[&quot;DE&quot;, &quot;ES&quot;, &quot;FR&quot;, &quot;GB&quot;, &quot;IT&quot;, &quot;BE&quot;, &quot;NL&quot;, &quot;PL&quot;, &quot;SE&quot;, &quot;IE&quot;, &quot;TR&quot;]" hidden>
+<input type="text" id="db_amz_countries" value="[&quot;DE&quot;, &quot;ES&quot;, &quot;FR&quot;, &quot;GB&quot;, &quot;IT&quot;]" hidden>
+<input type="text" id="column_display" value="" hidden>
+
+<button type="button" id="check_all_eligible" onclick="checkAllEligible()" hidden>Check all eligible</button>
+<!-- <button id="check_all_hazmat" onclick="checkAllHazmat()" hidden>Check all hazmat</button> -->
+<button type="button" id="refresh_all_amz_info" onclick="refreshAllAmzInfo()" hidden>Refresh all amz info</button>
+
+<div id="main-container">
+	<table class="header-table" width="100%">
+		<tr>
+			<td rowspan="2" width="1%">
+				<h4 style="margin-top:5px;margin-bottom:0;">
+					<span style="padding:22px;white-space: nowrap;">
+						
+						<i class="fas fa-search"></i>&nbsp;RECHERCHE PRODUITS
+						
+					</span>
+				</h4>
+			</td>
+			<td width="1%" class="extension_error" hidden>
+				&nbsp;
+			</td>
+			<td colspan="2" class="connect_to_amz" width="1%" hidden>
+				<span class="info-tooltipped" style="white-space: nowrap">
+					Amazon Seller Central
+					<span class="info-tooltiptext">Affiche l'état de la connexion à votre compte Amazon Seller Central</span>
+					<i class="far fa-question-circle"></i>
+				</span>
+			</td>
+			<td class="text-right">
+				<span class="info-tooltipped" style="white-space: nowrap">
+					
+					Filtres Avancés
+					<span class="info-tooltiptext">Activer les filtres avancés</span>
+					<i class="far fa-question-circle"></i>
+					
+				</span>
+			</td>
+		</tr>
+		<tr>
+			<td width="1%" class="extension_error" hidden>
+				<a role="button" href="https://chrome.google.com/webstore/detail/actorio/ofakjaihobggiigdhbmnbdnaoddapgla" target="_blank" rel="nofollow">
+					<span class="badge badge-secondary" style="padding: 1.4em;">Erreur - Mettre à jour l'Extension Actorio</span>
+				</a>
+			</td>
+			<td class="connect_to_amz" width="1%" hidden>
+				<a role="button" id="connect_to_amz_button" href="https://sellercentral-europe.amazon.com/home" target="_blank" rel="nofollow">
+					<span id="connect_to_amz_label" class="badge badge-warning">Connexion...</span>
+				</a>
+			</td>
+			<td class="connect_to_amz" width="1%" hidden>
+				<select name="seller" onchange="selectSeller()" id="seller_choice" class="form-control choice-select" hidden style="width:max-content !important">
+</select>
+			</td>
+			<td class="text-right">
+				<div class="feed-container" style="float:right;">
+					<div id="advanced_filters_feed" class="loader loader-small" style="margin-right:5px;margin-top:-8px;" hidden></div>
+					<label class="switch">
+						<input type="checkbox" name="advanced_filters" onchange="toggleAdvancedFilters()" id="advanced_filters" required>
+						<span class="slider"></span>
+					</label>
+				</div>
+			</td>
+		</tr>
+		
+		<tr>
+			<td>
+				<span style="cursor: pointer;margin-left: 20px;white-space: nowrap;" onclick="$('#modal-tutorial').modal('show')">
+					<i class="fa-solid fa-film"></i>&nbsp;Regarder le Tutoriel
+				</span>
+			</td>
+		</tr>
+		
+	</table>
+
+	<form id="search" method="get" class="form form-inline" autocomplete="off">
+		
+		<table class="filter-table" id="amazon_filters" >
+			<tr class="first-filter">
+				<td class="long-filter">
+					<h4 style="margin-top:10px; margin-bottom:-5px;">FILTRES AMAZON</h4>
+				</td>
+			</tr>
+			
+			<tr>
+				<td class="left-filter" id="marketplace_filter" style="vertical-align: top;" hidden>
+					<span class="filter-label">
+						<span class="info-tooltipped">
+							
+							Marketplace
+							<span class="info-tooltiptext">Sélectionnez le marketplace Amazon où vous souhaitez vendre des produits</span>
+							<i class="far fa-question-circle"></i>
+							
+						</span>
+					</span>
+					<br>
+					<select name="marketplace" class="multiselect form-control choice-select" onfocus="this.oldvalue = this.value;" onchange="selectMarketplace();this.oldvalue = this.value;" multiselect-show-empty="true" placeholder="TOUS" txtselected="sélectionné" default-value="" txtall="TOUS" id="id_marketplace">
+  <option value="" selected>TOUS</option>
+
+  <option value="DE" data-image="https://static.actorio.com/images/flags/DE.151a01acd435.svg">amazon.de</option>
+
+  <option value="ES" data-image="https://static.actorio.com/images/flags/ES.dc664854e7e8.svg">amazon.es</option>
+
+  <option value="FR" data-image="https://static.actorio.com/images/flags/FR.0166628f5d9a.svg">amazon.fr</option>
+
+  <option value="GB" data-image="https://static.actorio.com/images/flags/GB.374ffde57748.svg">amazon.co.uk</option>
+
+  <option value="IT" data-image="https://static.actorio.com/images/flags/IT.e095369ee2d3.svg">amazon.it</option>
+
+</select>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2" class="long-filter">
+					<!-- <div style="display:inline-flex;align-items:flex-end;width: 100%;"> -->
+					<table style="width: 100%;">
+						<tr>
+						<td>
+						<div id="missing_fba_filter" style="width: 100% !important;margin-right: 12px;">
+							<span class="filter-label">
+								<span class="info-tooltipped">
+									
+									Exclure Incomplets
+									<span class="info-tooltiptext">Si cette option est activée, cela exclura les produits dépourvus d’informations sur la taille et le poids</span>
+									<i class="far fa-question-circle"></i>
+									
+								</span>
+							</span>
+							<label class="switch">
+								<input type="checkbox" name="missing_fba" id="id_missing_fba">
+								<span class="slider"></span>
+							</label>
+						</div>
+						</td>
+						<td>
+						<div id="multipack_filter" style="width: 100% !important;margin-right: 12px;">
+							<span class="filter-label">
+								<span class="info-tooltipped">
+									
+									Exclure les Multipacks
+									<span class="info-tooltiptext">Si cette option est activée, les multipacks seront supprimés</span>
+									<i class="far fa-question-circle"></i>
+									
+								</span>
+							</span>
+							<label class="switch">
+								<input type="checkbox" name="multipack" id="id_multipack">
+								<span class="slider"></span>
+							</label>
+						</div>
+						</td>
+						<td>
+						<div id="hazmat_filter" style="width: 100% !important;margin-right: 12px;">
+							<span class="filter-label">
+								<span class="info-tooltipped">
+									
+									Exclure Hazmat
+									<span class="info-tooltiptext">Si cette option est activée, les produits classés comme marchandises dangereuses seront écartés</span>
+									<i class="far fa-question-circle"></i>
+									
+								</span>
+							</span>
+							<label class="switch">
+								<input type="checkbox" name="hazmat" id="id_hazmat">
+								<span class="slider"></span>
+							</label>
+						</div>
+						</td>
+						</tr>
+						<tr>
+						<td>
+						<div id="variations_filter" hidden style="width: 100% !important;margin-right: 12px;margin-top: 12px;">
+							<span class="filter-label">
+								<span class="info-tooltipped">
+									
+									<span>Exclure Variantes</span>
+									
+									<span class="amazon-filter-label-default">(N’IMPORTE QUEL Marketplace)</span>
+									
+									<span class="amazon-filter-label" hidden></span>
+									<i class="far fa-question-circle"></i>
+									<span class="info-tooltiptext">Si cette option est activée, les produits présentant des variantes sur Amazon seront supprimés</span>
+									
+								</span>
+							</span>
+							<label class="switch">
+								<input type="checkbox" name="variations" id="id_variations">
+								<span class="slider"></span>
+							</label>
+						</div>
+						</td>
+						<td colspan="2">
+						<div id="suppressed_buybox_filter" hidden style="width: 100% !important;margin-right: 12px;margin-top: 12px;">
+							<span class="filter-label">
+								<span class="info-tooltipped">
+									
+									<span>Exclure Buy Box Supprimée</span>
+									
+									<span class="amazon-filter-label-default">(N’IMPORTE QUEL Marketplace)</span>
+									
+									<span class="amazon-filter-label" hidden></span>
+									<i class="far fa-question-circle"></i>
+									<span class="info-tooltiptext">Si cette option est activée, les produits dont la Buy Box est supprimée sur Amazon seront supprimés</span>
+									
+								</span>
+							</span>
+							<label class="switch">
+								<input type="checkbox" name="suppressed_buybox" id="id_suppressed_buybox">
+								<span class="slider"></span>
+							</label>
+						</div>
+						</td>
+						</tr>
+					</table>
+					<!-- </div> -->
+				</td>
+			</tr>
+
+			<tr>
+				<td class="left-filter" id="competitive_price_filter">
+					<span class="filter-label">
+						<span class="info-tooltipped">
+							
+							<span>Prix Amazon</span>
+							
+							<span class="amazon-filter-label-default">(N’IMPORTE QUEL Marketplace)</span>
+							
+							<span class="amazon-filter-label" hidden></span>
+							<i class="far fa-question-circle"></i>
+							<span class="info-tooltiptext">Le prix de l’article sur N’IMPORTE QUEL des marketplaces Amazon sélectionnés est compris entre...</span>		
+							
+						</span>
+						
+					</span>
+					<br>
+					<span style="display:inline-flex;width:100%;">
+
+  
+<input class="numeric-filter form-control short-input" type="search" placeholder="Min " name="competitive_price_min" oninput="inputRegex(this, /[^0-9.]/gi);checkAllFilters()" maxlength="10" class="numeric-filter form-control short-input form-control filter-control" id="id_competitive_price_0" >
+  &nbsp;⇨&nbsp;
+
+  
+<input class="numeric-filter form-control short-input" type="search" placeholder="Max " name="competitive_price_max" oninput="inputRegex(this, /[^0-9.]/gi);checkAllFilters()" maxlength="10" class="numeric-filter form-control short-input form-control filter-control" id="id_competitive_price_1" >
+
+  
+
+</span>
+				</td>
+				<td class="left-filter" id="price_reference_filter" hidden>
+					<span class="filter-label" style="display:flex; align-items:center; gap:10px; margin-bottom:6px;">
+						<span class="info-tooltipped">
+							
+							Référence de Prix Amazon
+							<span class="info-tooltiptext">Choisissez quel prix Amazon est utilisé pour calculer le profit, le RoI et la marge</span>
+							<i class="far fa-question-circle"></i>
+							
+						</span>
+
+						<span class="new-feature-badge" style="font-size: 0.7em;">
+							NOUVEAU
+						</span>
+
+						<div id="price_reference_feed" class="loader loader-small" hidden></div>
+					</span>
+					<div class="segment-toggle">
+						
+						<input type="radio"
+							id="price_reference_1"
+							name="price_reference"
+							value=""
+							
+								oninput="updatePriceReference()"
+							
+							checked
+						>
+						<label for="price_reference_1">Prix Actuel</label>
+						
+						<input type="radio"
+							id="price_reference_2"
+							name="price_reference"
+							value="avg30"
+							
+								oninput="updatePriceReference()"
+							
+							
+						>
+						<label for="price_reference_2">Prix Stable</label>
+						
+					</div>
+				</td>
+			</tr>
+
+			<tr>
+				<td class="left-filter" id="category_filter" hidden>
+					<span class="filter-label">
+						<span class="info-tooltipped">
+							
+							<span>Catégorie</span>
+							<span class="info-tooltiptext">La catégorie sur Amazon</span>
+							<i class="far fa-question-circle"></i>
+							
+						</span>						
+					</span>
+					<br/>
+					<select name="category" class="multiselect form-control choice-select" multiselect-search="true" multiselect-select-all="true" multiselect-show-empty="false" multiselect-negative-select="true" multiselect-max-visible="1" placeholder="TOUS" txtall="Sélectionner TOUS" txtselected="sélectionné" default-value="" id="id_category" multiple>
+  <option value="">TOUS</option>
+
+  <option value="amazon-devices">Appareils Amazon</option>
+
+  <option value="baby">Bébés &amp; Puériculture</option>
+
+  <option value="beauty">Beauté et Parfum</option>
+
+  <option value="automotive">Auto et Moto</option>
+
+  <option value="popular">CD &amp; Vinyles</option>
+
+  <option value="computers">Informatique</option>
+
+  <option value="diy">Bricolage</option>
+
+  <option value="dvd">DVD &amp; Blu-ray</option>
+
+  <option value="electronics">High-Tech</option>
+
+  <option value="fashion">Mode</option>
+
+  <option value="outdoor">Jardin</option>
+
+  <option value="grocery">Epicerie</option>
+
+  <option value="drugstore">Hygiène et Santé</option>
+
+  <option value="kitchen">Cuisine &amp; Maison</option>
+
+  <option value="industrial">Secteur Industriel et Scientifique</option>
+
+  <option value="appliances">Gros Électroménager</option>
+
+  <option value="lighting">Luminaires et Eclairage</option>
+
+  <option value="fashion-luggage">Bagages et Accessoires de Voyage</option>
+
+  <option value="mi">Instruments de Musique &amp; Sono</option>
+
+  <option value="videogames">Jeux Vidéo</option>
+
+  <option value="pets">Animalerie</option>
+
+  <option value="software">Logiciels</option>
+
+  <option value="sports">Sports et Loisirs</option>
+
+  <option value="office-products">Fournitures de Bureau</option>
+
+  <option value="toys">Jeux et Jouets</option>
+
+</select> 
+				</td>
+				<td class="right-filter" id="size_filter" hidden>
+					<span class="filter-label">
+						<span class="info-tooltipped">
+							
+							Catégorie de Taille
+							<span class="info-tooltiptext">La catégorie de taille du produit</span>
+							<i class="far fa-question-circle"></i>
+							
+						</span>						
+					</span>
+					<br>
+					<select name="size" class="multiselect form-control choice-select" multiselect-search="true" multiselect-select-all="true" multiselect-show-empty="false" multiselect-negative-select="true" multiselect-max-visible="1" placeholder="TOUS" txtall="Sélectionner TOUS" txtselected="sélectionné" default-value="" id="id_size" multiple>
+  <option value="">TOUS</option>
+
+  <option value="LGT_ENV">Enveloppe Légère</option>
+
+  <option value="STD_ENV">Enveloppe Standard</option>
+
+  <option value="LRG_ENV">Grande Enveloppe</option>
+
+  <option value="XLRG_ENV">Très Grande Enveloppe</option>
+
+  <option value="SML_PAR">Petit Colis</option>
+
+  <option value="STD_PAR">Colis Standard</option>
+
+  <option value="SML_OVER">Surdimensionné - Petite Taille</option>
+
+  <option value="SLT_OVER">Surdimensionné Standard Léger</option>
+
+  <option value="SHV_OVER">Surdimensionné Standard Lourd</option>
+
+  <option value="SLG_OVER">Surdimensionné Standard Grand</option>
+
+  <option value="BLK_OVER">Surdimensionné Volumineux</option>
+
+  <option value="HVY_OVER">Surdimensionné Lourd</option>
+
+  <option value="SPE_OVER">Surdimensionné Spécial</option>
+
+</select>
+				</td>
+			</tr>
+			
+				<tr>
+				<td class="left-filter" id="profit_filter">
+					<span class="filter-label">
+						<span class="info-tooltipped">
+							
+							<span>Bénéfice Unitaire</span>
+							
+							<span class="amazon-filter-label-default">(N’IMPORTE QUEL Marketplace)</span>
+							
+							<span class="amazon-filter-label" hidden></span>
+							<i class="far fa-question-circle"></i>
+							<span class="info-tooltiptext">Le bénéfice net par unité sur N’IMPORTE QUEL des marketplaces Amazon sélectionnés est compris entre...</span>
+							
+						</span>
+						
+						<span id="profit_filter_warning" class="info-tooltipped" hidden>
+							<span class="info-tooltiptext">Il est peu probable que la valeur sélectionnée renvoie des résultats pertinents</span>
+							<i class="fa-solid fa-triangle-exclamation" style="color:orange;"></i>
+						</span>
+					</span>
+					<br>
+					<span style="display:inline-flex;width:100%;">
+
+  
+<input class="numeric-filter form-control short-input" type="search" placeholder="Min " name="profit_min" oninput="inputRegex(this, /[^0-9.-]/gi);checkAllFilters()" maxlength="10" class="numeric-filter form-control short-input form-control filter-control" id="id_profit_0" >
+  &nbsp;⇨&nbsp;
+
+  
+<input class="numeric-filter form-control short-input" type="search" placeholder="Max " name="profit_max" oninput="inputRegex(this, /[^0-9.-]/gi);checkAllFilters()" maxlength="10" class="numeric-filter form-control short-input form-control filter-control" id="id_profit_1" >
+
+  
+
+</span>
+				</td>
+				<td class="right-filter" id="roi_filter">
+					<span class="filter-label">
+						<span class="info-tooltipped">
+							
+							<span>RoI Unitaire</span>
+							
+							<span class="amazon-filter-label-default">(N’IMPORTE QUEL Marketplace)</span>
+							
+							<span class="amazon-filter-label" hidden></span>
+							<i class="far fa-question-circle"></i>
+							<span class="info-tooltiptext">Le retour sur investissement sur N’IMPORTE QUEL des marketplaces Amazon sélectionnés est compris entre...</span>				
+							
+						</span>
+						
+						<span id="roi_filter_warning" class="info-tooltipped" hidden>
+							<span class="info-tooltiptext">Il est peu probable que la valeur sélectionnée renvoie des résultats pertinents</span>
+							<i class="fa-solid fa-triangle-exclamation" style="color:orange;"></i>
+						</span>
+					</span>
+					<br>
+					<span style="display:inline-flex;width:100%;">
+
+  
+<input class="numeric-filter form-control short-input" type="search" placeholder="Min %" name="roi_min" placeholder="%" oninput="inputRegex(this, /[^0-9.-]/gi);checkAllFilters()" maxlength="10" class="numeric-filter form-control short-input form-control filter-control has-success" id="id_roi_0" >
+  &nbsp;⇨&nbsp;
+
+  
+<input class="numeric-filter form-control short-input" type="search" placeholder="Max %" name="roi_max" placeholder="%" oninput="inputRegex(this, /[^0-9.-]/gi);checkAllFilters()" maxlength="10" class="numeric-filter form-control short-input form-control filter-control has-success" id="id_roi_1" >
+
+  
+
+</span>
+				</td>
+				</tr>
+				<tr>
+				<td class="left-filter" id="profit_month_filter">
+					<span class="filter-label">
+						<span class="info-tooltipped">
+							
+							<span id="profit_month_label">Bénéfice Mensuel</span>
+							
+							<span class="amazon-filter-label-default">(Total)</span>
+							
+							<span class="amazon-filter-label" hidden></span>
+							<i class="far fa-question-circle"></i>
+							<span class="info-tooltiptext">Le bénéfice net total sur tous les marketplace Amazon sélectionnés est compris entre...</span>			
+							
+						</span>
+						
+						<span id="profit_month_filter_warning" class="info-tooltipped" hidden>
+							<span class="info-tooltiptext">Il est peu probable que la valeur sélectionnée renvoie des résultats pertinents</span>
+							<i class="fa-solid fa-triangle-exclamation" style="color:orange;"></i>
+						</span>
+					</span>
+					<br>
+					<span style="display:inline-flex;width:100%;">
+
+  
+<input class="numeric-filter form-control short-input" type="search" placeholder="Min " name="profit_month_min" oninput="inputRegex(this, /[^0-9.-]/gi);checkAllFilters()" maxlength="10" class="numeric-filter form-control short-input form-control filter-control has-success" id="id_profit_month_0" >
+  &nbsp;⇨&nbsp;
+
+  
+<input class="numeric-filter form-control short-input" type="search" placeholder="Max " name="profit_month_max" oninput="inputRegex(this, /[^0-9.-]/gi);checkAllFilters()" maxlength="10" class="numeric-filter form-control short-input form-control filter-control has-success" id="id_profit_month_1" >
+
+  
+
+</span> 
+				</td>
+				<td class="right-filter" id="sales_month_filter">
+					<span class="filter-label">
+						<span class="info-tooltipped">
+							
+							<span id="sales_month_label">Ventes Mensuelles</span>
+							
+							<span class="amazon-filter-label-default">(Total)</span>
+							
+							<span class="amazon-filter-label" hidden></span>
+							<i class="far fa-question-circle"></i>
+							<span class="info-tooltiptext">Le nombre d'unités vendues sur tous les marketplace Amazon sélectionnés est compris entre...</span>					
+							
+						</span>
+						
+					</span>
+					<br>
+					<span style="display:inline-flex;width:100%;">
+
+  
+<input class="numeric-filter form-control short-input" type="search" placeholder="Min " name="sales_month_min" oninput="inputRegex(this, /[^0-9]/gi);checkAllFilters()" maxlength="10" class="numeric-filter form-control short-input form-control filter-control has-success" id="id_sales_month_0" >
+  &nbsp;⇨&nbsp;
+
+  
+<input class="numeric-filter form-control short-input" type="search" placeholder="Max " name="sales_month_max" oninput="inputRegex(this, /[^0-9]/gi);checkAllFilters()" maxlength="10" class="numeric-filter form-control short-input form-control filter-control has-success" id="id_sales_month_1" >
+
+  
+
+</span>
+				</td>
+			</tr>
+			<tr class="last-filter">
+				<td class="long-filter" id="asin_list_filter" colspan="2">
+					<span class="filter-label">
+						<span class="info-tooltipped">
+							
+							Liste ASIN
+							<span class="info-tooltiptext">Une liste d'ASIN séparés par des espaces ou des virgules (max 80)</span>
+							<i class="far fa-question-circle"></i>
+							
+						</span>						
+					</span>
+					<br>
+					<span style="display:flex">
+						<input type="search" name="asin_list" placeholder="Liste ASIN" oninput="inputRegex(this, /[^a-zA-Z0-9,\s]/gi);checkAllFilters()" maxlength="1000" class="form-control long-input" id="id_asin_list"> 
+						
+					</span>
+				</td>
+			</tr>
+		</table>
+		<table class="filter-table" id="supplier_filters">
+			<tr class="first-filter">
+				<td colspan="2" class="long-filter">
+					<h4 style="margin-top:10px; margin-bottom:-2px;">FILTRES FOURNISSEUR</h4>
+				</td>
+			</tr>
+			<tr>
+				<td class="left-filter" id="country_filter">
+					<span class="filter-label">
+						<span class="info-tooltipped">
+							
+							Pays
+							<span class="info-tooltiptext">Rechercher des fournisseurs dans ce pays</span>
+							<i class="far fa-question-circle"></i>
+							
+						</span>						
+					</span>
+					<br>
+					<select name="country" class="multiselect form-control choice-select" onchange="refreshStoreList()" multiselect-search="true" multiselect-show-empty="true" placeholder="TOUS" txtselected="sélectionné" default-value="" txtall="TOUS" id="id_country">
+  <option value="" selected>TOUS</option>
+
+  <option value="BE" data-image="https://static.actorio.com/images/flags/BE.0127ff81afd7.svg">Belgique</option>
+
+  <option value="CZ" data-image="https://static.actorio.com/images/flags/CZ.3ee4e8d3aca8.svg">République Tchèque</option>
+
+  <option value="DE" data-image="https://static.actorio.com/images/flags/DE.151a01acd435.svg">Allemagne</option>
+
+  <option value="ES" data-image="https://static.actorio.com/images/flags/ES.dc664854e7e8.svg">Espagne</option>
+
+  <option value="FR" data-image="https://static.actorio.com/images/flags/FR.0166628f5d9a.svg">France</option>
+
+  <option value="HU" data-image="https://static.actorio.com/images/flags/HU.85015780d133.svg">Hongrie</option>
+
+  <option value="IT" data-image="https://static.actorio.com/images/flags/IT.e095369ee2d3.svg">Italie</option>
+
+  <option value="LT" data-image="https://static.actorio.com/images/flags/LT.738353318c77.svg">Lituanie</option>
+
+  <option value="NL" data-image="https://static.actorio.com/images/flags/NL.0de7e9306e3a.svg">Pays-Bas</option>
+
+  <option value="PL" data-image="https://static.actorio.com/images/flags/PL.ed9d5529ee96.svg">Pologne</option>
+
+  <option value="PT" data-image="https://static.actorio.com/images/flags/PT.36de2bf345b5.svg">Portugal</option>
+
+  <option value="RO" data-image="https://static.actorio.com/images/flags/RO.8158d11bdbd2.svg">Roumanie</option>
+
+  <option value="SE" data-image="https://static.actorio.com/images/flags/SE.d46dbac2c35d.svg">Suède</option>
+
+  <option value="SK" data-image="https://static.actorio.com/images/flags/SK.8067e5b2768f.svg">Slovaquie</option>
+
+  <option value="UK" data-image="https://static.actorio.com/images/flags/UK.374ffde57748.svg">Royaume-Uni</option>
+
+</select>
+				</td>
+				<td class="right-filter" id="type_filter">
+					<span class="filter-label">
+						<span class="info-tooltipped">
+							
+							Type
+							<span class="info-tooltiptext">Rechercher des fournisseurs de ce type</span>
+							<i class="far fa-question-circle"></i>
+							
+						</span>
+					</span>
+					<br>
+					<select name="type" onchange="refreshStoreList()" class="form-control choice-select" id="id_type">
+  <option value="" selected>TOUS</option>
+
+  <option value="RTL">Détaillant</option>
+
+  <option value="WHL">Grossiste</option>
+
+  <option value="UPL">Téléchargé</option>
+
+  <option value="EXC">Exclusif</option>
+
+</select>
+				</td>
+			</tr>
+			<tr>
+				<td class="long-filter" id="store_filter" colspan="2">
+					<span class="filter-label">
+						<span class="info-tooltipped">
+							
+							Fournisseur
+							<span class="info-tooltiptext">Sélectionnez un fournisseur à rechercher</span>
+							<i class="far fa-question-circle"></i>
+							
+						</span>
+						<a href="/subscriptions/user_stores/" title="Voir les détails des fournisseurs" target="_blank">Voir les détails des fournisseurs</a>
+					</span>
+					<br>
+					<select name="store" class="multiselect form-control choice-select" multiselect-search="true" multiselect-select-all="true" multiselect-show-empty="false" multiselect-negative-select="false" multiselect-max-visible="1" multiselect-max-selected="10" onchange="checkAllFilters();selectStore();this.oldvalue = this.value;" placeholder="Sélectionner un ou plusieurs fournisseurs..." txtall="Sélectionner TOUS" txtselected="sélectionné" default-value="EMPTY" autocomplete="off" id="id_store" multiple>
+  <option value="EMPTY" selected>Sélectionner un ou plusieurs fournisseurs...</option>
+
+  <option value="ALL">TOUS</option>
+
+  <option value="0815.eu">0815.eu</option>
+
+  <option value="1001hobbies.es">1001hobbies.es</option>
+
+  <option value="1001hobbies.fr">1001hobbies.fr</option>
+
+  <option value="3ppharma.fr">3ppharma.fr</option>
+
+  <option value="4gsm.com-de">4gsm.com-de</option>
+
+  <option value="4gsm.com-es">4gsm.com-es</option>
+
+  <option value="4gsm.com-fr">4gsm.com-fr</option>
+
+  <option value="4gsm.com-it">4gsm.com-it</option>
+
+  <option value="abacus.coop">abacus.coop</option>
+
+  <option value="abacus.coop-b2b">abacus.coop-b2b</option>
+
+  <option value="acer.com-de">acer.com-de</option>
+
+  <option value="acer.com-es">acer.com-es</option>
+
+  <option value="acer.com-fr">acer.com-fr</option>
+
+  <option value="acer.com-it">acer.com-it</option>
+
+  <option value="acer.com-uk">acer.com-uk</option>
+
+  <option value="achat-electrique.com">achat-electrique.com</option>
+
+  <option value="activecarestore.co.uk">activecarestore.co.uk</option>
+
+  <option value="aeg.co.uk">aeg.co.uk</option>
+
+  <option value="aeg.com.es">aeg.com.es</option>
+
+  <option value="aeg.de">aeg.de</option>
+
+  <option value="aeg.fr">aeg.fr</option>
+
+  <option value="aeg.it">aeg.it</option>
+
+  <option value="aessepiforniture.it">aessepiforniture.it</option>
+
+  <option value="afede.com">afede.com</option>
+
+  <option value="agustimestre.com">agustimestre.com</option>
+
+  <option value="alfastore.de">alfastore.de</option>
+
+  <option value="alibebe.es">alibebe.es</option>
+
+  <option value="alijuguetes.es">alijuguetes.es</option>
+
+  <option value="allesfuerzuhause.de">allesfuerzuhause.de</option>
+
+  <option value="almacenespalacios.com">almacenespalacios.com</option>
+
+  <option value="almacenesrubio.net">almacenesrubio.net</option>
+
+  <option value="alrossio.pt">alrossio.pt</option>
+
+  <option value="alternate-b2b.de">alternate-b2b.de</option>
+
+  <option value="alternate-b2b.es">alternate-b2b.es</option>
+
+  <option value="alternate.de">alternate.de</option>
+
+  <option value="alternate.es">alternate.es</option>
+
+  <option value="alternate.fr">alternate.fr</option>
+
+  <option value="alternate.it">alternate.it</option>
+
+  <option value="alternate.nl">alternate.nl</option>
+
+  <option value="alza.cz">alza.cz</option>
+
+  <option value="alza.de">alza.de</option>
+
+  <option value="andrees-hsw.de">andrees-hsw.de</option>
+
+  <option value="animallparadise.com">animallparadise.com</option>
+
+  <option value="apohealth.de">apohealth.de</option>
+
+  <option value="aponeo.de">aponeo.de</option>
+
+  <option value="appletonsweets.co.uk">appletonsweets.co.uk</option>
+
+  <option value="aqua-store.fr">aqua-store.fr</option>
+
+  <option value="aquario.pt">aquario.pt</option>
+
+  <option value="argos.co.uk">argos.co.uk</option>
+
+  <option value="arix.es">arix.es</option>
+
+  <option value="ars24.com">ars24.com</option>
+
+  <option value="artnaturals.com">artnaturals.com</option>
+
+  <option value="asmc.es">asmc.es</option>
+
+  <option value="atida.fr">atida.fr</option>
+
+  <option value="auchan.fr">auchan.fr</option>
+
+  <option value="auchan.pt">auchan.pt</option>
+
+  <option value="autourdebebe.com">autourdebebe.com</option>
+
+  <option value="babymarkt.com-de">babymarkt.com-de</option>
+
+  <option value="babyone.de">babyone.de</option>
+
+  <option value="babyprendas.com">babyprendas.com</option>
+
+  <option value="babys-mart.co.uk">babys-mart.co.uk</option>
+
+  <option value="banemo.de">banemo.de</option>
+
+  <option value="barrabes.com">barrabes.com</option>
+
+  <option value="bauhaus.se">bauhaus.se</option>
+
+  <option value="baumarkteu.de">baumarkteu.de</option>
+
+  <option value="baur.de">baur.de</option>
+
+  <option value="bcd-jeux.fr">bcd-jeux.fr</option>
+
+  <option value="beaniegames.co.uk">beaniegames.co.uk</option>
+
+  <option value="beautyjulia.com">beautyjulia.com</option>
+
+  <option value="beautywelt.de">beautywelt.de</option>
+
+  <option value="bebe9.com">bebe9.com</option>
+
+  <option value="bell-italia.com">bell-italia.com</option>
+
+  <option value="bellaffair.de">bellaffair.de</option>
+
+  <option value="bergfreunde.de">bergfreunde.de</option>
+
+  <option value="berrybase.de">berrybase.de</option>
+
+  <option value="bestprice.pt">bestprice.pt</option>
+
+  <option value="biggreensmile.com">biggreensmile.com</option>
+
+  <option value="bijdegroothandel.com">bijdegroothandel.com</option>
+
+  <option value="bike-discount.de">bike-discount.de</option>
+
+  <option value="bitiba.be">bitiba.be</option>
+
+  <option value="bitiba.co.uk">bitiba.co.uk</option>
+
+  <option value="bixoto.com">bixoto.com</option>
+
+  <option value="blaco.it">blaco.it</option>
+
+  <option value="bloomling.uk">bloomling.uk</option>
+
+  <option value="boc24.de">boc24.de</option>
+
+  <option value="bokus.com">bokus.com</option>
+
+  <option value="bol.com">bol.com</option>
+
+  <option value="boomstore.de">boomstore.de</option>
+
+  <option value="boticinal.com">boticinal.com</option>
+
+  <option value="boticom.es">boticom.es</option>
+
+  <option value="box.co.uk">box.co.uk</option>
+
+  <option value="braun.com-es">braun.com-es</option>
+
+  <option value="braun.com-fr">braun.com-fr</option>
+
+  <option value="braun.com-it">braun.com-it</option>
+
+  <option value="bresser.de">bresser.de</option>
+
+  <option value="brewers.co.uk">brewers.co.uk</option>
+
+  <option value="bricksdirect.co.uk">bricksdirect.co.uk</option>
+
+  <option value="bricksdirect.de">bricksdirect.de</option>
+
+  <option value="bricksdirect.es">bricksdirect.es</option>
+
+  <option value="bricksdirect.fr">bricksdirect.fr</option>
+
+  <option value="bricksdirect.it">bricksdirect.it</option>
+
+  <option value="brickshop.eu">brickshop.eu</option>
+
+  <option value="brickswelt.eu">brickswelt.eu</option>
+
+  <option value="brico-travo.com">brico-travo.com</option>
+
+  <option value="bricodepot.es">bricodepot.es</option>
+
+  <option value="bricodepot.fr">bricodepot.fr</option>
+
+  <option value="bricodepot.pt">bricodepot.pt</option>
+
+  <option value="bricorama.fr">bricorama.fr</option>
+
+  <option value="britdeals.co.uk">britdeals.co.uk</option>
+
+  <option value="buecher.de">buecher.de</option>
+
+  <option value="bulevip.com">bulevip.com</option>
+
+  <option value="buysbest.co.uk">buysbest.co.uk</option>
+
+  <option value="bygghemma.se">bygghemma.se</option>
+
+  <option value="bytecno.it">bytecno.it</option>
+
+  <option value="calumetphoto.de">calumetphoto.de</option>
+
+  <option value="camforpro.com">camforpro.com</option>
+
+  <option value="candyhero.com">candyhero.com</option>
+
+  <option value="canon.co.uk">canon.co.uk</option>
+
+  <option value="canon.de">canon.de</option>
+
+  <option value="canon.es">canon.es</option>
+
+  <option value="canon.fr">canon.fr</option>
+
+  <option value="canon.it">canon.it</option>
+
+  <option value="careb2b.com">careb2b.com</option>
+
+  <option value="carethy.co.uk">carethy.co.uk</option>
+
+  <option value="carethy.de">carethy.de</option>
+
+  <option value="carethy.es">carethy.es</option>
+
+  <option value="carethy.fr">carethy.fr</option>
+
+  <option value="carethy.it">carethy.it</option>
+
+  <option value="carrefour.es">carrefour.es</option>
+
+  <option value="caseking.de">caseking.de</option>
+
+  <option value="castorama.fr">castorama.fr</option>
+
+  <option value="castroelectronica.pt">castroelectronica.pt</option>
+
+  <option value="cclonline.com">cclonline.com</option>
+
+  <option value="centralcosmetics.co.uk">centralcosmetics.co.uk</option>
+
+  <option value="centrojuguete.com">centrojuguete.com</option>
+
+  <option value="chegiochi.it">chegiochi.it</option>
+
+  <option value="chemistconnect.com">chemistconnect.com</option>
+
+  <option value="cherrycosmetics.co.uk">cherrycosmetics.co.uk</option>
+
+  <option value="chicco.it">chicco.it</option>
+
+  <option value="chipman.pt">chipman.pt</option>
+
+  <option value="ck-modelcars.de">ck-modelcars.de</option>
+
+  <option value="cld.eu">cld.eu</option>
+
+  <option value="cleanstore.co.uk">cleanstore.co.uk</option>
+
+  <option value="clickbebe.es">clickbebe.es</option>
+
+  <option value="clickclack.es">clickclack.es</option>
+
+  <option value="cocktail-distribution.com">cocktail-distribution.com</option>
+
+  <option value="cocooncenter.co.uk">cocooncenter.co.uk</option>
+
+  <option value="cocooncenter.com">cocooncenter.com</option>
+
+  <option value="cocooncenter.de">cocooncenter.de</option>
+
+  <option value="cocooncenter.es">cocooncenter.es</option>
+
+  <option value="comet.it">comet.it</option>
+
+  <option value="comicstores.es">comicstores.es</option>
+
+  <option value="comptoir-droguerie.fr">comptoir-droguerie.fr</option>
+
+  <option value="conrad.de">conrad.de</option>
+
+  <option value="conrad.fr">conrad.fr</option>
+
+  <option value="continente.pt">continente.pt</option>
+
+  <option value="coolaccesorios.com">coolaccesorios.com</option>
+
+  <option value="coolmod.com">coolmod.com</option>
+
+  <option value="coolshop.co.uk">coolshop.co.uk</option>
+
+  <option value="coolshop.de">coolshop.de</option>
+
+  <option value="cosibella-wholesale.com">cosibella-wholesale.com</option>
+
+  <option value="cosmeticapartijen.nl">cosmeticapartijen.nl</option>
+
+  <option value="cosmeticexpress.com">cosmeticexpress.com</option>
+
+  <option value="cosmeticsmegastore.com-de">cosmeticsmegastore.com-de</option>
+
+  <option value="cosmeticsmegastore.com-es">cosmeticsmegastore.com-es</option>
+
+  <option value="cosmeticsmegastore.com-fr">cosmeticsmegastore.com-fr</option>
+
+  <option value="cosmeticsmegastore.com-uk">cosmeticsmegastore.com-uk</option>
+
+  <option value="cosmetis.com-de">cosmetis.com-de</option>
+
+  <option value="cosmetis.com-es">cosmetis.com-es</option>
+
+  <option value="cosmetis.com-it">cosmetis.com-it</option>
+
+  <option value="cosmetis.com-uk">cosmetis.com-uk</option>
+
+  <option value="costway.it">costway.it</option>
+
+  <option value="cotebrico.fr">cotebrico.fr</option>
+
+  <option value="cpadistributor.com">cpadistributor.com</option>
+
+  <option value="craftyarts.co.uk">craftyarts.co.uk</option>
+
+  <option value="cramptonandmoore.co.uk">cramptonandmoore.co.uk</option>
+
+  <option value="cstech.store">cstech.store</option>
+
+  <option value="currys.co.uk">currys.co.uk</option>
+
+  <option value="currys.co.uk-b2b">currys.co.uk-b2b</option>
+
+  <option value="cutpricewholesaler.com">cutpricewholesaler.com</option>
+
+  <option value="darty.pt">darty.pt</option>
+
+  <option value="dcshoes.de">dcshoes.de</option>
+
+  <option value="dcshoes.es">dcshoes.es</option>
+
+  <option value="dcshoes.fr">dcshoes.fr</option>
+
+  <option value="decathlon.co.uk">decathlon.co.uk</option>
+
+  <option value="decathlon.de">decathlon.de</option>
+
+  <option value="decathlon.es">decathlon.es</option>
+
+  <option value="decathlon.fr">decathlon.fr</option>
+
+  <option value="decathlon.it">decathlon.it</option>
+
+  <option value="degriffstock.com">degriffstock.com</option>
+
+  <option value="denk-outdoor.de">denk-outdoor.de</option>
+
+  <option value="depau.es">depau.es</option>
+
+  <option value="deporte-outlet.es">deporte-outlet.es</option>
+
+  <option value="digitalo.de">digitalo.de</option>
+
+  <option value="digitalplace.pt">digitalplace.pt</option>
+
+  <option value="digitfoto.de">digitfoto.de</option>
+
+  <option value="digitfoto.pt">digitfoto.pt</option>
+
+  <option value="dinotoys.nl">dinotoys.nl</option>
+
+  <option value="dinydon.com">dinydon.com</option>
+
+  <option value="direct-powertools.co.uk">direct-powertools.co.uk</option>
+
+  <option value="direct.asda.com">direct.asda.com</option>
+
+  <option value="directcosmetics.com">directcosmetics.com</option>
+
+  <option value="direkt.jacob.de">direkt.jacob.de</option>
+
+  <option value="dis-ar.com">dis-ar.com</option>
+
+  <option value="dispersajuguetes.com">dispersajuguetes.com</option>
+
+  <option value="distritoys.es">distritoys.es</option>
+
+  <option value="diy.com">diy.com</option>
+
+  <option value="dkwholesale.com">dkwholesale.com</option>
+
+  <option value="dm.de">dm.de</option>
+
+  <option value="doctormartillo.es">doctormartillo.es</option>
+
+  <option value="doema.es">doema.es</option>
+
+  <option value="donaghybros.co.uk">donaghybros.co.uk</option>
+
+  <option value="drako.it">drako.it</option>
+
+  <option value="dreamland.be">dreamland.be</option>
+
+  <option value="dreamsbaby.pt">dreamsbaby.pt</option>
+
+  <option value="drim.es">drim.es</option>
+
+  <option value="drmax.it">drmax.it</option>
+
+  <option value="drogisterijplus.nl">drogisterijplus.nl</option>
+
+  <option value="drogueriemoderne.com">drogueriemoderne.com</option>
+
+  <option value="dynos.es">dynos.es</option>
+
+  <option value="e-stayon.com">e-stayon.com</option>
+
+  <option value="e-trena.de">e-trena.de</option>
+
+  <option value="e.leclerc">e.leclerc</option>
+
+  <option value="eany.io">eany.io</option>
+
+  <option value="eastpak.com-de">eastpak.com-de</option>
+
+  <option value="eastpak.com-es">eastpak.com-es</option>
+
+  <option value="eastpak.com-fr">eastpak.com-fr</option>
+
+  <option value="eastpak.com-it">eastpak.com-it</option>
+
+  <option value="eastpak.com-uk">eastpak.com-uk</option>
+
+  <option value="easypara.co.uk">easypara.co.uk</option>
+
+  <option value="easypara.com">easypara.com</option>
+
+  <option value="easypara.es">easypara.es</option>
+
+  <option value="eds-group.it">eds-group.it</option>
+
+  <option value="efarma.com">efarma.com</option>
+
+  <option value="elbbricks.com">elbbricks.com</option>
+
+  <option value="elcorteingles.es">elcorteingles.es</option>
+
+  <option value="electricalworld.com">electricalworld.com</option>
+
+  <option value="electricbricks.com">electricbricks.com</option>
+
+  <option value="electronic4you.de">electronic4you.de</option>
+
+  <option value="electronis.de">electronis.de</option>
+
+  <option value="electronorma.com">electronorma.com</option>
+
+  <option value="electropescador.pt">electropescador.pt</option>
+
+  <option value="electropolis.es">electropolis.es</option>
+
+  <option value="electrowifi.es">electrowifi.es</option>
+
+  <option value="elektro4000.de">elektro4000.de</option>
+
+  <option value="elettroaffare.it">elettroaffare.it</option>
+
+  <option value="elettrocasa.it">elettrocasa.it</option>
+
+  <option value="elgiganten.se">elgiganten.se</option>
+
+  <option value="elkar.eus">elkar.eus</option>
+
+  <option value="elpaisdejauja.es">elpaisdejauja.es</option>
+
+  <option value="elv.com">elv.com</option>
+
+  <option value="enzinger.com">enzinger.com</option>
+
+  <option value="erregame.com">erregame.com</option>
+
+  <option value="escentual.com">escentual.com</option>
+
+  <option value="espritjeu.com">espritjeu.com</option>
+
+  <option value="esseeffe.com">esseeffe.com</option>
+
+  <option value="esupply.co.uk">esupply.co.uk</option>
+
+  <option value="euronics.de">euronics.de</option>
+
+  <option value="euronics.it">euronics.it</option>
+
+  <option value="euronics.pt">euronics.pt</option>
+
+  <option value="expert-technomarkt.de">expert-technomarkt.de</option>
+
+  <option value="expert.de">expert.de</option>
+
+  <option value="expert.es">expert.es</option>
+
+  <option value="expert.it">expert.it</option>
+
+  <option value="experteletro.pt">experteletro.pt</option>
+
+  <option value="fabiostore.it">fabiostore.it</option>
+
+  <option value="fahrrad-xxl.de">fahrrad-xxl.de</option>
+
+  <option value="fahrrad.de">fahrrad.de</option>
+
+  <option value="farma2go.com">farma2go.com</option>
+
+  <option value="farmacialoreto.es">farmacialoreto.es</option>
+
+  <option value="farmacialoreto.it">farmacialoreto.it</option>
+
+  <option value="farmacianorte.es">farmacianorte.es</option>
+
+  <option value="farmaclubprime.com">farmaclubprime.com</option>
+
+  <option value="farmaconvenienza.it">farmaconvenienza.it</option>
+
+  <option value="farmasave.it">farmasave.it</option>
+
+  <option value="fenwick.co.uk">fenwick.co.uk</option>
+
+  <option value="fishingtackleandbait.co.uk">fishingtackleandbait.co.uk</option>
+
+  <option value="fitadium.com">fitadium.com</option>
+
+  <option value="fixami.fr">fixami.fr</option>
+
+  <option value="flaconi.de">flaconi.de</option>
+
+  <option value="fleurtations.uk.com">fleurtations.uk.com</option>
+
+  <option value="fnac.com">fnac.com</option>
+
+  <option value="fnac.es">fnac.es</option>
+
+  <option value="foto-erhardt.de">foto-erhardt.de</option>
+
+  <option value="fotokoch.de">fotokoch.de</option>
+
+  <option value="frikimaz.es">frikimaz.es</option>
+
+  <option value="funktionelles.de">funktionelles.de</option>
+
+  <option value="gabona.com">gabona.com</option>
+
+  <option value="gadcet.com">gadcet.com</option>
+
+  <option value="galaxus.de">galaxus.de</option>
+
+  <option value="galaxus.fr">galaxus.fr</option>
+
+  <option value="galeria.de">galeria.de</option>
+
+  <option value="galileofarma.com">galileofarma.com</option>
+
+  <option value="gamingoase.de">gamingoase.de</option>
+
+  <option value="gatito.pl">gatito.pl</option>
+
+  <option value="geekdo.pt">geekdo.pt</option>
+
+  <option value="gibsonsgames.co.uk">gibsonsgames.co.uk</option>
+
+  <option value="giochidiclem.it">giochidiclem.it</option>
+
+  <option value="giochigiachi.it">giochigiachi.it</option>
+
+  <option value="giocolandiagiocheria.it">giocolandiagiocheria.it</option>
+
+  <option value="giodicart.it">giodicart.it</option>
+
+  <option value="globaldata.pt">globaldata.pt</option>
+
+  <option value="gomibo.de">gomibo.de</option>
+
+  <option value="gomibo.es">gomibo.es</option>
+
+  <option value="gomibo.fr">gomibo.fr</option>
+
+  <option value="gomibo.it">gomibo.it</option>
+
+  <option value="gotools.de">gotools.de</option>
+
+  <option value="granfarma.it">granfarma.it</option>
+
+  <option value="greeno.ro">greeno.ro</option>
+
+  <option value="grosbill.com">grosbill.com</option>
+
+  <option value="grupojupesa.es">grupojupesa.es</option>
+
+  <option value="haarshoppro.nl">haarshoppro.nl</option>
+
+  <option value="hagebau.de">hagebau.de</option>
+
+  <option value="hairstore.fr">hairstore.fr</option>
+
+  <option value="hamleys.com">hamleys.com</option>
+
+  <option value="hammerarzt.de">hammerarzt.de</option>
+
+  <option value="hausunddach.de">hausunddach.de</option>
+
+  <option value="hbv24.de">hbv24.de</option>
+
+  <option value="hispamicro.com">hispamicro.com</option>
+
+  <option value="hl-grosshandel.com">hl-grosshandel.com</option>
+
+  <option value="hmv.com">hmv.com</option>
+
+  <option value="hogiesonline.co.uk">hogiesonline.co.uk</option>
+
+  <option value="holacaracola.es">holacaracola.es</option>
+
+  <option value="homewareessentials.co.uk">homewareessentials.co.uk</option>
+
+  <option value="hood.de">hood.de</option>
+
+  <option value="hoover-home.com-de">hoover-home.com-de</option>
+
+  <option value="hoover-home.com-es">hoover-home.com-es</option>
+
+  <option value="hoover-home.com-fr">hoover-home.com-fr</option>
+
+  <option value="hoover-home.com-it">hoover-home.com-it</option>
+
+  <option value="hoover-home.com-uk">hoover-home.com-uk</option>
+
+  <option value="hornbach.de">hornbach.de</option>
+
+  <option value="hornbach.se">hornbach.se</option>
+
+  <option value="houseoffraser.co.uk">houseoffraser.co.uk</option>
+
+  <option value="howleys.co.uk">howleys.co.uk</option>
+
+  <option value="hp.com-de">hp.com-de</option>
+
+  <option value="hp.com-fr">hp.com-fr</option>
+
+  <option value="hp.com-uk">hp.com-uk</option>
+
+  <option value="huawei.com-de">huawei.com-de</option>
+
+  <option value="huawei.com-es">huawei.com-es</option>
+
+  <option value="huawei.com-fr">huawei.com-fr</option>
+
+  <option value="huawei.com-it">huawei.com-it</option>
+
+  <option value="huawei.com-uk">huawei.com-uk</option>
+
+  <option value="hugendubel.de">hugendubel.de</option>
+
+  <option value="ibood.com-de">ibood.com-de</option>
+
+  <option value="ibood.com-fr">ibood.com-fr</option>
+
+  <option value="ibood.com-nl">ibood.com-nl</option>
+
+  <option value="ibs.it">ibs.it</option>
+
+  <option value="idealo.de">idealo.de</option>
+
+  <option value="idealo.es">idealo.es</option>
+
+  <option value="idealo.fr">idealo.fr</option>
+
+  <option value="idealo.it">idealo.it</option>
+
+  <option value="idirecto.es">idirecto.es</option>
+
+  <option value="idufte.de">idufte.de</option>
+
+  <option value="iglm.store">iglm.store</option>
+
+  <option value="iherb.com-de">iherb.com-de</option>
+
+  <option value="iherb.com-es">iherb.com-es</option>
+
+  <option value="iherb.com-fr">iherb.com-fr</option>
+
+  <option value="iherb.com-uk">iherb.com-uk</option>
+
+  <option value="ilcapricciostore.com">ilcapricciostore.com</option>
+
+  <option value="infortisa.com">infortisa.com</option>
+
+  <option value="inktweb.nl">inktweb.nl</option>
+
+  <option value="innet24.de">innet24.de</option>
+
+  <option value="inovtel.pt">inovtel.pt</option>
+
+  <option value="inpexopcion.com">inpexopcion.com</option>
+
+  <option value="inspiratrading.co.uk">inspiratrading.co.uk</option>
+
+  <option value="ioburo.fr">ioburo.fr</option>
+
+  <option value="its.co.uk">its.co.uk</option>
+
+  <option value="jamarket.pt">jamarket.pt</option>
+
+  <option value="joguiba.com">joguiba.com</option>
+
+  <option value="johnlewis.com">johnlewis.com</option>
+
+  <option value="jono-toys.nl">jono-toys.nl</option>
+
+  <option value="joueclub.fr">joueclub.fr</option>
+
+  <option value="juegostetrakis.com">juegostetrakis.com</option>
+
+  <option value="jugamos.es">jugamos.es</option>
+
+  <option value="jugueterialapaz.com">jugueterialapaz.com</option>
+
+  <option value="jugueterialaperica.com">jugueterialaperica.com</option>
+
+  <option value="juguetesabracadabra.es">juguetesabracadabra.es</option>
+
+  <option value="juguetescarrion.com">juguetescarrion.com</option>
+
+  <option value="juguetesdondino.com">juguetesdondino.com</option>
+
+  <option value="juguetesmagda.com">juguetesmagda.com</option>
+
+  <option value="juguetesnidotoys.es">juguetesnidotoys.es</option>
+
+  <option value="juguetespanre.com">juguetespanre.com</option>
+
+  <option value="juguetespedrosa.es">juguetespedrosa.es</option>
+
+  <option value="juguetestiosam.com">juguetestiosam.com</option>
+
+  <option value="juguetienda.es">juguetienda.es</option>
+
+  <option value="juguetilandia.com">juguetilandia.com</option>
+
+  <option value="juguetilandia.de">juguetilandia.de</option>
+
+  <option value="juguetilandia.fr">juguetilandia.fr</option>
+
+  <option value="juguetilandia.it">juguetilandia.it</option>
+
+  <option value="juguettos.com">juguettos.com</option>
+
+  <option value="justmylook.com">justmylook.com</option>
+
+  <option value="kalatex.shop">kalatex.shop</option>
+
+  <option value="kalista-parfums.com">kalista-parfums.com</option>
+
+  <option value="karactermania.com">karactermania.com</option>
+
+  <option value="kaufland.de">kaufland.de</option>
+
+  <option value="keipper.shop">keipper.shop</option>
+
+  <option value="keroppa.com">keroppa.com</option>
+
+  <option value="kerrisontoys.co.uk">kerrisontoys.co.uk</option>
+
+  <option value="kidylusion.com">kidylusion.com</option>
+
+  <option value="kirchner24.de">kirchner24.de</option>
+
+  <option value="kitstore.cz-es">kitstore.cz-es</option>
+
+  <option value="kitstore.de">kitstore.de</option>
+
+  <option value="kitstore.fr">kitstore.fr</option>
+
+  <option value="kitstore.it">kitstore.it</option>
+
+  <option value="klemmshop.de">klemmshop.de</option>
+
+  <option value="koempf24.de">koempf24.de</option>
+
+  <option value="kontrolsat.com">kontrolsat.com</option>
+
+  <option value="krybuy.com">krybuy.com</option>
+
+  <option value="kuantokusta.pt">kuantokusta.pt</option>
+
+  <option value="kyeroo.com">kyeroo.com</option>
+
+  <option value="ladetergenza.com">ladetergenza.com</option>
+
+  <option value="lafeltrinelli.it">lafeltrinelli.it</option>
+
+  <option value="lagranderecre.fr">lagranderecre.fr</option>
+
+  <option value="laniustoys.com">laniustoys.com</option>
+
+  <option value="lasante.net">lasante.net</option>
+
+  <option value="latiendadirecta.es">latiendadirecta.es</option>
+
+  <option value="layer-grosshandel.de">layer-grosshandel.de</option>
+
+  <option value="lefeld.de">lefeld.de</option>
+
+  <option value="lego.com-de">lego.com-de</option>
+
+  <option value="lego.com-es">lego.com-es</option>
+
+  <option value="lego.com-fr">lego.com-fr</option>
+
+  <option value="lego.com-it">lego.com-it</option>
+
+  <option value="lego.com-uk">lego.com-uk</option>
+
+  <option value="legusplay.com">legusplay.com</option>
+
+  <option value="lekia.se">lekia.se</option>
+
+  <option value="leprechaun.es">leprechaun.es</option>
+
+  <option value="libreriatagore.es">libreriatagore.es</option>
+
+  <option value="lidl.de">lidl.de</option>
+
+  <option value="lidl.es">lidl.es</option>
+
+  <option value="lidl.fr">lidl.fr</option>
+
+  <option value="lifeinformatica.com">lifeinformatica.com</option>
+
+  <option value="ligatu.pt">ligatu.pt</option>
+
+  <option value="littlewoods.com">littlewoods.com</option>
+
+  <option value="lobbesjouet.fr">lobbesjouet.fr</option>
+
+  <option value="lojashampoo.pt">lojashampoo.pt</option>
+
+  <option value="ltt-versand.de">ltt-versand.de</option>
+
+  <option value="lucky-bricks.de">lucky-bricks.de</option>
+
+  <option value="ludum.fr">ludum.fr</option>
+
+  <option value="lyko.com-de">lyko.com-de</option>
+
+  <option value="madridhifi.com">madridhifi.com</option>
+
+  <option value="magicdisney.es">magicdisney.es</option>
+
+  <option value="magicmadhouse.co.uk">magicmadhouse.co.uk</option>
+
+  <option value="magictoysgiocheria.it">magictoysgiocheria.it</option>
+
+  <option value="makro.es">makro.es</option>
+
+  <option value="makro.pt">makro.pt</option>
+
+  <option value="manchatoys.com">manchatoys.com</option>
+
+  <option value="mandmdirect.com">mandmdirect.com</option>
+
+  <option value="manomano.de">manomano.de</option>
+
+  <option value="manomano.es">manomano.es</option>
+
+  <option value="manomano.fr">manomano.fr</option>
+
+  <option value="manomano.it">manomano.it</option>
+
+  <option value="maqio.com">maqio.com</option>
+
+  <option value="maquillalia.com">maquillalia.com</option>
+
+  <option value="markenbaumarkt24.de">markenbaumarkt24.de</option>
+
+  <option value="maurysonline.it">maurysonline.it</option>
+
+  <option value="maxizoo.be">maxizoo.be</option>
+
+  <option value="mayalbolsos.es">mayalbolsos.es</option>
+
+  <option value="mcbuero.de">mcbuero.de</option>
+
+  <option value="mediamarkt.be">mediamarkt.be</option>
+
+  <option value="mediamarkt.de">mediamarkt.de</option>
+
+  <option value="mediamarkt.es">mediamarkt.es</option>
+
+  <option value="mediamarkt.hu">mediamarkt.hu</option>
+
+  <option value="mediaworld.it">mediaworld.it</option>
+
+  <option value="medimax.de">medimax.de</option>
+
+  <option value="medion.com-de">medion.com-de</option>
+
+  <option value="mefarma.it">mefarma.it</option>
+
+  <option value="megasur.es">megasur.es</option>
+
+  <option value="melitosrl.com">melitosrl.com</option>
+
+  <option value="menkind.co.uk">menkind.co.uk</option>
+
+  <option value="mercadoactual.es">mercadoactual.es</option>
+
+  <option value="miamland.com">miamland.com</option>
+
+  <option value="micromania.fr">micromania.fr</option>
+
+  <option value="mielectro.es">mielectro.es</option>
+
+  <option value="moby-dick.it">moby-dick.it</option>
+
+  <option value="mondobrick.it">mondobrick.it</option>
+
+  <option value="monoprix.fr">monoprix.fr</option>
+
+  <option value="movertix.com">movertix.com</option>
+
+  <option value="mueller.de">mueller.de</option>
+
+  <option value="multishop.pt">multishop.pt</option>
+
+  <option value="mxwholesale.co.uk">mxwholesale.co.uk</option>
+
+  <option value="my-origines.com-de">my-origines.com-de</option>
+
+  <option value="my-origines.com-es">my-origines.com-es</option>
+
+  <option value="my-origines.com-fr">my-origines.com-fr</option>
+
+  <option value="my-origines.com-it">my-origines.com-it</option>
+
+  <option value="my-origines.com-uk">my-origines.com-uk</option>
+
+  <option value="myhappypara.com">myhappypara.com</option>
+
+  <option value="nanochip.pt">nanochip.pt</option>
+
+  <option value="nda-toys.com">nda-toys.com</option>
+
+  <option value="netto-online.de">netto-online.de</option>
+
+  <option value="nike.com-de">nike.com-de</option>
+
+  <option value="nike.com-es">nike.com-es</option>
+
+  <option value="nike.com-fr">nike.com-fr</option>
+
+  <option value="nike.com-it">nike.com-it</option>
+
+  <option value="nike.com-uk">nike.com-uk</option>
+
+  <option value="nocibe.fr">nocibe.fr</option>
+
+  <option value="notino.co.uk">notino.co.uk</option>
+
+  <option value="notino.cz">notino.cz</option>
+
+  <option value="notino.de">notino.de</option>
+
+  <option value="notino.es">notino.es</option>
+
+  <option value="notino.fr">notino.fr</option>
+
+  <option value="notino.hu">notino.hu</option>
+
+  <option value="notino.it">notino.it</option>
+
+  <option value="notino.nl">notino.nl</option>
+
+  <option value="notino.pt">notino.pt</option>
+
+  <option value="novaengel.com">novaengel.com</option>
+
+  <option value="novoatalho.pt">novoatalho.pt</option>
+
+  <option value="nuby.com-uk">nuby.com-uk</option>
+
+  <option value="nx3arquitectura.com">nx3arquitectura.com</option>
+
+  <option value="obi.de">obi.de</option>
+
+  <option value="ociostock.com">ociostock.com</option>
+
+  <option value="office-partner.de">office-partner.de</option>
+
+  <option value="officestationery.co.uk">officestationery.co.uk</option>
+
+  <option value="ohfeliz.de">ohfeliz.de</option>
+
+  <option value="okazje.info.pl">okazje.info.pl</option>
+
+  <option value="okfarma.es">okfarma.es</option>
+
+  <option value="ollo.it">ollo.it</option>
+
+  <option value="on4tech.pt">on4tech.pt</option>
+
+  <option value="onbit.pt">onbit.pt</option>
+
+  <option value="ondisc.pt">ondisc.pt</option>
+
+  <option value="oportunidade24.pt">oportunidade24.pt</option>
+
+  <option value="orly.es">orly.es</option>
+
+  <option value="orologistock.com">orologistock.com</option>
+
+  <option value="osiander.de">osiander.de</option>
+
+  <option value="osma-werm.com">osma-werm.com</option>
+
+  <option value="osma-werm.com-fr">osma-werm.com-fr</option>
+
+  <option value="otto.de">otto.de</option>
+
+  <option value="oupsmodel.com">oupsmodel.com</option>
+
+  <option value="overly.it">overly.it</option>
+
+  <option value="papelinho.pt">papelinho.pt</option>
+
+  <option value="papertiger.co.uk">papertiger.co.uk</option>
+
+  <option value="parapharmacie-express.com">parapharmacie-express.com</option>
+
+  <option value="parapharmacielafayette.com">parapharmacielafayette.com</option>
+
+  <option value="parapharmatop.fr">parapharmatop.fr</option>
+
+  <option value="parasanteonline.fr">parasanteonline.fr</option>
+
+  <option value="paratamtam.com">paratamtam.com</option>
+
+  <option value="parfuem365.de">parfuem365.de</option>
+
+  <option value="parfum.de">parfum.de</option>
+
+  <option value="parfumdreams.co.uk">parfumdreams.co.uk</option>
+
+  <option value="parfumdreams.de">parfumdreams.de</option>
+
+  <option value="parfumdreams.es">parfumdreams.es</option>
+
+  <option value="parfumdreams.fr">parfumdreams.fr</option>
+
+  <option value="parfumdreams.it">parfumdreams.it</option>
+
+  <option value="parfumgroup.de">parfumgroup.de</option>
+
+  <option value="parfumsclub.de">parfumsclub.de</option>
+
+  <option value="partytuyyo.com">partytuyyo.com</option>
+
+  <option value="pascalcoste-shopping.com">pascalcoste-shopping.com</option>
+
+  <option value="passion132.com">passion132.com</option>
+
+  <option value="pccomponentes.com">pccomponentes.com</option>
+
+  <option value="pccomponentes.fr">pccomponentes.fr</option>
+
+  <option value="pccomponentes.pt">pccomponentes.pt</option>
+
+  <option value="pearl.fr">pearl.fr</option>
+
+  <option value="perfumeprice.co.uk">perfumeprice.co.uk</option>
+
+  <option value="perfumesclub.be">perfumesclub.be</option>
+
+  <option value="perfumesclub.co.uk">perfumesclub.co.uk</option>
+
+  <option value="perfumesclub.com">perfumesclub.com</option>
+
+  <option value="perfumesclub.fr">perfumesclub.fr</option>
+
+  <option value="perfumesclub.it">perfumesclub.it</option>
+
+  <option value="petplanet.co.uk">petplanet.co.uk</option>
+
+  <option value="pharma-gdd.com">pharma-gdd.com</option>
+
+  <option value="pharma24.pt">pharma24.pt</option>
+
+  <option value="pharma360.fr">pharma360.fr</option>
+
+  <option value="pharmacasse.fr">pharmacasse.fr</option>
+
+  <option value="pharmaciedesdrakkars.com">pharmaciedesdrakkars.com</option>
+
+  <option value="pharmaciefernandes.com">pharmaciefernandes.com</option>
+
+  <option value="pharmaciepolygone.com">pharmaciepolygone.com</option>
+
+  <option value="pharmashopdiscount.com">pharmashopdiscount.com</option>
+
+  <option value="philibertnet.com">philibertnet.com</option>
+
+  <option value="philips-hue.com-de">philips-hue.com-de</option>
+
+  <option value="philips-hue.com-es">philips-hue.com-es</option>
+
+  <option value="philips-hue.com-fr">philips-hue.com-fr</option>
+
+  <option value="philips-hue.com-it">philips-hue.com-it</option>
+
+  <option value="philips-hue.com-uk">philips-hue.com-uk</option>
+
+  <option value="picksport.de">picksport.de</option>
+
+  <option value="pieper.de">pieper.de</option>
+
+  <option value="pinocchiotoys.it">pinocchiotoys.it</option>
+
+  <option value="pixelatoy.com">pixelatoy.com</option>
+
+  <option value="pixmania.com">pixmania.com</option>
+
+  <option value="plasticosur.com">plasticosur.com</option>
+
+  <option value="playmobil.com-de">playmobil.com-de</option>
+
+  <option value="playmobil.com-es">playmobil.com-es</option>
+
+  <option value="playmobil.com-fr">playmobil.com-fr</option>
+
+  <option value="playmobil.com-it">playmobil.com-it</option>
+
+  <option value="playmobil.com-uk">playmobil.com-uk</option>
+
+  <option value="playmycenter.com">playmycenter.com</option>
+
+  <option value="playox.de">playox.de</option>
+
+  <option value="plein.nl">plein.nl</option>
+
+  <option value="pollin.de">pollin.de</option>
+
+  <option value="poundfun.com">poundfun.com</option>
+
+  <option value="poundwholesale.co.uk">poundwholesale.co.uk</option>
+
+  <option value="prcdirect.co.uk">prcdirect.co.uk</option>
+
+  <option value="pressstart.pt">pressstart.pt</option>
+
+  <option value="prezzoforte.it">prezzoforte.it</option>
+
+  <option value="primeriti.es">primeriti.es</option>
+
+  <option value="primor.eu">primor.eu</option>
+
+  <option value="primor.eu-fr">primor.eu-fr</option>
+
+  <option value="primor.eu-pt">primor.eu-pt</option>
+
+  <option value="probems.be">probems.be</option>
+
+  <option value="proshop.de">proshop.de</option>
+
+  <option value="proshop.se">proshop.se</option>
+
+  <option value="provence-outillage.fr">provence-outillage.fr</option>
+
+  <option value="pscstore.pt">pscstore.pt</option>
+
+  <option value="puma.com-de">puma.com-de</option>
+
+  <option value="puma.com-es">puma.com-es</option>
+
+  <option value="puma.com-fr">puma.com-fr</option>
+
+  <option value="puma.com-uk">puma.com-uk</option>
+
+  <option value="puntorigenera.com">puntorigenera.com</option>
+
+  <option value="purepara.com">purepara.com</option>
+
+  <option value="qogita.com">qogita.com</option>
+
+  <option value="qogita.com-es">qogita.com-es</option>
+
+  <option value="qogita.com-fr">qogita.com-fr</option>
+
+  <option value="qogita.com-it">qogita.com-it</option>
+
+  <option value="qogita.com-uk">qogita.com-uk</option>
+
+  <option value="qubbos.es">qubbos.es</option>
+
+  <option value="qudobeauty.com">qudobeauty.com</option>
+
+  <option value="quercettistore.com">quercettistore.com</option>
+
+  <option value="quiksilver.de">quiksilver.de</option>
+
+  <option value="quiksilver.es">quiksilver.es</option>
+
+  <option value="quiksilver.fr">quiksilver.fr</option>
+
+  <option value="quzo.net">quzo.net</option>
+
+  <option value="racetools.fr">racetools.fr</option>
+
+  <option value="radiopopular.pt">radiopopular.pt</option>
+
+  <option value="rappelkiste-spielwaren.eu">rappelkiste-spielwaren.eu</option>
+
+  <option value="rasppishop.de">rasppishop.de</option>
+
+  <option value="recamania.com">recamania.com</option>
+
+  <option value="redcare-pharmacie.fr">redcare-pharmacie.fr</option>
+
+  <option value="redstring.es">redstring.es</option>
+
+  <option value="regiojatek.hu">regiojatek.hu</option>
+
+  <option value="reichelt.de">reichelt.de</option>
+
+  <option value="risparmiocasa.com">risparmiocasa.com</option>
+
+  <option value="roccogiocattoli.eu">roccogiocattoli.eu</option>
+
+  <option value="rofu.de">rofu.de</option>
+
+  <option value="roldanjuguetes.com">roldanjuguetes.com</option>
+
+  <option value="rollei.de">rollei.de</option>
+
+  <option value="rosalar.pt">rosalar.pt</option>
+
+  <option value="rossmann.de">rossmann.de</option>
+
+  <option value="ryman.co.uk">ryman.co.uk</option>
+
+  <option value="ryobitools.eu-uk">ryobitools.eu-uk</option>
+
+  <option value="sallybeauty.co.uk">sallybeauty.co.uk</option>
+
+  <option value="samsonite.co.uk">samsonite.co.uk</option>
+
+  <option value="samsonite.es">samsonite.es</option>
+
+  <option value="samsonite.fr">samsonite.fr</option>
+
+  <option value="samsonite.it">samsonite.it</option>
+
+  <option value="sanareva.co.uk">sanareva.co.uk</option>
+
+  <option value="sanareva.es">sanareva.es</option>
+
+  <option value="sanareva.it">sanareva.it</option>
+
+  <option value="sanitino.it">sanitino.it</option>
+
+  <option value="saturn.de">saturn.de</option>
+
+  <option value="savers.co.uk">savers.co.uk</option>
+
+  <option value="schork.shop">schork.shop</option>
+
+  <option value="schuettewelt.de">schuettewelt.de</option>
+
+  <option value="senetic.co.uk">senetic.co.uk</option>
+
+  <option value="servelec.pt">servelec.pt</option>
+
+  <option value="sherwoodmedia.es">sherwoodmedia.es</option>
+
+  <option value="shop-apotheke.com">shop-apotheke.com</option>
+
+  <option value="shopincasa.it">shopincasa.it</option>
+
+  <option value="shoppalob2b.com">shoppalob2b.com</option>
+
+  <option value="shoptimm.pt">shoptimm.pt</option>
+
+  <option value="sianwholesale.com">sianwholesale.com</option>
+
+  <option value="simpaticotech.it">simpaticotech.it</option>
+
+  <option value="slrhut.co.uk">slrhut.co.uk</option>
+
+  <option value="smdv.de">smdv.de</option>
+
+  <option value="smythstoys.com-de">smythstoys.com-de</option>
+
+  <option value="smythstoys.com-fr">smythstoys.com-fr</option>
+
+  <option value="smythstoys.com-uk">smythstoys.com-uk</option>
+
+  <option value="sonicdirect.co.uk">sonicdirect.co.uk</option>
+
+  <option value="sopo-onlineshop.de">sopo-onlineshop.de</option>
+
+  <option value="spacenk.com">spacenk.com</option>
+
+  <option value="spar-toys.de">spar-toys.de</option>
+
+  <option value="speedpc.es">speedpc.es</option>
+
+  <option value="spielzeug-fuchs.de">spielzeug-fuchs.de</option>
+
+  <option value="sportfiskeprylar.se">sportfiskeprylar.se</option>
+
+  <option value="sportmarken24.de">sportmarken24.de</option>
+
+  <option value="sportsdirect.com">sportsdirect.com</option>
+
+  <option value="sportspar.de">sportspar.de</option>
+
+  <option value="sprintersports.com">sprintersports.com</option>
+
+  <option value="sprintersports.com-pt">sprintersports.com-pt</option>
+
+  <option value="staractionfigures.co.uk">staractionfigures.co.uk</option>
+
+  <option value="steinehelden.de">steinehelden.de</option>
+
+  <option value="stockperfume.com">stockperfume.com</option>
+
+  <option value="storline.com">storline.com</option>
+
+  <option value="storline.com-b2b">storline.com-b2b</option>
+
+  <option value="studio.co.uk">studio.co.uk</option>
+
+  <option value="suonostore.com">suonostore.com</option>
+
+  <option value="superarcade.es">superarcade.es</option>
+
+  <option value="superdrug.com">superdrug.com</option>
+
+  <option value="supergros.it">supergros.it</option>
+
+  <option value="supermercadodeljuguete.es">supermercadodeljuguete.es</option>
+
+  <option value="switchtechnology.pt">switchtechnology.pt</option>
+
+  <option value="symphonya.eu">symphonya.eu</option>
+
+  <option value="tackleuk.co.uk">tackleuk.co.uk</option>
+
+  <option value="taschengelddieb.de">taschengelddieb.de</option>
+
+  <option value="tatino.es">tatino.es</option>
+
+  <option value="tcgfactory.com">tcgfactory.com</option>
+
+  <option value="teddypharm.de">teddypharm.de</option>
+
+  <option value="teddytoys.de">teddytoys.de</option>
+
+  <option value="tek4life.pt">tek4life.pt</option>
+
+  <option value="temo-elektro.de">temo-elektro.de</option>
+
+  <option value="tesco.com">tesco.com</option>
+
+  <option value="tesco.hu">tesco.hu</option>
+
+  <option value="thalia.de">thalia.de</option>
+
+  <option value="thebluekid.es">thebluekid.es</option>
+
+  <option value="thefragranceshop.co.uk">thefragranceshop.co.uk</option>
+
+  <option value="therange.co.uk">therange.co.uk</option>
+
+  <option value="thermopreen.eu">thermopreen.eu</option>
+
+  <option value="theworks.co.uk">theworks.co.uk</option>
+
+  <option value="thomas-philipps.de">thomas-philipps.de</option>
+
+  <option value="tickety-boo-toys.co.uk">tickety-boo-toys.co.uk</option>
+
+  <option value="tiendasmgi.es">tiendasmgi.es</option>
+
+  <option value="tiendasuperjuguete.com">tiendasuperjuguete.com</option>
+
+  <option value="tikodoco.com">tikodoco.com</option>
+
+  <option value="todojuguete.es">todojuguete.es</option>
+
+  <option value="todotaladros.com-de">todotaladros.com-de</option>
+
+  <option value="todotaladros.com-es">todotaladros.com-es</option>
+
+  <option value="tondoseviersen.de">tondoseviersen.de</option>
+
+  <option value="toner24.it">toner24.it</option>
+
+  <option value="toolmax.nl">toolmax.nl</option>
+
+  <option value="toolnation.de">toolnation.de</option>
+
+  <option value="toolstoreuk.co.uk">toolstoreuk.co.uk</option>
+
+  <option value="topbaby.es">topbaby.es</option>
+
+  <option value="toymi.eu">toymi.eu</option>
+
+  <option value="toyplanet.com">toyplanet.com</option>
+
+  <option value="toys-for-fun.com">toys-for-fun.com</option>
+
+  <option value="toyscenter.it">toyscenter.it</option>
+
+  <option value="toysmaniatic.com">toysmaniatic.com</option>
+
+  <option value="toysrus.es">toysrus.es</option>
+
+  <option value="toysrus.pt">toysrus.pt</option>
+
+  <option value="toytownstores.com">toytownstores.com</option>
+
+  <option value="tradeinn.com-de">tradeinn.com-de</option>
+
+  <option value="tradeinn.com-en">tradeinn.com-en</option>
+
+  <option value="tradeinn.com-es">tradeinn.com-es</option>
+
+  <option value="tradeinn.com-fr">tradeinn.com-fr</option>
+
+  <option value="tradeinn.com-it">tradeinn.com-it</option>
+
+  <option value="trena.fr">trena.fr</option>
+
+  <option value="trena.it">trena.it</option>
+
+  <option value="trony.it">trony.it</option>
+
+  <option value="troopertoys.com">troopertoys.com</option>
+
+  <option value="trotec.com-de">trotec.com-de</option>
+
+  <option value="trotec.com-es">trotec.com-es</option>
+
+  <option value="trotec.com-fr">trotec.com-fr</option>
+
+  <option value="trotec.com-it">trotec.com-it</option>
+
+  <option value="trotec.com-uk">trotec.com-uk</option>
+
+  <option value="tuul.zone">tuul.zone</option>
+
+  <option value="ultrajeux.com">ultrajeux.com</option>
+
+  <option value="unieuro.it">unieuro.it</option>
+
+  <option value="universpara.com">universpara.com</option>
+
+  <option value="universpharmacie.fr">universpharmacie.fr</option>
+
+  <option value="vearce.com">vearce.com</option>
+
+  <option value="very.co.uk">very.co.uk</option>
+
+  <option value="videooca.com">videooca.com</option>
+
+  <option value="videooca.com-b2b">videooca.com-b2b</option>
+
+  <option value="viking-direct.co.uk">viking-direct.co.uk</option>
+
+  <option value="visanta.com">visanta.com</option>
+
+  <option value="vitamin360.com-b2b">vitamin360.com-b2b</option>
+
+  <option value="voelkner.de">voelkner.de</option>
+
+  <option value="weldricks.co.uk">weldricks.co.uk</option>
+
+  <option value="werkzeugstore24.de">werkzeugstore24.de</option>
+
+  <option value="westocklots.com">westocklots.com</option>
+
+  <option value="wmf.com">wmf.com</option>
+
+  <option value="wonduu.com">wonduu.com</option>
+
+  <option value="workoutforless.co.uk">workoutforless.co.uk</option>
+
+  <option value="worldofbears.com">worldofbears.com</option>
+
+  <option value="worldofsweets.de">worldofsweets.de</option>
+
+  <option value="wowowtoys.co.uk">wowowtoys.co.uk</option>
+
+  <option value="xfilesaversa.it">xfilesaversa.it</option>
+
+  <option value="xxl-deals.de">xxl-deals.de</option>
+
+  <option value="yachew.com">yachew.com</option>
+
+  <option value="youget.pt">youget.pt</option>
+
+  <option value="zapatos.es">zapatos.es</option>
+
+  <option value="zentrada.de">zentrada.de</option>
+
+  <option value="zentrada.es">zentrada.es</option>
+
+  <option value="zentrada.fr">zentrada.fr</option>
+
+  <option value="zentrada.it">zentrada.it</option>
+
+  <option value="ziwwie.com">ziwwie.com</option>
+
+  <option value="zooplus.co.uk">zooplus.co.uk</option>
+
+  <option value="zooplus.de">zooplus.de</option>
+
+  <option value="zooplus.es">zooplus.es</option>
+
+  <option value="zooplus.fr">zooplus.fr</option>
+
+  <option value="zooplus.nl">zooplus.nl</option>
+
+  <option value="zurbrueggen.de">zurbrueggen.de</option>
+
+  <option value="zwilling.com-de">zwilling.com-de</option>
+
+  <option value="zwilling.com-es">zwilling.com-es</option>
+
+  <option value="zwilling.com-fr">zwilling.com-fr</option>
+
+  <option value="zwilling.com-it">zwilling.com-it</option>
+
+  <option value="zwilling.com-uk">zwilling.com-uk</option>
+
+</select>
+				</td>
+			</tr>
+			<tr>
+				<td class="left-filter" id="price_filter">
+					<span class="filter-label">
+						<span class="info-tooltipped">
+							
+							Prix Fournisseur (TVA incl.)
+							<span class="info-tooltiptext">Le coût de l'article chez le fournisseur est entre...</span>
+							<i class="far fa-question-circle"></i>						
+							
+						</span>
+					</span>
+					<br>
+					<span style="display:inline-flex;width:100%;">
+
+  
+<input class="numeric-filter form-control short-input" type="search" placeholder="Min " name="price_min" oninput="inputRegex(this, /[^0-9.]/gi);checkAllFilters()" maxlength="10" class="numeric-filter form-control short-input form-control filter-control" id="id_price_0" >
+  &nbsp;⇨&nbsp;
+
+  
+<input class="numeric-filter form-control short-input" type="search" placeholder="Max " name="price_max" oninput="inputRegex(this, /[^0-9.]/gi);checkAllFilters()" maxlength="10" class="numeric-filter form-control short-input form-control filter-control" id="id_price_1" >
+
+  
+
+</span>
+				</td>
+				<td class="right-filter" id="last_update">
+					<span class="filter-label">
+						<span class="info-tooltipped">
+							
+							Mis à Jour Récemment
+							<span class="info-tooltiptext">Affiche uniquement les produits mis à jour récemment</span>
+							<i class="far fa-question-circle"></i>
+							
+						</span>
+					</span>
+					<br/>
+					<select name="last_update" class="form-control choice-select" id="id_last_update">
+  <option value="" selected>TOUS</option>
+
+  <option value="24">Dernières 24h</option>
+
+  <option value="48">Dernières 48h</option>
+
+</select> 
+				</td>
+			</tr>
+			<tr>
+				<td class="long-filter" id="upc_list_filter" colspan="2">
+					<span class="filter-label">
+						<span class="info-tooltipped">
+							
+							Liste EAN/UPC
+							<span class="info-tooltiptext">Une liste d'EAN ou d'UPC séparés par des espaces ou des virgules (max 80)</span>
+							<i class="far fa-question-circle"></i>
+							
+						</span>
+					</span>
+					<br>
+					<input type="search" name="upc_list" placeholder="Liste EAN/UPC" oninput="inputRegex(this, /[^0-9,\s]/gi);checkAllFilters()" maxlength="1500" class="form-control long-input" id="id_upc_list">
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2" class="long-filter" id="keywords_filter" hidden>
+					<span class="filter-label">
+						<span class="info-tooltipped">
+							
+							Mots-clés / Mots-clés à exclure
+							<span class="info-tooltiptext">Mots-clés à rechercher / ajouter un tiret (&quot;-&quot;) pour exclure un mot-clé</span>
+							<i class="far fa-question-circle"></i>
+							
+						</span>
+					</span>
+					<br/>
+					<input type="search" name="keywords" placeholder="Mots-clés du Titre" oninput="inputRegex(this, /[^a-zA-Z0-9-\s]/gi);checkAllFilters()" maxlength="500" class="form-control string-filter long-input" id="id_keywords"> 
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2">
+					
+		<table id="similarity_filter" >
+			<tr>
+				<td colspan="3" class="long-filter" style="padding-bottom:0">
+					<span class="filter-label" style="display: inline-flex; gap:10px;">
+						<span class="info-tooltipped">
+							
+							Correspondance
+							<span class="info-tooltiptext">Filtrer les produits qui ne correspondent pas en fonction de leur correspondance</span>
+							<i class="far fa-question-circle"></i>
+							
+						</span>
+						<div id="similarity_feed" class="loader loader-small" hidden></div>
+					</span>
+					<br>
+					<input type="range" name="similarity" value="2" oninput="updateSimilarity()" id="similarity" min="0" max="2" step="1">
+				</td>
+			</tr>
+			<tr>
+				<td style="text-align:left" class="left-filter">
+					<span class="filter-label">
+						<span class="info-tooltipped clickable" onclick="selectSimilarity(0)">
+							Faible
+							<span class="info-tooltiptext left-border">Tous les produits apparaîtront</span>
+							<i class="far fa-question-circle"></i>
+						</span>
+					</span>
+				</td>
+				<td style="text-align:center;white-space: nowrap;padding-bottom: 0.5em;">
+					<span class="filter-label">
+						<span class="info-tooltipped clickable" onclick="selectSimilarity(1)">
+							Moyen
+							<span class="info-tooltiptext">Les produits qui correspondent à un degré moyen peuvent quand même apparaître</span>
+							<i class="far fa-question-circle"></i>
+						</span>
+					</span>
+				</td>
+				<td style="text-align:right" class="right-filter">
+					<span class="filter-label">
+						<span class="info-tooltipped clickable" onclick="selectSimilarity(2)">
+							Élevé
+							<span class="info-tooltiptext">Seuls les produits qui correspondent exactement apparaîtront</span>
+							<i class="far fa-question-circle"></i>
+						</span>
+					</span>
+				</td>
+			</tr>
+		</table>
+		
+				</td>
+			</tr>
+			<tr class="last-filter" >
+				<td colspan="2" class="long-filter" style="padding-top:5px;">
+					<span class="info-tooltipped clickable" >
+						<button type="button" class="btn btn-secondary" onclick="loadSearchFilters();">
+							<i class="fa-solid fa-filter"></i>
+							CHARGER FILTRES
+						</button>
+						<span class="info-tooltiptext">Mes filtres de recherche</span>
+					</span>
+					<span class="info-tooltipped clickable"  style="margin: 0 10px;">
+						<button type="button" class="btn btn-secondary" onclick="$('#modalSaveFilters').modal('show');">
+							<i class="fa-solid fa-floppy-disk"></i>
+							SAUVEGARDER FILTRES
+						</button>
+						<span class="info-tooltiptext">Sauvegarder les filtres de recherche actuels</span>
+					</span>
+					
+					<button class="btn btn-ec filter-button" id="filter_button" style="float: right;">
+						<i class="fas fa-search"></i>&nbsp;RECHERCHER
+					</button>
+					
+					<button type="button" id="clear-search" class="btn btn-secondary" onclick="enableLoading();window.location=window.location.pathname" style="margin: 0 10px;float: right;">
+					<!--button type='button' id="clear-search" class="btn btn-big btn-secondary" onclick="resetSearchFilters()"-->
+						<i class="fas fa-broom"></i>&nbsp;EFFACER
+					</button>
+				</td>
+			</tr>
+		</table>
+	</form>
+
+	<div id="results-header">
+		<table style="width: 100%;">
+			<tbody>
+				<tr>
+					<td>
+						<div style="display:flex;align-items:center;white-space:nowrap;">
+							<span id="total_results">0</span>
+							
+							<span>&nbsp;résultats</span>
+							
+							
+						</div>
+					</td>
+					<td style="text-align:right;width: 1%;">
+						<span class="no-wrap info-tooltipped clickable" >
+							<button type="button" class="btn btn-secondary" onclick="$('#modal-display-preferences').modal('show')">
+								<i class="fas fa-cogs fa-lg"></i>
+								PRÉFÉRENCES
+								
+							</button>
+							<span class="info-tooltiptext left-border">Préférences d'affichage</span>
+						</span>						
+					</td>
+					
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	
+	<div id="all-hidden" style="margin-left:10px;" hidden>
+		<h2>Il n'y a que des résultats peu correspondants sur cette page. <a id="all-hidden-next" hidden>Aller à la page suivante &rarr; </a></h2>
+	</div>
+	
+</div>
+
+
+
+
+<!-- Rewardful -->
+<script>(function(w,r){w._rwq=r;w[r]=w[r]||function(){(w[r].q=w[r].q||[]).push(arguments)}})(window,'rewardful');</script>
+<script async src='https://r.wdfl.co/rw.js' data-rewardful='138e8e'></script>
+
+<script src="/jsi18n/"></script>
+
+<script type="text/javascript" src="https://static.actorio.com/popper.js/popper.min.b0fbf5300bdb.js"></script>
+
+
+<script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
+
+
+<script type="text/javascript" src="https://static.actorio.com/js/commons.ac51fc05ef31.js?v=34"></script>
+
+<script>
+	window.STATIC_BASE_URL = "https://static.actorio.com/";
+	
+	function change_language(language_code) {
+		enableLoading()
+		postData(
+			url="/i18n/setlang/", 
+			data={'language': language_code}
+		)
+		.then((result) => {
+			if (result.ok)
+				window.location.reload(true);
+			else
+				console.error(result)
+		});
+	}
+</script>
+
+
+<script type="text/javascript" src="https://static.actorio.com/chart.js/4.4.1/chart.umd.min.50cf2ab0db25.js"></script>
+<script type="text/javascript" src="https://static.actorio.com/moment.js/2.30.1/moment.min.be51675f16a7.js"></script>
+<script type="text/javascript" src="https://static.actorio.com/chartjs-adapter-moment/1.0.1/chartjs-adapter-moment.min.ed2bbdf1b9ed.js"></script>
+<script type="text/javascript" src="https://static.actorio.com/multiselect-dropdown/js/multiselect-dropdown.ff1f45de69f1.js"></script>
+<script type="text/javascript" src="https://static.actorio.com/ecommercer/js/checkbox-multi-select-dropdown.b5caba9c0731.js"></script>
+<script type="text/javascript" src="https://static.actorio.com/ecommercer/js/weee-lookup-modal.4a793ab4fa0f.js"></script>
+<script type="text/javascript" src="https://static.actorio.com/ecommercer/js/product_search.7d6e298ceff2.js"></script>
+
+
+<!-- FlexOffers -->
+<!-- <script>
+	var imported = document.createElement('script');
+	imported.src = 'https://content.flexlinkspro.com/flexlinks_1514126.js';
+	document.head.appendChild(imported);
+</script> -->
+
+<footer>
+	<a href="javascript:topFunction()" id="gotop" class="go-top" title="Go to top">
+		<i class="fas fa-chevron-up"></i>
+	</a>
+<footer>
+</body>
+</html>

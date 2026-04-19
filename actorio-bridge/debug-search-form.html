@@ -1,0 +1,515 @@
+
+		
+		<table class="filter-table" id="amazon_filters">
+			<tbody><tr class="first-filter">
+				<td class="long-filter">
+					<h4 style="margin-top:10px; margin-bottom:-5px;">FILTRES AMAZON</h4>
+				</td>
+			</tr>
+			
+			<tr>
+				<td class="left-filter" id="marketplace_filter" style="vertical-align: top;" hidden="">
+					<span class="filter-label">
+						<span class="info-tooltipped">
+							
+							Marketplace
+							<span class="info-tooltiptext">Sélectionnez le marketplace Amazon où vous souhaitez vendre des produits</span>
+							<i class="far fa-question-circle"></i>
+							
+						</span>
+					</span>
+					<br>
+					<select name="marketplace" class="multiselect form-control choice-select" onfocus="this.oldvalue = this.value;" onchange="selectMarketplace();this.oldvalue = this.value;" multiselect-show-empty="true" placeholder="TOUS" txtselected="sélectionné" default-value="" txtall="TOUS" id="id_marketplace" style="display: none;">
+  <option value="" selected="">TOUS</option>
+
+  <option value="DE" data-image="https://static.actorio.com/images/flags/DE.151a01acd435.svg">amazon.de</option>
+
+  <option value="ES" data-image="https://static.actorio.com/images/flags/ES.dc664854e7e8.svg">amazon.es</option>
+
+  <option value="FR" data-image="https://static.actorio.com/images/flags/FR.0166628f5d9a.svg">amazon.fr</option>
+
+  <option value="GB" data-image="https://static.actorio.com/images/flags/GB.374ffde57748.svg">amazon.co.uk</option>
+
+  <option value="IT" data-image="https://static.actorio.com/images/flags/IT.e095369ee2d3.svg">amazon.it</option>
+
+</select><div id="id_marketplace_multiselect" class="multiselect-dropdown multiselect form-control choice-select" parent-id="id_marketplace" style="width: 17px;"><div class="multiselect-dropdown-list-wrapper" style="top: 26px;"><input id="marketplace-multiselect" class="multiselect-dropdown-search form-control" style="width: 100%; display: none;"><div class="multiselect-dropdown-list"><div class="checked multiselect-dropdown-option"><input type="checkbox" id="marketplace-" hidden="" style=""><span class="label">TOUS</span></div><div class="multiselect-dropdown-option"><input type="checkbox" id="marketplace-DE" hidden="" style=""><img src="https://static.actorio.com/images/flags/DE.151a01acd435.svg" width="20" style="margin-right: 5px;"><span class="label">amazon.de</span></div><div class="multiselect-dropdown-option"><input type="checkbox" id="marketplace-ES" hidden="" style=""><img src="https://static.actorio.com/images/flags/ES.dc664854e7e8.svg" width="20" style="margin-right: 5px;"><span class="label">amazon.es</span></div><div class="multiselect-dropdown-option"><input type="checkbox" id="marketplace-FR" hidden="" style=""><img src="https://static.actorio.com/images/flags/FR.0166628f5d9a.svg" width="20" style="margin-right: 5px;"><span class="label">amazon.fr</span></div><div class="multiselect-dropdown-option"><input type="checkbox" id="marketplace-GB" hidden="" style=""><img src="https://static.actorio.com/images/flags/GB.374ffde57748.svg" width="20" style="margin-right: 5px;"><span class="label">amazon.co.uk</span></div><div class="multiselect-dropdown-option"><input type="checkbox" id="marketplace-IT" hidden="" style=""><img src="https://static.actorio.com/images/flags/IT.e095369ee2d3.svg" width="20" style="margin-right: 5px;"><span class="label">amazon.it</span></div></div></div><span class="placeholder">TOUS</span></div>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2" class="long-filter">
+					<!-- <div style="display:inline-flex;align-items:flex-end;width: 100%;"> -->
+					<table style="width: 100%;">
+						<tbody><tr>
+						<td>
+						<div id="missing_fba_filter" style="width: 100% !important;margin-right: 12px;">
+							<span class="filter-label">
+								<span class="info-tooltipped">
+									
+									Exclure Incomplets
+									<span class="info-tooltiptext">Si cette option est activée, cela exclura les produits dépourvus d’informations sur la taille et le poids</span>
+									<i class="far fa-question-circle"></i>
+									
+								</span>
+							</span>
+							<label class="switch">
+								<input type="checkbox" name="missing_fba" id="id_missing_fba" style="">
+								<span class="slider"></span>
+							</label>
+						</div>
+						</td>
+						<td>
+						<div id="multipack_filter" style="width: 100% !important;margin-right: 12px;">
+							<span class="filter-label">
+								<span class="info-tooltipped">
+									
+									Exclure les Multipacks
+									<span class="info-tooltiptext">Si cette option est activée, les multipacks seront supprimés</span>
+									<i class="far fa-question-circle"></i>
+									
+								</span>
+							</span>
+							<label class="switch">
+								<input type="checkbox" name="multipack" id="id_multipack" style="">
+								<span class="slider"></span>
+							</label>
+						</div>
+						</td>
+						<td>
+						<div id="hazmat_filter" style="width: 100% !important;margin-right: 12px;">
+							<span class="filter-label">
+								<span class="info-tooltipped">
+									
+									Exclure Hazmat
+									<span class="info-tooltiptext">Si cette option est activée, les produits classés comme marchandises dangereuses seront écartés</span>
+									<i class="far fa-question-circle"></i>
+									
+								</span>
+							</span>
+							<label class="switch">
+								<input type="checkbox" name="hazmat" id="id_hazmat" style="">
+								<span class="slider"></span>
+							</label>
+						</div>
+						</td>
+						</tr>
+						<tr>
+						<td>
+						<div id="variations_filter" hidden="" style="width: 100% !important;margin-right: 12px;margin-top: 12px;">
+							<span class="filter-label">
+								<span class="info-tooltipped">
+									
+									<span>Exclure Variantes</span>
+									
+									<span class="amazon-filter-label-default">(N’IMPORTE QUEL Marketplace)</span>
+									
+									<span class="amazon-filter-label" hidden=""></span>
+									<i class="far fa-question-circle"></i>
+									<span class="info-tooltiptext">Si cette option est activée, les produits présentant des variantes sur Amazon seront supprimés</span>
+									
+								</span>
+							</span>
+							<label class="switch">
+								<input type="checkbox" name="variations" id="id_variations" style="">
+								<span class="slider"></span>
+							</label>
+						</div>
+						</td>
+						<td colspan="2">
+						<div id="suppressed_buybox_filter" hidden="" style="width: 100% !important;margin-right: 12px;margin-top: 12px;">
+							<span class="filter-label">
+								<span class="info-tooltipped">
+									
+									<span>Exclure Buy Box Supprimée</span>
+									
+									<span class="amazon-filter-label-default">(N’IMPORTE QUEL Marketplace)</span>
+									
+									<span class="amazon-filter-label" hidden=""></span>
+									<i class="far fa-question-circle"></i>
+									<span class="info-tooltiptext">Si cette option est activée, les produits dont la Buy Box est supprimée sur Amazon seront supprimés</span>
+									
+								</span>
+							</span>
+							<label class="switch">
+								<input type="checkbox" name="suppressed_buybox" id="id_suppressed_buybox" style="">
+								<span class="slider"></span>
+							</label>
+						</div>
+						</td>
+						</tr>
+					</tbody></table>
+					<!-- </div> -->
+				</td>
+			</tr>
+
+			<tr>
+				<td class="left-filter" id="competitive_price_filter">
+					<span class="filter-label">
+						<span class="info-tooltipped">
+							
+							<span>Prix Amazon</span>
+							
+							<span class="amazon-filter-label-default">(N’IMPORTE QUEL Marketplace)</span>
+							
+							<span class="amazon-filter-label" hidden=""></span>
+							<i class="far fa-question-circle"></i>
+							<span class="info-tooltiptext">Le prix de l’article sur N’IMPORTE QUEL des marketplaces Amazon sélectionnés est compris entre...</span>		
+							
+						</span>
+						
+					</span>
+					<br>
+					<span style="display:inline-flex;width:100%;">
+
+  
+<input class="numeric-filter form-control short-input" type="search" placeholder="Min " name="competitive_price_min" oninput="inputRegex(this, /[^0-9.]/gi);checkAllFilters()" maxlength="10" id="id_competitive_price_0" style="">
+  &nbsp;⇨&nbsp;
+
+  
+<input class="numeric-filter form-control short-input" type="search" placeholder="Max " name="competitive_price_max" oninput="inputRegex(this, /[^0-9.]/gi);checkAllFilters()" maxlength="10" id="id_competitive_price_1" style="">
+
+  
+
+</span>
+				</td>
+				<td class="left-filter" id="price_reference_filter" hidden="">
+					<span class="filter-label" style="display:flex; align-items:center; gap:10px; margin-bottom:6px;">
+						<span class="info-tooltipped">
+							
+							Référence de Prix Amazon
+							<span class="info-tooltiptext">Choisissez quel prix Amazon est utilisé pour calculer le profit, le RoI et la marge</span>
+							<i class="far fa-question-circle"></i>
+							
+						</span>
+
+						<span class="new-feature-badge" style="font-size: 0.7em;">
+							NOUVEAU
+						</span>
+
+						<div id="price_reference_feed" class="loader loader-small" hidden=""></div>
+					</span>
+					<div class="segment-toggle">
+						
+						<input type="radio" id="price_reference_1" name="price_reference" value="" oninput="updatePriceReference()" checked="" style="">
+						<label for="price_reference_1">Prix Actuel</label>
+						
+						<input type="radio" id="price_reference_2" name="price_reference" value="avg30" oninput="updatePriceReference()" style="">
+						<label for="price_reference_2">Prix Stable</label>
+						
+					</div>
+				</td>
+			</tr>
+
+			<tr>
+				<td class="left-filter" id="category_filter" hidden="">
+					<span class="filter-label">
+						<span class="info-tooltipped">
+							
+							<span>Catégorie</span>
+							<span class="info-tooltiptext">La catégorie sur Amazon</span>
+							<i class="far fa-question-circle"></i>
+							
+						</span>						
+					</span>
+					<br>
+					<select name="category" class="multiselect form-control choice-select" multiselect-search="true" multiselect-select-all="true" multiselect-show-empty="false" multiselect-negative-select="true" multiselect-max-visible="1" placeholder="TOUS" txtall="Sélectionner TOUS" txtselected="sélectionné" default-value="" id="id_category" multiple="" style="display: none;">
+  <option value="">TOUS</option>
+
+  <option value="amazon-devices">Appareils Amazon</option>
+
+  <option value="baby">Bébés &amp; Puériculture</option>
+
+  <option value="beauty">Beauté et Parfum</option>
+
+  <option value="automotive">Auto et Moto</option>
+
+  <option value="popular">CD &amp; Vinyles</option>
+
+  <option value="computers">Informatique</option>
+
+  <option value="diy">Bricolage</option>
+
+  <option value="dvd">DVD &amp; Blu-ray</option>
+
+  <option value="electronics">High-Tech</option>
+
+  <option value="fashion">Mode</option>
+
+  <option value="outdoor">Jardin</option>
+
+  <option value="grocery">Epicerie</option>
+
+  <option value="drugstore">Hygiène et Santé</option>
+
+  <option value="kitchen">Cuisine &amp; Maison</option>
+
+  <option value="industrial">Secteur Industriel et Scientifique</option>
+
+  <option value="appliances">Gros Électroménager</option>
+
+  <option value="lighting">Luminaires et Eclairage</option>
+
+  <option value="fashion-luggage">Bagages et Accessoires de Voyage</option>
+
+  <option value="mi">Instruments de Musique &amp; Sono</option>
+
+  <option value="videogames">Jeux Vidéo</option>
+
+  <option value="pets">Animalerie</option>
+
+  <option value="software">Logiciels</option>
+
+  <option value="sports">Sports et Loisirs</option>
+
+  <option value="office-products">Fournitures de Bureau</option>
+
+  <option value="toys">Jeux et Jouets</option>
+
+</select><div id="id_category_multiselect" class="multiselect-dropdown multiselect form-control choice-select" parent-id="id_category" style="width: 17px;"><div class="multiselect-dropdown-list-wrapper"><input id="category-multiselect" class="multiselect-dropdown-search form-control" style="width: 100%; display: block;"><div class="multiselect-dropdown-list"><div class="multiselect-dropdown-all-selector checked"><input type="checkbox" id="category-ALL" style=""><span class="label">Sélectionner TOUS</span></div><div class="multiselect-dropdown-option"><input type="checkbox" id="category-amazon-devices" style=""><span class="label">Appareils Amazon</span></div><div class="multiselect-dropdown-option"><input type="checkbox" id="category-baby" style=""><span class="label">Bébés &amp; Puériculture</span></div><div class="multiselect-dropdown-option"><input type="checkbox" id="category-beauty" style=""><span class="label">Beauté et Parfum</span></div><div class="multiselect-dropdown-option"><input type="checkbox" id="category-automotive" style=""><span class="label">Auto et Moto</span></div><div class="multiselect-dropdown-option"><input type="checkbox" id="category-popular" style=""><span class="label">CD &amp; Vinyles</span></div><div class="multiselect-dropdown-option"><input type="checkbox" id="category-computers" style=""><span class="label">Informatique</span></div><div class="multiselect-dropdown-option"><input type="checkbox" id="category-diy" style=""><span class="label">Bricolage</span></div><div class="multiselect-dropdown-option"><input type="checkbox" id="category-dvd" style=""><span class="label">DVD &amp; Blu-ray</span></div><div class="multiselect-dropdown-option"><input type="checkbox" id="category-electronics" style=""><span class="label">High-Tech</span></div><div class="multiselect-dropdown-option"><input type="checkbox" id="category-fashion" style=""><span class="label">Mode</span></div><div class="multiselect-dropdown-option"><input type="checkbox" id="category-outdoor" style=""><span class="label">Jardin</span></div><div class="multiselect-dropdown-option"><input type="checkbox" id="category-grocery" style=""><span class="label">Epicerie</span></div><div class="multiselect-dropdown-option"><input type="checkbox" id="category-drugstore" style=""><span class="label">Hygiène et Santé</span></div><div class="multiselect-dropdown-option"><input type="checkbox" id="category-kitchen" style=""><span class="label">Cuisine &amp; Maison</span></div><div class="multiselect-dropdown-option"><input type="checkbox" id="category-industrial" style=""><span class="label">Secteur Industriel et Scientifique</span></div><div class="multiselect-dropdown-option"><input type="checkbox" id="category-appliances" style=""><span class="label">Gros Électroménager</span></div><div class="multiselect-dropdown-option"><input type="checkbox" id="category-lighting" style=""><span class="label">Luminaires et Eclairage</span></div><div class="multiselect-dropdown-option"><input type="checkbox" id="category-fashion-luggage" style=""><span class="label">Bagages et Accessoires de Voyage</span></div><div class="multiselect-dropdown-option"><input type="checkbox" id="category-mi" style=""><span class="label">Instruments de Musique &amp; Sono</span></div><div class="multiselect-dropdown-option"><input type="checkbox" id="category-videogames" style=""><span class="label">Jeux Vidéo</span></div><div class="multiselect-dropdown-option"><input type="checkbox" id="category-pets" style=""><span class="label">Animalerie</span></div><div class="multiselect-dropdown-option"><input type="checkbox" id="category-software" style=""><span class="label">Logiciels</span></div><div class="multiselect-dropdown-option"><input type="checkbox" id="category-sports" style=""><span class="label">Sports et Loisirs</span></div><div class="multiselect-dropdown-option"><input type="checkbox" id="category-office-products" style=""><span class="label">Fournitures de Bureau</span></div><div class="multiselect-dropdown-option"><input type="checkbox" id="category-toys" style=""><span class="label">Jeux et Jouets</span></div></div></div><span class="placeholder">TOUS</span></div> 
+				</td>
+				<td class="right-filter" id="size_filter" hidden="">
+					<span class="filter-label">
+						<span class="info-tooltipped">
+							
+							Catégorie de Taille
+							<span class="info-tooltiptext">La catégorie de taille du produit</span>
+							<i class="far fa-question-circle"></i>
+							
+						</span>						
+					</span>
+					<br>
+					<select name="size" class="multiselect form-control choice-select" multiselect-search="true" multiselect-select-all="true" multiselect-show-empty="false" multiselect-negative-select="true" multiselect-max-visible="1" placeholder="TOUS" txtall="Sélectionner TOUS" txtselected="sélectionné" default-value="" id="id_size" multiple="" style="display: none;">
+  <option value="">TOUS</option>
+
+  <option value="LGT_ENV">Enveloppe Légère</option>
+
+  <option value="STD_ENV">Enveloppe Standard</option>
+
+  <option value="LRG_ENV">Grande Enveloppe</option>
+
+  <option value="XLRG_ENV">Très Grande Enveloppe</option>
+
+  <option value="SML_PAR">Petit Colis</option>
+
+  <option value="STD_PAR">Colis Standard</option>
+
+  <option value="SML_OVER">Surdimensionné - Petite Taille</option>
+
+  <option value="SLT_OVER">Surdimensionné Standard Léger</option>
+
+  <option value="SHV_OVER">Surdimensionné Standard Lourd</option>
+
+  <option value="SLG_OVER">Surdimensionné Standard Grand</option>
+
+  <option value="BLK_OVER">Surdimensionné Volumineux</option>
+
+  <option value="HVY_OVER">Surdimensionné Lourd</option>
+
+  <option value="SPE_OVER">Surdimensionné Spécial</option>
+
+</select><div id="id_size_multiselect" class="multiselect-dropdown multiselect form-control choice-select" parent-id="id_size" style="width: 17px;"><div class="multiselect-dropdown-list-wrapper"><input id="size-multiselect" class="multiselect-dropdown-search form-control" style="width: 100%; display: block;"><div class="multiselect-dropdown-list"><div class="multiselect-dropdown-all-selector checked"><input type="checkbox" id="size-ALL" style=""><span class="label">Sélectionner TOUS</span></div><div class="multiselect-dropdown-option"><input type="checkbox" id="size-LGT_ENV" style=""><span class="label">Enveloppe Légère</span></div><div class="multiselect-dropdown-option"><input type="checkbox" id="size-STD_ENV" style=""><span class="label">Enveloppe Standard</span></div><div class="multiselect-dropdown-option"><input type="checkbox" id="size-LRG_ENV" style=""><span class="label">Grande Enveloppe</span></div><div class="multiselect-dropdown-option"><input type="checkbox" id="size-XLRG_ENV" style=""><span class="label">Très Grande Enveloppe</span></div><div class="multiselect-dropdown-option"><input type="checkbox" id="size-SML_PAR" style=""><span class="label">Petit Colis</span></div><div class="multiselect-dropdown-option"><input type="checkbox" id="size-STD_PAR" style=""><span class="label">Colis Standard</span></div><div class="multiselect-dropdown-option"><input type="checkbox" id="size-SML_OVER" style=""><span class="label">Surdimensionné - Petite Taille</span></div><div class="multiselect-dropdown-option"><input type="checkbox" id="size-SLT_OVER" style=""><span class="label">Surdimensionné Standard Léger</span></div><div class="multiselect-dropdown-option"><input type="checkbox" id="size-SHV_OVER" style=""><span class="label">Surdimensionné Standard Lourd</span></div><div class="multiselect-dropdown-option"><input type="checkbox" id="size-SLG_OVER" style=""><span class="label">Surdimensionné Standard Grand</span></div><div class="multiselect-dropdown-option"><input type="checkbox" id="size-BLK_OVER" style=""><span class="label">Surdimensionné Volumineux</span></div><div class="multiselect-dropdown-option"><input type="checkbox" id="size-HVY_OVER" style=""><span class="label">Surdimensionné Lourd</span></div><div class="multiselect-dropdown-option"><input type="checkbox" id="size-SPE_OVER" style=""><span class="label">Surdimensionné Spécial</span></div></div></div><span class="placeholder">TOUS</span></div>
+				</td>
+			</tr>
+			
+				<tr>
+				<td class="left-filter" id="profit_filter">
+					<span class="filter-label">
+						<span class="info-tooltipped">
+							
+							<span>Bénéfice Unitaire</span>
+							
+							<span class="amazon-filter-label-default">(N’IMPORTE QUEL Marketplace)</span>
+							
+							<span class="amazon-filter-label" hidden=""></span>
+							<i class="far fa-question-circle"></i>
+							<span class="info-tooltiptext">Le bénéfice net par unité sur N’IMPORTE QUEL des marketplaces Amazon sélectionnés est compris entre...</span>
+							
+						</span>
+						
+						<span id="profit_filter_warning" class="info-tooltipped" hidden="">
+							<span class="info-tooltiptext">Il est peu probable que la valeur sélectionnée renvoie des résultats pertinents</span>
+							<i class="fa-solid fa-triangle-exclamation" style="color:orange;"></i>
+						</span>
+					</span>
+					<br>
+					<span style="display:inline-flex;width:100%;">
+
+  
+<input class="numeric-filter form-control short-input" type="search" placeholder="Min " name="profit_min" oninput="inputRegex(this, /[^0-9.-]/gi);checkAllFilters()" maxlength="10" id="id_profit_0" style="">
+  &nbsp;⇨&nbsp;
+
+  
+<input class="numeric-filter form-control short-input" type="search" placeholder="Max " name="profit_max" oninput="inputRegex(this, /[^0-9.-]/gi);checkAllFilters()" maxlength="10" id="id_profit_1" style="">
+
+  
+
+</span>
+				</td>
+				<td class="right-filter" id="roi_filter">
+					<span class="filter-label">
+						<span class="info-tooltipped">
+							
+							<span>RoI Unitaire</span>
+							
+							<span class="amazon-filter-label-default">(N’IMPORTE QUEL Marketplace)</span>
+							
+							<span class="amazon-filter-label" hidden=""></span>
+							<i class="far fa-question-circle"></i>
+							<span class="info-tooltiptext">Le retour sur investissement sur N’IMPORTE QUEL des marketplaces Amazon sélectionnés est compris entre...</span>				
+							
+						</span>
+						
+						<span id="roi_filter_warning" class="info-tooltipped" hidden="">
+							<span class="info-tooltiptext">Il est peu probable que la valeur sélectionnée renvoie des résultats pertinents</span>
+							<i class="fa-solid fa-triangle-exclamation" style="color:orange;"></i>
+						</span>
+					</span>
+					<br>
+					<span style="display:inline-flex;width:100%;">
+
+  
+<input class="numeric-filter form-control short-input" type="search" placeholder="Min %" name="roi_min" oninput="inputRegex(this, /[^0-9.-]/gi);checkAllFilters()" maxlength="10" id="id_roi_0" style="">
+  &nbsp;⇨&nbsp;
+
+  
+<input class="numeric-filter form-control short-input" type="search" placeholder="Max %" name="roi_max" oninput="inputRegex(this, /[^0-9.-]/gi);checkAllFilters()" maxlength="10" id="id_roi_1" style="">
+
+  
+
+</span>
+				</td>
+				</tr>
+				<tr>
+				<td class="left-filter" id="profit_month_filter">
+					<span class="filter-label">
+						<span class="info-tooltipped">
+							
+							<span id="profit_month_label">Bénéfice Mensuel</span>
+							
+							<span class="amazon-filter-label-default">(Total)</span>
+							
+							<span class="amazon-filter-label" hidden=""></span>
+							<i class="far fa-question-circle"></i>
+							<span class="info-tooltiptext">Le bénéfice net total sur tous les marketplace Amazon sélectionnés est compris entre...</span>			
+							
+						</span>
+						
+						<span id="profit_month_filter_warning" class="info-tooltipped" hidden="">
+							<span class="info-tooltiptext">Il est peu probable que la valeur sélectionnée renvoie des résultats pertinents</span>
+							<i class="fa-solid fa-triangle-exclamation" style="color:orange;"></i>
+						</span>
+					</span>
+					<br>
+					<span style="display:inline-flex;width:100%;">
+
+  
+<input class="numeric-filter form-control short-input" type="search" placeholder="Min " name="profit_month_min" oninput="inputRegex(this, /[^0-9.-]/gi);checkAllFilters()" maxlength="10" id="id_profit_month_0" style="">
+  &nbsp;⇨&nbsp;
+
+  
+<input class="numeric-filter form-control short-input" type="search" placeholder="Max " name="profit_month_max" oninput="inputRegex(this, /[^0-9.-]/gi);checkAllFilters()" maxlength="10" id="id_profit_month_1" style="">
+
+  
+
+</span> 
+				</td>
+				<td class="right-filter" id="sales_month_filter">
+					<span class="filter-label">
+						<span class="info-tooltipped">
+							
+							<span id="sales_month_label">Ventes Mensuelles</span>
+							
+							<span class="amazon-filter-label-default">(Total)</span>
+							
+							<span class="amazon-filter-label" hidden=""></span>
+							<i class="far fa-question-circle"></i>
+							<span class="info-tooltiptext">Le nombre d'unités vendues sur tous les marketplace Amazon sélectionnés est compris entre...</span>					
+							
+						</span>
+						
+					</span>
+					<br>
+					<span style="display:inline-flex;width:100%;">
+
+  
+<input class="numeric-filter form-control short-input" type="search" placeholder="Min " name="sales_month_min" oninput="inputRegex(this, /[^0-9]/gi);checkAllFilters()" maxlength="10" id="id_sales_month_0" style="">
+  &nbsp;⇨&nbsp;
+
+  
+<input class="numeric-filter form-control short-input" type="search" placeholder="Max " name="sales_month_max" oninput="inputRegex(this, /[^0-9]/gi);checkAllFilters()" maxlength="10" id="id_sales_month_1" style="">
+
+  
+
+</span>
+				</td>
+			</tr>
+			<tr class="last-filter">
+				<td class="long-filter" id="asin_list_filter" colspan="2">
+					<span class="filter-label">
+						<span class="info-tooltipped">
+							
+							Liste ASIN
+							<span class="info-tooltiptext">Une liste d'ASIN séparés par des espaces ou des virgules (max 80)</span>
+							<i class="far fa-question-circle"></i>
+							
+						</span>						
+					</span>
+					<br>
+					<span style="display:flex">
+						<input type="search" name="asin_list" placeholder="Liste ASIN" oninput="inputRegex(this, /[^a-zA-Z0-9,\s]/gi);checkAllFilters()" maxlength="1000" class="form-control long-input" id="id_asin_list" style=""> 
+						
+					</span>
+				</td>
+			</tr>
+		</tbody></table>
+		<table class="filter-table" id="supplier_filters">
+			<tbody><tr class="first-filter">
+				<td colspan="2" class="long-filter">
+					<h4 style="margin-top:10px; margin-bottom:-2px;">FILTRES FOURNISSEUR</h4>
+				</td>
+			</tr>
+			<tr>
+				<td class="left-filter" id="country_filter">
+					<span class="filter-label">
+						<span class="info-tooltipped">
+							
+							Pays
+							<span class="info-tooltiptext">Rechercher des fournisseurs dans ce pays</span>
+							<i class="far fa-question-circle"></i>
+							
+						</span>						
+					</span>
+					<br>
+					<select name="country" class="multiselect form-control choice-select" onchange="refreshStoreList()" multiselect-search="true" multiselect-show-empty="true" placeholder="TOUS" txtselected="sélectionné" default-value="" txtall="TOUS" id="id_country" style="display: none;">
+  <option value="" selected="">TOUS</option>
+
+  <option value="BE" data-image="https://static.actorio.com/images/flags/BE.0127ff81afd7.svg">Belgique</option>
+
+  <option value="CZ" data-image="https://static.actorio.com/images/flags/CZ.3ee4e8d3aca8.svg">République Tchèque</option>
+
+  <option value="DE" data-image="https://static.actorio.com/images/flags/DE.151a01acd435.svg">Allemagne</option>
+
+  <option value="ES" data-image="https://static.actorio.com/images/flags/ES.dc664854e7e8.svg">Espagne</option>
+
+  <option value="FR" data-image="https://static.actorio.com/images/flags/FR.0166628f5d9a.svg">France</option>
+
+  <option value="HU" data-image="https://static.actorio.com/images/flags/HU.85015780d133.svg">Hongrie</option>
+
+  <option value="IT" data-image="https://static.actorio.com/images/flags/IT.e095369ee2d3.svg">Italie</option>
+
+  <option value="LT" data-image="https://static.actorio.com/images/flags/LT.738353318c77.svg">Lituanie</option>
+
+  <option value="NL" data-image="https://static.actorio.com/images/flags/NL.0de7e9306e3a.svg">Pays-Bas</option>
+
+  <option value="PL" data-image="https://static.actorio.com/images/flags/PL.ed9d5529ee96.svg">Pologne</option>
+
+  <option value="PT" data-image="https://static.actorio.com/images/flags/PT.36de2bf345b5.svg">Portugal</option>
+
+  <option value="RO" data-image="https://static.actorio.com/images/flags/RO.8158d11bdbd2.svg">Roumanie</option>
+
+  <option value="SE" data-image="https://static.actorio.com/images/flags/SE.d46dbac2c35d.svg">Suède</option>
+
+  <option value="SK" data-image="https://static.actorio.com/images/flags/SK.8067e5b2768f.svg">Slovaquie</option>
+
+  <option value="UK" data-image="https://static.actorio.com/images/flags/UK.374ffde57748.svg">Royaume-Uni</option>
+
+</select><div id="id_country_multiselect" class="multiselect-dropdown multiselect form-control choice-select" parent-id="id_country" style="width: 333px;"><div class="multiselect-dropdown-list-wrapper"><input id="country-multiselect" class="multiselect-dropdown-search form-control" style="width: 100%; display: block;"><div class="multiselect-dropdown-list"><div class="checked multiselect-dropdown-option"><input type="checkbox" id="country-" hidden="" style=""><span class="label">TOUS</span></div><div class="multiselect-dropdown-option"><input type="checkbox" id="country-BE" hidden="" style=""><img src="https://static.actorio.com/images/flags/BE.0127ff81afd7.svg" width="20" style="margin-right: 5px;"><span class="label">Belgique</span></div><div class="multiselect-dropdown-option"><input type="checkbox" id="country-CZ" hidden="" style=""><img src="https://static.actorio.com/images/flags/CZ.3ee4e8d3aca8.svg" width="20" style="margin-right: 5px;"><span class="label">République Tchèque</span></div><div class="multiselect-dropdown-option"><input type="checkbox" id="country-DE" hidden="" style=""><img src="https://static.actorio.com/images/flags/DE.151a01acd435.svg" width="20" style="margin-right: 5px;"><span class="label">Allemagne</span></div><div class="multiselect-dropdown-option"><input type="checkbox" id="country-ES" hidden="" style=""><img src="https://static.actorio.com/images/flags/ES.dc664854e7e8.svg" width="20" style="margin-right: 5px;"><span class="label">Espagne</span></div><div class="multiselect-dropdown-option"><input type="checkbox" id="country-FR" hidden="" style=""><img src="https://static.act

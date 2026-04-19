@@ -1,0 +1,1 @@
+import{r as i}from"./react-vendor-CWc6ckgB.js";import{y as n}from"./index-BBcUjosR.js";const v=(t,a={})=>{const s=n.isNativePlatform()?6e4:3e4,{enabled:e=!0,interval:r=s}=a;i.useEffect(()=>{if(!e)return;const o=setInterval(()=>{t()},r);return()=>clearInterval(o)},[t,e,r])};export{v as u};

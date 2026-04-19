@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Check, CheckCheck, Clock, AlertCircle, Search, Send, Smile } from "lucide-react";
+import { ArrowLeft, Check, CheckCheck, Clock, AlertCircle, Search, Send, Smile, FileSpreadsheet } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAdmin } from "@/hooks/use-admin";
 import { useAuth } from "@/hooks/use-auth";
@@ -254,6 +254,14 @@ const AdminWhatsApp = () => {
               {conversations.length}
             </span>
           </div>
+          <button
+            onClick={() => navigate("/admin/whatsapp-bulk")}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-opacity hover:opacity-80"
+            style={{ background: "#00a884", color: "#111b21" }}
+          >
+            <FileSpreadsheet className="w-4 h-4" />
+            Envoi en masse
+          </button>
         </div>
 
         {/* Search */}

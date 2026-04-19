@@ -1,0 +1,1 @@
+import{r as o}from"./react-vendor-CWc6ckgB.js";import{u as a}from"./use-notifications-DOs8jbM8.js";const u=({category:t,subcategory:e})=>{const{markAsRead:s}=a();o.useEffect(()=>{const r=setTimeout(()=>{s(t,e)},1e3);return()=>clearTimeout(r)},[t,e,s])};export{u};
