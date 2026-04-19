@@ -266,11 +266,11 @@ const AdminWhatsAppBulk = () => {
     setSendStatus("sending");
     setResults([]);
 
-    const BATCH_SIZE = 18; // ~18 contacts per batch to stay under 150s Edge Function timeout
+    const BATCH_SIZE = 18;
+    const MAX_RETRIES = 2;
     const allResults: SendResult[] = [];
-    const batches = [];
+    const batches: ContactRow[][] = [];
 
-    // Split contacts into batches
     for (let i = 0; i < contacts.length; i += BATCH_SIZE) {
       batches.push(contacts.slice(i, i + BATCH_SIZE));
     }
@@ -280,44 +280,70 @@ const AdminWhatsAppBulk = () => {
 
     for (let b = 0; b < batches.length; b++) {
       const batch = batches[b];
+      let success = false;
 
-      try {
-        const res = await fetch(`${WHATSAPP_SUPABASE_URL}/functions/v1/bulk-send`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            contacts: batch.map((c) => ({ phone: c.phone, company: c.company })),
-            template_name: templateName,
-            template_language: templateLang,
-          }),
-        });
+      for (let attempt = 0; attempt <= MAX_RETRIES && !success; attempt++) {
+        try {
+          const controller = new AbortController();
+          const timeout = setTimeout(() => controller.abort(), 180000); // 3 min timeout
 
-        const data = await res.json();
-        if (data.results) {
-          allResults.push(...data.results);
-          setResults([...allResults]);
+          const res = await fetch(`${WHATSAPP_SUPABASE_URL}/functions/v1/bulk-send`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            signal: controller.signal,
+            body: JSON.stringify({
+              contacts: batch.map((c) => ({ phone: c.phone, company: c.company })),
+              template_name: templateName,
+              template_language: templateLang,
+            }),
+          });
+
+          clearTimeout(timeout);
+
+          if (!res.ok) {
+            const errText = await res.text();
+            throw new Error(`HTTP ${res.status}: ${errText.substring(0, 200)}`);
+          }
+
+          const data = await res.json();
+          if (data.results) {
+            allResults.push(...data.results);
+            setResults([...allResults]);
+          }
+          totalSent += data.sent || 0;
+          totalFailed += data.failed || 0;
+          success = true;
+
+          toast({
+            title: `Batch ${b + 1}/${batches.length} terminé`,
+            description: `${totalSent} envoyés, ${totalFailed} échoués sur ${contacts.length}`,
+          });
+        } catch (err: any) {
+          console.error(`Batch ${b + 1} attempt ${attempt + 1} failed:`, err);
+          if (attempt < MAX_RETRIES) {
+            toast({
+              variant: "destructive",
+              title: `Batch ${b + 1} erreur, retry ${attempt + 1}/${MAX_RETRIES}...`,
+              description: err.message?.substring(0, 100),
+            });
+            await new Promise((r) => setTimeout(r, 5000));
+          } else {
+            batch.forEach((c) => {
+              allResults.push({ phone: c.phone, company: c.company, success: false, error: err.message });
+            });
+            setResults([...allResults]);
+            totalFailed += batch.length;
+            toast({
+              variant: "destructive",
+              title: `Batch ${b + 1} échoué après ${MAX_RETRIES + 1} tentatives`,
+              description: err.message?.substring(0, 100),
+            });
+          }
         }
-        totalSent += data.sent || 0;
-        totalFailed += data.failed || 0;
-
-        toast({
-          title: `Batch ${b + 1}/${batches.length} terminé`,
-          description: `${totalSent} envoyés, ${totalFailed} échoués sur ${contacts.length}`,
-        });
-      } catch (err: any) {
-        // Mark remaining batch contacts as failed
-        batch.forEach((c) => {
-          allResults.push({ phone: c.phone, company: c.company, success: false, error: err.message });
-        });
-        setResults([...allResults]);
-        totalFailed += batch.length;
       }
 
-      // Small pause between batches to let Edge Functions cool down
       if (b < batches.length - 1) {
-        await new Promise((r) => setTimeout(r, 2000));
+        await new Promise((r) => setTimeout(r, 3000));
       }
     }
 
