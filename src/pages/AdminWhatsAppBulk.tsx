@@ -266,84 +266,52 @@ const AdminWhatsAppBulk = () => {
     setSendStatus("sending");
     setResults([]);
 
-    const BATCH_SIZE = 18;
-    const MAX_RETRIES = 2;
     const allResults: SendResult[] = [];
-    const batches: ContactRow[][] = [];
-
-    for (let i = 0; i < contacts.length; i += BATCH_SIZE) {
-      batches.push(contacts.slice(i, i + BATCH_SIZE));
-    }
-
     let totalSent = 0;
     let totalFailed = 0;
 
-    for (let b = 0; b < batches.length; b++) {
-      const batch = batches[b];
-      let success = false;
+    // Send one contact at a time — no batch timeout issues
+    for (let i = 0; i < contacts.length; i++) {
+      const contact = contacts[i];
 
-      for (let attempt = 0; attempt <= MAX_RETRIES && !success; attempt++) {
-        try {
-          const controller = new AbortController();
-          const timeout = setTimeout(() => controller.abort(), 180000); // 3 min timeout
+      try {
+        const res = await fetch(`${WHATSAPP_SUPABASE_URL}/functions/v1/bulk-send`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            contacts: [{ phone: contact.phone, company: contact.company }],
+            template_name: templateName,
+            template_language: templateLang,
+          }),
+        });
 
-          const res = await fetch(`${WHATSAPP_SUPABASE_URL}/functions/v1/bulk-send`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            signal: controller.signal,
-            body: JSON.stringify({
-              contacts: batch.map((c) => ({ phone: c.phone, company: c.company })),
-              template_name: templateName,
-              template_language: templateLang,
-            }),
-          });
-
-          clearTimeout(timeout);
-
-          if (!res.ok) {
-            const errText = await res.text();
-            throw new Error(`HTTP ${res.status}: ${errText.substring(0, 200)}`);
-          }
-
-          const data = await res.json();
-          if (data.results) {
-            allResults.push(...data.results);
-            setResults([...allResults]);
-          }
-          totalSent += data.sent || 0;
-          totalFailed += data.failed || 0;
-          success = true;
-
-          toast({
-            title: `Batch ${b + 1}/${batches.length} terminé`,
-            description: `${totalSent} envoyés, ${totalFailed} échoués sur ${contacts.length}`,
-          });
-        } catch (err: any) {
-          console.error(`Batch ${b + 1} attempt ${attempt + 1} failed:`, err);
-          if (attempt < MAX_RETRIES) {
-            toast({
-              variant: "destructive",
-              title: `Batch ${b + 1} erreur, retry ${attempt + 1}/${MAX_RETRIES}...`,
-              description: err.message?.substring(0, 100),
-            });
-            await new Promise((r) => setTimeout(r, 5000));
-          } else {
-            batch.forEach((c) => {
-              allResults.push({ phone: c.phone, company: c.company, success: false, error: err.message });
-            });
-            setResults([...allResults]);
-            totalFailed += batch.length;
-            toast({
-              variant: "destructive",
-              title: `Batch ${b + 1} échoué après ${MAX_RETRIES + 1} tentatives`,
-              description: err.message?.substring(0, 100),
-            });
-          }
+        const data = await res.json();
+        if (data.results?.[0]) {
+          allResults.push(data.results[0]);
+        } else {
+          allResults.push({ phone: contact.phone, company: contact.company, success: false, error: data.error || "Unknown error" });
         }
+        totalSent += data.sent || 0;
+        totalFailed += data.failed || 0;
+      } catch (err: any) {
+        console.error(`Contact ${i + 1} failed:`, err);
+        allResults.push({ phone: contact.phone, company: contact.company, success: false, error: err.message });
+        totalFailed += 1;
       }
 
-      if (b < batches.length - 1) {
-        await new Promise((r) => setTimeout(r, 3000));
+      setResults([...allResults]);
+
+      // Show progress every 10 contacts
+      if ((i + 1) % 10 === 0) {
+        toast({
+          title: `Progression : ${i + 1}/${contacts.length}`,
+          description: `${totalSent} envoyés, ${totalFailed} échoués`,
+        });
+      }
+
+      // Wait 6.5s between messages (Meta rate limit) — skip after last
+      if (i < contacts.length - 1) {
+        await new Promise((r) => setTimeout(r, 6500));
       }
     }
 
