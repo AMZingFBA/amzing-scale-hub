@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   ArrowLeft, Upload, FileSpreadsheet, Send, CheckCheck, AlertCircle,
@@ -105,6 +105,7 @@ const AdminWhatsAppBulk = () => {
   const { toast } = useToast();
   const { isAdmin, isLoading: adminLoading } = useAdmin();
   const { session } = useAuth();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [contacts, setContacts] = useState<ContactRow[]>([]);
   const [headers, setHeaders] = useState<string[]>([]);
@@ -222,6 +223,12 @@ const AdminWhatsAppBulk = () => {
     }
   }, [processData, toast]);
 
+  const handleFileInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) handleFile(file);
+    e.target.value = "";
+  }, [handleFile]);
+
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
     setDragOver(false);
@@ -322,6 +329,14 @@ const AdminWhatsAppBulk = () => {
       </div>
 
       <div className="max-w-5xl mx-auto p-4 space-y-4">
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept=".csv,.xlsx,.xls,.txt"
+          className="hidden"
+          onChange={handleFileInputChange}
+        />
+
         {/* Upload Zone */}
         {contacts.length === 0 ? (
           <div
@@ -333,16 +348,7 @@ const AdminWhatsAppBulk = () => {
               borderColor: dragOver ? "#00a884" : "#233138",
               background: dragOver ? "#1a2e35" : "#0b141a",
             }}
-            onClick={() => {
-              const input = document.createElement("input");
-              input.type = "file";
-              input.accept = ".csv,.xlsx,.xls,.txt";
-              input.onchange = (e) => {
-                const f = (e.target as HTMLInputElement).files?.[0];
-                if (f) handleFile(f);
-              };
-              input.click();
-            }}
+            onClick={() => fileInputRef.current?.click()}
           >
             <Upload className="w-12 h-12 mx-auto mb-4" style={{ color: "#00a884" }} />
             <h3 className="text-xl font-medium mb-2">Importez votre fichier</h3>
@@ -354,6 +360,7 @@ const AdminWhatsAppBulk = () => {
             </p>
           </div>
         ) : (
+          <>
           <>
             {/* File info + Column mapping */}
             <div className="rounded-xl p-4 space-y-3" style={{ background: "#202c33" }}>
