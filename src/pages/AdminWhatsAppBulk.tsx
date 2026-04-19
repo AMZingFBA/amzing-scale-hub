@@ -198,7 +198,7 @@ const AdminWhatsAppBulk = () => {
   };
 
   const handleSend = async () => {
-    if (!contacts.length || !session?.access_token) return;
+    if (!contacts.length) return;
 
     setSendStatus("sending");
     setResults([]);
@@ -208,7 +208,6 @@ const AdminWhatsAppBulk = () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${session.access_token}`,
         },
         body: JSON.stringify({
           contacts: contacts.map((c) => ({ phone: c.phone, company: c.company })),
