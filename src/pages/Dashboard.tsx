@@ -651,6 +651,7 @@ const Dashboard = () => {
                       <CategoryItem icon={Bell} label="gestion des alertes" link="/admin/alerts" />
                       <CategoryItem icon={CreditCard} label="gestion des abonnements" link="/admin/subscriptions" />
                       <CategoryItem icon={MessageCircle} label="WhatsApp" link="/admin/whatsapp" />
+                      <CategoryItem icon={MessageCircle} label="WhatsApp Bulk" link="/admin/whatsapp-bulk" />
                       <CategoryItem icon={CreditCard} label="Impayés / Recouvrement" link="/admin/failed-payments" />
                     </div>
                   </AccordionContent>
