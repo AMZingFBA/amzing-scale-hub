@@ -143,35 +143,58 @@ const AdminWhatsAppBulk = () => {
     }
   }, [toast]);
 
-  const handleFile = useCallback((file: File) => {
+  const handleFile = useCallback(async (file: File) => {
     const ext = file.name.split(".").pop()?.toLowerCase();
 
-    if (ext === "csv" || ext === "txt") {
-      Papa.parse(file, {
-        header: true,
-        skipEmptyLines: true,
-        complete: (result) => processData(result.data as Record<string, string>[], file.name),
-      });
-    } else if (ext === "xlsx" || ext === "xls") {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        try {
-          const data = new Uint8Array(e.target?.result as ArrayBuffer);
-          const wb = XLSX.read(data, { type: "array" });
-          const ws = wb.Sheets[wb.SheetNames[0]];
-          const rows = XLSX.utils.sheet_to_json<Record<string, string>>(ws, { defval: "", raw: false });
-          processData(rows, file.name);
-        } catch (err: any) {
-          console.error("XLSX parse error:", err);
-          toast({ variant: "destructive", title: "Erreur de lecture", description: err?.message || "Impossible de lire le fichier Excel" });
+    try {
+      if (ext === "csv" || ext === "txt") {
+        Papa.parse(file, {
+          header: true,
+          skipEmptyLines: true,
+          complete: (result) => processData(result.data as Record<string, string>[], file.name),
+          error: (error) => {
+            toast({ variant: "destructive", title: "Erreur de lecture", description: error.message });
+          },
+        });
+        return;
+      }
+
+      if (ext === "xlsx" || ext === "xls") {
+        const buffer = await file.arrayBuffer();
+        const wb = XLSX.read(buffer, { type: "array" });
+        const ws = wb.Sheets[wb.SheetNames[0]];
+        const data = XLSX.utils.sheet_to_json<(string | number | boolean | null)[]>(ws, {
+          header: 1,
+          defval: "",
+          raw: false,
+        });
+
+        if (!data.length) {
+          toast({ variant: "destructive", title: "Fichier vide" });
+          return;
         }
-      };
-      reader.onerror = () => {
-        toast({ variant: "destructive", title: "Erreur", description: "Impossible de lire le fichier" });
-      };
-      reader.readAsArrayBuffer(file);
-    } else {
+
+        const headers = (data[0] ?? []).map((value) => String(value ?? "").trim());
+        const rows = data
+          .slice(1)
+          .filter((row) => row.some((value) => String(value ?? "").trim() !== ""))
+          .map((row) => {
+            const record: Record<string, string> = {};
+            headers.forEach((header, index) => {
+              const key = header || `col_${index + 1}`;
+              record[key] = String(row[index] ?? "").trim();
+            });
+            return record;
+          });
+
+        processData(rows, file.name);
+        return;
+      }
+
       toast({ variant: "destructive", title: "Format non supporté", description: "Utilisez .csv, .xlsx ou .xls" });
+    } catch (err: any) {
+      console.error("File import error:", err);
+      toast({ variant: "destructive", title: "Erreur de lecture", description: err?.message || "Impossible de lire ce fichier" });
     }
   }, [processData, toast]);
 
