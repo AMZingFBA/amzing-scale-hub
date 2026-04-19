@@ -147,8 +147,8 @@ const Dashboard = () => {
 
   const { isRefreshing, handleRefresh } = usePullRefresh(handleRefreshDashboard);
 
-  // Auto-refresh every 30 seconds
-  useAutoRefresh(loadNotifications, { enabled: true, interval: 30000 });
+  // Auto-refresh every 30 seconds (skip for admins: badges hidden anyway)
+  useAutoRefresh(loadNotifications, { enabled: !isAdmin, interval: 30000 });
 
   if (isLoading || isAdminLoading) {
     return (
