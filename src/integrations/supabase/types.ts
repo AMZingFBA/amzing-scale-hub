@@ -2206,6 +2206,45 @@ export type Database = {
         }
         Relationships: []
       }
+      whatsapp_bot_jobs: {
+        Row: {
+          account_phone: string
+          contacts: Json
+          created_at: string
+          created_by: string | null
+          id: string
+          message_template: string
+          progress: Json
+          results: Json
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          account_phone: string
+          contacts?: Json
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          message_template: string
+          progress?: Json
+          results?: Json
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          account_phone?: string
+          contacts?: Json
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          message_template?: string
+          progress?: Json
+          results?: Json
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -2443,6 +2482,27 @@ export type Database = {
         Returns: undefined
       }
       reset_user_badge: { Args: { user_id_param: string }; Returns: undefined }
+      whatsapp_bot_claim_next: {
+        Args: never
+        Returns: {
+          account_phone: string
+          contacts: Json
+          created_at: string
+          created_by: string | null
+          id: string
+          message_template: string
+          progress: Json
+          results: Json
+          status: string
+          updated_at: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "whatsapp_bot_jobs"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
     }
     Enums: {
       app_role: "admin" | "user"
