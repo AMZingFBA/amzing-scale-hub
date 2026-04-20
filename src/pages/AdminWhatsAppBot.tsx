@@ -4,8 +4,14 @@ import { ArrowLeft, Send, Trash2, Plus, Loader2, CheckCircle, XCircle, Clock, Bo
 import { useToast } from "@/hooks/use-toast";
 import { useAdmin } from "@/hooks/use-admin";
 import { useAuth } from "@/hooks/use-auth";
-import { supabase } from "@/integrations/supabase/client";
+import { createClient } from "@supabase/supabase-js";
 import Navbar from "@/components/Navbar";
+
+// Client Supabase dédié au bot (projet séparé)
+const botSupabase = createClient(
+  "https://bxynpsxxalxcchewxmvf.supabase.co",
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ4eW5wc3h4YWx4Y2NoZXd4bXZmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2MjAwMjIsImV4cCI6MjA4OTE5NjAyMn0.gLYq9wofJIKAYSNfhTCl87SVvrQ8JaSkt81c2kUSzKI"
+);
 import Footer from "@/components/Footer";
 import Papa from "papaparse";
 import * as XLSX from "xlsx";
@@ -153,7 +159,7 @@ const AdminWhatsAppBot = () => {
 
   // Load job history
   const loadJobs = useCallback(async () => {
-    const { data } = await supabase
+    const { data } = await botSupabase
       .from("whatsapp_bot_jobs" as any)
       .select("*")
       .order("created_at", { ascending: false })
@@ -168,7 +174,7 @@ const AdminWhatsAppBot = () => {
 
   // Realtime: listen to job updates
   useEffect(() => {
-    const channel = supabase
+    const channel = botSupabase
       .channel("whatsapp-bot-jobs")
       .on(
         "postgres_changes",
@@ -192,7 +198,7 @@ const AdminWhatsAppBot = () => {
       )
       .subscribe();
 
-    return () => { supabase.removeChannel(channel); };
+    return () => { botSupabase.removeChannel(channel); };
   }, []);
 
   // Parse contacts from textarea
@@ -317,7 +323,7 @@ const AdminWhatsAppBot = () => {
 
     setSending(true);
     try {
-      const { data, error } = await supabase
+      const { data, error } = await botSupabase
         .from("whatsapp_bot_jobs" as any)
         .insert({
           created_by: user?.id,
