@@ -1,7 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { createClient } from '@supabase/supabase-js';
 import { useAuth } from '@/hooks/use-auth';
 import { toast } from 'sonner';
+
+// Dedicated Supabase client for file analysis (Edge Functions project)
+const ANALYSIS_SUPABASE_URL = 'https://bxynpsxxalxcchewxmvf.supabase.co';
+const ANALYSIS_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ4eW5wc3h4YWx4Y2NoZXd4bXZmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2MjAwMjIsImV4cCI6MjA4OTE5NjAyMn0.gLYq9wofJIKAYSNfhTCl87SVvrQ8JaSkt81c2kUSzKI';
+const analysisSupabase = createClient(ANALYSIS_SUPABASE_URL, ANALYSIS_ANON_KEY);
 
 export interface AnalysisFilters {
   country: string;
@@ -93,7 +98,7 @@ export function useFileAnalysis() {
   // Load analyses history
   const loadAnalyses = useCallback(async () => {
     if (!user) return;
-    const { data } = await supabase
+    const { data } = await analysisSupabase
       .from('file_analyses')
       .select('*')
       .eq('user_id', user.id)
@@ -105,7 +110,7 @@ export function useFileAnalysis() {
   // Load presets
   const loadPresets = useCallback(async () => {
     if (!user) return;
-    const { data } = await supabase
+    const { data } = await analysisSupabase
       .from('analysis_filter_presets')
       .select('*')
       .eq('user_id', user.id)
@@ -115,7 +120,7 @@ export function useFileAnalysis() {
 
   // Load results for a specific analysis
   const loadResults = useCallback(async (analysisId: string) => {
-    const { data } = await supabase
+    const { data } = await analysisSupabase
       .from('analysis_results')
       .select('*')
       .eq('analysis_id', analysisId)
@@ -132,9 +137,9 @@ export function useFileAnalysis() {
     setIsUploading(true);
 
     try {
-      // Upload to Storage
+      // Upload to Storage on analysis project
       const filePath = `${user.id}/${Date.now()}_${file.name}`;
-      const { error: uploadError } = await supabase.storage
+      const { error: uploadError } = await analysisSupabase.storage
         .from('file-uploads')
         .upload(filePath, file);
 
@@ -148,18 +153,26 @@ export function useFileAnalysis() {
         if (columnMapping.price !== '__none__') mapping.price = columnMapping.price;
       }
 
-      // Run analysis directly in Supabase Edge Function (no external Hetzner worker dependency)
+      // Run analysis via Edge Function on analysis project
       toast.info('Analyse en cours...');
-      const { data, error: fnError } = await supabase.functions.invoke('analysis-run', {
-        body: {
+      const resp = await fetch(`${ANALYSIS_SUPABASE_URL}/functions/v1/analysis-run`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${ANALYSIS_ANON_KEY}`,
+          'apikey': ANALYSIS_ANON_KEY,
+        },
+        body: JSON.stringify({
           filePath,
           fileName: file.name,
           filters,
           columnMapping: Object.keys(mapping).length > 0 ? mapping : null,
-        },
+          userId: user.id,
+        }),
       });
 
-      if (fnError) throw new Error(`Analyse échouée: ${fnError.message}`);
+      const data = await resp.json();
+      if (!resp.ok) throw new Error(data?.error || `Analyse échouée (${resp.status})`);
       if (data?.error) throw new Error(data.error);
 
       toast.success('Analyse terminée');
@@ -177,7 +190,7 @@ export function useFileAnalysis() {
   // Save filter preset
   const savePreset = useCallback(async (name: string, filters: AnalysisFilters) => {
     if (!user) return;
-    const { error } = await supabase
+    const { error } = await analysisSupabase
       .from('analysis_filter_presets')
       .insert({
         user_id: user.id,
@@ -194,7 +207,7 @@ export function useFileAnalysis() {
 
   // Delete preset
   const deletePreset = useCallback(async (presetId: string) => {
-    await supabase.from('analysis_filter_presets').delete().eq('id', presetId);
+    await analysisSupabase.from('analysis_filter_presets').delete().eq('id', presetId);
     await loadPresets();
   }, [loadPresets]);
 
@@ -203,9 +216,9 @@ export function useFileAnalysis() {
     // Delete file from storage
     const analysis = analyses.find(a => a.id === analysisId);
     if (analysis) {
-      await supabase.storage.from('file-uploads').remove([analysis.file_path]);
+      await analysisSupabase.storage.from('file-uploads').remove([analysis.file_path]);
     }
-    await supabase.from('file_analyses').delete().eq('id', analysisId);
+    await analysisSupabase.from('file_analyses').delete().eq('id', analysisId);
     if (selectedAnalysisId === analysisId) {
       setCurrentResults([]);
       setSelectedAnalysisId(null);
@@ -223,7 +236,7 @@ export function useFileAnalysis() {
   useEffect(() => {
     if (!user) return;
 
-    const channel = supabase
+    const channel = analysisSupabase
       .channel(`file-analyses-${user.id}`)
       .on(
         'postgres_changes',
@@ -259,7 +272,7 @@ export function useFileAnalysis() {
       .subscribe();
 
     return () => {
-      supabase.removeChannel(channel);
+      analysisSupabase.removeChannel(channel);
     };
   }, [user]);
 

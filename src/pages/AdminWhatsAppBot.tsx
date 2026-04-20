@@ -1,21 +1,24 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Send, Trash2, Plus, Loader2, CheckCircle, XCircle, Clock, Bot } from "lucide-react";
+import { ArrowLeft, Send, Trash2, Plus, Loader2, CheckCircle, XCircle, Clock, Bot, Upload, FileSpreadsheet } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAdmin } from "@/hooks/use-admin";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import Papa from "papaparse";
+import * as XLSX from "xlsx";
 
 // Comptes WhatsApp disponibles (profils Chrome sur le serveur)
 const WHATSAPP_ACCOUNTS = [
+  { phone: "+33780930274", label: "+33 7 80 93 02 74" },
   { phone: "+33601148619", label: "+33 6 01 14 86 19" },
 ];
 
 const DEFAULT_MESSAGE = `Bonjour {name},
 
-Je me permets de vous contacter car nous avons identifié votre boutique Amazon récemment.
+Nous avons récemment identifié votre boutique Amazon et celle de {company}.
 
 Nous collaborons actuellement avec plusieurs vendeurs FBA afin d'optimiser leur sourcing via un logiciel comprenant :
 – partenariats directs fabricants (LEGO, Playmobil, DJI, Android…)
@@ -35,6 +38,69 @@ L'équipe AMZing FBA`;
 interface Contact {
   phone: string;
   name: string;
+  company?: string;
+}
+
+// Normalize headers for detection
+function normalizeHeader(value: string): string {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+}
+
+// Detect phone column
+function detectPhoneColumn(headers: string[], rows: Record<string, string>[]): string | null {
+  const phoneMatchers = [
+    "phone", "telephone", "numero telephone", "numero de telephone",
+    "num telephone", "mobile", "whatsapp", "phone number", "numero", "tel",
+  ];
+
+  for (const h of headers) {
+    const norm = normalizeHeader(h);
+    if (phoneMatchers.some((m) => norm === m || norm.includes(m))) return h;
+  }
+
+  let bestCol = "";
+  let bestScore = 0;
+  for (const h of headers) {
+    let score = 0;
+    for (const row of rows.slice(0, 20)) {
+      const val = String(row[h] || "").replace(/[\s\-()]/g, "");
+      if (/^\+?\d{8,15}$/.test(val)) score++;
+    }
+    if (score > bestScore) {
+      bestScore = score;
+      bestCol = h;
+    }
+  }
+  return bestScore >= 2 ? bestCol : null;
+}
+
+// Detect company column
+function detectCompanyColumn(headers: string[]): string | null {
+  const companyMatchers = [
+    "company", "entreprise", "societe", "société", "nom", "name",
+    "business", "raison sociale", "enseigne", "marque", "société",
+  ];
+
+  for (const h of headers) {
+    const norm = normalizeHeader(h);
+    if (companyMatchers.some((m) => norm === m || norm.includes(m))) return h;
+  }
+  return null;
+}
+
+// Normalize phone (French 0X -> +33X)
+function normalizePhone(raw: string): string {
+  let digits = raw.replace(/[^0-9+]/g, "");
+  if (digits.startsWith("0") && digits.length === 10) {
+    digits = "33" + digits.slice(1);
+  }
+  digits = digits.replace(/^\+/, "");
+  return digits;
 }
 
 interface Job {
@@ -53,6 +119,10 @@ const AdminWhatsAppBot = () => {
   const { toast } = useToast();
   const { user } = useAuth();
   const { isAdmin, isLoading: isAdminLoading } = useAdmin();
+
+  // File upload
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [dragOver, setDragOver] = useState(false);
 
   // Contacts
   const [contactsText, setContactsText] = useState("");
@@ -134,23 +204,98 @@ const AdminWhatsAppBot = () => {
       const parts = line.split(",").map((p) => p.trim());
       const phone = parts[0]?.replace(/[\s\-()]/g, "");
       const name = parts[1] || "Inconnu";
+      const company = parts[2];
 
       if (!phone) continue;
 
       // Avoid duplicates
       if (contacts.some((c) => c.phone === phone) || newContacts.some((c) => c.phone === phone)) continue;
 
-      newContacts.push({ phone, name });
+      newContacts.push({ phone: normalizePhone(phone), name, company });
     }
 
     if (newContacts.length === 0) {
-      toast({ title: "Aucun nouveau contact", description: "Vérifiez le format: +33612345678, Nom", variant: "destructive" });
+      toast({ title: "Aucun nouveau contact", description: "Vérifiez le format: +33612345678, Nom, Société", variant: "destructive" });
       return;
     }
 
     setContacts((prev) => [...prev, ...newContacts]);
     setContactsText("");
     toast({ title: `${newContacts.length} contact(s) ajouté(s)` });
+  };
+
+  // Process Excel/CSV file
+  const processFile = useCallback((file: File) => {
+    const isXlsx = file.name.endsWith(".xlsx") || file.name.endsWith(".xls");
+    const isCsv = file.name.endsWith(".csv");
+
+    if (isXlsx) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const workbook = XLSX.read(e.target?.result, { type: "array" });
+          const sheet = workbook.Sheets[workbook.SheetNames[0]];
+          const rows = XLSX.utils.sheet_to_json<Record<string, string>>(sheet);
+          proceedWithRows(rows, file.name);
+        } catch (err: any) {
+          toast({ title: "Erreur fichier Excel", description: err.message, variant: "destructive" });
+        }
+      };
+      reader.readAsArrayBuffer(file);
+    } else if (isCsv) {
+      Papa.parse(file, {
+        complete: (results) => {
+          const rows = results.data.slice(1).filter((r: any) => r.length > 0).map((r: any) => {
+            const headers = (results.data[0] as any) || [];
+            const row: Record<string, string> = {};
+            headers.forEach((h: string, i: number) => {
+              row[h] = String(r[i] || "");
+            });
+            return row;
+          });
+          proceedWithRows(rows, file.name);
+        },
+      });
+    } else {
+      toast({ title: "Format non supporté", description: "Utilisez Excel (.xlsx) ou CSV", variant: "destructive" });
+    }
+  }, [toast]);
+
+  const proceedWithRows = (rows: Record<string, string>[], fileName: string) => {
+    if (!rows.length) {
+      toast({ title: "Fichier vide", variant: "destructive" });
+      return;
+    }
+
+    const headers = Object.keys(rows[0]);
+    const phoneCol = detectPhoneColumn(headers, rows);
+    const companyCol = detectCompanyColumn(headers);
+
+    if (!phoneCol) {
+      toast({ title: "Colonne téléphone non trouvée", variant: "destructive" });
+      return;
+    }
+
+    const imported: Contact[] = [];
+    for (const row of rows) {
+      const phone = normalizePhone(row[phoneCol] || "");
+      const company = companyCol ? (row[companyCol] || "").trim() : undefined;
+      const name = company || "Inconnu";
+
+      if (!phone || phone.length < 8) continue;
+      if (contacts.some((c) => c.phone === phone) || imported.some((c) => c.phone === phone)) continue;
+
+      imported.push({ phone, name, company });
+    }
+
+    if (imported.length === 0) {
+      toast({ title: "Aucun contact importé", description: "Vérifiez le format du fichier", variant: "destructive" });
+      return;
+    }
+
+    setContacts((prev) => [...prev, ...imported]);
+    toast({ title: `${imported.length} contact(s) importé(s) depuis ${fileName}` });
+    if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
   const removeContact = (phone: string) => {
@@ -246,11 +391,40 @@ const AdminWhatsAppBot = () => {
               {/* Contacts input */}
               <div className="bg-white rounded-xl border p-5 shadow-sm">
                 <h2 className="font-semibold text-lg mb-3">Contacts</h2>
-                <p className="text-sm text-gray-500 mb-2">1 contact par ligne : <code className="bg-gray-100 px-1 rounded">+33612345678, Nom</code></p>
+
+                {/* File upload */}
+                <div
+                  onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+                  onDragLeave={() => setDragOver(false)}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    setDragOver(false);
+                    if (e.dataTransfer.files[0]) processFile(e.dataTransfer.files[0]);
+                  }}
+                  className={`border-2 border-dashed rounded-lg p-4 mb-4 text-center transition ${dragOver ? "border-green-500 bg-green-50" : "border-gray-300"}`}
+                >
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept=".xlsx,.xls,.csv"
+                    onChange={(e) => e.target.files && processFile(e.target.files[0])}
+                    className="hidden"
+                  />
+                  <button
+                    onClick={() => fileInputRef.current?.click()}
+                    className="flex items-center justify-center gap-2 text-sm text-gray-600 hover:text-green-600 mx-auto"
+                  >
+                    <FileSpreadsheet className="w-4 h-4" />
+                    Importer un fichier Excel/CSV ou glisser-déposer
+                  </button>
+                  <p className="text-xs text-gray-400 mt-1">Colonnes: Téléphone, Nom/Société (auto-détectées)</p>
+                </div>
+
+                <p className="text-sm text-gray-500 mb-2">Ou saisir manuellement (1 par ligne) : <code className="bg-gray-100 px-1 rounded">+33612345678, Nom, Société</code></p>
                 <textarea
                   value={contactsText}
                   onChange={(e) => setContactsText(e.target.value)}
-                  placeholder={"+33612345678, Jean Dupont\n+33698765432, Marie Martin"}
+                  placeholder={"+33612345678, Jean Dupont, Dupont SARL\n+33698765432, Marie Martin, Martin Boutique"}
                   className="w-full border rounded-lg p-3 text-sm font-mono resize-y min-h-[100px] focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none"
                   rows={4}
                 />
@@ -295,7 +469,7 @@ const AdminWhatsAppBot = () => {
               {/* Message */}
               <div className="bg-white rounded-xl border p-5 shadow-sm">
                 <h2 className="font-semibold text-lg mb-3">Message</h2>
-                <p className="text-sm text-gray-500 mb-2">Utilisez <code className="bg-gray-100 px-1 rounded">{"{name}"}</code> pour le nom du contact</p>
+                <p className="text-sm text-gray-500 mb-2">Utilisez <code className="bg-gray-100 px-1 rounded">{"{name}"}</code> pour le nom et <code className="bg-gray-100 px-1 rounded">{"{company}"}</code> pour la société</p>
                 <textarea
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}

@@ -490,38 +490,18 @@ Deno.serve(async (req) => {
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const anonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
 
     const admin = createClient(supabaseUrl, serviceRoleKey);
 
-    const authHeader = req.headers.get('Authorization');
-    if (!authHeader) {
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-        status: 401,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-    }
-
-    const userClient = createClient(supabaseUrl, anonKey, {
-      global: { headers: { Authorization: authHeader } },
-    });
-
-    const { data: userRes, error: userErr } = await userClient.auth.getUser();
-    const user = userRes?.user;
-    if (userErr || !user) {
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-        status: 401,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-    }
-
-    const { filePath, fileName, filters, columnMapping } = await req.json();
-    if (!filePath || !fileName) {
-      return new Response(JSON.stringify({ error: 'filePath and fileName are required' }), {
+    const { filePath, fileName, filters, columnMapping, userId } = await req.json();
+    if (!filePath || !fileName || !userId) {
+      return new Response(JSON.stringify({ error: 'filePath, fileName, and userId are required' }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
+
+    const user = { id: userId };
 
     const countryCode = filters?.country || 'FR';
     const country = COUNTRIES[countryCode];
