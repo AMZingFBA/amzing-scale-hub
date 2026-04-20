@@ -54,6 +54,7 @@ import {
   Wrench,
   Search,
   CreditCard,
+  Bot,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -652,6 +653,7 @@ const Dashboard = () => {
                       <CategoryItem icon={CreditCard} label="gestion des abonnements" link="/admin/subscriptions" />
                       <CategoryItem icon={MessageCircle} label="WhatsApp" link="/admin/whatsapp-crm" />
                       <CategoryItem icon={MessageCircle} label="WhatsApp Bulk" link="/admin/whatsapp-bulk" />
+                      <CategoryItem icon={Bot} label="Bot WhatsApp Selenium" link="/admin/whatsapp-bot" />
                       <CategoryItem icon={CreditCard} label="Impayés / Recouvrement" link="/admin/failed-payments" />
                     </div>
                   </AccordionContent>
