@@ -6,15 +6,15 @@ import { useAdmin } from "@/hooks/use-admin";
 import { useAuth } from "@/hooks/use-auth";
 import { createClient } from "@supabase/supabase-js";
 import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+import Papa from "papaparse";
+import * as XLSX from "xlsx";
 
 // Client Supabase dédié au bot (projet séparé)
 const botSupabase = createClient(
   "https://bxynpsxxalxcchewxmvf.supabase.co",
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ4eW5wc3h4YWx4Y2NoZXd4bXZmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2MjAwMjIsImV4cCI6MjA4OTE5NjAyMn0.gLYq9wofJIKAYSNfhTCl87SVvrQ8JaSkt81c2kUSzKI"
 );
-import Footer from "@/components/Footer";
-import Papa from "papaparse";
-import * as XLSX from "xlsx";
 
 // Comptes WhatsApp disponibles (profils Chrome sur le serveur)
 const WHATSAPP_ACCOUNTS = [
