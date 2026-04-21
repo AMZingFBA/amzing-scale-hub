@@ -243,8 +243,9 @@ const AdminProspection = () => {
 
     await supabase.from('sms_contacts').insert(contactRows);
     setCampaign(camp);
+    setLaunching(false);
 
-    // Call edge function
+    // Call edge function (non-bloquant)
     const { data: { session } } = await supabase.auth.getSession();
     fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-sms`, {
       method: 'POST',
@@ -253,9 +254,18 @@ const AdminProspection = () => {
         'Authorization': `Bearer ${session?.access_token}`,
       },
       body: JSON.stringify({ action: 'process', campaign_id: camp.id }),
-    }).catch(() => {});
-
-    setLaunching(false);
+    }).then(async (res) => {
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: `HTTP ${res.status}` }));
+        await supabase.from('sms_campaigns').update({ status: 'stopped' }).eq('id', camp.id);
+        await supabase.from('sms_logs').insert({ campaign_id: camp.id, message: `❌ Erreur : ${err.error || res.status}`, type: 'error' });
+        toast({ title: 'Erreur edge function', description: err.error || `HTTP ${res.status}`, variant: 'destructive' });
+      }
+    }).catch(async (e) => {
+      await supabase.from('sms_campaigns').update({ status: 'stopped' }).eq('id', camp.id);
+      await supabase.from('sms_logs').insert({ campaign_id: camp.id, message: `❌ Erreur réseau : ${e.message}`, type: 'error' });
+      toast({ title: 'Erreur réseau', description: e.message, variant: 'destructive' });
+    });
   };
 
   // Pause / Resume / Stop
