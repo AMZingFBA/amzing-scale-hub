@@ -245,13 +245,14 @@ const AdminProspection = () => {
     setCampaign(camp);
     setLaunching(false);
 
-    // Call edge function sur le projet Supabase accessible
-    const { data: { session } } = await supabase.auth.getSession();
+    // Call edge function sur le projet Supabase dédié bot (clé anon de ce projet)
+    const BOT_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ4eW5wc3h4YWx4Y2NoZXd4bXZmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2MjAwMjIsImV4cCI6MjA4OTE5NjAyMn0.gLYq9wofJIKAYSNfhTCl87SVvrQ8JaSkt81c2kUSzKI";
     fetch(`https://bxynpsxxalxcchewxmvf.supabase.co/functions/v1/send-sms`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${session?.access_token}`,
+        'Authorization': `Bearer ${BOT_ANON_KEY}`,
+        'apikey': BOT_ANON_KEY,
       },
       body: JSON.stringify({ action: 'process', campaign_id: camp.id }),
     }).then(async (res) => {
