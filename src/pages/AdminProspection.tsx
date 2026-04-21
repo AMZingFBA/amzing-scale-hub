@@ -113,62 +113,76 @@ const AdminProspection = () => {
     logsEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [logs]);
 
+  // Normalize header for comparison (remove accents, lowercase, trim)
+  const normalizeHeader = (h: string) =>
+    h.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+
   // CSV / Excel upload
   const handleCSV = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     const ext = file.name.split('.').pop()?.toLowerCase();
 
+    const processRecords = (records: Record<string, string>[]) => {
+      if (!records.length) return;
+      const headers = Object.keys(records[0]);
+
+      // Detect phone column
+      const phoneKeywords = ['telephone', 'phone', 'tel', 'numero', 'mobile', 'whatsapp', 'num'];
+      let phoneCol = headers.find(h => phoneKeywords.some(k => normalizeHeader(h).includes(k)));
+      if (!phoneCol) {
+        // Fallback: column where most values look like phone numbers
+        phoneCol = headers.reduce((best, h) => {
+          const score = records.slice(0, 20).filter(r => /^\+?\d{7,15}$/.test(String(r[h] || '').replace(/[\s\-\.\(\)]/g, ''))).length;
+          const bestScore = records.slice(0, 20).filter(r => /^\+?\d{7,15}$/.test(String(r[best] || '').replace(/[\s\-\.\(\)]/g, ''))).length;
+          return score > bestScore ? h : best;
+        }, headers[0]);
+      }
+
+      // Detect name column
+      const nameKeywords = ['nom societe', 'nom_societe', 'societe', 'entreprise', 'company', 'nom', 'name', 'business'];
+      const nameCol = headers.find(h => nameKeywords.some(k => normalizeHeader(h).includes(k)));
+
+      const parsed = records
+        .map(r => ({
+          name: nameCol ? String(r[nameCol] || '').trim() : '',
+          phone: phoneCol ? String(r[phoneCol] || '').replace(/[\s\-\.\(\)]/g, '').trim() : '',
+        }))
+        .filter(c => c.phone && /^\+?\d{7,15}$/.test(c.phone));
+
+      if (!parsed.length) {
+        toast({ title: 'Aucun contact valide', description: 'Vérifiez les colonnes nom_societe et telephone', variant: 'destructive' });
+        return;
+      }
+
+      setContacts(parsed);
+      setContactsText(parsed.map(c => c.name ? `${c.name}:${c.phone}` : c.phone).join('\n'));
+      toast({ title: `${parsed.length} contacts importés`, description: nameCol ? `Nom: "${nameCol}" · Tel: "${phoneCol}"` : `Tel: "${phoneCol}"` });
+    };
+
     if (ext === 'xlsx' || ext === 'xls') {
-      // Excel
       const reader = new FileReader();
       reader.onload = (ev) => {
         const data = new Uint8Array(ev.target?.result as ArrayBuffer);
         const workbook = XLSX.read(data, { type: 'array' });
         const sheet = workbook.Sheets[workbook.SheetNames[0]];
-        const records: any[] = XLSX.utils.sheet_to_json(sheet, { defval: '' });
-
-        const parsed = records
-          .map(r => ({
-            name: String(r.nom_societe || r.nom || r.name || r.Nom || r['Nom Société'] || '').trim(),
-            phone: String(r.telephone || r.phone || r.tel || r.Telephone || '').trim(),
-          }))
-          .filter(c => c.phone);
-
-        setContacts(parsed);
-        setContactsText(parsed.map(c => c.name ? `${c.name}:${c.phone}` : c.phone).join('\n'));
-        toast({ title: `${parsed.length} contacts importés` });
+        const records = XLSX.utils.sheet_to_json<Record<string, string>>(sheet, { defval: '' });
+        processRecords(records);
       };
       reader.readAsArrayBuffer(file);
     } else {
-      // CSV
       const reader = new FileReader();
       reader.onload = (ev) => {
         const text = ev.target?.result as string;
         const lines = text.split('\n').filter(l => l.trim());
         if (lines.length < 2) return;
-
-        const header = lines[0].toLowerCase();
-        const cols = header.split(/[,;]/).map(c => c.trim().replace(/^"|"$/g, ''));
-        const nameIdx = cols.findIndex(c => ['nom_societe', 'nom', 'name'].includes(c));
-        const phoneIdx = cols.findIndex(c => ['telephone', 'phone', 'tel', 'numero'].includes(c));
-
-        if (phoneIdx === -1) {
-          toast({ title: 'Erreur CSV', description: 'Colonne "telephone" introuvable', variant: 'destructive' });
-          return;
-        }
-
-        const parsed: { name: string; phone: string }[] = [];
-        for (let i = 1; i < lines.length; i++) {
-          const vals = lines[i].split(/[,;]/).map(v => v.trim().replace(/^"|"$/g, ''));
-          if (vals[phoneIdx]) {
-            parsed.push({ name: nameIdx >= 0 ? vals[nameIdx] || '' : '', phone: vals[phoneIdx] });
-          }
-        }
-
-        setContacts(parsed);
-        setContactsText(parsed.map(c => c.name ? `${c.name}:${c.phone}` : c.phone).join('\n'));
-        toast({ title: `${parsed.length} contacts importés` });
+        const sep = lines[0].includes(';') ? ';' : ',';
+        const headers = lines[0].split(sep).map(h => h.trim().replace(/^"|"$/g, ''));
+        const records = lines.slice(1).map(line => {
+          const vals = line.split(sep).map(v => v.trim().replace(/^"|"$/g, ''));
+          return Object.fromEntries(headers.map((h, i) => [h, vals[i] || '']));
+        });
+        processRecords(records);
       };
       reader.readAsText(file);
     }
