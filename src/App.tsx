@@ -93,6 +93,7 @@ const AdminSubscriptions = lazy(() => import("./pages/AdminSubscriptions"));
 const AdminFailedPayments = lazy(() => import("./pages/AdminFailedPayments"));
 const AdminWhatsAppBulk = lazy(() => import("./pages/AdminWhatsAppBulk"));
 const AdminIMessageBulk = lazy(() => import("./pages/AdminIMessageBulk"));
+const AdminProspection = lazy(() => import("./pages/AdminProspection"));
 const AdminWhatsAppCRM = lazy(() => import("./pages/AdminWhatsAppCRM"));
 const AdminWhatsAppBot = lazy(() => import("./pages/AdminWhatsAppBot"));
 const AmazonToAmazon = lazy(() => import("./pages/AmazonToAmazon"));
@@ -230,6 +231,7 @@ const App = () => (
             <Route path="/admin/failed-payments" element={<AdminFailedPayments />} />
             <Route path="/admin/whatsapp-bulk" element={<AdminWhatsAppBulk />} />
             <Route path="/admin/imessage-bulk" element={<AdminIMessageBulk />} />
+            <Route path="/admin/prospection" element={<AdminProspection />} />
             <Route path="/admin/whatsapp-crm" element={<AdminWhatsAppCRM />} />
             <Route path="/admin/whatsapp-bot" element={<AdminWhatsAppBot />} />
 
