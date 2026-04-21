@@ -993,6 +993,48 @@ export type Database = {
         }
         Relationships: []
       }
+      imessage_jobs: {
+        Row: {
+          contacts: Json
+          created_at: string
+          current_recipient: string | null
+          failed: number
+          id: string
+          message: string
+          results: Json
+          sent: number
+          status: string
+          total: number
+          updated_at: string
+        }
+        Insert: {
+          contacts?: Json
+          created_at?: string
+          current_recipient?: string | null
+          failed?: number
+          id?: string
+          message: string
+          results?: Json
+          sent?: number
+          status?: string
+          total?: number
+          updated_at?: string
+        }
+        Update: {
+          contacts?: Json
+          created_at?: string
+          current_recipient?: string | null
+          failed?: number
+          id?: string
+          message?: string
+          results?: Json
+          sent?: number
+          status?: string
+          total?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       marketplace_buy_requests: {
         Row: {
           asin: string | null
