@@ -1,6 +1,6 @@
 // Service Worker pour cache et performance optimale
 // Bump this version whenever we need to force clients to refresh cached assets.
-const CACHE_VERSION = 'amzing-fba-v3';
+const CACHE_VERSION = 'amzing-fba-v4';
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const DYNAMIC_CACHE = `${CACHE_VERSION}-dynamic`;
 
@@ -50,16 +50,29 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // IMPORTANT: éviter de servir un JS/HTML obsolète (problème de filtres non appliqués)
-  // - Navigation (HTML) : Network-first sans fallback sur cache (sauf si offline -> cache)
-  // - Scripts/styles : Network-only (pas de cache)
+  // Navigation (HTML) : Stale-while-revalidate
+  // -> Sert immédiatement /index.html depuis le cache (retour onglet instantané, pas de reload visible)
+  // -> Met à jour le cache en arrière-plan
+  // Le hash dans les noms de fichiers JS/CSS (Vite) garantit que les nouveaux assets sont chargés.
   if (request.mode === 'navigate') {
     event.respondWith(
-      fetch(request).catch(() => caches.match('/index.html'))
+      caches.match('/index.html').then((cached) => {
+        const networkFetch = fetch(request)
+          .then((response) => {
+            if (response && response.status === 200) {
+              const clone = response.clone();
+              caches.open(STATIC_CACHE).then((cache) => cache.put('/index.html', clone));
+            }
+            return response;
+          })
+          .catch(() => cached);
+        return cached || networkFetch;
+      })
     );
     return;
   }
 
+  // Scripts/styles : Network-only (les noms sont hashés, pas de risque de stale)
   if (request.destination === 'script' || request.destination === 'style') {
     event.respondWith(fetch(request));
     return;
