@@ -14,7 +14,7 @@ function sleep(ms: number): Promise<void> {
 }
 
 function randomDelay(): number {
-  return Math.floor(Math.random() * 7000) + 3000; // 3-10s
+  return Math.floor(Math.random() * 2000) + 1000; // 1-3s
 }
 
 function personalizeMessage(template: string, name: string): string {
@@ -249,7 +249,7 @@ Deno.serve(async (req) => {
         // Delay between messages (3-10 sec)
         if (i < contacts.length - 1) {
           const delay = randomDelay();
-          await supabase.from("sms_logs").insert({ campaign_id, message: `Pause ${(delay / 1000).toFixed(0)}s...`, type: "info" });
+          await supabase.from("sms_logs").insert({ campaign_id, message: `⏳ ${(delay / 1000).toFixed(1)}s...`, type: "info" });
           await sleep(delay);
         }
       }
