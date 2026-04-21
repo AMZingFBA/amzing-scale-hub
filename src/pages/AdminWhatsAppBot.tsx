@@ -22,9 +22,9 @@ const WHATSAPP_ACCOUNTS = [
   { phone: "+33601148619", label: "+33 6 01 14 86 19" },
 ];
 
-const DEFAULT_MESSAGE = `Bonjour {name},
+const DEFAULT_MESSAGE = `Bonjour {company},
 
-Nous avons récemment identifié votre boutique Amazon et celle de {company}.
+Nous avons récemment identifié votre boutique Amazon.
 
 Nous collaborons actuellement avec plusieurs vendeurs FBA afin d'optimiser leur sourcing via un logiciel comprenant :
 – partenariats directs fabricants (LEGO, Playmobil, DJI, Android…)
@@ -209,19 +209,17 @@ const AdminWhatsAppBot = () => {
     for (const line of lines) {
       const parts = line.split(",").map((p) => p.trim());
       const phone = parts[0]?.replace(/[\s\-()]/g, "");
-      const name = parts[1] || "Inconnu";
-      const company = parts[2];
+      const company = parts[1] || "";
 
       if (!phone) continue;
 
-      // Avoid duplicates
       if (contacts.some((c) => c.phone === phone) || newContacts.some((c) => c.phone === phone)) continue;
 
-      newContacts.push({ phone: normalizePhone(phone), name, company });
+      newContacts.push({ phone: normalizePhone(phone), name: company || "Inconnu", company });
     }
 
     if (newContacts.length === 0) {
-      toast({ title: "Aucun nouveau contact", description: "Vérifiez le format: +33612345678, Nom, Société", variant: "destructive" });
+      toast({ title: "Aucun nouveau contact", description: "Format: +33612345678, Nom Société", variant: "destructive" });
       return;
     }
 
@@ -426,11 +424,11 @@ const AdminWhatsAppBot = () => {
                   <p className="text-xs text-gray-400 mt-1">Colonnes: Téléphone, Nom/Société (auto-détectées)</p>
                 </div>
 
-                <p className="text-sm text-gray-500 mb-2">Ou saisir manuellement (1 par ligne) : <code className="bg-gray-100 px-1 rounded">+33612345678, Nom, Société</code></p>
+                <p className="text-sm text-gray-500 mb-2">Ou saisir manuellement (1 par ligne) : <code className="bg-gray-100 px-1 rounded">+33612345678, Nom Société</code></p>
                 <textarea
                   value={contactsText}
                   onChange={(e) => setContactsText(e.target.value)}
-                  placeholder={"+33612345678, Jean Dupont, Dupont SARL\n+33698765432, Marie Martin, Martin Boutique"}
+                  placeholder={"+33612345678, Dupont SARL\n+33698765432, Martin Boutique"}
                   className="w-full border rounded-lg p-3 text-sm font-mono resize-y min-h-[100px] focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none"
                   rows={4}
                 />
@@ -475,7 +473,7 @@ const AdminWhatsAppBot = () => {
               {/* Message */}
               <div className="bg-white rounded-xl border p-5 shadow-sm">
                 <h2 className="font-semibold text-lg mb-3">Message</h2>
-                <p className="text-sm text-gray-500 mb-2">Utilisez <code className="bg-gray-100 px-1 rounded">{"{name}"}</code> pour le nom et <code className="bg-gray-100 px-1 rounded">{"{company}"}</code> pour la société</p>
+                <p className="text-sm text-gray-500 mb-2">Utilisez <code className="bg-gray-100 px-1 rounded">{"{company}"}</code> pour le nom de société. Si pas de société → <code className="bg-gray-100 px-1 rounded">Bonjour,</code> automatiquement.</p>
                 <textarea
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
