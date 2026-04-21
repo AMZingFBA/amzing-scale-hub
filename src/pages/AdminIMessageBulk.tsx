@@ -9,6 +9,7 @@ import { useAdmin } from "@/hooks/use-admin";
 import { useAuth } from "@/hooks/use-auth";
 import Papa from "papaparse";
 
+// iMessage Bulk Sender - Admin only
 const DEFAULT_BACKEND = "http://localhost:3001";
 function getSavedBackendUrl(): string {
   return localStorage.getItem("imessage_backend_url") || DEFAULT_BACKEND;
