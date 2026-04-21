@@ -6,6 +6,10 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+// Lovable Supabase project (données campagnes, contacts, logs)
+const LOVABLE_URL = "https://wvmfzlogijvqcsgablrb.supabase.co";
+const LOVABLE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind2bWZ6bG9naWp2cWNzZ2FibHJiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEyNTI3MTYsImV4cCI6MjA3NjgyODcxNn0.4ciuBXzeLQB4RatGnJuXJemQ_w6xr5f8Bhm2SUOzdtY";
+
 const ONOFF_API_V4 = "https://production-server.onoffapp.net/mobile/v4";
 const ONOFF_API_V5 = "https://production-server.onoffapp.net/mobile/v5";
 
@@ -21,19 +25,15 @@ function personalizeMessage(template: string, name: string): string {
   if (name) {
     return template.replace(/Bonjour \{nom\},/gi, `Bonjour ${name},`).replace(/{nom}/gi, name);
   }
-  // Pas de nom → "Bonjour,"
   return template.replace(/Bonjour \{nom\},/gi, "Bonjour,").replace(/{nom}/gi, "");
 }
 
-// Format phone number
 function formatPhone(phone: string): string {
   let p = phone.replace(/\s+/g, "").replace(/[^\d+]/g, "");
   if (p.startsWith("0")) p = "+33" + p.slice(1);
   if (!p.startsWith("+")) p = "+" + p;
   return p;
 }
-
-// ─── Onoff API calls ───
 
 async function onoffRequest(
   url: string,
@@ -50,96 +50,69 @@ async function onoffRequest(
       "x-user-agent": "onoff-web/4.74.0",
       "Origin": "https://phone.onoff.app",
     };
-
     const opts: RequestInit = { method, headers };
     if (body) opts.body = JSON.stringify(body);
-
     const res = await fetch(url, opts);
     const text = await res.text();
-    let data;
-    try { data = JSON.parse(text); } catch { data = text; }
-
-    if (!res.ok) {
-      return { ok: false, error: `HTTP ${res.status}: ${typeof data === "string" ? data : JSON.stringify(data)}` };
-    }
+    let data; try { data = JSON.parse(text); } catch { data = text; }
+    if (!res.ok) return { ok: false, error: `HTTP ${res.status}: ${typeof data === "string" ? data : JSON.stringify(data)}` };
     return { ok: true, data };
   } catch (err) {
     return { ok: false, error: err.message };
   }
 }
 
-// Get or create thread ID for a phone number
 async function getThreadId(
   phone: string,
   config: { auth_token: string; instance_id: string; sender_number: string }
 ): Promise<{ ok: boolean; threadId?: string; error?: string }> {
-  const formattedPhone = formatPhone(phone);
-
-  // Call get-thread-id endpoint (v5)
-  const url = `${ONOFF_API_V5}/get-thread-id?phoneNumber=${encodeURIComponent(formattedPhone)}&senderNumber=${encodeURIComponent(config.sender_number)}`;
-
+  const url = `${ONOFF_API_V5}/get-thread-id?phoneNumber=${encodeURIComponent(formatPhone(phone))}&senderNumber=${encodeURIComponent(config.sender_number)}`;
   const result = await onoffRequest(url, "GET", null, config);
-
-  if (!result.ok) {
-    return { ok: false, error: result.error };
-  }
-
-  // Extract threadId from response
+  if (!result.ok) return { ok: false, error: result.error };
   const threadId = result.data?.threadId || result.data?.id;
-  if (!threadId) {
-    return { ok: false, error: "threadId non trouvé dans la réponse" };
-  }
-
+  if (!threadId) return { ok: false, error: "threadId non trouvé" };
   return { ok: true, threadId };
 }
 
-// Send SMS via Onoff
 async function sendSms(
   phone: string,
   message: string,
   config: { auth_token: string; instance_id: string; sender_number: string }
 ): Promise<{ ok: boolean; error?: string }> {
-  // Step 1: Get thread ID for this contact
   const thread = await getThreadId(phone, config);
-  if (!thread.ok || !thread.threadId) {
-    return { ok: false, error: `Échec get-thread-id: ${thread.error}` };
-  }
-
-  // Step 2: Send message in thread
-  const result = await onoffRequest(`${ONOFF_API_V4}/send-message`, "POST", {
+  if (!thread.ok || !thread.threadId) return { ok: false, error: `Échec get-thread-id: ${thread.error}` };
+  return await onoffRequest(`${ONOFF_API_V4}/send-message`, "POST", {
     content: message,
     messageType: "TEXT",
     threadId: thread.threadId,
   }, config);
-
-  return result;
 }
 
 Deno.serve(async (req) => {
-  if (req.method === "OPTIONS") {
-    return new Response("ok", { headers: corsHeaders });
-  }
+  if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   try {
-    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const supabase = createClient(supabaseUrl, serviceKey);
-
-    // Auth check
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) {
       return new Response(JSON.stringify({ error: "Non autorisé" }), {
         status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
-    const { data: { user }, error: authError } = await supabase.auth.getUser(authHeader.replace("Bearer ", ""));
+
+    // Client authentifié avec le JWT de l'utilisateur → projet Lovable
+    const supabase = createClient(LOVABLE_URL, LOVABLE_ANON_KEY, {
+      global: { headers: { Authorization: authHeader } },
+    });
+
+    // Vérif auth
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
     if (authError || !user) {
       return new Response(JSON.stringify({ error: "Non autorisé" }), {
         status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    // Admin check
+    // Vérif admin
     const { data: roleData } = await supabase.from("user_roles").select("role").eq("user_id", user.id).eq("role", "admin").single();
     if (!roleData) {
       return new Response(JSON.stringify({ error: "Accès admin requis" }), {
@@ -157,10 +130,9 @@ Deno.serve(async (req) => {
         });
       }
 
-      // Get Onoff config
       const { data: config } = await supabase.from("onoff_config").select("*").eq("user_id", user.id).single();
       if (!config?.auth_token) {
-        return new Response(JSON.stringify({ error: "Config Onoff manquante - va dans Config Onoff" }), {
+        return new Response(JSON.stringify({ error: "Config Onoff manquante — va dans Config Onoff" }), {
           status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
@@ -171,11 +143,9 @@ Deno.serve(async (req) => {
         sender_number: config.sender_number || "",
       };
 
-      // Set running
       await supabase.from("sms_campaigns").update({ status: "running", updated_at: new Date().toISOString() }).eq("id", campaign_id);
       await supabase.from("sms_logs").insert({ campaign_id, message: `Démarrage — ${campaign.total_contacts} contacts`, type: "info" });
 
-      // Get pending contacts
       const { data: contacts } = await supabase
         .from("sms_contacts")
         .select("*")
@@ -194,9 +164,7 @@ Deno.serve(async (req) => {
       let failedCount = campaign.failed_count || 0;
 
       for (let i = 0; i < contacts.length; i++) {
-        // Check status
         const { data: check } = await supabase.from("sms_campaigns").select("status").eq("id", campaign_id).single();
-
         if (!check || check.status === "stopped") {
           await supabase.from("sms_logs").insert({ campaign_id, message: "Arrêté par l'utilisateur", type: "warn" });
           break;
@@ -205,17 +173,14 @@ Deno.serve(async (req) => {
         if (check.status === "paused") {
           await supabase.from("sms_logs").insert({ campaign_id, message: "En pause...", type: "warn" });
           let waited = 0;
-          while (waited < 300000) { // 5 min max
+          while (waited < 300000) {
             await sleep(2000);
             waited += 2000;
             const { data: r } = await supabase.from("sms_campaigns").select("status").eq("id", campaign_id).single();
-            if (!r || r.status === "stopped" || r.status === "running") break;
+            if (!r || r.status !== "paused") break;
           }
           const { data: r2 } = await supabase.from("sms_campaigns").select("status").eq("id", campaign_id).single();
           if (!r2 || r2.status === "stopped") break;
-          if (r2.status === "running") {
-            await supabase.from("sms_logs").insert({ campaign_id, message: "Reprise...", type: "info" });
-          }
         }
 
         const contact = contacts[i];
@@ -223,8 +188,8 @@ Deno.serve(async (req) => {
 
         await supabase.from("sms_logs").insert({
           campaign_id,
-          message: `[${i + 1}/${contacts.length}] Envoi à ${contact.name || contact.phone}...`,
-          type: "info"
+          message: `[${i + 1}/${contacts.length}] → ${contact.name || contact.phone}`,
+          type: "info",
         });
 
         const result = await sendSms(contact.phone, msg, onoffConfig);
@@ -246,11 +211,10 @@ Deno.serve(async (req) => {
           updated_at: new Date().toISOString(),
         }).eq("id", campaign_id);
 
-        // Delay between messages (3-10 sec)
         if (i < contacts.length - 1) {
-          const delay = randomDelay();
-          await supabase.from("sms_logs").insert({ campaign_id, message: `⏳ ${(delay / 1000).toFixed(1)}s...`, type: "info" });
-          await sleep(delay);
+          const d = randomDelay();
+          await supabase.from("sms_logs").insert({ campaign_id, message: `⏳ ${(d / 1000).toFixed(1)}s`, type: "info" });
+          await sleep(d);
         }
       }
 
@@ -260,8 +224,8 @@ Deno.serve(async (req) => {
       }
       await supabase.from("sms_logs").insert({
         campaign_id,
-        message: `Terminé : ${sentCount} envoyés, ${failedCount} échoués`,
-        type: "success"
+        message: `✅ Terminé : ${sentCount} envoyés, ${failedCount} échoués`,
+        type: "success",
       });
 
       return new Response(JSON.stringify({ sent: sentCount, failed: failedCount }), {

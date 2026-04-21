@@ -245,9 +245,9 @@ const AdminProspection = () => {
     setCampaign(camp);
     setLaunching(false);
 
-    // Call edge function (non-bloquant)
+    // Call edge function sur le projet Supabase accessible
     const { data: { session } } = await supabase.auth.getSession();
-    fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-sms`, {
+    fetch(`https://bxynpsxxalxcchewxmvf.supabase.co/functions/v1/send-sms`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
