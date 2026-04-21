@@ -100,12 +100,13 @@ Deno.serve(async (req) => {
     }
 
     // Client authentifié avec le JWT de l'utilisateur → projet Lovable
+    const token = authHeader.replace("Bearer ", "");
     const supabase = createClient(LOVABLE_URL, LOVABLE_ANON_KEY, {
       global: { headers: { Authorization: authHeader } },
     });
 
     // Vérif auth
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
     if (authError || !user) {
       return new Response(JSON.stringify({ error: "Non autorisé" }), {
         status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
