@@ -92,36 +92,18 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   try {
-    const authHeader = req.headers.get("Authorization");
-    if (!authHeader) {
-      return new Response(JSON.stringify({ error: "Non autorisé" }), {
+    const { action, campaign_id, user_token } = await req.json();
+
+    if (!user_token) {
+      return new Response(JSON.stringify({ error: "user_token manquant" }), {
         status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    // Client authentifié avec le JWT de l'utilisateur → projet Lovable
-    const token = authHeader.replace("Bearer ", "");
+    // Client Lovable avec le JWT passé dans le body
     const supabase = createClient(LOVABLE_URL, LOVABLE_ANON_KEY, {
-      global: { headers: { Authorization: authHeader } },
+      global: { headers: { Authorization: `Bearer ${user_token}` } },
     });
-
-    // Vérif auth
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
-    if (authError || !user) {
-      return new Response(JSON.stringify({ error: "Non autorisé" }), {
-        status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
-    // Vérif admin
-    const { data: roleData } = await supabase.from("user_roles").select("role").eq("user_id", user.id).eq("role", "admin").single();
-    if (!roleData) {
-      return new Response(JSON.stringify({ error: "Accès admin requis" }), {
-        status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
-    const { action, campaign_id } = await req.json();
 
     if (action === "process") {
       const { data: campaign } = await supabase.from("sms_campaigns").select("*").eq("id", campaign_id).single();
@@ -131,7 +113,7 @@ Deno.serve(async (req) => {
         });
       }
 
-      const { data: config } = await supabase.from("onoff_config").select("*").eq("user_id", user.id).single();
+      const { data: config } = await supabase.from("onoff_config").select("*").eq("user_id", campaign.user_id).single();
       if (!config?.auth_token) {
         return new Response(JSON.stringify({ error: "Config Onoff manquante — va dans Config Onoff" }), {
           status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
