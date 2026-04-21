@@ -24,18 +24,15 @@ const WHATSAPP_ACCOUNTS = [
 
 const DEFAULT_MESSAGE = `Bonjour {company},
 
-Nous avons récemment identifié votre boutique Amazon.
+Je me permets de vous contacter car nous avons identifié votre boutique Amazon récemment.
 
-Nous collaborons actuellement avec plusieurs vendeurs FBA afin d'optimiser leur sourcing via un logiciel comprenant :
-– partenariats directs fabricants (LEGO, Playmobil, DJI, Android…)
-– des moniteurs automatisés sur une vingtaine de sites (Qogita, EANY, Leclerc, Auchan, Stockomani…)
-– des opportunités quotidiennes à fort ROI
-– une marketplace entre vendeurs Amazon
-– des outils IA facilitant l'analyse et le gain de temps
-– formation + accompagnement dédié
-
-Voici le lien de notre site si cela peut vous intéresser :
-https://amzingfba.com
+Nous collaborons actuellement avec plusieurs vendeurs FBA afin d'optimiser leur sourcing grâce à un logiciel comprenant :
+•⁠ des partenariats directs avec des fabricants
+•⁠ des moniteurs automatisés sur plus de 750 sites
+•⁠ des opportunités quotidiennes à fort ROI
+•⁠ une marketplace entre vendeurs Amazon
+•⁠ des outils d'IA facilitant l'analyse et le gain de temps
+•⁠ une formation et un accompagnement dédié
 
 Restant à votre disposition si vous souhaitez échanger.
 
