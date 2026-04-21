@@ -154,14 +154,19 @@ const AdminWhatsAppBot = () => {
     }
   }, [isAdmin, isAdminLoading, navigate]);
 
-  // Load job history
+  // Load job history + restore active job on page reload
   const loadJobs = useCallback(async () => {
     const { data } = await botSupabase
       .from("whatsapp_bot_jobs" as any)
       .select("*")
       .order("created_at", { ascending: false })
       .limit(20);
-    if (data) setJobs(data as any);
+    if (data) {
+      setJobs(data as any);
+      // Restore active job if one is pending/running
+      const active = (data as any[]).find((j) => j.status === "pending" || j.status === "running");
+      if (active) setActiveJob(active);
+    }
     setLoadingJobs(false);
   }, []);
 
@@ -313,6 +318,11 @@ const AdminWhatsAppBot = () => {
     }
     if (!message.trim()) {
       toast({ title: "Le message est vide", variant: "destructive" });
+      return;
+    }
+    // Prevent duplicate jobs
+    if (activeJob && (activeJob.status === "pending" || activeJob.status === "running")) {
+      toast({ title: "Un envoi est déjà en cours", description: "Attendez la fin avant d'en lancer un nouveau.", variant: "destructive" });
       return;
     }
 
