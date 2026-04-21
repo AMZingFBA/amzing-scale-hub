@@ -15,6 +15,23 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, Play, Square, Pause, Upload, Download, Settings, Send, Users, CheckCircle2, XCircle, Clock, MessageSquare } from 'lucide-react';
+import * as XLSX from 'xlsx';
+
+const DEFAULT_MESSAGE = `Bonjour {nom},
+
+Je me permets de vous contacter car nous avons identifié votre boutique Amazon récemment.
+
+Nous collaborons actuellement avec plusieurs vendeurs FBA afin d'optimiser leur sourcing grâce à un logiciel comprenant :
+• des partenariats directs avec des fabricants
+• des moniteurs automatisés sur plus de 750 sites
+• des opportunités quotidiennes à fort ROI
+• une marketplace entre vendeurs Amazon
+• des outils d'IA facilitant l'analyse et le gain de temps
+• une formation et un accompagnement dédié
+
+Restant à votre disposition si vous souhaitez échanger.
+
+L'équipe AMZing FBA`;
 
 const AdminProspection = () => {
   const { user } = useAuth();
@@ -24,7 +41,7 @@ const AdminProspection = () => {
   const logsEndRef = useRef<HTMLDivElement>(null);
 
   // State
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState(DEFAULT_MESSAGE);
   const [contactsText, setContactsText] = useState('');
   const [contacts, setContacts] = useState<{ name: string; phone: string }[]>([]);
   const [campaign, setCampaign] = useState<any>(null);
@@ -96,39 +113,65 @@ const AdminProspection = () => {
     logsEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [logs]);
 
-  // CSV upload
+  // CSV / Excel upload
   const handleCSV = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      const text = ev.target?.result as string;
-      const lines = text.split('\n').filter(l => l.trim());
-      if (lines.length < 2) return;
+    const ext = file.name.split('.').pop()?.toLowerCase();
 
-      const header = lines[0].toLowerCase();
-      const cols = header.split(/[,;]/).map(c => c.trim());
-      const nameIdx = cols.findIndex(c => ['nom', 'name'].includes(c));
-      const phoneIdx = cols.findIndex(c => ['telephone', 'phone', 'tel', 'numero'].includes(c));
+    if (ext === 'xlsx' || ext === 'xls') {
+      // Excel
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const data = new Uint8Array(ev.target?.result as ArrayBuffer);
+        const workbook = XLSX.read(data, { type: 'array' });
+        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+        const records: any[] = XLSX.utils.sheet_to_json(sheet, { defval: '' });
 
-      if (phoneIdx === -1) {
-        toast({ title: 'Erreur CSV', description: 'Colonne "telephone" ou "phone" introuvable', variant: 'destructive' });
-        return;
-      }
+        const parsed = records
+          .map(r => ({
+            name: String(r.nom_societe || r.nom || r.name || r.Nom || r['Nom Société'] || '').trim(),
+            phone: String(r.telephone || r.phone || r.tel || r.Telephone || '').trim(),
+          }))
+          .filter(c => c.phone);
 
-      const parsed: { name: string; phone: string }[] = [];
-      for (let i = 1; i < lines.length; i++) {
-        const vals = lines[i].split(/[,;]/).map(v => v.trim().replace(/^"|"$/g, ''));
-        if (vals[phoneIdx]) {
-          parsed.push({ name: nameIdx >= 0 ? vals[nameIdx] || '' : '', phone: vals[phoneIdx] });
+        setContacts(parsed);
+        setContactsText(parsed.map(c => c.name ? `${c.name}:${c.phone}` : c.phone).join('\n'));
+        toast({ title: `${parsed.length} contacts importés` });
+      };
+      reader.readAsArrayBuffer(file);
+    } else {
+      // CSV
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const text = ev.target?.result as string;
+        const lines = text.split('\n').filter(l => l.trim());
+        if (lines.length < 2) return;
+
+        const header = lines[0].toLowerCase();
+        const cols = header.split(/[,;]/).map(c => c.trim().replace(/^"|"$/g, ''));
+        const nameIdx = cols.findIndex(c => ['nom_societe', 'nom', 'name'].includes(c));
+        const phoneIdx = cols.findIndex(c => ['telephone', 'phone', 'tel', 'numero'].includes(c));
+
+        if (phoneIdx === -1) {
+          toast({ title: 'Erreur CSV', description: 'Colonne "telephone" introuvable', variant: 'destructive' });
+          return;
         }
-      }
 
-      setContacts(parsed);
-      setContactsText(parsed.map(c => c.name ? `${c.name}:${c.phone}` : c.phone).join('\n'));
-      toast({ title: `${parsed.length} contacts importés` });
-    };
-    reader.readAsText(file);
+        const parsed: { name: string; phone: string }[] = [];
+        for (let i = 1; i < lines.length; i++) {
+          const vals = lines[i].split(/[,;]/).map(v => v.trim().replace(/^"|"$/g, ''));
+          if (vals[phoneIdx]) {
+            parsed.push({ name: nameIdx >= 0 ? vals[nameIdx] || '' : '', phone: vals[phoneIdx] });
+          }
+        }
+
+        setContacts(parsed);
+        setContactsText(parsed.map(c => c.name ? `${c.name}:${c.phone}` : c.phone).join('\n'));
+        toast({ title: `${parsed.length} contacts importés` });
+      };
+      reader.readAsText(file);
+    }
   };
 
   // Save Onoff config
@@ -309,7 +352,7 @@ const AdminProspection = () => {
                   disabled={isActive}
                 />
                 <p className="text-xs text-gray-400 mt-2">
-                  Variable disponible : <code className="bg-gray-100 px-1 rounded">{'{nom}'}</code>
+                  Variable : <code className="bg-gray-100 px-1 rounded">{'{nom}'}</code> → nom de société (absent = "Bonjour,")
                 </p>
               </CardContent>
             </Card>
@@ -322,9 +365,9 @@ const AdminProspection = () => {
                   </CardTitle>
                   <label className="cursor-pointer">
                     <Button variant="outline" size="sm" asChild>
-                      <span><Upload className="h-3 w-3 mr-1" /> CSV</span>
+                      <span><Upload className="h-3 w-3 mr-1" /> CSV / Excel</span>
                     </Button>
-                    <input type="file" accept=".csv" className="hidden" onChange={handleCSV} disabled={isActive} />
+                    <input type="file" accept=".csv,.xlsx,.xls" className="hidden" onChange={handleCSV} disabled={isActive} />
                   </label>
                 </div>
               </CardHeader>
@@ -338,7 +381,7 @@ const AdminProspection = () => {
                   disabled={isActive}
                 />
                 <p className="text-xs text-gray-400 mt-2">
-                  Format : <code>+33...</code> ou <code>nom:+33...</code> — CSV avec colonnes nom, telephone
+                  Format : <code>+33...</code> ou <code>nom_societe:+33...</code> — CSV/Excel avec colonnes <code>nom_societe</code>, <code>telephone</code>
                 </p>
               </CardContent>
             </Card>

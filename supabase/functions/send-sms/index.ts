@@ -18,7 +18,11 @@ function randomDelay(): number {
 }
 
 function personalizeMessage(template: string, name: string): string {
-  return template.replace(/{nom}/gi, name || "");
+  if (name) {
+    return template.replace(/Bonjour \{nom\},/gi, `Bonjour ${name},`).replace(/{nom}/gi, name);
+  }
+  // Pas de nom → "Bonjour,"
+  return template.replace(/Bonjour \{nom\},/gi, "Bonjour,").replace(/{nom}/gi, "");
 }
 
 // Format phone number

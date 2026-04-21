@@ -8,11 +8,25 @@ import { useToast } from "@/hooks/use-toast";
 import { useAdmin } from "@/hooks/use-admin";
 import { useAuth } from "@/hooks/use-auth";
 import Papa from "papaparse";
+import { supabase } from "@/integrations/supabase/client";
 
 // iMessage Bulk Sender - Admin only
 const DEFAULT_BACKEND = "http://localhost:3001";
 function getSavedBackendUrl(): string {
   return localStorage.getItem("imessage_backend_url") || DEFAULT_BACKEND;
+}
+
+async function fetchBackendUrlFromSupabase(): Promise<string | null> {
+  try {
+    const { data } = await supabase
+      .from("app_config" as any)
+      .select("value")
+      .eq("key", "imessage_backend_url")
+      .single();
+    return (data as any)?.value ?? null;
+  } catch {
+    return null;
+  }
 }
 
 interface Contact {
@@ -67,6 +81,16 @@ export default function AdminIMessageBulk() {
       navigate("/");
     }
   }, [user, isAdmin, isAdminLoading, navigate, toast]);
+
+  // Fetch backend URL from Supabase on mount (auto-configured via tunnel)
+  useEffect(() => {
+    fetchBackendUrlFromSupabase().then((url) => {
+      if (url) {
+        setBackendUrl(url);
+        localStorage.setItem("imessage_backend_url", url);
+      }
+    });
+  }, []);
 
   // Check backend connectivity
   const checkBackend = useCallback(() => {
