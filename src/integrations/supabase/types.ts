@@ -891,7 +891,7 @@ export type Database = {
           stripe_invoice_id: string | null
           stripe_subscription_id: string | null
           updated_at: string
-          user_id: string
+          user_id: string | null
         }
         Insert: {
           amount?: number
@@ -916,7 +916,7 @@ export type Database = {
           stripe_invoice_id?: string | null
           stripe_subscription_id?: string | null
           updated_at?: string
-          user_id: string
+          user_id?: string | null
         }
         Update: {
           amount?: number
@@ -941,7 +941,7 @@ export type Database = {
           stripe_invoice_id?: string | null
           stripe_subscription_id?: string | null
           updated_at?: string
-          user_id?: string
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -1523,6 +1523,7 @@ export type Database = {
       onoff_config: {
         Row: {
           auth_token: string | null
+          category_id: string | null
           created_at: string | null
           id: string
           instance_id: string | null
@@ -1532,6 +1533,7 @@ export type Database = {
         }
         Insert: {
           auth_token?: string | null
+          category_id?: string | null
           created_at?: string | null
           id?: string
           instance_id?: string | null
@@ -1541,6 +1543,7 @@ export type Database = {
         }
         Update: {
           auth_token?: string | null
+          category_id?: string | null
           created_at?: string | null
           id?: string
           instance_id?: string | null

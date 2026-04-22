@@ -188,6 +188,14 @@ export default function Auth() {
       return;
     }
 
+    if (!signupData.siren || !/^\d{9}$/.test(signupData.siren)) {
+      const msg = "Le SIREN est obligatoire (9 chiffres). Recherchez votre société.";
+      setError(msg);
+      toast.error(msg);
+      setIsLoading(false);
+      return;
+    }
+
     // Save signup data
     setSignupData({ email, password, fullName, nickname, phone, siren: signupData.siren, companyName: signupData.companyName });
 

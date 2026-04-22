@@ -243,7 +243,7 @@ serve(async (req) => {
   }
 
   try {
-    const { email, action } = await req.json();
+    const { email, action, sirenOverride, fullNameOverride, phoneOverride } = await req.json();
     
     if (!email) {
       return new Response(JSON.stringify({ error: "email required" }), { status: 400, headers: corsHeaders });
@@ -325,10 +325,12 @@ serve(async (req) => {
     }
 
     // Step 2: Create new debt case with invoice + CGV
-    const fullName = profile?.full_name || fp.full_name || 'Client';
+    const fullName = fullNameOverride || profile?.full_name || fp.full_name || 'Client';
     const nameParts = fullName.trim().split(' ');
     const firstName = nameParts[0] || 'Client';
     const lastName = nameParts.slice(1).join(' ') || 'Inconnu';
+    const effectiveSiren = sirenOverride || profile?.siren || null;
+    const effectivePhone = phoneOverride || profile?.phone || fp.phone || '0184807678';
 
     const invoiceDate = fp.created_at.split('T')[0];
     const invoiceNumber = fp.stripe_invoice_id || `REC-${Date.now()}`;
@@ -359,12 +361,12 @@ serve(async (req) => {
     }
 
     const formData = new FormData();
-    formData.append('debt[siren]', profile?.siren || fp.phone || '000000000');
+    formData.append('debt[siren]', effectiveSiren || '000000000');
     formData.append('debt[gender]', 'male');
     formData.append('debt[first_name]', firstName);
     formData.append('debt[last_name]', lastName);
     formData.append('debt[email]', email);
-    formData.append('debt[phone]', profile?.phone || fp.phone || '0184807678');
+    formData.append('debt[phone]', effectivePhone);
     formData.append('debt[items_attributes][0][amount]', fp.amount.toFixed(2));
     formData.append('debt[items_attributes][0][invoice_number]', invoiceNumber);
     formData.append('debt[items_attributes][0][invoiced_on]', invoiceDate);
@@ -380,7 +382,7 @@ serve(async (req) => {
       dueDate: invoiceDate,
       clientName: fullName,
       clientEmail: email,
-      clientSiren: profile?.siren,
+      clientSiren: effectiveSiren || undefined,
       clientCompanyName: profile?.company_name,
       clientAddress: billingAddress,
       clientCity: billingCity,
