@@ -623,6 +623,101 @@ async function sendPaymentFailedEmail(email: string, fullName: string, failedDat
 }
 
 // ============================================================
+// ADMIN ALERT: Failed payment with no profile (manual recovery needed)
+// ============================================================
+async function sendNoProfileAdminAlert(data: {
+  email: string;
+  customerName: string;
+  stripeCustomerId: string;
+  stripeInvoiceId: string;
+  invoiceNumber: string;
+  amount: number;
+  currency: string;
+  failureReason: string;
+  customer: any;
+}) {
+  const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY');
+  if (!RESEND_API_KEY) {
+    logStep("RESEND_API_KEY not configured, skipping admin alert");
+    return false;
+  }
+
+  const addr = data.customer?.address || {};
+  const phone = data.customer?.phone || 'Non renseigné';
+  const billingLine = [addr.line1, addr.line2].filter(Boolean).join(', ') || 'Non renseignée';
+  const billingCity = [addr.postal_code, addr.city].filter(Boolean).join(' ') || '';
+  const billingCountry = addr.country || '';
+  const taxIds = data.customer?.tax_ids?.data?.map((t: any) => `${t.type}: ${t.value}`).join(', ') || 'Aucun';
+
+  const html = `
+    <!DOCTYPE html><html lang="fr"><head><meta charset="utf-8"></head>
+    <body style="font-family:Arial,sans-serif;background:#f4f4f4;padding:20px;color:#333;">
+      <div style="max-width:640px;margin:0 auto;background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.1);">
+        <div style="background:linear-gradient(135deg,#dc2626,#991b1b);color:#fff;padding:30px;text-align:center;">
+          <h1 style="margin:0;font-size:22px;">⚠️ Paiement échoué SANS compte utilisateur</h1>
+          <p style="margin:8px 0 0;font-size:14px;opacity:0.9;">Recouvrement Rubypayeur impossible automatiquement</p>
+        </div>
+        <div style="padding:30px;">
+          <p>Un paiement Stripe a échoué pour un client <strong>qui n'a pas de compte sur la plateforme</strong>.<br>
+          Il faut récupérer son SIREN et déclencher manuellement le recouvrement.</p>
+          
+          <h3 style="margin-top:25px;border-bottom:2px solid #dc2626;padding-bottom:8px;">Informations client</h3>
+          <table style="width:100%;border-collapse:collapse;font-size:14px;">
+            <tr><td style="padding:6px 0;color:#666;width:180px;">Email :</td><td><strong>${data.email}</strong></td></tr>
+            <tr><td style="padding:6px 0;color:#666;">Nom :</td><td>${data.customerName || 'Non renseigné'}</td></tr>
+            <tr><td style="padding:6px 0;color:#666;">Téléphone :</td><td>${phone}</td></tr>
+            <tr><td style="padding:6px 0;color:#666;">Adresse :</td><td>${billingLine}</td></tr>
+            <tr><td style="padding:6px 0;color:#666;">Ville :</td><td>${billingCity}</td></tr>
+            <tr><td style="padding:6px 0;color:#666;">Pays :</td><td>${billingCountry}</td></tr>
+            <tr><td style="padding:6px 0;color:#666;">Tax IDs :</td><td>${taxIds}</td></tr>
+          </table>
+
+          <h3 style="margin-top:25px;border-bottom:2px solid #dc2626;padding-bottom:8px;">Informations paiement</h3>
+          <table style="width:100%;border-collapse:collapse;font-size:14px;">
+            <tr><td style="padding:6px 0;color:#666;width:180px;">Montant :</td><td><strong style="color:#dc2626;">${data.amount.toFixed(2)} ${data.currency}</strong></td></tr>
+            <tr><td style="padding:6px 0;color:#666;">Facture Stripe :</td><td>${data.invoiceNumber}</td></tr>
+            <tr><td style="padding:6px 0;color:#666;">Customer ID :</td><td><code>${data.stripeCustomerId}</code></td></tr>
+            <tr><td style="padding:6px 0;color:#666;">Invoice ID :</td><td><code>${data.stripeInvoiceId}</code></td></tr>
+            <tr><td style="padding:6px 0;color:#666;">Raison :</td><td>${data.failureReason}</td></tr>
+          </table>
+
+          <div style="background:#fff3cd;border-left:4px solid #f59e0b;padding:15px 20px;margin:25px 0;border-radius:4px;">
+            <strong style="display:block;margin-bottom:8px;color:#856404;">Action requise</strong>
+            Récupère le <strong>SIREN</strong> du client (ou son adresse complète si particulier),<br>
+            puis dans le chat Lovable : <em>"relance Rubypayeur pour ${data.email} avec siren XXXXXXXXX"</em>.
+          </div>
+        </div>
+        <div style="text-align:center;padding:15px 30px;color:#666;font-size:12px;background:#f9f9f9;border-top:1px solid #e0e0e0;">
+          Alerte automatique – AMZing FBA
+        </div>
+      </div>
+    </body></html>
+  `;
+
+  try {
+    const response = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${RESEND_API_KEY}`,
+      },
+      body: JSON.stringify({
+        from: 'AMZing FBA Alerts <contact@amzingfba.com>',
+        to: ['contact@amzingfba.com'],
+        subject: `🔴 Paiement échoué sans compte – ${data.email} (${data.amount.toFixed(2)} ${data.currency})`,
+        replyTo: 'contact@amzingfba.com',
+        html,
+      }),
+    });
+    logStep("Admin alert email sent", { email: data.email, status: response.status });
+    return response.ok;
+  } catch (e) {
+    logStep("Admin alert email error", { error: e instanceof Error ? e.message : 'Unknown' });
+    return false;
+  }
+}
+
+// ============================================================
 // MAIN WEBHOOK HANDLER
 // ============================================================
 serve(async (req) => {
