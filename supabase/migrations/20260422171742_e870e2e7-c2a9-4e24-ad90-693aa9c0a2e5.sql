@@ -1,0 +1,1 @@
+ALTER TABLE public.failed_payments ALTER COLUMN user_id DROP NOT NULL;
