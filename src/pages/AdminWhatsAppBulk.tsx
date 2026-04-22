@@ -100,6 +100,36 @@ function normalizePhone(raw: string): string {
   return digits;
 }
 
+// Parse raw text with phone numbers (TAB-separated or space-separated without headers)
+function parseRawText(text: string): { contacts: ContactRow[]; headers: string[] } {
+  const lines = text.split("\n").filter((line) => line.trim());
+  const phoneRegex = /(\+?33|0)[0-9]{8,9}/g;
+  const contacts: ContactRow[] = [];
+
+  for (const line of lines) {
+    const phoneMatches = line.match(phoneRegex);
+    if (!phoneMatches) continue;
+
+    // Take the first phone number on this line
+    const phoneRaw = phoneMatches[0];
+    const phoneNormalized = normalizePhone(phoneRaw);
+
+    // Extract name: everything before the phone number
+    const phoneIndex = line.indexOf(phoneRaw);
+    const namePart = line.substring(0, phoneIndex).trim();
+
+    if (phoneNormalized.length >= 8) {
+      contacts.push({
+        phone: phoneNormalized,
+        company: namePart || "",
+        raw: { phone: phoneNormalized, company: namePart || "" },
+      });
+    }
+  }
+
+  return { contacts, headers: ["phone", "company"] };
+}
+
 const AdminWhatsAppBulk = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -119,6 +149,8 @@ const AdminWhatsAppBulk = () => {
   const [search, setSearch] = useState("");
   const [dragOver, setDragOver] = useState(false);
   const [logs, setLogs] = useState<string[]>([]);
+  const [pastedText, setPastedText] = useState("");
+  const [inputMode, setInputMode] = useState<"file" | "text">("file");
   const logsEndRef = useRef<HTMLDivElement>(null);
 
   const addLog = (msg: string) => {
@@ -246,6 +278,44 @@ const AdminWhatsAppBulk = () => {
     const file = e.dataTransfer.files[0];
     if (file) handleFile(file);
   }, [handleFile]);
+
+  const handlePastedText = useCallback(() => {
+    if (!pastedText.trim()) {
+      toast({ variant: "destructive", title: "Le texte est vide" });
+      return;
+    }
+
+    const { contacts: parsed, headers: hdrs } = parseRawText(pastedText);
+
+    if (!parsed.length) {
+      toast({
+        variant: "destructive",
+        title: "Aucun contact trouvé",
+        description: "Le texte doit contenir des numéros de téléphone valides",
+      });
+      return;
+    }
+
+    // Deduplicate
+    const seen = new Set<string>();
+    const unique = parsed.filter((c) => {
+      if (seen.has(c.phone)) return false;
+      seen.add(c.phone);
+      return true;
+    });
+
+    setContacts(unique);
+    setHeaders(hdrs);
+    setPhoneCol("phone");
+    setCompanyCol("company");
+    setFileName("Texte collé");
+    setInputMode("file"); // Switch view to show data
+    setPastedText(""); // Clear textarea
+    toast({
+      title: `${unique.length} contacts importés`,
+      description: "Prêt à envoyer les messages",
+    });
+  }, [pastedText, toast]);
 
   // Re-map columns manually
   const remapColumns = () => {
@@ -395,25 +465,74 @@ const AdminWhatsAppBulk = () => {
 
         {/* Upload Zone */}
         {contacts.length === 0 ? (
-          <div
-            onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
-            onDragLeave={() => setDragOver(false)}
-            onDrop={handleDrop}
-            className="border-2 border-dashed rounded-xl p-12 text-center transition-all cursor-pointer"
-            style={{
-              borderColor: dragOver ? "#00a884" : "#233138",
-              background: dragOver ? "#1a2e35" : "#0b141a",
-            }}
-            onClick={() => fileInputRef.current?.click()}
-          >
-            <Upload className="w-12 h-12 mx-auto mb-4" style={{ color: "#00a884" }} />
-            <h3 className="text-xl font-medium mb-2">Importez votre fichier</h3>
-            <p className="text-sm mb-1" style={{ color: "#8696a0" }}>
-              Glissez-déposez ou cliquez pour sélectionner
-            </p>
-            <p className="text-xs" style={{ color: "#8696a0" }}>
-              Formats supportés : CSV, XLSX, XLS — Le numéro de téléphone et le nom de société seront détectés automatiquement
-            </p>
+          <div>
+            {/* Tab selector */}
+            <div className="flex gap-2 mb-4 border-b" style={{ borderColor: "#233138" }}>
+              <button
+                onClick={() => setInputMode("file")}
+                className="px-4 py-2 text-sm font-medium transition-colors"
+                style={{
+                  color: inputMode === "file" ? "#00a884" : "#8696a0",
+                  borderBottom: inputMode === "file" ? "2px solid #00a884" : "none",
+                }}
+              >
+                📁 Fichier
+              </button>
+              <button
+                onClick={() => setInputMode("text")}
+                className="px-4 py-2 text-sm font-medium transition-colors"
+                style={{
+                  color: inputMode === "text" ? "#00a884" : "#8696a0",
+                  borderBottom: inputMode === "text" ? "2px solid #00a884" : "none",
+                }}
+              >
+                📝 Coller du texte
+              </button>
+            </div>
+
+            {/* File upload */}
+            {inputMode === "file" && (
+              <div
+                onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+                onDragLeave={() => setDragOver(false)}
+                onDrop={handleDrop}
+                className="border-2 border-dashed rounded-xl p-12 text-center transition-all cursor-pointer"
+                style={{
+                  borderColor: dragOver ? "#00a884" : "#233138",
+                  background: dragOver ? "#1a2e35" : "#0b141a",
+                }}
+                onClick={() => fileInputRef.current?.click()}
+              >
+                <Upload className="w-12 h-12 mx-auto mb-4" style={{ color: "#00a884" }} />
+                <h3 className="text-xl font-medium mb-2">Importez votre fichier</h3>
+                <p className="text-sm mb-1" style={{ color: "#8696a0" }}>
+                  Glissez-déposez ou cliquez pour sélectionner
+                </p>
+                <p className="text-xs" style={{ color: "#8696a0" }}>
+                  Formats supportés : CSV, XLSX, XLS — Le numéro de téléphone et le nom de société seront détectés automatiquement
+                </p>
+              </div>
+            )}
+
+            {/* Text paste */}
+            {inputMode === "text" && (
+              <div className="space-y-3">
+                <textarea
+                  value={pastedText}
+                  onChange={(e) => setPastedText(e.target.value)}
+                  placeholder="Collez votre texte ici (format: Nom du contact [TAB/espaces] Numéro de téléphone)&#10;Exemple:&#10;MA COQUE PERSO	+33615961607&#10;ELANDEPOT HUB S.R.L.	+33686250511&#10;	+33769989272"
+                  className="w-full h-48 rounded-lg px-4 py-3 text-sm"
+                  style={{ background: "#2a3942", color: "#e9edef", border: "1px solid #233138" }}
+                />
+                <button
+                  onClick={handlePastedText}
+                  className="w-full px-4 py-2.5 rounded-lg font-medium transition-opacity hover:opacity-80"
+                  style={{ background: "#00a884", color: "#111b21" }}
+                >
+                  ✓ Importer le texte
+                </button>
+              </div>
+            )}
           </div>
         ) : (
           <>

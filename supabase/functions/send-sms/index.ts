@@ -66,12 +66,39 @@ async function getThreadId(
   phone: string,
   config: { auth_token: string; instance_id: string; sender_number: string }
 ): Promise<{ ok: boolean; threadId?: string; error?: string }> {
-  const url = `${ONOFF_API_V5}/get-thread-id?phoneNumber=${encodeURIComponent(formatPhone(phone))}&senderNumber=${encodeURIComponent(config.sender_number)}`;
-  const result = await onoffRequest(url, "GET", null, config);
-  if (!result.ok) return { ok: false, error: result.error };
-  const threadId = result.data?.threadId || result.data?.id;
-  if (!threadId) return { ok: false, error: "threadId non trouvé" };
-  return { ok: true, threadId };
+  const formattedPhone = formatPhone(phone);
+  const formattedSender = formatPhone(config.sender_number);
+
+  // Essai 1 : GET v5
+  const urlGet = `${ONOFF_API_V5}/get-thread-id?phoneNumber=${encodeURIComponent(formattedPhone)}&senderNumber=${encodeURIComponent(formattedSender)}`;
+  const resGet = await onoffRequest(urlGet, "GET", null, config);
+  if (resGet.ok) {
+    const threadId = resGet.data?.threadId || resGet.data?.id;
+    if (threadId) return { ok: true, threadId };
+  }
+
+  // Essai 2 : POST v5 avec body
+  const resPost = await onoffRequest(`${ONOFF_API_V5}/get-thread-id`, "POST", {
+    phoneNumber: formattedPhone,
+    senderNumber: formattedSender,
+  }, config);
+  if (resPost.ok) {
+    const threadId = resPost.data?.threadId || resPost.data?.id;
+    if (threadId) return { ok: true, threadId };
+  }
+
+  // Essai 3 : POST v4 new-thread
+  const resV4 = await onoffRequest(`${ONOFF_API_V4}/new-thread`, "POST", {
+    phoneNumber: formattedPhone,
+    senderNumber: formattedSender,
+  }, config);
+  if (resV4.ok) {
+    const threadId = resV4.data?.threadId || resV4.data?.id || resV4.data?.thread?.id;
+    if (threadId) return { ok: true, threadId };
+  }
+
+  console.log("get-thread-id all failed:", JSON.stringify({ resGet, resPost, resV4 }));
+  return { ok: false, error: `get-thread-id 400 (phone: ${formattedPhone})` };
 }
 
 async function sendSms(
