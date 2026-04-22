@@ -209,19 +209,36 @@ const AdminWhatsAppBot = () => {
     const newContacts: Contact[] = [];
 
     for (const line of lines) {
-      const parts = line.split(",").map((p) => p.trim());
-      const phone = parts[0]?.replace(/[\s\-()]/g, "");
-      const company = parts[1] || "";
+      let phone = "";
+      let company = "";
+
+      if (line.includes("\t")) {
+        // Tab-separated: company TAB phone
+        const [companyPart, phonePart] = line.split("\t");
+        company = companyPart?.trim() || "";
+        phone = phonePart?.trim() || "";
+      } else if (line.includes(",")) {
+        // Comma-separated: phone, company
+        const [phonePart, companyPart] = line.split(",");
+        phone = phonePart?.trim() || "";
+        company = companyPart?.trim() || "";
+      } else {
+        // Just a phone number
+        phone = line.trim();
+      }
 
       if (!phone) continue;
 
-      if (contacts.some((c) => c.phone === phone) || newContacts.some((c) => c.phone === phone)) continue;
+      const normalized = normalizePhone(phone.replace(/[\s\-()]/g, ""));
+      if (!normalized) continue;
 
-      newContacts.push({ phone: normalizePhone(phone), name: company || "Inconnu", company });
+      if (contacts.some((c) => c.phone === normalized) || newContacts.some((c) => c.phone === normalized)) continue;
+
+      newContacts.push({ phone: normalized, name: company || "Inconnu", company });
     }
 
     if (newContacts.length === 0) {
-      toast({ title: "Aucun nouveau contact", description: "Format: +33612345678, Nom Société", variant: "destructive" });
+      toast({ title: "Aucun nouveau contact", description: "Format: Société[tab]+33612345678", variant: "destructive" });
       return;
     }
 
@@ -435,7 +452,7 @@ const AdminWhatsAppBot = () => {
                 <textarea
                   value={contactsText}
                   onChange={(e) => setContactsText(e.target.value)}
-                  placeholder={"+33612345678, Dupont SARL\n+33698765432, Martin Boutique"}
+                  placeholder={"Dupont SARL\t+33612345678\nMartin Boutique\t+33698765432\n\t+33769989272"}
                   className="w-full border rounded-lg p-3 text-sm font-mono resize-y min-h-[100px] focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none"
                   rows={4}
                 />
