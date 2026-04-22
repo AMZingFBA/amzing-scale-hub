@@ -301,7 +301,7 @@ serve(async (req) => {
 
     console.log(`[Sync User to Airtable] Upserting into "${USERS_TABLE}" (new=${isNewUserInAirtable})`);
 
-    const upsertResponse = await fetch(`https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${encodeURIComponent(USERS_TABLE)}`, {
+    let upsertResponse = await fetch(`https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${encodeURIComponent(USERS_TABLE)}`, {
       method: 'PATCH',
       headers: airtableHeaders,
       body: JSON.stringify({
@@ -310,8 +310,26 @@ serve(async (req) => {
       }),
     });
 
-    const result = await upsertResponse.json();
+    let result = await upsertResponse.json();
     console.log(`[Sync User to Airtable] Result:`, result);
+
+    // Fallback: if Airtable rejects unknown fields (SIREN/Société not yet created), retry without them
+    if (!upsertResponse.ok && result?.error?.type === 'UNKNOWN_FIELD_NAME') {
+      console.warn(`[Sync User to Airtable] Unknown field detected, retrying without SIREN/Société. Error:`, result.error.message);
+      const fallbackFields = { ...fields };
+      delete fallbackFields["SIREN"];
+      delete fallbackFields["Société"];
+      upsertResponse = await fetch(`https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${encodeURIComponent(USERS_TABLE)}`, {
+        method: 'PATCH',
+        headers: airtableHeaders,
+        body: JSON.stringify({
+          records: [{ fields: fallbackFields }],
+          performUpsert: { fieldsToMergeOn: ["Email (principal)"] },
+        }),
+      });
+      result = await upsertResponse.json();
+      console.log(`[Sync User to Airtable] Fallback result:`, result);
+    }
 
     if (!upsertResponse.ok || result?.error) {
       throw new Error(result?.error?.message || `Airtable error (${upsertResponse.status})`);
