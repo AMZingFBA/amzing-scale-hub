@@ -325,10 +325,12 @@ serve(async (req) => {
     }
 
     // Step 2: Create new debt case with invoice + CGV
-    const fullName = profile?.full_name || fp.full_name || 'Client';
+    const fullName = fullNameOverride || profile?.full_name || fp.full_name || 'Client';
     const nameParts = fullName.trim().split(' ');
     const firstName = nameParts[0] || 'Client';
     const lastName = nameParts.slice(1).join(' ') || 'Inconnu';
+    const effectiveSiren = sirenOverride || profile?.siren || null;
+    const effectivePhone = phoneOverride || profile?.phone || fp.phone || '0184807678';
 
     const invoiceDate = fp.created_at.split('T')[0];
     const invoiceNumber = fp.stripe_invoice_id || `REC-${Date.now()}`;
