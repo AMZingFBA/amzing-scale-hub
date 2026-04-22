@@ -238,6 +238,8 @@ serve(async (req) => {
       "Email (principal)": user.email,
       "Nom": user.full_name || user.nickname || '',
       "telephone": formattedPhone,
+      "SIREN": user.siren || '',
+      "Société": user.company_name || '',
       "Abonnement actif": isCurrentlyVip, // false when canceled
       "Type d\u2019abonnement": typeAbonnement,
       "ID Stripe / RevenueCat": user.stripe_customer_id || user.stripe_subscription_id || '',
