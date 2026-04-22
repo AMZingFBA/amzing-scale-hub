@@ -59,15 +59,16 @@ const AdminProspection = () => {
 
   // Parse contacts from text
   useEffect(() => {
-    const lines = contactsText.split(/[\n,;]+/).map(l => l.trim()).filter(Boolean);
+    const lines = contactsText.split(/[\n;]+/).map(l => l.trim()).filter(Boolean);
     const parsed = lines.map(line => {
-      // Format: "nom:+33..." or just "+33..."
-      const parts = line.split(':');
-      if (parts.length >= 2) {
-        return { name: parts[0].trim(), phone: parts.slice(1).join(':').trim() };
-      }
-      return { name: '', phone: line };
-    });
+      // Extract phone (anything matching +<digits/spaces>) and treat the rest as name
+      // Supports separators: ":", tab, comma, multiple spaces, or just a phone alone
+      const phoneMatch = line.match(/(\+?\d[\d\s().-]{6,}\d)/);
+      if (!phoneMatch) return { name: line, phone: '' };
+      const phone = phoneMatch[1].replace(/[\s().-]/g, '');
+      const name = line.replace(phoneMatch[0], '').replace(/[:,\t]+$/, '').replace(/^[:,\t\s]+|[:,\t\s]+$/g, '').trim();
+      return { name, phone };
+    }).filter(c => c.phone);
     setContacts(parsed);
   }, [contactsText]);
 
