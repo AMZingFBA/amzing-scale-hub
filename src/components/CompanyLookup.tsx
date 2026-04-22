@@ -89,7 +89,7 @@ export default function CompanyLookup({ onSelect, defaultSiren = '', defaultComp
     <div ref={containerRef} className="relative space-y-2">
       <Label htmlFor="siren-lookup">
         <Building2 className="w-4 h-4 inline mr-2" />
-        SIREN / Nom de société <span className="text-xs text-muted-foreground">(optionnel)</span>
+        SIREN / Nom de société <span className="text-destructive">*</span>
       </Label>
       <div className="relative group">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-all duration-300" />
