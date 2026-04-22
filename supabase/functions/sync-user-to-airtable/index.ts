@@ -16,6 +16,8 @@ interface UserData {
   full_name?: string;
   nickname?: string;
   phone?: string;
+  siren?: string;
+  company_name?: string;
   user_id?: string;
   subscription_status?: string;
   plan_type?: string;
