@@ -382,7 +382,7 @@ serve(async (req) => {
       dueDate: invoiceDate,
       clientName: fullName,
       clientEmail: email,
-      clientSiren: profile?.siren,
+      clientSiren: effectiveSiren || undefined,
       clientCompanyName: profile?.company_name,
       clientAddress: billingAddress,
       clientCity: billingCity,
