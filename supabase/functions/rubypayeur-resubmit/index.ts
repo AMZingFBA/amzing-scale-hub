@@ -243,7 +243,7 @@ serve(async (req) => {
   }
 
   try {
-    const { email, action } = await req.json();
+    const { email, action, sirenOverride, fullNameOverride, phoneOverride } = await req.json();
     
     if (!email) {
       return new Response(JSON.stringify({ error: "email required" }), { status: 400, headers: corsHeaders });
