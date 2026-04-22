@@ -940,7 +940,23 @@ serve(async (req) => {
         .single();
 
       if (!profile) {
-        logStep("User not found", { email: customerEmail });
+        logStep("⚠️ User not found in profiles - sending admin alert", { email: customerEmail });
+        // Send alert email to admin so they can manually trigger Rubypayeur recovery
+        try {
+          await sendNoProfileAdminAlert({
+            email: customerEmail,
+            customerName: customer.name || '',
+            stripeCustomerId: customer.id,
+            stripeInvoiceId: invoice.id,
+            invoiceNumber: invoice.number || invoice.id,
+            amount: invoice.amount_due ? invoice.amount_due / 100 : 0,
+            currency: (invoice.currency || 'eur').toUpperCase(),
+            failureReason: invoice.last_finalization_error?.message || 'Paiement refusé',
+            customer,
+          });
+        } catch (alertErr) {
+          logStep("Failed to send admin alert email", { error: alertErr instanceof Error ? alertErr.message : String(alertErr) });
+        }
         return new Response(JSON.stringify({ received: true }), { status: 200, headers: { "Content-Type": "application/json" } });
       }
 
