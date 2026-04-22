@@ -33,6 +33,14 @@ const handler = async (req: Request): Promise<Response> => {
     console.log("Referral Code:", referralCode);
     console.log("Registration Source:", registrationSource);
 
+    // SIREN is mandatory (9 digits)
+    if (!siren || !/^\d{9}$/.test(String(siren).trim())) {
+      return new Response(
+        JSON.stringify({ error: "Le SIREN est obligatoire (9 chiffres)." }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     // Use service role key for database operations
     const supabaseAdmin = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
