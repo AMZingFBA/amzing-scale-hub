@@ -112,6 +112,13 @@ export default function AdminIMessageBulk() {
     e.target.value = "";
   }, [toast]);
 
+  const sendViaIPhone = () => {
+    if (!message.trim() || contacts.length === 0) return;
+    const phones = contacts.map((c) => c.phone).join("|");
+    const payload = encodeURIComponent(`${message}|${phones}`);
+    window.location.href = `shortcuts://run-shortcut?name=AMZing%20Sender&input=text&text=${payload}`;
+  };
+
   const startSend = async () => {
     if (!message.trim() || contacts.length === 0) return;
     const { data, error } = await (supabase as any)
@@ -252,11 +259,18 @@ export default function AdminIMessageBulk() {
           {!isActive ? (
             <div className="flex gap-3">
               <button
+                onClick={sendViaIPhone}
+                disabled={!message.trim() || contacts.length === 0}
+                className="flex-1 py-3 rounded-lg text-white font-semibold text-sm bg-green-500 hover:bg-green-600 disabled:opacity-40 disabled:cursor-not-allowed transition flex items-center justify-center gap-2"
+              >
+                📱 iPhone → Tout le monde ({contacts.length})
+              </button>
+              <button
                 onClick={startSend}
                 disabled={!message.trim() || contacts.length === 0}
                 className="flex-1 py-3 rounded-lg text-white font-semibold text-sm bg-blue-500 hover:bg-blue-600 disabled:opacity-40 disabled:cursor-not-allowed transition flex items-center justify-center gap-2"
               >
-                <Send className="h-4 w-4" /> Envoyer à {contacts.length} contact{contacts.length > 1 ? "s" : ""}
+                <Send className="h-4 w-4" /> Mac → iPhones uniquement
               </button>
               {job?.results && job.results.length > 0 && (
                 <button onClick={exportCSV} className={`py-3 px-5 rounded-lg text-sm font-medium flex items-center gap-2 border transition ${dark ? "border-slate-700 hover:bg-slate-800" : "border-slate-200 hover:bg-slate-50"}`}>
