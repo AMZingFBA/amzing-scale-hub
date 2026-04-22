@@ -209,28 +209,16 @@ const AdminWhatsAppBot = () => {
     const newContacts: Contact[] = [];
 
     for (const line of lines) {
-      let phone = "";
-      let company = "";
+      // Extract phone number by regex: +33..., 0033..., 06..., 07...
+      const phoneMatch = line.match(/(\+33|0033|00\d{2}|\b0[67])\s?[\d\s\-().]{6,}/);
+      if (!phoneMatch) continue;
 
-      if (line.includes("\t")) {
-        // Tab-separated: company TAB phone
-        const [companyPart, phonePart] = line.split("\t");
-        company = companyPart?.trim() || "";
-        phone = phonePart?.trim() || "";
-      } else if (line.includes(",")) {
-        // Comma-separated: phone, company
-        const [phonePart, companyPart] = line.split(",");
-        phone = phonePart?.trim() || "";
-        company = companyPart?.trim() || "";
-      } else {
-        // Just a phone number
-        phone = line.trim();
-      }
+      const phoneRaw = phoneMatch[0].replace(/[\s\-()]/g, "");
+      const normalized = normalizePhone(phoneRaw);
+      if (!normalized || normalized.length < 8) continue;
 
-      if (!phone) continue;
-
-      const normalized = normalizePhone(phone.replace(/[\s\-()]/g, ""));
-      if (!normalized) continue;
+      // Everything before the phone match is the company name
+      const company = line.slice(0, phoneMatch.index).replace(/[\t,]/g, "").trim();
 
       if (contacts.some((c) => c.phone === normalized) || newContacts.some((c) => c.phone === normalized)) continue;
 
