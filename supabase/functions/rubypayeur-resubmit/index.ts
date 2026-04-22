@@ -361,12 +361,12 @@ serve(async (req) => {
     }
 
     const formData = new FormData();
-    formData.append('debt[siren]', profile?.siren || fp.phone || '000000000');
+    formData.append('debt[siren]', effectiveSiren || '000000000');
     formData.append('debt[gender]', 'male');
     formData.append('debt[first_name]', firstName);
     formData.append('debt[last_name]', lastName);
     formData.append('debt[email]', email);
-    formData.append('debt[phone]', profile?.phone || fp.phone || '0184807678');
+    formData.append('debt[phone]', effectivePhone);
     formData.append('debt[items_attributes][0][amount]', fp.amount.toFixed(2));
     formData.append('debt[items_attributes][0][invoice_number]', invoiceNumber);
     formData.append('debt[items_attributes][0][invoiced_on]', invoiceDate);
