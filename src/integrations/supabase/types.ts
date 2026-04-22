@@ -1523,6 +1523,7 @@ export type Database = {
       onoff_config: {
         Row: {
           auth_token: string | null
+          category_id: string | null
           created_at: string | null
           id: string
           instance_id: string | null
@@ -1532,6 +1533,7 @@ export type Database = {
         }
         Insert: {
           auth_token?: string | null
+          category_id?: string | null
           created_at?: string | null
           id?: string
           instance_id?: string | null
@@ -1541,6 +1543,7 @@ export type Database = {
         }
         Update: {
           auth_token?: string | null
+          category_id?: string | null
           created_at?: string | null
           id?: string
           instance_id?: string | null
