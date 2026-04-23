@@ -116,13 +116,19 @@ def process_job(sb, job: dict):
         driver.quit()
         print("  Chrome fermé")
 
-    # Finaliser
+    # Finaliser — ne pas écraser un statut "failed" (arrêt manuel)
+    try:
+        current = sb.table("whatsapp_bot_jobs").select("status").eq("id", job_id).single().execute()
+        final_status = "failed" if (current.data and current.data.get("status") == "failed") else "completed"
+    except Exception:
+        final_status = "completed"
+
     update_job(sb, job_id,
-               status="completed",
+               status=final_status,
                progress={"sent": sent, "failed": failed, "total": len(contacts), "current_contact": ""},
                results=results)
 
-    print(f"  Terminé: {sent} envoyé(s), {failed} échoué(s)")
+    print(f"  Terminé ({final_status}): {sent} envoyé(s), {failed} échoué(s)")
 
 
 def main():
