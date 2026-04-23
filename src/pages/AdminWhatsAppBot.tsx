@@ -361,6 +361,26 @@ const AdminWhatsAppBot = () => {
     }
   };
 
+  // Stop active job
+  const stopJob = async () => {
+    if (!activeJob) return;
+    if (!confirm("Arrêter l'envoi en cours ? Les contacts restants ne seront pas contactés.")) return;
+    try {
+      const { error } = await botSupabase
+        .from("whatsapp_bot_jobs" as any)
+        .update({
+          status: "failed",
+          progress: { ...activeJob.progress, current_contact: "Arrêté manuellement" },
+        } as any)
+        .eq("id", activeJob.id);
+      if (error) throw error;
+      toast({ title: "Envoi arrêté", description: "Le worker s'arrêtera au prochain contact." });
+      setActiveJob({ ...activeJob, status: "failed" });
+    } catch (e: any) {
+      toast({ title: "Erreur", description: e.message, variant: "destructive" });
+    }
+  };
+
   const statusBadge = (status: string) => {
     const styles: Record<string, string> = {
       pending: "bg-yellow-100 text-yellow-800",
@@ -526,7 +546,17 @@ const AdminWhatsAppBot = () => {
                 <div className="bg-white rounded-xl border p-5 shadow-sm">
                   <div className="flex items-center justify-between mb-3">
                     <h2 className="font-semibold text-lg">Envoi en cours</h2>
-                    {statusBadge(activeJob.status)}
+                    <div className="flex items-center gap-2">
+                      {statusBadge(activeJob.status)}
+                      {(activeJob.status === "pending" || activeJob.status === "running") && (
+                        <button
+                          onClick={stopJob}
+                          className="flex items-center gap-1 bg-red-600 text-white text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-red-700 transition"
+                        >
+                          <XCircle className="w-3.5 h-3.5" /> Arrêter
+                        </button>
+                      )}
+                    </div>
                   </div>
 
                   {/* Progress bar */}
