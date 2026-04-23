@@ -31,8 +31,6 @@ Nous collaborons actuellement avec plusieurs vendeurs FBA afin d'optimiser leur 
 
 Le lien du site : https://amzingfba.com
 
-Le lien du site : https://amzingfba.com
-
 Restant à votre disposition si vous souhaitez échanger.
 
 L'équipe AMZing FBA`;
