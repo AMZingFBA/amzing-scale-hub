@@ -75,6 +75,15 @@ def process_job(sb, job: dict):
             phone = contact["phone"]
             name = contact.get("name", "Inconnu")
 
+            # Vérifier si le job a été arrêté manuellement (status passé à "failed")
+            try:
+                check = sb.table("whatsapp_bot_jobs").select("status").eq("id", job_id).single().execute()
+                if check.data and check.data.get("status") == "failed":
+                    print(f"  Arrêt manuel détecté — interruption de l'envoi.")
+                    break
+            except Exception as e:
+                print(f"  (check status err: {e})")
+
             # Update progress
             update_job(sb, job_id,
                        progress={"sent": sent, "failed": failed, "total": len(contacts), "current_contact": f"{name} ({phone})"},
