@@ -17,17 +17,19 @@ import { useToast } from '@/hooks/use-toast';
 import { Loader2, Play, Square, Pause, Upload, Download, Settings, Send, Users, CheckCircle2, XCircle, Clock, MessageSquare } from 'lucide-react';
 import * as XLSX from 'xlsx';
 
-const DEFAULT_MESSAGE = `Bonjour {nom},
+const DEFAULT_MESSAGE = `Bonjour {company},
 
 Je me permets de vous contacter car nous avons identifié votre boutique Amazon récemment.
 
 Nous collaborons actuellement avec plusieurs vendeurs FBA afin d'optimiser leur sourcing grâce à un logiciel comprenant :
-• des partenariats directs avec des fabricants
-• des moniteurs automatisés sur plus de 750 sites
-• des opportunités quotidiennes à fort ROI
-• une marketplace entre vendeurs Amazon
-• des outils d'IA facilitant l'analyse et le gain de temps
-• une formation et un accompagnement dédié
+•⁠ des partenariats directs avec des fabricants
+•⁠ des moniteurs automatisés sur plus de 750 sites
+•⁠ des opportunités quotidiennes à fort ROI
+•⁠ une marketplace entre vendeurs Amazon
+•⁠ des outils d'IA facilitant l'analyse et le gain de temps
+•⁠ une formation et un accompagnement dédié
+
+Le lien du site : https://amzingfba.com
 
 Le lien du site : https://amzingfba.com
 

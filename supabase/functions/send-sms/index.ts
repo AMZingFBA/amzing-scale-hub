@@ -23,9 +23,17 @@ function randomDelay(): number {
 
 function personalizeMessage(template: string, name: string): string {
   if (name) {
-    return template.replace(/Bonjour \{nom\},/gi, `Bonjour ${name},`).replace(/{nom}/gi, name);
+    return template
+      .replace(/Bonjour \{company\},/gi, `Bonjour ${name},`)
+      .replace(/Bonjour \{nom\},/gi, `Bonjour ${name},`)
+      .replace(/\{company\}/gi, name)
+      .replace(/\{nom\}/gi, name);
   }
-  return template.replace(/Bonjour \{nom\},/gi, "Bonjour,").replace(/{nom}/gi, "");
+  return template
+    .replace(/Bonjour \{company\},/gi, "Bonjour,")
+    .replace(/Bonjour \{nom\},/gi, "Bonjour,")
+    .replace(/\{company\}/gi, "")
+    .replace(/\{nom\}/gi, "");
 }
 
 function formatPhone(phone: string): string {
@@ -62,51 +70,45 @@ async function onoffRequest(
   }
 }
 
+async function getCategoryId(
+  senderNumber: string,
+  config: { auth_token: string; instance_id: string }
+): Promise<string | null> {
+  const res = await onoffRequest(`${ONOFF_API_V4}/get-categories?inclCounter=true`, "GET", null, config);
+  if (!res.ok) { console.log("get-categories failed:", res.error); return null; }
+  const list: any[] = Array.isArray(res.data) ? res.data : (res.data?.categories || res.data?.data || []);
+  console.log("categories:", JSON.stringify(list).slice(0, 500));
+  const formatted = formatPhone(senderNumber);
+  const cat = list.find((c: any) => {
+    const num = c.phoneNumber || c.number || c.phone || c.lineNumber || "";
+    return formatPhone(num) === formatted;
+  });
+  console.log("matched category:", JSON.stringify(cat));
+  return cat?.id || cat?.categoryId || cat?._id || null;
+}
+
 async function getThreadId(
   phone: string,
-  config: { auth_token: string; instance_id: string; sender_number: string }
+  categoryId: string,
+  config: { auth_token: string; instance_id: string }
 ): Promise<{ ok: boolean; threadId?: string; error?: string }> {
-  const formattedPhone = formatPhone(phone);
-  const formattedSender = formatPhone(config.sender_number);
-
-  // Essai 1 : GET v5
-  const urlGet = `${ONOFF_API_V5}/get-thread-id?phoneNumber=${encodeURIComponent(formattedPhone)}&senderNumber=${encodeURIComponent(formattedSender)}`;
-  const resGet = await onoffRequest(urlGet, "GET", null, config);
-  if (resGet.ok) {
-    const threadId = resGet.data?.threadId || resGet.data?.id;
-    if (threadId) return { ok: true, threadId };
-  }
-
-  // Essai 2 : POST v5 avec body
-  const resPost = await onoffRequest(`${ONOFF_API_V5}/get-thread-id`, "POST", {
-    phoneNumber: formattedPhone,
-    senderNumber: formattedSender,
+  const res = await onoffRequest(`${ONOFF_API_V5}/get-thread-id`, "POST", {
+    creator: { categoryId },
+    receiver: { phoneNumbers: [phone] },
   }, config);
-  if (resPost.ok) {
-    const threadId = resPost.data?.threadId || resPost.data?.id;
-    if (threadId) return { ok: true, threadId };
-  }
-
-  // Essai 3 : POST v4 new-thread
-  const resV4 = await onoffRequest(`${ONOFF_API_V4}/new-thread`, "POST", {
-    phoneNumber: formattedPhone,
-    senderNumber: formattedSender,
-  }, config);
-  if (resV4.ok) {
-    const threadId = resV4.data?.threadId || resV4.data?.id || resV4.data?.thread?.id;
-    if (threadId) return { ok: true, threadId };
-  }
-
-  console.log("get-thread-id all failed:", JSON.stringify({ resGet, resPost, resV4 }));
-  return { ok: false, error: `get-thread-id 400 (phone: ${formattedPhone})` };
+  if (!res.ok) return { ok: false, error: res.error };
+  const threadId = res.data?.threadId || res.data?.id || res.data?.thread?.id;
+  if (!threadId) return { ok: false, error: `threadId non trouvé: ${JSON.stringify(res.data)}` };
+  return { ok: true, threadId };
 }
 
 async function sendSms(
   phone: string,
   message: string,
+  categoryId: string,
   config: { auth_token: string; instance_id: string; sender_number: string }
 ): Promise<{ ok: boolean; error?: string }> {
-  const thread = await getThreadId(phone, config);
+  const thread = await getThreadId(phone, categoryId, config);
   if (!thread.ok || !thread.threadId) return { ok: false, error: `Échec get-thread-id: ${thread.error}` };
   return await onoffRequest(`${ONOFF_API_V4}/send-message`, "POST", {
     content: message,
@@ -151,7 +153,17 @@ Deno.serve(async (req) => {
         auth_token: config.auth_token,
         instance_id: config.instance_id || "",
         sender_number: config.sender_number || "",
+        category_id: config.category_id || "",
       };
+
+      const categoryId = config.category_id;
+      if (!categoryId) {
+        await supabase.from("sms_campaigns").update({ status: "stopped" }).eq("id", campaign_id);
+        await supabase.from("sms_logs").insert({ campaign_id, message: "❌ category_id manquant dans Config Onoff", type: "error" });
+        return new Response(JSON.stringify({ error: "categoryId introuvable" }), {
+          status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
 
       await supabase.from("sms_campaigns").update({ status: "running", updated_at: new Date().toISOString() }).eq("id", campaign_id);
       await supabase.from("sms_logs").insert({ campaign_id, message: `Démarrage — ${campaign.total_contacts} contacts`, type: "info" });
@@ -202,7 +214,7 @@ Deno.serve(async (req) => {
           type: "info",
         });
 
-        const result = await sendSms(contact.phone, msg, onoffConfig);
+        const result = await sendSms(formatPhone(contact.phone), msg, categoryId, onoffConfig);
 
         if (result.ok) {
           sentCount++;
