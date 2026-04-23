@@ -361,6 +361,26 @@ const AdminWhatsAppBot = () => {
     }
   };
 
+  // Stop active job
+  const stopJob = async () => {
+    if (!activeJob) return;
+    if (!confirm("Arrêter l'envoi en cours ? Les contacts restants ne seront pas contactés.")) return;
+    try {
+      const { error } = await botSupabase
+        .from("whatsapp_bot_jobs" as any)
+        .update({
+          status: "failed",
+          progress: { ...activeJob.progress, current_contact: "Arrêté manuellement" },
+        } as any)
+        .eq("id", activeJob.id);
+      if (error) throw error;
+      toast({ title: "Envoi arrêté", description: "Le worker s'arrêtera au prochain contact." });
+      setActiveJob({ ...activeJob, status: "failed" });
+    } catch (e: any) {
+      toast({ title: "Erreur", description: e.message, variant: "destructive" });
+    }
+  };
+
   const statusBadge = (status: string) => {
     const styles: Record<string, string> = {
       pending: "bg-yellow-100 text-yellow-800",
