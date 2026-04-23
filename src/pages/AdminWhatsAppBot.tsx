@@ -546,7 +546,17 @@ const AdminWhatsAppBot = () => {
                 <div className="bg-white rounded-xl border p-5 shadow-sm">
                   <div className="flex items-center justify-between mb-3">
                     <h2 className="font-semibold text-lg">Envoi en cours</h2>
-                    {statusBadge(activeJob.status)}
+                    <div className="flex items-center gap-2">
+                      {statusBadge(activeJob.status)}
+                      {(activeJob.status === "pending" || activeJob.status === "running") && (
+                        <button
+                          onClick={stopJob}
+                          className="flex items-center gap-1 bg-red-600 text-white text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-red-700 transition"
+                        >
+                          <XCircle className="w-3.5 h-3.5" /> Arrêter
+                        </button>
+                      )}
+                    </div>
                   </div>
 
                   {/* Progress bar */}
