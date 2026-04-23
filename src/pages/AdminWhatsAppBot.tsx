@@ -34,6 +34,8 @@ Nous collaborons actuellement avec plusieurs vendeurs FBA afin d'optimiser leur 
 •⁠ des outils d'IA facilitant l'analyse et le gain de temps
 •⁠ une formation et un accompagnement dédié
 
+Le lien du site : https://amzingfba.com
+
 Restant à votre disposition si vous souhaitez échanger.
 
 L'équipe AMZing FBA`;
