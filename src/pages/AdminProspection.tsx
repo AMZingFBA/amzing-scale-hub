@@ -1,8 +1,7 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/use-auth';
 import { useAdmin } from '@/hooks/use-admin';
-import { supabase } from '@/integrations/supabase/client';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -10,11 +9,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Play, Square, Pause, Upload, Download, Settings, Send, Users, CheckCircle2, XCircle, Clock, MessageSquare } from 'lucide-react';
+import { Loader2, Play, Square, Pause, Upload, Download, Settings, Users, CheckCircle2, XCircle, MessageSquare, Wifi, WifiOff } from 'lucide-react';
 import * as XLSX from 'xlsx';
 
 const DEFAULT_MESSAGE = `Bonjour {company},
@@ -35,38 +33,70 @@ Restant à votre disposition si vous souhaitez échanger.
 
 L'équipe AMZing FBA`;
 
+const DEFAULT_BACKEND = 'http://localhost:3001';
+
 const AdminProspection = () => {
   const { user } = useAuth();
   const { isAdmin, isLoading: isAdminLoading } = useAdmin();
   const navigate = useNavigate();
   const { toast } = useToast();
   const logsEndRef = useRef<HTMLDivElement>(null);
+  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const logOffsetRef = useRef(0);
 
-  // State
   const [message, setMessage] = useState(DEFAULT_MESSAGE);
   const [contactsText, setContactsText] = useState('');
   const [contacts, setContacts] = useState<{ name: string; phone: string }[]>([]);
-  const [campaign, setCampaign] = useState<any>(null);
-  const [logs, setLogs] = useState<any[]>([]);
   const [configOpen, setConfigOpen] = useState(false);
-  const [config, setConfig] = useState({ auth_token: '', instance_id: '', sender_number: '' });
-  const [saving, setSaving] = useState(false);
+  const [config, setConfig] = useState({
+    auth_token: '',
+    instance_id: '',
+    category_id: '',
+    backendUrl: DEFAULT_BACKEND,
+  });
+  const [backendOnline, setBackendOnline] = useState<boolean | null>(null);
+  const [status, setStatus] = useState<any>(null);
+  const [logs, setLogs] = useState<{ time: string; message: string; type: string }[]>([]);
   const [launching, setLaunching] = useState(false);
 
-  // Redirect non-admin
+  // Auth guard
   useEffect(() => {
     if (!isAdminLoading && !isAdmin) navigate('/dashboard');
     if (!user && !isAdminLoading) navigate('/auth');
   }, [user, isAdmin, isAdminLoading, navigate]);
 
+  // Load config from localStorage
+  useEffect(() => {
+    const saved = localStorage.getItem('onoff_config');
+    if (saved) {
+      try { setConfig(JSON.parse(saved)); } catch {}
+    }
+  }, []);
+
+  // Check backend online
+  const checkBackend = async (url = config.backendUrl) => {
+    try {
+      const res = await fetch(`${url}/api/onoff/status`, { signal: AbortSignal.timeout(2000) });
+      setBackendOnline(res.ok);
+      return res.ok;
+    } catch {
+      setBackendOnline(false);
+      return false;
+    }
+  };
+
+  useEffect(() => {
+    checkBackend();
+    const t = setInterval(() => checkBackend(), 5000);
+    return () => clearInterval(t);
+  }, [config.backendUrl]);
+
   // Parse contacts from text
   useEffect(() => {
     const lines = contactsText.split(/[\n;]+/).map(l => l.trim()).filter(Boolean);
     const parsed = lines.map(line => {
-      // Extract phone (anything matching +<digits/spaces>) and treat the rest as name
-      // Supports separators: ":", tab, comma, multiple spaces, or just a phone alone
       const phoneMatch = line.match(/(\+?\d[\d\s().-]{6,}\d)/);
-      if (!phoneMatch) return { name: line, phone: '' };
+      if (!phoneMatch) return { name: '', phone: '' };
       const phone = phoneMatch[1].replace(/[\s().-]/g, '');
       const name = line.replace(phoneMatch[0], '').replace(/[:,\t]+$/, '').replace(/^[:,\t\s]+|[:,\t\s]+$/g, '').trim();
       return { name, phone };
@@ -74,53 +104,17 @@ const AdminProspection = () => {
     setContacts(parsed);
   }, [contactsText]);
 
-  // Load onoff config
-  useEffect(() => {
-    if (!user) return;
-    const loadConfig = async () => {
-      const { data } = await supabase
-        .from('onoff_config')
-        .select('*')
-        .eq('user_id', user.id)
-        .single();
-      if (data) {
-        setConfig({
-          auth_token: data.auth_token || '',
-          instance_id: data.instance_id || '',
-          sender_number: data.sender_number || '',
-        });
-      }
-    };
-    loadConfig();
-  }, [user]);
-
-  // Subscribe to campaign updates (realtime)
-  useEffect(() => {
-    if (!campaign?.id) return;
-
-    const campaignSub = supabase
-      .channel(`campaign-${campaign.id}`)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'sms_campaigns', filter: `id=eq.${campaign.id}` },
-        (payload: any) => { setCampaign((prev: any) => ({ ...prev, ...payload.new })); }
-      )
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'sms_logs', filter: `campaign_id=eq.${campaign.id}` },
-        (payload: any) => { setLogs(prev => [...prev, payload.new]); }
-      )
-      .subscribe();
-
-    return () => { supabase.removeChannel(campaignSub); };
-  }, [campaign?.id]);
-
   // Auto-scroll logs
   useEffect(() => {
     logsEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [logs]);
 
-  // Normalize header for comparison (remove accents, lowercase, trim)
+  // Cleanup poll on unmount
+  useEffect(() => () => { if (pollRef.current) clearInterval(pollRef.current); }, []);
+
   const normalizeHeader = (h: string) =>
     h.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
 
-  // CSV / Excel upload
   const handleCSV = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -130,11 +124,9 @@ const AdminProspection = () => {
       if (!records.length) return;
       const headers = Object.keys(records[0]);
 
-      // Detect phone column
-      const phoneKeywords = ['telephone', 'phone', 'tel', 'numero', 'mobile', 'whatsapp', 'num'];
+      const phoneKeywords = ['telephone', 'phone', 'tel', 'numero', 'mobile', 'num'];
       let phoneCol = headers.find(h => phoneKeywords.some(k => normalizeHeader(h).includes(k)));
       if (!phoneCol) {
-        // Fallback: column where most values look like phone numbers
         phoneCol = headers.reduce((best, h) => {
           const score = records.slice(0, 20).filter(r => /^\+?\d{7,15}$/.test(String(r[h] || '').replace(/[\s\-\.\(\)]/g, ''))).length;
           const bestScore = records.slice(0, 20).filter(r => /^\+?\d{7,15}$/.test(String(r[best] || '').replace(/[\s\-\.\(\)]/g, ''))).length;
@@ -142,8 +134,7 @@ const AdminProspection = () => {
         }, headers[0]);
       }
 
-      // Detect name column
-      const nameKeywords = ['nom societe', 'nom_societe', 'societe', 'entreprise', 'company', 'nom', 'name', 'business'];
+      const nameKeywords = ['nom societe', 'nom_societe', 'societe', 'entreprise', 'company', 'nom', 'name'];
       const nameCol = headers.find(h => nameKeywords.some(k => normalizeHeader(h).includes(k)));
 
       const parsed = records
@@ -154,13 +145,13 @@ const AdminProspection = () => {
         .filter(c => c.phone && /^\+?\d{7,15}$/.test(c.phone));
 
       if (!parsed.length) {
-        toast({ title: 'Aucun contact valide', description: 'Vérifiez les colonnes nom_societe et telephone', variant: 'destructive' });
+        toast({ title: 'Aucun contact valide', variant: 'destructive' });
         return;
       }
 
       setContacts(parsed);
       setContactsText(parsed.map(c => c.name ? `${c.name}:${c.phone}` : c.phone).join('\n'));
-      toast({ title: `${parsed.length} contacts importés`, description: nameCol ? `Nom: "${nameCol}" · Tel: "${phoneCol}"` : `Tel: "${phoneCol}"` });
+      toast({ title: `${parsed.length} contacts importés` });
     };
 
     if (ext === 'xlsx' || ext === 'xls') {
@@ -191,120 +182,95 @@ const AdminProspection = () => {
     }
   };
 
-  // Save Onoff config
-  const saveConfig = async () => {
-    if (!user) return;
-    setSaving(true);
-
-    const { error } = await supabase.from('onoff_config').upsert({
-      user_id: user.id,
-      auth_token: config.auth_token,
-      instance_id: config.instance_id,
-      sender_number: config.sender_number,
-      updated_at: new Date().toISOString(),
-    }, { onConflict: 'user_id' });
-
-    setSaving(false);
-    if (error) {
-      toast({ title: 'Erreur', description: error.message, variant: 'destructive' });
-    } else {
-      toast({ title: 'Config Onoff sauvegardée' });
-      setConfigOpen(false);
-    }
+  const saveConfig = () => {
+    localStorage.setItem('onoff_config', JSON.stringify(config));
+    toast({ title: 'Config sauvegardée' });
+    setConfigOpen(false);
+    checkBackend(config.backendUrl);
   };
 
-  // Start campaign
-  const startCampaign = async () => {
+  const startPolling = () => {
+    logOffsetRef.current = 0;
+    if (pollRef.current) clearInterval(pollRef.current);
+    pollRef.current = setInterval(async () => {
+      try {
+        const res = await fetch(`${config.backendUrl}/api/onoff/status?after=${logOffsetRef.current}`);
+        if (!res.ok) return;
+        const data = await res.json();
+        setStatus(data);
+        if (data.logs?.length) {
+          setLogs(prev => [...prev, ...data.logs]);
+          logOffsetRef.current += data.logs.length;
+        }
+        if (!data.active) {
+          clearInterval(pollRef.current!);
+          pollRef.current = null;
+        }
+      } catch {}
+    }, 1000);
+  };
+
+  const startSend = async () => {
     if (!message.trim() || contacts.length === 0) {
       toast({ title: 'Message et contacts requis', variant: 'destructive' });
       return;
     }
-    if (!user) return;
-    setLaunching(true);
-    setLogs([]);
-
-    // Create campaign
-    const { data: camp, error: campErr } = await supabase
-      .from('sms_campaigns')
-      .insert({ user_id: user.id, message, status: 'running', total_contacts: contacts.length })
-      .select()
-      .single();
-
-    if (campErr || !camp) {
-      toast({ title: 'Erreur', description: campErr?.message || 'Erreur création campagne', variant: 'destructive' });
-      setLaunching(false);
+    if (!config.auth_token || !config.category_id) {
+      toast({ title: 'Config Onoff manquante', description: 'Remplis auth_token et category_id', variant: 'destructive' });
+      setConfigOpen(true);
       return;
     }
 
-    // Insert contacts
-    const contactRows = contacts.map((c, i) => ({
-      campaign_id: camp.id,
-      name: c.name,
-      phone: c.phone,
-      sort_order: i,
-    }));
+    const online = await checkBackend();
+    if (!online) {
+      toast({ title: 'Backend hors ligne', description: `Lance le backend sur ton Mac : cd imessage-sender/backend && node server.js`, variant: 'destructive' });
+      return;
+    }
 
-    await supabase.from('sms_contacts').insert(contactRows);
-    setCampaign(camp);
-    setLaunching(false);
+    setLaunching(true);
+    setLogs([]);
+    setStatus(null);
 
-    // Call edge function sur le projet Supabase dédié bot (clé anon de ce projet)
-    const BOT_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ4eW5wc3h4YWx4Y2NoZXd4bXZmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2MjAwMjIsImV4cCI6MjA4OTE5NjAyMn0.gLYq9wofJIKAYSNfhTCl87SVvrQ8JaSkt81c2kUSzKI";
-    const { data: { session } } = await supabase.auth.getSession();
-    fetch(`https://bxynpsxxalxcchewxmvf.supabase.co/functions/v1/send-sms`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${BOT_ANON_KEY}`,
-        'apikey': BOT_ANON_KEY,
-      },
-      body: JSON.stringify({ action: 'process', campaign_id: camp.id, user_token: session?.access_token }),
-    }).then(async (res) => {
+    try {
+      const res = await fetch(`${config.backendUrl}/api/onoff/send`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contacts,
+          message,
+          config: {
+            auth_token: config.auth_token,
+            instance_id: config.instance_id,
+            category_id: config.category_id,
+          },
+        }),
+      });
+
       if (!res.ok) {
         const err = await res.json().catch(() => ({ error: `HTTP ${res.status}` }));
-        await supabase.from('sms_campaigns').update({ status: 'stopped' }).eq('id', camp.id);
-        await supabase.from('sms_logs').insert({ campaign_id: camp.id, message: `❌ Erreur : ${err.error || res.status}`, type: 'error' });
-        toast({ title: 'Erreur edge function', description: err.error || `HTTP ${res.status}`, variant: 'destructive' });
+        toast({ title: 'Erreur', description: err.error, variant: 'destructive' });
+        setLaunching(false);
+        return;
       }
-    }).catch(async (e) => {
-      await supabase.from('sms_campaigns').update({ status: 'stopped' }).eq('id', camp.id);
-      await supabase.from('sms_logs').insert({ campaign_id: camp.id, message: `❌ Erreur réseau : ${e.message}`, type: 'error' });
+
+      startPolling();
+    } catch (e: any) {
       toast({ title: 'Erreur réseau', description: e.message, variant: 'destructive' });
-    });
+    }
+    setLaunching(false);
   };
 
-  // Pause / Resume / Stop
-  const updateCampaignStatus = async (status: string) => {
-    if (!campaign?.id) return;
-    await supabase.from('sms_campaigns').update({ status, updated_at: new Date().toISOString() }).eq('id', campaign.id);
-    setCampaign((prev: any) => ({ ...prev, status }));
+  const sendControl = async (action: 'pause' | 'resume' | 'stop') => {
+    await fetch(`${config.backendUrl}/api/onoff/${action}`, { method: 'POST' });
   };
 
-  // Export CSV
-  const exportResults = async () => {
-    if (!campaign?.id) return;
-    const { data } = await supabase
-      .from('sms_contacts')
-      .select('*')
-      .eq('campaign_id', campaign.id)
-      .order('sort_order');
-
-    if (!data) return;
-    const csv = 'nom,telephone,statut,erreur,envoyé_le\n' +
-      data.map(r => `"${r.name}","${r.phone}","${r.status}","${r.error_message || ''}","${r.sent_at || ''}"`).join('\n');
-
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `resultats-campagne-${campaign.id.slice(0, 8)}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
+  const exportCSV = () => {
+    window.open(`${config.backendUrl}/api/onoff/export`);
   };
 
-  const isRunning = campaign?.status === 'running';
-  const isPaused = campaign?.status === 'paused';
-  const isActive = isRunning || isPaused;
+  const isActive = status?.active;
+  const isPaused = isActive && status?.paused;
+  const isRunning = isActive && !isPaused;
 
   if (isAdminLoading) {
     return (
@@ -318,14 +284,19 @@ const AdminProspection = () => {
     <div className="min-h-screen bg-gray-50">
       <Navbar />
       <div className="max-w-6xl mx-auto px-4 py-8">
+
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-2xl font-bold flex items-center gap-2">
               <MessageSquare className="h-6 w-6 text-blue-600" />
-              Prospection SMS
+              Prospection SMS — Onoff
             </h1>
-            <p className="text-gray-500 text-sm mt-1">Envoi de SMS en masse via Onoff</p>
+            <div className="flex items-center gap-2 mt-1">
+              {backendOnline === true && <span className="flex items-center gap-1 text-xs text-green-600"><Wifi className="h-3 w-3" /> Backend en ligne</span>}
+              {backendOnline === false && <span className="flex items-center gap-1 text-xs text-red-500"><WifiOff className="h-3 w-3" /> Backend hors ligne — lance node server.js</span>}
+              {backendOnline === null && <span className="text-xs text-gray-400">Vérification du backend...</span>}
+            </div>
           </div>
           <Dialog open={configOpen} onOpenChange={setConfigOpen}>
             <DialogTrigger asChild>
@@ -335,38 +306,41 @@ const AdminProspection = () => {
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Configuration API Onoff</DialogTitle>
+                <DialogTitle>Configuration Onoff</DialogTitle>
               </DialogHeader>
               <div className="space-y-4 mt-4">
                 <div className="bg-blue-50 rounded-lg p-3 text-sm text-blue-700">
                   <p className="font-semibold mb-1">Comment trouver ces infos :</p>
-                  <p>Va sur <code>phone.onoff.app</code> → F12 → Network → envoie un SMS → clique sur "send-message"</p>
+                  <p>Va sur <code>phone.onoff.app</code> → F12 → Network → envoie un SMS → clique sur "send-message" → Headers</p>
                 </div>
                 <div>
-                  <Label>Token d'authentification (Basic)</Label>
-                  <Input type="password" placeholder="MTc1NjE0MzI2NTQ0NS1iNm..." value={config.auth_token} onChange={e => setConfig(c => ({ ...c, auth_token: e.target.value }))} />
-                  <p className="text-xs text-gray-400 mt-1">La valeur après "Basic " dans le header Authorization</p>
+                  <Label>Token (Basic auth)</Label>
+                  <Input type="password" placeholder="MTc1NjE0..." value={config.auth_token} onChange={e => setConfig(c => ({ ...c, auth_token: e.target.value }))} />
+                  <p className="text-xs text-gray-400 mt-1">Valeur après "Basic " dans Authorization</p>
                 </div>
                 <div>
                   <Label>Instance ID</Label>
-                  <Input placeholder="0a569592-c2f4-4edf-..." value={config.instance_id} onChange={e => setConfig(c => ({ ...c, instance_id: e.target.value }))} />
+                  <Input placeholder="0a569592-c2f4-..." value={config.instance_id} onChange={e => setConfig(c => ({ ...c, instance_id: e.target.value }))} />
                   <p className="text-xs text-gray-400 mt-1">Header x-instance-id</p>
                 </div>
                 <div>
-                  <Label>Numéro Onoff expéditeur</Label>
-                  <Input placeholder="+33..." value={config.sender_number} onChange={e => setConfig(c => ({ ...c, sender_number: e.target.value }))} />
+                  <Label>Category ID</Label>
+                  <Input placeholder="1758135516747-16e5a32bccef-0001" value={config.category_id} onChange={e => setConfig(c => ({ ...c, category_id: e.target.value }))} />
+                  <p className="text-xs text-gray-400 mt-1">Dans le body de get-thread-id → creator.categoryId</p>
                 </div>
-                <Button onClick={saveConfig} disabled={saving} className="w-full">
-                  {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-                  Sauvegarder
-                </Button>
+                <div>
+                  <Label>URL du backend local</Label>
+                  <Input placeholder="http://localhost:3001" value={config.backendUrl} onChange={e => setConfig(c => ({ ...c, backendUrl: e.target.value }))} />
+                </div>
+                <Button onClick={saveConfig} className="w-full">Sauvegarder</Button>
               </div>
             </DialogContent>
           </Dialog>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* LEFT: Message + Contacts */}
+
+          {/* LEFT */}
           <div className="space-y-4">
             <Card>
               <CardHeader className="pb-3">
@@ -374,14 +348,13 @@ const AdminProspection = () => {
               </CardHeader>
               <CardContent>
                 <Textarea
-                  rows={5}
-                  placeholder="Bonjour {nom}, votre message ici..."
+                  rows={10}
                   value={message}
                   onChange={e => setMessage(e.target.value)}
                   disabled={isActive}
                 />
                 <p className="text-xs text-gray-400 mt-2">
-                  Variable : <code className="bg-gray-100 px-1 rounded">{'{nom}'}</code> → nom de société (absent = "Bonjour,")
+                  <code className="bg-gray-100 px-1 rounded">{'{company}'}</code> → nom de société · absent = "Bonjour,"
                 </p>
               </CardContent>
             </Card>
@@ -402,20 +375,19 @@ const AdminProspection = () => {
               </CardHeader>
               <CardContent>
                 <Textarea
-                  rows={6}
+                  rows={5}
                   className="font-mono text-sm"
-                  placeholder={"+33612345678\nJean Dupont:+33698765432\n..."}
+                  placeholder={"+33612345678\nSociété ACME:+33698765432\n..."}
                   value={contactsText}
                   onChange={e => setContactsText(e.target.value)}
                   disabled={isActive}
                 />
                 <p className="text-xs text-gray-400 mt-2">
-                  Format : <code>+33...</code> ou <code>nom_societe:+33...</code> — CSV/Excel avec colonnes <code>nom_societe</code>, <code>telephone</code>
+                  Format : <code>+33...</code> ou <code>nom_societe:+33...</code> · CSV/Excel : colonnes <code>nom_societe</code>, <code>telephone</code>
                 </p>
               </CardContent>
             </Card>
 
-            {/* Contact preview */}
             {contacts.length > 0 && (
               <Card>
                 <CardContent className="pt-4 max-h-40 overflow-y-auto">
@@ -435,35 +407,35 @@ const AdminProspection = () => {
             {/* Action buttons */}
             <div className="flex gap-3 flex-wrap">
               {!isActive ? (
-                <Button onClick={startCampaign} disabled={launching} size="lg" className="bg-green-600 hover:bg-green-700">
+                <Button onClick={startSend} disabled={launching || backendOnline === false} size="lg" className="bg-green-600 hover:bg-green-700">
                   {launching ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Play className="h-4 w-4 mr-2" />}
                   Démarrer l'envoi
                 </Button>
               ) : (
                 <>
-                  {!isPaused ? (
-                    <Button onClick={() => updateCampaignStatus('paused')} variant="outline" size="lg" className="border-yellow-500 text-yellow-600">
+                  {isRunning ? (
+                    <Button onClick={() => sendControl('pause')} variant="outline" size="lg" className="border-yellow-500 text-yellow-600">
                       <Pause className="h-4 w-4 mr-2" /> Pause
                     </Button>
                   ) : (
-                    <Button onClick={() => updateCampaignStatus('running')} size="lg" className="bg-blue-600 hover:bg-blue-700">
+                    <Button onClick={() => sendControl('resume')} size="lg" className="bg-blue-600 hover:bg-blue-700">
                       <Play className="h-4 w-4 mr-2" /> Reprendre
                     </Button>
                   )}
-                  <Button onClick={() => updateCampaignStatus('stopped')} variant="destructive" size="lg">
+                  <Button onClick={() => sendControl('stop')} variant="destructive" size="lg">
                     <Square className="h-4 w-4 mr-2" /> STOP
                   </Button>
                 </>
               )}
-              {campaign && (campaign.sent_count > 0 || campaign.failed_count > 0) && (
-                <Button onClick={exportResults} variant="outline" size="lg">
+              {status && (status.sent > 0 || status.failed > 0) && (
+                <Button onClick={exportCSV} variant="outline" size="lg">
                   <Download className="h-4 w-4 mr-2" /> Export CSV
                 </Button>
               )}
             </div>
           </div>
 
-          {/* RIGHT: Stats + Logs */}
+          {/* RIGHT */}
           <div className="space-y-4">
             <Card>
               <CardHeader className="pb-3">
@@ -472,30 +444,29 @@ const AdminProspection = () => {
               <CardContent>
                 <div className="grid grid-cols-3 gap-3 text-center">
                   <div className="bg-green-50 rounded-lg p-3">
-                    <p className="text-2xl font-bold text-green-600">{campaign?.sent_count || 0}</p>
+                    <p className="text-2xl font-bold text-green-600">{status?.sent || 0}</p>
                     <p className="text-xs text-gray-500 flex items-center justify-center gap-1"><CheckCircle2 className="h-3 w-3" /> Envoyés</p>
                   </div>
                   <div className="bg-red-50 rounded-lg p-3">
-                    <p className="text-2xl font-bold text-red-600">{campaign?.failed_count || 0}</p>
+                    <p className="text-2xl font-bold text-red-600">{status?.failed || 0}</p>
                     <p className="text-xs text-gray-500 flex items-center justify-center gap-1"><XCircle className="h-3 w-3" /> Échoués</p>
                   </div>
                   <div className="bg-blue-50 rounded-lg p-3">
-                    <p className="text-2xl font-bold text-blue-600">{campaign?.total_contacts || 0}</p>
+                    <p className="text-2xl font-bold text-blue-600">{status?.total || contacts.length}</p>
                     <p className="text-xs text-gray-500 flex items-center justify-center gap-1"><Users className="h-3 w-3" /> Total</p>
                   </div>
                 </div>
 
-                {/* Progress bar */}
-                {isActive && campaign?.total_contacts > 0 && (
+                {isActive && status?.total > 0 && (
                   <div className="mt-4">
                     <div className="w-full bg-gray-200 rounded-full h-2">
                       <div
                         className="bg-blue-600 h-2 rounded-full transition-all duration-500"
-                        style={{ width: `${((campaign.sent_count + campaign.failed_count) / campaign.total_contacts) * 100}%` }}
+                        style={{ width: `${((status.sent + status.failed) / status.total) * 100}%` }}
                       />
                     </div>
                     <p className="text-xs text-gray-400 mt-1 text-right">
-                      {campaign.sent_count + campaign.failed_count}/{campaign.total_contacts}
+                      {status.sent + status.failed}/{status.total}
                     </p>
                   </div>
                 )}
@@ -503,11 +474,11 @@ const AdminProspection = () => {
                 <div className="mt-3 flex items-center gap-2">
                   <span className={`w-3 h-3 rounded-full ${isRunning ? 'bg-green-500 animate-pulse' : isPaused ? 'bg-yellow-400' : 'bg-gray-300'}`} />
                   <span className="text-sm">
-                    {isRunning ? 'Envoi en cours...' : isPaused ? 'En pause' : campaign?.status === 'completed' ? 'Terminé' : campaign?.status === 'stopped' ? 'Arrêté' : 'Inactif'}
+                    {isRunning ? 'Envoi en cours...' : isPaused ? 'En pause' : status && !status.active && (status.sent > 0 || status.failed > 0) ? 'Terminé' : 'Inactif'}
                   </span>
-                  {campaign?.status && (
-                    <Badge variant={isRunning ? 'default' : isPaused ? 'secondary' : 'outline'}>
-                      {campaign.status}
+                  {isActive && (
+                    <Badge variant={isRunning ? 'default' : 'secondary'}>
+                      {isRunning ? 'running' : 'paused'}
                     </Badge>
                   )}
                 </div>
@@ -519,7 +490,7 @@ const AdminProspection = () => {
                 <CardTitle className="text-base">Logs en direct</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="bg-gray-900 rounded-lg p-3 h-80 overflow-y-auto font-mono text-xs space-y-1">
+                <div className="bg-gray-900 rounded-lg p-3 h-96 overflow-y-auto font-mono text-xs space-y-1">
                   {logs.length === 0 && <p className="text-gray-500">En attente de démarrage...</p>}
                   {logs.map((log, i) => (
                     <div key={i} className={
@@ -528,9 +499,7 @@ const AdminProspection = () => {
                       log.type === 'warn' ? 'text-yellow-400' :
                       'text-gray-400'
                     }>
-                      <span className="text-gray-600">
-                        {new Date(log.created_at).toLocaleTimeString()}
-                      </span>{' '}
+                      <span className="text-gray-600">{new Date(log.time).toLocaleTimeString()}</span>{' '}
                       {log.message}
                     </div>
                   ))}
