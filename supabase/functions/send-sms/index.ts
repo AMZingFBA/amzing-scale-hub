@@ -6,19 +6,25 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// Lovable Supabase project (données campagnes, contacts, logs)
 const LOVABLE_URL = "https://wvmfzlogijvqcsgablrb.supabase.co";
 const LOVABLE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind2bWZ6bG9naWp2cWNzZ2FibHJiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEyNTI3MTYsImV4cCI6MjA3NjgyODcxNn0.4ciuBXzeLQB4RatGnJuXJemQ_w6xr5f8Bhm2SUOzdtY";
 
-const ONOFF_API_V4 = "https://production-server.onoffapp.net/mobile/v4";
-const ONOFF_API_V5 = "https://production-server.onoffapp.net/mobile/v5";
+const ONOFF_V4 = "https://production-server.onoffapp.net/mobile/v4";
+const ONOFF_V5 = "https://production-server.onoffapp.net/mobile/v5";
 
-function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+function sleep(ms: number) {
+  return new Promise((r) => setTimeout(r, ms));
 }
 
-function randomDelay(): number {
-  return Math.floor(Math.random() * 2000) + 1000; // 1-3s
+function randomDelay() {
+  return Math.floor(Math.random() * 4000) + 2000;
+}
+
+function formatPhone(phone: string): string {
+  let p = phone.replace(/\s+/g, "").replace(/[^\d+]/g, "");
+  if (p.startsWith("0")) p = "+33" + p.slice(1);
+  if (!p.startsWith("+")) p = "+" + p;
+  return p;
 }
 
 function personalizeMessage(template: string, name: string): string {
@@ -36,13 +42,6 @@ function personalizeMessage(template: string, name: string): string {
     .replace(/\{nom\}/gi, "");
 }
 
-function formatPhone(phone: string): string {
-  let p = phone.replace(/\s+/g, "").replace(/[^\d+]/g, "");
-  if (p.startsWith("0")) p = "+33" + p.slice(1);
-  if (!p.startsWith("+")) p = "+" + p;
-  return p;
-}
-
 async function onoffRequest(
   url: string,
   method: string,
@@ -57,7 +56,7 @@ async function onoffRequest(
       "Authorization": `Basic ${config.auth_token}`,
       "x-instance-id": config.instance_id,
       "x-user-agent": "onoff-web/4.75.0",
-      "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.1 Safari/605.1.15",
+      "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.3.1 Safari/605.1.15",
       "Origin": "https://phone.onoff.app",
       "Referer": "https://phone.onoff.app/",
     };
@@ -65,42 +64,31 @@ async function onoffRequest(
     if (body) opts.body = JSON.stringify(body);
     const res = await fetch(url, opts);
     const text = await res.text();
-    let data; try { data = JSON.parse(text); } catch { data = text; }
+    let data: any;
+    try { data = JSON.parse(text); } catch { data = text; }
     if (!res.ok) return { ok: false, error: `HTTP ${res.status}: ${typeof data === "string" ? data : JSON.stringify(data)}` };
     return { ok: true, data };
-  } catch (err) {
+  } catch (err: any) {
     return { ok: false, error: err.message };
   }
 }
 
-async function getCategoryId(
-  senderNumber: string,
-  config: { auth_token: string; instance_id: string }
-): Promise<string | null> {
-  const res = await onoffRequest(`${ONOFF_API_V4}/get-categories?inclCounter=true`, "GET", null, config);
-  if (!res.ok) { console.log("get-categories failed:", res.error); return null; }
-  const list: any[] = Array.isArray(res.data) ? res.data : (res.data?.categories || res.data?.data || []);
-  console.log("categories:", JSON.stringify(list).slice(0, 500));
-  const formatted = formatPhone(senderNumber);
-  const cat = list.find((c: any) => {
-    const num = c.phoneNumber || c.number || c.phone || c.lineNumber || "";
-    return formatPhone(num) === formatted;
-  });
-  console.log("matched category:", JSON.stringify(cat));
-  return cat?.id || cat?.categoryId || cat?._id || null;
-}
-
+// Format confirmed from browser DevTools: creator/receiver
 async function getThreadId(
   phone: string,
-  categoryId: string,
-  config: { auth_token: string; instance_id: string }
+  config: { auth_token: string; instance_id: string; category_id: string }
 ): Promise<{ ok: boolean; threadId?: string; error?: string }> {
-  const res = await onoffRequest(`${ONOFF_API_V5}/get-thread-id`, "POST", {
-    creator: { categoryId },
-    receiver: { phoneNumbers: [phone] },
-  }, config);
+  const res = await onoffRequest(
+    `${ONOFF_V5}/get-thread-id`,
+    "POST",
+    {
+      creator: { categoryId: config.category_id },
+      receiver: { phoneNumbers: [phone] },
+    },
+    config
+  );
   if (!res.ok) return { ok: false, error: res.error };
-  const threadId = res.data?.threadId || res.data?.id || res.data?.thread?.id;
+  const threadId = res.data?.threadId || res.data?.id;
   if (!threadId) return { ok: false, error: `threadId non trouvé: ${JSON.stringify(res.data)}` };
   return { ok: true, threadId };
 }
@@ -108,12 +96,11 @@ async function getThreadId(
 async function sendSms(
   phone: string,
   message: string,
-  categoryId: string,
-  config: { auth_token: string; instance_id: string; sender_number: string }
+  config: { auth_token: string; instance_id: string; category_id: string }
 ): Promise<{ ok: boolean; error?: string }> {
-  const thread = await getThreadId(phone, categoryId, config);
-  if (!thread.ok || !thread.threadId) return { ok: false, error: `Échec get-thread-id: ${thread.error}` };
-  return await onoffRequest(`${ONOFF_API_V4}/send-message`, "POST", {
+  const thread = await getThreadId(formatPhone(phone), config);
+  if (!thread.ok || !thread.threadId) return { ok: false, error: `get-thread-id échoué: ${thread.error}` };
+  return await onoffRequest(`${ONOFF_V4}/send-message`, "POST", {
     content: message,
     messageType: "TEXT",
     threadId: thread.threadId,
@@ -132,7 +119,6 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Client Lovable avec le JWT passé dans le body
     const supabase = createClient(LOVABLE_URL, LOVABLE_ANON_KEY, {
       global: { headers: { Authorization: `Bearer ${user_token}` } },
     });
@@ -147,7 +133,14 @@ Deno.serve(async (req) => {
 
       const { data: config } = await supabase.from("onoff_config").select("*").eq("user_id", campaign.user_id).single();
       if (!config?.auth_token) {
-        return new Response(JSON.stringify({ error: "Config Onoff manquante — va dans Config Onoff" }), {
+        return new Response(JSON.stringify({ error: "Config Onoff manquante" }), {
+          status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      if (!config.category_id) {
+        await supabase.from("sms_campaigns").update({ status: "stopped" }).eq("id", campaign_id);
+        await supabase.from("sms_logs").insert({ campaign_id, message: "❌ category_id manquant", type: "error" });
+        return new Response(JSON.stringify({ error: "category_id manquant" }), {
           status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
@@ -155,18 +148,8 @@ Deno.serve(async (req) => {
       const onoffConfig = {
         auth_token: config.auth_token,
         instance_id: config.instance_id || "",
-        sender_number: config.sender_number || "",
-        category_id: config.category_id || "",
+        category_id: config.category_id,
       };
-
-      const categoryId = config.category_id;
-      if (!categoryId) {
-        await supabase.from("sms_campaigns").update({ status: "stopped" }).eq("id", campaign_id);
-        await supabase.from("sms_logs").insert({ campaign_id, message: "❌ category_id manquant dans Config Onoff", type: "error" });
-        return new Response(JSON.stringify({ error: "categoryId introuvable" }), {
-          status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
 
       await supabase.from("sms_campaigns").update({ status: "running", updated_at: new Date().toISOString() }).eq("id", campaign_id);
       await supabase.from("sms_logs").insert({ campaign_id, message: `Démarrage — ${campaign.total_contacts} contacts`, type: "info" });
@@ -217,7 +200,7 @@ Deno.serve(async (req) => {
           type: "info",
         });
 
-        const result = await sendSms(formatPhone(contact.phone), msg, categoryId, onoffConfig);
+        const result = await sendSms(contact.phone, msg, onoffConfig);
 
         if (result.ok) {
           sentCount++;
@@ -261,7 +244,7 @@ Deno.serve(async (req) => {
     return new Response(JSON.stringify({ error: "Action inconnue" }), {
       status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
-  } catch (err) {
+  } catch (err: any) {
     return new Response(JSON.stringify({ error: err.message }), {
       status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
