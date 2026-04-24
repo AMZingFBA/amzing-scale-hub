@@ -52,11 +52,14 @@ async function onoffRequest(
   try {
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
-      Accept: "application/json, text/plain, */*",
-      Authorization: `Basic ${config.auth_token}`,
+      "Accept": "application/json, text/plain, */*",
+      "Accept-Language": "fr-FR,fr;q=0.9",
+      "Authorization": `Basic ${config.auth_token}`,
       "x-instance-id": config.instance_id,
-      "x-user-agent": "onoff-web/4.74.0",
+      "x-user-agent": "onoff-web/4.75.0",
+      "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.1 Safari/605.1.15",
       "Origin": "https://phone.onoff.app",
+      "Referer": "https://phone.onoff.app/",
     };
     const opts: RequestInit = { method, headers };
     if (body) opts.body = JSON.stringify(body);
