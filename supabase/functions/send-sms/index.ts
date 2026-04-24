@@ -132,24 +132,19 @@ Deno.serve(async (req) => {
       }
 
       const { data: config } = await supabase.from("onoff_config").select("*").eq("user_id", campaign.user_id).single();
-      if (!config?.auth_token) {
+
+      // Fallback sur les secrets Supabase si pas de config en DB
+      const onoffConfig = {
+        auth_token: config?.auth_token || Deno.env.get("ONOFF_AUTH_TOKEN") || "",
+        instance_id: config?.instance_id || Deno.env.get("ONOFF_INSTANCE_ID") || "",
+        category_id: config?.category_id || Deno.env.get("ONOFF_CATEGORY_ID") || "",
+      };
+
+      if (!onoffConfig.auth_token || !onoffConfig.category_id) {
         return new Response(JSON.stringify({ error: "Config Onoff manquante" }), {
           status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
-      if (!config.category_id) {
-        await supabase.from("sms_campaigns").update({ status: "stopped" }).eq("id", campaign_id);
-        await supabase.from("sms_logs").insert({ campaign_id, message: "❌ category_id manquant", type: "error" });
-        return new Response(JSON.stringify({ error: "category_id manquant" }), {
-          status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-
-      const onoffConfig = {
-        auth_token: config.auth_token,
-        instance_id: config.instance_id || "",
-        category_id: config.category_id,
-      };
 
       await supabase.from("sms_campaigns").update({ status: "running", updated_at: new Date().toISOString() }).eq("id", campaign_id);
       await supabase.from("sms_logs").insert({ campaign_id, message: `Démarrage — ${campaign.total_contacts} contacts`, type: "info" });
