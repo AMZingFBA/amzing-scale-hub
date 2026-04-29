@@ -1,3 +1,23 @@
 /AMZing-Sender.shortcut
   Content-Type: application/x-apple-aspen-config
   Content-Disposition: attachment; filename="AMZing-Sender.shortcut"
+
+/media2/*.opus
+  Content-Type: audio/ogg; codecs=opus
+  Access-Control-Allow-Origin: *
+
+/media2/*.mp4
+  Content-Type: video/mp4
+  Access-Control-Allow-Origin: *
+
+/media2/*.jpg
+  Content-Type: image/jpeg
+  Access-Control-Allow-Origin: *
+
+/media2/*.jpeg
+  Content-Type: image/jpeg
+  Access-Control-Allow-Origin: *
+
+/media2/*.png
+  Content-Type: image/png
+  Access-Control-Allow-Origin: *
