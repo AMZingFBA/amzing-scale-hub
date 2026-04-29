@@ -340,68 +340,115 @@ function getMime(ext){
 // ══════════════════════════════════════════
 function parseChat(text) {
   var lines = text.split('\n');
-  var pattern = /^[\u200e\u200f]?\[(\d{2}\/\d{2}\/\d{4}),?\s+(\d{2}:\d{2}(?::\d{2})?)\]\s+([^:]+):\s(.*)$/;
+
+  // Support iOS [DD/MM/YYYY, HH:MM:SS], iOS FR [DD/MM/YYYY à HH:MM:SS],
+  // Android "DD/MM/YYYY, HH:MM - Sender:", US format M/D/YY H:MM AM/PM -
+  var iosPattern    = /^[\u200e\u200f\u202f]?\[(\d{1,2}\/\d{1,2}\/\d{2,4})[,\s]+(\d{1,2}:\d{2}(?::\d{2})?)\s*(?:AM|PM)?\]\s+([^:]+):\s?(.*)$/;
+  var iosFrPattern  = /^[\u200e\u200f\u202f]?\[(\d{1,2}\/\d{1,2}\/\d{2,4})\s+[àa]\s+(\d{1,2}:\d{2}(?::\d{2})?)\]\s+([^:]+):\s?(.*)$/;
+  var androidPat    = /^[\u200e\u200f\u202f]?(\d{1,2}\/\d{1,2}\/\d{2,4})[,\s]+(\d{1,2}:\d{2}(?::\d{2})?)\s*(?:AM|PM)?\s+-\s+([^:]+):\s?(.*)$/;
+  var androidUSPat  = /^[\u200e\u200f\u202f]?(\d{1,2}\/\d{1,2}\/\d{2,4}),\s+(\d{1,2}:\d{2})\s*(AM|PM)\s+-\s+([^:]+):\s?(.*)$/;
+
+  // Media extensions
+  var IMG_EXT  = ['jpg','jpeg','png','gif','webp'];
+  var VID_EXT  = ['mp4','mov','avi','mkv','3gp'];
+  var AUD_EXT  = ['opus','mp3','m4a','aac','ogg','wav','amr'];
+  var ALL_EXT  = IMG_EXT.concat(VID_EXT).concat(AUD_EXT).concat(['pdf','xlsx','xls','docx','doc','pptx','zip','txt']);
+  var extRe    = new RegExp('\\.(' + ALL_EXT.join('|') + ')$', 'i');
+
+  // Attachment detection — supports all languages:
+  // EN: (file attached), FR: (fichier joint), ES: (archivo adjunto), etc.
+  // Also: <attached: file>, ‎<attaché : file>
+  function detectAttach(raw) {
+    raw = raw.replace(/[\u200e\u200f\u202f]/g,'').trim();
+    // <attached: ...> or <attaché : ...>
+    var m = raw.match(/^<attach[eé]?\s*:\s*(.+?)>$/i);
+    if(m) return m[1].trim();
+    // filename.ext (anything) — catches all localisations
+    m = raw.match(/^(.+?' + "'" + extRe.source.replace(/\\/g,'\\\\') + ')\s*(?:\([^)]*\))?$/i);
+    if(m && extRe.test(m[1])) return m[1].trim();
+    // Plain filename.ext (no parens)
+    if(extRe.test(raw.split(/\s/)[0])) return raw.split(/\s/)[0];
+    return null;
+  }
+
+  // Simpler robust version (avoiding regex nesting issues):
+  function getAttachFilename(raw) {
+    var s = raw.replace(/[\u200e\u200f\u202f\uFEFF]/g,'').trim();
+    // Pattern 1: <attached: name> / <attaché : name>
+    var m1 = s.match(/^<[^:>]+:\s*(.+?)>$/i);
+    if(m1) return m1[1].trim();
+    // Pattern 2: name.ext (anything in parens) or just name.ext
+    var m2 = s.match(/^(.+\.(jpg|jpeg|png|gif|webp|mp4|mov|avi|mkv|3gp|opus|mp3|m4a|aac|ogg|wav|amr|pdf|xlsx|xls|docx|doc|pptx|zip|txt))\s*(?:\([^)]*\))?$/i);
+    if(m2) return m2[1].trim();
+    return null;
+  }
+
+  function extType(fname) {
+    var ext = fname.split('.').pop().toLowerCase();
+    if(IMG_EXT.includes(ext)) return 'image';
+    if(VID_EXT.includes(ext)) return 'video';
+    if(AUD_EXT.includes(ext)) return 'audio';
+    return 'document';
+  }
+
   var messages = [];
   var current = null;
   var senderCount = {};
 
   for(var i=0; i<lines.length; i++){
     var line = lines[i].replace(/^\uFEFF/,'').trim();
-    var m = pattern.exec(line);
+    var m = iosPattern.exec(line) || iosFrPattern.exec(line) || androidPat.exec(line);
+
+    // Android US AM/PM (4 groups instead of 3)
+    if(!m){
+      var mu = androidUSPat.exec(line);
+      if(mu) m = [mu[0], mu[1], mu[2]+' '+mu[3], mu[4], mu[5]];
+    }
+
     if(m){
       if(current) messages.push(current);
-      var date = m[1], time = m[2].substring(0,5), sender = m[3].trim();
-      var rawText = (m[4] || '').replace(/\u200e/g,'').trim();
+      var date   = m[1];
+      var time   = m[2].substring(0,5);
+      var sender = m[3].trim();
+      var rawText = (m[4] || '').replace(/[\u200e\u200f\u202f]/g,'').trim();
 
       senderCount[sender] = (senderCount[sender]||0) + 1;
 
-      // Detect type
       var type = 'text';
       var mediaFile = null;
 
-      // WhatsApp media attachments: "filename.ext (file attached)" or "<attached: filename>"
-      var attachMatch = rawText.match(/^<attached:\s*(.+?)>$/) ||
-                        rawText.match(/^(.+?\.(jpg|jpeg|png|gif|opus|mp3|m4a|aac|mp4|mov|pdf|xlsx|docx|webp))\s*\(file attached\)$/i) ||
-                        rawText.match(/^(.+?\.(jpg|jpeg|png|gif|opus|mp3|m4a|aac|mp4|mov|pdf|xlsx|docx|webp))$/i);
-
-      if(attachMatch){
-        var fname = (attachMatch[1]||'').trim();
-        var ext = fname.split('.').pop().toLowerCase();
-        mediaFile = fname;
-        if(['jpg','jpeg','png','gif','webp'].includes(ext)) type = 'image';
-        else if(['mp4','mov','avi'].includes(ext)) type = 'video';
-        else if(['opus','mp3','m4a','aac','ogg'].includes(ext)) type = 'audio';
-        else type = 'document';
-      } else if(rawText.match(/^\u200eimage omise$|^image absente$|^\u200ephoto omise$/i)){
+      var attachFname = getAttachFilename(rawText);
+      if(attachFname){
+        mediaFile = attachFname;
+        type = extType(attachFname);
+      } else if(/image omise|photo omise|image absente/i.test(rawText)){
         type = 'image';
-      } else if(rawText.match(/^audio omis$|^\u200eaudio omis$/i)){
+      } else if(/audio omis|voice omitted/i.test(rawText)){
         type = 'audio';
-      } else if(rawText.match(/^vid.o omise$|^\u200evid.o omise$/i)){
+      } else if(/vid[eé]o omise|video omitted/i.test(rawText)){
         type = 'video';
-      } else if(rawText.match(/^document manquant/i)){
+      } else if(/document manquant|document omis/i.test(rawText)){
         type = 'document';
-      } else if(rawText.match(/Appel vocal|appel manqué/i)){
+      } else if(/Appel vocal|appel manqué|missed voice call|voice call/i.test(rawText)){
         type = 'call';
-      } else if(rawText.match(/Vous avez supprimé ce message|Ce message a été supprimé/i)){
+      } else if(/supprimé ce message|message supprimé|message was deleted|you deleted this message/i.test(rawText)){
         type = 'deleted';
-      } else if(rawText.match(/<Ce message a été modifié>/)){
+      } else if(/<Ce message a été modifié>/i.test(rawText)){
         type = 'edited';
-        rawText = rawText.replace('<Ce message a été modifié>','').trim();
+        rawText = rawText.replace(/<Ce message a été modifié>/i,'').trim();
       }
 
-      current = {date, time, sender, text: rawText, type, mediaFile};
+      current = {date: date, time: time, sender: sender, text: rawText, type: type, mediaFile: mediaFile};
     } else if(current && line){
       current.text += '\n' + line;
     }
   }
   if(current) messages.push(current);
 
-  // Determine "my" name = sender with most messages (heuristic: usually 2 senders)
-  var senders = Object.keys(senderCount).sort((a,b)=>senderCount[b]-senderCount[a]);
-  // Try to detect: the user's sender is usually different from the contact
+  var senders = Object.keys(senderCount).sort(function(a,b){return senderCount[b]-senderCount[a];});
   var myName = senders[0] || '';
 
-  return {messages, myName};
+  return {messages: messages, myName: myName};
 }
 
 // ══════════════════════════════════════════
