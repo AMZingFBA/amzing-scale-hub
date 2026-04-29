@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>WhatsApp Export · AMZing FBA</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<style>
+:root {
+  --bg: #0b141a;
+  --surface: #202c33;
+  --surface2: #2a3942;
+  --green: #00a884;
+  --green-dark: #005c4b;
+  --text: #e9edef;
+  --muted: #8696a0;
+  --border: #2a3942;
+  --ticks: #53bdeb;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,"Segoe UI",Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+
+/* ── LANDING / UPLOAD SCREEN ── */
+#upload-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:24px;gap:32px}
+.logo{display:flex;align-items:center;gap:12px}
+.logo-icon{width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#128C7E,#075E54);display:flex;align-items:center;justify-content:center;font-size:26px}
+.logo-text{font-size:22px;font-weight:700;color:var(--text)}
+.logo-sub{font-size:13px;color:var(--muted);margin-top:2px}
+
+.card{background:var(--surface);border-radius:20px;padding:40px;max-width:520px;width:100%;box-shadow:0 8px 40px rgba(0,0,0,.4)}
+.card h1{font-size:24px;font-weight:700;margin-bottom:8px;text-align:center}
+.card p{color:var(--muted);font-size:14px;text-align:center;line-height:1.6;margin-bottom:32px}
+
+.drop-zone{border:2px dashed var(--border);border-radius:16px;padding:48px 32px;text-align:center;cursor:pointer;transition:all .2s;position:relative}
+.drop-zone:hover,.drop-zone.drag{border-color:var(--green);background:rgba(0,168,132,.06)}
+.drop-zone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.drop-icon{font-size:48px;margin-bottom:16px}
+.drop-title{font-size:16px;font-weight:600;margin-bottom:6px}
+.drop-hint{font-size:13px;color:var(--muted)}
+.drop-badge{display:inline-block;background:var(--green-dark);color:var(--green);font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;margin-top:12px;letter-spacing:.5px}
+
+.steps{display:flex;flex-direction:column;gap:12px;margin-top:28px}
+.step{display:flex;align-items:flex-start;gap:12px;padding:14px 16px;background:var(--surface2);border-radius:12px}
+.step-num{width:24px;height:24px;border-radius:50%;background:var(--green);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.step-text{font-size:13px;line-height:1.5;color:var(--muted)}
+.step-text strong{color:var(--text)}
+
+/* ── PROGRESS ── */
+#progress-screen{display:none;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:24px;gap:24px}
+.progress-card{background:var(--surface);border-radius:20px;padding:40px;max-width:440px;width:100%;text-align:center}
+.progress-card h2{margin-bottom:8px}
+.progress-card p{color:var(--muted);font-size:14px;margin-bottom:28px}
+.prog-bar-wrap{background:var(--surface2);border-radius:99px;height:8px;overflow:hidden}
+.prog-bar{height:100%;background:linear-gradient(90deg,var(--green),#00d4a8);border-radius:99px;width:0%;transition:width .3s}
+.prog-label{font-size:13px;color:var(--muted);margin-top:12px}
+.prog-spinner{width:48px;height:48px;border:3px solid var(--border);border-top-color:var(--green);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 20px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── CHAT VIEW ── */
+#chat-screen{display:none;flex-direction:column;height:100vh}
+
+.chat-header{background:var(--surface);padding:10px 16px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border);flex-shrink:0;z-index:5}
+.chat-header .av{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#128C7E,#075E54);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;flex-shrink:0}
+.chat-header .hi{flex:1}.chat-header .hn{font-size:16px;font-weight:500}.chat-header .hs{color:var(--muted);font-size:12px}
+.chat-header-actions{display:flex;gap:10px}
+
+.btn{display:inline-flex;align-items:center;gap:8px;padding:9px 18px;border-radius:10px;border:none;cursor:pointer;font-size:13px;font-weight:600;transition:all .15s}
+.btn-green{background:var(--green);color:#fff}.btn-green:hover{background:#00cf9d}
+.btn-ghost{background:var(--surface2);color:var(--text)}.btn-ghost:hover{background:#374045}
+.btn-sm{padding:7px 14px;font-size:12px}
+
+.chat-body{flex:1;overflow-y:auto;padding:10px 5% 16px;background:var(--bg);display:flex;flex-direction:column;gap:2px}
+.chat-body::-webkit-scrollbar{width:5px}.chat-body::-webkit-scrollbar-thumb{background:var(--surface2);border-radius:3px}
+
+/* ── DATE SEP ── */
+.dsep{display:flex;justify-content:center;margin:12px 0 4px}
+.dsep span{background:#182229;color:var(--muted);font-size:12px;padding:5px 14px;border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,.4);text-transform:capitalize}
+
+/* ── SYSTEM ── */
+.sys{display:flex;justify-content:center;margin:4px 0}
+.sys span{background:#182229;color:var(--muted);font-size:12px;padding:5px 12px;border-radius:8px;text-align:center;max-width:80%}
+
+/* ── BUBBLES ── */
+.b{max-width:72%;display:flex;flex-direction:column;position:relative;word-break:break-word}
+.b.out{align-self:flex-end}
+.b.in{align-self:flex-start}
+.b.out>.tx,.b.out>.ar,.b.out>.dr2{background:var(--green-dark);border-radius:8px 0 8px 8px;box-shadow:0 1px 2px rgba(0,0,0,.3)}
+.b.in>.tx,.b.in>.ar,.b.in>.dr2{background:var(--surface);border-radius:0 8px 8px 8px;box-shadow:0 1px 2px rgba(0,0,0,.3)}
+.b.out>.mw{border-radius:8px 0 8px 8px;overflow:hidden}
+.b.in>.mw{border-radius:0 8px 8px 8px;overflow:hidden}
+
+.tx{padding:6px 10px 20px;color:var(--text);font-size:14.5px;line-height:1.45;min-width:60px}
+.ts{position:absolute;bottom:4px;right:8px;font-size:11px;color:var(--muted);white-space:nowrap;display:flex;align-items:center;gap:3px}
+.tk{color:var(--ticks);font-size:13px}
+
+/* ── MEDIA ── */
+.mw{position:relative;max-width:300px;min-width:100px}
+.mw img{width:100%;display:block;cursor:zoom-in;transition:opacity .15s}.mw img:hover{opacity:.88}
+.mw video{width:100%;display:block;max-width:300px}
+.tsm{position:absolute;bottom:6px;right:8px;font-size:11px;color:rgba(255,255,255,.9);background:rgba(0,0,0,.38);padding:2px 6px;border-radius:4px;white-space:nowrap;display:flex;align-items:center;gap:3px}
+
+/* ── AUDIO ── */
+.ar{display:flex;align-items:center;gap:8px;padding:8px 10px 22px;min-width:230px;position:relative}
+.pb{width:42px;height:42px;border-radius:50%;background:var(--green);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0;transition:background .15s}
+.pb:hover{background:#00cf9d}
+.ww{display:flex;align-items:center;gap:2px;flex:1;height:32px;cursor:pointer}
+.wb{width:3px;border-radius:2px;min-height:3px;background:var(--muted)}
+.wb.done{background:var(--ticks)}.wb.cur{background:var(--green)}
+.b.out .wb{background:rgba(255,255,255,.3)}.b.out .wb.done,.b.out .wb.cur{background:rgba(255,255,255,.85)}
+.ai{display:flex;flex-direction:column;align-items:flex-end;gap:3px;min-width:44px;color:var(--muted)}
+.dr{font-size:12px}
+.spd{font-size:11px;font-weight:700;background:transparent;border:none;cursor:pointer;color:var(--muted);padding:0;font-family:inherit}
+.spd:hover,.spd.active{color:var(--green)}
+.tsa{position:absolute;bottom:4px;right:8px;font-size:11px;color:var(--muted);white-space:nowrap;display:flex;align-items:center;gap:3px}
+
+/* ── DOCUMENT ── */
+.dr2{display:flex;align-items:center;gap:10px;padding:10px 10px 24px;min-width:220px;position:relative}
+.dic{width:44px;height:44px;border-radius:50%;background:var(--surface2);display:flex;align-items:center;justify-content:center;position:relative;flex-shrink:0;color:#aebac1}
+.dex{position:absolute;bottom:-1px;right:-2px;background:var(--green);color:#fff;font-size:7px;padding:1px 3px;border-radius:2px;font-weight:700}
+.dn{flex:1;font-size:13px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:160px}
+
+/* ── LIGHTBOX ── */
+#lb{display:none;position:fixed;inset:0;background:rgba(0,0,0,.93);z-index:9999;align-items:center;justify-content:center;cursor:zoom-out}
+#lb.on{display:flex}
+#lb img{max-width:92vw;max-height:92vh;object-fit:contain;border-radius:4px;cursor:default}
+#lbx{position:absolute;top:16px;right:22px;color:#fff;font-size:32px;cursor:pointer;line-height:1}
+
+/* ── TOOLBAR ── */
+.chat-footer{background:var(--surface);padding:8px 16px;display:flex;align-items:center;gap:10px;border-top:1px solid var(--border);flex-shrink:0}
+.chat-footer input{flex:1;background:var(--surface2);border:none;border-radius:22px;padding:10px 16px;color:var(--text);font-size:15px;outline:none}
+.chat-footer input::placeholder{color:var(--muted)}
+
+/* ── DOWNLOAD PANEL ── */
+#dl-panel{position:fixed;bottom:80px;right:20px;background:var(--surface);border-radius:16px;padding:20px;box-shadow:0 8px 32px rgba(0,0,0,.5);display:flex;flex-direction:column;gap:10px;min-width:220px;z-index:100;transition:transform .2s,opacity .2s}
+#dl-panel h3{font-size:14px;margin-bottom:4px}
+#dl-panel p{font-size:12px;color:var(--muted);margin-bottom:4px}
+.dl-toggle{position:fixed;bottom:80px;right:20px;width:48px;height:48px;border-radius:50%;background:var(--green);border:none;color:#fff;cursor:pointer;box-shadow:0 2px 12px rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;z-index:101;font-size:20px}
+
+/* Scroll btn */
+#sdn{position:fixed;bottom:80px;left:20px;width:42px;height:42px;border-radius:50%;background:var(--surface);border:none;color:var(--green);cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:50}
+
+/* ── TOAST ── */
+.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-80px);background:var(--surface);color:var(--text);padding:12px 20px;border-radius:10px;font-size:14px;box-shadow:0 4px 20px rgba(0,0,0,.4);transition:transform .3s;z-index:9999;border-left:3px solid var(--green)}
+.toast.show{transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════
+     UPLOAD SCREEN
+════════════════════════════════════════ -->
+<div id="upload-screen">
+  <div class="logo">
+    <div class="logo-icon">📱</div>
+    <div>
+      <div class="logo-text">WhatsApp Viewer</div>
+      <div class="logo-sub">by AMZing FBA</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h1>Importer une conversation</h1>
+    <p>Dépose le fichier ZIP exporté depuis WhatsApp sur iPhone ou Android. Photos, vidéos et vocaux sont inclus automatiquement.</p>
+
+    <div class="drop-zone" id="dropZone">
+      <input type="file" id="fileInput" accept=".zip">
+      <div class="drop-icon">📦</div>
+      <div class="drop-title">Dépose ton fichier ZIP ici</div>
+      <div class="drop-hint">ou clique pour sélectionner</div>
+      <div class="drop-badge">FORMAT ZIP WHATSAPP</div>
+    </div>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-text"><strong>Sur iPhone :</strong> Ouvre la conversation → Nom du contact → Exporter la discussion → Joindre les médias → Envoie-toi le ZIP</div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-text"><strong>Sur Android :</strong> Ouvre la conversation → ⋮ → Plus → Exporter la discussion → Avec médias</div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-text"><strong>Ici :</strong> Dépose le ZIP → La conversation s'affiche instantanément avec tous les médias</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     PROGRESS SCREEN
+════════════════════════════════════════ -->
+<div id="progress-screen">
+  <div class="progress-card">
+    <div class="prog-spinner"></div>
+    <h2>Traitement en cours…</h2>
+    <p id="prog-status">Extraction du fichier ZIP</p>
+    <div class="prog-bar-wrap"><div class="prog-bar" id="progBar"></div></div>
+    <div class="prog-label" id="prog-label">0%</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     CHAT SCREEN
+════════════════════════════════════════ -->
+<div id="chat-screen">
+  <div class="chat-header">
+    <div class="av" id="chatAv">?</div>
+    <div class="hi">
+      <div class="hn" id="chatName">Conversation</div>
+      <div class="hs" id="chatSub"></div>
+    </div>
+    <div class="chat-header-actions">
+      <button class="btn btn-ghost btn-sm" onclick="resetApp()">⬅ Nouvelle</button>
+      <button class="btn btn-green btn-sm" onclick="downloadHTML()">⬇ Télécharger HTML</button>
+    </div>
+  </div>
+
+  <div class="chat-body" id="chatBody"></div>
+
+  <div class="chat-footer">
+    <span style="font-size:22px;cursor:pointer">😊</span>
+    <input placeholder="Message" readonly>
+    <span style="font-size:22px;cursor:pointer;color:var(--muted)">🎤</span>
+  </div>
+</div>
+
+<!-- Lightbox -->
+<div id="lb" onclick="closeLb()"><span id="lbx" onclick="closeLb()">✕</span><img id="lbi" src="" alt="" onclick="event.stopPropagation()"></div>
+
+<!-- Scroll to bottom -->
+<button id="sdn" onclick="document.getElementById('chatBody').scrollTop=1e9" title="Fin de conversation">
+  <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M20 12l-1.41-1.41L13 16.17V4h-2v12.17l-5.58-5.59L4 12l8 8 8-8z"/></svg>
+</button>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════
+var state = {
+  contactName: '',
+  myName: '',
+  messages: [],
+  mediaBlobs: {},   // filename -> blob URL
+  audioIds: []
+};
+
+var speeds = [1, 1.5, 2];
+var currentAudio = null, currentPk = null;
+
+// ══════════════════════════════════════════
+//  UPLOAD
+// ══════════════════════════════════════════
+var dz = document.getElementById('dropZone');
+var fi = document.getElementById('fileInput');
+
+dz.addEventListener('dragover', function(e){ e.preventDefault(); dz.classList.add('drag'); });
+dz.addEventListener('dragleave', function(){ dz.classList.remove('drag'); });
+dz.addEventListener('drop', function(e){
+  e.preventDefault(); dz.classList.remove('drag');
+  var f = e.dataTransfer.files[0];
+  if(f) processZip(f);
+});
+fi.addEventListener('change', function(){ if(fi.files[0]) processZip(fi.files[0]); });
+
+// ══════════════════════════════════════════
+//  PROCESS ZIP
+// ══════════════════════════════════════════
+async function processZip(file) {
+  showScreen('progress');
+  setProgress(5, 'Ouverture du ZIP…');
+
+  var zip;
+  try { zip = await JSZip.loadAsync(file); }
+  catch(e){ showToast('❌ Fichier ZIP invalide'); showScreen('upload'); return; }
+
+  setProgress(15, 'Recherche du fichier de conversation…');
+
+  // Find _chat.txt
+  var chatFile = null;
+  zip.forEach(function(path, f){
+    if(!f.dir && (path.endsWith('_chat.txt') || path === '_chat.txt')) chatFile = f;
+  });
+  if(!chatFile){ showToast('❌ Pas de fichier _chat.txt trouvé'); showScreen('upload'); return; }
+
+  setProgress(25, 'Lecture des messages…');
+  var chatText = await chatFile.async('string');
+
+  // Detect contact name from ZIP filename
+  var zipName = file.name.replace(/\.zip$/i,'').replace(/^WhatsApp Chat - /,'');
+  state.contactName = zipName || 'Contact';
+
+  setProgress(35, 'Analyse des messages…');
+  var parsed = parseChat(chatText);
+  state.messages = parsed.messages;
+  state.myName = parsed.myName;
+
+  // Load media files
+  setProgress(45, 'Chargement des médias…');
+  var mediaFiles = [];
+  zip.forEach(function(path, f){ if(!f.dir && path !== '_chat.txt' && !path.startsWith('__MACOSX')) mediaFiles.push({path, file: f}); });
+
+  state.mediaBlobs = {};
+  for(var i=0; i<mediaFiles.length; i++){
+    var mf = mediaFiles[i];
+    var fname = mf.path.split('/').pop();
+    try {
+      var blob = await mf.file.async('blob');
+      var ext = fname.split('.').pop().toLowerCase();
+      var mime = getMime(ext);
+      var blobObj = new Blob([blob], {type: mime});
+      state.mediaBlobs[fname] = URL.createObjectURL(blobObj);
+    } catch(e){}
+    var pct = 45 + Math.floor((i/mediaFiles.length)*40);
+    setProgress(pct, 'Chargement médias ' + (i+1) + '/' + mediaFiles.length + '…');
+  }
+
+  setProgress(90, 'Rendu de l\'interface…');
+  await new Promise(r => setTimeout(r, 100));
+  renderChat();
+  setProgress(100, 'Terminé !');
+  await new Promise(r => setTimeout(r, 300));
+  showScreen('chat');
+}
+
+function getMime(ext){
+  var map = {jpg:'image/jpeg',jpeg:'image/jpeg',png:'image/png',gif:'image/gif',webp:'image/webp',
+             mp4:'video/mp4',mov:'video/quicktime',avi:'video/avi',
+             opus:'audio/ogg;codecs=opus',mp3:'audio/mpeg',m4a:'audio/mp4',aac:'audio/aac',ogg:'audio/ogg',
+             pdf:'application/pdf',xlsx:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+             docx:'application/vnd.openxmlformats-officedocument.wordprocessingml.document'};
+  return map[ext] || 'application/octet-stream';
+}
+
+// ══════════════════════════════════════════
+//  PARSE _chat.txt
+// ══════════════════════════════════════════
+function parseChat(text) {
+  var lines = text.split('\n');
+  var pattern = /^[\u200e\u200f]?\[(\d{2}\/\d{2}\/\d{4}),?\s+(\d{2}:\d{2}(?::\d{2})?)\]\s+([^:]+):\s(.*)$/;
+  var messages = [];
+  var current = null;
+  var senderCount = {};
+
+  for(var i=0; i<lines.length; i++){
+    var line = lines[i].replace(/^\uFEFF/,'').trim();
+    var m = pattern.exec(line);
+    if(m){
+      if(current) messages.push(current);
+      var date = m[1], time = m[2].substring(0,5), sender = m[3].trim();
+      var rawText = (m[4] || '').replace(/\u200e/g,'').trim();
+
+      senderCount[sender] = (senderCount[sender]||0) + 1;
+
+      // Detect type
+      var type = 'text';
+      var mediaFile = null;
+
+      // WhatsApp media attachments: "filename.ext (file attached)" or "<attached: filename>"
+      var attachMatch = rawText.match(/^<attached:\s*(.+?)>$/) ||
+                        rawText.match(/^(.+?\.(jpg|jpeg|png|gif|opus|mp3|m4a|aac|mp4|mov|pdf|xlsx|docx|webp))\s*\(file attached\)$/i) ||
+                        rawText.match(/^(.+?\.(jpg|jpeg|png|gif|opus|mp3|m4a|aac|mp4|mov|pdf|xlsx|docx|webp))$/i);
+
+      if(attachMatch){
+        var fname = (attachMatch[1]||'').trim();
+        var ext = fname.split('.').pop().toLowerCase();
+        mediaFile = fname;
+        if(['jpg','jpeg','png','gif','webp'].includes(ext)) type = 'image';
+        else if(['mp4','mov','avi'].includes(ext)) type = 'video';
+        else if(['opus','mp3','m4a','aac','ogg'].includes(ext)) type = 'audio';
+        else type = 'document';
+      } else if(rawText.match(/^\u200eimage omise$|^image absente$|^\u200ephoto omise$/i)){
+        type = 'image';
+      } else if(rawText.match(/^audio omis$|^\u200eaudio omis$/i)){
+        type = 'audio';
+      } else if(rawText.match(/^vid.o omise$|^\u200evid.o omise$/i)){
+        type = 'video';
+      } else if(rawText.match(/^document manquant/i)){
+        type = 'document';
+      } else if(rawText.match(/Appel vocal|appel manqué/i)){
+        type = 'call';
+      } else if(rawText.match(/Vous avez supprimé ce message|Ce message a été supprimé/i)){
+        type = 'deleted';
+      } else if(rawText.match(/<Ce message a été modifié>/)){
+        type = 'edited';
+        rawText = rawText.replace('<Ce message a été modifié>','').trim();
+      }
+
+      current = {date, time, sender, text: rawText, type, mediaFile};
+    } else if(current && line){
+      current.text += '\n' + line;
+    }
+  }
+  if(current) messages.push(current);
+
+  // Determine "my" name = sender with most messages (heuristic: usually 2 senders)
+  var senders = Object.keys(senderCount).sort((a,b)=>senderCount[b]-senderCount[a]);
+  // Try to detect: the user's sender is usually different from the contact
+  var myName = senders[0] || '';
+
+  return {messages, myName};
+}
+
+// ══════════════════════════════════════════
+//  RENDER CHAT
+// ══════════════════════════════════════════
+var audioCounter = 0;
+
+function renderChat(){
+  var msgs = state.messages;
+  var myName = state.myName;
+  var contactName = state.contactName;
+
+  // Update header
+  document.getElementById('chatName').textContent = contactName;
+  document.getElementById('chatAv').textContent = contactName.charAt(0).toUpperCase();
+  document.getElementById('chatSub').textContent = msgs.length + ' messages · ' + countType(msgs,'audio') + ' vocaux · ' + countType(msgs,'image') + ' photos';
+
+  var html = '';
+  var curDate = null;
+  audioCounter = 0;
+  state.audioIds = [];
+
+  for(var i=0; i<msgs.length; i++){
+    var msg = msgs[i];
+    var isMe = msg.sender === myName;
+    var side = isMe ? 'out' : 'in';
+    var t = msg.time;
+    var ticks = isMe ? '<span class="tk">✓✓</span>' : '';
+
+    if(msg.date !== curDate){
+      curDate = msg.date;
+      html += '<div class="dsep"><span>' + dateFr(msg.date) + '</span></div>';
+    }
+
+    var content = '';
+
+    if(msg.type === 'text' || msg.type === 'edited'){
+      var editedTag = msg.type === 'edited' ? ' <span style="color:var(--muted);font-size:11px">modifié</span>' : '';
+      content = '<div class="tx">' + esc(msg.text) + editedTag + '</div><span class="ts">' + t + ticks + '</span>';
+
+    } else if(msg.type === 'image'){
+      var blobUrl = msg.mediaFile ? (state.mediaBlobs[msg.mediaFile] || null) : null;
+      if(blobUrl){
+        content = '<div class="mw"><img src="' + blobUrl + '" loading="lazy" onclick="lb(this)"><span class="tsm">' + t + ticks + '</span></div>';
+      } else {
+        content = '<div class="tx" style="color:var(--muted);font-style:italic">🖼 Photo · ' + t + ticks + '</div>';
+      }
+
+    } else if(msg.type === 'video'){
+      var blobUrl = msg.mediaFile ? (state.mediaBlobs[msg.mediaFile] || null) : null;
+      if(blobUrl){
+        content = '<div class="mw"><video controls preload="metadata" src="' + blobUrl + '"></video><span class="tsm">' + t + ticks + '</span></div>';
+      } else {
+        content = '<div class="tx" style="color:var(--muted);font-style:italic">🎬 Vidéo · ' + t + ticks + '</div>';
+      }
+
+    } else if(msg.type === 'audio'){
+      var blobUrl = msg.mediaFile ? (state.mediaBlobs[msg.mediaFile] || null) : null;
+      var aid = 'aud' + (audioCounter++);
+      state.audioIds.push(aid);
+      var wave = genWave();
+      if(blobUrl){
+        content = '<div class="ar">' +
+          '<audio id="' + aid + '" src="' + blobUrl + '" preload="none"></audio>' +
+          '<button class="pb" onclick="playAudio(this,\'' + aid + '\')">' +
+            '<svg class="ip2" viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M8 5v14l11-7z"/></svg>' +
+            '<svg class="ip3" viewBox="0 0 24 24" width="22" height="22" style="display:none"><path fill="currentColor" d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>' +
+          '</button>' +
+          '<div class="ww" onclick="seekAudio(event,\'' + aid + '\')">' + wave + '</div>' +
+          '<div class="ai">' +
+            '<button class="spd" data-spd="1" onclick="changeSpeed(this,\'' + aid + '\')">1x</button>' +
+            '<span class="dr" id="dr' + aid + '">0:00</span>' +
+            '<svg viewBox="0 0 24 24" width="11" height="11"><path fill="currentColor" d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm-1-9c0-.55.45-1 1-1s1 .45 1 1v6c0 .55-.45 1-1 1s-1-.45-1-1V5zm6 6c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>' +
+          '</div>' +
+          '<span class="tsa">' + t + ticks + '</span>' +
+        '</div>';
+      } else {
+        content = '<div class="ar">' +
+          '<div class="pb" style="background:var(--surface2);cursor:default"><svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M8 5v14l11-7z"/></svg></div>' +
+          '<div class="ww">' + wave + '</div>' +
+          '<div class="ai"><span class="dr">—</span></div>' +
+          '<span class="tsa">' + t + ticks + '</span>' +
+        '</div>';
+      }
+
+    } else if(msg.type === 'document'){
+      var blobUrl = msg.mediaFile ? (state.mediaBlobs[msg.mediaFile] || null) : null;
+      var fname = msg.mediaFile || msg.text || 'Document';
+      fname = fname.replace(/\s*\(file attached\)/i,'');
+      var ext = fname.split('.').pop().toUpperCase().substring(0,4);
+      var linkOpen = blobUrl ? '<a href="' + blobUrl + '" download="' + fname + '" style="display:flex;align-items:center;gap:10px;flex:1;text-decoration:none;color:inherit">' : '<div style="display:flex;align-items:center;gap:10px;flex:1">';
+      var linkClose = blobUrl ? '</a>' : '</div>';
+      content = '<div class="dr2">' + linkOpen +
+        '<div class="dic"><svg viewBox="0 0 24 24" width="26" height="26"><path fill="currentColor" d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.89 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11z"/></svg><span class="dex">' + ext + '</span></div>' +
+        '<div class="dn" title="' + esc(fname) + '">' + esc(fname) + '</div>' +
+        linkClose + '<span class="ts">' + t + ticks + '</span></div>';
+
+    } else if(msg.type === 'call'){
+      var callText = msg.text.replace(/\u200e|\u202f|\xa0/g,' ').trim();
+      var missed = /sans réponse|manqué/i.test(callText);
+      content = '<div class="tx" style="display:flex;align-items:center;gap:8px">' +
+        '<span style="font-size:18px">' + (missed ? '📵' : '📞') + '</span>' +
+        '<span>' + esc(callText) + '</span>' +
+        '<span class="ts" style="position:static;margin-left:auto">' + t + ticks + '</span>' +
+        '</div>';
+
+    } else if(msg.type === 'deleted'){
+      content = '<div class="tx" style="color:var(--muted);font-style:italic;display:flex;align-items:center;gap:6px"><span>🚫</span><span>Message supprimé</span><span class="ts" style="position:static;margin-left:auto">' + t + ticks + '</span></div>';
+
+    } else {
+      if(msg.text) content = '<div class="tx">' + esc(msg.text) + '</div><span class="ts">' + t + ticks + '</span>';
+    }
+
+    if(content) html += '<div class="b ' + side + '">' + content + '</div>';
+  }
+
+  document.getElementById('chatBody').innerHTML = html;
+  document.getElementById('chatBody').scrollTop = 1e9;
+
+  // Load audio durations
+  state.audioIds.forEach(function(aid){
+    var el = document.getElementById(aid);
+    if(!el) return;
+    el.addEventListener('loadedmetadata', function(){
+      var dur = el.duration;
+      if(!isNaN(dur)){
+        var m=Math.floor(dur/60),s=Math.floor(dur%60);
+        var drEl = document.getElementById('dr'+aid);
+        if(drEl){ drEl.textContent = m+':'+(s<10?'0':'')+s; drEl._orig = drEl.textContent; }
+      }
+    });
+    el.load();
+  });
+}
+
+function genWave(){
+  var h = '';
+  for(var i=0;i<30;i++) h += '<div class="wb" style="height:'+(3+Math.floor(Math.random()*12))+'px"></div>';
+  return h;
+}
+
+function countType(msgs, type){ return msgs.filter(function(m){return m.type===type;}).length; }
+
+var monthsFr = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+var daysFr = ['lundi','mardi','mercredi','jeudi','vendredi','samedi','dimanche'];
+function dateFr(d){
+  var parts = d.split('/');
+  var day=parseInt(parts[0]),mo=parseInt(parts[1]),yr=parseInt(parts[2]);
+  var dt = new Date(yr, mo-1, day);
+  return daysFr[dt.getDay()===0?6:dt.getDay()-1] + ' ' + day + ' ' + monthsFr[mo-1] + ' ' + yr;
+}
+
+function esc(t){
+  return (t||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+}
+
+// ══════════════════════════════════════════
+//  AUDIO PLAYER
+// ══════════════════════════════════════════
+function stopCurrent(){
+  if(!currentAudio) return;
+  currentAudio.pause();
+  var prevBtn = document.querySelector('[data-playing="1"]');
+  if(prevBtn){
+    var pRow = prevBtn.closest('.ar');
+    pRow.querySelectorAll('.wb').forEach(function(b){b.classList.remove('done','cur');});
+    prevBtn.querySelector('.ip2').style.display='';
+    prevBtn.querySelector('.ip3').style.display='none';
+    prevBtn.dataset.playing='0';
+  }
+  currentAudio=null; currentPk=null;
+}
+
+function playAudio(btn, aid){
+  var audio = document.getElementById(aid);
+  if(!audio) return;
+  var row = btn.closest('.ar');
+  var bars = row.querySelectorAll('.wb');
+  var drEl = document.getElementById('dr'+aid);
+  var ipPlay = btn.querySelector('.ip2');
+  var ipPause = btn.querySelector('.ip3');
+
+  if(currentAudio && currentPk !== aid) stopCurrent();
+
+  if(audio.paused){
+    var spdBtn = row.querySelector('.spd');
+    audio.playbackRate = parseFloat(spdBtn ? spdBtn.dataset.spd : 1);
+    audio.play();
+    currentAudio=audio; currentPk=aid;
+    btn.dataset.playing='1';
+    ipPlay.style.display='none'; ipPause.style.display='';
+
+    audio.ontimeupdate = function(){
+      var pct = audio.duration ? audio.currentTime/audio.duration : 0;
+      var idx = Math.floor(pct * bars.length);
+      bars.forEach(function(b,i){
+        b.classList.remove('done','cur');
+        if(i<idx) b.classList.add('done');
+        else if(i===idx) b.classList.add('cur');
+      });
+      var rem = (audio.duration - audio.currentTime) / audio.playbackRate;
+      if(!isNaN(rem)){
+        var m=Math.floor(rem/60),s=Math.floor(rem%60);
+        drEl.textContent = m+':'+(s<10?'0':'')+s;
+      }
+    };
+    audio.onended = function(){
+      btn.dataset.playing='0';
+      ipPlay.style.display=''; ipPause.style.display='none';
+      bars.forEach(function(b){b.classList.remove('done','cur');});
+      if(drEl._orig) drEl.textContent=drEl._orig;
+      currentAudio=null; currentPk=null;
+    };
+    if(!drEl._orig) drEl._orig = drEl.textContent;
+  } else {
+    audio.pause();
+    btn.dataset.playing='0';
+    ipPlay.style.display=''; ipPause.style.display='none';
+    currentAudio=null; currentPk=null;
+  }
+}
+
+function changeSpeed(btn, aid){
+  var audio = document.getElementById(aid);
+  var cur = parseFloat(btn.dataset.spd||1);
+  var next = speeds[(speeds.indexOf(cur)+1)%speeds.length];
+  btn.dataset.spd = next;
+  btn.textContent = next+'x';
+  btn.classList.toggle('active', next>1);
+  if(audio) audio.playbackRate = next;
+}
+
+function seekAudio(e, aid){
+  var audio = document.getElementById(aid);
+  if(!audio||!audio.duration) return;
+  var ww = e.currentTarget;
+  var pct = (e.clientX - ww.getBoundingClientRect().left) / ww.offsetWidth;
+  audio.currentTime = pct * audio.duration;
+}
+
+// ══════════════════════════════════════════
+//  LIGHTBOX
+// ══════════════════════════════════════════
+function lb(img){ document.getElementById('lbi').src=img.src; document.getElementById('lb').classList.add('on'); }
+function closeLb(){ document.getElementById('lb').classList.remove('on'); }
+document.addEventListener('keydown',function(e){if(e.key==='Escape')closeLb();});
+
+// ══════════════════════════════════════════
+//  DOWNLOAD HTML
+// ══════════════════════════════════════════
+function downloadHTML(){
+  showToast('⏳ Génération du fichier…');
+  setTimeout(async function(){
+    var chatHtml = document.getElementById('chatBody').innerHTML;
+    var name = state.contactName;
+    var slug = name.toLowerCase().replace(/[^a-z0-9]/g,'-').replace(/-+/g,'-');
+
+    var page = '<!DOCTYPE html>\n<html lang="fr">\n<head>\n<meta charset="UTF-8">\n<meta name="viewport" content="width=device-width,initial-scale=1">\n<title>' + name + ' · WhatsApp</title>\n' +
+      getEmbeddedStyles() +
+      '</head>\n<body>\n' +
+      '<div id="chat-screen" style="display:flex">\n' +
+      '<div class="chat-header">' +
+        '<div class="av">' + name.charAt(0).toUpperCase() + '</div>' +
+        '<div class="hi"><div class="hn">' + esc(name) + '</div><div class="hs">' + state.messages.length + ' messages</div></div>' +
+      '</div>\n' +
+      '<div class="chat-body" id="chatBody">\n' + chatHtml + '\n</div>\n' +
+      '<div class="chat-footer"><span style="font-size:22px">😊</span><input placeholder="Message" readonly><span style="font-size:22px;color:var(--muted)">🎤</span></div>\n' +
+      '</div>\n' +
+      '<div id="lb" onclick="closeLb()"><span id="lbx" onclick="closeLb()">✕</span><img id="lbi" src="" onclick="event.stopPropagation()"></div>\n' +
+      '<button id="sdn" onclick="document.getElementById(\'chatBody\').scrollTop=1e9"><svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M20 12l-1.41-1.41L13 16.17V4h-2v12.17l-5.58-5.59L4 12l8 8 8-8z"/></svg></button>\n' +
+      getEmbeddedScript() +
+      '</body>\n</html>';
+
+    var blob = new Blob([page], {type:'text/html'});
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = slug + '_whatsapp.html';
+    a.click();
+    showToast('✅ Fichier téléchargé !');
+  }, 100);
+}
+
+function getEmbeddedStyles(){
+  // Return inline styles for standalone file
+  return '<style>\n:root{--bg:#0b141a;--surface:#202c33;--surface2:#2a3942;--green:#00a884;--green-dark:#005c4b;--text:#e9edef;--muted:#8696a0;--border:#2a3942;--ticks:#53bdeb}\n*{margin:0;padding:0;box-sizing:border-box}\nbody{font-family:-apple-system,"Segoe UI",Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text);display:flex;height:100vh;overflow:hidden;justify-content:center}\n#chat-screen{width:100%;max-width:940px;display:flex;flex-direction:column;height:100vh}\n.chat-header{background:var(--surface);padding:10px 16px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border);flex-shrink:0}\n.av{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#128C7E,#075E54);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:#fff;flex-shrink:0}\n.hi{flex:1}.hn{color:var(--text);font-size:16px;font-weight:500}.hs{color:var(--muted);font-size:12px}\n.chat-body{flex:1;overflow-y:auto;padding:10px 5% 16px;background:var(--bg);display:flex;flex-direction:column;gap:2px}\n.chat-body::-webkit-scrollbar{width:5px}.chat-body::-webkit-scrollbar-thumb{background:var(--surface2);border-radius:3px}\n.chat-footer{background:var(--surface);padding:8px 16px;display:flex;align-items:center;gap:10px;flex-shrink:0;border-top:1px solid var(--border)}\n.chat-footer input{flex:1;background:var(--surface2);border:none;border-radius:22px;padding:10px 16px;color:var(--text);font-size:15px;outline:none}\n.chat-footer input::placeholder{color:var(--muted)}\n.dsep{display:flex;justify-content:center;margin:12px 0 4px}.dsep span{background:#182229;color:var(--muted);font-size:12px;padding:5px 14px;border-radius:8px;text-transform:capitalize}\n.sys{display:flex;justify-content:center;margin:4px 0}.sys span{background:#182229;color:var(--muted);font-size:12px;padding:5px 12px;border-radius:8px;text-align:center;max-width:80%}\n.b{max-width:72%;display:flex;flex-direction:column;position:relative;word-break:break-word}\n.b.out{align-self:flex-end}.b.in{align-self:flex-start}\n.b.out>.tx,.b.out>.ar,.b.out>.dr2{background:var(--green-dark);border-radius:8px 0 8px 8px;box-shadow:0 1px 2px rgba(0,0,0,.3)}\n.b.in>.tx,.b.in>.ar,.b.in>.dr2{background:var(--surface);border-radius:0 8px 8px 8px;box-shadow:0 1px 2px rgba(0,0,0,.3)}\n.b.out>.mw{border-radius:8px 0 8px 8px;overflow:hidden}.b.in>.mw{border-radius:0 8px 8px 8px;overflow:hidden}\n.tx{padding:6px 10px 20px;color:var(--text);font-size:14.5px;line-height:1.45;min-width:60px}\n.ts{position:absolute;bottom:4px;right:8px;font-size:11px;color:var(--muted);white-space:nowrap;display:flex;align-items:center;gap:3px}\n.tk{color:var(--ticks);font-size:13px}\n.mw{position:relative;max-width:300px;min-width:100px}\n.mw img{width:100%;display:block;cursor:zoom-in;transition:opacity .15s}.mw img:hover{opacity:.88}\n.mw video{width:100%;display:block;max-width:300px}\n.tsm{position:absolute;bottom:6px;right:8px;font-size:11px;color:rgba(255,255,255,.9);background:rgba(0,0,0,.38);padding:2px 6px;border-radius:4px;white-space:nowrap;display:flex;align-items:center;gap:3px}\n.ar{display:flex;align-items:center;gap:8px;padding:8px 10px 22px;min-width:230px;position:relative}\n.pb{width:42px;height:42px;border-radius:50%;background:var(--green);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0;transition:background .15s}\n.pb:hover{background:#00cf9d}\n.ww{display:flex;align-items:center;gap:2px;flex:1;height:32px;cursor:pointer}\n.wb{width:3px;border-radius:2px;min-height:3px;background:var(--muted)}\n.wb.done{background:var(--ticks)}.wb.cur{background:var(--green)}\n.b.out .wb{background:rgba(255,255,255,.3)}.b.out .wb.done,.b.out .wb.cur{background:rgba(255,255,255,.85)}\n.ai{display:flex;flex-direction:column;align-items:flex-end;gap:3px;min-width:44px;color:var(--muted)}\n.dr{font-size:12px}\n.spd{font-size:11px;font-weight:700;background:transparent;border:none;cursor:pointer;color:var(--muted);padding:0;font-family:inherit}.spd:hover,.spd.active{color:var(--green)}\n.tsa{position:absolute;bottom:4px;right:8px;font-size:11px;color:var(--muted);white-space:nowrap;display:flex;align-items:center;gap:3px}\n.dr2{display:flex;align-items:center;gap:10px;padding:10px 10px 24px;min-width:220px;position:relative}\n.dic{width:44px;height:44px;border-radius:50%;background:var(--surface2);display:flex;align-items:center;justify-content:center;position:relative;flex-shrink:0;color:#aebac1}\n.dex{position:absolute;bottom:-1px;right:-2px;background:var(--green);color:#fff;font-size:7px;padding:1px 3px;border-radius:2px;font-weight:700}\n.dn{flex:1;font-size:13px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:160px}\n#lb{display:none;position:fixed;inset:0;background:rgba(0,0,0,.93);z-index:9999;align-items:center;justify-content:center;cursor:zoom-out}\n#lb.on{display:flex}#lb img{max-width:92vw;max-height:92vh;object-fit:contain;border-radius:4px;cursor:default}\n#lbx{position:absolute;top:16px;right:22px;color:#fff;font-size:32px;cursor:pointer;line-height:1}\n#sdn{position:fixed;bottom:80px;left:20px;width:42px;height:42px;border-radius:50%;background:var(--surface);border:none;color:var(--green);cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:50}\n</style>\n';
+}
+
+function getEmbeddedScript(){
+  return '<script>\nvar speeds=[1,1.5,2];var currentAudio=null,currentPk=null;\ndocument.getElementById("chatBody").scrollTop=1e9;\ndocument.querySelectorAll(".mw img").forEach(function(img){img.addEventListener("click",function(){document.getElementById("lbi").src=this.src;document.getElementById("lb").classList.add("on");});});\nfunction closeLb(){document.getElementById("lb").classList.remove("on");}\ndocument.addEventListener("keydown",function(e){if(e.key==="Escape")closeLb();});\nfunction stopCurrent(){if(!currentAudio)return;currentAudio.pause();var b=document.querySelector("[data-playing=\'1\']");if(b){b.closest(".ar").querySelectorAll(".wb").forEach(function(x){x.classList.remove("done","cur");});b.querySelector(".ip2").style.display="";b.querySelector(".ip3").style.display="none";b.dataset.playing="0";}currentAudio=null;currentPk=null;}\nfunction playAudio(btn,aid){var audio=document.getElementById(aid);if(!audio)return;var row=btn.closest(".ar");var bars=row.querySelectorAll(".wb");var drEl=document.getElementById("dr"+aid);var ipPlay=btn.querySelector(".ip2");var ipPause=btn.querySelector(".ip3");if(currentAudio&&currentPk!==aid)stopCurrent();if(audio.paused){var spdBtn=row.querySelector(".spd");audio.playbackRate=parseFloat(spdBtn?spdBtn.dataset.spd:1);audio.play();currentAudio=audio;currentPk=aid;btn.dataset.playing="1";ipPlay.style.display="none";ipPause.style.display="";audio.ontimeupdate=function(){var pct=audio.duration?audio.currentTime/audio.duration:0;var idx=Math.floor(pct*bars.length);bars.forEach(function(b,i){b.classList.remove("done","cur");if(i<idx)b.classList.add("done");else if(i===idx)b.classList.add("cur");});var rem=(audio.duration-audio.currentTime)/audio.playbackRate;if(!isNaN(rem)){var m=Math.floor(rem/60),s=Math.floor(rem%60);drEl.textContent=m+":"+(s<10?"0":"")+s;}};audio.onended=function(){btn.dataset.playing="0";ipPlay.style.display="";ipPause.style.display="none";bars.forEach(function(b){b.classList.remove("done","cur");});if(drEl._orig)drEl.textContent=drEl._orig;currentAudio=null;currentPk=null;};if(!drEl._orig)drEl._orig=drEl.textContent;}else{audio.pause();btn.dataset.playing="0";ipPlay.style.display="";ipPause.style.display="none";currentAudio=null;currentPk=null;}}\nfunction changeSpeed(btn,aid){var audio=document.getElementById(aid);var cur=parseFloat(btn.dataset.spd||1);var next=speeds[(speeds.indexOf(cur)+1)%speeds.length];btn.dataset.spd=next;btn.textContent=next+"x";btn.classList.toggle("active",next>1);if(audio)audio.playbackRate=next;}\nfunction seekAudio(e,aid){var audio=document.getElementById(aid);if(!audio||!audio.duration)return;var ww=e.currentTarget;var pct=(e.clientX-ww.getBoundingClientRect().left)/ww.offsetWidth;audio.currentTime=pct*audio.duration;}\ndocument.querySelectorAll(".ar audio").forEach(function(el){el.addEventListener("loadedmetadata",function(){var dur=el.duration;if(!isNaN(dur)){var m=Math.floor(dur/60),s=Math.floor(dur%60);var drEl=document.getElementById("dr"+el.id);if(drEl){drEl.textContent=m+":"+(s<10?"0":"")+s;drEl._orig=drEl.textContent;}}});el.load();});\n<\/script>\n';
+}
+
+// ══════════════════════════════════════════
+//  UI HELPERS
+// ══════════════════════════════════════════
+function showScreen(name){
+  document.getElementById('upload-screen').style.display = name==='upload' ? 'flex' : 'none';
+  document.getElementById('progress-screen').style.display = name==='progress' ? 'flex' : 'none';
+  document.getElementById('chat-screen').style.display = name==='chat' ? 'flex' : 'none';
+}
+
+function setProgress(pct, label){
+  document.getElementById('progBar').style.width = pct+'%';
+  document.getElementById('prog-label').textContent = pct+'%';
+  document.getElementById('prog-status').textContent = label;
+}
+
+function resetApp(){
+  // Revoke blob URLs
+  Object.values(state.mediaBlobs).forEach(function(url){ URL.revokeObjectURL(url); });
+  state = {contactName:'',myName:'',messages:[],mediaBlobs:{},audioIds:[]};
+  document.getElementById('chatBody').innerHTML = '';
+  document.getElementById('fileInput').value = '';
+  showScreen('upload');
+}
+
+function showToast(msg){
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); }, 3000);
+}
+
+// Init
+showScreen('upload');
+</script>
+</body>
+</html>

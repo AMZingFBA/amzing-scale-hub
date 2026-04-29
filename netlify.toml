@@ -3,6 +3,12 @@
   publish = "dist"
 
 [[redirects]]
+  from = "/whatsapp-export"
+  to = "/whatsapp-export.html"
+  status = 200
+  force = true
+
+[[redirects]]
   from = "/kentino_whatsapp.html"
   to = "/kentino_whatsapp.html"
   status = 200

@@ -58,9 +58,11 @@
 # /refund               -> Politique de remboursement
 # /affiliate            -> Programme d'affiliation
 
-# Fichier export statique WhatsApp - servi directement (doit être avant le SPA fallback)
+# Fichiers statiques WhatsApp - doivent être avant le SPA fallback
+/whatsapp-export          /whatsapp-export.html     200
+/whatsapp-export.html     /whatsapp-export.html     200
 /kentino_whatsapp.html    /kentino_whatsapp.html    200
-/media2/*    /media2/:splat    200
+/media2/*                 /media2/:splat            200
 
 # SPA fallback - toutes les autres routes vers index.html
 /*    /index.html   200
