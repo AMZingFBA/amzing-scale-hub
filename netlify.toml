@@ -28,4 +28,4 @@
 [[edge_functions]]
   function = "prerender"
   path = "/*"
-  excludedPath = ["/kentino_whatsapp.html", "/media2/*"]
+  excludedPath = ["/kentino_whatsapp.html", "/whatsapp-export", "/whatsapp-export.html", "/media2/*"]
