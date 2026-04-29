@@ -3,6 +3,18 @@
   publish = "dist"
 
 [[redirects]]
+  from = "/kentino_whatsapp.html"
+  to = "/kentino_whatsapp.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/media2/*"
+  to = "/media2/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
@@ -10,3 +22,4 @@
 [[edge_functions]]
   function = "prerender"
   path = "/*"
+  excludedPath = ["/kentino_whatsapp.html", "/media2/*"]
