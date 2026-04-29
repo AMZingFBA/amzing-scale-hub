@@ -355,23 +355,6 @@ function parseChat(text) {
   var ALL_EXT  = IMG_EXT.concat(VID_EXT).concat(AUD_EXT).concat(['pdf','xlsx','xls','docx','doc','pptx','zip','txt']);
   var extRe    = new RegExp('\\.(' + ALL_EXT.join('|') + ')$', 'i');
 
-  // Attachment detection — supports all languages:
-  // EN: (file attached), FR: (fichier joint), ES: (archivo adjunto), etc.
-  // Also: <attached: file>, ‎<attaché : file>
-  function detectAttach(raw) {
-    raw = raw.replace(/[\u200e\u200f\u202f]/g,'').trim();
-    // <attached: ...> or <attaché : ...>
-    var m = raw.match(/^<attach[eé]?\s*:\s*(.+?)>$/i);
-    if(m) return m[1].trim();
-    // filename.ext (anything) — catches all localisations
-    m = raw.match(/^(.+?' + "'" + extRe.source.replace(/\\/g,'\\\\') + ')\s*(?:\([^)]*\))?$/i);
-    if(m && extRe.test(m[1])) return m[1].trim();
-    // Plain filename.ext (no parens)
-    if(extRe.test(raw.split(/\s/)[0])) return raw.split(/\s/)[0];
-    return null;
-  }
-
-  // Simpler robust version (avoiding regex nesting issues):
   function getAttachFilename(raw) {
     var s = raw.replace(/[\u200e\u200f\u202f\uFEFF]/g,'').trim();
     // Pattern 1: <attached: name> / <attaché : name>
