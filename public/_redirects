@@ -59,6 +59,7 @@
 # /affiliate            -> Programme d'affiliation
 
 # Fichiers statiques WhatsApp - doivent être avant le SPA fallback
+/crm                      /crm.html                 200
 /whatsapp-export          /whatsapp-export.html     200
 /whatsapp-export.html     /whatsapp-export.html     200
 /kentino_whatsapp.html    /kentino_whatsapp.html    200

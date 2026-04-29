@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>WhatsApp CRM · AMZing FBA</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<style>
+:root{--bg:#0b141a;--surface:#202c33;--surface2:#2a3942;--green:#00a884;--green-dark:#005c4b;--text:#e9edef;--muted:#8696a0;--border:#2a3942;--ticks:#53bdeb;--sw:360px}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--text);height:100vh;display:flex;overflow:hidden}
+
+/* ── SIDEBAR ── */
+#sidebar{width:var(--sw);flex-shrink:0;display:flex;flex-direction:column;background:var(--surface);border-right:1px solid var(--border)}
+.sb-hd{padding:12px 16px;display:flex;align-items:center;justify-content:space-between;background:var(--surface2);flex-shrink:0}
+.sb-logo{display:flex;align-items:center;gap:10px}
+.sb-ico{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#128C7E,#075E54);display:flex;align-items:center;justify-content:center;font-size:20px}
+.sb-title{font-size:16px;font-weight:700}.sb-sub{font-size:11px;color:var(--muted);margin-top:1px}
+.icon-btn{width:38px;height:38px;border-radius:50%;border:none;background:transparent;color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s}
+.icon-btn:hover{background:var(--border);color:var(--text)}
+.sb-search{padding:8px 12px;background:var(--surface);flex-shrink:0}
+.sb-search input{width:100%;background:var(--surface2);border:none;border-radius:8px;padding:9px 14px 9px 36px;color:var(--text);font-size:14px;outline:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='16'%3E%3Cpath fill='%238696a0' d='M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:12px center}
+.sb-search input::placeholder{color:var(--muted)}
+#contact-list{flex:1;overflow-y:auto}
+#contact-list::-webkit-scrollbar{width:4px}
+#contact-list::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.ci{display:flex;align-items:center;gap:12px;padding:12px 16px;cursor:pointer;border-bottom:1px solid rgba(42,57,66,.5);transition:background .1s;position:relative}
+.ci:hover{background:rgba(255,255,255,.04)}.ci.active{background:var(--surface2)}
+.ci-av{width:49px;height:49px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;flex-shrink:0;color:#fff}
+.ci-info{flex:1;min-width:0}
+.ci-name{font-size:15px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ci-prev{font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+.ci-meta{display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0}
+.ci-date{font-size:11px;color:var(--muted)}
+.ci-badge{background:var(--green);color:#fff;font-size:11px;font-weight:700;padding:2px 7px;border-radius:12px}
+.ci-del{position:absolute;right:10px;top:8px;opacity:0;font-size:14px;cursor:pointer;color:var(--muted);background:none;border:none;padding:4px;transition:opacity .15s}
+.ci:hover .ci-del{opacity:1}.ci-del:hover{color:#f15c6d}
+.sb-empty{padding:48px 24px;text-align:center;color:var(--muted)}
+.sb-empty-icon{font-size:52px;margin-bottom:16px}
+.sb-empty p{font-size:14px;line-height:1.7}
+
+/* ── MAIN ── */
+#main{flex:1;display:flex;flex-direction:column;background:var(--bg);position:relative;overflow:hidden}
+#empty-state{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;opacity:.4}
+.es-icon{font-size:72px}.es-title{font-size:22px;font-weight:600}.es-sub{font-size:14px;color:var(--muted)}
+
+/* ── LOADING ── */
+#loading-overlay{display:none;position:absolute;inset:0;background:var(--bg);align-items:center;justify-content:center;flex-direction:column;gap:16px;z-index:10}
+.lo-spin{width:44px;height:44px;border:3px solid var(--border);border-top-color:var(--green);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── CHAT VIEW ── */
+#chat-view{display:none;flex-direction:column;height:100%}
+.chat-header{background:var(--surface);padding:10px 16px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border);flex-shrink:0}
+.ch-av{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;flex-shrink:0;color:#fff}
+.ch-info{flex:1}.ch-name{font-size:16px;font-weight:500}.ch-sub{color:var(--muted);font-size:12px}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;border:none;cursor:pointer;font-size:12px;font-weight:600;transition:all .15s}
+.btn-green{background:var(--green);color:#fff}.btn-green:hover{background:#00cf9d}
+.btn-ghost{background:var(--surface2);color:var(--text)}.btn-ghost:hover{background:#374045}
+.chat-body{flex:1;overflow-y:auto;padding:10px 5% 16px;background:var(--bg);display:flex;flex-direction:column;gap:2px}
+.chat-body::-webkit-scrollbar{width:5px}.chat-body::-webkit-scrollbar-thumb{background:var(--surface2);border-radius:3px}
+.chat-footer{background:var(--surface);padding:8px 16px;display:flex;align-items:center;gap:10px;border-top:1px solid var(--border);flex-shrink:0}
+.chat-footer input{flex:1;background:var(--surface2);border:none;border-radius:22px;padding:10px 16px;color:var(--text);font-size:15px;outline:none}
+.chat-footer input::placeholder{color:var(--muted)}
+
+/* ── BUBBLES ── */
+.dsep{display:flex;justify-content:center;margin:12px 0 4px}
+.dsep span{background:#182229;color:var(--muted);font-size:12px;padding:5px 14px;border-radius:8px;text-transform:capitalize}
+.b{max-width:72%;display:flex;flex-direction:column;position:relative;word-break:break-word}
+.b.out{align-self:flex-end}.b.in{align-self:flex-start}
+.b.out>.tx,.b.out>.ar,.b.out>.dr2{background:var(--green-dark);border-radius:8px 0 8px 8px;box-shadow:0 1px 2px rgba(0,0,0,.3)}
+.b.in>.tx,.b.in>.ar,.b.in>.dr2{background:var(--surface);border-radius:0 8px 8px 8px;box-shadow:0 1px 2px rgba(0,0,0,.3)}
+.b.out>.mw{border-radius:8px 0 8px 8px;overflow:hidden}.b.in>.mw{border-radius:0 8px 8px 8px;overflow:hidden}
+.tx{padding:6px 10px 20px;color:var(--text);font-size:14.5px;line-height:1.45;min-width:60px}
+.ts{position:absolute;bottom:4px;right:8px;font-size:11px;color:var(--muted);white-space:nowrap;display:flex;align-items:center;gap:3px}
+.tk{color:var(--ticks);font-size:13px}
+.mw{position:relative;max-width:300px;min-width:100px}
+.mw img{width:100%;display:block;cursor:zoom-in;transition:opacity .15s}.mw img:hover{opacity:.88}
+.mw video{width:100%;display:block;max-width:300px}
+.tsm{position:absolute;bottom:6px;right:8px;font-size:11px;color:rgba(255,255,255,.9);background:rgba(0,0,0,.38);padding:2px 6px;border-radius:4px;white-space:nowrap;display:flex;align-items:center;gap:3px}
+.ar{display:flex;align-items:center;gap:8px;padding:8px 10px 22px;min-width:230px;position:relative}
+.pb{width:42px;height:42px;border-radius:50%;background:var(--green);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0;transition:background .15s}
+.pb:hover{background:#00cf9d}
+.ww{display:flex;align-items:center;gap:2px;flex:1;height:32px;cursor:pointer}
+.wb{width:3px;border-radius:2px;min-height:3px;background:var(--muted)}
+.wb.done{background:var(--ticks)}.wb.cur{background:var(--green)}
+.b.out .wb{background:rgba(255,255,255,.3)}.b.out .wb.done,.b.out .wb.cur{background:rgba(255,255,255,.85)}
+.ai{display:flex;flex-direction:column;align-items:flex-end;gap:3px;min-width:44px;color:var(--muted)}
+.dr{font-size:12px}
+.spd{font-size:11px;font-weight:700;background:transparent;border:none;cursor:pointer;color:var(--muted);padding:0;font-family:inherit}
+.spd:hover,.spd.active{color:var(--green)}
+.tsa{position:absolute;bottom:4px;right:8px;font-size:11px;color:var(--muted);white-space:nowrap;display:flex;align-items:center;gap:3px}
+.dr2{display:flex;align-items:center;gap:10px;padding:10px 10px 24px;min-width:220px;position:relative}
+.dic{width:44px;height:44px;border-radius:50%;background:var(--surface2);display:flex;align-items:center;justify-content:center;position:relative;flex-shrink:0;color:#aebac1}
+.dex{position:absolute;bottom:-1px;right:-2px;background:var(--green);color:#fff;font-size:7px;padding:1px 3px;border-radius:2px;font-weight:700}
+.dn{flex:1;font-size:13px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:160px}
+
+/* ── LIGHTBOX ── */
+#lb{display:none;position:fixed;inset:0;background:rgba(0,0,0,.93);z-index:9999;align-items:center;justify-content:center;cursor:zoom-out}
+#lb.on{display:flex}
+#lb img{max-width:92vw;max-height:92vh;object-fit:contain;border-radius:4px;cursor:default}
+#lbx{position:absolute;top:16px;right:22px;color:#fff;font-size:32px;cursor:pointer;line-height:1}
+
+/* ── IMPORT MODAL ── */
+#import-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:200;align-items:center;justify-content:center}
+#import-modal.on{display:flex}
+.modal-card{background:var(--surface);border-radius:20px;padding:32px;max-width:440px;width:90%;text-align:center}
+.modal-card h2{font-size:20px;margin-bottom:8px}.modal-card p{color:var(--muted);font-size:14px;margin-bottom:24px}
+.dz{border:2px dashed var(--border);border-radius:16px;padding:40px 24px;cursor:pointer;transition:all .2s;position:relative}
+.dz:hover,.dz.drag{border-color:var(--green);background:rgba(0,168,132,.06)}
+.dz input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.dz-icon{font-size:40px;margin-bottom:12px}.dz-title{font-size:15px;font-weight:600;margin-bottom:4px}
+.dz-hint{font-size:13px;color:var(--muted)}
+
+/* ── TOAST ── */
+.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-80px);background:var(--surface);color:var(--text);padding:12px 20px;border-radius:10px;font-size:14px;box-shadow:0 4px 20px rgba(0,0,0,.4);transition:transform .3s;z-index:9999;border-left:3px solid var(--green)}
+.toast.show{transform:translateX(-50%) translateY(0)}
+
+/* ── AVATAR COLORS ── */
+.av-1{background:linear-gradient(135deg,#128C7E,#075E54)}
+.av-2{background:linear-gradient(135deg,#1da462,#0d7a45)}
+.av-3{background:linear-gradient(135deg,#7b68ee,#5a4fcf)}
+.av-4{background:linear-gradient(135deg,#e8734a,#c0542b)}
+.av-5{background:linear-gradient(135deg,#4a9edd,#2b7ab5)}
+.av-6{background:linear-gradient(135deg,#e84a8c,#c02b6a)}
+</style>
+</head>
+<body>
+
+<!-- ═══════════ SIDEBAR ═══════════ -->
+<div id="sidebar">
+  <div class="sb-hd">
+    <div class="sb-logo">
+      <div class="sb-ico">💬</div>
+      <div>
+        <div class="sb-title">WhatsApp CRM</div>
+        <div class="sb-sub">AMZing FBA</div>
+      </div>
+    </div>
+    <button class="icon-btn" onclick="openImport()" title="Ajouter une conversation">
+      <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+    </button>
+  </div>
+
+  <div class="sb-search">
+    <input type="text" id="searchInput" placeholder="Rechercher…" oninput="renderSidebar()">
+  </div>
+
+  <div id="contact-list">
+    <div class="sb-empty" id="sb-empty">
+      <div class="sb-empty-icon">💬</div>
+      <p>Aucune conversation<br>Clique sur <strong>+</strong> pour importer<br>un ZIP WhatsApp</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ MAIN ═══════════ -->
+<div id="main">
+  <div id="empty-state">
+    <div class="es-icon">💬</div>
+    <div class="es-title">WhatsApp CRM</div>
+    <div class="es-sub">Sélectionne une conversation</div>
+  </div>
+
+  <div id="loading-overlay">
+    <div class="lo-spin"></div>
+    <div style="color:var(--muted);font-size:14px" id="lo-label">Chargement…</div>
+  </div>
+
+  <div id="chat-view">
+    <div class="chat-header">
+      <div class="ch-av av-1" id="ch-av">?</div>
+      <div class="ch-info">
+        <div class="ch-name" id="ch-name">Contact</div>
+        <div class="ch-sub" id="ch-sub"></div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-green" onclick="downloadCurrentHTML()">⬇ HTML</button>
+        <button class="btn btn-ghost" onclick="deleteCurrentConv()" style="color:#f15c6d">🗑</button>
+      </div>
+    </div>
+    <div class="chat-body" id="chatBody"></div>
+    <div class="chat-footer">
+      <span style="font-size:22px">😊</span>
+      <input placeholder="Message" readonly>
+      <span style="font-size:22px;color:var(--muted)">🎤</span>
+    </div>
+  </div>
+</div>
+
+<!-- Lightbox -->
+<div id="lb" onclick="closeLb()"><span id="lbx" onclick="closeLb()">✕</span><img id="lbi" src="" alt="" onclick="event.stopPropagation()"></div>
+
+<!-- Import Modal -->
+<div id="import-modal">
+  <div class="modal-card">
+    <h2>Importer une conversation</h2>
+    <p>Dépose le ZIP exporté depuis WhatsApp (avec médias inclus)</p>
+    <div class="dz" id="modalDrop">
+      <input type="file" id="modalFile" accept=".zip">
+      <div class="dz-icon">📦</div>
+      <div class="dz-title">Dépose ton ZIP ici</div>
+      <div class="dz-hint">ou clique pour choisir</div>
+    </div>
+    <button class="btn btn-ghost" onclick="closeImport()" style="margin-top:16px;width:100%;justify-content:center">Annuler</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════
+//  INDEXEDDB
+// ══════════════════════════════════
+var db = null;
+function openDB(){
+  return new Promise(function(res,rej){
+    var r=indexedDB.open('whatsapp-crm',1);
+    r.onupgradeneeded=function(e){
+      var d=e.target.result;
+      if(!d.objectStoreNames.contains('conversations'))
+        d.createObjectStore('conversations',{keyPath:'id',autoIncrement:true});
+    };
+    r.onsuccess=function(e){db=e.target.result;res();};
+    r.onerror=function(){rej();};
+  });
+}
+function dbAll(){return new Promise(function(res,rej){var r=db.transaction('conversations','readonly').objectStore('conversations').getAll();r.onsuccess=function(){res(r.result);};r.onerror=rej;});}
+function dbGet(id){return new Promise(function(res,rej){var r=db.transaction('conversations','readonly').objectStore('conversations').get(id);r.onsuccess=function(){res(r.result);};r.onerror=rej;});}
+function dbAdd(rec){return new Promise(function(res,rej){var r=db.transaction('conversations','readwrite').objectStore('conversations').add(rec);r.onsuccess=function(){res(r.result);};r.onerror=rej;});}
+function dbDel(id){return new Promise(function(res,rej){var r=db.transaction('conversations','readwrite').objectStore('conversations').delete(id);r.onsuccess=res;r.onerror=rej;});}
+
+// ══════════════════════════════════
+//  STATE
+// ══════════════════════════════════
+var convList=[], currentId=null, currentBlobs={}, currentBlobsLC={}, currentMessages=[], currentMyName='';
+var speeds=[1,1.5,2], currentAudio=null, currentPk=null, audioCounter=0;
+
+var COLORS=['av-1','av-2','av-3','av-4','av-5','av-6'];
+function avatarColor(name){var c=0;for(var i=0;i<name.length;i++)c+=name.charCodeAt(i);return COLORS[c%COLORS.length];}
+
+// ══════════════════════════════════
+//  INIT
+// ══════════════════════════════════
+openDB().then(dbAll).then(function(rows){
+  convList=rows.sort(function(a,b){return b.addedAt-a.addedAt;});
+  renderSidebar();
+});
+
+// ══════════════════════════════════
+//  SIDEBAR
+// ══════════════════════════════════
+function renderSidebar(){
+  var q=document.getElementById('searchInput').value.toLowerCase();
+  var list=document.getElementById('contact-list');
+  var filtered=convList.filter(function(c){return c.name.toLowerCase().includes(q);});
+  if(!filtered.length){
+    list.innerHTML='<div class="sb-empty"><div class="sb-empty-icon">💬</div><p>'+(q?'Aucun résultat':'Aucune conversation<br>Clique sur <strong>+</strong> pour importer<br>un ZIP WhatsApp')+'</p></div>';
+    return;
+  }
+  list.innerHTML=filtered.map(function(c){
+    var col=avatarColor(c.name);
+    var active=c.id===currentId?' active':'';
+    return '<div class="ci'+active+'" onclick="openConv('+c.id+')">' +
+      '<div class="ci-av '+col+'">'+c.name.charAt(0).toUpperCase()+'</div>' +
+      '<div class="ci-info"><div class="ci-name">'+esc(c.name)+'</div><div class="ci-prev">'+esc(c.lastMessage||'')+'</div></div>' +
+      '<div class="ci-meta"><span class="ci-date">'+c.lastDate+'</span><span class="ci-badge">'+c.messageCount+'</span></div>' +
+      '<button class="ci-del" onclick="event.stopPropagation();deleteConv('+c.id+')" title="Supprimer">✕</button>' +
+    '</div>';
+  }).join('');
+}
+
+// ══════════════════════════════════
+//  OPEN CONV
+// ══════════════════════════════════
+async function openConv(id){
+  if(currentId===id) return;
+  currentId=id; renderSidebar();
+  Object.values(currentBlobs).forEach(function(u){URL.revokeObjectURL(u);});
+  currentBlobs={}; currentBlobsLC={};
+  showLoading('Chargement…');
+  try{
+    var rec=await dbGet(id);
+    var zip=await JSZip.loadAsync(rec.zipData);
+    var chatFile=null;
+    zip.forEach(function(p,f){if(!f.dir&&(p.endsWith('_chat.txt')||p==='_chat.txt'))chatFile=f;});
+    if(!chatFile){hideLoading();showToast('❌ Pas de _chat.txt');return;}
+    var chatText=await chatFile.async('string');
+    var parsed=parseChat(chatText);
+    currentMessages=parsed.messages; currentMyName=parsed.myName;
+    var mediaFiles=[];
+    zip.forEach(function(p,f){if(!f.dir&&!p.endsWith('_chat.txt')&&!p.startsWith('__MACOSX'))mediaFiles.push({path:p,file:f});});
+    for(var i=0;i<mediaFiles.length;i++){
+      var mf=mediaFiles[i]; var fname=mf.path.split('/').pop();
+      try{
+        var blob=await mf.file.async('blob');
+        var ext=fname.split('.').pop().toLowerCase();
+        var burl=URL.createObjectURL(new Blob([blob],{type:getMime(ext)}));
+        currentBlobs[fname]=burl; currentBlobsLC[fname.toLowerCase()]=burl;
+      }catch(e){}
+    }
+    var col=avatarColor(rec.name);
+    document.getElementById('ch-av').textContent=rec.name.charAt(0).toUpperCase();
+    document.getElementById('ch-av').className='ch-av '+col;
+    document.getElementById('ch-name').textContent=rec.name;
+    document.getElementById('ch-sub').textContent=currentMessages.length+' messages · '+countType(currentMessages,'audio')+' vocaux · '+countType(currentMessages,'image')+' photos';
+    renderChatBody();
+    hideLoading(); showChat();
+  }catch(e){hideLoading();showToast('❌ Erreur');console.error(e);}
+}
+
+function getBlobUrl(f){if(!f)return null;return currentBlobs[f]||currentBlobsLC[f.toLowerCase()]||null;}
+
+// ══════════════════════════════════
+//  IMPORT
+// ══════════════════════════════════
+function openImport(){document.getElementById('import-modal').classList.add('on');}
+function closeImport(){document.getElementById('import-modal').classList.remove('on');}
+
+var md=document.getElementById('modalDrop'), mf=document.getElementById('modalFile');
+md.addEventListener('dragover',function(e){e.preventDefault();md.classList.add('drag');});
+md.addEventListener('dragleave',function(){md.classList.remove('drag');});
+md.addEventListener('drop',function(e){e.preventDefault();md.classList.remove('drag');if(e.dataTransfer.files[0])importZip(e.dataTransfer.files[0]);});
+mf.addEventListener('change',function(){if(mf.files[0])importZip(mf.files[0]);});
+
+async function importZip(file){
+  closeImport(); showLoading('Import en cours…');
+  try{
+    var buf=await file.arrayBuffer();
+    var zip=await JSZip.loadAsync(buf);
+    var chatFile=null;
+    zip.forEach(function(p,f){if(!f.dir&&(p.endsWith('_chat.txt')||p==='_chat.txt'))chatFile=f;});
+    if(!chatFile){hideLoading();showToast('❌ Pas de _chat.txt dans ce ZIP');return;}
+    var chatText=await chatFile.async('string');
+    var parsed=parseChat(chatText);
+    var msgs=parsed.messages;
+    var name=file.name.replace(/\.zip$/i,'').replace(/^WhatsApp (Chat|Discussion) (with |avec |- )?/i,'').trim()||'Contact';
+    var lastMsg=msgs[msgs.length-1];
+    var lastText=lastMsg?(lastMsg.type==='text'?lastMsg.text.substring(0,60):'📎 '+lastMsg.type):'';
+    var lastDate=lastMsg?lastMsg.date:'';
+    var rec={name:name,zipData:buf,lastMessage:lastText,lastDate:lastDate,messageCount:msgs.length,addedAt:Date.now()};
+    var newId=await dbAdd(rec); rec.id=newId;
+    convList.unshift(rec); renderSidebar();
+    hideLoading(); showToast('✅ '+name+' importé !');
+    openConv(newId);
+  }catch(e){hideLoading();showToast('❌ Erreur lors de l\'import');console.error(e);}
+}
+
+// ══════════════════════════════════
+//  DELETE
+// ══════════════════════════════════
+async function deleteConv(id){
+  if(!confirm('Supprimer cette conversation ?')) return;
+  await dbDel(id);
+  convList=convList.filter(function(c){return c.id!==id;});
+  if(currentId===id){currentId=null;showEmptyState();}
+  renderSidebar(); showToast('🗑 Supprimé');
+}
+function deleteCurrentConv(){if(currentId)deleteConv(currentId);}
+
+// ══════════════════════════════════
+//  PARSE _chat.txt
+// ══════════════════════════════════
+function parseChat(text){
+  var lines=text.split('\n');
+  var iosPat  =/^[\u200e\u200f\u202f]?\[(\d{1,2}\/\d{1,2}\/\d{2,4})[,\s]+(\d{1,2}:\d{2}(?::\d{2})?)\s*(?:AM|PM)?\]\s+([^:]+):\s?(.*)$/;
+  var iosFrPat=/^[\u200e\u200f\u202f]?\[(\d{1,2}\/\d{1,2}\/\d{2,4})\s+[àa]\s+(\d{1,2}:\d{2}(?::\d{2})?)\]\s+([^:]+):\s?(.*)$/;
+  var andPat  =/^[\u200e\u200f\u202f]?(\d{1,2}\/\d{1,2}\/\d{2,4})[,\s]+(\d{1,2}:\d{2}(?::\d{2})?)\s*(?:AM|PM)?\s+-\s+([^:]+):\s?(.*)$/;
+  var andUSPat=/^[\u200e\u200f\u202f]?(\d{1,2}\/\d{1,2}\/\d{2,4}),\s+(\d{1,2}:\d{2})\s*(AM|PM)\s+-\s+([^:]+):\s?(.*)$/;
+
+  function getAttach(raw){
+    var s=raw.replace(/[\u200e\u200f\u202f\uFEFF\u200b\u200c\u200d]/g,'').trim();
+    var m1=s.match(/^<[^:>]+:\s*(.+?)>$/i); if(m1)return m1[1].trim();
+    var m2=s.match(/^(.+\.(jpg|jpeg|png|gif|webp|mp4|mov|avi|mkv|3gp|opus|mp3|m4a|aac|ogg|wav|amr|pdf|xlsx|xls|docx|doc|pptx|zip|txt))\s*(?:\([^)]*\)|<[^>:]*>)?$/i);
+    if(m2)return m2[1].trim(); return null;
+  }
+  function extType(f){var e=f.split('.').pop().toLowerCase();if(['jpg','jpeg','png','gif','webp'].includes(e))return 'image';if(['mp4','mov','avi','mkv','3gp'].includes(e))return 'video';if(['opus','mp3','m4a','aac','ogg','wav','amr'].includes(e))return 'audio';return 'document';}
+
+  var messages=[],current=null,senderCount={};
+  for(var i=0;i<lines.length;i++){
+    var line=lines[i].replace(/^\uFEFF/,'').trim();
+    var m=iosPat.exec(line)||iosFrPat.exec(line)||andPat.exec(line);
+    if(!m){var mu=andUSPat.exec(line);if(mu)m=[mu[0],mu[1],mu[2]+' '+mu[3],mu[4],mu[5]];}
+    if(m){
+      if(current)messages.push(current);
+      var date=m[1],time=m[2].substring(0,5),sender=m[3].trim();
+      var rawText=(m[4]||'').replace(/[\u200e\u200f\u202f]/g,'').trim();
+      senderCount[sender]=(senderCount[sender]||0)+1;
+      var type='text',mediaFile=null;
+      var fn=getAttach(rawText);
+      if(fn){mediaFile=fn;type=extType(fn);}
+      else if(/image omise|photo omise|image absente/i.test(rawText))type='image';
+      else if(/audio omis|voice omitted/i.test(rawText))type='audio';
+      else if(/vid[eé]o omise|video omitted/i.test(rawText))type='video';
+      else if(/document manquant|document omis/i.test(rawText))type='document';
+      else if(/appel vocal|appel manqué|missed voice call/i.test(rawText))type='call';
+      else if(/supprimé ce message|message supprimé|message was deleted/i.test(rawText))type='deleted';
+      else if(/<Ce message a été modifié>/i.test(rawText)){type='edited';rawText=rawText.replace(/<Ce message a été modifié>/i,'').trim();}
+      current={date:date,time:time,sender:sender,text:rawText,type:type,mediaFile:mediaFile};
+    }else if(current&&line){current.text+='\n'+line;}
+  }
+  if(current)messages.push(current);
+  var senders=Object.keys(senderCount).sort(function(a,b){return senderCount[b]-senderCount[a];});
+  return{messages:messages,myName:senders[0]||''};
+}
+
+// ══════════════════════════════════
+//  RENDER CHAT
+// ══════════════════════════════════
+function renderChatBody(){
+  var msgs=currentMessages,myName=currentMyName,html='',curDate=null;
+  audioCounter=0; var audioIds=[];
+  for(var i=0;i<msgs.length;i++){
+    var msg=msgs[i],side=msg.sender===myName?'out':'in',t=msg.time;
+    var ticks=msg.sender===myName?'<span class="tk">✓✓</span>':'';
+    if(msg.date!==curDate){curDate=msg.date;html+='<div class="dsep"><span>'+dateFr(msg.date)+'</span></div>';}
+    var content='';
+    if(msg.type==='text'||msg.type==='edited'){
+      var ed=msg.type==='edited'?' <span style="color:var(--muted);font-size:11px">modifié</span>':'';
+      content='<div class="tx">'+esc(msg.text)+ed+'</div><span class="ts">'+t+ticks+'</span>';
+    }else if(msg.type==='image'){
+      var bu=getBlobUrl(msg.mediaFile);
+      content=bu?'<div class="mw"><img src="'+bu+'" loading="lazy" onclick="lb(this)"><span class="tsm">'+t+ticks+'</span></div>':'<div class="tx" style="color:var(--muted);font-style:italic">🖼 Photo · '+t+ticks+'</div>';
+    }else if(msg.type==='video'){
+      var bu=getBlobUrl(msg.mediaFile);
+      content=bu?'<div class="mw"><video controls preload="metadata" src="'+bu+'"></video><span class="tsm">'+t+ticks+'</span></div>':'<div class="tx" style="color:var(--muted);font-style:italic">🎬 Vidéo · '+t+ticks+'</div>';
+    }else if(msg.type==='audio'){
+      var bu=getBlobUrl(msg.mediaFile),aid='aud'+(audioCounter++);
+      audioIds.push(aid); var wave=genWave();
+      if(bu){
+        content='<div class="ar"><audio id="'+aid+'" src="'+bu+'" preload="none"></audio>'+
+          '<button class="pb" onclick="playAudio(this,\''+aid+'\')">'+
+            '<svg class="ip2" viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M8 5v14l11-7z"/></svg>'+
+            '<svg class="ip3" viewBox="0 0 24 24" width="22" height="22" style="display:none"><path fill="currentColor" d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>'+
+          '</button>'+
+          '<div class="ww" onclick="seekAudio(event,\''+aid+'\')">'+wave+'</div>'+
+          '<div class="ai"><button class="spd" data-spd="1" onclick="changeSpeed(this,\''+aid+'\')">1x</button><span class="dr" id="dr'+aid+'">0:00</span></div>'+
+          '<span class="tsa">'+t+ticks+'</span></div>';
+      }else{
+        content='<div class="ar"><div class="pb" style="background:var(--surface2);cursor:default"><svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M8 5v14l11-7z"/></svg></div><div class="ww">'+wave+'</div><div class="ai"><span class="dr">—</span></div><span class="tsa">'+t+ticks+'</span></div>';
+      }
+    }else if(msg.type==='document'){
+      var bu=getBlobUrl(msg.mediaFile);
+      var fname=(msg.mediaFile||msg.text||'Document').replace(/\s*\(file attached\)/i,'');
+      var ext=fname.split('.').pop().toUpperCase().substring(0,4);
+      var lo=bu?'<a href="'+bu+'" download="'+fname+'" style="display:flex;align-items:center;gap:10px;flex:1;text-decoration:none;color:inherit">':'<div style="display:flex;align-items:center;gap:10px;flex:1">';
+      var lc=bu?'</a>':'</div>';
+      content='<div class="dr2">'+lo+'<div class="dic"><svg viewBox="0 0 24 24" width="26" height="26"><path fill="currentColor" d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.89 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11z"/></svg><span class="dex">'+ext+'</span></div><div class="dn" title="'+esc(fname)+'">'+esc(fname)+'</div>'+lc+'<span class="ts">'+t+ticks+'</span></div>';
+    }else if(msg.type==='call'){
+      var missed=/sans réponse|manqué/i.test(msg.text);
+      content='<div class="tx" style="display:flex;align-items:center;gap:8px"><span style="font-size:18px">'+(missed?'📵':'📞')+'</span><span>'+esc(msg.text)+'</span><span class="ts" style="position:static;margin-left:auto">'+t+ticks+'</span></div>';
+    }else if(msg.type==='deleted'){
+      content='<div class="tx" style="color:var(--muted);font-style:italic;display:flex;align-items:center;gap:6px"><span>🚫</span><span>Message supprimé</span><span class="ts" style="position:static;margin-left:auto">'+t+ticks+'</span></div>';
+    }else if(msg.text){
+      content='<div class="tx">'+esc(msg.text)+'</div><span class="ts">'+t+ticks+'</span>';
+    }
+    if(content)html+='<div class="b '+side+'">'+content+'</div>';
+  }
+  var cb=document.getElementById('chatBody');
+  cb.innerHTML=html; cb.scrollTop=1e9;
+  audioIds.forEach(function(aid){
+    var el=document.getElementById(aid); if(!el)return;
+    el.addEventListener('loadedmetadata',function(){
+      var dur=el.duration; if(!isNaN(dur)){var mm=Math.floor(dur/60),ss=Math.floor(dur%60);var d=document.getElementById('dr'+aid);if(d){d.textContent=mm+':'+(ss<10?'0':'')+ss;d._orig=d.textContent;}}
+    }); el.load();
+  });
+}
+
+// ══════════════════════════════════
+//  AUDIO
+// ══════════════════════════════════
+function stopCurrent(){
+  if(!currentAudio)return; currentAudio.pause();
+  var b=document.querySelector('[data-playing="1"]');
+  if(b){b.closest('.ar').querySelectorAll('.wb').forEach(function(x){x.classList.remove('done','cur');});b.querySelector('.ip2').style.display='';b.querySelector('.ip3').style.display='none';b.dataset.playing='0';}
+  currentAudio=null;currentPk=null;
+}
+function playAudio(btn,aid){
+  var audio=document.getElementById(aid); if(!audio)return;
+  var row=btn.closest('.ar'),bars=row.querySelectorAll('.wb'),drEl=document.getElementById('dr'+aid);
+  var ipPlay=btn.querySelector('.ip2'),ipPause=btn.querySelector('.ip3');
+  if(currentAudio&&currentPk!==aid)stopCurrent();
+  if(audio.paused){
+    var sb=row.querySelector('.spd'); audio.playbackRate=parseFloat(sb?sb.dataset.spd:1);
+    audio.play(); currentAudio=audio; currentPk=aid; btn.dataset.playing='1'; ipPlay.style.display='none'; ipPause.style.display='';
+    audio.ontimeupdate=function(){var pct=audio.duration?audio.currentTime/audio.duration:0;var idx=Math.floor(pct*bars.length);bars.forEach(function(b,i){b.classList.remove('done','cur');if(i<idx)b.classList.add('done');else if(i===idx)b.classList.add('cur');});var rem=(audio.duration-audio.currentTime)/audio.playbackRate;if(!isNaN(rem)){var mm=Math.floor(rem/60),ss=Math.floor(rem%60);drEl.textContent=mm+':'+(ss<10?'0':'')+ss;}};
+    audio.onended=function(){btn.dataset.playing='0';ipPlay.style.display='';ipPause.style.display='none';bars.forEach(function(b){b.classList.remove('done','cur');});if(drEl._orig)drEl.textContent=drEl._orig;currentAudio=null;currentPk=null;};
+    if(!drEl._orig)drEl._orig=drEl.textContent;
+  }else{audio.pause();btn.dataset.playing='0';ipPlay.style.display='';ipPause.style.display='none';currentAudio=null;currentPk=null;}
+}
+function changeSpeed(btn,aid){var audio=document.getElementById(aid);var cur=parseFloat(btn.dataset.spd||1);var next=speeds[(speeds.indexOf(cur)+1)%speeds.length];btn.dataset.spd=next;btn.textContent=next+'x';btn.classList.toggle('active',next>1);if(audio)audio.playbackRate=next;}
+function seekAudio(e,aid){var audio=document.getElementById(aid);if(!audio||!audio.duration)return;var pct=(e.clientX-e.currentTarget.getBoundingClientRect().left)/e.currentTarget.offsetWidth;audio.currentTime=pct*audio.duration;}
+
+// ══════════════════════════════════
+//  LIGHTBOX
+// ══════════════════════════════════
+function lb(img){document.getElementById('lbi').src=img.src;document.getElementById('lb').classList.add('on');}
+function closeLb(){document.getElementById('lb').classList.remove('on');}
+document.addEventListener('keydown',function(e){if(e.key==='Escape')closeLb();});
+
+// ══════════════════════════════════
+//  DOWNLOAD HTML
+// ══════════════════════════════════
+function downloadCurrentHTML(){
+  if(!currentMessages.length)return;
+  var name=document.getElementById('ch-name').textContent;
+  var slug=name.toLowerCase().replace(/[^a-z0-9]/g,'-').replace(/-+/g,'-');
+  var chatHtml=document.getElementById('chatBody').innerHTML;
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob(['<!DOCTYPE html><html><head><meta charset="UTF-8"><title>'+name+'</title></head><body style="background:#0b141a">'+chatHtml+'</body></html>'],{type:'text/html'}));
+  a.download=slug+'_whatsapp.html'; a.click(); showToast('✅ Téléchargé !');
+}
+
+// ══════════════════════════════════
+//  HELPERS
+// ══════════════════════════════════
+function getMime(e){var m={jpg:'image/jpeg',jpeg:'image/jpeg',png:'image/png',gif:'image/gif',webp:'image/webp',mp4:'video/mp4',mov:'video/quicktime',opus:'audio/ogg;codecs=opus',mp3:'audio/mpeg',m4a:'audio/mp4',aac:'audio/aac',ogg:'audio/ogg'};return m[e]||'application/octet-stream';}
+function countType(msgs,t){return msgs.filter(function(m){return m.type===t;}).length;}
+var MFR=['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+var DFR=['lundi','mardi','mercredi','jeudi','vendredi','samedi','dimanche'];
+function dateFr(d){var p=d.split('/');var dd=parseInt(p[0]),mo=parseInt(p[1]),yr=parseInt(p[2]);var dt=new Date(yr,mo-1,dd);return DFR[dt.getDay()===0?6:dt.getDay()-1]+' '+dd+' '+MFR[mo-1]+' '+yr;}
+function esc(t){return(t||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');}
+function genWave(){var h='';for(var i=0;i<30;i++)h+='<div class="wb" style="height:'+(3+Math.floor(Math.random()*12))+'px"></div>';return h;}
+function showEmptyState(){document.getElementById('empty-state').style.display='flex';document.getElementById('chat-view').style.display='none';document.getElementById('loading-overlay').style.display='none';}
+function showChat(){document.getElementById('empty-state').style.display='none';document.getElementById('chat-view').style.display='flex';document.getElementById('loading-overlay').style.display='none';}
+function showLoading(msg){document.getElementById('lo-label').textContent=msg||'Chargement…';document.getElementById('empty-state').style.display='none';document.getElementById('chat-view').style.display='none';document.getElementById('loading-overlay').style.display='flex';}
+function hideLoading(){document.getElementById('loading-overlay').style.display='none';}
+function showToast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},3000);}
+showEmptyState();
+</script>
+</body>
+</html>
