@@ -304,6 +304,7 @@ async function processZip(file) {
   zip.forEach(function(path, f){ if(!f.dir && path !== '_chat.txt' && !path.startsWith('__MACOSX')) mediaFiles.push({path, file: f}); });
 
   state.mediaBlobs = {};
+  state.mediaBlobsLC = {}; // lowercase index for case-insensitive lookup
   for(var i=0; i<mediaFiles.length; i++){
     var mf = mediaFiles[i];
     var fname = mf.path.split('/').pop();
@@ -312,7 +313,9 @@ async function processZip(file) {
       var ext = fname.split('.').pop().toLowerCase();
       var mime = getMime(ext);
       var blobObj = new Blob([blob], {type: mime});
-      state.mediaBlobs[fname] = URL.createObjectURL(blobObj);
+      var burl = URL.createObjectURL(blobObj);
+      state.mediaBlobs[fname] = burl;
+      state.mediaBlobsLC[fname.toLowerCase()] = burl;
     } catch(e){}
     var pct = 45 + Math.floor((i/mediaFiles.length)*40);
     setProgress(pct, 'Chargement médias ' + (i+1) + '/' + mediaFiles.length + '…');
@@ -356,12 +359,12 @@ function parseChat(text) {
   var extRe    = new RegExp('\\.(' + ALL_EXT.join('|') + ')$', 'i');
 
   function getAttachFilename(raw) {
-    var s = raw.replace(/[\u200e\u200f\u202f\uFEFF]/g,'').trim();
-    // Pattern 1: <attached: name> / <attaché : name>
+    var s = raw.replace(/[\u200e\u200f\u202f\uFEFF\u200b\u200c\u200d]/g,'').trim();
+    // Pattern 1: <attached: name> / <attaché : name> / <Fichier : name>
     var m1 = s.match(/^<[^:>]+:\s*(.+?)>$/i);
     if(m1) return m1[1].trim();
-    // Pattern 2: name.ext (anything in parens) or just name.ext
-    var m2 = s.match(/^(.+\.(jpg|jpeg|png|gif|webp|mp4|mov|avi|mkv|3gp|opus|mp3|m4a|aac|ogg|wav|amr|pdf|xlsx|xls|docx|doc|pptx|zip|txt))\s*(?:\([^)]*\))?$/i);
+    // Pattern 2: name.ext followed by optional (anything) OR <anything without colon>
+    var m2 = s.match(/^(.+\.(jpg|jpeg|png|gif|webp|mp4|mov|avi|mkv|3gp|opus|mp3|m4a|aac|ogg|wav|amr|pdf|xlsx|xls|docx|doc|pptx|zip|txt))\s*(?:\([^)]*\)|<[^>:]*>)?$/i);
     if(m2) return m2[1].trim();
     return null;
   }
@@ -454,6 +457,11 @@ function renderChat(){
   audioCounter = 0;
   state.audioIds = [];
 
+  function getBlobUrl(fname) {
+    if(!fname) return null;
+    return state.mediaBlobs[fname] || state.mediaBlobsLC[fname.toLowerCase()] || null;
+  }
+
   for(var i=0; i<msgs.length; i++){
     var msg = msgs[i];
     var isMe = msg.sender === myName;
@@ -473,7 +481,7 @@ function renderChat(){
       content = '<div class="tx">' + esc(msg.text) + editedTag + '</div><span class="ts">' + t + ticks + '</span>';
 
     } else if(msg.type === 'image'){
-      var blobUrl = msg.mediaFile ? (state.mediaBlobs[msg.mediaFile] || null) : null;
+      var blobUrl = getBlobUrl(msg.mediaFile);
       if(blobUrl){
         content = '<div class="mw"><img src="' + blobUrl + '" loading="lazy" onclick="lb(this)"><span class="tsm">' + t + ticks + '</span></div>';
       } else {
@@ -481,7 +489,7 @@ function renderChat(){
       }
 
     } else if(msg.type === 'video'){
-      var blobUrl = msg.mediaFile ? (state.mediaBlobs[msg.mediaFile] || null) : null;
+      var blobUrl = getBlobUrl(msg.mediaFile);
       if(blobUrl){
         content = '<div class="mw"><video controls preload="metadata" src="' + blobUrl + '"></video><span class="tsm">' + t + ticks + '</span></div>';
       } else {
@@ -489,7 +497,7 @@ function renderChat(){
       }
 
     } else if(msg.type === 'audio'){
-      var blobUrl = msg.mediaFile ? (state.mediaBlobs[msg.mediaFile] || null) : null;
+      var blobUrl = getBlobUrl(msg.mediaFile);
       var aid = 'aud' + (audioCounter++);
       state.audioIds.push(aid);
       var wave = genWave();
@@ -518,7 +526,7 @@ function renderChat(){
       }
 
     } else if(msg.type === 'document'){
-      var blobUrl = msg.mediaFile ? (state.mediaBlobs[msg.mediaFile] || null) : null;
+      var blobUrl = getBlobUrl(msg.mediaFile);
       var fname = msg.mediaFile || msg.text || 'Document';
       fname = fname.replace(/\s*\(file attached\)/i,'');
       var ext = fname.split('.').pop().toUpperCase().substring(0,4);
@@ -741,7 +749,7 @@ function setProgress(pct, label){
 function resetApp(){
   // Revoke blob URLs
   Object.values(state.mediaBlobs).forEach(function(url){ URL.revokeObjectURL(url); });
-  state = {contactName:'',myName:'',messages:[],mediaBlobs:{},audioIds:[]};
+  state = {contactName:'',myName:'',messages:[],mediaBlobs:{},mediaBlobsLC:{},audioIds:[]};
   document.getElementById('chatBody').innerHTML = '';
   document.getElementById('fileInput').value = '';
   showScreen('upload');
