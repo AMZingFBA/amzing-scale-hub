@@ -225,7 +225,7 @@ export function useMP() {
       const profile = profiles.find(p => p.id === activeProfileId);
       const country = countryCode || profile?.country_code || 'FR';
 
-      toast.info('Recherche en cours…');
+      toast.info('Recherche soumise — traitement en cours…');
 
       const { data, error } = await supabase.functions.invoke('mp-lookup', {
         body: {
@@ -238,8 +238,8 @@ export function useMP() {
       if (error) throw new Error(error.message);
       if (data?.error) throw new Error(data.error);
 
+      // Results will arrive via realtime subscription when the worker completes
       await loadLookups();
-      if (data?.lookup_id) await loadResults(data.lookup_id);
     } catch (err: any) {
       toast.error(err.message || 'Erreur lors de la recherche');
     } finally {

@@ -427,22 +427,21 @@ Deno.serve(async (req) => {
       });
     }
 
-    const country = COUNTRIES[countryCode];
-    if (!country) {
+    if (!COUNTRIES[countryCode]) {
       return new Response(JSON.stringify({ error: `Unknown country: ${countryCode}` }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
-    // Parse items
+    // Parse items to determine query type
     const items = queryInput
       .split(/[,\n]/)
       .map((s: string) => s.trim().toUpperCase())
       .filter(Boolean);
     const queryType = items.length > 1 ? 'batch' : 'single';
 
-    // Create lookup row with status 'processing'
+    // Create lookup row with status 'pending' — the Hetzner mp-worker will process it
     const { data: lookup, error: lookupErr } = await supabaseAdmin
       .from('mp_lookups')
       .insert({
@@ -451,131 +450,17 @@ Deno.serve(async (req) => {
         query_type: queryType,
         query_input: queryInput.trim(),
         country_code: countryCode,
-        status: 'processing',
+        status: 'pending',
       })
       .select()
       .single();
 
     if (lookupErr) throw new Error(`Failed to create lookup: ${lookupErr.message}`);
-    const lookupId = lookup.id;
-    const t0 = Date.now();
 
-    // Get credentials
-    const sasEmail = Deno.env.get('SAS_EMAIL');
-    const sasPassword = Deno.env.get('SAS_PASSWORD');
-    const workerSecret = Deno.env.get('WORKER_SECRET');
-
-    if (!sasEmail || !sasPassword || !workerSecret) {
-      throw new Error('Missing SAS_EMAIL, SAS_PASSWORD or WORKER_SECRET env vars');
-    }
-
-    // Login to SellerAmp
-    const sas = new SellerAmpClient();
-    await sas.login(sasEmail, sasPassword);
-
-    // Separate ASINs from EANs
-    const asins: string[] = [];
-    const eanToAsin: Record<string, string> = {};
-
-    for (const item of items) {
-      if (/^B[A-Z0-9]{9}$/.test(item)) {
-        asins.push(item);
-      } else if (/^\d{8,13}$/.test(item)) {
-        const asin = await sas.resolveEan(item);
-        if (asin) {
-          eanToAsin[item] = asin;
-          asins.push(asin);
-        } else {
-          console.warn(`EAN not found: ${item}`);
-        }
-      } else {
-        asins.push(item); // try as ASIN anyway
-      }
-    }
-
-    if (asins.length === 0) {
-      await supabaseAdmin.rpc('mp_fail', {
-        p_secret: workerSecret,
-        p_id: lookupId,
-        p_error: 'No valid ASINs found',
-      });
-      return new Response(JSON.stringify({ error: 'No valid ASINs found' }), {
-        status: 400,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-    }
-
-    // Lookup all 5 countries in parallel
-    const allCountryCodes = Object.keys(COUNTRIES);
-    const countryResults: Record<string, Record<string, any>> = {};
-
-    await Promise.all(
-      allCountryCodes.map(async (cc) => {
-        try {
-          countryResults[cc] = await sas.lookupBatch(asins, COUNTRIES[cc].keepa_mp);
-        } catch (e) {
-          console.error(`Lookup failed for ${cc}:`, e);
-          countryResults[cc] = {};
-        }
-      }),
-    );
-
-    // Build results for primary country
-    const primaryData = countryResults[countryCode] || {};
-    const asinToEan: Record<string, string> = {};
-    for (const [ean, asin] of Object.entries(eanToAsin)) asinToEan[asin] = ean;
-
-    const results: any[] = [];
-
-    for (const [asin, productData] of Object.entries(primaryData)) {
-      productData._asin = asin;
-      if (asinToEan[asin] && !productData.ean) productData.ean = asinToEan[asin];
-
-      const result = calculateProduct(productData, countryCode, user.id, lookupId);
-
-      // Add eu_data from all countries
-      const euData: Record<string, any> = {};
-      for (const cc of allCountryCodes) {
-        const ccPd = countryResults[cc]?.[asin];
-        if (!ccPd) continue;
-        ccPd._asin = asin;
-        const ccResult = calculateProduct(ccPd, cc, user.id, lookupId);
-        euData[cc] = {
-          bsr: ccResult.bsr,
-          sell_price: ccResult.sell_price,
-          fba_fee: ccResult.fba_fee,
-          commission_eur: ccResult.commission_eur,
-          commission_pct: ccResult.commission_pct,
-          closing_fee: ccResult.closing_fee,
-          fba_sellers: ccResult.fba_sellers,
-          fbm_sellers: ccResult.fbm_sellers,
-          sales_monthly: ccResult.sales_monthly,
-          amazon_price: ccResult.amazon_price,
-          fba_price: ccResult.fba_price,
-          variations: ccResult.variations,
-          alerts: ccResult.alerts,
-          offers: ccResult.offers,
-        };
-      }
-      result.eu_data = euData;
-      results.push(result);
-    }
-
-    // Store via mp_complete RPC
-    const processingMs = Date.now() - t0;
-    const { error: rpcErr } = await supabaseAdmin.rpc('mp_complete', {
-      p_secret: workerSecret,
-      p_id: lookupId,
-      p_results: results,
-      p_processing_ms: processingMs,
-    });
-
-    if (rpcErr) throw new Error(`mp_complete failed: ${rpcErr.message}`);
-
-    console.log(`[OK] Lookup ${lookupId} done in ${processingMs}ms — ${results.length} results`);
+    console.log(`[OK] Job ${lookup.id} enqueued for mp-worker`);
 
     return new Response(
-      JSON.stringify({ success: true, lookup_id: lookupId, count: results.length }),
+      JSON.stringify({ success: true, lookup_id: lookup.id }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
     );
   } catch (err: any) {
