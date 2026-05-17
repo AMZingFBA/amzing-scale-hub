@@ -1,0 +1,35 @@
+# AMZing FBA
+
+> Plateforme française tout-en-un pour vendeurs Amazon FBA : formation, moniteurs de produits rentables, sourcing fournisseurs, stockage et expédition.
+
+AMZing FBA accompagne les vendeurs Amazon FBA/FBM avec une formation complète, des outils de sourcing (moniteurs de produits, analyse de fichiers, recherche IA), un catalogue de fournisseurs et grossistes, et des services logistiques (stockage, expédition, cashback).
+
+## Pages
+
+- [Accueil](/): Vue d'ensemble de la plateforme AMZing FBA.
+- [Formation Amazon FBA](/formation): Méthode pas à pas + outils + communauté.
+- [Tarifs](/tarifs): Formules et abonnements.
+- [Services](/services): Moniteurs, catalogue fournisseurs, logistique.
+- [Suite d'outils](/suite): Suite complète d'outils Amazon FBA.
+- [Guides](/guides): Guides Amazon FBA et fiches pratiques.
+- [Débuter](/debuter): Comment se lancer sur Amazon FBA.
+- [Création de société](/creation-societe): Structurer son business e-commerce.
+- [Blog](/blog): Articles SEO et actualités Amazon.
+- [FAQ](/faq): Questions fréquentes.
+- [Avis](/avis): Témoignages des membres.
+- [Contact](/contact): Nous contacter.
+
+## Guides Amazon FBA
+
+- [Amazon FBA c'est quoi](/guide/amazon-fba-cest-quoi): Définition complète.
+- [Comment débuter Amazon FBA](/guide/comment-debuter-amazon-fba): Étapes de lancement.
+- [Combien coûte Amazon FBA](/guide/combien-coute-amazon-fba): Frais et budget.
+- [Amazon FBA vs FBM](/guide/amazon-fba-vs-fbm): Comparatif.
+- [Formation Amazon FBA débutant](/guide/formation-amazon-fba-debutant): Apprendre les bases.
+
+## Optional
+
+- [Mentions légales](/mentions-legales)
+- [CGV](/cgv)
+- [CGU](/cgu)
+- [Politique de confidentialité](/confidentialite)
