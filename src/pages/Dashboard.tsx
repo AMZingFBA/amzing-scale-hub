@@ -307,66 +307,6 @@ const Dashboard = () => {
                       badge={notifications.produits?.subcategories?.["produits-find"]}
                     />
                     <CategoryItem
-                      icon={Store}
-                      label="Produits Leclerc"
-                      link="/product-alerts/leclerc"
-                      badge={notifications.produits?.subcategories?.["produits-leclerc"]}
-                    />
-                    <CategoryItem
-                      icon={Store}
-                      label="Produits Ibood"
-                      link="/produits-ibood"
-                      badge={notifications.produits?.subcategories?.["produits-ibood"]}
-                    />
-                    <CategoryItem
-                      icon={Store}
-                      label="Produits Carrefour"
-                      link="/product-alerts/carrefour"
-                      badge={notifications.produits?.subcategories?.["produits-carrefour"]}
-                    />
-                    <CategoryItem
-                      icon={Store}
-                      label="Produits Auchan"
-                      link="/produits-auchan"
-                      badge={notifications.produits?.subcategories?.["produits-auchan"]}
-                    />
-                    <CategoryItem
-                      icon={Store}
-                      label="Produits SmythsToys"
-                      link="/product-alerts/smyth-toys"
-                      badge={notifications.produits?.subcategories?.["produits-smythstoys"]}
-                    />
-                    <CategoryItem
-                      icon={Store}
-                      label="Produits Miamland"
-                      link="/product-alerts/miamland"
-                      badge={notifications.produits?.subcategories?.["produits-miamland"]}
-                    />
-                    <CategoryItem
-                      icon={Store}
-                      label="Produits Stokomani"
-                      link="/product-alerts/stokomani"
-                      badge={notifications.produits?.subcategories?.["produits-stokomani"]}
-                    />
-                    <CategoryItem
-                      icon={Store}
-                      label="Produits Eany"
-                      link="/product-alerts/eany"
-                      badge={notifications.produits?.subcategories?.["produits-eany"]}
-                    />
-                    <CategoryItem
-                      icon={Store}
-                      label="Produits Qogita 2"
-                      link="/product-alerts/qogita2"
-                      badge={notifications.produits?.subcategories?.["produits-qogita2"]}
-                    />
-                    <CategoryItem
-                      icon={Sparkles}
-                      label="produits qogita"
-                      onClick={handleQogitaClick}
-                      badge={notifications.produits?.subcategories?.["produits-qogita"]}
-                    />
-                    <CategoryItem
                       icon={DollarSign}
                       label="promotions"
                       link="/promotions"
