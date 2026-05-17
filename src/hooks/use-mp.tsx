@@ -216,7 +216,7 @@ export function useMP() {
     }
   }, []);
 
-  // Submit a new lookup — calls Edge Function directly (no Hetzner worker needed)
+  // Submit a new lookup — insert directly into mp_lookups (RLS allows authenticated users)
   const submitLookup = useCallback(async (queryInput: string, countryCode?: string) => {
     if (!user) return;
     setIsSearching(true);
@@ -225,18 +225,21 @@ export function useMP() {
       const profile = profiles.find(p => p.id === activeProfileId);
       const country = countryCode || profile?.country_code || 'FR';
 
+      const items = queryInput.split(/[,\n]/).map(s => s.trim()).filter(Boolean);
+      const queryType = items.length > 1 ? 'batch' : 'single';
+
       toast.info('Recherche soumise — traitement en cours…');
 
-      const { data, error } = await supabase.functions.invoke('mp-lookup', {
-        body: {
-          queryInput: queryInput.trim(),
-          countryCode: country,
-          profileId: activeProfileId || null,
-        },
-      });
+      const { error } = await supabase.from('mp_lookups').insert({
+        user_id: user.id,
+        profile_id: activeProfileId || null,
+        query_type: queryType,
+        query_input: queryInput.trim(),
+        country_code: country,
+        status: 'pending',
+      } as any);
 
       if (error) throw new Error(error.message);
-      if (data?.error) throw new Error(data.error);
 
       // Results will arrive via realtime subscription when the worker completes
       await loadLookups();
@@ -245,7 +248,7 @@ export function useMP() {
     } finally {
       setIsSearching(false);
     }
-  }, [user, profiles, activeProfileId, loadLookups, loadResults]);
+  }, [user, profiles, activeProfileId, loadLookups]);
 
   // Delete lookup
   const deleteLookup = useCallback(async (lookupId: string) => {
