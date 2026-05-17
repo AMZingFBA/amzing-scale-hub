@@ -406,28 +406,21 @@ export async function search(filters: ActorioFilters, maxResults = Infinity): Pr
         await page.goto(pageUrl, { waitUntil: 'domcontentloaded', timeout: 30000 });
       }
 
-      // Wait for table rows (up to 10s)
+      // Wait for table rows — poll every 200ms instead of fixed 2s waits
       let loaded = false;
-      for (let i = 0; i < 5; i++) {
-        await page.waitForTimeout(2000);
-        const rowCount = await page.evaluate((): number => {
+      try {
+        await page.waitForFunction(() => {
           const mainTbl = document.querySelector('table#main-table') as HTMLTableElement | null;
-          if (mainTbl && mainTbl.tBodies[0]) return mainTbl.tBodies[0].rows.length;
-          let max = 0;
-          Array.from(document.querySelectorAll('table') as NodeListOf<HTMLTableElement>).forEach(function(t) {
-            const tb = t.tBodies[0];
-            if (tb && tb.rows.length > max) max = tb.rows.length;
-          });
-          return max;
-        });
-        console.log(`[scraper] [${(i + 1) * 2}s] rows=${rowCount}`);
-        if (rowCount > 0) { loaded = true; break; }
+          if (mainTbl && mainTbl.tBodies[0] && mainTbl.tBodies[0].rows.length > 0) return true;
+          const tables = Array.from(document.querySelectorAll('table') as NodeListOf<HTMLTableElement>);
+          return tables.some(t => t.tBodies[0] && t.tBodies[0].rows.length > 0);
+        }, { timeout: 10000, polling: 200 });
+        loaded = true;
+      } catch {
+        console.log('[scraper] No rows found, stopping');
       }
 
-      if (!loaded) {
-        console.log('[scraper] No rows found, stopping');
-        break;
-      }
+      if (!loaded) break;
 
       const pageRows = await scrapeFromDom(page, filters.marketplace ?? 'amazon.fr', pricesByAsin);
       if (pageRows.length === 0) break;
