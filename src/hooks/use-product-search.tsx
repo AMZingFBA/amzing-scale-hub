@@ -321,7 +321,7 @@ export function useProductSearch() {
 
     // Polling toutes les 5 s jusqu'à ce que le bridge complète la recherche.
     // submitSearch gère le timeout de 30 s avec Promise.race — pas besoin ici.
-    const deadline = Date.now() + 5 * 60_000; // max 5 min
+    const deadline = Date.now() + 10 * 60_000; // max 10 min
     while (Date.now() < deadline) {
       await new Promise(r => setTimeout(r, 5000));
 
@@ -365,12 +365,12 @@ export function useProductSearch() {
         return await submitSearchActorio(filters);
       }
       // Queue the search via Supabase — the bridge picks it up (~60s on Hetzner).
-      // Timeout at 150s to give the bridge enough time.
+      // Timeout at 600s (10 min) — large searches can take several minutes.
       try {
         const queueResult = await Promise.race([
           submitSearchQueue(filters),
           new Promise<null>((_, reject) =>
-            setTimeout(() => reject(new Error('__QUEUE_TIMEOUT__')), 150_000)
+            setTimeout(() => reject(new Error('__QUEUE_TIMEOUT__')), 600_000)
           ),
         ]);
         return queueResult;
