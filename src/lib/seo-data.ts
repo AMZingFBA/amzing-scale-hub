@@ -13,8 +13,8 @@ export const seoData: Record<string, SeoPageData> = {
   // ============================================
   
   home: {
-    title: "AMZing FBA – Plateforme tout-en-un pour réussir sur Amazon FBA",
-    description: "AMZing FBA : outils, méthode, sourcing et communauté pour vendre sur Amazon. Accède à une plateforme complète pour lancer ton business Amazon FBA.",
+    title: "AMZing FBA – Formation & Outils Amazon FBA",
+    description: "AMZing FBA : outils, méthode, sourcing et communauté pour vendre sur Amazon. Plateforme complète pour lancer ton business Amazon FBA.",
     keywords: "outil amazon fba, plateforme amazon fba, vendre sur amazon, solution amazon fba, business amazon fba, moniteurs produits rentables",
     robots: "index,follow",
   },

@@ -115,6 +115,30 @@ const Contact = () => {
         title={seoData.contact.title}
         description={seoData.contact.description}
         keywords={seoData.contact.keywords}
+        schema={{
+          "@context": "https://schema.org",
+          "@type": "LocalBusiness",
+          name: "AMZing FBA",
+          image: "https://amzingfba.com/logo-amzing.png",
+          url: "https://amzingfba.com/contact",
+          telephone: "+33-1-00-00-00-00",
+          email: "contact@amzingfba.com",
+          address: {
+            "@type": "PostalAddress",
+            streetAddress: "59 Rue de Ponthieu",
+            addressLocality: "Paris",
+            postalCode: "75008",
+            addressCountry: "FR",
+          },
+          openingHoursSpecification: [
+            {
+              "@type": "OpeningHoursSpecification",
+              dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+              opens: "09:00",
+              closes: "18:00",
+            },
+          ],
+        }}
       />
       <Navbar />
       
