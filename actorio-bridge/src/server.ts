@@ -41,13 +41,16 @@ app.post('/api/login', async (_req, res) => {
     if (!email || !password) {
       return res.status(400).json({ error: 'ACTORIO_EMAIL and ACTORIO_PASSWORD not set in .env' });
     }
+    // Cancel any pending retry before manual login attempt
+    if (loginRetryTimer) { clearTimeout(loginRetryTimer); loginRetryTimer = null; }
 
     await initBrowser(HEADLESS);
     const success = await login(email, password);
     if (success) {
       ready = true;
       loginError = null;
-      return res.json({ success: true });
+      if (!stopWorker) stopWorker = startWorker();
+      return res.json({ success: true, email });
     }
     loginError = 'Login failed - check credentials';
     return res.status(401).json({ error: loginError });
@@ -85,6 +88,31 @@ app.post('/api/search', async (req, res) => {
 
 // --- Startup ---
 
+const LOGIN_RETRY_INTERVAL_MS = 30_000; // retry every 30s if login fails
+let loginRetryTimer: ReturnType<typeof setTimeout> | null = null;
+
+async function attemptLogin(email: string, password: string): Promise<void> {
+  try {
+    await initBrowser(HEADLESS);
+    const success = await login(email, password);
+    if (success) {
+      ready = true;
+      loginError = null;
+      if (loginRetryTimer) { clearTimeout(loginRetryTimer); loginRetryTimer = null; }
+      if (!stopWorker) stopWorker = startWorker();
+      console.log('✓ Logged in to Actorio');
+    } else {
+      loginError = 'Login failed — check credentials';
+      console.error(`✗ Login failed (${email}) — retry in ${LOGIN_RETRY_INTERVAL_MS / 1000}s`);
+      loginRetryTimer = setTimeout(() => attemptLogin(email, password), LOGIN_RETRY_INTERVAL_MS);
+    }
+  } catch (err: any) {
+    loginError = err.message;
+    console.error(`✗ Login error: ${err.message} — retry in ${LOGIN_RETRY_INTERVAL_MS / 1000}s`);
+    loginRetryTimer = setTimeout(() => attemptLogin(email, password), LOGIN_RETRY_INTERVAL_MS);
+  }
+}
+
 async function startup() {
   const email = process.env.ACTORIO_EMAIL;
   const password = process.env.ACTORIO_PASSWORD;
@@ -93,21 +121,7 @@ async function startup() {
     console.error('⚠  ACTORIO_EMAIL and ACTORIO_PASSWORD not set in .env');
     console.error('   Set them and restart, or call POST /api/login');
   } else {
-    try {
-      await initBrowser(HEADLESS);
-      const success = await login(email, password);
-      if (success) {
-        ready = true;
-        console.log('✓ Logged in to Actorio');
-        stopWorker = startWorker(); // start Supabase queue worker
-      } else {
-        loginError = 'Login failed';
-        console.error('✗ Login failed - check credentials');
-      }
-    } catch (err: any) {
-      loginError = err.message;
-      console.error(`✗ Startup error: ${err.message}`);
-    }
+    attemptLogin(email, password); // non-blocking — retries automatically on failure
   }
 
   app.listen(PORT, () => {
@@ -116,18 +130,21 @@ async function startup() {
     console.log(`   Login:   POST http://localhost:${PORT}/api/login`);
     console.log(`   Search:  POST http://localhost:${PORT}/api/search`);
     console.log(`   Headless: ${HEADLESS}\n`);
+    console.log(`   Email: ${email ?? '(not set)'}`);
   });
 }
 
 // Graceful shutdown
 process.on('SIGINT', async () => {
   console.log('\nShutting down...');
+  if (loginRetryTimer) clearTimeout(loginRetryTimer);
   stopWorker?.();
   await closeBrowser();
   process.exit(0);
 });
 
 process.on('SIGTERM', async () => {
+  if (loginRetryTimer) clearTimeout(loginRetryTimer);
   stopWorker?.();
   await closeBrowser();
   process.exit(0);

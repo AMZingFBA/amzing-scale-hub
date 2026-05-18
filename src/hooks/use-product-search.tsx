@@ -97,6 +97,20 @@ export function useProductSearch() {
 
   const loadSearches = useCallback(async () => {
     if (!user) return;
+    // Timeout client-side: mark own pending/processing searches older than 15 min as error
+    // (handles the case where the bridge server is down or unreachable)
+    const cutoff = new Date(Date.now() - 15 * 60 * 1000).toISOString();
+    await supabase
+      .from('product_searches')
+      .update({
+        status: 'error',
+        error_message: 'Le serveur de recherche ne répond pas. Réessayez dans quelques minutes.',
+      })
+      .eq('user_id', user.id)
+      .in('status', ['pending', 'processing'])
+      .lt('created_at', cutoff)
+      .catch(() => {});
+
     const { data, error: err } = await supabase
       .from('product_searches')
       .select('*')
