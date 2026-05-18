@@ -970,9 +970,9 @@ Se lancer sur Amazon est accessible à tous avec la bonne méthode. Les clés du
 // Article 4: Frais FBA détaillés
 export const articleFraisFba: BlogArticle = {
   slug: 'frais-fba-amazon-tous-les-couts',
-  title: "Frais FBA Amazon : Tous les Coûts Détaillés [2026]",
-  metaTitle: "Frais FBA Amazon 2026 : Guide Complet des Coûts et Commissions",
-  metaDescription: "Découvrez tous les frais FBA Amazon en 2026 : commissions, frais de stockage, fulfillment, retours. Calculez vos marges avec notre guide complet.",
+  title: "Frais FBA Amazon 2026 : Tous les Coûts (avec exemples chiffrés)",
+  metaTitle: "Frais FBA Amazon 2026 : Liste Complète + Calcul de Marge",
+  metaDescription: "✅ Tous les frais FBA Amazon en 2026 : commissions, stockage, expédition, retours. Tableaux + simulateur pour calculer votre marge nette en 2 minutes.",
   keywords: ['frais fba', 'frais amazon fba', 'commission amazon', 'cout amazon fba', 'frais stockage amazon', 'frais expédition fba', 'tarif amazon vendeur', 'frais fulfillment amazon', 'cout vendre amazon', 'marge amazon fba'],
   excerpt: "Commissions, frais FBA, stockage, retours... Découvrez TOUS les frais Amazon FBA détaillés et comment les optimiser pour maximiser vos marges.",
   category: 'logistique',
