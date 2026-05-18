@@ -574,9 +574,9 @@ La préparation d'envoi FBA demande de la rigueur mais devient routinière avec 
 // Article 4: Wholesale Amazon FBA
 export const articleWholesaleAmazon: BlogArticle = {
   slug: 'wholesale-amazon-fba-guide',
-  title: "Wholesale Amazon FBA : Guide Complet pour Acheter en Gros",
-  metaTitle: "Wholesale Amazon FBA 2026 : Guide Achat en Gros et Fournisseurs",
-  metaDescription: "Maîtrisez le wholesale Amazon FBA : trouver des fournisseurs, négocier, calculer la rentabilité. Guide complet pour acheter en gros et revendre sur Amazon.",
+  title: "Wholesale Amazon FBA : Guide Complet Achat en Gros 2026",
+  metaTitle: "Wholesale Amazon FBA 2026 : Acheter en Gros + Revendre (×2 marge)",
+  metaDescription: "💼 Wholesale Amazon FBA expliqué : trouver les bons fournisseurs, négocier, calculer la rentabilité. Méthode pas-à-pas pour doubler votre marge en 2026.",
   keywords: ['wholesale amazon fba', 'achat en gros amazon', 'fournisseur amazon fba', 'grossiste amazon', 'revente amazon fba', 'distributeur amazon', 'acheter en gros revendre', 'wholesale france', 'fournisseur produits amazon', 'grossiste e-commerce'],
   excerpt: "Le wholesale Amazon FBA consiste à acheter des produits de marque en gros auprès de distributeurs officiels pour les revendre sur Amazon. Un modèle stable et scalable.",
   category: 'produits-rentables',
