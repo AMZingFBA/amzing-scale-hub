@@ -1464,9 +1464,9 @@ Pour la majorité des vendeurs, FBA est le choix optimal : moins de travail quot
 
 const satelliteCouts: BlogArticle = {
   slug: 'combien-coute-amazon-fba',
-  title: "Combien Coûte Amazon FBA ? Tous les Frais Expliqués",
-  metaTitle: "Coûts Amazon FBA 2026 : Tous les Frais Détaillés",
-  metaDescription: "Découvrez tous les frais Amazon FBA : commissions, fulfillment, stockage, abonnement. Calculez précisément vos coûts et optimisez votre rentabilité.",
+  title: "Combien Coûte Amazon FBA en 2026 ? Le Vrai Budget (chiffré)",
+  metaTitle: "Combien Coûte Amazon FBA ? Budget Réel 2026 (de 500€ à 5000€)",
+  metaDescription: "💰 Combien coûte vraiment Amazon FBA en 2026 ? Détail de TOUS les frais (commissions, stockage, abonnement) + budget de départ réel par modèle. Sans surprise.",
   keywords: ['coût amazon fba', 'frais amazon fba', 'commission amazon', 'frais fba', 'tarif amazon vendeur'],
   excerpt: "Les frais Amazon FBA peuvent sembler complexes. Ce guide détaille chaque coût pour vous aider à calculer précisément votre rentabilité.",
   category: 'guide-fba',
