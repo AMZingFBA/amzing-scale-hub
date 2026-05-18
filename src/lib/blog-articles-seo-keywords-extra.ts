@@ -5,9 +5,9 @@ import type { BlogArticle } from './blog-data';
 // Article 1: Amazon Brand Registry
 const amazonBrandRegistry: BlogArticle = {
   slug: 'amazon-brand-registry-guide-complet',
-  title: "Amazon Brand Registry : Guide Complet pour Protéger Votre Marque en 2026",
-  metaTitle: "Amazon Brand Registry : Guide Complet [2026] | Inscription & Avantages",
-  metaDescription: "Découvrez Amazon Brand Registry : inscription, avantages, protection marque. Guide complet pour enregistrer votre marque sur Amazon et protéger vos produits.",
+  title: "Amazon Brand Registry 2026 : Inscription + Avantages (Guide)",
+  metaTitle: "Amazon Brand Registry 2026 : Inscription pas-à-pas (sans erreur)",
+  metaDescription: "🛡️ Amazon Brand Registry expliqué : éligibilité, inscription pas-à-pas, A+ Content, protection marque. Toutes les étapes 2026 + erreurs à éviter.",
   keywords: ['amazon brand registry', 'amazon brand registration', 'amazon brand amazon', 'enregistrement marque amazon', 'protéger marque amazon', 'brand registry amazon'],
   excerpt: "Amazon Brand Registry est le programme officiel d'Amazon pour protéger votre marque contre les contrefaçons et accéder à des outils marketing exclusifs.",
   category: 'vendre-amazon',
