@@ -290,9 +290,9 @@ Investir dans une formation Amazon FBA est le meilleur moyen d'accélérer votre
 // Article 2: Logiciel Amazon FBA
 export const articleLogicielAmazonFba: BlogArticle = {
   slug: 'logiciel-amazon-fba-outils-indispensables',
-  title: "Logiciel Amazon FBA : Les Outils Indispensables en 2026",
-  metaTitle: "Logiciel Amazon FBA 2026 : Top 10 Outils Indispensables pour Vendeurs",
-  metaDescription: "Découvrez les meilleurs logiciels Amazon FBA : SellerAmp, Keepa, Helium 10... Comparatif complet des outils essentiels pour réussir sur Amazon en 2026.",
+  title: "Logiciel Amazon FBA 2026 : Top 10 Outils Testés (avec prix)",
+  metaTitle: "Logiciel Amazon FBA : Top 10 Outils 2026 (gratuits + payants)",
+  metaDescription: "🚀 Les 10 meilleurs logiciels Amazon FBA en 2026 testés : SellerAmp, Keepa, Helium 10, Jungle Scout. Prix, fonctions, lequel choisir selon votre niveau.",
   keywords: ['logiciel amazon fba', 'outils amazon fba', 'selleramp', 'keepa', 'helium 10', 'jungle scout', 'outil vendeur amazon', 'logiciel sourcing amazon', 'application amazon fba', 'software amazon seller'],
   excerpt: "SellerAmp, Keepa, Helium 10, Jungle Scout... Comparatif complet des logiciels essentiels pour analyser, sourcer et optimiser votre business Amazon FBA.",
   category: 'guide-fba',
@@ -970,9 +970,9 @@ Se lancer sur Amazon est accessible à tous avec la bonne méthode. Les clés du
 // Article 4: Frais FBA détaillés
 export const articleFraisFba: BlogArticle = {
   slug: 'frais-fba-amazon-tous-les-couts',
-  title: "Frais FBA Amazon : Tous les Coûts Détaillés [2026]",
-  metaTitle: "Frais FBA Amazon 2026 : Guide Complet des Coûts et Commissions",
-  metaDescription: "Découvrez tous les frais FBA Amazon en 2026 : commissions, frais de stockage, fulfillment, retours. Calculez vos marges avec notre guide complet.",
+  title: "Frais FBA Amazon 2026 : Tous les Coûts (avec exemples chiffrés)",
+  metaTitle: "Frais FBA Amazon 2026 : Liste Complète + Calcul de Marge",
+  metaDescription: "✅ Tous les frais FBA Amazon en 2026 : commissions, stockage, expédition, retours. Tableaux + simulateur pour calculer votre marge nette en 2 minutes.",
   keywords: ['frais fba', 'frais amazon fba', 'commission amazon', 'cout amazon fba', 'frais stockage amazon', 'frais expédition fba', 'tarif amazon vendeur', 'frais fulfillment amazon', 'cout vendre amazon', 'marge amazon fba'],
   excerpt: "Commissions, frais FBA, stockage, retours... Découvrez TOUS les frais Amazon FBA détaillés et comment les optimiser pour maximiser vos marges.",
   category: 'logistique',

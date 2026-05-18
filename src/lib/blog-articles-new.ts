@@ -8,9 +8,9 @@ import { BlogArticle } from './blog-data';
 // Article 1: Catégories les plus rentables
 export const articleCategoriesRentables: BlogArticle = {
   slug: 'categories-produits-rentables-amazon-fba',
-  title: "Top 10 Catégories de Produits Rentables sur Amazon FBA en 2026",
-  metaTitle: "Catégories Rentables Amazon FBA 2026 : Top 10 Niches Profitables",
-  metaDescription: "Découvrez les 10 catégories de produits les plus rentables sur Amazon FBA en 2026. Électronique, beauté, maison... Guide complet pour choisir votre niche.",
+  title: "Top 10 Catégories de Produits Rentables Amazon FBA en 2026",
+  metaTitle: "Top 10 Produits Rentables Amazon FBA 2026 (Niches à fort ROI)",
+  metaDescription: "🔥 Les 10 catégories les plus rentables sur Amazon FBA en 2026 : marges réelles, concurrence, exemples chiffrés. Trouvez votre niche profitable en 5 min.",
   keywords: ['catégories rentables amazon', 'niche amazon fba', 'produits amazon fba', 'meilleures catégories amazon', 'catégorie produit amazon', 'niche rentable e-commerce', 'produits à vendre amazon', 'catégorie amazon fba', 'marché amazon france', 'vendre sur amazon catégories'],
   excerpt: "Électronique, beauté, maison, sport... Quelles sont les catégories de produits qui génèrent le plus de profits sur Amazon FBA ? Analyse détaillée des meilleures niches.",
   category: 'produits-rentables',
@@ -574,9 +574,9 @@ La préparation d'envoi FBA demande de la rigueur mais devient routinière avec 
 // Article 4: Wholesale Amazon FBA
 export const articleWholesaleAmazon: BlogArticle = {
   slug: 'wholesale-amazon-fba-guide',
-  title: "Wholesale Amazon FBA : Guide Complet pour Acheter en Gros",
-  metaTitle: "Wholesale Amazon FBA 2026 : Guide Achat en Gros et Fournisseurs",
-  metaDescription: "Maîtrisez le wholesale Amazon FBA : trouver des fournisseurs, négocier, calculer la rentabilité. Guide complet pour acheter en gros et revendre sur Amazon.",
+  title: "Wholesale Amazon FBA : Guide Complet Achat en Gros 2026",
+  metaTitle: "Wholesale Amazon FBA 2026 : Acheter en Gros + Revendre (×2 marge)",
+  metaDescription: "💼 Wholesale Amazon FBA expliqué : trouver les bons fournisseurs, négocier, calculer la rentabilité. Méthode pas-à-pas pour doubler votre marge en 2026.",
   keywords: ['wholesale amazon fba', 'achat en gros amazon', 'fournisseur amazon fba', 'grossiste amazon', 'revente amazon fba', 'distributeur amazon', 'acheter en gros revendre', 'wholesale france', 'fournisseur produits amazon', 'grossiste e-commerce'],
   excerpt: "Le wholesale Amazon FBA consiste à acheter des produits de marque en gros auprès de distributeurs officiels pour les revendre sur Amazon. Un modèle stable et scalable.",
   category: 'produits-rentables',

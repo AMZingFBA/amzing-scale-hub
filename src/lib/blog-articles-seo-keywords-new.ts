@@ -535,9 +535,9 @@ Amazon FBA en 2026 reste une opportunité exceptionnelle pour créer un business
 // Article 4: "amazon fba france" - Focus marché français
 export const articleAmazonFbaFrance2026: BlogArticle = {
   slug: 'amazon-fba-france-vendeur-francais',
-  title: "Amazon FBA France : Tout Savoir pour les Vendeurs Français 2026",
-  metaTitle: "Amazon FBA France 2026 : Guide Complet Vendeurs Français",
-  metaDescription: "Amazon FBA France : guide complet pour vendeurs français. Statuts juridiques, fiscalité, entrepôts, spécificités du marché français. Tout pour réussir.",
+  title: "Amazon FBA France 2026 : Le Guide Vendeur Français Complet",
+  metaTitle: "Amazon FBA France 2026 : Statut, TVA, Entrepôts (vendeur FR)",
+  metaDescription: "🇫🇷 Vendre sur Amazon FBA depuis la France en 2026 : statut juridique, TVA, micro vs SASU, entrepôts FR. Tout ce qu'un vendeur français doit savoir.",
   keywords: ['amazon fba france', 'amazon fba en france', 'vendeur amazon france', 'fba france', 'amazon seller france', 'vendre amazon france', 'amazon fba français', 'fba france 2026'],
   excerpt: "Amazon FBA France : le guide complet pour les vendeurs français. Statuts juridiques, fiscalité, entrepôts et toutes les spécificités du marché français.",
   category: 'guide-fba',
