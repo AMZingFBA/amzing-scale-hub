@@ -9,8 +9,8 @@ import { BlogArticle } from './blog-data';
 export const articleCategoriesRentables: BlogArticle = {
   slug: 'categories-produits-rentables-amazon-fba',
   title: "Top 10 Catégories de Produits Rentables Amazon FBA en 2026",
-  metaTitle: "Top 10 Produits Rentables Amazon FBA 2026 (Niches à fort ROI)",
-  metaDescription: "🔥 Les 10 catégories les plus rentables sur Amazon FBA en 2026 : marges réelles, concurrence, exemples chiffrés. Trouvez votre niche profitable en 5 min.",
+  metaTitle: 'Amazon FBA : Top 10 produits rentables à lancer en 2026',
+  metaDescription: 'Découvrez les 10 catégories les plus rentables sur Amazon FBA en 2026 avec marges et exemples concrets. Trouvez votre niche à fort potentiel rapidement !',
   keywords: ['catégories rentables amazon', 'niche amazon fba', 'produits amazon fba', 'meilleures catégories amazon', 'catégorie produit amazon', 'niche rentable e-commerce', 'produits à vendre amazon', 'catégorie amazon fba', 'marché amazon france', 'vendre sur amazon catégories'],
   excerpt: "Électronique, beauté, maison, sport... Quelles sont les catégories de produits qui génèrent le plus de profits sur Amazon FBA ? Analyse détaillée des meilleures niches.",
   category: 'produits-rentables',
