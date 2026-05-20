@@ -1,5 +1,6 @@
 // ============================================
 // NOUVEAUX ARTICLES SATELLITES SEO
+// Updated: 2026-05-20
 // ============================================
 
 import { blogImages } from './blog-images';
