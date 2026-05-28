@@ -189,7 +189,7 @@ export default function Auth() {
     }
 
     if (!signupData.siren || !/^\d{9}$/.test(signupData.siren)) {
-      const msg = "Le SIREN est obligatoire (9 chiffres). Recherchez votre société.";
+      const msg = "Le SIREN est obligatoire (9 chiffres). Recherchez votre société, ou cochez \"Je n'ai pas de société française\".";
       setError(msg);
       toast.error(msg);
       setIsLoading(false);
