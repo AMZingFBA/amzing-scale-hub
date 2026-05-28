@@ -17,6 +17,20 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  // Verify shared webhook secret from systeme.io
+  const expectedSecret = Deno.env.get("SYSTEME_IO_WEBHOOK_SECRET") ?? "";
+  const providedSecret =
+    req.headers.get("x-webhook-secret") ||
+    req.headers.get("x-systeme-secret") ||
+    new URL(req.url).searchParams.get("secret") ||
+    "";
+  if (!expectedSecret || providedSecret !== expectedSecret) {
+    console.warn("[SYSTEME-IO-WEBHOOK] Invalid or missing webhook secret");
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
   try {
     logStep("Webhook received", { method: req.method });
 

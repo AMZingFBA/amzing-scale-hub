@@ -160,11 +160,7 @@ const handler = async (req: Request): Promise<Response> => {
     // Generate 6-digit code
     const code = Math.floor(100000 + Math.random() * 900000).toString();
 
-    console.log("======================");
-    console.log("CODE DE VÉRIFICATION:", code);
-    console.log("Pour l'utilisateur:", userEmail);
-    console.log("Type:", type);
-    console.log("======================");
+    console.log("Verification code generated for:", userEmail, "type:", type);
 
     // Create admin client with service role to bypass RLS
     const supabaseAdmin = createClient(

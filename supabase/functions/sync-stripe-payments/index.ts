@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+// Auth: requires Bearer service-role key (set by cron callers)
 import Stripe from "https://esm.sh/stripe@18.5.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 
@@ -603,6 +604,10 @@ async function runAutomatedRecovery(
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
+  }
+  const srk = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
+  if (req.headers.get("Authorization") !== `Bearer ${srk}`) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
   }
 
   try {
