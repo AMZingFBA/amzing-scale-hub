@@ -490,18 +490,46 @@ Deno.serve(async (req) => {
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const anonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
+
+    // Verify caller is authenticated
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader?.startsWith('Bearer ')) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+    const userClient = createClient(supabaseUrl, anonKey, {
+      global: { headers: { Authorization: authHeader } },
+    });
+    const token = authHeader.replace('Bearer ', '');
+    const { data: claims, error: claimsErr } = await userClient.auth.getClaims(token);
+    if (claimsErr || !claims?.claims?.sub) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
 
     const admin = createClient(supabaseUrl, serviceRoleKey);
 
-    const { filePath, fileName, filters, columnMapping, userId } = await req.json();
-    if (!filePath || !fileName || !userId) {
-      return new Response(JSON.stringify({ error: 'filePath, fileName, and userId are required' }), {
+    const { filePath, fileName, filters, columnMapping } = await req.json();
+    if (!filePath || !fileName) {
+      return new Response(JSON.stringify({ error: 'filePath and fileName are required' }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
-    const user = { id: userId };
+    // Derive userId from verified JWT — never trust the request body
+    const user = { id: claims.claims.sub as string };
+
+    // Enforce file ownership: path must start with the user's id (analysis-files convention)
+    const ownerSegment = String(filePath).split('/')[0];
+    if (ownerSegment !== user.id) {
+      return new Response(JSON.stringify({ error: 'Forbidden: file does not belong to user' }), {
+        status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
 
     const countryCode = filters?.country || 'FR';
     const country = COUNTRIES[countryCode];

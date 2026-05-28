@@ -38,9 +38,7 @@ const handler = async (req: Request): Promise<Response> => {
     console.log("User found:", user ? "Yes" : "No");
     console.log("User ID:", user?.id);
     console.log("Email verified:", user?.email_verified);
-    console.log("Stored code:", user?.verification_code);
-    console.log("Received code:", code);
-    console.log("Codes match:", user?.verification_code === code);
+    console.log("Code comparison performed");
 
     if (getUserError || !user) {
       console.error("Get user error:", getUserError);
