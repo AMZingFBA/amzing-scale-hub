@@ -97,7 +97,10 @@ serve(async (req) => {
         const isVip = planType === 'vip' && subscription?.status === 'active';
 
         // Search for existing record in Airtable
-        const searchUrl = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${USERS_TABLE}?filterByFormula={Email (principal)}="${profile.email}"`;
+        // Case-insensitive + URL-encoded so emails containing '+' aren't matched as space
+        const normalizedEmail = (profile.email || '').trim().toLowerCase();
+        const formula = `LOWER({Email (principal)})="${normalizedEmail}"`;
+        const searchUrl = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${USERS_TABLE}?filterByFormula=${encodeURIComponent(formula)}`;
         const searchResponse = await fetch(searchUrl, {
           headers: { 'Authorization': `Bearer ${AIRTABLE_API_KEY}` },
         });
