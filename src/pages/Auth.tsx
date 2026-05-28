@@ -189,7 +189,7 @@ export default function Auth() {
     }
 
     if (!signupData.siren || !/^\d{9}$/.test(signupData.siren)) {
-      const msg = "Le SIREN est obligatoire (9 chiffres). Recherchez votre société.";
+      const msg = "Le SIREN est obligatoire (9 chiffres). Recherchez votre société, ou cochez \"Je n'ai pas de société française\".";
       setError(msg);
       toast.error(msg);
       setIsLoading(false);
@@ -526,12 +526,28 @@ export default function Auth() {
                       </div>
                     </div>
 
-                    <div className="animate-slide-in-up" style={{ animationDelay: "175ms" }}>
+                    <div className="animate-slide-in-up space-y-2" style={{ animationDelay: "175ms" }}>
                       <CompanyLookup
+                        key={signupData.siren === '000000000' ? 'noco' : 'co'}
                         onSelect={(siren, companyName) => setSignupData(prev => ({ ...prev, siren, companyName }))}
-                        disabled={isLoading}
+                        disabled={isLoading || signupData.siren === '000000000'}
                       />
+                      <label className="flex items-start gap-2 text-xs text-muted-foreground cursor-pointer pt-1">
+                        <input
+                          type="checkbox"
+                          className="mt-0.5"
+                          checked={signupData.siren === '000000000'}
+                          onChange={(e) => setSignupData(prev => ({
+                            ...prev,
+                            siren: e.target.checked ? '000000000' : '',
+                            companyName: e.target.checked ? 'Particulier / Hors France' : '',
+                          }))}
+                          disabled={isLoading}
+                        />
+                        <span>Je n'ai pas de société française (expatrié, particulier, société étrangère)</span>
+                      </label>
                     </div>
+
 
                     <div className="space-y-2 animate-slide-in-up" style={{ animationDelay: "200ms" }}>
                       <Label htmlFor="signup-email">Email</Label>

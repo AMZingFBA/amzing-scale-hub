@@ -34,9 +34,10 @@ const handler = async (req: Request): Promise<Response> => {
     console.log("Registration Source:", registrationSource);
 
     // SIREN is mandatory (9 digits)
+    // SIREN is mandatory (9 digits). "000000000" is allowed for expats / non-French entities.
     if (!siren || !/^\d{9}$/.test(String(siren).trim())) {
       return new Response(
-        JSON.stringify({ error: "Le SIREN est obligatoire (9 chiffres)." }),
+        JSON.stringify({ error: "Le SIREN est obligatoire (9 chiffres) ou cochez l'option \"pas de société française\"." }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
