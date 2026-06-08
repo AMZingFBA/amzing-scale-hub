@@ -5,14 +5,14 @@ import SEO from "@/components/SEO";
 interface LandingLayoutProps {
   title: string;
   description: string;
-  canonical: string;
+  canonical?: string;
   children: React.ReactNode;
 }
 
-export const LandingLayout = ({ title, description, canonical, children }: LandingLayoutProps) => {
+export const LandingLayout = ({ title, description, children }: LandingLayoutProps) => {
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <SEO title={title} description={description} canonical={canonical} />
+      <SEO title={title} description={description} />
       <header className="sticky top-0 z-30 border-b border-border/60 bg-background/95 backdrop-blur">
         <div className="container mx-auto flex h-16 items-center justify-between px-4">
           <Link to="/" className="text-lg font-bold tracking-tight">
