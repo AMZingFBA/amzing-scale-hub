@@ -124,6 +124,12 @@ const BlogPost = lazy(() => import("./pages/BlogPost"));
 const AccompagnementAmazonFba = lazy(() => import("./pages/AccompagnementAmazonFba"));
 const Merci = lazy(() => import("./pages/Merci"));
 const DemandeRecue = lazy(() => import("./pages/DemandeRecue"));
+const DemanderRappel = lazy(() => import("./pages/DemanderRappel"));
+const ProgrammeAmazonFba = lazy(() => import("./pages/ProgrammeAmazonFba"));
+const SourcingProduitAmazon = lazy(() => import("./pages/SourcingProduitAmazon"));
+const AnalyseMargesFba = lazy(() => import("./pages/AnalyseMargesFba"));
+const TarifsAmzingFba = lazy(() => import("./pages/TarifsAmzingFba"));
+const FaqAmazonFba = lazy(() => import("./pages/FaqAmazonFba"));
 
 const queryClient = new QueryClient();
 
@@ -270,6 +276,12 @@ const App = () => (
             <Route path="/formation-amazon-fba" element={<AccompagnementAmazonFba />} />
             <Route path="/merci" element={<Merci />} />
             <Route path="/demande-recue" element={<DemandeRecue />} />
+            <Route path="/demander-rappel" element={<DemanderRappel />} />
+            <Route path="/programme-amazon-fba" element={<ProgrammeAmazonFba />} />
+            <Route path="/sourcing-produit-amazon" element={<SourcingProduitAmazon />} />
+            <Route path="/analyse-marges-fba" element={<AnalyseMargesFba />} />
+            <Route path="/tarifs-amzing-fba" element={<TarifsAmzingFba />} />
+            <Route path="/faq-amazon-fba" element={<FaqAmazonFba />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
