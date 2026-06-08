@@ -14,9 +14,14 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import {
-  CheckCircle2, Compass, Calculator, ShieldCheck, GraduationCap,
-  Search, AlertTriangle, Layers, ClipboardList, ArrowRight,
-  PhoneCall, Lightbulb, Route,
+  CheckCircle2,
+  Calculator,
+  ShieldCheck,
+  Search,
+  ArrowRight,
+  PhoneCall,
+  Lightbulb,
+  Route,
 } from "lucide-react";
 
 const LEVELS = ["Débutant", "Déjà vendeur Amazon", "E-commerçant hors Amazon", "Autre"];
@@ -29,6 +34,8 @@ declare global {
     gtag?: (...args: any[]) => void;
   }
 }
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const LeadForm = ({ id }: { id: string }) => {
   const navigate = useNavigate();
@@ -43,18 +50,36 @@ const LeadForm = ({ id }: { id: string }) => {
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const normalized = {
+      ...form,
+      first_name: form.first_name.trim(),
+      last_name: form.last_name.trim(),
+      email: form.email.trim(),
+      phone: form.phone.trim(),
+      message: form.message.trim(),
+    };
+
     if (!form.consent) {
       toast.error("Merci d'accepter d'être recontacté.");
       return;
     }
-    if (!form.first_name || !form.last_name || !form.email || !form.phone) {
+    if (!normalized.first_name || !normalized.last_name || !normalized.email || !normalized.phone) {
       toast.error("Merci de remplir les champs obligatoires.");
       return;
     }
+    if (!EMAIL_RE.test(normalized.email)) {
+      toast.error("Merci de saisir une adresse email valide.");
+      return;
+    }
+    if (!form.level || !form.objective || !form.budget) {
+      toast.error("Merci de sélectionner votre niveau, votre objectif et votre budget.");
+      return;
+    }
+
     setLoading(true);
     try {
       const { data, error } = await supabase.functions.invoke("submit-lead", {
-        body: { ...form, source_page: location.pathname, source: "google_ads" },
+        body: { ...normalized, level: form.level, objective: form.objective, budget: form.budget, consent: form.consent, source_page: location.pathname, source: "google_ads" },
       });
       if (error || !data?.ok) throw new Error(error?.message || "Erreur");
 
@@ -100,21 +125,21 @@ const LeadForm = ({ id }: { id: string }) => {
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="space-y-1.5">
-          <Label>Niveau actuel</Label>
+          <Label>Niveau actuel *</Label>
           <Select value={form.level} onValueChange={(v) => update("level", v)}>
             <SelectTrigger><SelectValue placeholder="Sélectionner" /></SelectTrigger>
             <SelectContent>{LEVELS.map((l) => <SelectItem key={l} value={l}>{l}</SelectItem>)}</SelectContent>
           </Select>
         </div>
         <div className="space-y-1.5">
-          <Label>Objectif principal</Label>
+          <Label>Objectif principal *</Label>
           <Select value={form.objective} onValueChange={(v) => update("objective", v)}>
             <SelectTrigger><SelectValue placeholder="Sélectionner" /></SelectTrigger>
             <SelectContent>{OBJECTIVES.map((l) => <SelectItem key={l} value={l}>{l}</SelectItem>)}</SelectContent>
           </Select>
         </div>
         <div className="space-y-1.5">
-          <Label>Budget de départ</Label>
+          <Label>Budget de départ approximatif *</Label>
           <Select value={form.budget} onValueChange={(v) => update("budget", v)}>
             <SelectTrigger><SelectValue placeholder="Sélectionner" /></SelectTrigger>
             <SelectContent>{BUDGETS.map((l) => <SelectItem key={l} value={l}>{l}</SelectItem>)}</SelectContent>
@@ -122,8 +147,8 @@ const LeadForm = ({ id }: { id: string }) => {
         </div>
       </div>
       <div className="space-y-1.5">
-        <Label htmlFor={`${id}-msg`}>Votre message</Label>
-        <Textarea id={`${id}-msg`} rows={4} maxLength={2000} value={form.message} onChange={(e) => update("message", e.target.value)} placeholder="Parlez-nous brièvement de votre projet…" />
+        <Label htmlFor={`${id}-msg`}>Message libre</Label>
+        <Textarea id={`${id}-msg`} rows={4} maxLength={2000} value={form.message} onChange={(e) => update("message", e.target.value)} placeholder="Décrivez brièvement votre projet, votre situation actuelle ou vos questions…" />
       </div>
       <div className="flex items-start gap-3">
         <Checkbox id={`${id}-c`} checked={form.consent} onCheckedChange={(v) => update("consent", v === true)} />
@@ -149,37 +174,41 @@ const LeadForm = ({ id }: { id: string }) => {
   );
 };
 
-const REASSURANCE = [
-  { icon: ClipboardList, title: "Méthode structurée étape par étape", desc: "Un cadre clair pour avancer sans s'éparpiller." },
-  { icon: Search, title: "Sourcing et analyse produit", desc: "Outils d'analyse produit avec estimation de marge et de ROI." },
-  { icon: Calculator, title: "Frais Amazon FBA / FBM", desc: "Maîtriser commissions, frais logistiques et marges." },
-  { icon: GraduationCap, title: "Adapté débutants & e-commerçants", desc: "Un accompagnement calibré selon votre profil." },
-];
-
-const LEARN = [
-  { icon: Search, title: "Trouver et analyser des produits", desc: "Opportunités de sourcing analysées selon des critères de marge, de frais et de concurrence." },
-  { icon: Calculator, title: "Marges, frais Amazon et logistique", desc: "Construire un calcul de rentabilité fiable." },
-  { icon: AlertTriangle, title: "Éviter les erreurs fréquentes", desc: "Les pièges classiques des débutants à anticiper." },
-  { icon: Layers, title: "Structurer votre activité e-commerce", desc: "Process, suivi, organisation et outils de pilotage." },
-  { icon: Compass, title: "Méthode avant les achats", desc: "Valider votre approche avant d'engager du budget." },
-  { icon: ShieldCheck, title: "Cadre clair et professionnel", desc: "Un accompagnement transparent, sans promesse irréaliste." },
+const HERO_POINTS = [
+  "Outils d'analyse produit avec estimation de marge et de ROI",
+  "Opportunités de sourcing analysées selon des critères de marge, de frais et de concurrence",
+  "Méthode claire pour construire une activité e-commerce structurée",
 ];
 
 const WHY_CALL = [
-  { icon: Lightbulb, title: "Comprendre si Amazon FBA est adapté à votre profil", desc: "Un échange pour évaluer si le modèle correspond à vos objectifs et contraintes." },
-  { icon: Route, title: "Identifier les étapes avant de vous lancer", desc: "Faire le point sur les prérequis : budget, temps, statut juridique, outils." },
+  { icon: Lightbulb, title: "Vérifier si Amazon FBA est adapté à votre profil", desc: "Un échange pour évaluer si ce modèle correspond à votre situation, votre budget et vos objectifs." },
+  { icon: Route, title: "Comprendre les étapes avant de vous lancer", desc: "Faire le point sur la méthode, les prérequis et les premières décisions à prendre." },
   { icon: PhoneCall, title: "Découvrir la méthode AMZing FBA sans engagement", desc: "Un appel d'information clair, sans pression et sans obligation d'achat." },
 ];
 
 const AccompagnementAmazonFba = () => {
+  const schema = {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    name: "Formation et accompagnement Amazon FBA",
+    provider: {
+      "@type": "Organization",
+      name: "AMZing FBA",
+      url: "https://amzingfba.com",
+    },
+    areaServed: "FR",
+    url: "https://amzingfba.com/accompagnement-amazon-fba",
+    description: "Landing page de demande de rappel pour la formation et l'accompagnement Amazon FBA d'AMZing FBA.",
+  };
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <SEO
-        title="Formation et accompagnement Amazon FBA | AMZing FBA"
-        description="Formation et accompagnement Amazon FBA : sourcing produit, analyse de marge et de ROI, logistique FBA/FBM, méthode professionnelle. Demandez un rappel."
+        title="Accompagnement Amazon FBA | AMZing FBA"
+        description="Formation et accompagnement Amazon FBA avec méthode claire, outils d'analyse produit et rappel rapide. Demandez à être recontacté."
+        schema={schema}
       />
 
-      {/* HEADER simple */}
       <header className="border-b border-border/50 bg-background/80 backdrop-blur sticky top-0 z-30">
         <div className="container mx-auto px-4 h-14 flex items-center justify-between">
           <Link to="/" className="font-bold text-lg">AMZing <span className="text-primary">FBA</span></Link>
@@ -187,52 +216,65 @@ const AccompagnementAmazonFba = () => {
         </div>
       </header>
 
-      {/* HERO — on mobile: title first, then form right after */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-background pointer-events-none" />
-        <div className="container mx-auto px-4 py-8 lg:py-16 relative">
+        <div className="container mx-auto px-4 py-6 lg:py-14 relative">
           <div className="grid lg:grid-cols-2 gap-8 lg:gap-10 items-start">
-            {/* Title block — appears first on mobile */}
-            <div className="space-y-5 order-1">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-primary/30 bg-primary/5 text-xs font-medium text-primary">
+            <div className="space-y-4 order-1 lg:pt-6">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-primary/30 bg-primary/5 text-xs font-medium text-primary w-fit">
                 <ShieldCheck className="w-3.5 h-3.5" /> Formation et accompagnement Amazon FBA
               </div>
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight leading-tight">
-                Lancez et structurez votre activité Amazon FBA avec un accompagnement clair et concret
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight leading-tight max-w-xl">
+                Structurez votre activité Amazon FBA avec une méthode claire et progressive
               </h1>
-              <p className="text-base lg:text-lg text-muted-foreground leading-relaxed">
-                AMZing FBA accompagne les entrepreneurs et e-commerçants dans le sourcing produit,
-                l'analyse de marge et de ROI, la logistique FBA/FBM et la mise en place d'une
-                méthode de travail professionnelle.
+              <p className="text-base lg:text-lg text-muted-foreground leading-relaxed max-w-xl">
+                AMZing FBA accompagne les profils débutants, vendeurs Amazon et e-commerçants
+                qui souhaitent clarifier leur projet, analyser leurs opportunités et mettre en
+                place une activité e-commerce structurée sans promesse irréaliste.
               </p>
-              <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
-                {["Méthode claire", "Sourcing & rentabilité", "Frais FBA / FBM", "Suivi adapté"].map((t) => (
-                  <li key={t} className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <CheckCircle2 className="w-4 h-4 text-primary" /> {t}
-                  </li>
+              <div className="hidden lg:grid gap-3 pt-2">
+                {HERO_POINTS.map((point) => (
+                  <div key={point} className="flex items-start gap-3 text-sm text-muted-foreground leading-relaxed">
+                    <CheckCircle2 className="w-4 h-4 text-primary mt-0.5 shrink-0" />
+                    <span>{point}</span>
+                  </div>
                 ))}
-              </ul>
+              </div>
+              <div className="hidden lg:flex items-center gap-6 pt-3 text-sm text-muted-foreground">
+                <span className="flex items-center gap-2"><Calculator className="w-4 h-4 text-primary" /> Accès annuel : 700 € TTC/an</span>
+                <span className="flex items-center gap-2"><Search className="w-4 h-4 text-primary" /> Appel d'information sans engagement</span>
+              </div>
             </div>
 
-            {/* Form — visible top: order-2 mobile (right after title), lg right column */}
-            <Card id="form" className="p-5 sm:p-7 shadow-xl border-border/60 scroll-mt-20 order-2">
-              <h2 className="text-xl font-semibold mb-1">Demandez à être recontacté</h2>
-              <p className="text-sm text-muted-foreground mb-5">
-                Décrivez votre projet, l'équipe AMZing FBA revient vers vous rapidement.
+            <Card id="form" className="p-4 sm:p-6 shadow-xl border-border/60 scroll-mt-20 order-2 lg:sticky lg:top-20">
+              <h2 className="text-xl font-semibold mb-1">Demandez un rappel</h2>
+              <p className="text-sm text-muted-foreground mb-2">
+                Remplissez le formulaire pour être recontacté par l'équipe AMZing FBA.
+              </p>
+              <p className="text-xs text-muted-foreground mb-5 leading-relaxed">
+                Accès annuel : 700 € TTC/an, ou paiement en 12 mensualités d'environ 64 €/mois,
+                soit un engagement annuel de 12 mois.
               </p>
               <LeadForm id="lead-top" />
             </Card>
           </div>
+          <div className="grid gap-2 pt-5 lg:hidden">
+            {HERO_POINTS.map((point) => (
+              <div key={point} className="flex items-start gap-3 text-sm text-muted-foreground leading-relaxed">
+                <CheckCircle2 className="w-4 h-4 text-primary mt-0.5 shrink-0" />
+                <span>{point}</span>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* POURQUOI DEMANDER UN RAPPEL */}
-      <section className="py-14 lg:py-20 border-t border-border/50">
+      <section id="decouvrir" className="py-14 lg:py-20 border-t border-border/50">
         <div className="container mx-auto px-4">
           <div className="max-w-2xl mb-10">
             <h2 className="text-2xl lg:text-3xl font-bold mb-3">Pourquoi demander un rappel ?</h2>
             <p className="text-muted-foreground">
-              Un échange court et concret pour faire le point avant de vous lancer ou de structurer votre activité.
+              Un échange simple pour valider votre situation, comprendre la méthode et savoir si l'accompagnement correspond à votre profil.
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -254,50 +296,7 @@ const AccompagnementAmazonFba = () => {
         </div>
       </section>
 
-      {/* RÉASSURANCE */}
-      <section id="decouvrir" className="py-14 lg:py-20 border-t border-border/50 bg-muted/30">
-        <div className="container mx-auto px-4">
-          <div className="max-w-2xl mb-10">
-            <h2 className="text-2xl lg:text-3xl font-bold mb-3">Un cadre professionnel pour avancer sereinement</h2>
-            <p className="text-muted-foreground">Quatre piliers pour démarrer ou structurer votre activité Amazon.</p>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {REASSURANCE.map((r) => (
-              <Card key={r.title} className="p-5 bg-background hover:border-primary/40 transition-colors">
-                <div className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center mb-3">
-                  <r.icon className="w-5 h-5" />
-                </div>
-                <h3 className="font-semibold mb-1.5">{r.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{r.desc}</p>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* CE QUE VOUS ALLEZ APPRENDRE */}
-      <section className="py-14 lg:py-20 border-y border-border/50">
-        <div className="container mx-auto px-4">
-          <div className="max-w-2xl mb-10">
-            <h2 className="text-2xl lg:text-3xl font-bold mb-3">Ce que vous allez apprendre</h2>
-            <p className="text-muted-foreground">
-              Un programme orienté méthode et compétences concrètes — sans promesse de gain.
-            </p>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {LEARN.map((l) => (
-              <Card key={l.title} className="p-5">
-                <l.icon className="w-6 h-6 text-primary mb-3" />
-                <h3 className="font-semibold mb-1.5">{l.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{l.desc}</p>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* TARIF — clarification */}
-      <section className="py-14 lg:py-20 bg-muted/30 border-b border-border/50">
+      <section className="py-14 lg:py-20 bg-muted/30 border-y border-border/50">
         <div className="container mx-auto px-4 max-w-3xl">
           <Card className="p-6 sm:p-8 bg-background">
             <h2 className="text-2xl lg:text-3xl font-bold mb-4">Tarif de l'accompagnement</h2>
@@ -307,8 +306,9 @@ const AccompagnementAmazonFba = () => {
               <strong>engagement annuel de 12 mois</strong>.
             </p>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Le tarif couvre l'accès à la méthode, aux outils d'analyse produit et au suivi
-              pédagogique pendant toute la durée de l'engagement. Aucun résultat financier n'est garanti.
+              Le tarif couvre l'accès à la méthode, aux outils d'analyse produit avec estimation
+              de marge et de ROI, ainsi qu'au suivi pédagogique pendant toute la durée de
+              l'engagement. Aucun résultat financier n'est garanti.
             </p>
             <div className="mt-6">
               <Button asChild size="lg" className="h-12 text-base">
@@ -319,18 +319,17 @@ const AccompagnementAmazonFba = () => {
         </div>
       </section>
 
-      {/* FORM REPEAT */}
       <section className="py-14 lg:py-20">
-        <div className="container mx-auto px-4 max-w-3xl">
+        <div className="container mx-auto px-4 max-w-3xl text-center">
           <div className="text-center mb-8">
-            <h2 className="text-2xl lg:text-3xl font-bold mb-3">Parlons de votre projet</h2>
+            <h2 className="text-2xl lg:text-3xl font-bold mb-3">Vous souhaitez en savoir plus ?</h2>
             <p className="text-muted-foreground">
-              Laissez vos coordonnées : l'équipe AMZing FBA vous recontacte rapidement.
+              Laissez vos coordonnées et l'équipe AMZing FBA vous recontactera.
             </p>
           </div>
-          <Card className="p-5 sm:p-7 shadow-xl">
-            <LeadForm id="lead-bottom" />
-          </Card>
+          <Button asChild size="lg" className="h-12 text-base">
+            <a href="#form">Demander un rappel <ArrowRight className="ml-1" /></a>
+          </Button>
         </div>
       </section>
 

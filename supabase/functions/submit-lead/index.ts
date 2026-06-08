@@ -7,6 +7,15 @@ const corsHeaders = {
 };
 
 const NOTIFY_TO = "noazaghdoun55555@gmail.com";
+const LEVELS = new Set(["Débutant", "Déjà vendeur Amazon", "E-commerçant hors Amazon", "Autre"]);
+const OBJECTIVES = new Set(["Me former", "Être accompagné", "Trouver des produits", "Structurer mon activité", "Autre"]);
+const BUDGETS = new Set(["Moins de 500 €", "500 à 1 500 €", "1 500 à 5 000 €", "Plus de 5 000 €"]);
+const escapeHtml = (value: string) => value
+  .replaceAll("&", "&amp;")
+  .replaceAll("<", "&lt;")
+  .replaceAll(">", "&gt;")
+  .replaceAll('"', "&quot;")
+  .replaceAll("'", "&#39;");
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
@@ -27,6 +36,10 @@ Deno.serve(async (req) => {
     if (!str(last_name, 100)) errors.push("last_name");
     if (!str(email, 255) || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errors.push("email");
     if (!str(phone, 40)) errors.push("phone");
+    if (!str(level, 80) || !LEVELS.has(level.trim())) errors.push("level");
+    if (!str(objective, 80) || !OBJECTIVES.has(objective.trim())) errors.push("objective");
+    if (!str(budget, 80) || !BUDGETS.has(budget.trim())) errors.push("budget");
+    if (typeof message === "string" && message.length > 2000) errors.push("message");
     if (consent !== true) errors.push("consent");
     if (errors.length) {
       return new Response(JSON.stringify({ error: "Invalid fields", fields: errors }), {
@@ -46,10 +59,10 @@ Deno.serve(async (req) => {
         last_name: last_name.trim(),
         email: email.trim().toLowerCase(),
         phone: phone.trim(),
-        level: level ?? null,
-        objective: objective ?? null,
-        budget: budget ?? null,
-        message: message ?? null,
+        level: level.trim(),
+        objective: objective.trim(),
+        budget: budget.trim(),
+        message: typeof message === "string" && message.trim().length > 0 ? message.trim() : null,
         source_page: source_page ?? null,
         source: source ?? "google_ads",
         consent: true,
@@ -68,20 +81,28 @@ Deno.serve(async (req) => {
     const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
     if (RESEND_API_KEY) {
       try {
+        const safeFullName = escapeHtml(`${lead.first_name} ${lead.last_name}`);
+        const safeEmail = escapeHtml(lead.email);
+        const safePhone = escapeHtml(lead.phone);
+        const safeLevel = escapeHtml(lead.level ?? "-");
+        const safeObjective = escapeHtml(lead.objective ?? "-");
+        const safeBudget = escapeHtml(lead.budget ?? "-");
+        const safePage = escapeHtml(lead.source_page ?? "-");
+        const safeMessage = escapeHtml(lead.message ?? "").replace(/\n/g, "<br/>");
         const html = `
           <h2>Nouveau lead AMZing FBA</h2>
           <p><strong>Date :</strong> ${new Date(lead.created_at).toLocaleString("fr-FR")}</p>
-          <p><strong>Page source :</strong> ${lead.source_page ?? "-"}</p>
+          <p><strong>Page source :</strong> ${safePage}</p>
           <hr/>
-          <p><strong>Nom :</strong> ${lead.first_name} ${lead.last_name}</p>
-          <p><strong>Email :</strong> ${lead.email}</p>
-          <p><strong>Téléphone :</strong> ${lead.phone}</p>
-          <p><strong>Niveau :</strong> ${lead.level ?? "-"}</p>
-          <p><strong>Objectif :</strong> ${lead.objective ?? "-"}</p>
-          <p><strong>Budget :</strong> ${lead.budget ?? "-"}</p>
+          <p><strong>Nom :</strong> ${safeFullName}</p>
+          <p><strong>Email :</strong> ${safeEmail}</p>
+          <p><strong>Téléphone :</strong> ${safePhone}</p>
+          <p><strong>Niveau :</strong> ${safeLevel}</p>
+          <p><strong>Objectif :</strong> ${safeObjective}</p>
+          <p><strong>Budget :</strong> ${safeBudget}</p>
           <hr/>
           <p><strong>Message :</strong></p>
-          <p>${(lead.message ?? "").replace(/\n/g, "<br/>")}</p>
+          <p>${safeMessage}</p>
         `;
         const r = await fetch("https://api.resend.com/emails", {
           method: "POST",
