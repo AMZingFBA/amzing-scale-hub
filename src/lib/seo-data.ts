@@ -34,9 +34,9 @@ export const seoData: Record<string, SeoPageData> = {
   },
   
   services: {
-    title: "Services Amazon FBA – Moniteurs, catalogue & logistique | AMZing FBA",
-    description: "Découvre les services AMZing FBA : moniteurs de produits rentables, accompagnement Amazon FBA, logistique, stockage, expédition et cashback fournisseurs.",
-    keywords: "service logistique amazon fba, stockage fba, expédition amazon, business e-commerce rentable, moniteurs produits",
+    title: "Services Amazon FBA – Accompagnement, outils & logistique | AMZing FBA",
+    description: "Découvre les services AMZing FBA : outils d'analyse produit, accompagnement Amazon FBA, logistique, stockage, expédition et cashback fournisseurs.",
+    keywords: "service logistique amazon fba, stockage fba, expédition amazon, activité e-commerce structurée, outils d'analyse produit",
     robots: "index,follow",
   },
   
@@ -481,7 +481,7 @@ export const schemas = {
     "name": "AMZing FBA",
     "url": "https://amzingfba.com/",
     "logo": "https://amzingfba.com/logo-amzing.png",
-    "description": "AMZing FBA est une formation Amazon FBA couplée à une plateforme complète : guides, moniteurs de produits rentables, catalogue fournisseurs, cashback et logistique pour construire un business e-commerce rentable.",
+    "description": "AMZing FBA est une formation et un accompagnement Amazon FBA avec guides, outils d'analyse produit, catalogue fournisseurs, cashback et logistique pour structurer une activité e-commerce.",
     "contactPoint": {
       "@type": "ContactPoint",
       "contactType": "Customer Service",
