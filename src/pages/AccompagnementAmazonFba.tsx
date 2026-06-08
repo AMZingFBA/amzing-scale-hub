@@ -382,7 +382,7 @@ const AccompagnementAmazonFba = () => {
       <main>
         <section className="border-b border-border/50 bg-muted/20">
           <div className="container mx-auto px-4 py-8 sm:py-10 lg:py-14">
-            <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1.05fr)_minmax(340px,460px)] lg:gap-8">
+            <div className="grid items-start gap-6 lg:grid-cols-2 lg:gap-8 xl:grid-cols-[minmax(0,1.02fr)_420px]">
               <div className="order-1 max-w-2xl space-y-5 lg:space-y-6 lg:pt-4">
                 <div className="inline-flex w-fit items-center gap-2 rounded-full border border-primary/30 bg-primary/5 px-3 py-1 text-xs font-medium text-primary">
                   <ShieldCheck className="h-3.5 w-3.5" />
@@ -427,7 +427,7 @@ const AccompagnementAmazonFba = () => {
                 </div>
               </div>
 
-              <div className="order-2 hidden lg:block">
+              <div className="order-2 hidden min-w-0 lg:block lg:justify-self-end lg:w-full lg:max-w-[420px]">
                 <Card id="formulaire-lead" className="border-border/60 p-6 shadow-xl lg:sticky lg:top-24">
                   <div className="mb-5 space-y-1">
                     <h2 className="text-2xl font-semibold">Demander un rappel</h2>
