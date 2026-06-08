@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Helmet } from "react-helmet-async";
+import SEO from "@/components/SEO";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -167,13 +167,10 @@ const LEARN = [
 const AccompagnementAmazonFba = () => {
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <Helmet>
-        <title>Accompagnement Amazon FBA — Formation & coaching | AMZing FBA</title>
-        <meta name="description" content="Lancez et structurez votre activité Amazon FBA avec un accompagnement clair : sourcing produit, analyse de rentabilité, logistique FBA/FBM, méthode professionnelle." />
-        <link rel="canonical" href="https://amzingfba.com/accompagnement-amazon-fba" />
-        <meta property="og:title" content="Accompagnement Amazon FBA — AMZing FBA" />
-        <meta property="og:description" content="Accompagnement professionnel pour vendre sur Amazon FBA / FBM : méthode, sourcing, rentabilité, logistique." />
-      </Helmet>
+      <SEO
+        title="Accompagnement Amazon FBA — Formation & coaching | AMZing FBA"
+        description="Lancez et structurez votre activité Amazon FBA avec un accompagnement clair : sourcing produit, analyse de rentabilité, logistique FBA/FBM, méthode professionnelle."
+      />
 
       {/* HEADER simple */}
       <header className="border-b border-border/50 bg-background/80 backdrop-blur sticky top-0 z-30">
