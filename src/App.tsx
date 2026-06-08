@@ -123,6 +123,7 @@ const Blog = lazy(() => import("./pages/Blog"));
 const BlogPost = lazy(() => import("./pages/BlogPost"));
 const AccompagnementAmazonFba = lazy(() => import("./pages/AccompagnementAmazonFba"));
 const Merci = lazy(() => import("./pages/Merci"));
+const DemandeRecue = lazy(() => import("./pages/DemandeRecue"));
 
 const queryClient = new QueryClient();
 
@@ -268,7 +269,7 @@ const App = () => (
             <Route path="/accompagnement-amazon-fba" element={<AccompagnementAmazonFba />} />
             <Route path="/formation-amazon-fba" element={<AccompagnementAmazonFba />} />
             <Route path="/merci" element={<Merci />} />
-            <Route path="/demande-recue" element={<Merci />} />
+            <Route path="/demande-recue" element={<DemandeRecue />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
