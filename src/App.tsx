@@ -269,7 +269,7 @@ const App = () => (
             <Route path="/accompagnement-amazon-fba" element={<AccompagnementAmazonFba />} />
             <Route path="/formation-amazon-fba" element={<AccompagnementAmazonFba />} />
             <Route path="/merci" element={<Merci />} />
-            <Route path="/demande-recue" element={<Merci />} />
+            <Route path="/demande-recue" element={<DemandeRecue />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
