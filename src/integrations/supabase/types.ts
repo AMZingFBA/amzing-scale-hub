@@ -1035,6 +1035,60 @@ export type Database = {
         }
         Relationships: []
       }
+      leads: {
+        Row: {
+          budget: string | null
+          consent: boolean
+          created_at: string
+          email: string
+          first_name: string
+          id: string
+          last_name: string
+          level: string | null
+          message: string | null
+          objective: string | null
+          phone: string
+          source: string | null
+          source_page: string | null
+          status: Database["public"]["Enums"]["lead_status"]
+          updated_at: string
+        }
+        Insert: {
+          budget?: string | null
+          consent?: boolean
+          created_at?: string
+          email: string
+          first_name: string
+          id?: string
+          last_name: string
+          level?: string | null
+          message?: string | null
+          objective?: string | null
+          phone: string
+          source?: string | null
+          source_page?: string | null
+          status?: Database["public"]["Enums"]["lead_status"]
+          updated_at?: string
+        }
+        Update: {
+          budget?: string | null
+          consent?: boolean
+          created_at?: string
+          email?: string
+          first_name?: string
+          id?: string
+          last_name?: string
+          level?: string | null
+          message?: string | null
+          objective?: string | null
+          phone?: string
+          source?: string | null
+          source_page?: string | null
+          status?: Database["public"]["Enums"]["lead_status"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
       marketplace_buy_requests: {
         Row: {
           asin: string | null
@@ -2696,6 +2750,12 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "user"
+      lead_status:
+        | "nouveau"
+        | "contacte"
+        | "interesse"
+        | "non_interesse"
+        | "client"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -2824,6 +2884,13 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "user"],
+      lead_status: [
+        "nouveau",
+        "contacte",
+        "interesse",
+        "non_interesse",
+        "client",
+      ],
     },
   },
 } as const
