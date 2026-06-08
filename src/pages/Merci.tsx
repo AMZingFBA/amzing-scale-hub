@@ -14,10 +14,9 @@ const Merci = () => (
       <div className="w-16 h-16 mx-auto rounded-full bg-primary/10 text-primary flex items-center justify-center">
         <CheckCircle2 className="w-9 h-9" />
       </div>
-      <h1 className="text-3xl font-bold">Votre demande a bien été envoyée</h1>
+      <h1 className="text-3xl font-bold">Demande reçue</h1>
       <p className="text-muted-foreground leading-relaxed">
-        Merci ! L'équipe AMZing FBA vous recontactera rapidement pour échanger
-        sur votre projet et vous proposer l'accompagnement le plus adapté.
+        Votre demande a bien été envoyée. L'équipe AMZing FBA vous recontactera rapidement.
       </p>
       <Button asChild size="lg">
         <Link to="/">Retour à l'accueil</Link>
