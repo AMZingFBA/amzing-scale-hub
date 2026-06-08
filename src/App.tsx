@@ -123,6 +123,7 @@ const Blog = lazy(() => import("./pages/Blog"));
 const BlogPost = lazy(() => import("./pages/BlogPost"));
 const AccompagnementAmazonFba = lazy(() => import("./pages/AccompagnementAmazonFba"));
 const Merci = lazy(() => import("./pages/Merci"));
+const DemandeRecue = lazy(() => import("./pages/DemandeRecue"));
 
 const queryClient = new QueryClient();
 
