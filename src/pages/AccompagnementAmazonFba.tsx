@@ -235,7 +235,8 @@ const AccompagnementAmazonFba = () => {
               <div className="hidden lg:grid gap-3 pt-2">
                 {HERO_POINTS.map((point) => (
                   <div key={point} className="flex items-start gap-3 text-sm text-muted-foreground leading-relaxed">
-                    <CheckCircle2 className="w-4 h-4 text-primary" /> {t}
+                    <CheckCircle2 className="w-4 h-4 text-primary mt-0.5 shrink-0" />
+                    <span>{point}</span>
                   </div>
                 ))}
               </div>
