@@ -121,6 +121,8 @@ const SuiteSuccess = lazy(() => import("./pages/SuiteSuccess"));
 const PaymentSuccessSysteme = lazy(() => import("./pages/PaymentSuccessSysteme"));
 const Blog = lazy(() => import("./pages/Blog"));
 const BlogPost = lazy(() => import("./pages/BlogPost"));
+const AccompagnementAmazonFba = lazy(() => import("./pages/AccompagnementAmazonFba"));
+const Merci = lazy(() => import("./pages/Merci"));
 
 const queryClient = new QueryClient();
 
@@ -263,6 +265,10 @@ const App = () => (
             <Route path="/cours-particulier" element={<CoursParticulier />} />
             <Route path="/whatsapp-export" element={<WhatsappExport />} />
             <Route path="/crm" element={<CRM />} />
+            <Route path="/accompagnement-amazon-fba" element={<AccompagnementAmazonFba />} />
+            <Route path="/formation-amazon-fba" element={<AccompagnementAmazonFba />} />
+            <Route path="/merci" element={<Merci />} />
+            <Route path="/demande-recue" element={<Merci />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
