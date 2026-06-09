@@ -128,6 +128,8 @@ const SitelinkAnalyseRenta = lazy(() => import("./pages/sitelinks/AnalyseRentabi
 const SitelinkOutilsVendeurs = lazy(() => import("./pages/sitelinks/OutilsVendeurs"));
 const SitelinkProgramme = lazy(() => import("./pages/sitelinks/ProgrammeAmzing"));
 const SitelinkAppelGratuit = lazy(() => import("./pages/sitelinks/AppelGratuit"));
+const VilleAccompagnement = lazy(() => import("./pages/sitelinks/VilleAccompagnement"));
+const VillesIndex = lazy(() => import("./pages/sitelinks/VillesIndex"));
 const Merci = lazy(() => import("./pages/Merci"));
 const DemandeRecue = lazy(() => import("./pages/DemandeRecue"));
 const DemanderRappel = lazy(() => import("./pages/DemanderRappel"));
