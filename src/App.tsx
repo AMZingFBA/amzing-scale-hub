@@ -122,6 +122,12 @@ const PaymentSuccessSysteme = lazy(() => import("./pages/PaymentSuccessSysteme")
 const Blog = lazy(() => import("./pages/Blog"));
 const BlogPost = lazy(() => import("./pages/BlogPost"));
 const AccompagnementAmazonFba = lazy(() => import("./pages/AccompagnementAmazonFba"));
+const SitelinkAccompagnement = lazy(() => import("./pages/sitelinks/AccompagnementHub"));
+const SitelinkSourcingIA = lazy(() => import("./pages/sitelinks/SourcingAutomatiqueIA"));
+const SitelinkAnalyseRenta = lazy(() => import("./pages/sitelinks/AnalyseRentabilite"));
+const SitelinkOutilsVendeurs = lazy(() => import("./pages/sitelinks/OutilsVendeurs"));
+const SitelinkProgramme = lazy(() => import("./pages/sitelinks/ProgrammeAmzing"));
+const SitelinkAppelGratuit = lazy(() => import("./pages/sitelinks/AppelGratuit"));
 const Merci = lazy(() => import("./pages/Merci"));
 const DemandeRecue = lazy(() => import("./pages/DemandeRecue"));
 const DemanderRappel = lazy(() => import("./pages/DemanderRappel"));
@@ -272,7 +278,13 @@ const App = () => (
             <Route path="/cours-particulier" element={<CoursParticulier />} />
             <Route path="/whatsapp-export" element={<WhatsappExport />} />
             <Route path="/crm" element={<CRM />} />
-            <Route path="/accompagnement-amazon-fba" element={<AccompagnementAmazonFba />} />
+            <Route path="/accompagnement-amazon-fba" element={<SitelinkAccompagnement />} />
+            <Route path="/accompagnement" element={<AccompagnementAmazonFba />} />
+            <Route path="/sourcing-automatique-ia" element={<SitelinkSourcingIA />} />
+            <Route path="/analyse-rentabilite-amazon" element={<SitelinkAnalyseRenta />} />
+            <Route path="/outils-vendeurs-amazon" element={<SitelinkOutilsVendeurs />} />
+            <Route path="/programme-amzing-fba" element={<SitelinkProgramme />} />
+            <Route path="/appel-gratuit" element={<SitelinkAppelGratuit />} />
             <Route path="/formation-amazon-fba" element={<AccompagnementAmazonFba />} />
             <Route path="/merci" element={<Merci />} />
             <Route path="/demande-recue" element={<DemandeRecue />} />
