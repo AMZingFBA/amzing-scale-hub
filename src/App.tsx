@@ -278,7 +278,13 @@ const App = () => (
             <Route path="/cours-particulier" element={<CoursParticulier />} />
             <Route path="/whatsapp-export" element={<WhatsappExport />} />
             <Route path="/crm" element={<CRM />} />
-            <Route path="/accompagnement-amazon-fba" element={<AccompagnementAmazonFba />} />
+            <Route path="/accompagnement-amazon-fba" element={<SitelinkAccompagnement />} />
+            <Route path="/accompagnement" element={<AccompagnementAmazonFba />} />
+            <Route path="/sourcing-automatique-ia" element={<SitelinkSourcingIA />} />
+            <Route path="/analyse-rentabilite-amazon" element={<SitelinkAnalyseRenta />} />
+            <Route path="/outils-vendeurs-amazon" element={<SitelinkOutilsVendeurs />} />
+            <Route path="/programme-amzing-fba" element={<SitelinkProgramme />} />
+            <Route path="/appel-gratuit" element={<SitelinkAppelGratuit />} />
             <Route path="/formation-amazon-fba" element={<AccompagnementAmazonFba />} />
             <Route path="/merci" element={<Merci />} />
             <Route path="/demande-recue" element={<DemandeRecue />} />
