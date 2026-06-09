@@ -122,6 +122,12 @@ const PaymentSuccessSysteme = lazy(() => import("./pages/PaymentSuccessSysteme")
 const Blog = lazy(() => import("./pages/Blog"));
 const BlogPost = lazy(() => import("./pages/BlogPost"));
 const AccompagnementAmazonFba = lazy(() => import("./pages/AccompagnementAmazonFba"));
+const SitelinkAccompagnement = lazy(() => import("./pages/sitelinks/AccompagnementHub"));
+const SitelinkSourcingIA = lazy(() => import("./pages/sitelinks/SourcingAutomatiqueIA"));
+const SitelinkAnalyseRenta = lazy(() => import("./pages/sitelinks/AnalyseRentabilite"));
+const SitelinkOutilsVendeurs = lazy(() => import("./pages/sitelinks/OutilsVendeurs"));
+const SitelinkProgramme = lazy(() => import("./pages/sitelinks/ProgrammeAmzing"));
+const SitelinkAppelGratuit = lazy(() => import("./pages/sitelinks/AppelGratuit"));
 const Merci = lazy(() => import("./pages/Merci"));
 const DemandeRecue = lazy(() => import("./pages/DemandeRecue"));
 const DemanderRappel = lazy(() => import("./pages/DemanderRappel"));
