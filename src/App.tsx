@@ -281,6 +281,8 @@ const App = () => (
             <Route path="/whatsapp-export" element={<WhatsappExport />} />
             <Route path="/crm" element={<CRM />} />
             <Route path="/accompagnement-amazon-fba" element={<SitelinkAccompagnement />} />
+            <Route path="/accompagnement-amazon-fba/:slug" element={<VilleAccompagnement />} />
+            <Route path="/villes" element={<VillesIndex />} />
             <Route path="/accompagnement" element={<AccompagnementAmazonFba />} />
             <Route path="/sourcing-automatique-ia" element={<SitelinkSourcingIA />} />
             <Route path="/analyse-rentabilite-amazon" element={<SitelinkAnalyseRenta />} />
