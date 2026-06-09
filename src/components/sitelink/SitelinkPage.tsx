@@ -94,7 +94,6 @@ export const SitelinkPage = ({
   features,
   faq,
 }: SitelinkPageProps) => {
-  const canonicalUrl = `https://amzingfba.com${canonicalPath}`;
   const schema = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
