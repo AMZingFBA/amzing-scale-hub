@@ -20,7 +20,6 @@ const VillesIndex = () => {
       <SEO
         title="Accompagnement Amazon FBA — Toutes les villes de France | AMZing FBA"
         description="Trouvez votre ville : accompagnement Amazon FBA disponible à distance dans plus de 1000 communes françaises. Méthode, sourcing, analyse de rentabilité."
-        canonicalUrl="https://amzingfba.com/villes"
       />
       <section className="container mx-auto px-4 py-16">
         <Link to="/" className="text-sm text-muted-foreground hover:text-primary">
