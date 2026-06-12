@@ -1,4 +1,4 @@
-import { ArrowRight, Package, GraduationCap, Warehouse, Users, CheckCircle2, TrendingUp, BookOpen, Wrench, Target, Smartphone, Shield, Headphones, RefreshCw, Building2, Mail, HelpCircle, Scale } from "lucide-react";
+import { ArrowRight, CheckCircle2, Star, ShieldCheck, Zap, TrendingUp, Users, Package, GraduationCap, Sparkles, Clock, Lock, BadgeCheck, Smartphone, MessageCircle, Building2, HelpCircle, PlayCircle, LineChart, Target } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
@@ -11,146 +11,56 @@ import TestimonialsCarousel from "@/components/TestimonialsCarousel";
 import TestimonialsMobile from "@/components/TestimonialsMobile";
 import AppInstallBanner from "@/components/AppInstallBanner";
 import SEO from "@/components/SEO";
-import OptimizedImage from "@/components/OptimizedImage";
-import heroWarehouse from "@/assets/hero-warehouse.jpg";
-import teamWorking from "@/assets/team-working.jpg";
-import logistics from "@/assets/logistics.jpg";
 import { useTrial } from "@/hooks/use-trial";
 import { useAuth } from "@/hooks/use-auth";
-import { useScrollReveal } from "@/hooks/use-scroll-reveal";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Capacitor } from "@capacitor/core";
-import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { seoData, schemas } from "@/lib/seo-data";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useRegistrationSource } from "@/hooks/use-registration-source";
 import HomeDashboardPreview from "@/components/home/HomeDashboardPreview";
-import HomePreviewSection from "@/components/home/HomePreviewSection";
-import HomeMockups from "@/components/home/HomeMockups";
-import HomeAISearchPromo from "@/components/home/HomeAISearchPromo";
-import HomeToolsPromo from "@/components/home/HomeToolsPromo";
 import PromoCountdown from "@/components/PromoCountdown";
 
-const ServiceCard = ({ 
-  children, 
-  delay, 
-  animation = "fade-up" 
-}: { 
-  children: React.ReactNode; 
-  delay: number;
-  animation?: "fade-up" | "fade-left" | "fade-right" | "scale" | "rotate" | "slide-rotate";
-}) => {
-  const { ref, isVisible } = useScrollReveal({ delay, animation });
-  const isNativeApp = Capacitor.isNativePlatform();
-
-  if (!isNativeApp) {
-    return <>{children}</>;
-  }
-
-  const getAnimationClasses = () => {
-    const base = "transition-all duration-500";
-    
-    if (!isVisible) {
-      switch (animation) {
-        case "fade-left":
-          return `${base} opacity-0 -translate-x-8`;
-        case "fade-right":
-          return `${base} opacity-0 translate-x-8`;
-        case "scale":
-          return `${base} opacity-0 scale-90`;
-        case "rotate":
-          return `${base} opacity-0 rotate-[-3deg] translate-y-4`;
-        case "slide-rotate":
-          return `${base} opacity-0 translate-y-4 rotate-[2deg] scale-95`;
-        default: // fade-up
-          return `${base} opacity-0 translate-y-4`;
-      }
-    }
-    
-    return `${base} opacity-100 translate-y-0 translate-x-0 scale-100 rotate-0`;
-  };
-
-  return (
-    <div
-      ref={ref}
-      className={getAnimationClasses()}
-    >
-      {children}
-    </div>
-  );
-};
-
 const Index = () => {
-  const { 
-    startFreeTrial, 
-    isStarting, 
-    showCGVModal, 
-    setShowCGVModal, 
-    acceptedCGV, 
-    setAcceptedCGV, 
-    handleConfirmPayment 
+  const {
+    startFreeTrial,
+    isStarting,
+    showCGVModal,
+    setShowCGVModal,
+    acceptedCGV,
+    setAcceptedCGV,
+    handleConfirmPayment,
   } = useTrial();
   const { isVIP, isLoading, user, subscription } = useAuth();
-  const { toast } = useToast();
   const navigate = useNavigate();
-  const isNativeApp = Capacitor.isNativePlatform();
   const isMobile = useIsMobile();
-  
-  // Capture UTM parameters when user lands on page
+  const isNativeApp = Capacitor.isNativePlatform();
+
   useRegistrationSource();
 
-  // Redirect VIP users and admins to dashboard immediately when they land on homepage
   useEffect(() => {
-    console.log('[Index] Redirect check:', { isLoading, hasUser: !!user, subscription, isVIP });
-    
-    // Wait until auth is fully loaded AND subscription data is resolved
-    if (isLoading) {
-      console.log('[Index] Still loading auth, waiting...');
-      return;
-    }
-    if (!user) {
-      console.log('[Index] No user, staying on homepage');
-      return;
-    }
-    if (!subscription) {
-      console.log('[Index] User present but subscription not yet loaded, waiting...');
-      return;
-    }
-    
-    console.log('[Index] All data ready. isVIP:', isVIP, 'subscription:', subscription);
-    
-    // If already VIP, redirect immediately without waiting for admin check
+    if (isLoading || !user || !subscription) return;
     if (isVIP) {
-      console.log('[Index] User is VIP, redirecting to dashboard');
-      navigate('/dashboard', { replace: true });
+      navigate("/dashboard", { replace: true });
       return;
     }
-    
-    // Otherwise check admin status
-    const checkAndRedirect = async () => {
+    (async () => {
       const { data: roleData } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', user.id)
-        .eq('role', 'admin')
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", user.id)
+        .eq("role", "admin")
         .maybeSingle();
-      
-      console.log('[Index] Admin check result:', roleData);
-      if (roleData?.role === 'admin') {
-        navigate('/dashboard', { replace: true });
-      }
-    };
-    
-    checkAndRedirect();
+      if (roleData?.role === "admin") navigate("/dashboard", { replace: true });
+    })();
   }, [isVIP, isLoading, user, navigate, subscription]);
 
-  // Schéma combiné pour la home
   const homeSchema = [...schemas.homePageSchemas, schemas.homeFAQ];
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-background">
       <SEO
         title={seoData.home.title}
         description={seoData.home.description}
@@ -159,509 +69,362 @@ const Index = () => {
       />
       <Navbar />
       <AppInstallBanner />
-      
-      {/* H1 SEO - Visible */}
-      <h1 className="sr-only">
-        Plateforme tout-en-un pour réussir sur Amazon FBA
-      </h1>
 
-      {/* Hero Section */}
-      <section className="relative pt-32 pb-20 overflow-hidden">
-        <div className="absolute inset-0 z-0">
-          <OptimizedImage 
-            src={heroWarehouse} 
-            alt="Entrepôt logistique Amazon FBA avec produits stockés" 
-            loading="eager"
-            fetchPriority="high"
-            width={1920}
-            height={1054}
-            className="w-full h-full object-cover opacity-10"
-          />
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-background to-secondary/20" />
-        </div>
-        
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="max-w-4xl mx-auto text-center">
-            <Badge className="mb-6 bg-primary/10 text-primary border-primary/20">
-              Sans engagement | Outils + Méthode + Communauté
-            </Badge>
-            
-            <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
-              Plateforme tout-en-un pour réussir sur Amazon FBA
+      <h1 className="sr-only">AMZing FBA — Plateforme + formation Amazon FBA</h1>
+
+      {/* ============== HERO ============== */}
+      <section className="relative pt-28 lg:pt-32 pb-16 lg:pb-24 overflow-hidden">
+        {/* Subtle premium background */}
+        <div className="absolute inset-0 -z-10 bg-gradient-to-b from-background via-background to-muted/30" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] -z-10 bg-gradient-to-br from-primary/15 via-transparent to-secondary/10 rounded-full blur-3xl opacity-60" />
+        <div className="absolute inset-0 -z-10 bg-[linear-gradient(to_right,hsl(var(--border))_1px,transparent_1px),linear-gradient(to_bottom,hsl(var(--border))_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-30" />
+
+        <div className="container mx-auto px-4">
+          <div className="max-w-5xl mx-auto">
+            {/* Trust badge */}
+            <div className="flex justify-center mb-6">
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-border bg-background/60 backdrop-blur text-sm">
+                <span className="flex -space-x-1.5">
+                  {[0, 1, 2, 3].map((i) => (
+                    <span key={i} className="w-5 h-5 rounded-full bg-gradient-to-br from-primary to-secondary border-2 border-background" />
+                  ))}
+                </span>
+                <span className="font-medium">500+ vendeurs accompagnés</span>
+                <span className="text-muted-foreground">·</span>
+                <span className="flex items-center gap-0.5 text-amber-500">
+                  {[...Array(5)].map((_, i) => <Star key={i} className="w-3.5 h-3.5 fill-current" />)}
+                </span>
+                <span className="font-medium">4,9/5</span>
+              </div>
+            </div>
+
+            <h2 className="text-center text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.1] mb-6">
+              Lancez votre business{" "}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-primary-glow to-secondary">
+                Amazon FBA
+              </span>
+              <br className="hidden sm:block" />
+              avec une méthode éprouvée
             </h2>
-            
-            <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-3xl mx-auto">
-              Moniteurs de produits rentables, méthode structurée, sourcing et communauté active. 
-              Tout ce qu'il faut pour lancer ton business Amazon FBA.
+
+            <p className="text-center text-lg lg:text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
+              Formation complète, outils de sourcing, fournisseurs vérifiés et accompagnement par un vendeur actif.
+              Tout pour générer vos premiers revenus en quelques semaines.
             </p>
-            
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button 
-                variant="hero" 
-                size="xl" 
+
+            {/* CTAs */}
+            <div className="flex flex-col sm:flex-row gap-3 justify-center items-center mb-6">
+              <Button
+                variant="hero"
+                size="xl"
                 onClick={startFreeTrial}
                 disabled={isStarting}
+                className="w-full sm:w-auto min-w-[260px]"
               >
-                {isStarting ? 'Activation...' : 'Accéder à AMZing FBA'} <ArrowRight className="ml-2" />
+                {isStarting ? "Activation..." : "Démarrer maintenant"}
+                <ArrowRight className="ml-1" />
               </Button>
-              <Button variant="outline" size="xl" asChild>
+              <Button variant="outline" size="xl" asChild className="w-full sm:w-auto min-w-[220px]">
                 <Link to="/formation">
-                  Voir la formation Amazon FBA
+                  <PlayCircle className="mr-1" /> Voir la formation
                 </Link>
               </Button>
             </div>
-            <p className="mt-6 text-muted-foreground text-lg">
-              À partir de <span className="text-foreground font-semibold">64€/mois × 12</span> ou <span className="line-through text-muted-foreground/70">700€</span> <span className="text-foreground font-semibold text-xl bg-gradient-to-r from-red-500 via-orange-500 to-yellow-500 bg-clip-text text-transparent">500€ TTC</span> en une fois <span className="ml-1 bg-red-500/20 text-red-500 text-xs font-bold px-2 py-0.5 rounded animate-pulse">-29%</span>
-            </p>
-            <PromoCountdown />
+
+            {/* Price anchor */}
+            <div className="text-center space-y-2">
+              <p className="text-base">
+                <span className="text-muted-foreground line-through mr-2">700€</span>
+                <span className="text-2xl font-bold">500€ TTC</span>
+                <span className="ml-2 inline-flex items-center gap-1 bg-primary/15 text-primary text-xs font-bold px-2 py-1 rounded-full">
+                  <Sparkles className="w-3 h-3" /> -29% offre lancement
+                </span>
+              </p>
+              <p className="text-sm text-muted-foreground">
+                ou <span className="font-semibold text-foreground">64€/mois × 12</span> · Sans frais cachés · Accès immédiat
+              </p>
+              <div className="pt-2"><PromoCountdown /></div>
+            </div>
+
+            {/* Reassurance row */}
+            <div className="mt-10 grid grid-cols-2 md:grid-cols-4 gap-3 max-w-3xl mx-auto">
+              {[
+                { icon: ShieldCheck, label: "Paiement sécurisé Stripe" },
+                { icon: Lock, label: "Société française" },
+                { icon: Zap, label: "Accès immédiat" },
+                { icon: BadgeCheck, label: "Support 7j/7" },
+              ].map(({ icon: Icon, label }) => (
+                <div key={label} className="flex items-center gap-2 px-3 py-2 rounded-lg bg-background/60 border border-border/60 text-sm text-muted-foreground">
+                  <Icon className="w-4 h-4 text-primary flex-shrink-0" />
+                  <span className="truncate">{label}</span>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Micro-bloc Formation CTA */}
-      <section className="py-6 bg-primary/5 border-y border-primary/10">
-        <div className="container mx-auto px-4 text-center">
-          <p className="text-lg">
-            Tu cherches une <strong>formation Amazon FBA</strong> complète ?{" "}
-            <Link to="/formation" className="text-primary font-semibold hover:underline inline-flex items-center gap-1">
-              Voir la formation complète <ArrowRight className="w-4 h-4" />
-            </Link>
-          </p>
-        </div>
-      </section>
-
-      {/* Dashboard Preview - "Ton espace membre" */}
-      <HomeDashboardPreview />
-
-      {/* Platform Preview - "Aperçu de la plateforme" */}
-      <HomePreviewSection />
-
-      {/* Mockups - Tous les appareils */}
-      <HomeMockups />
-
-      {/* AI Search Promo - Public */}
-      <HomeAISearchPromo />
-
-      {/* AMZing AMP + Analyse de Fichier - Promo Tools */}
-      <HomeToolsPromo />
-
-      {/* Guides Amazon FBA - Section SEO - Bold banner style */}
-      <section className="py-16 relative overflow-hidden">
-        {/* Animated background */}
-        <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-secondary/10 to-primary/20" />
-        <div className="absolute top-0 left-1/4 w-64 h-64 bg-primary/20 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-0 right-1/4 w-48 h-48 bg-secondary/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
-        
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="text-center mb-10">
-            <Badge className="mb-4 bg-primary/20 text-primary border-primary/30 animate-fade-in">
-              📚 Ressources gratuites
-            </Badge>
-            <h2 className="text-3xl md:text-4xl font-bold mb-3">Débuter sur Amazon</h2>
-            <p className="text-muted-foreground max-w-md mx-auto">
-              Commence par comprendre les bases avant de passer à l'action
-            </p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-            {/* Carte 1 - Priorité SEO */}
-            <Link to="/amazon-fba-debutant" className="group relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-primary to-primary-glow rounded-2xl blur-lg opacity-50 group-hover:opacity-80 transition-opacity" />
-              <div className="relative flex flex-col gap-3 p-6 rounded-2xl bg-background/90 backdrop-blur border-2 border-primary/30 hover:border-primary hover:scale-[1.02] transition-all duration-300 shadow-lg h-full">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-primary-glow flex items-center justify-center group-hover:rotate-6 transition-transform shrink-0">
-                    <BookOpen className="w-6 h-6 text-white" />
-                  </div>
-                  <span className="font-bold text-lg">Amazon FBA : c'est quoi ?</span>
+      {/* ============== STATS BAR ============== */}
+      <section className="border-y border-border bg-muted/30">
+        <div className="container mx-auto px-4 py-10">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-5xl mx-auto">
+            {[
+              { value: "500+", label: "Vendeurs accompagnés" },
+              { value: "5,2 M€", label: "CA généré (8 mois)" },
+              { value: "1 700+", label: "Produits sourcés" },
+              { value: "92%", label: "Taux de renouvellement" },
+            ].map((s) => (
+              <div key={s.label} className="text-center">
+                <div className="text-3xl lg:text-4xl font-bold bg-gradient-to-br from-primary to-secondary bg-clip-text text-transparent">
+                  {s.value}
                 </div>
-                <p className="text-sm text-muted-foreground">
-                  Définition simple, fonctionnement, coûts et différence avec FBM.
-                </p>
-                <div className="flex items-center gap-2 text-primary font-medium mt-auto">
-                  Lire le guide
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </div>
+                <div className="text-sm text-muted-foreground mt-1">{s.label}</div>
               </div>
-            </Link>
-            
-            {/* Carte 2 - FBA vs FBM */}
-            <Link to="/amazon-fba-debutant#fba-vs-fbm" className="group relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-secondary to-accent rounded-2xl blur-lg opacity-50 group-hover:opacity-80 transition-opacity" />
-              <div className="relative flex flex-col gap-3 p-6 rounded-2xl bg-background/90 backdrop-blur border-2 border-secondary/30 hover:border-secondary hover:scale-[1.02] transition-all duration-300 shadow-lg h-full">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-secondary to-accent flex items-center justify-center group-hover:rotate-6 transition-transform shrink-0">
-                    <Scale className="w-6 h-6 text-white" />
-                  </div>
-                  <span className="font-bold text-lg">FBA vs FBM : lequel choisir ?</span>
-                </div>
-                <p className="text-sm text-muted-foreground">
-                  Comparatif clair pour choisir la meilleure option.
-                </p>
-                <div className="flex items-center gap-2 text-secondary font-medium mt-auto">
-                  Comparer
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </div>
-              </div>
-            </Link>
-            
-            {/* Carte 3 - Outils FBA */}
-            <Link to="/outil-amazon-fba" className="group relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-purple-600 rounded-2xl blur-lg opacity-50 group-hover:opacity-80 transition-opacity" />
-              <div className="relative flex flex-col gap-3 p-6 rounded-2xl bg-background/90 backdrop-blur border-2 border-purple-500/30 hover:border-purple-500 hover:scale-[1.02] transition-all duration-300 shadow-lg h-full">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center group-hover:rotate-6 transition-transform shrink-0">
-                    <Wrench className="w-6 h-6 text-white" />
-                  </div>
-                  <span className="font-bold text-lg">Outils Amazon FBA</span>
-                </div>
-                <p className="text-sm text-muted-foreground">
-                  Analyse de produits et outils pour vendeurs.
-                </p>
-                <div className="flex items-center gap-2 text-purple-500 font-medium mt-auto">
-                  Découvrir
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </div>
-              </div>
-            </Link>
-            
-            {/* Carte 4 - Produits rentables */}
-            <Link to="/produits-rentables-amazon" className="group relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-green-500 to-green-600 rounded-2xl blur-lg opacity-50 group-hover:opacity-80 transition-opacity" />
-              <div className="relative flex flex-col gap-3 p-6 rounded-2xl bg-background/90 backdrop-blur border-2 border-green-500/30 hover:border-green-500 hover:scale-[1.02] transition-all duration-300 shadow-lg h-full">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center group-hover:rotate-6 transition-transform shrink-0">
-                    <Target className="w-6 h-6 text-white" />
-                  </div>
-                  <span className="font-bold text-lg">Produits rentables</span>
-                </div>
-                <p className="text-sm text-muted-foreground">
-                  Trouver les pépites qui se vendent sur Amazon.
-                </p>
-                <div className="flex items-center gap-2 text-green-500 font-medium mt-auto">
-                  Explorer
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </div>
-              </div>
-            </Link>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* What's Included */}
-      <section className="py-20">
+      {/* ============== PROBLEM → SOLUTION ============== */}
+      <section className="py-20 lg:py-28">
         <div className="container mx-auto px-4">
-          {/* SEO H2 - Outils de sourcing */}
-          <h2 className="sr-only">
-            Outils de sourcing produits rentables pour Amazon FBA et arbitrage en ligne
-          </h2>
-          
-          {/* SEO H2 - Catalogue */}
-          <h2 className="sr-only">
-            Catalogue de produits optimisés pour la revente sur Amazon FBA
-          </h2>
-          <div className="text-center mb-16">
-            <Badge className="mb-4 bg-primary/10 text-primary border-primary/20">
-              Accès complet
-            </Badge>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">
-              Ce Que Tu Obtiens
+          <div className="max-w-3xl mx-auto text-center mb-14">
+            <Badge variant="outline" className="mb-4">Pourquoi 9 vendeurs sur 10 échouent</Badge>
+            <h2 className="text-3xl lg:text-4xl font-bold mb-4">
+              Vendre sur Amazon sans méthode, c'est perdre du temps et de l'argent
             </h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Tous les outils et ressources pour réussir sur Amazon FBA
+            <p className="text-lg text-muted-foreground">
+              Trop d'outils dispersés, des "gourous" qui revendent des PDF, aucun suivi réel.
+              AMZing FBA réunit tout dans un seul écosystème, avec un vendeur actif à vos côtés.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            <ServiceCard delay={0} animation="fade-left">
-            <Card className={`border-2 border-primary/20 cursor-pointer transition-all duration-300 ${isNativeApp ? 'hover:border-primary hover:shadow-[0_0_20px_rgba(255,153,0,0.3)]' : 'hover:border-primary hover:shadow-glow'} hover:scale-105 active:scale-95 active:border-primary`}>
-              <CardContent className="pt-6">
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-gradient-to-br from-primary to-primary-glow rounded-xl flex items-center justify-center flex-shrink-0 transition-transform duration-200 group-hover:rotate-6">
-                    <TrendingUp className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-bold mb-2">Moniteurs produits</h3>
-                    <p className="text-muted-foreground text-sm">
-                      Notifications temps réel de produits rentables sur Qogita, Auchan, King Jouet...
-                    </p>
-                  </div>
-                </div>
+          <div className="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto">
+            <Card className="border-destructive/20 bg-destructive/[0.03]">
+              <CardContent className="p-8">
+                <Badge variant="outline" className="mb-4 border-destructive/30 text-destructive">Sans AMZing FBA</Badge>
+                <ul className="space-y-3">
+                  {[
+                    "Sourcing manuel chronophage, produits non rentables",
+                    "Outils éparpillés à 30, 50, 100€/mois chacun",
+                    "Formations PDF sans accompagnement réel",
+                    "Aucun retour terrain sur vos décisions",
+                    "Risque élevé de blocage de compte",
+                  ].map((t) => (
+                    <li key={t} className="flex items-start gap-3 text-muted-foreground">
+                      <span className="mt-1 w-5 h-5 rounded-full bg-destructive/10 flex items-center justify-center flex-shrink-0">
+                        <span className="w-2 h-2 rounded-full bg-destructive" />
+                      </span>
+                      <span>{t}</span>
+                    </li>
+                  ))}
+                </ul>
               </CardContent>
             </Card>
-            </ServiceCard>
 
-            <ServiceCard delay={80} animation="fade-right">
-            <Card className={`border-2 border-primary/20 cursor-pointer transition-all duration-300 ${isNativeApp ? 'hover:border-secondary hover:shadow-[0_0_20px_rgba(33,150,243,0.3)]' : 'hover:border-secondary hover:shadow-blue'} hover:scale-105 active:scale-95 active:border-secondary`}>
-              <CardContent className="pt-6">
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-gradient-to-br from-secondary to-accent rounded-xl flex items-center justify-center flex-shrink-0 transition-transform duration-200 group-hover:rotate-6">
-                    <GraduationCap className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-bold mb-2">Guides Amazon FBA</h3>
-                    <p className="text-muted-foreground text-sm">
-                      Formation complète de A à Z pour maîtriser Amazon FBA
-                    </p>
-                  </div>
-                </div>
+            <Card className="border-primary/30 bg-primary/[0.04] shadow-glow">
+              <CardContent className="p-8">
+                <Badge className="mb-4 bg-primary/15 text-primary border-primary/30 hover:bg-primary/20">Avec AMZing FBA</Badge>
+                <ul className="space-y-3">
+                  {[
+                    "Produits rentables détectés automatiquement chaque jour",
+                    "Plateforme tout-en-un, un seul abonnement",
+                    "Méthode pas-à-pas + support direct par chat",
+                    "Coaching hebdo avec un vendeur en activité",
+                    "Process testés pour rester conforme aux règles Amazon",
+                  ].map((t) => (
+                    <li key={t} className="flex items-start gap-3">
+                      <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                      <span>{t}</span>
+                    </li>
+                  ))}
+                </ul>
               </CardContent>
             </Card>
-            </ServiceCard>
+          </div>
+        </div>
+      </section>
 
-            <ServiceCard delay={160} animation="scale">
-            <Card className={`border-2 border-primary/20 cursor-pointer transition-all duration-300 ${isNativeApp ? 'hover:border-primary hover:shadow-[0_0_20px_rgba(255,153,0,0.3)]' : 'hover:border-primary hover:shadow-glow'} hover:scale-105 active:scale-95 active:border-primary`}>
-              <CardContent className="pt-6">
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center flex-shrink-0 transition-transform duration-200 group-hover:rotate-6">
-                    <Package className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-bold mb-2">Fournisseurs privés</h3>
-                    <p className="text-muted-foreground text-sm">
-                      Listing exclusif de produits sourcés et testés
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            </ServiceCard>
-
-            <ServiceCard delay={240} animation="rotate">
-            <Card className={`border-2 border-primary/20 cursor-pointer transition-all duration-300 ${isNativeApp ? 'hover:border-secondary hover:shadow-[0_0_20px_rgba(33,150,243,0.3)]' : 'hover:border-secondary hover:shadow-blue'} hover:scale-105 active:scale-95 active:border-secondary`}>
-              <CardContent className="pt-6">
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-gradient-to-br from-secondary to-primary rounded-xl flex items-center justify-center flex-shrink-0 transition-transform duration-200 group-hover:rotate-6">
-                    <CheckCircle2 className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-bold mb-2">Analyses de marché</h3>
-                    <p className="text-muted-foreground text-sm">
-                      Tendances et opportunités du marché Amazon
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            </ServiceCard>
-
-            <ServiceCard delay={320} animation="slide-rotate">
-            <Card className={`border-2 border-primary/20 cursor-pointer transition-all duration-300 ${isNativeApp ? 'hover:border-primary hover:shadow-[0_0_20px_rgba(255,153,0,0.3)]' : 'hover:border-primary hover:shadow-glow'} hover:scale-105 active:scale-95 active:border-primary`}>
-              <CardContent className="pt-6">
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center flex-shrink-0 transition-transform duration-200 group-hover:rotate-6">
-                    <Warehouse className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-bold mb-2">Service logistique</h3>
-                    <p className="text-muted-foreground text-sm">
-                      Stockage et expédition sous 24h disponibles
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            </ServiceCard>
-
-            <ServiceCard delay={400} animation="fade-up">
-            <Card className={`border-2 border-primary/20 cursor-pointer transition-all duration-300 ${isNativeApp ? 'hover:border-secondary hover:shadow-[0_0_20px_rgba(33,150,243,0.3)]' : 'hover:border-secondary hover:shadow-blue'} hover:scale-105 active:scale-95 active:border-secondary`}>
-              <CardContent className="pt-6">
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-gradient-to-br from-secondary to-accent rounded-xl flex items-center justify-center flex-shrink-0 transition-transform duration-200 group-hover:rotate-6">
-                    <TrendingUp className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-bold mb-2">Réductions exclusives</h3>
-                    <p className="text-muted-foreground text-sm">
-                      Tarifs préférentiels sur emballages et services
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            </ServiceCard>
+      {/* ============== WHAT YOU GET ============== */}
+      <section className="py-20 lg:py-28 bg-muted/30 border-y border-border">
+        <div className="container mx-auto px-4">
+          <div className="max-w-3xl mx-auto text-center mb-14">
+            <Badge variant="outline" className="mb-4">Ce qui est inclus</Badge>
+            <h2 className="text-3xl lg:text-4xl font-bold mb-4">
+              Tout ce qu'il faut pour réussir, dans un seul abonnement
+            </h2>
+            <p className="text-lg text-muted-foreground">
+              Outils, méthode, sourcing, communauté et coaching. Pas besoin d'acheter 5 logiciels en plus.
+            </p>
           </div>
 
-          <div className="text-center mt-12">
-            <Button variant="hero" size="xl" asChild>
-              <Link to="/services">
-                Voir tous les avantages <ArrowRight className="ml-2" />
-              </Link>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5 max-w-6xl mx-auto">
+            {[
+              { icon: TrendingUp, title: "Moniteurs de produits rentables", desc: "Alertes temps réel sur Qogita, Auchan, King Jouet et + de 20 sources." },
+              { icon: GraduationCap, title: "Formation complète A → Z", desc: "Plus de 60 vidéos pour passer de zéro à votre premier produit livré." },
+              { icon: Package, title: "Fournisseurs vérifiés", desc: "Catalogue privé de grossistes testés en Europe et hors UE." },
+              { icon: LineChart, title: "Analyse rentabilité automatique", desc: "ROI, marge, frais Amazon et estimation des ventes calculés pour vous." },
+              { icon: Users, title: "Communauté privée", desc: "Discord actif, retours d'expérience, entraide entre vendeurs sérieux." },
+              { icon: MessageCircle, title: "Coaching hebdomadaire", desc: "Sessions live 30 à 60 min pour débloquer vos sujets en direct." },
+            ].map(({ icon: Icon, title, desc }) => (
+              <Card key={title} className="border-border/60 bg-background hover:border-primary/40 hover:shadow-glow transition-all duration-300 group">
+                <CardContent className="p-6">
+                  <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-primary/15 to-secondary/15 flex items-center justify-center mb-4 group-hover:scale-105 transition-transform">
+                    <Icon className="w-5 h-5 text-primary" />
+                  </div>
+                  <h3 className="font-semibold text-lg mb-1.5">{title}</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{desc}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          <div className="text-center mt-10">
+            <Button size="lg" variant="outline" asChild>
+              <Link to="/services">Voir tout en détail <ArrowRight className="ml-1" /></Link>
             </Button>
           </div>
         </div>
       </section>
 
-      {/* AMZing FBA 360 Section */}
-      <section className="py-20 bg-muted/30">
+      {/* ============== DASHBOARD PREVIEW ============== */}
+      <section className="py-20 lg:py-28">
         <div className="container mx-auto px-4">
-          {/* SEO H2 - Marketplace et services */}
-          <h2 className="sr-only">
-            Marketplace de services spécialisés pour vendeurs Amazon FBA et FBM
-          </h2>
-          <Card className="border-2 border-primary/20 shadow-2xl overflow-hidden max-w-6xl mx-auto hover:shadow-glow transition-all duration-500 hover:scale-102 animate-fade-in">
-            <div className="grid md:grid-cols-2 gap-0">
-              <div className="bg-gradient-to-br from-primary/10 via-secondary/10 to-primary/5 p-12 flex flex-col justify-center relative overflow-hidden">
-                {/* Animated background orbs */}
-                <div className="absolute top-10 right-10 w-32 h-32 bg-primary/10 rounded-full blur-2xl animate-float" />
-                <div className="absolute bottom-10 left-10 w-40 h-40 bg-secondary/10 rounded-full blur-2xl animate-float" style={{ animationDelay: "1s" }} />
-                
-                <Badge className="mb-4 bg-primary/20 text-primary border-primary/30 w-fit animate-fade-in hover:scale-110 transition-transform cursor-pointer" style={{ animationDelay: "0.1s" }}>
-                  Service Premium Inclus
-                </Badge>
-                <h2 className="text-4xl font-bold mb-6 text-gradient animate-fade-in" style={{ animationDelay: "0.2s" }}>
-                  🚛 AMZing FBA 360
-                </h2>
-                <p className="text-xl font-semibold mb-4 animate-fade-in" style={{ animationDelay: "0.3s" }}>
-                  Votre solution logistique tout-en-un
-                </p>
-                <p className="text-muted-foreground text-lg leading-relaxed mb-4 animate-fade-in" style={{ animationDelay: "0.4s" }}>
-                  AMZing FBA 360 est une solution complète pensée pour les vendeurs Amazon.
-                </p>
-                <p className="text-muted-foreground leading-relaxed animate-fade-in" style={{ animationDelay: "0.5s" }}>
-                  Nous agissons comme votre propre centre logistique, <strong className="text-foreground">plus flexible et plus abordable que le FBA d'Amazon</strong>.
-                </p>
+          <div className="max-w-3xl mx-auto text-center mb-12">
+            <Badge variant="outline" className="mb-4">Aperçu de la plateforme</Badge>
+            <h2 className="text-3xl lg:text-4xl font-bold mb-4">Votre tableau de bord, pensé pour l'action</h2>
+            <p className="text-lg text-muted-foreground">
+              Toutes vos opportunités, notifications, fournisseurs et formations à portée de clic.
+            </p>
+          </div>
+          <HomeDashboardPreview />
+        </div>
+      </section>
+
+      {/* ============== HOW IT WORKS ============== */}
+      <section className="py-20 lg:py-28 bg-muted/30 border-y border-border">
+        <div className="container mx-auto px-4">
+          <div className="max-w-3xl mx-auto text-center mb-14">
+            <Badge variant="outline" className="mb-4">Comment ça marche</Badge>
+            <h2 className="text-3xl lg:text-4xl font-bold mb-4">Vos premiers résultats en 3 étapes</h2>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+            {[
+              { step: "01", title: "Activez votre accès", desc: "Inscription en 2 min, accès immédiat à la plateforme et aux formations." },
+              { step: "02", title: "Recevez vos produits", desc: "Nos moniteurs détectent les opportunités rentables, vous validez les bonnes." },
+              { step: "03", title: "Vendez et scalez", desc: "Méthode + support pour vos premières ventes, puis automatisez progressivement." },
+            ].map(({ step, title, desc }, i) => (
+              <div key={step} className="relative">
+                <div className="absolute -top-3 -left-3 text-7xl font-bold text-primary/10 select-none">{step}</div>
+                <Card className="relative h-full border-border bg-background">
+                  <CardContent className="p-7">
+                    <div className="text-sm font-semibold text-primary mb-2">Étape {i + 1}</div>
+                    <h3 className="text-xl font-bold mb-2">{title}</h3>
+                    <p className="text-muted-foreground">{desc}</p>
+                  </CardContent>
+                </Card>
               </div>
-              <div className="p-12 bg-background">
-                <div className="space-y-6">
-                  <div>
-                    <h3 className="text-xl font-bold mb-3 animate-fade-in" style={{ animationDelay: "0.2s" }}>Comment ça marche ?</h3>
-                    <ul className="space-y-3 text-muted-foreground">
-                      <li className="flex items-start gap-3 group hover:translate-x-2 transition-all duration-300 animate-fade-in" style={{ animationDelay: "0.3s" }}>
-                        <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-1 group-hover:scale-125 group-hover:text-primary-glow transition-all" />
-                        <span className="group-hover:text-foreground transition-colors">Nous fournissons vos produits rentables</span>
-                      </li>
-                      <li className="flex items-start gap-3 group hover:translate-x-2 transition-all duration-300 animate-fade-in" style={{ animationDelay: "0.4s" }}>
-                        <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-1 group-hover:scale-125 group-hover:text-primary-glow transition-all" />
-                        <span className="group-hover:text-foreground transition-colors">Stockage dans nos entrepôts sécurisés</span>
-                      </li>
-                      <li className="flex items-start gap-3 group hover:translate-x-2 transition-all duration-300 animate-fade-in" style={{ animationDelay: "0.5s" }}>
-                        <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-1 group-hover:scale-125 group-hover:text-primary-glow transition-all" />
-                        <span className="group-hover:text-foreground transition-colors">Emballage aux standards Amazon</span>
-                      </li>
-                      <li className="flex items-start gap-3 group hover:translate-x-2 transition-all duration-300 animate-fade-in" style={{ animationDelay: "0.6s" }}>
-                        <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-1 group-hover:scale-125 group-hover:text-primary-glow transition-all" />
-                        <span className="group-hover:text-foreground transition-colors">Expédition sous 24h à vos clients</span>
-                      </li>
-                      <li className="flex items-start gap-3 group hover:translate-x-2 transition-all duration-300 animate-fade-in" style={{ animationDelay: "0.7s" }}>
-                        <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-1 group-hover:scale-125 group-hover:text-primary-glow transition-all" />
-                        <span className="group-hover:text-foreground transition-colors">Gestion du SAV et suivi des commandes</span>
-                      </li>
-                    </ul>
-                  </div>
-                  <div className="pt-4 border-t animate-fade-in" style={{ animationDelay: "0.8s" }}>
-                    <div className="bg-primary/10 rounded-lg p-4 hover:bg-primary/20 transition-all duration-300 hover:scale-105 cursor-pointer group">
-                      <p className="font-semibold text-lg mb-2 group-hover:text-primary transition-colors">
-                        <span className="inline-block animate-pulse">💰</span> Économisez jusqu'à 30%
-                      </p>
-                      <p className="text-sm text-muted-foreground group-hover:text-foreground transition-colors">
-                        Frais de stockage et d'expédition inférieurs à Amazon FBA, avec un contrôle total sur vos marges
-                      </p>
-                    </div>
-                  </div>
-                  <p className="text-sm text-muted-foreground italic pt-4 animate-fade-in" style={{ animationDelay: "0.9s" }}>
-                    AMZing FBA 360 = Votre grossiste + Votre entrepôt + Votre partenaire logistique
-                  </p>
-                </div>
-              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ============== TESTIMONIALS ============== */}
+      <section className="py-20 lg:py-28">
+        <div className="container mx-auto px-4">
+          <div className="max-w-3xl mx-auto text-center mb-14">
+            <Badge variant="outline" className="mb-4">Témoignages</Badge>
+            <h2 className="text-3xl lg:text-4xl font-bold mb-4">Ils ont franchi le cap avec AMZing FBA</h2>
+            <div className="flex items-center justify-center gap-2 text-muted-foreground">
+              <span className="flex items-center gap-0.5 text-amber-500">
+                {[...Array(5)].map((_, i) => <Star key={i} className="w-4 h-4 fill-current" />)}
+              </span>
+              <span>4,9/5 · 500+ vendeurs actifs</span>
             </div>
+          </div>
+          {(isNativeApp || isMobile) ? <TestimonialsMobile /> : <TestimonialsCarousel />}
+        </div>
+      </section>
+
+      {/* ============== PRICING ============== */}
+      <section id="pricing" className="py-20 lg:py-28 bg-muted/30 border-y border-border">
+        <div className="container mx-auto px-4">
+          <div className="max-w-3xl mx-auto text-center mb-12">
+            <Badge variant="outline" className="mb-4">Tarif</Badge>
+            <h2 className="text-3xl lg:text-4xl font-bold mb-4">Un tarif, tout inclus</h2>
+            <p className="text-lg text-muted-foreground">
+              Accès 12 mois à la plateforme, à la formation, aux fournisseurs et au coaching.
+            </p>
+          </div>
+
+          <Card className="max-w-2xl mx-auto border-2 border-primary/40 shadow-glow relative overflow-hidden">
+            <div className="absolute top-0 right-0 bg-gradient-to-r from-primary to-secondary text-primary-foreground text-xs font-bold px-4 py-1.5 rounded-bl-xl">
+              OFFRE LANCEMENT -29%
+            </div>
+            <CardContent className="p-8 lg:p-10">
+              <div className="flex flex-col items-center text-center">
+                <Badge className="mb-4 bg-primary/15 text-primary border-primary/30 hover:bg-primary/20">Accès complet AMZing FBA</Badge>
+                <div className="flex items-baseline gap-3 mb-2">
+                  <span className="text-2xl text-muted-foreground line-through">700€</span>
+                  <span className="text-5xl lg:text-6xl font-bold">500€</span>
+                  <span className="text-muted-foreground">TTC</span>
+                </div>
+                <p className="text-muted-foreground mb-6">ou <span className="font-semibold text-foreground">64€/mois × 12</span> sans frais cachés</p>
+
+                <div className="w-full border-t border-border pt-6 mb-6">
+                  <ul className="grid sm:grid-cols-2 gap-3 text-left">
+                    {[
+                      "Plateforme complète 12 mois",
+                      "Formation A → Z (60+ vidéos)",
+                      "Moniteurs produits temps réel",
+                      "Catalogue fournisseurs privé",
+                      "Communauté Discord active",
+                      "Coaching hebdomadaire",
+                      "Support chat 7j/7",
+                      "Apps iOS + Android",
+                    ].map((f) => (
+                      <li key={f} className="flex items-center gap-2 text-sm">
+                        <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0" />
+                        <span>{f}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <Button variant="hero" size="xl" className="w-full sm:w-auto min-w-[280px]" onClick={startFreeTrial} disabled={isStarting}>
+                  {isStarting ? "Activation..." : "Accéder maintenant"} <ArrowRight className="ml-1" />
+                </Button>
+                <div className="mt-4 flex items-center gap-2 text-xs text-muted-foreground">
+                  <ShieldCheck className="w-4 h-4" /> Paiement sécurisé Stripe · Accès immédiat
+                </div>
+                <div className="mt-4"><PromoCountdown /></div>
+              </div>
+            </CardContent>
           </Card>
         </div>
       </section>
 
-      {/* Testimonials Section */}
-      <section className="py-20 bg-muted/30">
-        <h2 className="sr-only">
-          Témoignages et avis des membres AMZing FBA
-        </h2>
-        {(isNativeApp || isMobile) ? (
-          <TestimonialsMobile />
-        ) : (
-          <div className="container mx-auto px-4">
-            <div className="text-center mb-16">
-              <Badge className="mb-4 bg-primary/10 text-primary border-primary/20">
-                Témoignages clients
-              </Badge>
-              <h2 className="text-4xl md:text-5xl font-bold mb-4">
-                Ce que disent nos membres
-              </h2>
-            </div>
-
-            <TestimonialsCarousel />
-          </div>
-        )}
-      </section>
-
-      {/* Stats & Confiance Section */}
-      <section className="py-20 bg-gradient-to-br from-primary/10 via-background to-secondary/10">
+      {/* ============== GUARANTEE / WHO ============== */}
+      <section className="py-20">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <Badge className="mb-4 bg-green-500/10 text-green-600 border-green-500/20">
-              AMZing FBA en chiffres
-            </Badge>
-            <h2 className="text-4xl font-bold mb-4">Une communauté qui grandit</h2>
-          </div>
-          
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto mb-16">
-            <div className="text-center">
-              <div className="text-4xl md:text-5xl font-bold text-gradient mb-2">500+</div>
-              <div className="text-muted-foreground">Membres actifs</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl md:text-5xl font-bold text-gradient mb-2">1700+</div>
-              <div className="text-muted-foreground">Produits sourcés</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl md:text-5xl font-bold text-gradient mb-2">5,2M €</div>
-              <div className="text-muted-foreground">CA généré en 8 mois</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl md:text-5xl font-bold text-gradient mb-2">92%</div>
-              <div className="text-muted-foreground">Taux de renouvellement</div>
-            </div>
-          </div>
-
-          {/* Points de confiance */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto mb-12">
-            <div className="text-center p-6 rounded-2xl bg-background/80 backdrop-blur border">
-              <Smartphone className="w-10 h-10 text-primary mx-auto mb-3" />
-              <div className="font-bold">iOS & Android</div>
-              <div className="text-sm text-muted-foreground">Apps natives</div>
-            </div>
-            <div className="text-center p-6 rounded-2xl bg-background/80 backdrop-blur border">
-              <Headphones className="w-10 h-10 text-secondary mx-auto mb-3" />
-              <div className="font-bold">Support réactif</div>
-              <div className="text-sm text-muted-foreground">7j/7 par chat</div>
-            </div>
-            <div className="text-center p-6 rounded-2xl bg-background/80 backdrop-blur border">
-              <RefreshCw className="w-10 h-10 text-primary mx-auto mb-3" />
-              <div className="font-bold">Sans engagement</div>
-              <div className="text-sm text-muted-foreground">Résiliable en 2 clics</div>
-            </div>
-            <div className="text-center p-6 rounded-2xl bg-background/80 backdrop-blur border">
-              <Shield className="w-10 h-10 text-secondary mx-auto mb-3" />
-              <div className="font-bold">Société française</div>
-              <div className="text-sm text-muted-foreground">Basée à Paris</div>
-            </div>
-          </div>
-
-          {/* Qui est derrière AMZing FBA */}
-          <Card className="max-w-3xl mx-auto border-2 border-primary/10 bg-background/80 backdrop-blur">
-            <CardContent className="p-8">
-              <div className="flex items-start gap-6 flex-col md:flex-row">
+          <Card className="max-w-4xl mx-auto border-2 border-border bg-gradient-to-br from-background to-muted/30">
+            <CardContent className="p-8 lg:p-10">
+              <div className="grid md:grid-cols-[auto,1fr] gap-6 items-start">
                 <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center flex-shrink-0">
-                  <Building2 className="w-8 h-8 text-white" />
+                  <Building2 className="w-8 h-8 text-primary-foreground" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold mb-2">Qui est derrière AMZing FBA ?</h3>
-                  <p className="text-muted-foreground mb-4">
-                    AMZing FBA est une société française. 
-                    Notre mission : rendre le business Amazon FBA accessible grâce à des outils concrets et une méthode claire.
+                  <h3 className="text-2xl font-bold mb-3">Qui se cache derrière AMZing FBA ?</h3>
+                  <p className="text-muted-foreground mb-4 leading-relaxed">
+                    AMZing FBA est édité par <strong className="text-foreground">N.Z Consulting</strong>, société française.
+                    Notre mission : rendre le e-commerce sur Amazon accessible avec des outils concrets, une méthode claire
+                    et un accompagnement humain. Aucune promesse de revenus magiques, juste un cadre éprouvé.
                   </p>
-                  <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
-                    <Link to="/contact" className="flex items-center gap-1 hover:text-primary transition-colors">
-                      <Mail className="w-4 h-4" /> contact@amzingfba.com
-                    </Link>
-                    <span>Paris, France</span>
+                  <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-muted-foreground">
+                    <span className="inline-flex items-center gap-1.5"><Smartphone className="w-4 h-4 text-primary" /> Apps iOS & Android</span>
+                    <span className="inline-flex items-center gap-1.5"><Clock className="w-4 h-4 text-primary" /> Support 7j/7</span>
+                    <span className="inline-flex items-center gap-1.5"><ShieldCheck className="w-4 h-4 text-primary" /> Paiement Stripe sécurisé</span>
                   </div>
                 </div>
               </div>
@@ -670,173 +433,87 @@ const Index = () => {
         </div>
       </section>
 
-      {/* FAQ Section - Orientée Plateforme/Outils */}
-      <section className="py-20 bg-muted/30">
+      {/* ============== FAQ ============== */}
+      <section className="py-20 lg:py-28 bg-muted/30 border-y border-border">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <Badge className="mb-4 bg-primary/10 text-primary border-primary/20">
-              Questions fréquentes
-            </Badge>
-            <h2 className="text-4xl font-bold mb-4">FAQ Plateforme</h2>
-            <p className="text-xl text-muted-foreground">Tout savoir sur AMZing FBA</p>
+          <div className="max-w-3xl mx-auto text-center mb-12">
+            <Badge variant="outline" className="mb-4">FAQ</Badge>
+            <h2 className="text-3xl lg:text-4xl font-bold mb-4">Vos questions, nos réponses</h2>
           </div>
-          
+
           <div className="max-w-3xl mx-auto">
-            <Accordion type="single" collapsible className="space-y-4">
-              <AccordionItem value="item-1" className="bg-background rounded-lg border px-6">
-                <AccordionTrigger className="text-left font-semibold hover:no-underline">
-                  <span className="flex items-center gap-3">
-                    <HelpCircle className="w-5 h-5 text-primary flex-shrink-0" />
-                    Qu'est-ce qu'AMZing FBA concrètement ?
-                  </span>
-                </AccordionTrigger>
-                <AccordionContent className="text-muted-foreground pl-8">
-                  AMZing FBA est une plateforme tout-en-un pour vendre sur Amazon FBA. Elle combine des moniteurs automatiques qui détectent des produits rentables, un catalogue de fournisseurs, une méthode structurée et une communauté active. C'est un écosystème complet, pas juste un outil isolé.
-                </AccordionContent>
-              </AccordionItem>
-              
-              <AccordionItem value="item-2" className="bg-background rounded-lg border px-6">
-                <AccordionTrigger className="text-left font-semibold hover:no-underline">
-                  <span className="flex items-center gap-3">
-                    <HelpCircle className="w-5 h-5 text-primary flex-shrink-0" />
-                    Comment fonctionnent les moniteurs de produits ?
-                  </span>
-                </AccordionTrigger>
-                <AccordionContent className="text-muted-foreground pl-8">
-                  Les moniteurs scannent automatiquement des grossistes et sites e-commerce pour identifier des produits avec un bon potentiel de revente sur Amazon. Tu reçois des alertes avec les données clés : prix d'achat, prix de vente estimé, marge, ROI et historique de ventes. La décision finale t'appartient toujours.
-                </AccordionContent>
-              </AccordionItem>
-              
-              <AccordionItem value="item-3" className="bg-background rounded-lg border px-6">
-                <AccordionTrigger className="text-left font-semibold hover:no-underline">
-                  <span className="flex items-center gap-3">
-                    <HelpCircle className="w-5 h-5 text-primary flex-shrink-0" />
-                    Quels fournisseurs sont disponibles dans le catalogue ?
-                  </span>
-                </AccordionTrigger>
-                <AccordionContent className="text-muted-foreground pl-8">
-                  Le catalogue inclut des grossistes européens vérifiés : Qogita, Eany, ainsi que des alertes sur des sites comme Auchan, King Jouet et d'autres. Les sources sont régulièrement mises à jour pour maximiser les opportunités.
-                </AccordionContent>
-              </AccordionItem>
-              
-              <AccordionItem value="item-4" className="bg-background rounded-lg border px-6">
-                <AccordionTrigger className="text-left font-semibold hover:no-underline">
-                  <span className="flex items-center gap-3">
-                    <HelpCircle className="w-5 h-5 text-primary flex-shrink-0" />
-                    Combien coûte l'abonnement ?
-                  </span>
-                </AccordionTrigger>
-                <AccordionContent className="text-muted-foreground pl-8">
-                  L'abonnement AMZing FBA est à 700€/an TTC ou environ 64€/mois sur 12 mois. C'est un accès annuel qui te donne accès à tous les outils, moniteurs, ressources et à la communauté pendant 12 mois complets.
-                </AccordionContent>
-              </AccordionItem>
-              
-              <AccordionItem value="item-5" className="bg-background rounded-lg border px-6">
-                <AccordionTrigger className="text-left font-semibold hover:no-underline">
-                  <span className="flex items-center gap-3">
-                    <HelpCircle className="w-5 h-5 text-primary flex-shrink-0" />
-                    C'est adapté aux débutants ?
-                  </span>
-                </AccordionTrigger>
-                <AccordionContent className="text-muted-foreground pl-8">
-                  Oui. AMZing FBA est conçu pour accompagner les débutants comme les vendeurs expérimentés. Pour ceux qui partent de zéro, une formation complète est disponible.{" "}
-                  <Link to="/formation" className="text-primary hover:underline font-medium">
-                    Voir la formation Amazon FBA →
-                  </Link>
-                </AccordionContent>
-              </AccordionItem>
-              
-              <AccordionItem value="item-6" className="bg-background rounded-lg border px-6">
-                <AccordionTrigger className="text-left font-semibold hover:no-underline">
-                  <span className="flex items-center gap-3">
-                    <HelpCircle className="w-5 h-5 text-primary flex-shrink-0" />
-                    C'est quoi la différence entre FBA et FBM ?
-                  </span>
-                </AccordionTrigger>
-                <AccordionContent className="text-muted-foreground pl-8">
-                  <strong>FBA</strong> : Amazon gère le stockage, l'expédition et le SAV. Tu bénéficies du badge Prime. Frais Amazon plus élevés mais moins de travail.<br/>
-                  <strong>FBM</strong> : Tu gères toi-même l'expédition. Plus de contrôle, frais réduits, mais plus de travail logistique. AMZing FBA couvre les deux modèles.
-                </AccordionContent>
-              </AccordionItem>
-              
-              <AccordionItem value="item-7" className="bg-background rounded-lg border px-6">
-                <AccordionTrigger className="text-left font-semibold hover:no-underline">
-                  <span className="flex items-center gap-3">
-                    <HelpCircle className="w-5 h-5 text-primary flex-shrink-0" />
-                    Faut-il créer une société pour commencer ?
-                  </span>
-                </AccordionTrigger>
-                <AccordionContent className="text-muted-foreground pl-8">
-                  Oui, pour vendre légalement sur Amazon tu as besoin d'une structure : micro-entreprise, SASU, EURL... La micro-entreprise est souvent le choix des débutants.{" "}
-                  <Link to="/creation-societe" className="text-primary hover:underline font-medium">
-                    Voir le guide création de société →
-                  </Link>
-                </AccordionContent>
-              </AccordionItem>
-              
-              <AccordionItem value="item-8" className="bg-background rounded-lg border px-6">
-                <AccordionTrigger className="text-left font-semibold hover:no-underline">
-                  <span className="flex items-center gap-3">
-                    <HelpCircle className="w-5 h-5 text-primary flex-shrink-0" />
-                    L'application est disponible sur mobile ?
-                  </span>
-                </AccordionTrigger>
-                <AccordionContent className="text-muted-foreground pl-8">
-                  Oui, AMZing FBA est disponible en application iOS native (App Store) et Android. Tu peux consulter les alertes, accéder à la communauté et suivre tes opportunités depuis ton smartphone.
-                </AccordionContent>
-              </AccordionItem>
+            <Accordion type="single" collapsible className="space-y-3">
+              {[
+                { q: "Qu'est-ce qu'AMZing FBA exactement ?", a: "Une plateforme tout-en-un qui combine outils de sourcing, formation Amazon FBA complète, catalogue de fournisseurs vérifiés, communauté privée et coaching hebdomadaire. Tout est inclus dans un seul abonnement." },
+                { q: "Combien coûte l'accès ?", a: "500€ TTC en offre de lancement (au lieu de 700€), ou 64€/mois sur 12 mois. Aucun frais caché, l'accès dure 12 mois complets." },
+                { q: "C'est adapté aux débutants ?", a: "Oui. La formation reprend depuis zéro : création de société, ouverture de compte vendeur, premier produit, expédition. Le support et le coaching sont là pour vous accompagner." },
+                { q: "Combien de temps avant les premiers résultats ?", a: "La plupart de nos membres lancent leur premier produit entre 3 et 8 semaines après l'inscription. Les résultats dépendent de votre implication et de votre budget de départ." },
+                { q: "Quel budget pour démarrer en plus de l'abonnement ?", a: "Comptez 500 à 2 000€ de stock initial selon les produits choisis. La méthode privilégie les produits à faible mise de fonds pour limiter le risque." },
+                { q: "Puis-je payer en plusieurs fois ?", a: "Oui, le paiement en 12 fois sans frais est disponible (64€/mois). Paiement sécurisé via Stripe." },
+                { q: "Y a-t-il une application mobile ?", a: "Oui, AMZing FBA est disponible en application iOS native (App Store) et Android. Vous suivez vos alertes et la communauté depuis votre smartphone." },
+                { q: "Comment résilier ?", a: "L'abonnement est annuel et engage sur 12 mois. À l'issue, vous pouvez ne pas renouveler en 2 clics depuis votre espace." },
+              ].map((item, i) => (
+                <AccordionItem key={i} value={`item-${i}`} className="bg-background rounded-xl border border-border px-5">
+                  <AccordionTrigger className="text-left font-semibold hover:no-underline py-5">
+                    <span className="flex items-center gap-3">
+                      <HelpCircle className="w-5 h-5 text-primary flex-shrink-0" />
+                      {item.q}
+                    </span>
+                  </AccordionTrigger>
+                  <AccordionContent className="text-muted-foreground pl-8 pb-5">{item.a}</AccordionContent>
+                </AccordionItem>
+              ))}
             </Accordion>
-            
-            <div className="text-center mt-8 space-y-3">
+
+            <div className="text-center mt-8">
               <Link to="/faq" className="text-primary hover:underline font-medium inline-flex items-center gap-2">
                 Voir toutes les questions <ArrowRight className="w-4 h-4" />
               </Link>
-              <p className="text-sm text-muted-foreground">
-                Tu cherches des infos sur la formation ?{" "}
-                <Link to="/formation#faq" className="text-primary hover:underline">
-                  Voir la FAQ Formation
-                </Link>
-              </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-r from-primary to-secondary">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-            Prêt à démarrer sur Amazon ?
+      {/* ============== FINAL CTA ============== */}
+      <section className="py-20 lg:py-28 relative overflow-hidden">
+        <div className="absolute inset-0 -z-10 bg-gradient-to-br from-primary via-primary to-secondary" />
+        <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.15),transparent_50%)]" />
+
+        <div className="container mx-auto px-4 text-center text-primary-foreground">
+          <Badge className="mb-6 bg-white/15 text-white border-white/20 hover:bg-white/20">
+            <Sparkles className="w-3 h-3 mr-1" /> Offre de lancement -29%
+          </Badge>
+          <h2 className="text-3xl lg:text-5xl font-bold mb-5 max-w-3xl mx-auto leading-tight">
+            Prêt à lancer votre business Amazon FBA ?
           </h2>
-          <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
-            Accède à la plateforme complète : outils, méthode et communauté
+          <p className="text-lg lg:text-xl text-white/90 mb-8 max-w-2xl mx-auto">
+            Rejoignez les 500+ vendeurs qui utilisent AMZing FBA pour sourcer, vendre et scaler chaque mois.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button 
-              variant="secondary" 
-              size="xl" 
-              className="bg-gradient-to-r from-white via-primary/5 to-white bg-[length:200%_100%] animate-[gradient_3s_ease_infinite] text-primary hover:scale-105 hover:shadow-[0_0_40px_rgba(255,153,0,0.4)] transition-all duration-300 relative overflow-hidden group font-semibold border-2 border-primary/10"
+
+          <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
+            <Button
+              size="xl"
               onClick={startFreeTrial}
               disabled={isStarting}
-              style={{
-                animation: 'gradient 3s ease infinite, pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
-              }}
+              className="bg-background text-foreground hover:bg-background/90 min-w-[260px] shadow-2xl"
             >
-              <span className="relative z-10 flex items-center gap-2">
-                {isStarting ? 'Activation...' : 'Accéder à AMZing FBA'}
-                <span className="inline-block group-hover:translate-x-1 transition-transform duration-300">→</span>
-              </span>
-              <span className="absolute inset-0 bg-gradient-to-r from-primary/0 via-primary/20 to-primary/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></span>
+              {isStarting ? "Activation..." : "Accéder à AMZing FBA"} <ArrowRight className="ml-1" />
             </Button>
-            <Button variant="outline" size="xl" className="border-white text-white hover:bg-white/10" asChild>
-              <Link to="/formation">
-                Voir la formation
-              </Link>
+            <Button size="xl" variant="outline" asChild className="bg-transparent border-white/40 text-white hover:bg-white/10 hover:text-white min-w-[220px]">
+              <Link to="/formation">Voir la formation</Link>
             </Button>
           </div>
-          <p className="mt-6 text-white/90 text-lg">
-            À partir de <span className="font-semibold">64€/mois × 12</span> ou <span className="line-through opacity-70">700€</span> <span className="font-semibold">500€ TTC</span> <span className="ml-1 bg-red-500/20 text-red-400 text-xs font-bold px-2 py-0.5 rounded animate-pulse">🔥 -200€</span>
+
+          <p className="mt-6 text-white/90">
+            <span className="line-through opacity-70 mr-1">700€</span>
+            <span className="font-bold text-xl">500€ TTC</span>
+            <span className="mx-2 opacity-70">·</span>
+            <span>ou 64€/mois × 12</span>
           </p>
+          <div className="mt-3 flex items-center justify-center gap-4 text-sm text-white/80">
+            <span className="inline-flex items-center gap-1"><ShieldCheck className="w-4 h-4" /> Paiement sécurisé</span>
+            <span className="inline-flex items-center gap-1"><Zap className="w-4 h-4" /> Accès immédiat</span>
+          </div>
         </div>
       </section>
 
@@ -847,54 +524,40 @@ const Index = () => {
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle>Confirmation d'abonnement</DialogTitle>
-            <DialogDescription>
-              Veuillez accepter les conditions avant de continuer
-            </DialogDescription>
+            <DialogDescription>Veuillez accepter les conditions avant de continuer</DialogDescription>
           </DialogHeader>
-          
+
           <div className="space-y-4 py-4">
             <div className="bg-primary/5 p-4 rounded-lg border border-primary/20">
-              <p className="text-sm font-semibold mb-2">Abonnement VIP AMZing FBA - Annuel</p>
-              <p className="text-2xl font-bold text-primary">700€<span className="text-sm font-normal text-muted-foreground">/an TTC</span></p>
+              <p className="text-sm font-semibold mb-2">Abonnement VIP AMZing FBA — Annuel</p>
+              <p className="text-2xl font-bold text-primary">
+                700€<span className="text-sm font-normal text-muted-foreground">/an TTC</span>
+              </p>
               <p className="text-sm text-muted-foreground">ou ~64€/mois × 12 mois</p>
               <p className="text-xs text-muted-foreground mt-2">Accès pendant 12 mois</p>
             </div>
 
             <div className="flex items-start space-x-3">
-              <Checkbox 
-                id="cgv-payment" 
+              <Checkbox
+                id="cgv-payment"
                 checked={acceptedCGV}
                 onCheckedChange={(checked) => setAcceptedCGV(checked === true)}
                 className="mt-1"
               />
               <label htmlFor="cgv-payment" className="text-sm leading-relaxed cursor-pointer select-none">
                 Je reconnais avoir lu et accepté les{" "}
-                <Link 
-                  to="/cgv" 
-                  target="_blank"
-                  className="text-primary hover:underline font-medium"
-                  onClick={(e) => e.stopPropagation()}
-                >
+                <Link to="/cgv" target="_blank" className="text-primary hover:underline font-medium" onClick={(e) => e.stopPropagation()}>
                   Conditions Générales de Vente
-                </Link>
-                {" "}et je demande l'exécution immédiate du service.
+                </Link>{" "}
+                et je demande l'exécution immédiate du service.
               </label>
             </div>
           </div>
 
           <DialogFooter>
-            <Button 
-              variant="outline" 
-              onClick={() => setShowCGVModal(false)}
-            >
-              Annuler
-            </Button>
-            <Button 
-              onClick={handleConfirmPayment}
-              disabled={!acceptedCGV || isStarting}
-              className="bg-gradient-to-r from-primary to-secondary"
-            >
-              {isStarting ? 'Traitement...' : 'Confirmer le paiement'}
+            <Button variant="outline" onClick={() => setShowCGVModal(false)}>Annuler</Button>
+            <Button onClick={handleConfirmPayment} disabled={!acceptedCGV || isStarting} className="bg-gradient-to-r from-primary to-secondary">
+              {isStarting ? "Traitement..." : "Confirmer le paiement"}
             </Button>
           </DialogFooter>
         </DialogContent>
