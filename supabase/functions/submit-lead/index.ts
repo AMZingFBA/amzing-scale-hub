@@ -6,7 +6,7 @@ const corsHeaders = {
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
-const NOTIFY_TO = "noazaghdoun55555@gmail.com";
+const NOTIFY_TO = "contact@amzingfba.com";
 const LEVELS = new Set(["Débutant", "Déjà vendeur Amazon", "E-commerçant hors Amazon", "Autre"]);
 const OBJECTIVES = new Set(["Me former", "Être accompagné", "Trouver des produits", "Structurer mon activité", "Autre"]);
 const BUDGETS = new Set(["Moins de 500 €", "500 à 1 500 €", "1 500 à 5 000 €", "Plus de 5 000 €"]);
