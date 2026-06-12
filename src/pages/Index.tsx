@@ -98,11 +98,9 @@ const Index = () => {
               </div>
             </div>
 
-            <h2 className="text-center text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.1] mb-6">
+            <h2 className="text-center text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.1] mb-6 text-foreground">
               Lancez votre business{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-primary-glow to-secondary">
-                Amazon FBA
-              </span>
+              <span className="text-primary">Amazon FBA</span>
               <br className="hidden sm:block" />
               avec une méthode éprouvée
             </h2>
@@ -115,11 +113,10 @@ const Index = () => {
             {/* CTAs */}
             <div className="flex flex-col sm:flex-row gap-3 justify-center items-center mb-6">
               <Button
-                variant="hero"
                 size="xl"
                 onClick={startFreeTrial}
                 disabled={isStarting}
-                className="w-full sm:w-auto min-w-[260px]"
+                className="w-full sm:w-auto min-w-[260px] bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg"
               >
                 {isStarting ? "Activation..." : "Démarrer maintenant"}
                 <ArrowRight className="ml-1" />
@@ -132,18 +129,17 @@ const Index = () => {
             </div>
 
             {/* Price anchor */}
-            <div className="text-center space-y-2">
+            <div className="text-center space-y-1.5">
               <p className="text-base">
                 <span className="text-muted-foreground line-through mr-2">700€</span>
                 <span className="text-2xl font-bold">500€ TTC</span>
-                <span className="ml-2 inline-flex items-center gap-1 bg-primary/15 text-primary text-xs font-bold px-2 py-1 rounded-full">
+                <span className="ml-2 inline-flex items-center gap-1 bg-primary/10 text-primary text-xs font-bold px-2 py-1 rounded-full border border-primary/20">
                   <Sparkles className="w-3 h-3" /> -29% offre lancement
                 </span>
               </p>
               <p className="text-sm text-muted-foreground">
                 ou <span className="font-semibold text-foreground">64€/mois × 12</span> · Sans frais cachés · Accès immédiat
               </p>
-              <div className="pt-2"><PromoCountdown /></div>
             </div>
 
             {/* Reassurance row */}
