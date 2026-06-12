@@ -317,6 +317,9 @@ const Index = () => {
         </div>
       </section>
 
+      {/* ============== MULTI-DEVICE MOCKUP ============== */}
+      <MultiDeviceMockup />
+
       {/* ============== DASHBOARD PREVIEW ============== */}
       <HomeDashboardPreview />
 
