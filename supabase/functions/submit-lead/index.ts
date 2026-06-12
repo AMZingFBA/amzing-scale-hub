@@ -6,7 +6,7 @@ const corsHeaders = {
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
-const NOTIFY_TO = "contact@amzingfba.com";
+const NOTIFY_TO = "amzingfba26@gmail.com";
 const LEVELS = new Set(["Débutant", "Déjà vendeur Amazon", "E-commerçant hors Amazon", "Autre"]);
 const OBJECTIVES = new Set(["Me former", "Être accompagné", "Trouver des produits", "Structurer mon activité", "Autre"]);
 const BUDGETS = new Set(["Moins de 500 €", "500 à 1 500 €", "1 500 à 5 000 €", "Plus de 5 000 €"]);
@@ -111,7 +111,7 @@ Deno.serve(async (req) => {
             Authorization: `Bearer ${RESEND_API_KEY}`,
           },
           body: JSON.stringify({
-            from: "AMZing FBA Leads <onboarding@resend.dev>",
+            from: "AMZing FBA Leads <leads@amzingfba.com>",
             to: [NOTIFY_TO],
             reply_to: lead.email,
             subject: `[Lead] ${lead.first_name} ${lead.last_name} — ${lead.objective ?? "demande"}`,
