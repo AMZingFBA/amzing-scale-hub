@@ -73,13 +73,12 @@ const Index = () => {
       <h1 className="sr-only">AMZing FBA — Plateforme + formation Amazon FBA</h1>
 
       {/* ============== HERO ============== */}
-      <section className="relative pt-28 lg:pt-32 pb-16 lg:pb-24 overflow-hidden">
+      <section className="relative pt-28 lg:pt-32 pb-16 lg:pb-24 overflow-hidden bg-gradient-to-b from-background via-background to-muted/30">
         {/* Subtle premium background */}
-        <div className="absolute inset-0 -z-10 bg-gradient-to-b from-background via-background to-muted/30" />
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] -z-10 bg-gradient-to-br from-primary/15 via-transparent to-secondary/10 rounded-full blur-3xl opacity-60" />
-        <div className="absolute inset-0 -z-10 bg-[linear-gradient(to_right,hsl(var(--border))_1px,transparent_1px),linear-gradient(to_bottom,hsl(var(--border))_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-30" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-gradient-to-br from-primary/15 via-transparent to-secondary/10 rounded-full blur-3xl opacity-60 pointer-events-none" />
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,hsl(var(--border))_1px,transparent_1px),linear-gradient(to_bottom,hsl(var(--border))_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-30 pointer-events-none" />
 
-        <div className="container mx-auto px-4">
+        <div className="container mx-auto px-4 relative">
           <div className="max-w-5xl mx-auto">
             {/* Trust badge */}
             <div className="flex justify-center mb-6">
@@ -460,12 +459,12 @@ const Index = () => {
       </section>
 
       {/* ============== FINAL CTA ============== */}
-      <section className="py-20 lg:py-28 relative overflow-hidden">
-        <div className="absolute inset-0 -z-10 bg-gradient-to-br from-primary via-primary to-secondary" />
-        <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.15),transparent_50%)]" />
+      <section className="relative overflow-hidden bg-gradient-to-br from-primary via-primary to-secondary py-20 lg:py-28">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.18),transparent_55%)] pointer-events-none" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_80%,rgba(255,255,255,0.12),transparent_50%)] pointer-events-none" />
 
-        <div className="container mx-auto px-4 text-center text-primary-foreground">
-          <Badge className="mb-6 bg-white/15 text-white border-white/20 hover:bg-white/20">
+        <div className="container mx-auto px-4 relative text-center text-white">
+          <Badge className="mb-6 bg-white/15 text-white border-white/25 hover:bg-white/20 backdrop-blur">
             <Sparkles className="w-3 h-3 mr-1" /> Offre de lancement -29%
           </Badge>
           <h2 className="text-3xl lg:text-5xl font-bold mb-5 max-w-3xl mx-auto leading-tight">
@@ -480,24 +479,25 @@ const Index = () => {
               size="xl"
               onClick={startFreeTrial}
               disabled={isStarting}
-              className="bg-background text-foreground hover:bg-background/90 min-w-[260px] shadow-2xl"
+              className="bg-white text-primary hover:bg-white/95 min-w-[260px] shadow-2xl font-semibold"
             >
               {isStarting ? "Activation..." : "Accéder à AMZing FBA"} <ArrowRight className="ml-1" />
             </Button>
-            <Button size="xl" variant="outline" asChild className="bg-transparent border-white/40 text-white hover:bg-white/10 hover:text-white min-w-[220px]">
+            <Button size="xl" variant="outline" asChild className="bg-transparent border-2 border-white/60 text-white hover:bg-white/10 hover:text-white min-w-[220px]">
               <Link to="/formation">Voir la formation</Link>
             </Button>
           </div>
 
-          <p className="mt-6 text-white/90">
+          <p className="mt-6 text-white/95">
             <span className="line-through opacity-70 mr-1">700€</span>
             <span className="font-bold text-xl">500€ TTC</span>
             <span className="mx-2 opacity-70">·</span>
-            <span>ou 64€/mois × 12</span>
+            <span>ou 64€/mois × 12 sans frais</span>
           </p>
-          <div className="mt-3 flex items-center justify-center gap-4 text-sm text-white/80">
-            <span className="inline-flex items-center gap-1"><ShieldCheck className="w-4 h-4" /> Paiement sécurisé</span>
+          <div className="mt-3 flex flex-wrap items-center justify-center gap-x-5 gap-y-1 text-sm text-white/85">
+            <span className="inline-flex items-center gap-1"><ShieldCheck className="w-4 h-4" /> Paiement sécurisé Stripe</span>
             <span className="inline-flex items-center gap-1"><Zap className="w-4 h-4" /> Accès immédiat</span>
+            <span className="inline-flex items-center gap-1"><BadgeCheck className="w-4 h-4" /> Société française</span>
           </div>
         </div>
       </section>
