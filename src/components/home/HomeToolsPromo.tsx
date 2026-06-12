@@ -180,8 +180,8 @@ export default function HomeToolsPromo() {
         {/* Bottom trust line */}
         <div className="text-center mt-10">
           <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-muted/80 border border-border/50 text-sm text-muted-foreground">
-            <Sparkles className="w-4 h-4 text-primary" />
-            <span>Inclus dans l'abonnement AMZing — <strong className="text-foreground">acces illimite</strong></span>
+            <Brain className="w-4 h-4 text-primary" />
+            <span>Outils IA inclus dans l'abonnement AMZing — <strong className="text-foreground">accès illimité</strong></span>
           </div>
         </div>
       </div>
