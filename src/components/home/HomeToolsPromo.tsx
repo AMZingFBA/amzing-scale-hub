@@ -15,17 +15,17 @@ export default function HomeToolsPromo() {
         {/* Header */}
         <div className="text-center mb-14">
           <Badge className="mb-4 bg-gradient-to-r from-primary/15 to-secondary/15 text-primary border-primary/25 text-sm px-4 py-1.5">
-            <Zap className="w-3.5 h-3.5 mr-1.5" />
-            Outils Pro — Inclus dans ton abonnement
+            <Brain className="w-3.5 h-3.5 mr-1.5" />
+            Outils IA — Inclus dans ton abonnement
           </Badge>
           <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-4">
-            Analyse tes produits{' '}
+            Une IA qui analyse tes produits{' '}
             <span className="bg-gradient-to-r from-primary via-orange-500 to-secondary bg-clip-text text-transparent">
-              comme un pro
+              à ta place
             </span>
           </h2>
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
-            Deux outils puissants pour scanner, analyser et valider tes opportunités Amazon en quelques secondes.
+            Deux outils boostés à l'intelligence artificielle pour scanner, scorer et valider tes opportunités Amazon en quelques secondes.
           </p>
         </div>
 
