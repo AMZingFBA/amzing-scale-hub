@@ -383,7 +383,7 @@ const Index = () => {
                 <div className="mt-4 flex items-center gap-2 text-xs text-muted-foreground">
                   <ShieldCheck className="w-4 h-4" /> Paiement sécurisé Stripe · Accès immédiat
                 </div>
-                <div className="mt-4"><PromoCountdown /></div>
+                
               </div>
             </CardContent>
           </Card>
