@@ -21,7 +21,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Checkbox } from "@/components/ui/checkbox";
 import { useRegistrationSource } from "@/hooks/use-registration-source";
 import HomeDashboardPreview from "@/components/home/HomeDashboardPreview";
-import PromoCountdown from "@/components/PromoCountdown";
+
 
 const Index = () => {
   const {
@@ -98,11 +98,9 @@ const Index = () => {
               </div>
             </div>
 
-            <h2 className="text-center text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.1] mb-6">
+            <h2 className="text-center text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.1] mb-6 text-foreground">
               Lancez votre business{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-primary-glow to-secondary">
-                Amazon FBA
-              </span>
+              <span className="text-primary">Amazon FBA</span>
               <br className="hidden sm:block" />
               avec une méthode éprouvée
             </h2>
@@ -115,11 +113,10 @@ const Index = () => {
             {/* CTAs */}
             <div className="flex flex-col sm:flex-row gap-3 justify-center items-center mb-6">
               <Button
-                variant="hero"
                 size="xl"
                 onClick={startFreeTrial}
                 disabled={isStarting}
-                className="w-full sm:w-auto min-w-[260px]"
+                className="w-full sm:w-auto min-w-[260px] bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg"
               >
                 {isStarting ? "Activation..." : "Démarrer maintenant"}
                 <ArrowRight className="ml-1" />
@@ -132,18 +129,17 @@ const Index = () => {
             </div>
 
             {/* Price anchor */}
-            <div className="text-center space-y-2">
+            <div className="text-center space-y-1.5">
               <p className="text-base">
                 <span className="text-muted-foreground line-through mr-2">700€</span>
                 <span className="text-2xl font-bold">500€ TTC</span>
-                <span className="ml-2 inline-flex items-center gap-1 bg-primary/15 text-primary text-xs font-bold px-2 py-1 rounded-full">
+                <span className="ml-2 inline-flex items-center gap-1 bg-primary/10 text-primary text-xs font-bold px-2 py-1 rounded-full border border-primary/20">
                   <Sparkles className="w-3 h-3" /> -29% offre lancement
                 </span>
               </p>
               <p className="text-sm text-muted-foreground">
                 ou <span className="font-semibold text-foreground">64€/mois × 12</span> · Sans frais cachés · Accès immédiat
               </p>
-              <div className="pt-2"><PromoCountdown /></div>
             </div>
 
             {/* Reassurance row */}
@@ -288,18 +284,7 @@ const Index = () => {
       </section>
 
       {/* ============== DASHBOARD PREVIEW ============== */}
-      <section className="py-20 lg:py-28">
-        <div className="container mx-auto px-4">
-          <div className="max-w-3xl mx-auto text-center mb-12">
-            <Badge variant="outline" className="mb-4">Aperçu de la plateforme</Badge>
-            <h2 className="text-3xl lg:text-4xl font-bold mb-4">Votre tableau de bord, pensé pour l'action</h2>
-            <p className="text-lg text-muted-foreground">
-              Toutes vos opportunités, notifications, fournisseurs et formations à portée de clic.
-            </p>
-          </div>
-          <HomeDashboardPreview />
-        </div>
-      </section>
+      <HomeDashboardPreview />
 
       {/* ============== HOW IT WORKS ============== */}
       <section className="py-20 lg:py-28 bg-muted/30 border-y border-border">
@@ -398,7 +383,7 @@ const Index = () => {
                 <div className="mt-4 flex items-center gap-2 text-xs text-muted-foreground">
                   <ShieldCheck className="w-4 h-4" /> Paiement sécurisé Stripe · Accès immédiat
                 </div>
-                <div className="mt-4"><PromoCountdown /></div>
+                
               </div>
             </CardContent>
           </Card>
