@@ -321,6 +321,9 @@ const Index = () => {
       {/* ============== MULTI-DEVICE MOCKUP ============== */}
       <MultiDeviceMockup />
 
+      {/* ============== AI SOURCING + AMZing AMP ============== */}
+      <AISourcingSpotlight />
+
       {/* ============== DASHBOARD PREVIEW ============== */}
       <HomeDashboardPreview />
 
