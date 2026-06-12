@@ -284,18 +284,7 @@ const Index = () => {
       </section>
 
       {/* ============== DASHBOARD PREVIEW ============== */}
-      <section className="py-20 lg:py-28">
-        <div className="container mx-auto px-4">
-          <div className="max-w-3xl mx-auto text-center mb-12">
-            <Badge variant="outline" className="mb-4">Aperçu de la plateforme</Badge>
-            <h2 className="text-3xl lg:text-4xl font-bold mb-4">Votre tableau de bord, pensé pour l'action</h2>
-            <p className="text-lg text-muted-foreground">
-              Toutes vos opportunités, notifications, fournisseurs et formations à portée de clic.
-            </p>
-          </div>
-          <HomeDashboardPreview />
-        </div>
-      </section>
+      <HomeDashboardPreview />
 
       {/* ============== HOW IT WORKS ============== */}
       <section className="py-20 lg:py-28 bg-muted/30 border-y border-border">
