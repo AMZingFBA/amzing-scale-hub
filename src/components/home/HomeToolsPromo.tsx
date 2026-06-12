@@ -43,27 +43,32 @@ export default function HomeToolsPromo() {
                 {/* Icon + Title */}
                 <div className="flex items-center gap-4 mb-6">
                   <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-orange-500 flex items-center justify-center shadow-lg shadow-primary/30 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
-                    <Search className="w-7 h-7 text-white" />
+                    <Brain className="w-7 h-7 text-white" />
                   </div>
                   <div>
-                    <h3 className="text-2xl font-extrabold">AMZing AMP</h3>
-                    <p className="text-sm text-muted-foreground">Analyse Multi-Pays</p>
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-2xl font-extrabold">AMZing AMP</h3>
+                      <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-primary/40 text-primary font-bold">
+                        <Sparkles className="w-2.5 h-2.5 mr-0.5" />IA
+                      </Badge>
+                    </div>
+                    <p className="text-sm text-muted-foreground">Analyse IA Multi-Pays</p>
                   </div>
                 </div>
 
                 {/* Description */}
                 <p className="text-muted-foreground mb-6 leading-relaxed">
-                  Entre un EAN ou ASIN et obtiens instantanement une fiche produit complete avec les donnees de <strong className="text-foreground">5 marketplaces Amazon</strong> (FR, UK, DE, ES, IT).
+                  Entre un EAN ou ASIN — notre <strong className="text-foreground">IA propriétaire</strong> calcule la rentabilité, score le produit et compare <strong className="text-foreground">5 marketplaces Amazon</strong> (FR, UK, DE, ES, IT) en moins de 3 secondes.
                 </p>
 
                 {/* Features */}
                 <div className="space-y-3 mb-8">
                   {[
-                    'Prix Buy Box, FBA & FBM en temps reel',
-                    'ROI et profit calcules automatiquement',
+                    'Score de rentabilité IA (0 → 100)',
+                    'Prix Buy Box, FBA & FBM en temps réel',
+                    'ROI et profit calculés automatiquement',
                     'Graphiques Keepa 30/90/180/365 jours',
-                    'Liens Seller Central integres',
-                    'Analyse sur 5 pays europeens',
+                    'Analyse IA sur 5 pays européens',
                   ].map((feat) => (
                     <div key={feat} className="flex items-center gap-3 group/item">
                       <CheckCircle2 className="w-5 h-5 text-primary shrink-0 group-hover/item:scale-110 transition-transform" />
@@ -75,9 +80,9 @@ export default function HomeToolsPromo() {
                 {/* Stats */}
                 <div className="grid grid-cols-3 gap-3 mb-8">
                   {[
+                    { icon: Brain, value: 'IA', label: 'Scoring' },
                     { icon: Globe, value: '5', label: 'Pays' },
                     { icon: BarChart3, value: 'Keepa', label: 'Graphiques' },
-                    { icon: TrendingUp, value: 'ROI', label: 'Auto' },
                   ].map(({ icon: Icon, value, label }) => (
                     <div key={label} className="text-center p-3 rounded-xl bg-primary/5 border border-primary/10">
                       <Icon className="w-5 h-5 text-primary mx-auto mb-1" />
