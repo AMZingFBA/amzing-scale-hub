@@ -22,6 +22,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useRegistrationSource } from "@/hooks/use-registration-source";
 import HomeDashboardPreview from "@/components/home/HomeDashboardPreview";
 import MultiDeviceMockup from "@/components/home/MultiDeviceMockup";
+import AISourcingSpotlight from "@/components/home/AISourcingSpotlight";
 
 
 const Index = () => {
