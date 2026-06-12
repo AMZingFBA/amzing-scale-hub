@@ -73,11 +73,10 @@ const Index = () => {
       <h1 className="sr-only">AMZing FBA — Plateforme + formation Amazon FBA</h1>
 
       {/* ============== HERO ============== */}
-      <section className="relative pt-28 lg:pt-32 pb-16 lg:pb-24 overflow-hidden">
+      <section className="relative pt-28 lg:pt-32 pb-16 lg:pb-24 overflow-hidden bg-gradient-to-b from-background via-background to-muted/30">
         {/* Subtle premium background */}
-        <div className="absolute inset-0 -z-10 bg-gradient-to-b from-background via-background to-muted/30" />
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] -z-10 bg-gradient-to-br from-primary/15 via-transparent to-secondary/10 rounded-full blur-3xl opacity-60" />
-        <div className="absolute inset-0 -z-10 bg-[linear-gradient(to_right,hsl(var(--border))_1px,transparent_1px),linear-gradient(to_bottom,hsl(var(--border))_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-30" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-gradient-to-br from-primary/15 via-transparent to-secondary/10 rounded-full blur-3xl opacity-60 pointer-events-none" />
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,hsl(var(--border))_1px,transparent_1px),linear-gradient(to_bottom,hsl(var(--border))_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-30 pointer-events-none" />
 
         <div className="container mx-auto px-4">
           <div className="max-w-5xl mx-auto">
