@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Search, FileSpreadsheet, ArrowRight, Zap, BarChart3, Globe, TrendingUp, CheckCircle2, Sparkles } from 'lucide-react';
+import { Search, FileSpreadsheet, ArrowRight, Zap, BarChart3, Globe, TrendingUp, CheckCircle2, Sparkles, Brain, Bot } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 
