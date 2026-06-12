@@ -95,8 +95,8 @@ export default function HomeToolsPromo() {
                 {/* CTA */}
                 <Link to="/amzing-amp">
                   <Button className="w-full group/btn gap-2 font-bold shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all h-12 text-base">
-                    <Search className="w-5 h-5" />
-                    Essayer AMZing AMP
+                    <Brain className="w-5 h-5" />
+                    Lancer l'analyse IA
                     <ArrowRight className="w-5 h-5 transition-transform group-hover/btn:translate-x-1" />
                   </Button>
                 </Link>
