@@ -72,96 +72,122 @@ const Index = () => {
 
       <h1 className="sr-only">AMZing FBA — Plateforme + formation Amazon FBA</h1>
 
-      {/* ============== HERO ============== */}
-      <section className="relative pt-28 lg:pt-32 pb-16 lg:pb-24 overflow-hidden bg-gradient-to-b from-background via-background to-muted/30">
-        {/* Subtle premium background */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-gradient-to-br from-primary/15 via-transparent to-secondary/10 rounded-full blur-3xl opacity-60 pointer-events-none" />
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,hsl(var(--border))_1px,transparent_1px),linear-gradient(to_bottom,hsl(var(--border))_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-30 pointer-events-none" />
+      {/* ============== HERO — dark editorial premium ============== */}
+      <section className="relative pt-28 lg:pt-36 pb-20 lg:pb-28 overflow-hidden bg-[#0B0F1A] text-white">
+        {/* Layered premium background */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_-10%,rgba(255,153,0,0.18),transparent_60%)] pointer-events-none" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_50%_40%_at_85%_30%,rgba(255,122,24,0.10),transparent_60%)] pointer-events-none" />
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.04)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.04)_1px,transparent_1px)] bg-[size:48px_48px] [mask-image:radial-gradient(ellipse_70%_60%_at_50%_30%,#000_50%,transparent_100%)] pointer-events-none" />
+        <div className="absolute bottom-0 inset-x-0 h-32 bg-gradient-to-b from-transparent to-[#0B0F1A] pointer-events-none" />
 
         <div className="container mx-auto px-4 relative">
           <div className="max-w-5xl mx-auto">
-            {/* Trust badge */}
-            <div className="flex justify-center mb-6">
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-border bg-background/60 backdrop-blur text-sm">
-                <span className="flex -space-x-1.5">
-                  {[0, 1, 2, 3].map((i) => (
-                    <span key={i} className="w-5 h-5 rounded-full bg-gradient-to-br from-primary to-secondary border-2 border-background" />
-                  ))}
-                </span>
-                <span className="font-medium">500+ vendeurs accompagnés</span>
-                <span className="text-muted-foreground">·</span>
-                <span className="flex items-center gap-0.5 text-amber-500">
-                  {[...Array(5)].map((_, i) => <Star key={i} className="w-3.5 h-3.5 fill-current" />)}
-                </span>
-                <span className="font-medium">4,9/5</span>
+            {/* Eyebrow */}
+            <div className="flex justify-center mb-8">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/15 bg-white/[0.04] backdrop-blur text-xs uppercase tracking-[0.18em] text-white/70">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#FF9900] animate-pulse" />
+                Plateforme Amazon FBA · Édition 2026
               </div>
             </div>
 
-            <h2 className="text-center text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.1] mb-6 text-foreground">
-              Lancez votre business{" "}
-              <span className="text-primary">Amazon FBA</span>
+            {/* Headline — editorial serif + sans hybrid */}
+            <h2 className="text-center font-bold tracking-tight leading-[0.98] mb-7 text-white text-[44px] sm:text-6xl lg:text-[80px]">
+              Construisez un business
               <br className="hidden sm:block" />
-              avec une méthode éprouvée
+              Amazon FBA{" "}
+              <span className="italic font-normal text-[#FFB347]" style={{ fontFamily: "'Instrument Serif', serif" }}>
+                rentable
+              </span>
+              .
             </h2>
 
-            <p className="text-center text-lg lg:text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
-              Formation complète, outils de sourcing, fournisseurs vérifiés et accompagnement par un vendeur actif.
-              Tout pour générer vos premiers revenus en quelques semaines.
+            <p className="text-center text-base sm:text-lg lg:text-xl text-white/65 max-w-2xl mx-auto mb-10 leading-relaxed">
+              Une méthode, des outils de sourcing et un accompagnement par un vendeur en activité.
+              Tout réuni dans une seule plateforme française.
             </p>
 
             {/* CTAs */}
-            <div className="flex flex-col sm:flex-row gap-3 justify-center items-center mb-6">
+            <div className="flex flex-col sm:flex-row gap-3 justify-center items-center mb-8">
               <Button
                 size="xl"
                 onClick={startFreeTrial}
                 disabled={isStarting}
-                className="w-full sm:w-auto min-w-[260px] bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg"
+                className="w-full sm:w-auto min-w-[260px] bg-[#FF9900] text-[#0B0F1A] hover:bg-[#FFB347] font-semibold shadow-[0_10px_40px_-10px_rgba(255,153,0,0.6)]"
               >
-                {isStarting ? "Activation..." : "Démarrer maintenant"}
+                {isStarting ? "Activation..." : "Accéder à la plateforme"}
                 <ArrowRight className="ml-1" />
               </Button>
-              <Button variant="outline" size="xl" asChild className="w-full sm:w-auto min-w-[220px]">
+              <Button
+                variant="outline"
+                size="xl"
+                asChild
+                className="w-full sm:w-auto min-w-[220px] bg-white/[0.03] border-white/20 text-white hover:bg-white/10 hover:text-white backdrop-blur"
+              >
                 <Link to="/formation">
                   <PlayCircle className="mr-1" /> Voir la formation
                 </Link>
               </Button>
             </div>
 
-            {/* Price anchor */}
-            <div className="text-center space-y-1.5">
-              <p className="text-base">
-                <span className="text-muted-foreground line-through mr-2">700€</span>
-                <span className="text-2xl font-bold">500€ TTC</span>
-                <span className="ml-2 inline-flex items-center gap-1 bg-primary/10 text-primary text-xs font-bold px-2 py-1 rounded-full border border-primary/20">
-                  <Sparkles className="w-3 h-3" /> -29% offre lancement
-                </span>
-              </p>
-              <p className="text-sm text-muted-foreground">
-                ou <span className="font-semibold text-foreground">64€/mois × 12</span> · Sans frais cachés · Accès immédiat
-              </p>
+            {/* Price line — minimal, anchored */}
+            <div className="text-center mb-12">
+              <div className="inline-flex items-baseline gap-2 text-white/80">
+                <span className="line-through text-white/40 text-sm">700€</span>
+                <span className="text-xl font-semibold text-white">500€ TTC</span>
+                <span className="text-white/50 text-sm">· 64€ /mois × 12 sans frais</span>
+              </div>
             </div>
 
-            {/* Reassurance row */}
-            <div className="mt-10 grid grid-cols-2 md:grid-cols-4 gap-3 max-w-3xl mx-auto">
-              {[
-                { icon: ShieldCheck, label: "Paiement sécurisé Stripe" },
-                { icon: Lock, label: "Société française" },
-                { icon: Zap, label: "Accès immédiat" },
-                { icon: BadgeCheck, label: "Support 7j/7" },
-              ].map(({ icon: Icon, label }) => (
-                <div key={label} className="flex items-center gap-2 px-3 py-2 rounded-lg bg-background/60 border border-border/60 text-sm text-muted-foreground">
-                  <Icon className="w-4 h-4 text-primary flex-shrink-0" />
-                  <span className="truncate">{label}</span>
-                </div>
-              ))}
+            {/* Social proof bar */}
+            <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-4 pt-8 border-t border-white/10">
+              <div className="flex items-center gap-3">
+                <span className="flex -space-x-2">
+                  {["A","M","Z","N"].map((c, i) => (
+                    <span key={i} className="w-7 h-7 rounded-full bg-gradient-to-br from-[#FF9900] to-[#FF5E00] border-2 border-[#0B0F1A] text-[10px] font-bold flex items-center justify-center text-white">
+                      {c}
+                    </span>
+                  ))}
+                </span>
+                <span className="text-sm text-white/70"><span className="text-white font-semibold">500+</span> vendeurs accompagnés</span>
+              </div>
+              <div className="flex items-center gap-2 text-sm">
+                <span className="flex items-center gap-0.5 text-[#FFB347]">
+                  {[...Array(5)].map((_, i) => <Star key={i} className="w-4 h-4 fill-current" />)}
+                </span>
+                <span className="text-white/70"><span className="text-white font-semibold">4,9/5</span> · avis vérifiés</span>
+              </div>
+              <div className="hidden md:flex items-center gap-2 text-sm text-white/70">
+                <ShieldCheck className="w-4 h-4 text-[#FFB347]" />
+                <span><span className="text-white font-semibold">N.Z Consulting</span> · société française</span>
+              </div>
+              <div className="hidden lg:flex items-center gap-2 text-sm text-white/70">
+                <Lock className="w-4 h-4 text-[#FFB347]" />
+                <span>Paiement Stripe sécurisé</span>
+              </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ============== COMPATIBLE / TRUSTED WITH ============== */}
+      <section className="bg-[#0B0F1A] border-t border-white/5 pb-14">
+        <div className="container mx-auto px-4">
+          <p className="text-center text-xs uppercase tracking-[0.2em] text-white/40 mb-6">
+            Conçu pour les vendeurs actifs sur
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-x-10 gap-y-4 text-white/60">
+            {["Amazon Seller", "Stripe", "Discord", "App Store", "Google Play", "Keepa"].map((name) => (
+              <span key={name} className="text-sm font-semibold tracking-wide hover:text-white transition-colors">
+                {name}
+              </span>
+            ))}
           </div>
         </div>
       </section>
 
       {/* ============== STATS BAR ============== */}
       <section className="border-y border-border bg-muted/30">
-        <div className="container mx-auto px-4 py-10">
+        <div className="container mx-auto px-4 py-12">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-5xl mx-auto">
             {[
               { value: "500+", label: "Vendeurs accompagnés" },
@@ -170,10 +196,10 @@ const Index = () => {
               { value: "92%", label: "Taux de renouvellement" },
             ].map((s) => (
               <div key={s.label} className="text-center">
-                <div className="text-3xl lg:text-4xl font-bold bg-gradient-to-br from-primary to-secondary bg-clip-text text-transparent">
+                <div className="text-4xl lg:text-5xl font-bold text-foreground tracking-tight">
                   {s.value}
                 </div>
-                <div className="text-sm text-muted-foreground mt-1">{s.label}</div>
+                <div className="text-sm text-muted-foreground mt-2 uppercase tracking-wider">{s.label}</div>
               </div>
             ))}
           </div>
