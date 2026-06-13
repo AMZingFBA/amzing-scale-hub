@@ -26,6 +26,7 @@ import { DirectChatRoom } from '@/components/chat/DirectChatRoom';
 import { GroupDialog } from '@/components/chat/GroupDialog';
 import { useAdmin } from '@/hooks/use-admin';
 import Navbar from '@/components/Navbar';
+import NoIndex from '@/components/NoIndex';
 
 interface Room {
   id: string;

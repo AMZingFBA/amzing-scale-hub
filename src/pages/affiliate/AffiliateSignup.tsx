@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { ArrowLeft } from "lucide-react";
+import NoIndex from "@/components/NoIndex";
 
 const AffiliateSignup = () => {
   const navigate = useNavigate();

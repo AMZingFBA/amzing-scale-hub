@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { ArrowLeft } from "lucide-react";
+import NoIndex from "@/components/NoIndex";
 
 const AffiliateLogin = () => {
   const navigate = useNavigate();
