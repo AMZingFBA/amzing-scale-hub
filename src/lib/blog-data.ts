@@ -18,6 +18,12 @@ import { seoFinalArticles as seoFinalKeywordsArticles } from './blog-articles-se
 import { seoAmzingKeywordsArticles } from './blog-articles-seo-amzing-keywords';
 import { seoSellerCentralArticles } from './blog-articles-seo-seller-central';
 import { seoFbaDefinitionArticles } from './blog-articles-seo-fba-definition';
+import { clusterFormationArticles } from './blog-articles-cluster-formation';
+import { clusterAmazonFbaArticles } from './blog-articles-cluster-amazon-fba';
+import { clusterAmazonFbmArticles } from './blog-articles-cluster-amazon-fbm';
+import { clusterSourcingAmazonArticles } from './blog-articles-cluster-sourcing-amazon';
+import { clusterProduitGagnantArticles } from './blog-articles-cluster-produit-gagnant';
+import { clusterIaAmazonArticles } from './blog-articles-cluster-ia-amazon';
 export interface BlogFAQ {
   question: string;
   answer: string;
