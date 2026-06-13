@@ -1,11 +1,32 @@
 User-agent: *
 Allow: /
+
+# Zones privées / utilitaires (à NE PAS indexer)
 Disallow: /admin/
 Disallow: /dashboard
 Disallow: /profile
 Disallow: /auth
 Disallow: /reset-password
+Disallow: /forgot-password
 Disallow: /ticket/
+Disallow: /support
+Disallow: /chat
+Disallow: /suppression-compte
+Disallow: /facture-autorisation
+Disallow: /gestion-produits-info
+Disallow: /affiliate/signup
+Disallow: /affiliate/login
+Disallow: /affiliate/verify
+Disallow: /affiliate/dashboard
+Disallow: /affiliate/admin
+Disallow: /acheter
+Disallow: /marketplace
+
+# Évite les variantes paramétrées (catégories blog, UTM, etc.)
+Disallow: /*?categorie=
+Disallow: /*?utm_
+Disallow: /*?from=
+Disallow: /*&utm_
 
 # Sitemap
 Sitemap: https://amzingfba.com/sitemap.xml

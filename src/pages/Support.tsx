@@ -6,6 +6,7 @@ import { useMarkAsRead } from '@/hooks/use-mark-as-read';
 import { supabase } from '@/integrations/supabase/client';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import NoIndex from '@/components/NoIndex';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -230,6 +231,7 @@ const Support = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
+      <NoIndex />
       <Navbar />
       <main className="flex-grow pt-24 md:pt-20">
         <div className="container mx-auto px-4 py-8 max-w-4xl">

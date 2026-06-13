@@ -1,8 +1,10 @@
 import { Mail, Clock, Trash2, Database } from "lucide-react";
+import NoIndex from "@/components/NoIndex";
 
 const SuppressionCompte = () => {
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      <NoIndex />
       <div className="max-w-2xl w-full bg-card border border-border rounded-lg shadow-lg p-8">
         <h1 className="text-3xl font-bold text-foreground mb-6">
           Suppression de Compte – AMZing FBA

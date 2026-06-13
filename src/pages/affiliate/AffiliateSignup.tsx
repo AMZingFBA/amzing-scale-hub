@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { ArrowLeft } from "lucide-react";
+import NoIndex from "@/components/NoIndex";
 
 const AffiliateSignup = () => {
   const navigate = useNavigate();
@@ -91,6 +92,7 @@ const AffiliateSignup = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-secondary/20 py-12">
+      <NoIndex />
       <div className="container mx-auto px-4 max-w-2xl">
         <Button
           variant="ghost"

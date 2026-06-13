@@ -339,20 +339,6 @@
   
   <!-- Pages marketplace -->
   <url>
-    <loc>https://amzingfba.com/marketplace</loc>
-    <lastmod>2026-01-04</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-  </url>
-  
-  <url>
-    <loc>https://amzingfba.com/acheter</loc>
-    <lastmod>2026-01-04</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  
-  <url>
     <loc>https://amzingfba.com/vendre</loc>
     <lastmod>2026-01-04</lastmod>
     <changefreq>daily</changefreq>
@@ -417,36 +403,6 @@
     <priority>0.3</priority>
   </url>
   
-  <url>
-    <loc>https://amzingfba.com/suppression-compte</loc>
-    <lastmod>2026-01-04</lastmod>
-    <changefreq>yearly</changefreq>
-    <priority>0.3</priority>
-  </url>
-  
-  <!-- Pages affiliation -->
-  <url>
-    <loc>https://amzingfba.com/affiliate</loc>
-    <lastmod>2026-01-04</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <url>
-    <loc>https://amzingfba.com/affiliate/signup</loc>
-    <lastmod>2026-01-04</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <url>
-    <loc>https://amzingfba.com/affiliate/login</loc>
-    <lastmod>2026-01-04</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.4</priority>
-  </url>
-  
-  <!-- Nouveaux articles SEO mots-clés stratégiques -->
   <url>
     <loc>https://amzingfba.com/blog/formation-amazon-fba-guide-complet</loc>
     <lastmod>2026-01-05</lastmod>
@@ -1359,7 +1315,6 @@
   <url><loc>https://amzingfba.com/accompagnement-amazon-fba/bagnolet</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
   <url><loc>https://amzingfba.com/accompagnement-amazon-fba/bron</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
   <url><loc>https://amzingfba.com/accompagnement-amazon-fba/chalons-en-champagne</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
-  <url><loc>https://amzingfba.com/accompagnement-amazon-fba/chateauroux</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
   <url><loc>https://amzingfba.com/accompagnement-amazon-fba/arras</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
   <url><loc>https://amzingfba.com/accompagnement-amazon-fba/thionville</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
   <url><loc>https://amzingfba.com/accompagnement-amazon-fba/villenave-d-ornon</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
@@ -1404,7 +1359,6 @@
   <url><loc>https://amzingfba.com/accompagnement-amazon-fba/sainte-marie</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
   <url><loc>https://amzingfba.com/accompagnement-amazon-fba/conflans-sainte-honorine</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
   <url><loc>https://amzingfba.com/accompagnement-amazon-fba/vitrolles</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
-  <url><loc>https://amzingfba.com/accompagnement-amazon-fba/chatillon</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
   <url><loc>https://amzingfba.com/accompagnement-amazon-fba/meyzieu</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
   <url><loc>https://amzingfba.com/accompagnement-amazon-fba/athis-mons</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
   <url><loc>https://amzingfba.com/accompagnement-amazon-fba/la-possession</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
@@ -1415,7 +1369,6 @@
   <url><loc>https://amzingfba.com/accompagnement-amazon-fba/villeneuve-saint-georges</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
   <url><loc>https://amzingfba.com/accompagnement-amazon-fba/villefranche-sur-saone</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
   <url><loc>https://amzingfba.com/accompagnement-amazon-fba/saint-leu</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
-  <url><loc>https://amzingfba.com/accompagnement-amazon-fba/chatenay-malabry</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
   <url><loc>https://amzingfba.com/accompagnement-amazon-fba/saint-chamond</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
   <url><loc>https://amzingfba.com/accompagnement-amazon-fba/sainte-genevieve-des-bois</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
   <url><loc>https://amzingfba.com/accompagnement-amazon-fba/roanne</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
@@ -1460,12 +1413,10 @@
   <url><loc>https://amzingfba.com/accompagnement-amazon-fba/savigny-le-temple</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
   <url><loc>https://amzingfba.com/accompagnement-amazon-fba/cambrai</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
   <url><loc>https://amzingfba.com/accompagnement-amazon-fba/cachan</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
-  <url><loc>https://amzingfba.com/accompagnement-amazon-fba/chatellerault</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
   <url><loc>https://amzingfba.com/accompagnement-amazon-fba/baie-mahault</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
   <url><loc>https://amzingfba.com/accompagnement-amazon-fba/viry-chatillon</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
   <url><loc>https://amzingfba.com/accompagnement-amazon-fba/le-chesnay-rocquencourt</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
   <url><loc>https://amzingfba.com/accompagnement-amazon-fba/menton</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
-  <url><loc>https://amzingfba.com/accompagnement-amazon-fba/chatou</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
   <url><loc>https://amzingfba.com/accompagnement-amazon-fba/malakoff</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
   <url><loc>https://amzingfba.com/accompagnement-amazon-fba/la-garenne-colombes</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
   <url><loc>https://amzingfba.com/accompagnement-amazon-fba/tournefeuille</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
@@ -1717,7 +1668,6 @@
   <url><loc>https://amzingfba.com/accompagnement-amazon-fba/cognac</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
   <url><loc>https://amzingfba.com/accompagnement-amazon-fba/moissy-cramayel</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
   <url><loc>https://amzingfba.com/accompagnement-amazon-fba/bry-sur-marne</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
-  <url><loc>https://amzingfba.com/accompagnement-amazon-fba/chateauneuf-les-martigues</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
   <url><loc>https://amzingfba.com/accompagnement-amazon-fba/eragny-sur-oise</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
   <url><loc>https://amzingfba.com/accompagnement-amazon-fba/le-pontet</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
   <url><loc>https://amzingfba.com/accompagnement-amazon-fba/romorantin-lanthenay</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
@@ -1780,8 +1730,6 @@
   <url><loc>https://amzingfba.com/accompagnement-amazon-fba/cestas</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
   <url><loc>https://amzingfba.com/accompagnement-amazon-fba/lons-le-saunier</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
   <url><loc>https://amzingfba.com/accompagnement-amazon-fba/bois-d-arcy</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
-  <url><loc>https://amzingfba.com/accompagnement-amazon-fba/chateau-gontier-sur-mayenne</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
-  <url><loc>https://amzingfba.com/accompagnement-amazon-fba/chateaurenard</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
   <url><loc>https://amzingfba.com/accompagnement-amazon-fba/mauguio</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
   <url><loc>https://amzingfba.com/accompagnement-amazon-fba/les-herbiers</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
   <url><loc>https://amzingfba.com/accompagnement-amazon-fba/orsay</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
@@ -1843,7 +1791,6 @@
   <url><loc>https://amzingfba.com/accompagnement-amazon-fba/senlis</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
   <url><loc>https://amzingfba.com/accompagnement-amazon-fba/issoire</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
   <url><loc>https://amzingfba.com/accompagnement-amazon-fba/montmagny</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
-  <url><loc>https://amzingfba.com/accompagnement-amazon-fba/chateau-thierry</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
   <url><loc>https://amzingfba.com/accompagnement-amazon-fba/vesoul</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
   <url><loc>https://amzingfba.com/accompagnement-amazon-fba/haubourdin</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
   <url><loc>https://amzingfba.com/accompagnement-amazon-fba/lognes</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
@@ -1971,7 +1918,6 @@
   <url><loc>https://amzingfba.com/accompagnement-amazon-fba/yzeure</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
   <url><loc>https://amzingfba.com/accompagnement-amazon-fba/nemours</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
   <url><loc>https://amzingfba.com/accompagnement-amazon-fba/mayenne</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
-  <url><loc>https://amzingfba.com/accompagnement-amazon-fba/chateaudun</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
   <url><loc>https://amzingfba.com/accompagnement-amazon-fba/moret-loing-et-orvanne</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
   <url><loc>https://amzingfba.com/accompagnement-amazon-fba/saint-andre-les-vergers</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
   <url><loc>https://amzingfba.com/accompagnement-amazon-fba/pornichet</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
@@ -2009,7 +1955,6 @@
   <url><loc>https://amzingfba.com/accompagnement-amazon-fba/le-chambon-feugerolles</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
   <url><loc>https://amzingfba.com/accompagnement-amazon-fba/vernouillet</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
   <url><loc>https://amzingfba.com/accompagnement-amazon-fba/cogolin</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
-  <url><loc>https://amzingfba.com/accompagnement-amazon-fba/chateaubriant</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
   <url><loc>https://amzingfba.com/accompagnement-amazon-fba/creutzwald</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
   <url><loc>https://amzingfba.com/accompagnement-amazon-fba/harnes</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
   <url><loc>https://amzingfba.com/accompagnement-amazon-fba/bischwiller</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
@@ -2139,7 +2084,6 @@
   <url><loc>https://amzingfba.com/accompagnement-amazon-fba/chanteloup-les-vignes</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
   <url><loc>https://amzingfba.com/accompagnement-amazon-fba/passy</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
   <url><loc>https://amzingfba.com/accompagnement-amazon-fba/annullin</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
-  <url><loc>https://amzingfba.com/accompagnement-amazon-fba/chateaugiron</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
   <url><loc>https://amzingfba.com/accompagnement-amazon-fba/teva-i-uta</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
   <url><loc>https://amzingfba.com/accompagnement-amazon-fba/igny</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
   <url><loc>https://amzingfba.com/accompagnement-amazon-fba/deville-les-rouen</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>

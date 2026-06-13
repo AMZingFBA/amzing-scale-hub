@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { ArrowLeft } from "lucide-react";
+import NoIndex from "@/components/NoIndex";
 
 const AffiliateLogin = () => {
   const navigate = useNavigate();
@@ -54,6 +55,7 @@ const AffiliateLogin = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-secondary/20 py-12 flex items-center">
+      <NoIndex />
       <div className="container mx-auto px-4 max-w-md">
         <Button
           variant="ghost"
