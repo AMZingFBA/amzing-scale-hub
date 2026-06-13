@@ -17,6 +17,7 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { supabase } from "@/integrations/supabase/client";
 import { Checkbox } from "@/components/ui/checkbox";
 import { getRegistrationSource, useRegistrationSource, clearRegistrationSource } from "@/hooks/use-registration-source";
+import NoIndex from "@/components/NoIndex";
 
 export default function Auth() {
   const navigate = useNavigate();
@@ -343,6 +344,7 @@ export default function Auth() {
 
   return (
     <ErrorBoundary>
+      <NoIndex />
       <div className="min-h-screen w-full flex bg-gradient-to-br from-[#FFF7E6] via-background to-background">
       {/* Left Side - Form */}
       <div className={`w-full lg:w-1/2 flex items-center justify-center p-8 relative overflow-hidden ${isNativeApp ? 'pt-16 bg-gradient-to-br from-[#FFF7E6] via-background to-primary/5' : ''}`}>
