@@ -55,6 +55,7 @@ const AffiliateLogin = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-secondary/20 py-12 flex items-center">
+      <NoIndex />
       <div className="container mx-auto px-4 max-w-md">
         <Button
           variant="ghost"

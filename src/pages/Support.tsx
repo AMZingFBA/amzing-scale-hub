@@ -231,6 +231,7 @@ const Support = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
+      <NoIndex />
       <Navbar />
       <main className="flex-grow pt-24 md:pt-20">
         <div className="container mx-auto px-4 py-8 max-w-4xl">

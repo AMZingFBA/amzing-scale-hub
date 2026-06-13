@@ -378,6 +378,7 @@ const Chat = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      <NoIndex />
       <Navbar />
       
       <div className="flex-1 flex flex-col pt-20">
