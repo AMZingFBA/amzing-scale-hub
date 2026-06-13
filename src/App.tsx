@@ -226,6 +226,7 @@ const App = () => (
             <Route path="/acheter" element={<Marketplace />} />
             <Route path="/vendre" element={<WantToSell />} />
             <Route path="/marketplace" element={<Marketplace />} />
+            <Route path="/partenaires" element={<Navigate to="/affiliate" replace />} />
             <Route path="/avis" element={<Avis />} />
             <Route path="/admin/profiles" element={<AdminProfiles />} />
             <Route path="/profile" element={<Profile />} />

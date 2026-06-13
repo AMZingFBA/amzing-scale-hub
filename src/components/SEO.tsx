@@ -9,6 +9,7 @@ interface SEOProps {
   type?: 'website' | 'article' | 'product';
   schema?: object;
   robots?: 'index,follow' | 'noindex,follow' | 'noindex,nofollow';
+  canonicalPath?: string;
 }
 
 const SEO = ({
@@ -19,9 +20,11 @@ const SEO = ({
   type = 'website',
   schema,
   robots = 'index,follow',
+  canonicalPath,
 }: SEOProps) => {
   const location = useLocation();
-  const url = `https://amzingfba.com${location.pathname}`;
+  const resolvedPath = canonicalPath ?? location.pathname;
+  const url = `https://amzingfba.com${resolvedPath}`;
 
   useEffect(() => {
     // Update title

@@ -462,12 +462,6 @@
 
   <!-- Nouveaux articles SEO - Mots-clés finaux -->
   <url>
-    <loc>https://amzingfba.com/blog/formation-amazon-ads-publicite-ppc</loc>
-    <lastmod>2026-01-06</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>https://amzingfba.com/blog/amazon-fba-2026-guide-actualise</loc>
     <lastmod>2026-01-06</lastmod>
     <changefreq>weekly</changefreq>
@@ -539,19 +533,6 @@
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
-  <url>
-    <loc>https://amzingfba.com/blog/formation-amazon-fba-gratuite-ressources</loc>
-    <lastmod>2026-01-06</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://amzingfba.com/blog/avis-formation-amazon-fba-comparatif</loc>
-    <lastmod>2026-01-06</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  
   <!-- Articles SEO extra - mots-clés stratégiques -->
   <url>
     <loc>https://amzingfba.com/blog/amazon-fba-guide-ultime-vendeur</loc>
@@ -565,13 +546,6 @@
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
-  <url>
-    <loc>https://amzingfba.com/blog/amazon-fba-france-guide-vendeur-francais</loc>
-    <lastmod>2026-01-07</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-
   <!-- Nouveaux articles SEO - Mots-clés ciblés Janvier 2026 -->
   <url>
     <loc>https://amzingfba.com/blog/amazon-fba-cest-quoi-definition-complete</loc>
@@ -820,19 +794,7 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://amzingfba.com/blog/fulfillment-by-amazon-guide-fba</loc>
-    <lastmod>2026-01-12</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>https://amzingfba.com/blog/amazon-fulfillment-services-logistique</loc>
-    <lastmod>2026-01-12</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://amzingfba.com/blog/amazon-fbm-guide-expedition-vendeur</loc>
     <lastmod>2026-01-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -943,42 +905,8 @@
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
-  <url>
-    <loc>https://amzingfba.com/blog/amazon-repricer-software-logiciel-repricing</loc>
-    <lastmod>2026-01-15</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://amzingfba.com/blog/amazon-repricer-tool-outil-repricing-guide</loc>
-    <lastmod>2026-01-15</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://amzingfba.com/blog/fba-on-amazon-fulfillment-by-amazon-guide</loc>
-    <lastmod>2026-01-15</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://amzingfba.com/blog/devenir-vendeur-amazon-guide-etapes-complet</loc>
-    <lastmod>2026-01-15</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://amzingfba.com/blog/formations-amazon-guide-meilleures-formations</loc>
-    <lastmod>2026-01-15</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://amzingfba.com/blog/logiciel-amazon-fba-outils-essentiels-vendeur</loc>
-    <lastmod>2026-01-15</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
+  
+  
   <url>
     <loc>https://amzingfba.com/blog/amazon-fulfillment-logistique-complete</loc>
     <lastmod>2026-01-15</lastmod>
@@ -997,30 +925,7 @@
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
-  <url>
-    <loc>https://amzingfba.com/blog/protection-marque-sur-amazon-strategies</loc>
-    <lastmod>2026-01-15</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://amzingfba.com/blog/amazon-ppc-agence-services-publicite-amazon</loc>
-    <lastmod>2026-01-15</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://amzingfba.com/blog/compte-vendeur-amazon-creation-gestion-complete</loc>
-    <lastmod>2026-01-15</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://amzingfba.com/blog/amazon-fulfillment-services-guide-complet</loc>
-    <lastmod>2026-01-15</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
+  
   
   <!-- Articles SEO AMZing Keywords -->
   <url>
@@ -1119,12 +1024,6 @@
   </url>
   <url>
     <loc>https://amzingfba.com/blog/creer-mon-compte-amazon-guide-vendeur</loc>
-    <lastmod>2026-01-18</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://amzingfba.com/blog/contenu-enrichi-amazon-a-plus-guide</loc>
     <lastmod>2026-01-18</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
