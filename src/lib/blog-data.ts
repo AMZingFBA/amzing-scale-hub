@@ -1771,7 +1771,7 @@ export const blogArticles: BlogArticle[] = [
   
   // Articles SEO FBA Definition (fba definition, variantes amazonfba, contenu enrichi, etc.)
   ...seoFbaDefinitionArticles
-];
+].filter((article, index, articles) => articles.findIndex((entry) => entry.slug === article.slug) === index);
 
 // Fonction utilitaire pour récupérer un article par son slug
 export const getArticleBySlug = (slug: string): BlogArticle | undefined => {
