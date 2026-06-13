@@ -1776,7 +1776,15 @@ export const blogArticles: BlogArticle[] = [
   ...seoSellerCentralArticles,
   
   // Articles SEO FBA Definition (fba definition, variantes amazonfba, contenu enrichi, etc.)
-  ...seoFbaDefinitionArticles
+  ...seoFbaDefinitionArticles,
+
+  // Clusters SEO 2026 (formation, amazon fba, amazon fbm, sourcing, produit gagnant, IA)
+  ...clusterFormationArticles,
+  ...clusterAmazonFbaArticles,
+  ...clusterAmazonFbmArticles,
+  ...clusterSourcingAmazonArticles,
+  ...clusterProduitGagnantArticles,
+  ...clusterIaAmazonArticles
 ].filter((article, index, articles) => articles.findIndex((entry) => entry.slug === article.slug) === index);
 
 // Fonction utilitaire pour récupérer un article par son slug
