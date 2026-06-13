@@ -10,6 +10,8 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { blogArticles, blogCategories, getPilierArticles } from '@/lib/blog-data';
 
+const BLOG_CANONICAL_PATH = '/blog';
+
 const Blog = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState('');
@@ -90,6 +92,7 @@ const Blog = () => {
         description="Découvrez nos guides complets sur Amazon FBA : sourcing de produits rentables, logistique, optimisation des ventes. Conseils d'experts pour réussir."
         keywords="blog amazon fba, guide fba, conseils amazon, tutoriel fba, formation amazon"
         schema={blogSchema}
+        canonicalPath={BLOG_CANONICAL_PATH}
       />
       
       <Navbar />
