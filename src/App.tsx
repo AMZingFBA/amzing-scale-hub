@@ -140,6 +140,7 @@ const SourcingProduitAmazon = lazy(() => import("./pages/SourcingProduitAmazon")
 const AnalyseMargesFba = lazy(() => import("./pages/AnalyseMargesFba"));
 const TarifsAmzingFba = lazy(() => import("./pages/TarifsAmzingFba"));
 const FaqAmazonFba = lazy(() => import("./pages/FaqAmazonFba"));
+const Temoignages = lazy(() => import("./pages/Temoignages"));
 
 const queryClient = new QueryClient();
 
