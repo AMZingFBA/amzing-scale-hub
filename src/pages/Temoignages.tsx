@@ -80,7 +80,7 @@ const Temoignages = () => {
       <SEO
         title="Témoignages clients AMZing FBA — résultats réels d'Amazon FBA"
         description="Découvrez les témoignages de nos clients : vendeurs Amazon FBA qui ont multiplié leur CA, atteint la liberté financière et lancé leur business grâce à AMZing FBA."
-        canonical="https://amzingfba.com/temoignages"
+        canonicalPath="/temoignages"
       />
       <Navbar />
 
