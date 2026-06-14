@@ -48,7 +48,7 @@ const Blog = () => {
       if (a.type !== 'pilier' && b.type === 'pilier') return 1;
       return new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime();
     });
-  }, [selectedCategory, searchQuery]);
+  }, [selectedCategory, searchQuery, dbArticles]);
 
   const pilierArticles = getPilierArticles();
   const featuredArticle = pilierArticles[0];
