@@ -449,6 +449,78 @@ export type Database = {
         }
         Relationships: []
       }
+      blog_posts: {
+        Row: {
+          author: string
+          author_id: string | null
+          category: string
+          content: string
+          cover_image: string | null
+          created_at: string
+          excerpt: string
+          faqs: Json
+          id: string
+          images: Json
+          keywords: string[]
+          meta_description: string
+          meta_title: string
+          published_at: string | null
+          read_time: number
+          related_slugs: string[]
+          slug: string
+          status: string
+          title: string
+          tone: string | null
+          updated_at: string
+        }
+        Insert: {
+          author?: string
+          author_id?: string | null
+          category?: string
+          content?: string
+          cover_image?: string | null
+          created_at?: string
+          excerpt?: string
+          faqs?: Json
+          id?: string
+          images?: Json
+          keywords?: string[]
+          meta_description: string
+          meta_title: string
+          published_at?: string | null
+          read_time?: number
+          related_slugs?: string[]
+          slug: string
+          status?: string
+          title: string
+          tone?: string | null
+          updated_at?: string
+        }
+        Update: {
+          author?: string
+          author_id?: string | null
+          category?: string
+          content?: string
+          cover_image?: string | null
+          created_at?: string
+          excerpt?: string
+          faqs?: Json
+          id?: string
+          images?: Json
+          keywords?: string[]
+          meta_description?: string
+          meta_title?: string
+          published_at?: string | null
+          read_time?: number
+          related_slugs?: string[]
+          slug?: string
+          status?: string
+          title?: string
+          tone?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       catalogue_products: {
         Row: {
           admin_id: string
