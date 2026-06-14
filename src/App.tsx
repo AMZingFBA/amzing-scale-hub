@@ -72,6 +72,8 @@ const CatalogueBHDistribution = lazy(() => import("./pages/CatalogueBHDistributi
 const Questions = lazy(() => import("./pages/Questions"));
 const Avis = lazy(() => import("./pages/Avis"));
 const AdminProfiles = lazy(() => import("./pages/AdminProfiles"));
+const AdminBlogGenerator = lazy(() => import("./pages/AdminBlogGenerator"));
+const AdminBlogArticles = lazy(() => import("./pages/AdminBlogArticles"));
 const Profile = lazy(() => import("./pages/Profile"));
 const TestPushNotifications = lazy(() => import("./pages/TestPushNotifications"));
 const DebugPushNotifications = lazy(() => import("./pages/DebugPushNotifications"));
