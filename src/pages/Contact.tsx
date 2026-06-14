@@ -52,9 +52,12 @@ const Contact = () => {
       // Validate form data
       const validatedData = contactSchema.parse(formData);
 
+      // Combine dial code with phone number for the email payload
+      const phoneWithDial = `${selectedCountry.dial} ${validatedData.phone}`.trim();
+
       // Call edge function to send email
       const { error } = await supabase.functions.invoke("send-contact-email", {
-        body: validatedData,
+        body: { ...validatedData, phone: phoneWithDial },
       });
 
       if (error) throw error;
