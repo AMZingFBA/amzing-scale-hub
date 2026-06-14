@@ -140,6 +140,7 @@ const SourcingProduitAmazon = lazy(() => import("./pages/SourcingProduitAmazon")
 const AnalyseMargesFba = lazy(() => import("./pages/AnalyseMargesFba"));
 const TarifsAmzingFba = lazy(() => import("./pages/TarifsAmzingFba"));
 const FaqAmazonFba = lazy(() => import("./pages/FaqAmazonFba"));
+const Temoignages = lazy(() => import("./pages/Temoignages"));
 
 const queryClient = new QueryClient();
 
@@ -230,6 +231,7 @@ const App = () => (
             <Route path="/marketplace" element={<Marketplace />} />
             <Route path="/partenaires" element={<Navigate to="/affiliate" replace />} />
             <Route path="/avis" element={<Avis />} />
+            <Route path="/temoignages" element={<Temoignages />} />
             <Route path="/admin/profiles" element={<AdminProfiles />} />
             <Route path="/admin/blog-generator" element={<AdminBlogGenerator />} />
             <Route path="/admin/blog-articles" element={<AdminBlogArticles />} />
