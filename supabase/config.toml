@@ -2,3 +2,9 @@ project_id = "wvmfzlogijvqcsgablrb"
 
 [functions.submit-lead]
 verify_jwt = false
+
+[functions.auto-blog-from-gsc]
+verify_jwt = false
+
+[functions.blog-sitemap]
+verify_jwt = false
