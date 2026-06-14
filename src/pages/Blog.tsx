@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { Search, Filter, BookOpen, TrendingUp, ArrowRight, ArrowLeft } from 'lucide-react';
 import Navbar from '@/components/Navbar';
@@ -8,18 +8,24 @@ import BlogCard from '@/components/blog/BlogCard';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { blogArticles, blogCategories, getPilierArticles } from '@/lib/blog-data';
+import { blogArticles, blogCategories, getPilierArticles, type BlogArticle } from '@/lib/blog-data';
+import { fetchPublishedDbArticles } from '@/lib/blog-db';
 
 const BLOG_CANONICAL_PATH = '/blog';
 
 const Blog = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState('');
-  
+  const [dbArticles, setDbArticles] = useState<BlogArticle[]>([]);
+
+  useEffect(() => {
+    fetchPublishedDbArticles().then(setDbArticles).catch(() => {});
+  }, []);
+
   const selectedCategory = searchParams.get('categorie') || 'all';
 
   const filteredArticles = useMemo(() => {
-    let articles = [...blogArticles];
+    let articles: BlogArticle[] = [...dbArticles, ...blogArticles];
     
     // Filtre par catégorie
     if (selectedCategory !== 'all') {
@@ -42,7 +48,7 @@ const Blog = () => {
       if (a.type !== 'pilier' && b.type === 'pilier') return 1;
       return new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime();
     });
-  }, [selectedCategory, searchQuery]);
+  }, [selectedCategory, searchQuery, dbArticles]);
 
   const pilierArticles = getPilierArticles();
   const featuredArticle = pilierArticles[0];

@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Clock, Calendar, Share2, ChevronRight, User } from 'lucide-react';
 import Navbar from '@/components/Navbar';
@@ -8,14 +9,38 @@ import BlogSidebar from '@/components/blog/BlogSidebar';
 import BlogArticleContent from '@/components/blog/BlogArticleContent';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { getArticleBySlug, blogCategories } from '@/lib/blog-data';
+import { getArticleBySlug, blogCategories, type BlogArticle } from '@/lib/blog-data';
+import { fetchDbArticleBySlug } from '@/lib/blog-db';
 import { toast } from 'sonner';
 
 const BlogPost = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
-  
-  const article = slug ? getArticleBySlug(slug) : undefined;
+
+  const staticArticle = slug ? getArticleBySlug(slug) : undefined;
+  const [article, setArticle] = useState<BlogArticle | undefined>(staticArticle);
+  const [loading, setLoading] = useState(!staticArticle && !!slug);
+
+  useEffect(() => {
+    if (staticArticle || !slug) return;
+    setLoading(true);
+    fetchDbArticleBySlug(slug)
+      .then((a) => setArticle(a))
+      .finally(() => setLoading(false));
+  }, [slug, staticArticle]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navbar />
+        <main className="container mx-auto px-4 py-24 text-center">
+          <p className="text-muted-foreground">Chargement de l'article…</p>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
   
   if (!article) {
     return (

@@ -72,6 +72,8 @@ const CatalogueBHDistribution = lazy(() => import("./pages/CatalogueBHDistributi
 const Questions = lazy(() => import("./pages/Questions"));
 const Avis = lazy(() => import("./pages/Avis"));
 const AdminProfiles = lazy(() => import("./pages/AdminProfiles"));
+const AdminBlogGenerator = lazy(() => import("./pages/AdminBlogGenerator"));
+const AdminBlogArticles = lazy(() => import("./pages/AdminBlogArticles"));
 const Profile = lazy(() => import("./pages/Profile"));
 const TestPushNotifications = lazy(() => import("./pages/TestPushNotifications"));
 const DebugPushNotifications = lazy(() => import("./pages/DebugPushNotifications"));
@@ -229,6 +231,8 @@ const App = () => (
             <Route path="/partenaires" element={<Navigate to="/affiliate" replace />} />
             <Route path="/avis" element={<Avis />} />
             <Route path="/admin/profiles" element={<AdminProfiles />} />
+            <Route path="/admin/blog-generator" element={<AdminBlogGenerator />} />
+            <Route path="/admin/blog-articles" element={<AdminBlogArticles />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/test-push" element={<TestPushNotifications />} />
             <Route path="/debug-push" element={<DebugPushNotifications />} />

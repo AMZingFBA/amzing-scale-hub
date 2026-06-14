@@ -1,38 +1,74 @@
+# Générateur de blog IA — Admin AMZing FBA
 
+## Vue d'ensemble
 
-# Accorder le VIP a ilyesj35@gmail.com jusqu'au 19 janvier 2027
+Aujourd'hui les articles de blog sont **statiques** (fichiers TS hardcodés dans `src/lib/blog-articles-*.ts` puis agrégés dans `blog-data.ts`). On ajoute une couche **dynamique** en base de données pour les articles générés par IA, **sans toucher** aux articles statiques existants ni à leur rendu visuel. Le rendu public réutilise exactement le composant `BlogPost.tsx` actuel.
 
-## Constat
+## 1. Base de données (Lovable Cloud)
 
-L'abonnement de cet utilisateur revient systematiquement a `free / unpaid` apres chaque mise a jour manuelle. C'est la **3eme fois** que cette demande est faite, ce qui indique qu'un mecanisme automatique (webhook Stripe ou trigger base de donnees) reinitialise le statut.
+Nouvelle table `blog_posts` :
+- `slug` (unique), `title`, `meta_title`, `meta_description`
+- `excerpt`, `content` (markdown/HTML), `category`, `keywords[]`, `related_slugs[]`
+- `cover_image` (url storage), `images` (jsonb : url + alt + position)
+- `faqs` (jsonb)
+- `status` : `draft` | `published`
+- `author_id`, `published_at`, `created_at`, `updated_at`
 
-## Action immediate
+RLS :
+- `SELECT` public uniquement si `status = 'published'`
+- `INSERT/UPDATE/DELETE` réservé au rôle `admin` (via `has_role(auth.uid(), 'admin')`)
 
-Mettre a jour la table `subscriptions` pour l'utilisateur (`524b16d3-afc8-43e8-87ef-5b017bd9f090`) :
+Bucket Storage public `blog-ai-images` pour les images générées.
 
-```sql
-UPDATE subscriptions
-SET plan_type = 'vip',
-    status = 'active',
-    is_trial = false,
-    expires_at = '2027-01-19T23:59:59+00:00'
-WHERE user_id = '524b16d3-afc8-43e8-87ef-5b017bd9f090';
-```
+## 2. Edge functions (clés IA côté serveur)
 
-## Investigation recommandee
+- `admin-blog-generate` — vérifie le JWT + rôle admin, appelle Lovable AI Gateway (`google/gemini-3-flash-preview`) pour produire en JSON structuré : intro, sections H2/H3, FAQ, meta, slug, alt-text d'images. Génère ensuite N images via `openai/gpt-image-2`, les upload dans le bucket, et insère le post en `draft` ou `published`.
+- `admin-blog-update` / `admin-blog-delete` — mutations sécurisées admin uniquement.
 
-Pour eviter que le statut soit ecrase a nouveau, il faudrait investiguer :
+Toutes les clés (`LOVABLE_API_KEY`) restent server-side.
 
-1. **Le webhook Stripe** (`stripe-webhook` edge function) qui pourrait recevoir un evenement (paiement echoue, annulation) et reinitialiser le statut
-2. **Le trigger `check_subscription_expiry`** sur la table `subscriptions` qui remet automatiquement a `free/expired` les abonnements dont `expires_at < now()` -- mais ici la date est dans le futur donc ce n'est pas la cause
-3. **Le trigger `sync_user_to_airtable_realtime`** qui se declenche sur les modifications et pourrait avoir un effet de bord
+## 3. Pages admin (`/admin/...`)
 
-Si vous souhaitez, je peux aussi ajouter une entree dans la table `subscription_engagements` pour documenter cet acces manuel et eviter toute confusion future.
+- **`/admin/blog-generator`** — formulaire (titre, mots-clés principaux/secondaires, nb d'images, ton, catégorie, statut, meta title/description, slug auto-éditable). Bouton "Générer" → loader → aperçu éditable → "Publier" ou "Enregistrer brouillon".
+- **`/admin/blog-articles`** — liste des articles générés (filtre publié/brouillon), actions : voir / modifier / publier-dépublier / supprimer.
 
-## Details techniques
+Garde : route protégée + check `has_role` côté UI et RLS côté backend.
 
-- **User ID** : `524b16d3-afc8-43e8-87ef-5b017bd9f090`
-- **Email** : ilyesj35@gmail.com
-- **VIP jusqu'au** : 19 janvier 2027
-- **Fichier concerne** : aucune modification de code, uniquement mise a jour de donnees
+## 4. Rendu public
 
+- `getArticleBySlug` étendu : si pas trouvé dans le statique, requête `blog_posts` (published) en DB.
+- `Blog.tsx` fusionne les deux sources pour la liste.
+- `BlogPost.tsx` **inchangé visuellement** : même mise en page, sidebar, FAQ, JSON-LD. Les articles IA respectent la même `interface BlogArticle`.
+
+## 5. SEO
+
+JSON-LD `Article` + `FAQPage` déjà géré par `BlogPost.tsx` — fonctionnera automatiquement. Images avec alt text généré par l'IA. Sitemap : ajout dynamique au build (phase 2, optionnel).
+
+## Détails techniques
+
+- Le prompt IA exige un JSON strict respectant `BlogArticle` (validation Zod côté edge function).
+- Génération images : streaming désactivé, on stocke le PNG final dans le bucket et on stocke l'URL publique.
+- Slug auto = slugify(title) avec dédoublonnage en DB.
+- Aucune modification des fichiers `blog-articles-*.ts` existants.
+
+## Fichiers créés / modifiés
+
+Créés :
+- Migration `blog_posts` + bucket
+- `supabase/functions/admin-blog-generate/index.ts`
+- `supabase/functions/admin-blog-update/index.ts` (+ delete)
+- `src/pages/AdminBlogGenerator.tsx`
+- `src/pages/AdminBlogArticles.tsx`
+- `src/lib/blog-db.ts` (helpers fetch DB articles)
+
+Modifiés :
+- `src/App.tsx` (routes admin)
+- `src/lib/blog-data.ts` (`getArticleBySlug` async fallback ou helper séparé)
+- `src/pages/Blog.tsx` + `BlogPost.tsx` (chargement DB + statique fusionné — visuel identique)
+- Page admin (sidebar/menu) pour ajouter les 2 nouveaux liens
+
+## Estimation
+
+~1h de génération côté agent + coût crédits IA par article généré (texte + N images). L'admin contrôle le volume.
+
+Confirme et je lance l'implémentation.
