@@ -231,6 +231,7 @@ const App = () => (
             <Route path="/marketplace" element={<Marketplace />} />
             <Route path="/partenaires" element={<Navigate to="/affiliate" replace />} />
             <Route path="/avis" element={<Avis />} />
+            <Route path="/temoignages" element={<Temoignages />} />
             <Route path="/admin/profiles" element={<AdminProfiles />} />
             <Route path="/admin/blog-generator" element={<AdminBlogGenerator />} />
             <Route path="/admin/blog-articles" element={<AdminBlogArticles />} />
