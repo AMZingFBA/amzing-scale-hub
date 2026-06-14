@@ -275,18 +275,56 @@ const Contact = () => {
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="phone">Téléphone (optionnel)</Label>
-                    <div className="relative group">
-                      <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-hover:text-primary group-focus-within:text-primary transition-colors" />
-                      <Input 
-                        id="phone" 
-                        type="tel" 
-                        placeholder="+33 6 12 34 56 78" 
-                        value={formData.phone}
-                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                        className="pl-10 transition-all duration-300 hover:border-primary/50 hover:shadow-sm focus:scale-102 focus:border-primary"
-                      />
+                    <Label htmlFor="phone" className="flex items-center gap-2">
+                      Téléphone
+                      {touched.phone && !errors.phone && formData.phone && (
+                        <CheckCircle className="w-4 h-4 text-green-500 animate-scale-in" />
+                      )}
+                    </Label>
+                    <div className="flex gap-2">
+                      <Select value={countryCode} onValueChange={setCountryCode}>
+                        <SelectTrigger className="w-[140px] shrink-0">
+                          <SelectValue>
+                            <span className="flex items-center gap-2">
+                              <span className="text-lg leading-none">{selectedCountry.flag}</span>
+                              <span className="text-sm">{selectedCountry.dial}</span>
+                            </span>
+                          </SelectValue>
+                        </SelectTrigger>
+                        <SelectContent className="max-h-[300px]">
+                          {COUNTRY_CODES.map((c) => (
+                            <SelectItem key={c.code} value={c.code}>
+                              <span className="flex items-center gap-2">
+                                <span className="text-lg leading-none">{c.flag}</span>
+                                <span>{c.name}</span>
+                                <span className="text-muted-foreground text-xs ml-1">{c.dial}</span>
+                              </span>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <div className="relative group flex-1">
+                        <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-hover:text-primary group-focus-within:text-primary transition-colors" />
+                        <Input
+                          id="phone"
+                          type="tel"
+                          placeholder="6 12 34 56 78"
+                          value={formData.phone}
+                          onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                          onBlur={() => handleBlur("phone")}
+                          className={`pl-10 transition-all duration-300 hover:border-primary/50 hover:shadow-sm ${
+                            errors.phone && touched.phone
+                              ? "border-destructive focus:ring-destructive"
+                              : touched.phone && formData.phone
+                              ? "border-green-500 focus:ring-green-500"
+                              : ""
+                          } focus:scale-102 focus:border-primary`}
+                        />
+                      </div>
                     </div>
+                    {errors.phone && touched.phone && (
+                      <p className="text-sm text-destructive animate-fade-in">{errors.phone}</p>
+                    )}
                   </div>
                   
                   <div className="space-y-2">
