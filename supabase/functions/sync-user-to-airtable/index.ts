@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -234,6 +235,25 @@ serve(async (req) => {
       sourceInscription = 'App';
     }
 
+    // Fetch account creation date from profiles (by email)
+    let creationCompte: string | null = null;
+    try {
+      const supabaseAdmin = createClient(
+        Deno.env.get("SUPABASE_URL") ?? "",
+        Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
+      );
+      const { data: profileRow } = await supabaseAdmin
+        .from('profiles')
+        .select('created_at')
+        .ilike('email', normalizedEmail)
+        .maybeSingle();
+      if (profileRow?.created_at) {
+        creationCompte = new Date(profileRow.created_at).toISOString().split('T')[0];
+      }
+    } catch (e) {
+      console.error('[Sync User to Airtable] Failed to fetch profile created_at:', e);
+    }
+
     const fields: Record<string, unknown> = {
       "Email (principal)": user.email,
       "Nom": user.full_name || user.nickname || '',
@@ -248,6 +268,10 @@ serve(async (req) => {
       "Outil principal": outilPrincipal,
       "Source d\u2019inscription": sourceInscription,
     };
+
+    if (creationCompte) {
+      fields["Création compte"] = creationCompte;
+    }
 
     // Add date activation only if available
     if (dateActivation) {
