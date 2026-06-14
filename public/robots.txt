@@ -30,3 +30,4 @@ Disallow: /*&utm_
 
 # Sitemap
 Sitemap: https://amzingfba.com/sitemap.xml
+Sitemap: https://amzingfba.com/blog-sitemap.xml

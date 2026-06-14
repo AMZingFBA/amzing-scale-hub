@@ -449,6 +449,50 @@ export type Database = {
         }
         Relationships: []
       }
+      auto_blog_runs: {
+        Row: {
+          blog_post_id: string | null
+          blog_slug: string | null
+          created_at: string
+          error: string | null
+          gsc_data: Json | null
+          id: string
+          keyword: string
+          status: string
+          strategy: string
+        }
+        Insert: {
+          blog_post_id?: string | null
+          blog_slug?: string | null
+          created_at?: string
+          error?: string | null
+          gsc_data?: Json | null
+          id?: string
+          keyword: string
+          status?: string
+          strategy: string
+        }
+        Update: {
+          blog_post_id?: string | null
+          blog_slug?: string | null
+          created_at?: string
+          error?: string | null
+          gsc_data?: Json | null
+          id?: string
+          keyword?: string
+          status?: string
+          strategy?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "auto_blog_runs_blog_post_id_fkey"
+            columns: ["blog_post_id"]
+            isOneToOne: false
+            referencedRelation: "blog_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       blog_posts: {
         Row: {
           author: string
