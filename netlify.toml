@@ -27,6 +27,12 @@
   force = true
 
 [[redirects]]
+  from = "/blog-sitemap.xml"
+  to = "https://wvmfzlogijvqcsgablrb.supabase.co/functions/v1/blog-sitemap"
+  status = 200
+  force = true
+
+[[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
