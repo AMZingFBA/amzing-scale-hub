@@ -37,8 +37,11 @@ const Contact = () => {
     subject: "",
     message: "",
   });
+  const [countryCode, setCountryCode] = useState("FR");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
+
+  const selectedCountry = COUNTRY_CODES.find((c) => c.code === countryCode) || COUNTRY_CODES[0];
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
