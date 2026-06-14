@@ -231,6 +231,8 @@ const App = () => (
             <Route path="/partenaires" element={<Navigate to="/affiliate" replace />} />
             <Route path="/avis" element={<Avis />} />
             <Route path="/admin/profiles" element={<AdminProfiles />} />
+            <Route path="/admin/blog-generator" element={<AdminBlogGenerator />} />
+            <Route path="/admin/blog-articles" element={<AdminBlogArticles />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/test-push" element={<TestPushNotifications />} />
             <Route path="/debug-push" element={<DebugPushNotifications />} />
