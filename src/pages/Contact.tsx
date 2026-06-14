@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useState } from "react";
@@ -14,11 +15,12 @@ import SEO from "@/components/SEO";
 import { useNavigate, Link } from "react-router-dom";
 import { Capacitor } from "@capacitor/core";
 import { seoData } from "@/lib/seo-data";
+import { COUNTRY_CODES } from "@/lib/country-codes";
 
 const contactSchema = z.object({
   name: z.string().trim().min(1, "Le nom est requis").max(100, "Le nom est trop long"),
   email: z.string().trim().email("Email invalide").max(255, "L'email est trop long"),
-  phone: z.string().optional(),
+  phone: z.string().trim().min(6, "Numéro de téléphone invalide").max(30, "Numéro trop long"),
   subject: z.string().trim().min(1, "Le sujet est requis").max(200, "Le sujet est trop long"),
   message: z.string().trim().min(10, "Le message doit contenir au moins 10 caractères").max(2000, "Le message est trop long"),
 });
