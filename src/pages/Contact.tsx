@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useState } from "react";
@@ -14,11 +15,12 @@ import SEO from "@/components/SEO";
 import { useNavigate, Link } from "react-router-dom";
 import { Capacitor } from "@capacitor/core";
 import { seoData } from "@/lib/seo-data";
+import { COUNTRY_CODES } from "@/lib/country-codes";
 
 const contactSchema = z.object({
   name: z.string().trim().min(1, "Le nom est requis").max(100, "Le nom est trop long"),
   email: z.string().trim().email("Email invalide").max(255, "L'email est trop long"),
-  phone: z.string().optional(),
+  phone: z.string().trim().min(6, "Numéro de téléphone invalide").max(30, "Numéro trop long"),
   subject: z.string().trim().min(1, "Le sujet est requis").max(200, "Le sujet est trop long"),
   message: z.string().trim().min(10, "Le message doit contenir au moins 10 caractères").max(2000, "Le message est trop long"),
 });
@@ -35,8 +37,11 @@ const Contact = () => {
     subject: "",
     message: "",
   });
+  const [countryCode, setCountryCode] = useState("FR");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
+
+  const selectedCountry = COUNTRY_CODES.find((c) => c.code === countryCode) || COUNTRY_CODES[0];
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,9 +52,12 @@ const Contact = () => {
       // Validate form data
       const validatedData = contactSchema.parse(formData);
 
+      // Combine dial code with phone number for the email payload
+      const phoneWithDial = `${selectedCountry.dial} ${validatedData.phone}`.trim();
+
       // Call edge function to send email
       const { error } = await supabase.functions.invoke("send-contact-email", {
-        body: validatedData,
+        body: { ...validatedData, phone: phoneWithDial },
       });
 
       if (error) throw error;
@@ -267,18 +275,56 @@ const Contact = () => {
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="phone">Téléphone (optionnel)</Label>
-                    <div className="relative group">
-                      <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-hover:text-primary group-focus-within:text-primary transition-colors" />
-                      <Input 
-                        id="phone" 
-                        type="tel" 
-                        placeholder="+33 6 12 34 56 78" 
-                        value={formData.phone}
-                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                        className="pl-10 transition-all duration-300 hover:border-primary/50 hover:shadow-sm focus:scale-102 focus:border-primary"
-                      />
+                    <Label htmlFor="phone" className="flex items-center gap-2">
+                      Téléphone
+                      {touched.phone && !errors.phone && formData.phone && (
+                        <CheckCircle className="w-4 h-4 text-green-500 animate-scale-in" />
+                      )}
+                    </Label>
+                    <div className="flex gap-2">
+                      <Select value={countryCode} onValueChange={setCountryCode}>
+                        <SelectTrigger className="w-[140px] shrink-0">
+                          <SelectValue>
+                            <span className="flex items-center gap-2">
+                              <span className="text-lg leading-none">{selectedCountry.flag}</span>
+                              <span className="text-sm">{selectedCountry.dial}</span>
+                            </span>
+                          </SelectValue>
+                        </SelectTrigger>
+                        <SelectContent className="max-h-[300px]">
+                          {COUNTRY_CODES.map((c) => (
+                            <SelectItem key={c.code} value={c.code}>
+                              <span className="flex items-center gap-2">
+                                <span className="text-lg leading-none">{c.flag}</span>
+                                <span>{c.name}</span>
+                                <span className="text-muted-foreground text-xs ml-1">{c.dial}</span>
+                              </span>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <div className="relative group flex-1">
+                        <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-hover:text-primary group-focus-within:text-primary transition-colors" />
+                        <Input
+                          id="phone"
+                          type="tel"
+                          placeholder="6 12 34 56 78"
+                          value={formData.phone}
+                          onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                          onBlur={() => handleBlur("phone")}
+                          className={`pl-10 transition-all duration-300 hover:border-primary/50 hover:shadow-sm ${
+                            errors.phone && touched.phone
+                              ? "border-destructive focus:ring-destructive"
+                              : touched.phone && formData.phone
+                              ? "border-green-500 focus:ring-green-500"
+                              : ""
+                          } focus:scale-102 focus:border-primary`}
+                        />
+                      </div>
                     </div>
+                    {errors.phone && touched.phone && (
+                      <p className="text-sm text-destructive animate-fade-in">{errors.phone}</p>
+                    )}
                   </div>
                   
                   <div className="space-y-2">
