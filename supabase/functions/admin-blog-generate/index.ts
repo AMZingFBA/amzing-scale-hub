@@ -149,9 +149,9 @@ async function uploadImage(supabaseAdmin: any, slug: string, idx: number, bytes:
     .from("blog-ai-images")
     .upload(path, bytes, { contentType: "image/png", upsert: false });
   if (error) throw new Error(`Upload failed: ${error.message}`);
-  const { data } = supabaseAdmin.storage.from("blog-ai-images").getPublicUrl(path);
-  return data.publicUrl;
+  return `${SUPABASE_URL}/functions/v1/blog-image/${path}`;
 }
+
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
