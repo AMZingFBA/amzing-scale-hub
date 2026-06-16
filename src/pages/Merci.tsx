@@ -28,8 +28,8 @@ const Merci = () => {
       try {
         const w = window as any;
         if (typeof w.gtag === "function") {
-          w.gtag("event", "conversion", {
-            send_to: "AW-18223379828/O6fDCKiJr8AcEPTqvvFD",
+        w.gtag("event", "conversion", {
+            send_to: "AW-18223379828/O6fDCKiJr8AcEPTqyvFD",
           });
         }
       } catch (e) {
