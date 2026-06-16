@@ -8,3 +8,6 @@ verify_jwt = false
 
 [functions.blog-sitemap]
 verify_jwt = false
+
+[functions.blog-image]
+verify_jwt = false
