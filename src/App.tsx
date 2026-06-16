@@ -14,7 +14,6 @@ import { WhatsAppNotificationBanner } from "./components/WhatsAppNotificationBan
 // Pages critiques chargées immédiatement
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
-import Merci from "./pages/Merci";
 
 // Lazy loading des pages non critiques pour réduire le bundle initial
 const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
