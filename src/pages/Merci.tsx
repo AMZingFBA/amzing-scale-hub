@@ -12,6 +12,16 @@ const Merci = () => {
   const [countdown, setCountdown] = useState(3);
 
   useEffect(() => {
+    document.title = "Inscription confirmée – AMZing FBA";
+    let robots = document.querySelector('meta[name="robots"]') as HTMLMetaElement | null;
+    if (!robots) {
+      robots = document.createElement("meta");
+      robots.name = "robots";
+      document.head.appendChild(robots);
+    }
+    const prev = robots.content;
+    robots.content = "noindex, nofollow";
+
     // Fire Google Ads conversion ONCE on this confirmation page only
     if (!firedRef.current) {
       firedRef.current = true;
