@@ -171,8 +171,9 @@ async function uploadImage(admin: any, slug: string, idx: number, bytes: Uint8Ar
   const path = `${slug}/${Date.now()}-${idx}.png`;
   const { error } = await admin.storage.from("blog-ai-images").upload(path, bytes, { contentType: "image/png" });
   if (error) throw new Error(error.message);
-  return admin.storage.from("blog-ai-images").getPublicUrl(path).data.publicUrl;
+  return `${SUPABASE_URL}/functions/v1/blog-image/${path}`;
 }
+
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
