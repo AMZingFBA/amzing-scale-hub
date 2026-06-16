@@ -1,14 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Helmet } from "react-helmet-async";
 import { CheckCircle2, Loader2 } from "lucide-react";
-
-declare global {
-  interface Window {
-    gtag?: (...args: any[]) => void;
-    dataLayer?: any[];
-  }
-}
 
 const SAFE_INTERNAL_PATHS = ["/dashboard", "/android-payment", "/tarifs", "/"];
 
@@ -24,8 +16,9 @@ const Merci = () => {
     if (!firedRef.current) {
       firedRef.current = true;
       try {
-        if (typeof window !== "undefined" && typeof window.gtag === "function") {
-          window.gtag("event", "conversion", {
+        const w = window as any;
+        if (typeof w.gtag === "function") {
+          w.gtag("event", "conversion", {
             send_to: "AW-18223379828/O6fDCKiJr8AcEPTqvvFD",
           });
         }
@@ -67,10 +60,6 @@ const Merci = () => {
 
   return (
     <>
-      <Helmet>
-        <title>Inscription confirmée – AMZing FBA</title>
-        <meta name="robots" content="noindex, nofollow" />
-      </Helmet>
       <main className="min-h-screen flex items-center justify-center bg-background px-4">
         <div className="max-w-md w-full text-center bg-card border border-border rounded-2xl p-8 shadow-lg">
           <div className="flex justify-center mb-4">
