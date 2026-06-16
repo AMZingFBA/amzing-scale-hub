@@ -7,7 +7,7 @@ const SAFE_INTERNAL_PATHS = ["/dashboard", "/android-payment", "/tarifs", "/"];
 const Merci = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const firedRef = useRef(false);
+  
   const [redirectUrl, setRedirectUrl] = useState<string | null>(null);
   const [countdown, setCountdown] = useState(3);
 
