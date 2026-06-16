@@ -22,21 +22,6 @@ const Merci = () => {
     const prev = robots.content;
     robots.content = "noindex, nofollow";
 
-    // Fire Google Ads conversion ONCE on this confirmation page only
-    if (!firedRef.current) {
-      firedRef.current = true;
-      try {
-        const w = window as any;
-        if (typeof w.gtag === "function") {
-        w.gtag("event", "conversion", {
-            send_to: "AW-18223379828/O6fDCKiJr8AcEPTqyvFD",
-          });
-        }
-      } catch (e) {
-        console.error("[Merci] gtag conversion error", e);
-      }
-    }
-
     // Determine next destination (passed via router state or sessionStorage)
     const stateNext = (location.state as { next?: string } | null)?.next;
     const stored = sessionStorage.getItem("post_signup_redirect");
