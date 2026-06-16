@@ -14,6 +14,7 @@ import { WhatsAppNotificationBanner } from "./components/WhatsAppNotificationBan
 // Pages critiques chargées immédiatement
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
+import Merci from "./pages/Merci";
 
 // Lazy loading des pages non critiques pour réduire le bundle initial
 const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
@@ -167,6 +168,8 @@ const App = () => (
             <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/merci" element={<Merci />} />
+            <Route path="/inscription-validee" element={<Merci />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/dashboard" element={<Dashboard />} />

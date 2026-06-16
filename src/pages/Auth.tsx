@@ -310,29 +310,24 @@ export default function Auth() {
       // Clear suite payment email from sessionStorage after successful signup
       sessionStorage.removeItem('suite_payment_email');
 
-      // If user came from Suite payment, redirect to dashboard (already paid)
+      // Determine post-signup destination
+      let nextUrl: string;
       if (suitePaymentEmail || redirectAfterAuth === '/dashboard') {
-        toast.success("Compte créé ! Redirection vers votre espace...");
-        navigate('/dashboard', { replace: true });
-        return;
+        nextUrl = '/dashboard';
+      } else if (isNativeApp) {
+        nextUrl = '/android-payment';
+      } else {
+        nextUrl = 'https://amzingfba26.systeme.io/67172439';
       }
 
-      // Rediriger vers le paiement Stripe pour toutes les plateformes (Web, iOS, Android)
+      // Stocker pour fallback puis rediriger vers /merci qui déclenche
+      // la conversion Google Ads UNIQUEMENT après inscription réussie.
       try {
-        toast.success("Redirection vers le paiement sécurisé...");
-        
-        // Sur iOS/Android natif, rediriger vers la page de paiement avec CGV
-        if (isNativeApp) {
-          navigate('/android-payment');
-        } else {
-          // Sur le web, redirection directe vers systeme.io
-          window.location.href = 'https://amzingfba26.systeme.io/67172439';
-        }
-      } catch (error: any) {
-        console.error('Error starting checkout:', error);
-        toast.error('Erreur lors de la redirection vers le paiement: ' + error.message);
-        setIsLoading(false);
-      }
+        sessionStorage.setItem('post_signup_redirect', nextUrl);
+      } catch {}
+      toast.success('Inscription validée ! Redirection…');
+      navigate('/merci', { replace: true, state: { next: nextUrl } });
+      return;
     } catch (error: any) {
       console.error('Caught error in handleVerifyAndSignUp:', error);
       const errorMessage = error.message || "Une erreur est survenue";
