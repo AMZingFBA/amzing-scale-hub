@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { BlogArticle } from '@/lib/blog-data';
-import { CheckCircle, AlertTriangle, Lightbulb, TrendingUp, Info } from 'lucide-react';
+import { CheckCircle, AlertTriangle, Lightbulb, TrendingUp, Info, Lock, Star, Award } from 'lucide-react';
 
 interface BlogArticleContentProps {
   article: BlogArticle;
@@ -17,7 +17,7 @@ const BlogArticleContent = ({ article }: BlogArticleContentProps) => {
       const hasEmoji = /^[📌🎯💡🔥⚠️✅❌🔹🔸📊📈💰🛒📦🏆]/.test(text);
       return (
         <h2 
-          className={`text-2xl md:text-3xl font-bold mt-14 mb-6 pb-3 border-b-2 border-primary/20 ${hasEmoji ? 'flex items-center gap-2' : ''}`} 
+          className={`text-2xl md:text-3xl font-bold mt-16 mb-6 pb-4 border-b-2 border-primary/20 ${hasEmoji ? 'flex items-center gap-3' : ''}`} 
           {...props}
         >
           {children}
@@ -25,12 +25,12 @@ const BlogArticleContent = ({ article }: BlogArticleContentProps) => {
       );
     },
     h3: ({ children, ...props }: any) => (
-      <h3 className="text-xl md:text-2xl font-bold mt-10 mb-4 text-primary/90" {...props}>
+      <h3 className="text-xl md:text-2xl font-bold mt-12 mb-4 text-primary/90" {...props}>
         {children}
       </h3>
     ),
     h4: ({ children, ...props }: any) => (
-      <h4 className="text-lg font-bold mt-6 mb-3 text-foreground/90" {...props}>
+      <h4 className="text-lg font-bold mt-8 mb-3 text-foreground/90" {...props}>
         {children}
       </h4>
     ),
@@ -51,7 +51,7 @@ const BlogArticleContent = ({ article }: BlogArticleContentProps) => {
     ),
     li: ({ children, ordered, ...props }: any) => (
       <li className="flex items-start gap-3 text-foreground/80 leading-relaxed" {...props}>
-        <span className="mt-1.5 w-2 h-2 bg-primary rounded-full shrink-0" />
+        <span className="mt-2 w-2 h-2 bg-primary rounded-full shrink-0" />
         <span>{children}</span>
       </li>
     ),
@@ -65,9 +65,11 @@ const BlogArticleContent = ({ article }: BlogArticleContentProps) => {
       const isWarning = text.includes('⚠️') || text.includes('Attention');
       const isTip = text.includes('💡') || text.includes('Conseil');
       const isSuccess = text.includes('✅');
+      const isPremium = text.includes('🔒') || text.includes('Formation') || text.includes('membre') || text.includes('VIP');
       
       let bgColor = 'bg-primary/5 border-primary';
       let icon = <Lightbulb className="w-5 h-5 text-primary shrink-0" />;
+      let label = null;
       
       if (isWarning) {
         bgColor = 'bg-orange-500/10 border-orange-500';
@@ -78,12 +80,24 @@ const BlogArticleContent = ({ article }: BlogArticleContentProps) => {
       } else if (isTip) {
         bgColor = 'bg-blue-500/10 border-blue-500';
         icon = <Info className="w-5 h-5 text-blue-500 shrink-0" />;
+      } else if (isPremium) {
+        bgColor = 'bg-gradient-to-br from-primary/10 to-primary/5 border-primary/40';
+        icon = <Lock className="w-5 h-5 text-primary shrink-0" />;
+        label = (
+          <div className="flex items-center gap-1.5 mb-2">
+            <Award className="w-3.5 h-3.5 text-primary" />
+            <span className="text-[10px] font-bold uppercase tracking-wider text-primary">Contenu Formation</span>
+          </div>
+        );
       }
       
       return (
-        <blockquote className={`my-8 pl-5 pr-4 py-4 border-l-4 ${bgColor} rounded-r-lg flex items-start gap-3`} {...props}>
-          {icon}
-          <div className="[&>p]:mb-0 [&>p]:text-foreground/90">{children}</div>
+        <blockquote className={`my-8 pl-5 pr-5 py-5 border-l-4 ${bgColor} rounded-r-xl flex items-start gap-3`} {...props}>
+          <div className="mt-0.5">{icon}</div>
+          <div className="[&>p]:mb-0 [&>p]:text-foreground/90">
+            {label}
+            {children}
+          </div>
         </blockquote>
       );
     },
@@ -115,7 +129,7 @@ const BlogArticleContent = ({ article }: BlogArticleContentProps) => {
       </tr>
     ),
     hr: () => (
-      <hr className="my-10 border-border/50 border-dashed" />
+      <hr className="my-12 border-border/50 border-dashed" />
     ),
     a: ({ children, href, ...props }: any) => (
       <a 
