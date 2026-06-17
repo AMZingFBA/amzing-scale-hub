@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { ArrowRight, BookOpen, TrendingUp } from 'lucide-react';
+import { ArrowRight, BookOpen, CheckCircle2, Sparkles, Star, TrendingUp, Zap } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -16,25 +16,50 @@ const BlogSidebar = ({ currentArticle }: BlogSidebarProps) => {
 
   return (
     <aside className="space-y-6">
-      {/* CTA Box */}
-      <Card className="bg-gradient-to-br from-primary/10 via-primary/5 to-background border-primary/20">
-        <CardContent className="p-6">
-          <div className="flex items-center gap-2 mb-3">
+      {/* CTA Box — version conversion forte */}
+      <Card className="relative overflow-hidden border-2 border-primary/40 shadow-xl bg-gradient-to-br from-primary/15 via-primary/5 to-background">
+        <div className="absolute -top-10 -right-10 w-32 h-32 bg-primary/20 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-primary/10 rounded-full blur-3xl pointer-events-none" />
+        <CardContent className="p-6 relative">
+          <Badge className="mb-3 bg-primary text-primary-foreground border-0 shadow-md">
+            <Sparkles className="w-3 h-3 mr-1" />
+            Offre limitée
+          </Badge>
+          <div className="flex items-center gap-2 mb-2">
             <TrendingUp className="w-5 h-5 text-primary" />
-            <span className="font-bold text-primary">Produits Rentables</span>
+            <span className="font-bold text-primary text-sm uppercase tracking-wide">AMZing FBA</span>
           </div>
-          <h3 className="font-bold text-lg mb-2">
-            Recevez des alertes produits quotidiennes
+          <h3 className="font-extrabold text-xl mb-3 leading-tight">
+            Trouvez vos prochains produits gagnants en 2 clics
           </h3>
-          <p className="text-sm text-muted-foreground mb-4">
-            Nos algorithmes détectent les meilleures opportunités Amazon FBA chaque jour.
-          </p>
-          <Button asChild className="w-full" variant="hero">
-            <Link to="/tarifs">
-              Découvrir AMZing FBA
+          <ul className="space-y-2 mb-4">
+            {[
+              'Alertes produits rentables quotidiennes',
+              'Formation Amazon FBA complète',
+              'Communauté privée + suivi 1:1',
+            ].map((b) => (
+              <li key={b} className="flex items-start gap-2 text-sm">
+                <CheckCircle2 className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                <span>{b}</span>
+              </li>
+            ))}
+          </ul>
+          <div className="flex items-center gap-1 mb-3">
+            {[1, 2, 3, 4, 5].map((i) => (
+              <Star key={i} className="w-4 h-4 fill-primary text-primary" />
+            ))}
+            <span className="text-xs text-muted-foreground ml-1">+500 membres actifs</span>
+          </div>
+          <Button asChild size="lg" className="w-full font-bold shadow-lg" variant="hero">
+            <Link to="/auth?tab=signup">
+              <Zap className="w-4 h-4 mr-2" />
+              Démarrer maintenant
               <ArrowRight className="w-4 h-4 ml-2" />
             </Link>
           </Button>
+          <p className="text-[11px] text-center text-muted-foreground mt-2">
+            Sans engagement · Accès immédiat
+          </p>
         </CardContent>
       </Card>
 
