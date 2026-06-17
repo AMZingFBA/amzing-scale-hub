@@ -7,6 +7,8 @@ import SEO from '@/components/SEO';
 import BlogFAQ from '@/components/blog/BlogFAQ';
 import BlogSidebar from '@/components/blog/BlogSidebar';
 import BlogArticleContent from '@/components/blog/BlogArticleContent';
+import BlogConversionCTA from '@/components/blog/BlogConversionCTA';
+import BlogStickyMobileCTA from '@/components/blog/BlogStickyMobileCTA';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { getArticleBySlug, blogCategories, type BlogArticle } from '@/lib/blog-data';
@@ -292,11 +294,17 @@ const BlogPost = () => {
             {/* Article */}
             <div className="max-w-none">
               <BlogArticleContent article={article} />
-              
+
+              {/* Bloc de conversion principal */}
+              <BlogConversionCTA />
+
               {/* FAQ */}
               {article.faqs.length > 0 && (
                 <BlogFAQ faqs={article.faqs} articleTitle={article.title} />
               )}
+
+              {/* Second CTA après FAQ pour rattraper les lecteurs longs */}
+              {article.faqs.length > 0 && <BlogConversionCTA />}
 
               {/* Tags */}
               <div className="mt-12 pt-8 border-t border-border">
@@ -322,6 +330,7 @@ const BlogPost = () => {
       </main>
 
       <Footer />
+      <BlogStickyMobileCTA />
     </div>
   );
 };
