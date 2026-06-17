@@ -204,56 +204,69 @@ const BlogPost = () => {
         </nav>
 
         {/* Hero */}
-        <header className="relative py-12 md:py-16">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-secondary/5" />
+        <header className="relative py-14 md:py-20 overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/8 via-background to-secondary/5" />
+          <div className="absolute top-0 right-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none" />
+          
           <div className="container mx-auto px-4 relative">
             <Button
               variant="ghost"
               size="sm"
               onClick={() => navigate(-1)}
-              className="mb-6"
+              className="mb-8 hover:bg-primary/10"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
               Retour
             </Button>
 
             <div className="max-w-4xl">
-              <div className="flex flex-wrap items-center gap-3 mb-4">
-                <Badge variant="outline">{category.name}</Badge>
+              {/* Badge formation certifiante */}
+              <div className="flex flex-wrap items-center gap-3 mb-5">
+                <Badge variant="outline" className="font-medium">{category.name}</Badge>
                 {article.type === 'pilier' && (
-                  <Badge className="bg-primary text-primary-foreground">
+                  <Badge className="bg-primary text-primary-foreground font-bold">
+                    <Award className="w-3 h-3 mr-1" />
                     Guide Complet
                   </Badge>
                 )}
+                <div className="hidden sm:flex items-center gap-1.5 text-xs text-muted-foreground bg-muted/50 px-2.5 py-1 rounded-full">
+                  <Star className="w-3 h-3 fill-primary text-primary" />
+                  <span className="font-semibold text-foreground">4.9</span>
+                  <span>· 127 avis</span>
+                </div>
               </div>
 
-              <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6 leading-tight">
+              <h1 className="text-3xl md:text-4xl lg:text-5xl font-extrabold mb-6 leading-tight tracking-tight">
                 {article.title}
               </h1>
 
-              <p className="text-xl text-muted-foreground mb-6">
+              <p className="text-xl md:text-2xl text-muted-foreground mb-8 leading-relaxed max-w-3xl">
                 {article.excerpt}
               </p>
 
-              <div className="flex flex-wrap items-center gap-6 text-sm text-muted-foreground">
-                <div className="flex items-center gap-2">
-                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                    <User className="w-5 h-5 text-primary" />
+              <div className="flex flex-wrap items-center gap-4 md:gap-8 text-sm">
+                <div className="flex items-center gap-3 bg-muted/40 rounded-full px-4 py-2">
+                  <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center">
+                    <User className="w-4 h-4 text-primary" />
                   </div>
                   <div>
-                    <p className="font-medium text-foreground">{article.author}</p>
-                    <p className="text-xs">Expert Amazon FBA</p>
+                    <p className="font-semibold text-foreground text-sm">{article.author}</p>
+                    <p className="text-xs text-muted-foreground">Expert Amazon FBA</p>
                   </div>
                 </div>
-                <span className="flex items-center gap-1">
-                  <Calendar className="w-4 h-4" />
-                  {formatDate(article.publishedAt)}
-                </span>
-                <span className="flex items-center gap-1">
-                  <Clock className="w-4 h-4" />
-                  {article.readTime} min de lecture
-                </span>
-                <Button variant="ghost" size="sm" onClick={handleShare}>
+                
+                <div className="flex items-center gap-6 text-muted-foreground">
+                  <span className="flex items-center gap-1.5">
+                    <Calendar className="w-4 h-4" />
+                    {formatDate(article.publishedAt)}
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <BookOpen className="w-4 h-4" />
+                    {article.readTime} min
+                  </span>
+                </div>
+
+                <Button variant="ghost" size="sm" onClick={handleShare} className="rounded-full hover:bg-muted/50">
                   <Share2 className="w-4 h-4 mr-2" />
                   Partager
                 </Button>
