@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { ArrowRight, BookOpen, CheckCircle2, Sparkles, Star, TrendingUp, Zap } from 'lucide-react';
+import { ArrowRight, BookOpen, CheckCircle2, Star, Shield, Users, Zap, PlayCircle, Award } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -16,59 +16,99 @@ const BlogSidebar = ({ currentArticle }: BlogSidebarProps) => {
 
   return (
     <aside className="space-y-6">
-      {/* CTA Box — version conversion forte */}
-      <Card className="relative overflow-hidden border-2 border-primary/40 shadow-xl bg-gradient-to-br from-primary/15 via-primary/5 to-background">
-        <div className="absolute -top-10 -right-10 w-32 h-32 bg-primary/20 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-primary/10 rounded-full blur-3xl pointer-events-none" />
-        <CardContent className="p-6 relative">
-          <Badge className="mb-3 bg-primary text-primary-foreground border-0 shadow-md">
-            <Sparkles className="w-3 h-3 mr-1" />
-            Offre limitée
-          </Badge>
-          <div className="flex items-center gap-2 mb-2">
-            <TrendingUp className="w-5 h-5 text-primary" />
-            <span className="font-bold text-primary text-sm uppercase tracking-wide">AMZing FBA</span>
+      {/* ─── CTA FORMATION PREMIUM ─── */}
+      <div className="relative overflow-hidden rounded-2xl border border-border/60 bg-card shadow-2xl">
+        {/* Bandeau premium en haut */}
+        <div className="relative bg-gradient-to-r from-foreground via-foreground to-muted-foreground px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Award className="w-5 h-5 text-primary" />
+              <span className="text-sm font-bold text-primary-foreground tracking-wide uppercase">
+                Formation Certifiante
+              </span>
+            </div>
+            <Badge className="bg-primary text-primary-foreground border-0 text-xs font-bold shadow-lg">
+              700€
+            </Badge>
           </div>
-          <h3 className="font-extrabold text-xl mb-3 leading-tight">
-            Trouvez vos prochains produits gagnants en 2 clics
-          </h3>
-          <ul className="space-y-2 mb-4">
+        </div>
+
+        <div className="p-6 space-y-5">
+          {/* Titre + preuve */}
+          <div>
+            <h3 className="text-xl font-extrabold leading-tight mb-2">
+              Devenir Vendeur Amazon FBA
+              <span className="block text-primary mt-1">En 30 Jours</span>
+            </h3>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              La méthode complète pour créer un business Amazon rentable, 
+              même en partant de zéro.
+            </p>
+          </div>
+
+          {/* Preuve sociale chiffrée */}
+          <div className="flex items-center gap-3 bg-muted/50 rounded-xl p-3">
+            <div className="flex -space-x-2">
+              {[1,2,3,4].map(i => (
+                <div key={i} className="w-8 h-8 rounded-full bg-gradient-to-br from-primary/80 to-primary/40 border-2 border-background flex items-center justify-center text-[10px] font-bold text-primary-foreground">
+                  {String.fromCharCode(64+i)}
+                </div>
+              ))}
+            </div>
+            <div className="text-xs">
+              <span className="font-bold text-foreground">+500</span>
+              <span className="text-muted-foreground"> membres formés</span>
+            </div>
+          </div>
+
+          {/* Liste des inclusions */}
+          <ul className="space-y-2.5">
             {[
-              'Alertes produits rentables quotidiennes',
-              'Formation Amazon FBA complète',
-              'Communauté privée + suivi 1:1',
-            ].map((b) => (
-              <li key={b} className="flex items-start gap-2 text-sm">
-                <CheckCircle2 className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-                <span>{b}</span>
+              { icon: PlayCircle, text: '40+ heures de vidéo HD' },
+              { icon: Users, text: 'Accès communauté privée Discord' },
+              { icon: Zap, text: 'Alertes produits rentables' },
+              { icon: Shield, text: 'Garantie 30 jours satisfait/remboursé' },
+              { icon: CheckCircle2, text: 'Mises à jour à vie incluses' },
+            ].map(({ icon: Icon, text }) => (
+              <li key={text} className="flex items-center gap-2.5 text-sm">
+                <Icon className="w-4 h-4 text-primary shrink-0" />
+                <span>{text}</span>
               </li>
             ))}
           </ul>
-          <div className="flex items-center gap-1 mb-3">
-            {[1, 2, 3, 4, 5].map((i) => (
-              <Star key={i} className="w-4 h-4 fill-primary text-primary" />
-            ))}
-            <span className="text-xs text-muted-foreground ml-1">+500 membres actifs</span>
+
+          {/* Note / avis */}
+          <div className="flex items-center gap-2 bg-primary/5 rounded-lg px-3 py-2">
+            <div className="flex">
+              {[1,2,3,4,5].map(i => (
+                <Star key={i} className="w-3.5 h-3.5 fill-primary text-primary" />
+              ))}
+            </div>
+            <span className="text-xs font-semibold">4.9/5</span>
+            <span className="text-xs text-muted-foreground">· Basé sur 127 avis vérifiés</span>
           </div>
-          <Button asChild size="lg" className="w-full font-bold shadow-lg" variant="hero">
+
+          {/* CTA Principal */}
+          <Button asChild size="lg" className="w-full font-bold text-base shadow-lg hover:shadow-xl transition-shadow">
             <Link to="/auth?tab=signup">
               <Zap className="w-4 h-4 mr-2" />
-              Démarrer maintenant
+              Rejoindre la Formation
               <ArrowRight className="w-4 h-4 ml-2" />
             </Link>
           </Button>
-          <p className="text-[11px] text-center text-muted-foreground mt-2">
-            Sans engagement · Accès immédiat
-          </p>
-        </CardContent>
-      </Card>
 
-      {/* Articles liés */}
+          <p className="text-[11px] text-center text-muted-foreground">
+            Paiement sécurisé · Accès immédiat · Support 7j/7
+          </p>
+        </div>
+      </div>
+
+      {/* ─── ARTICLES LIÉS ─── */}
       {relatedArticles.length > 0 && (
-        <Card>
+        <Card className="border-border/60 shadow-sm">
           <CardHeader className="pb-3">
-            <CardTitle className="text-lg flex items-center gap-2">
-              <BookOpen className="w-4 h-4" />
+            <CardTitle className="text-base flex items-center gap-2">
+              <BookOpen className="w-4 h-4 text-primary" />
               Articles connexes
             </CardTitle>
           </CardHeader>
@@ -83,7 +123,7 @@ const BlogSidebar = ({ currentArticle }: BlogSidebarProps) => {
                   <img
                     src={article.image}
                     alt={article.title}
-                    className="w-16 h-16 object-cover rounded shrink-0"
+                    className="w-16 h-16 object-cover rounded-lg shrink-0"
                   />
                   <div className="min-w-0">
                     <h4 className="font-medium text-sm line-clamp-2 group-hover:text-primary transition-colors">
@@ -100,10 +140,10 @@ const BlogSidebar = ({ currentArticle }: BlogSidebarProps) => {
         </Card>
       )}
 
-      {/* Catégorie actuelle */}
-      <Card>
+      {/* ─── CATÉGORIE ─── */}
+      <Card className="border-border/60 shadow-sm">
         <CardHeader className="pb-3">
-          <CardTitle className="text-lg">Dans cette catégorie</CardTitle>
+          <CardTitle className="text-base">Dans cette catégorie</CardTitle>
         </CardHeader>
         <CardContent>
           <Link to={`/blog?categorie=${category.slug}`}>
@@ -117,11 +157,11 @@ const BlogSidebar = ({ currentArticle }: BlogSidebarProps) => {
         </CardContent>
       </Card>
 
-      {/* Guides principaux */}
+      {/* ─── GUIDES COMPLETS ─── */}
       {pilierArticles.length > 0 && (
-        <Card>
+        <Card className="border-border/60 shadow-sm">
           <CardHeader className="pb-3">
-            <CardTitle className="text-lg">Guides Complets</CardTitle>
+            <CardTitle className="text-base">Guides Complets</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
             {pilierArticles.map(article => (
