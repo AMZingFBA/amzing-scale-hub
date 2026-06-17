@@ -28,7 +28,7 @@ const BlogSidebar = ({ currentArticle }: BlogSidebarProps) => {
               </span>
             </div>
             <Badge className="bg-primary text-primary-foreground border-0 text-xs font-bold shadow-lg">
-              700€
+              64€/mois
             </Badge>
           </div>
         </div>

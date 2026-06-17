@@ -100,9 +100,9 @@ const BlogConversionCTA = () => {
                 </div>
               </div>
               <div className="bg-muted/50 rounded-xl p-6 border border-border/50 text-center">
-                <div className="text-5xl font-extrabold text-foreground">700€</div>
+                <div className="text-5xl font-extrabold text-foreground">64€</div>
                 <div className="text-xs text-muted-foreground mt-1 uppercase tracking-wide font-medium">
-                  Investissement unique
+                  Par mois
                 </div>
               </div>
               <div className="bg-muted/50 rounded-xl p-4 border border-border/50 flex items-center gap-3">
