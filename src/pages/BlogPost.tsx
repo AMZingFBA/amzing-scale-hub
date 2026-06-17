@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Clock, Calendar, Share2, ChevronRight, User } from 'lucide-react';
+import { ArrowLeft, Clock, Calendar, Share2, ChevronRight, User, Award, BookOpen, Star } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import SEO from '@/components/SEO';
