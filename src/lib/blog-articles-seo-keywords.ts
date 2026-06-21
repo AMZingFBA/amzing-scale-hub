@@ -8,9 +8,9 @@ import { BlogArticle } from './blog-data';
 // Article 1: Formation Amazon FBA
 export const articleFormationAmazonFba: BlogArticle = {
   slug: 'formation-amazon-fba-guide-complet',
-  title: "Formation Amazon FBA : Le Guide Complet pour Se Former en 2026",
-  metaTitle: "Formation Amazon FBA 2026 : Guide Complet pour Apprendre à Vendre",
-  metaDescription: "Découvrez les meilleures formations Amazon FBA en 2026. Gratuit, payant, en ligne : comparatif complet pour choisir la formation qui vous correspond.",
+  title: "Formation Amazon FBA : apprendre à vendre avec une vraie méthode",
+  metaTitle: "Formation Amazon FBA : apprendre à vendre avec une vraie méthode",
+  metaDescription: "Découvrez comment une formation Amazon FBA peut vous aider à éviter les erreurs, choisir les bons produits et structurer votre activité.",
   keywords: ['formation amazon fba', 'formation amazon fba france', 'amazon fba formation', 'apprendre amazon fba', 'cours amazon fba', 'formation vendeur amazon', 'se former amazon fba', 'formation e-commerce amazon', 'amazon fba débutant formation', 'meilleure formation amazon fba'],
   excerpt: "Formation Amazon FBA : tout ce qu'il faut savoir pour se former efficacement au business Amazon. Comparatif des formations, ressources gratuites, et conseils d'experts.",
   category: 'guide-fba',

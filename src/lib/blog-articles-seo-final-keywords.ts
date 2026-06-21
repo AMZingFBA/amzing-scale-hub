@@ -1169,10 +1169,10 @@ Le sourcing est le pilier de votre réussite sur Amazon FBA. Maîtrisez les outi
 // Article: Que signifie FBA
 export const articleQueSignifieFba: BlogArticle = {
   slug: 'que-signifie-fba-definition-complete',
-  title: "FBA : Définition Simple + Signification Réelle (Amazon 2026)",
-  metaTitle: "Que Signifie FBA ? Définition Amazon Claire en 30 secondes",
-  metaDescription: "Que veut dire FBA ? Définition simple de Fulfillment by Amazon, fonctionnement expliqué avec un exemple concret + comparatif avec FBM. Tout comprendre vite.",
-  keywords: ['que signifie fba', 'fba definition', 'fba signification', 'fba meaning', 'que veut dire fba', 'amz fba', 'c est quoi fba', 'fba explication', 'fba amazon definition', 'definition fba amazon'],
+  title: "FBA : définition simple et signification (Amazon, 2026)",
+  metaTitle: "FBA : définition simple de Fulfillment by Amazon (2026)",
+  metaDescription: "Que veut dire FBA ? Définition courte et claire de Fulfillment by Amazon, avec un exemple concret et la différence avec FBM, en 2 minutes.",
+  keywords: ['que signifie fba', 'fba definition', 'fba signification', 'fba meaning', 'que veut dire fba', 'definition fba amazon'],
   excerpt: "Que signifie FBA ? Définition complète de Fulfillment by Amazon. Comprenez ce que veut dire FBA et comment ce service logistique fonctionne.",
   category: 'guide-fba',
   type: 'satellite',
@@ -2602,9 +2602,9 @@ Bien que les formations Amazon FBA pures ne soient généralement pas éligibles
 // Article: SellerAmp
 export const articleSelleramp: BlogArticle = {
   slug: 'selleramp-avis-guide-complet',
-  title: "SellerAmp : Avis et Guide Complet de l'Outil de Sourcing 2026",
-  metaTitle: "SellerAmp 2026 : Avis, Guide Complet et Tutoriel",
-  metaDescription: "SellerAmp : avis complet sur l'outil de sourcing Amazon FBA. Fonctionnalités, prix, tutoriel. Tout savoir sur SellerAmp SAS.",
+  title: "SellerAmp : analyser la rentabilité d'un produit Amazon FBA",
+  metaTitle: "SellerAmp : analyser la rentabilité d'un produit Amazon FBA",
+  metaDescription: "Découvrez comment utiliser SellerAmp pour calculer les frais Amazon, le ROI, les ventes estimées et éviter les erreurs de sourcing.",
   keywords: ['selleramp', 'selleramp avis', 'selleramp sas', 'outil sourcing amazon', 'selleramp tutorial', 'selleramp prix', 'selleramp fba', 'application sourcing amazon', 'scanner amazon fba', 'meilleur outil sourcing'],
   excerpt: "SellerAmp : avis complet sur l'outil de sourcing Amazon FBA n°1. Fonctionnalités, prix, tutoriel. Tout ce qu'il faut savoir.",
   category: 'produits-rentables',
