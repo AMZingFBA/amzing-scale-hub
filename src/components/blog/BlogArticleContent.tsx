@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import rehypeSlug from 'rehype-slug';
 import { BlogArticle } from '@/lib/blog-data';
 import { CheckCircle, AlertTriangle, Lightbulb, TrendingUp, Info, Lock, Star, Award } from 'lucide-react';
 
