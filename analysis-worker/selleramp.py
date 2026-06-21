@@ -72,15 +72,22 @@ class SellerAmpClient:
                 await asyncio.sleep(2)
 
         data_map = {}
+        if not isinstance(result, dict):
+            return {}
+        kpls = result.get('kpls') or {}
+        if not isinstance(kpls, dict):
+            return {}
         for asin in asins:
-            kpl = result.get('kpls', {}).get(asin, {})
+            kpl = kpls.get(asin) or {}
             if not isinstance(kpl, dict):
                 continue
 
-            cur = kpl.get('current', {})
-            prix_new = int(cur.get('18', '-1'))
-            prix_amz = int(cur.get('0', '-1'))
-            prix_fba = int(cur.get('7', '-1'))
+            cur = kpl.get('current') or {}
+            if not isinstance(cur, dict):
+                cur = {}
+            prix_new = int(cur.get('18', '-1') or '-1')
+            prix_amz = int(cur.get('0', '-1') or '-1')
+            prix_fba = int(cur.get('7', '-1') or '-1')
             prix = -1
             for p in [prix_new, prix_amz, prix_fba]:
                 if p > 0:
