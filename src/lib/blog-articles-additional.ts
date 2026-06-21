@@ -871,9 +871,9 @@ Le statut juridique optimal évolue avec votre business. Commencez en micro-entr
 // Article 12: Keepa analyse
 export const articleKeepaAnalyse: BlogArticle = {
   slug: 'keepa-analyser-historique-prix-amazon',
-  title: "Keepa : Comment Analyser l'Historique des Prix Amazon [Tuto]",
-  metaTitle: 'Keepa 2026 : Analyse Historique des Prix et BSR Amazon Facile',
-  metaDescription: 'Découvrez comment Keepa vous aide à suivre les prix Amazon et BSR. Tutoriel simple pour optimiser vos achats et ventes Amazon FBA. Essayez-le dès aujourd’hui !',
+  title: "Keepa Amazon : comment analyser les ventes et éviter les mauvais produits",
+  metaTitle: "Keepa Amazon : analyser les ventes et éviter les mauvais produits",
+  metaDescription: "Guide simple pour comprendre Keepa, lire les courbes Amazon et vérifier si un produit est vraiment rentable avant d'acheter.",
   keywords: ['keepa amazon', 'historique prix amazon', 'graphique keepa', 'bsr amazon', 'analyse prix amazon', 'outil keepa', 'extension keepa', 'suivi prix amazon', 'keepa chrome', 'prix historique produit'],
   excerpt: "Keepa est l'outil indispensable pour analyser l'historique des prix et du BSR sur Amazon. Apprenez à lire les graphiques et éviter les mauvais investissements.",
   category: 'produits-rentables',
