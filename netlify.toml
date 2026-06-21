@@ -32,6 +32,19 @@
   status = 200
   force = true
 
+# === SEO 301 — Décannibalisation pillar "amazon-fba-cest-quoi-guide-complet" ===
+[[redirects]]
+  from = "/blog/fba-amazon-cest-quoi-explication-complete"
+  to = "/blog/amazon-fba-cest-quoi-guide-complet"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/blog/cest-quoi-amazon-fba-definition-complete"
+  to = "/blog/amazon-fba-cest-quoi-guide-complet"
+  status = 301
+  force = true
+
 [[redirects]]
   from = "/*"
   to = "/index.html"
