@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link, useNavigate, Navigate } from 'react-router-dom';
 import { ArrowLeft, Clock, Calendar, Share2, ChevronRight, User, Award, BookOpen, Star } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -15,9 +15,21 @@ import { getArticleBySlug, blogCategories, type BlogArticle } from '@/lib/blog-d
 import { fetchDbArticleBySlug } from '@/lib/blog-db';
 import { toast } from 'sonner';
 
+// Redirections SEO 301 (cannibalisation) — voir aussi netlify.toml
+const BLOG_REDIRECTS: Record<string, string> = {
+  'fba-amazon-cest-quoi-explication-complete': 'amazon-fba-cest-quoi-guide-complet',
+  'cest-quoi-amazon-fba-definition-complete': 'amazon-fba-cest-quoi-guide-complet',
+};
+
 const BlogPost = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
+
+  // Redirection SPA pour les slugs cannibalisants
+  if (slug && BLOG_REDIRECTS[slug]) {
+    return <Navigate to={`/blog/${BLOG_REDIRECTS[slug]}`} replace />;
+  }
+
 
   const staticArticle = slug ? getArticleBySlug(slug) : undefined;
   const [article, setArticle] = useState<BlogArticle | undefined>(staticArticle);
