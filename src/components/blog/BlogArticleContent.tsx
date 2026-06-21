@@ -160,7 +160,7 @@ const BlogArticleContent = ({ article }: BlogArticleContentProps) => {
 
   return (
     <article className="prose prose-lg max-w-none">
-      <ReactMarkdown components={components} remarkPlugins={[remarkGfm]}>
+      <ReactMarkdown components={components} remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeSlug]}>
         {article.content}
       </ReactMarkdown>
     </article>
