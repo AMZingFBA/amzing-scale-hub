@@ -112,7 +112,7 @@ const pilierGuideFba: BlogArticle = {
   content: `
 > 📌 **En résumé** — Amazon FBA, c'est le service logistique d'Amazon : vous envoyez votre stock, Amazon stocke, emballe, expédie et gère le SAV. Ce guide s'adresse aux personnes qui veulent **vraiment** comprendre comment ça marche, **combien ça coûte**, si c'est **encore rentable en 2026**, et comment **éviter les erreurs** classiques de débutant.
 
-<p style="margin: 1.5rem 0;"><a href="/accompagnement" style="display: inline-block; background: hsl(var(--primary)); color: hsl(var(--primary-foreground)); padding: 0.875rem 1.5rem; border-radius: 0.5rem; font-weight: 700; text-decoration: none;">→ Être accompagné pour lancer mon Amazon FBA</a></p>
+### 👉 [Être accompagné pour lancer mon Amazon FBA](/accompagnement)
 
 ---
 
