@@ -193,7 +193,7 @@ const Dashboard = () => {
               )}
             </div>
 
-            <RecentUpdates />
+            {/* <RecentUpdates /> — section Nouveautés masquée temporairement à la demande */}
             <Accordion type="multiple" className="space-y-4">
               {/* INTRODUCTION */}
               <AccordionItem value="introduction" className="border rounded-lg px-6 bg-card">
