@@ -163,6 +163,17 @@ const BlogPost = () => {
     ]
   };
 
+  // FAQPage schema (si l'article a une FAQ)
+  const faqSchema = article.faqs.length > 0 ? {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": article.faqs.map(f => ({
+      "@type": "Question",
+      "name": f.question,
+      "acceptedAnswer": { "@type": "Answer", "text": f.answer }
+    }))
+  } : null;
+
   return (
     <div className="min-h-screen bg-background">
       <SEO
@@ -179,6 +190,13 @@ const BlogPost = () => {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
+      {faqSchema && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+        />
+      )}
+      
       
       <Navbar />
       
