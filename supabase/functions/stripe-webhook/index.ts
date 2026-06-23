@@ -998,6 +998,34 @@ serve(async (req) => {
             .update({ payment_status: "payé", payment_month: new Date().toISOString().slice(0, 7) })
             .eq("id", referral.id);
         }
+
+        // Notify Credaris: subscription reactivated/active
+        const { data: pForCredaris } = await supabaseClient.from("profiles")
+          .select("id,email,full_name,phone,phone_e164,siren,company_name,legal_form,client_ref,billing_address_street,billing_address_zip,billing_address_city,billing_address_country,created_at")
+          .eq("id", profile.id).maybeSingle();
+        const { data: sForCredaris } = await supabaseClient.from("subscriptions").select("*").eq("user_id", profile.id).maybeSingle();
+        await notifyCredaris(
+          "subscription.reactivated",
+          `evt_amzing_sub_${subscription.id}_${event.id}`,
+          {
+            client: buildCredarisClient(pForCredaris, customerEmail, sForCredaris),
+            abonnement: {
+              offre: sForCredaris?.offer_label || "VIP Annuel",
+              date_souscription: sForCredaris?.started_at?.slice(0,10) || null,
+              duree_mois: sForCredaris?.commitment_months || 12,
+              prix_mensuel_eur: sForCredaris?.price_monthly_eur || null,
+              stripe_customer_id: subscription.customer,
+              stripe_subscription_id: subscription.id,
+              cgv_version: sForCredaris?.cgv_version || pForCredaris?.cgv_version || "",
+              cgv_acceptees_le: sForCredaris?.cgv_accepted_at || pForCredaris?.cgv_accepted_at || null,
+              cgv_ip: sForCredaris?.cgv_ip || pForCredaris?.cgv_ip || "",
+              cgv_user_agent: sForCredaris?.cgv_user_agent || pForCredaris?.cgv_user_agent || "",
+            },
+            payment: {},
+            documents: [],
+          },
+          profile.id,
+        );
       } else if (subscription.status === "canceled" || subscription.status === "unpaid" || subscription.status === "past_due") {
         const { data: existingSub } = await supabaseClient
           .from("subscriptions")
