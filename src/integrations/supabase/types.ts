@@ -613,6 +613,30 @@ export type Database = {
         }
         Relationships: []
       }
+      cgv_versions: {
+        Row: {
+          created_at: string
+          is_current: boolean
+          pdf_url: string
+          published_at: string
+          version: string
+        }
+        Insert: {
+          created_at?: string
+          is_current?: boolean
+          pdf_url: string
+          published_at?: string
+          version: string
+        }
+        Update: {
+          created_at?: string
+          is_current?: boolean
+          pdf_url?: string
+          published_at?: string
+          version?: string
+        }
+        Relationships: []
+      }
       chat_messages: {
         Row: {
           content: string | null
@@ -784,6 +808,57 @@ export type Database = {
           name?: string | null
           type?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      credaris_sync_log: {
+        Row: {
+          created_at: string
+          error_message: string | null
+          event: string
+          external_id: string
+          http_status: number | null
+          id: string
+          last_attempt_at: string | null
+          next_retry_at: string | null
+          payload: Json
+          response_body: string | null
+          retry_count: number
+          status: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          error_message?: string | null
+          event: string
+          external_id: string
+          http_status?: number | null
+          id?: string
+          last_attempt_at?: string | null
+          next_retry_at?: string | null
+          payload: Json
+          response_body?: string | null
+          retry_count?: number
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          error_message?: string | null
+          event?: string
+          external_id?: string
+          http_status?: number | null
+          id?: string
+          last_attempt_at?: string | null
+          next_retry_at?: string | null
+          payload?: Json
+          response_body?: string | null
+          retry_count?: number
+          status?: string
+          updated_at?: string
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -1723,6 +1798,69 @@ export type Database = {
         }
         Relationships: []
       }
+      payment_attempts: {
+        Row: {
+          amount_eur: number | null
+          attempted_at: string
+          created_at: string
+          currency: string | null
+          email: string | null
+          error_code: string | null
+          error_message: string | null
+          id: string
+          installment_number: number | null
+          method: string | null
+          raw_psp_response: Json | null
+          status: string
+          stripe_customer_id: string | null
+          stripe_event_id: string | null
+          stripe_invoice_id: string | null
+          stripe_subscription_id: string | null
+          transaction_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          amount_eur?: number | null
+          attempted_at?: string
+          created_at?: string
+          currency?: string | null
+          email?: string | null
+          error_code?: string | null
+          error_message?: string | null
+          id?: string
+          installment_number?: number | null
+          method?: string | null
+          raw_psp_response?: Json | null
+          status: string
+          stripe_customer_id?: string | null
+          stripe_event_id?: string | null
+          stripe_invoice_id?: string | null
+          stripe_subscription_id?: string | null
+          transaction_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          amount_eur?: number | null
+          attempted_at?: string
+          created_at?: string
+          currency?: string | null
+          email?: string | null
+          error_code?: string | null
+          error_message?: string | null
+          id?: string
+          installment_number?: number | null
+          method?: string | null
+          raw_psp_response?: Json | null
+          status?: string
+          stripe_customer_id?: string | null
+          stripe_event_id?: string | null
+          stripe_invoice_id?: string | null
+          stripe_subscription_id?: string | null
+          transaction_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       product_find_alerts: {
         Row: {
           admin_id: string
@@ -1905,39 +2043,72 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null
+          billing_address_city: string | null
+          billing_address_country: string | null
+          billing_address_street: string | null
+          billing_address_zip: string | null
+          cgv_accepted_at: string | null
+          cgv_ip: string | null
+          cgv_user_agent: string | null
+          cgv_version: string | null
+          client_ref: string | null
           company_name: string | null
           created_at: string
           email: string
           full_name: string | null
           id: string
+          legal_form: string | null
           nickname: string | null
           phone: string | null
+          phone_e164: string | null
           registration_source: string | null
           siren: string | null
           updated_at: string
         }
         Insert: {
           avatar_url?: string | null
+          billing_address_city?: string | null
+          billing_address_country?: string | null
+          billing_address_street?: string | null
+          billing_address_zip?: string | null
+          cgv_accepted_at?: string | null
+          cgv_ip?: string | null
+          cgv_user_agent?: string | null
+          cgv_version?: string | null
+          client_ref?: string | null
           company_name?: string | null
           created_at?: string
           email: string
           full_name?: string | null
           id: string
+          legal_form?: string | null
           nickname?: string | null
           phone?: string | null
+          phone_e164?: string | null
           registration_source?: string | null
           siren?: string | null
           updated_at?: string
         }
         Update: {
           avatar_url?: string | null
+          billing_address_city?: string | null
+          billing_address_country?: string | null
+          billing_address_street?: string | null
+          billing_address_zip?: string | null
+          cgv_accepted_at?: string | null
+          cgv_ip?: string | null
+          cgv_user_agent?: string | null
+          cgv_version?: string | null
+          client_ref?: string | null
           company_name?: string | null
           created_at?: string
           email?: string
           full_name?: string | null
           id?: string
+          legal_form?: string | null
           nickname?: string | null
           phone?: string | null
+          phone_e164?: string | null
           registration_source?: string | null
           siren?: string | null
           updated_at?: string
@@ -2335,12 +2506,22 @@ export type Database = {
       subscriptions: {
         Row: {
           apple_transaction_id: string | null
+          cgv_accepted_at: string | null
+          cgv_ip: string | null
+          cgv_user_agent: string | null
+          cgv_version: string | null
+          commitment_months: number | null
+          consecutive_failed_count: number
           created_at: string
           expires_at: string | null
           id: string
           is_trial: boolean | null
+          last_failure_at: string | null
+          offer_label: string | null
+          payment_link_url: string | null
           payment_provider: string | null
           plan_type: string
+          price_monthly_eur: number | null
           started_at: string
           status: string
           stripe_customer_id: string | null
@@ -2351,12 +2532,22 @@ export type Database = {
         }
         Insert: {
           apple_transaction_id?: string | null
+          cgv_accepted_at?: string | null
+          cgv_ip?: string | null
+          cgv_user_agent?: string | null
+          cgv_version?: string | null
+          commitment_months?: number | null
+          consecutive_failed_count?: number
           created_at?: string
           expires_at?: string | null
           id?: string
           is_trial?: boolean | null
+          last_failure_at?: string | null
+          offer_label?: string | null
+          payment_link_url?: string | null
           payment_provider?: string | null
           plan_type: string
+          price_monthly_eur?: number | null
           started_at?: string
           status: string
           stripe_customer_id?: string | null
@@ -2367,12 +2558,22 @@ export type Database = {
         }
         Update: {
           apple_transaction_id?: string | null
+          cgv_accepted_at?: string | null
+          cgv_ip?: string | null
+          cgv_user_agent?: string | null
+          cgv_version?: string | null
+          commitment_months?: number | null
+          consecutive_failed_count?: number
           created_at?: string
           expires_at?: string | null
           id?: string
           is_trial?: boolean | null
+          last_failure_at?: string | null
+          offer_label?: string | null
+          payment_link_url?: string | null
           payment_provider?: string | null
           plan_type?: string
+          price_monthly_eur?: number | null
           started_at?: string
           status?: string
           stripe_customer_id?: string | null

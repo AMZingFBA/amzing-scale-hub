@@ -1,74 +1,109 @@
-# Générateur de blog IA — Admin AMZing FBA
+# Intégration automatique Credaris (recouvrement)
 
-## Vue d'ensemble
+Objectif : dès qu'un paiement échoue sur Amzing FBA, un webhook signé est envoyé automatiquement à Credaris avec toutes les preuves juridiques (CGV horodatées + IP, factures, contexte abonnement). Zéro saisie manuelle.
 
-Aujourd'hui les articles de blog sont **statiques** (fichiers TS hardcodés dans `src/lib/blog-articles-*.ts` puis agrégés dans `blog-data.ts`). On ajoute une couche **dynamique** en base de données pour les articles générés par IA, **sans toucher** aux articles statiques existants ni à leur rendu visuel. Le rendu public réutilise exactement le composant `BlogPost.tsx` actuel.
+## 1. Secrets & configuration
 
-## 1. Base de données (Lovable Cloud)
+Ajouter deux secrets runtime via le tool secrets :
+- `AMZING_WEBHOOK_SECRET` = `IMnZWDvKdnW2WXQhuyVFKShOHDlM0AVHBAP51f7HgsVQ6AEcAuyYa2xqXvn0RtKr`
+- `CREDARIS_WEBHOOK_URL` = `https://project--b49eaac5-99cf-4800-bc49-cb6c0bac61e8.lovable.app/api/public/amzing/webhook` (modifiable plus tard pour la prod)
 
-Nouvelle table `blog_posts` :
-- `slug` (unique), `title`, `meta_title`, `meta_description`
-- `excerpt`, `content` (markdown/HTML), `category`, `keywords[]`, `related_slugs[]`
-- `cover_image` (url storage), `images` (jsonb : url + alt + position)
-- `faqs` (jsonb)
-- `status` : `draft` | `published`
-- `author_id`, `published_at`, `created_at`, `updated_at`
+## 2. Migration base de données
 
-RLS :
-- `SELECT` public uniquement si `status = 'published'`
-- `INSERT/UPDATE/DELETE` réservé au rôle `admin` (via `has_role(auth.uid(), 'admin')`)
+Nouvelles colonnes / tables :
 
-Bucket Storage public `blog-ai-images` pour les images générées.
+**profiles** (ajouts) :
+- `cgv_version` text
+- `cgv_accepted_at` timestamptz
+- `cgv_ip` text
+- `cgv_user_agent` text
+- `billing_address_street`, `billing_address_zip`, `billing_address_city`, `billing_address_country` text
+- `phone_e164` text
+- `legal_form` text (SAS, SARL, EI, etc.)
+- `client_ref` text unique (format `AMZ-CL-XXXXXX`, auto-généré)
 
-## 2. Edge functions (clés IA côté serveur)
+**cgv_versions** (nouvelle table) :
+- `version` text PK, `pdf_url` text, `published_at` timestamptz, `is_current` boolean
 
-- `admin-blog-generate` — vérifie le JWT + rôle admin, appelle Lovable AI Gateway (`google/gemini-3-flash-preview`) pour produire en JSON structuré : intro, sections H2/H3, FAQ, meta, slug, alt-text d'images. Génère ensuite N images via `openai/gpt-image-2`, les upload dans le bucket, et insère le post en `draft` ou `published`.
-- `admin-blog-update` / `admin-blog-delete` — mutations sécurisées admin uniquement.
+**payment_attempts** (nouvelle table) :
+- `id`, `user_id`, `stripe_event_id`, `transaction_id`, `amount_eur`, `currency`, `method`, `status` (failed/succeeded), `error_code`, `error_message`, `raw_psp_response` jsonb, `installment_number` int, `attempted_at`
 
-Toutes les clés (`LOVABLE_API_KEY`) restent server-side.
+**consecutive_failures** (compteur dénormalisé sur subscriptions) :
+- `subscriptions.consecutive_failed_count` int default 0
+- `subscriptions.last_failure_at` timestamptz
 
-## 3. Pages admin (`/admin/...`)
+**credaris_sync_log** (nouvelle table) :
+- `id`, `event` text, `external_id` text unique, `payload` jsonb, `status` (pending/success/failed), `http_status` int, `response_body` text, `retry_count` int, `last_attempt_at`, `next_retry_at`, `created_at`
 
-- **`/admin/blog-generator`** — formulaire (titre, mots-clés principaux/secondaires, nb d'images, ton, catégorie, statut, meta title/description, slug auto-éditable). Bouton "Générer" → loader → aperçu éditable → "Publier" ou "Enregistrer brouillon".
-- **`/admin/blog-articles`** — liste des articles générés (filtre publié/brouillon), actions : voir / modifier / publier-dépublier / supprimer.
+Toutes avec `GRANT` appropriés + RLS (admin-only sauf `cgv_versions` lisible par tous).
 
-Garde : route protégée + check `has_role` côté UI et RLS côté backend.
+## 3. Storage bucket privé
 
-## 4. Rendu public
+Créer bucket privé `invoices` pour stocker les PDF de factures avec URL signée 7 jours minimum.
 
-- `getArticleBySlug` étendu : si pas trouvé dans le statique, requête `blog_posts` (published) en DB.
-- `Blog.tsx` fusionne les deux sources pour la liste.
-- `BlogPost.tsx` **inchangé visuellement** : même mise en page, sidebar, FAQ, JSON-LD. Les articles IA respectent la même `interface BlogArticle`.
+## 4. Edge functions
 
-## 5. SEO
+**`notify-credaris`** (cœur du système) :
+- Reçoit `{ event, externalId, payload }`
+- Signe le body brut en HMAC-SHA256 hex avec `AMZING_WEBHOOK_SECRET`
+- POST vers `CREDARIS_WEBHOOK_URL` avec header `X-Amzing-Signature`
+- Log dans `credaris_sync_log`
+- Retry exponentiel (0s, 30s, 5min) si HTTP ≠ 2xx
+- Idempotence via `external_id`
 
-JSON-LD `Article` + `FAQPage` déjà géré par `BlogPost.tsx` — fonctionnera automatiquement. Images avec alt text généré par l'IA. Sitemap : ajout dynamique au build (phase 2, optionnel).
+**`stripe-webhook`** (modification de l'existant) :
+- Sur `invoice.payment_failed` : incrémente compteur, log `payment_attempt`, construit payload complet (client + abonnement + payment + documents), appelle `notify-credaris` avec event `payment.failed`
+- Sur `invoice.payment_succeeded` : reset compteur, appelle event `payment.succeeded`
+- Sur `customer.subscription.updated|deleted` : appelle event correspondant
+- Toujours capture la réponse PSP brute
+
+**`credaris-manual-dossier`** :
+- Appelée par le bouton admin
+- Construit le payload complet pour un user_id donné
+- Envoie event `dossier.create_manual`
+
+**`capture-cgv-acceptance`** :
+- Appelée à l'inscription / souscription
+- Lit IP depuis `x-forwarded-for` / `cf-connecting-ip`
+- Stocke `cgv_version`, `cgv_accepted_at`, `cgv_ip`, `cgv_user_agent` sur le profil
+
+**`credaris-retry-failed`** (cron / appel manuel) :
+- Relance les entrées `credaris_sync_log` en status `failed` éligibles au retry
+
+## 5. Frontend
+
+**Formulaire d'inscription / souscription** :
+- Champs adresse de facturation séparés (rue / CP / ville / pays)
+- Téléphone forcé E.164 (avec react-phone-number-input ou validation regex)
+- Champ SIRET + forme juridique conditionnels (si client pro)
+- Case à cocher obligatoire « J'accepte les CGV » avec lien vers PDF de la version courante
+- À la soumission : appel `capture-cgv-acceptance` avant le redirect Stripe
+
+**Page admin** `/admin/credaris-sync` :
+- Liste paginée de `credaris_sync_log`
+- Filtres status (success/failed/pending), event, date
+- Colonnes : date, event, client, external_id, status, retry_count, HTTP status
+- Bouton « Renvoyer » par ligne (appelle `notify-credaris` avec même external_id)
+- Bouton « Voir payload » (modale JSON)
+
+**Fiche client admin** (probablement `AdminAirtableUsers` ou équivalent) :
+- Bouton « Créer un dossier Credaris » → appelle `credaris-manual-dossier`
+- Toast succès avec `dossier_id` retourné
+
+## 6. Test final
+
+Bouton de test dans `/admin/credaris-sync` qui envoie un `dossier.create_manual` avec `external_id: test_<timestamp>` et affiche la réponse Credaris.
 
 ## Détails techniques
 
-- Le prompt IA exige un JSON strict respectant `BlogArticle` (validation Zod côté edge function).
-- Génération images : streaming désactivé, on stocke le PNG final dans le bucket et on stocke l'URL publique.
-- Slug auto = slugify(title) avec dédoublonnage en DB.
-- Aucune modification des fichiers `blog-articles-*.ts` existants.
+- HMAC : `createHmac("sha256", secret).update(rawBody, "utf8").digest("hex")` — body sérialisé UNE SEULE FOIS pour éviter les drifts de signature
+- IP : prioriser `cf-connecting-ip` > première valeur de `x-forwarded-for` > `req.headers.get('x-real-ip')`
+- `external_id` : format `evt_amzing_<uuid>` généré côté Amzing, persisté avant l'envoi
+- Retries : stockés en `pending` avec `next_retry_at`, repris par cron (ou appel manuel admin)
+- Tous les logs masquent le secret HMAC
 
-## Fichiers créés / modifiés
+## Confirmation requise
 
-Créés :
-- Migration `blog_posts` + bucket
-- `supabase/functions/admin-blog-generate/index.ts`
-- `supabase/functions/admin-blog-update/index.ts` (+ delete)
-- `src/pages/AdminBlogGenerator.tsx`
-- `src/pages/AdminBlogArticles.tsx`
-- `src/lib/blog-db.ts` (helpers fetch DB articles)
-
-Modifiés :
-- `src/App.tsx` (routes admin)
-- `src/lib/blog-data.ts` (`getArticleBySlug` async fallback ou helper séparé)
-- `src/pages/Blog.tsx` + `BlogPost.tsx` (chargement DB + statique fusionné — visuel identique)
-- Page admin (sidebar/menu) pour ajouter les 2 nouveaux liens
-
-## Estimation
-
-~1h de génération côté agent + coût crédits IA par article généré (texte + N images). L'admin contrôle le volume.
-
-Confirme et je lance l'implémentation.
+Avant d'implémenter, deux questions :
+1. Le bouton « Créer un dossier Credaris » va sur quelle page admin exactement (fiche profil dans `AdminAirtableUsers`, ou nouvelle page dédiée) ?
+2. Le PDF des CGV courantes existe-t-il déjà quelque part (URL publique) ou faut-il créer la table `cgv_versions` vide et tu uploadras le PDF manuellement après ?
