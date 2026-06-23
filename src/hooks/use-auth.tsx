@@ -239,7 +239,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           .from('profiles')
           .update({ phone: phone })
           .eq('id', data.user.id);
-        
+
+        // Capture CGV acceptance (IP + user-agent + version) — preuve juridique pour Credaris
+        try {
+          await supabase.functions.invoke('capture-cgv-acceptance', { body: {} });
+        } catch (e) {
+          console.warn('CGV capture failed', e);
+        }
+
         // NOTE: Ne pas appeler syncUserToAirtable ici car l'événement SIGNED_IN
         // dans onAuthStateChange le fait déjà automatiquement
       }
