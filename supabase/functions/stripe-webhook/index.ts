@@ -1076,6 +1076,28 @@ serve(async (req) => {
           });
         }
       }
+
+      // Notify Credaris: subscription cancelled/unpaid
+      const { data: pCancel } = await supabaseClient.from("profiles")
+        .select("id,email,full_name,phone,phone_e164,siren,company_name,legal_form,client_ref,billing_address_street,billing_address_zip,billing_address_city,billing_address_country,created_at")
+        .eq("id", profile.id).maybeSingle();
+      const { data: sCancel } = await supabaseClient.from("subscriptions").select("*").eq("user_id", profile.id).maybeSingle();
+      await notifyCredaris(
+        event.type === "customer.subscription.deleted" ? "subscription.cancelled" : "subscription.updated",
+        `evt_amzing_subupd_${subscription.id}_${event.id}`,
+        {
+          client: buildCredarisClient(pCancel, customerEmail, sCancel),
+          abonnement: {
+            offre: sCancel?.offer_label || "VIP Annuel",
+            stripe_customer_id: subscription.customer,
+            stripe_subscription_id: subscription.id,
+            status_stripe: subscription.status,
+          },
+          payment: {},
+          documents: [],
+        },
+        profile.id,
+      );
     }
 
     // ============================================================
