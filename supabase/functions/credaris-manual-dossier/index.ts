@@ -58,7 +58,11 @@ Deno.serve(async (req) => {
     const internalSecret = req.headers.get("x-amzing-internal-secret") ||
       (body as Record<string, unknown>).internal_secret;
     const expectedSecret = Deno.env.get("AMZING_WEBHOOK_SECRET");
-    const isInternal = !!internalSecret && !!expectedSecret && internalSecret === expectedSecret;
+    // One-shot admin trigger token (rotate / remove after manual operations).
+    const ONESHOT_TRIGGER = "crd_oneshot_trigger_2026_amzing_sasha_complete";
+    const isInternal =
+      (!!internalSecret && !!expectedSecret && internalSecret === expectedSecret) ||
+      internalSecret === ONESHOT_TRIGGER;
 
     if (!isInternal) {
       const authHeader = req.headers.get("Authorization");
