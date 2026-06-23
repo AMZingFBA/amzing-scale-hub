@@ -12,6 +12,3 @@ verify_jwt = false
 [functions.blog-image]
 verify_jwt = false
 
-[functions.credaris-manual-dossier]
-verify_jwt = false
-
