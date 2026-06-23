@@ -93,6 +93,7 @@ const AdminAirtableUsers = lazy(() => import("./pages/AdminAirtableUsers"));
 const AdminSubscriptions = lazy(() => import("./pages/AdminSubscriptions"));
 
 const AdminFailedPayments = lazy(() => import("./pages/AdminFailedPayments"));
+const AdminCredarisSync = lazy(() => import("./pages/AdminCredarisSync"));
 const AdminWhatsAppBulk = lazy(() => import("./pages/AdminWhatsAppBulk"));
 const AdminIMessageBulk = lazy(() => import("./pages/AdminIMessageBulk"));
 const AdminProspection = lazy(() => import("./pages/AdminProspection"));
