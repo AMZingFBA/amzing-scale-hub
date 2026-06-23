@@ -7,6 +7,45 @@ const logStep = (step: string, details?: any) => {
   console.log(`[STRIPE-WEBHOOK] ${step}${detailsStr}`);
 };
 
+// Fire-and-forget call to notify-credaris (signed HMAC + retry handled there).
+async function notifyCredaris(event: string, externalId: string, payload: Record<string, unknown>, userId?: string | null) {
+  try {
+    const url = `${Deno.env.get("SUPABASE_URL")}/functions/v1/notify-credaris`;
+    const key = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
+    await fetch(url, {
+      method: "POST",
+      headers: { "content-type": "application/json", authorization: `Bearer ${key}`, apikey: key },
+      body: JSON.stringify({ event, external_id: externalId, user_id: userId ?? null, payload }),
+    });
+    logStep("→ Credaris notified", { event, externalId });
+  } catch (e) {
+    logStep("Credaris notify failed", { error: e instanceof Error ? e.message : String(e) });
+  }
+}
+
+function buildCredarisClient(profile: any, customerEmail: string, sub?: any) {
+  const [prenom, ...rest] = (profile?.full_name || "").trim().split(/\s+/);
+  const fullAddress = [
+    profile?.billing_address_street, profile?.billing_address_zip,
+    profile?.billing_address_city, profile?.billing_address_country,
+  ].filter(Boolean).join(", ");
+  return {
+    ref: profile?.client_ref || `AMZ-CL-${(profile?.id || "").slice(0,8).toUpperCase()}`,
+    nom: rest.join(" "),
+    prenom: prenom || "",
+    societe: profile?.company_name || "",
+    email: customerEmail,
+    telephone: profile?.phone_e164 || profile?.phone || "",
+    siret: profile?.siren || "",
+    forme_juridique: profile?.legal_form || "",
+    adresse: fullAddress,
+    adresse_facturation: fullAddress,
+    adresse_livraison: fullAddress,
+    cree_le: profile?.created_at || null,
+    statut: sub?.status === "active" ? "actif" : sub?.status === "canceled" || sub?.status === "expired" ? "resilie" : "suspendu",
+  };
+}
+
 // Tradedoubler server-side tracking (Server to Server)
 async function trackTradedoublerConversion(data: {
   transactionId: string;
@@ -959,6 +998,34 @@ serve(async (req) => {
             .update({ payment_status: "payé", payment_month: new Date().toISOString().slice(0, 7) })
             .eq("id", referral.id);
         }
+
+        // Notify Credaris: subscription reactivated/active
+        const { data: pForCredaris } = await supabaseClient.from("profiles")
+          .select("id,email,full_name,phone,phone_e164,siren,company_name,legal_form,client_ref,billing_address_street,billing_address_zip,billing_address_city,billing_address_country,created_at")
+          .eq("id", profile.id).maybeSingle();
+        const { data: sForCredaris } = await supabaseClient.from("subscriptions").select("*").eq("user_id", profile.id).maybeSingle();
+        await notifyCredaris(
+          "subscription.reactivated",
+          `evt_amzing_sub_${subscription.id}_${event.id}`,
+          {
+            client: buildCredarisClient(pForCredaris, customerEmail, sForCredaris),
+            abonnement: {
+              offre: sForCredaris?.offer_label || "VIP Annuel",
+              date_souscription: sForCredaris?.started_at?.slice(0,10) || null,
+              duree_mois: sForCredaris?.commitment_months || 12,
+              prix_mensuel_eur: sForCredaris?.price_monthly_eur || null,
+              stripe_customer_id: subscription.customer,
+              stripe_subscription_id: subscription.id,
+              cgv_version: sForCredaris?.cgv_version || pForCredaris?.cgv_version || "",
+              cgv_acceptees_le: sForCredaris?.cgv_accepted_at || pForCredaris?.cgv_accepted_at || null,
+              cgv_ip: sForCredaris?.cgv_ip || pForCredaris?.cgv_ip || "",
+              cgv_user_agent: sForCredaris?.cgv_user_agent || pForCredaris?.cgv_user_agent || "",
+            },
+            payment: {},
+            documents: [],
+          },
+          profile.id,
+        );
       } else if (subscription.status === "canceled" || subscription.status === "unpaid" || subscription.status === "past_due") {
         const { data: existingSub } = await supabaseClient
           .from("subscriptions")
@@ -1009,6 +1076,28 @@ serve(async (req) => {
           });
         }
       }
+
+      // Notify Credaris: subscription cancelled/unpaid
+      const { data: pCancel } = await supabaseClient.from("profiles")
+        .select("id,email,full_name,phone,phone_e164,siren,company_name,legal_form,client_ref,billing_address_street,billing_address_zip,billing_address_city,billing_address_country,created_at")
+        .eq("id", profile.id).maybeSingle();
+      const { data: sCancel } = await supabaseClient.from("subscriptions").select("*").eq("user_id", profile.id).maybeSingle();
+      await notifyCredaris(
+        event.type === "customer.subscription.deleted" ? "subscription.cancelled" : "subscription.updated",
+        `evt_amzing_subupd_${subscription.id}_${event.id}`,
+        {
+          client: buildCredarisClient(pCancel, customerEmail, sCancel),
+          abonnement: {
+            offre: sCancel?.offer_label || "VIP Annuel",
+            stripe_customer_id: subscription.customer,
+            stripe_subscription_id: subscription.id,
+            status_stripe: subscription.status,
+          },
+          payment: {},
+          documents: [],
+        },
+        profile.id,
+      );
     }
 
     // ============================================================
@@ -1194,12 +1283,141 @@ serve(async (req) => {
         logStep("🏦 Rubypayeur case created", { ref: rubypayeurRef, email: customerEmail });
       }
 
-      logStep("✅ Automated recovery completed", { 
-        email: customerEmail, 
-        emailSent, 
-        rubypayeurRef: rubypayeurRef || 'failed',
-        amount 
+      // Record payment attempt + increment consecutive counter
+      await supabaseClient.from("payment_attempts").insert({
+        user_id: profile.id,
+        email: customerEmail,
+        stripe_event_id: event.id,
+        stripe_invoice_id: invoice.id,
+        stripe_subscription_id: invoice.subscription || null,
+        stripe_customer_id: invoice.customer as string,
+        transaction_id: invoice.payment_intent as string || invoice.id,
+        amount_eur: amount,
+        currency: (invoice.currency || "eur").toUpperCase(),
+        method: "card",
+        status: "failed",
+        error_code: invoice.last_finalization_error?.code || null,
+        error_message: failureReason,
+        raw_psp_response: { invoice: invoice as any },
+        attempted_at: now.toISOString(),
       });
+
+      const { data: subRow } = await supabaseClient.from("subscriptions")
+        .select("consecutive_failed_count").eq("user_id", profile.id).maybeSingle();
+      const newCount = (subRow?.consecutive_failed_count || 0) + 1;
+      await supabaseClient.from("subscriptions")
+        .update({ consecutive_failed_count: newCount, last_failure_at: now.toISOString() })
+        .eq("user_id", profile.id);
+
+      // Notify Credaris on EVERY failure (Credaris decides at 2nd consecutive)
+      const { data: pFail } = await supabaseClient.from("profiles")
+        .select("id,email,full_name,phone,phone_e164,siren,company_name,legal_form,client_ref,billing_address_street,billing_address_zip,billing_address_city,billing_address_country,created_at,cgv_version,cgv_accepted_at,cgv_ip,cgv_user_agent")
+        .eq("id", profile.id).maybeSingle();
+      const { data: sFail } = await supabaseClient.from("subscriptions").select("*").eq("user_id", profile.id).maybeSingle();
+      await notifyCredaris(
+        "payment.failed",
+        `evt_amzing_payfail_${invoice.id}_${event.id}`,
+        {
+          client: buildCredarisClient(pFail, customerEmail, sFail),
+          abonnement: {
+            offre: sFail?.offer_label || "VIP Annuel",
+            date_souscription: sFail?.started_at?.slice(0,10) || null,
+            duree_mois: sFail?.commitment_months || 12,
+            prix_mensuel_eur: sFail?.price_monthly_eur || amount,
+            total_engagement_eur: sFail?.price_monthly_eur && sFail?.commitment_months
+              ? Number(sFail.price_monthly_eur) * Number(sFail.commitment_months) : null,
+            stripe_customer_id: invoice.customer,
+            stripe_subscription_id: invoice.subscription || null,
+            payment_link_url: sFail?.payment_link_url || "",
+            cgv_version: sFail?.cgv_version || pFail?.cgv_version || "",
+            cgv_acceptees_le: sFail?.cgv_accepted_at || pFail?.cgv_accepted_at || null,
+            cgv_ip: sFail?.cgv_ip || pFail?.cgv_ip || "",
+            cgv_user_agent: sFail?.cgv_user_agent || pFail?.cgv_user_agent || "",
+          },
+          payment: {
+            transaction_id: invoice.payment_intent || invoice.id,
+            montant_eur: amount,
+            moyen: "card",
+            message_erreur: failureReason,
+            numero_echeance: newCount,
+            date_echec: now.toISOString(),
+            stripe_invoice_id: invoice.id,
+            invoice_number: invoice.number || null,
+            hosted_invoice_url: invoice.hosted_invoice_url || null,
+          },
+          documents: invoice.invoice_pdf
+            ? [{ type: "facture", nom: `${invoice.number || invoice.id}.pdf`, mime: "application/pdf", url: invoice.invoice_pdf }]
+            : [],
+        },
+        profile.id,
+      );
+
+      logStep("✅ Automated recovery completed", {
+        email: customerEmail,
+        emailSent,
+        rubypayeurRef: rubypayeurRef || 'failed',
+        amount,
+        credarisNotified: true,
+        consecutiveFailures: newCount,
+      });
+    }
+
+    // ============================================================
+    // INVOICE PAYMENT SUCCEEDED — reset counter + notify Credaris
+    // ============================================================
+    if (event.type === "invoice.payment_succeeded") {
+      const invoice = event.data.object as Stripe.Invoice;
+      const customer = await stripe.customers.retrieve(invoice.customer as string);
+      if (!customer.deleted && customer.email) {
+        const { data: profile } = await supabaseClient.from("profiles")
+          .select("id,email,full_name,phone,phone_e164,siren,company_name,legal_form,client_ref,billing_address_street,billing_address_zip,billing_address_city,billing_address_country,created_at,cgv_version,cgv_accepted_at,cgv_ip,cgv_user_agent")
+          .eq("email", customer.email).maybeSingle();
+        if (profile) {
+          const amount = invoice.amount_paid ? invoice.amount_paid / 100 : 0;
+          await supabaseClient.from("payment_attempts").insert({
+            user_id: profile.id,
+            email: customer.email,
+            stripe_event_id: event.id,
+            stripe_invoice_id: invoice.id,
+            stripe_subscription_id: invoice.subscription || null,
+            stripe_customer_id: invoice.customer as string,
+            transaction_id: invoice.payment_intent as string || invoice.id,
+            amount_eur: amount,
+            currency: (invoice.currency || "eur").toUpperCase(),
+            method: "card",
+            status: "succeeded",
+            raw_psp_response: { invoice: invoice as any },
+            attempted_at: new Date().toISOString(),
+          });
+          await supabaseClient.from("subscriptions")
+            .update({ consecutive_failed_count: 0 }).eq("user_id", profile.id);
+          const { data: sOk } = await supabaseClient.from("subscriptions").select("*").eq("user_id", profile.id).maybeSingle();
+          await notifyCredaris(
+            "payment.succeeded",
+            `evt_amzing_paysucc_${invoice.id}_${event.id}`,
+            {
+              client: buildCredarisClient(profile, customer.email, sOk),
+              abonnement: {
+                stripe_customer_id: invoice.customer,
+                stripe_subscription_id: invoice.subscription || null,
+              },
+              payment: {
+                transaction_id: invoice.payment_intent || invoice.id,
+                montant_eur: amount,
+                moyen: "card",
+                date_paiement: new Date().toISOString(),
+                stripe_invoice_id: invoice.id,
+                invoice_number: invoice.number || null,
+                hosted_invoice_url: invoice.hosted_invoice_url || null,
+              },
+              documents: invoice.invoice_pdf
+                ? [{ type: "facture", nom: `${invoice.number || invoice.id}.pdf`, mime: "application/pdf", url: invoice.invoice_pdf }]
+                : [],
+            },
+            profile.id,
+          );
+        }
+      }
     }
 
     return new Response(JSON.stringify({ received: true }), {

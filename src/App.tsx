@@ -93,6 +93,7 @@ const AdminAirtableUsers = lazy(() => import("./pages/AdminAirtableUsers"));
 const AdminSubscriptions = lazy(() => import("./pages/AdminSubscriptions"));
 
 const AdminFailedPayments = lazy(() => import("./pages/AdminFailedPayments"));
+const AdminCredarisSync = lazy(() => import("./pages/AdminCredarisSync"));
 const AdminWhatsAppBulk = lazy(() => import("./pages/AdminWhatsAppBulk"));
 const AdminIMessageBulk = lazy(() => import("./pages/AdminIMessageBulk"));
 const AdminProspection = lazy(() => import("./pages/AdminProspection"));
@@ -256,6 +257,7 @@ const App = () => (
             <Route path="/admin/subscriptions" element={<AdminSubscriptions />} />
             <Route path="/admin/whatsapp" element={<Navigate to="/admin/whatsapp-crm" replace />} />
             <Route path="/admin/failed-payments" element={<AdminFailedPayments />} />
+            <Route path="/admin/credaris-sync" element={<AdminCredarisSync />} />
             <Route path="/admin/whatsapp-bulk" element={<AdminWhatsAppBulk />} />
             <Route path="/admin/imessage-bulk" element={<AdminIMessageBulk />} />
             <Route path="/admin/prospection" element={<AdminProspection />} />
