@@ -24,6 +24,7 @@ import { clusterAmazonFbmArticles } from './blog-articles-cluster-amazon-fbm';
 import { clusterSourcingAmazonArticles } from './blog-articles-cluster-sourcing-amazon';
 import { clusterProduitGagnantArticles } from './blog-articles-cluster-produit-gagnant';
 import { clusterIaAmazonArticles } from './blog-articles-cluster-ia-amazon';
+import { clusterKeepaFormationRentableArticles } from './blog-articles-cluster-keepa-formation-rentable';
 export interface BlogFAQ {
   question: string;
   answer: string;
@@ -1820,7 +1821,10 @@ export const blogArticles: BlogArticle[] = [
   ...clusterAmazonFbmArticles,
   ...clusterSourcingAmazonArticles,
   ...clusterProduitGagnantArticles,
-  ...clusterIaAmazonArticles
+  ...clusterIaAmazonArticles,
+
+  // Cluster SEO Keepa + Formation Amazon FBA + Amazon FBA avis rentable (juillet 2026)
+  ...clusterKeepaFormationRentableArticles
 ].filter((article, index, articles) => articles.findIndex((entry) => entry.slug === article.slug) === index);
 
 // Fonction utilitaire pour récupérer un article par son slug
