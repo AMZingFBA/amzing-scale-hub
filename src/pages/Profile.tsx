@@ -19,12 +19,28 @@ import { NotificationSettings } from '@/components/NotificationSettings';
 
 interface ProfileData {
   full_name: string | null;
+  first_name: string | null;
+  last_name: string | null;
   nickname: string | null;
   phone: string | null;
+  phone_e164: string | null;
   avatar_url: string | null;
   email: string;
   siren: string | null;
+  siret: string | null;
+  vat_number: string | null;
+  legal_form: string | null;
   company_name: string | null;
+  billing_address_street: string | null;
+  billing_address_zip: string | null;
+  billing_address_city: string | null;
+  billing_address_country: string | null;
+  shipping_same_as_billing: boolean;
+  shipping_address_street: string | null;
+  shipping_address_zip: string | null;
+  shipping_address_city: string | null;
+  shipping_address_country: string | null;
+  client_ref: string | null;
 }
 
 const Profile = () => {
@@ -49,15 +65,15 @@ const Profile = () => {
   const [isVerifying, setIsVerifying] = useState(false);
   const [subscription, setSubscription] = useState<any>(null);
   const [isLoadingSubscription, setIsLoadingSubscription] = useState(true);
-  const [profileData, setProfileData] = useState<ProfileData>({
-    full_name: '',
-    nickname: '',
-    phone: '',
-    avatar_url: '',
-    email: '',
-    siren: '',
-    company_name: '',
+  const emptyProfile = (email = ''): ProfileData => ({
+    full_name: '', first_name: '', last_name: '', nickname: '', phone: '', phone_e164: '',
+    avatar_url: '', email, siren: '', siret: '', vat_number: '', legal_form: '',
+    company_name: '', billing_address_street: '', billing_address_zip: '',
+    billing_address_city: '', billing_address_country: 'FR', shipping_same_as_billing: true,
+    shipping_address_street: '', shipping_address_zip: '', shipping_address_city: '',
+    shipping_address_country: 'FR', client_ref: '',
   });
+  const [profileData, setProfileData] = useState<ProfileData>(emptyProfile());
   const isNativeApp = Capacitor.isNativePlatform();
 
   // Reset code state when dialogs are opened
@@ -112,37 +128,39 @@ const Profile = () => {
       if (error) throw error;
 
       if (data) {
+        const d = data as any;
         setProfileData({
-          full_name: data.full_name || '',
-          nickname: data.nickname || '',
-          phone: data.phone || '',
-          avatar_url: data.avatar_url || '',
-          email: data.email || user.email || '',
-          siren: (data as any).siren || '',
-          company_name: (data as any).company_name || '',
+          ...emptyProfile(d.email || user.email || ''),
+          full_name: d.full_name || '',
+          first_name: d.first_name || '',
+          last_name: d.last_name || '',
+          nickname: d.nickname || '',
+          phone: d.phone || '',
+          phone_e164: d.phone_e164 || '',
+          avatar_url: d.avatar_url || '',
+          siren: d.siren || '',
+          siret: d.siret || '',
+          vat_number: d.vat_number || '',
+          legal_form: d.legal_form || '',
+          company_name: d.company_name || '',
+          billing_address_street: d.billing_address_street || '',
+          billing_address_zip: d.billing_address_zip || '',
+          billing_address_city: d.billing_address_city || '',
+          billing_address_country: d.billing_address_country || 'FR',
+          shipping_same_as_billing: d.shipping_same_as_billing ?? true,
+          shipping_address_street: d.shipping_address_street || '',
+          shipping_address_zip: d.shipping_address_zip || '',
+          shipping_address_city: d.shipping_address_city || '',
+          shipping_address_country: d.shipping_address_country || 'FR',
+          client_ref: d.client_ref || '',
         });
       } else {
         // Create profile if it doesn't exist
         const { error: insertError } = await supabase
           .from('profiles')
-          .insert([
-            {
-              id: user.id,
-              email: user.email || '',
-            },
-          ]);
-
+          .insert([{ id: user.id, email: user.email || '' }]);
         if (insertError) throw insertError;
-
-        setProfileData({
-          full_name: '',
-          nickname: '',
-          phone: '',
-          avatar_url: '',
-          email: user.email || '',
-          siren: '',
-          company_name: '',
-        });
+        setProfileData(emptyProfile(user.email || ''));
       }
     } catch (error) {
       console.error('Error loading profile:', error);
@@ -161,16 +179,29 @@ const Profile = () => {
 
     setIsSaving(true);
     try {
-      const { error } = await supabase
-        .from('profiles')
-        .update({
-          full_name: profileData.full_name || null,
-          nickname: profileData.nickname || null,
-          phone: profileData.phone || null,
-          siren: profileData.siren || null,
-          company_name: profileData.company_name || null,
-        } as any)
-        .eq('id', user.id);
+      const payload: any = {
+        full_name: profileData.full_name || null,
+        first_name: profileData.first_name || null,
+        last_name: profileData.last_name || null,
+        nickname: profileData.nickname || null,
+        phone: profileData.phone || null,
+        phone_e164: profileData.phone_e164 || profileData.phone || null,
+        siren: profileData.siren || null,
+        siret: profileData.siret || null,
+        vat_number: profileData.vat_number || null,
+        legal_form: profileData.legal_form || null,
+        company_name: profileData.company_name || null,
+        billing_address_street: profileData.billing_address_street || null,
+        billing_address_zip: profileData.billing_address_zip || null,
+        billing_address_city: profileData.billing_address_city || null,
+        billing_address_country: profileData.billing_address_country || null,
+        shipping_same_as_billing: profileData.shipping_same_as_billing,
+        shipping_address_street: profileData.shipping_same_as_billing ? null : (profileData.shipping_address_street || null),
+        shipping_address_zip: profileData.shipping_same_as_billing ? null : (profileData.shipping_address_zip || null),
+        shipping_address_city: profileData.shipping_same_as_billing ? null : (profileData.shipping_address_city || null),
+        shipping_address_country: profileData.shipping_same_as_billing ? null : (profileData.shipping_address_country || null),
+      };
+      const { error } = await supabase.from('profiles').update(payload).eq('id', user.id);
 
       if (error) throw error;
 
@@ -876,6 +907,97 @@ const Profile = () => {
                   defaultSiren={profileData.siren || ''}
                   defaultCompanyName={profileData.company_name || ''}
                 />
+              </div>
+
+              <div className="space-y-3 pt-4 border-t">
+                <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
+                  Identité légale (facturation & recouvrement)
+                </h3>
+                {profileData.client_ref && (
+                  <p className="text-xs text-muted-foreground">Référence client : <span className="font-mono">{profileData.client_ref}</span></p>
+                )}
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="space-y-1">
+                    <Label htmlFor="first_name" className="text-xs">Prénom</Label>
+                    <Input id="first_name" value={profileData.first_name || ''} onChange={(e) => setProfileData({ ...profileData, first_name: e.target.value })} />
+                  </div>
+                  <div className="space-y-1">
+                    <Label htmlFor="last_name" className="text-xs">Nom</Label>
+                    <Input id="last_name" value={profileData.last_name || ''} onChange={(e) => setProfileData({ ...profileData, last_name: e.target.value })} />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="space-y-1">
+                    <Label htmlFor="legal_form" className="text-xs">Forme juridique</Label>
+                    <Input id="legal_form" placeholder="SASU, EI, SARL…" value={profileData.legal_form || ''} onChange={(e) => setProfileData({ ...profileData, legal_form: e.target.value })} />
+                  </div>
+                  <div className="space-y-1">
+                    <Label htmlFor="siret" className="text-xs">SIRET</Label>
+                    <Input id="siret" placeholder="14 chiffres" value={profileData.siret || ''} onChange={(e) => setProfileData({ ...profileData, siret: e.target.value })} />
+                  </div>
+                </div>
+                <div className="space-y-1">
+                  <Label htmlFor="vat_number" className="text-xs">N° TVA intracommunautaire</Label>
+                  <Input id="vat_number" placeholder="FRXX999999999" value={profileData.vat_number || ''} onChange={(e) => setProfileData({ ...profileData, vat_number: e.target.value })} />
+                </div>
+                <div className="space-y-1">
+                  <Label htmlFor="phone_e164" className="text-xs">Téléphone format international (E.164)</Label>
+                  <Input id="phone_e164" placeholder="+33612345678" value={profileData.phone_e164 || ''} onChange={(e) => setProfileData({ ...profileData, phone_e164: e.target.value })} />
+                </div>
+              </div>
+
+              <div className="space-y-3 pt-4 border-t">
+                <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Adresse de facturation</h3>
+                <div className="space-y-1">
+                  <Label htmlFor="bill_street" className="text-xs">Rue</Label>
+                  <Input id="bill_street" value={profileData.billing_address_street || ''} onChange={(e) => setProfileData({ ...profileData, billing_address_street: e.target.value })} />
+                </div>
+                <div className="grid grid-cols-3 gap-2">
+                  <div className="space-y-1">
+                    <Label htmlFor="bill_zip" className="text-xs">Code postal</Label>
+                    <Input id="bill_zip" value={profileData.billing_address_zip || ''} onChange={(e) => setProfileData({ ...profileData, billing_address_zip: e.target.value })} />
+                  </div>
+                  <div className="space-y-1 col-span-2">
+                    <Label htmlFor="bill_city" className="text-xs">Ville</Label>
+                    <Input id="bill_city" value={profileData.billing_address_city || ''} onChange={(e) => setProfileData({ ...profileData, billing_address_city: e.target.value })} />
+                  </div>
+                </div>
+                <div className="space-y-1">
+                  <Label htmlFor="bill_country" className="text-xs">Pays</Label>
+                  <Input id="bill_country" placeholder="FR" value={profileData.billing_address_country || ''} onChange={(e) => setProfileData({ ...profileData, billing_address_country: e.target.value })} />
+                </div>
+              </div>
+
+              <div className="space-y-3 pt-4 border-t">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Adresse de livraison</h3>
+                  <label className="flex items-center gap-2 text-xs">
+                    <input type="checkbox" checked={profileData.shipping_same_as_billing} onChange={(e) => setProfileData({ ...profileData, shipping_same_as_billing: e.target.checked })} />
+                    Identique à la facturation
+                  </label>
+                </div>
+                {!profileData.shipping_same_as_billing && (
+                  <>
+                    <div className="space-y-1">
+                      <Label className="text-xs">Rue</Label>
+                      <Input value={profileData.shipping_address_street || ''} onChange={(e) => setProfileData({ ...profileData, shipping_address_street: e.target.value })} />
+                    </div>
+                    <div className="grid grid-cols-3 gap-2">
+                      <div className="space-y-1">
+                        <Label className="text-xs">Code postal</Label>
+                        <Input value={profileData.shipping_address_zip || ''} onChange={(e) => setProfileData({ ...profileData, shipping_address_zip: e.target.value })} />
+                      </div>
+                      <div className="space-y-1 col-span-2">
+                        <Label className="text-xs">Ville</Label>
+                        <Input value={profileData.shipping_address_city || ''} onChange={(e) => setProfileData({ ...profileData, shipping_address_city: e.target.value })} />
+                      </div>
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-xs">Pays</Label>
+                      <Input placeholder="FR" value={profileData.shipping_address_country || ''} onChange={(e) => setProfileData({ ...profileData, shipping_address_country: e.target.value })} />
+                    </div>
+                  </>
+                )}
               </div>
 
               <div className="space-y-2">

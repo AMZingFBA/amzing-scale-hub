@@ -811,6 +811,42 @@ export type Database = {
         }
         Relationships: []
       }
+      client_documents: {
+        Row: {
+          created_at: string
+          doc_type: string
+          id: string
+          metadata: Json | null
+          storage_path: string | null
+          title: string | null
+          updated_at: string
+          url: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          doc_type: string
+          id?: string
+          metadata?: Json | null
+          storage_path?: string | null
+          title?: string | null
+          updated_at?: string
+          url?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          doc_type?: string
+          id?: string
+          metadata?: Json | null
+          storage_path?: string | null
+          title?: string | null
+          updated_at?: string
+          url?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       credaris_sync_log: {
         Row: {
           created_at: string
@@ -2055,14 +2091,27 @@ export type Database = {
           company_name: string | null
           created_at: string
           email: string
+          first_name: string | null
           full_name: string | null
           id: string
+          last_login_at: string | null
+          last_login_ip: string | null
+          last_name: string | null
           legal_form: string | null
           nickname: string | null
           phone: string | null
           phone_e164: string | null
+          previous_emails: string[] | null
           registration_source: string | null
+          shipping_address_city: string | null
+          shipping_address_country: string | null
+          shipping_address_street: string | null
+          shipping_address_zip: string | null
+          shipping_same_as_billing: boolean | null
+          signup_ip: string | null
+          signup_user_agent: string | null
           siren: string | null
+          siret: string | null
           updated_at: string
           vat_number: string | null
         }
@@ -2080,14 +2129,27 @@ export type Database = {
           company_name?: string | null
           created_at?: string
           email: string
+          first_name?: string | null
           full_name?: string | null
           id: string
+          last_login_at?: string | null
+          last_login_ip?: string | null
+          last_name?: string | null
           legal_form?: string | null
           nickname?: string | null
           phone?: string | null
           phone_e164?: string | null
+          previous_emails?: string[] | null
           registration_source?: string | null
+          shipping_address_city?: string | null
+          shipping_address_country?: string | null
+          shipping_address_street?: string | null
+          shipping_address_zip?: string | null
+          shipping_same_as_billing?: boolean | null
+          signup_ip?: string | null
+          signup_user_agent?: string | null
           siren?: string | null
+          siret?: string | null
           updated_at?: string
           vat_number?: string | null
         }
@@ -2105,14 +2167,27 @@ export type Database = {
           company_name?: string | null
           created_at?: string
           email?: string
+          first_name?: string | null
           full_name?: string | null
           id?: string
+          last_login_at?: string | null
+          last_login_ip?: string | null
+          last_name?: string | null
           legal_form?: string | null
           nickname?: string | null
           phone?: string | null
           phone_e164?: string | null
+          previous_emails?: string[] | null
           registration_source?: string | null
+          shipping_address_city?: string | null
+          shipping_address_country?: string | null
+          shipping_address_street?: string | null
+          shipping_address_zip?: string | null
+          shipping_same_as_billing?: boolean | null
+          signup_ip?: string | null
+          signup_user_agent?: string | null
           siren?: string | null
+          siret?: string | null
           updated_at?: string
           vat_number?: string | null
         }
