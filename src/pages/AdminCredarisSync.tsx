@@ -42,7 +42,7 @@ const statusColor: Record<string, string> = {
 };
 
 export default function AdminCredarisSync() {
-  const { isAdmin, loading: adminLoading } = useAdmin();
+  const { isAdmin, isLoading: adminLoading } = useAdmin();
   const [rows, setRows] = useState<SyncRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<"all" | "failed" | "success" | "pending">("all");
