@@ -288,6 +288,19 @@ const AdminFailedPayments = () => {
                           Résolu
                         </Button>
                       )}
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={async () => {
+                          const { data, error } = await supabase.functions.invoke("credaris-manual-dossier", {
+                            body: { user_id: payment.user_id },
+                          });
+                          if (error) toast.error("Credaris : " + error.message);
+                          else toast.success("Dossier Credaris envoyé");
+                        }}
+                      >
+                        Créer dossier Credaris
+                      </Button>
                     </div>
                   </div>
                 </CardContent>
