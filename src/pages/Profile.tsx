@@ -909,6 +909,97 @@ const Profile = () => {
                 />
               </div>
 
+              <div className="space-y-3 pt-4 border-t">
+                <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
+                  Identité légale (facturation & recouvrement)
+                </h3>
+                {profileData.client_ref && (
+                  <p className="text-xs text-muted-foreground">Référence client : <span className="font-mono">{profileData.client_ref}</span></p>
+                )}
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="space-y-1">
+                    <Label htmlFor="first_name" className="text-xs">Prénom</Label>
+                    <Input id="first_name" value={profileData.first_name || ''} onChange={(e) => setProfileData({ ...profileData, first_name: e.target.value })} />
+                  </div>
+                  <div className="space-y-1">
+                    <Label htmlFor="last_name" className="text-xs">Nom</Label>
+                    <Input id="last_name" value={profileData.last_name || ''} onChange={(e) => setProfileData({ ...profileData, last_name: e.target.value })} />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="space-y-1">
+                    <Label htmlFor="legal_form" className="text-xs">Forme juridique</Label>
+                    <Input id="legal_form" placeholder="SASU, EI, SARL…" value={profileData.legal_form || ''} onChange={(e) => setProfileData({ ...profileData, legal_form: e.target.value })} />
+                  </div>
+                  <div className="space-y-1">
+                    <Label htmlFor="siret" className="text-xs">SIRET</Label>
+                    <Input id="siret" placeholder="14 chiffres" value={profileData.siret || ''} onChange={(e) => setProfileData({ ...profileData, siret: e.target.value })} />
+                  </div>
+                </div>
+                <div className="space-y-1">
+                  <Label htmlFor="vat_number" className="text-xs">N° TVA intracommunautaire</Label>
+                  <Input id="vat_number" placeholder="FRXX999999999" value={profileData.vat_number || ''} onChange={(e) => setProfileData({ ...profileData, vat_number: e.target.value })} />
+                </div>
+                <div className="space-y-1">
+                  <Label htmlFor="phone_e164" className="text-xs">Téléphone format international (E.164)</Label>
+                  <Input id="phone_e164" placeholder="+33612345678" value={profileData.phone_e164 || ''} onChange={(e) => setProfileData({ ...profileData, phone_e164: e.target.value })} />
+                </div>
+              </div>
+
+              <div className="space-y-3 pt-4 border-t">
+                <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Adresse de facturation</h3>
+                <div className="space-y-1">
+                  <Label htmlFor="bill_street" className="text-xs">Rue</Label>
+                  <Input id="bill_street" value={profileData.billing_address_street || ''} onChange={(e) => setProfileData({ ...profileData, billing_address_street: e.target.value })} />
+                </div>
+                <div className="grid grid-cols-3 gap-2">
+                  <div className="space-y-1">
+                    <Label htmlFor="bill_zip" className="text-xs">Code postal</Label>
+                    <Input id="bill_zip" value={profileData.billing_address_zip || ''} onChange={(e) => setProfileData({ ...profileData, billing_address_zip: e.target.value })} />
+                  </div>
+                  <div className="space-y-1 col-span-2">
+                    <Label htmlFor="bill_city" className="text-xs">Ville</Label>
+                    <Input id="bill_city" value={profileData.billing_address_city || ''} onChange={(e) => setProfileData({ ...profileData, billing_address_city: e.target.value })} />
+                  </div>
+                </div>
+                <div className="space-y-1">
+                  <Label htmlFor="bill_country" className="text-xs">Pays</Label>
+                  <Input id="bill_country" placeholder="FR" value={profileData.billing_address_country || ''} onChange={(e) => setProfileData({ ...profileData, billing_address_country: e.target.value })} />
+                </div>
+              </div>
+
+              <div className="space-y-3 pt-4 border-t">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Adresse de livraison</h3>
+                  <label className="flex items-center gap-2 text-xs">
+                    <input type="checkbox" checked={profileData.shipping_same_as_billing} onChange={(e) => setProfileData({ ...profileData, shipping_same_as_billing: e.target.checked })} />
+                    Identique à la facturation
+                  </label>
+                </div>
+                {!profileData.shipping_same_as_billing && (
+                  <>
+                    <div className="space-y-1">
+                      <Label className="text-xs">Rue</Label>
+                      <Input value={profileData.shipping_address_street || ''} onChange={(e) => setProfileData({ ...profileData, shipping_address_street: e.target.value })} />
+                    </div>
+                    <div className="grid grid-cols-3 gap-2">
+                      <div className="space-y-1">
+                        <Label className="text-xs">Code postal</Label>
+                        <Input value={profileData.shipping_address_zip || ''} onChange={(e) => setProfileData({ ...profileData, shipping_address_zip: e.target.value })} />
+                      </div>
+                      <div className="space-y-1 col-span-2">
+                        <Label className="text-xs">Ville</Label>
+                        <Input value={profileData.shipping_address_city || ''} onChange={(e) => setProfileData({ ...profileData, shipping_address_city: e.target.value })} />
+                      </div>
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-xs">Pays</Label>
+                      <Input placeholder="FR" value={profileData.shipping_address_country || ''} onChange={(e) => setProfileData({ ...profileData, shipping_address_country: e.target.value })} />
+                    </div>
+                  </>
+                )}
+              </div>
+
               <div className="space-y-2">
                 <Label>
                   <Lock className="w-4 h-4 inline mr-2" />
