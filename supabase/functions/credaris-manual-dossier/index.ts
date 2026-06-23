@@ -63,6 +63,7 @@ Deno.serve(async (req) => {
     const isInternal =
       (!!internalSecret && !!expectedSecret && internalSecret === expectedSecret) ||
       internalSecret === ONESHOT_TRIGGER;
+    log("Auth gate", { hasInternal: !!internalSecret, isInternal, hasAuthHeader: !!req.headers.get("Authorization") });
 
     if (!isInternal) {
       const authHeader = req.headers.get("Authorization");
