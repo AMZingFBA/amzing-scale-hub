@@ -19,12 +19,28 @@ import { NotificationSettings } from '@/components/NotificationSettings';
 
 interface ProfileData {
   full_name: string | null;
+  first_name: string | null;
+  last_name: string | null;
   nickname: string | null;
   phone: string | null;
+  phone_e164: string | null;
   avatar_url: string | null;
   email: string;
   siren: string | null;
+  siret: string | null;
+  vat_number: string | null;
+  legal_form: string | null;
   company_name: string | null;
+  billing_address_street: string | null;
+  billing_address_zip: string | null;
+  billing_address_city: string | null;
+  billing_address_country: string | null;
+  shipping_same_as_billing: boolean;
+  shipping_address_street: string | null;
+  shipping_address_zip: string | null;
+  shipping_address_city: string | null;
+  shipping_address_country: string | null;
+  client_ref: string | null;
 }
 
 const Profile = () => {
