@@ -47,6 +47,13 @@ const IGNORE_EXTENSIONS = [
 export default async (request: Request, context: any) => {
   const url = new URL(request.url);
   const userAgent = request.headers.get('user-agent')?.toLowerCase() || '';
+
+  // Les pages blog ont désormais un HTML SEO statique généré au build.
+  // On laisse donc Netlify servir /blog/.../index.html directement pour éviter
+  // tout cache Prerender obsolète avec les metas de la page d'accueil.
+  if (url.pathname === '/blog' || url.pathname.startsWith('/blog/')) {
+    return context.next();
+  }
   
   // Check if it's a static file
   const isStaticFile = IGNORE_EXTENSIONS.some(ext => url.pathname.toLowerCase().endsWith(ext));
