@@ -2064,6 +2064,7 @@ export type Database = {
           registration_source: string | null
           siren: string | null
           updated_at: string
+          vat_number: string | null
         }
         Insert: {
           avatar_url?: string | null
@@ -2088,6 +2089,7 @@ export type Database = {
           registration_source?: string | null
           siren?: string | null
           updated_at?: string
+          vat_number?: string | null
         }
         Update: {
           avatar_url?: string | null
@@ -2112,6 +2114,7 @@ export type Database = {
           registration_source?: string | null
           siren?: string | null
           updated_at?: string
+          vat_number?: string | null
         }
         Relationships: []
       }
