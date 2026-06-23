@@ -108,7 +108,7 @@ export default function AdminCredarisSync() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <SEO title="Sync Credaris — Admin" />
+      <SEO title="Sync Credaris — Admin" description="Journal des envois Credaris." />
       <Navbar />
       <main className="flex-1 container py-8 space-y-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
