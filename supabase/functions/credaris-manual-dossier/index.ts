@@ -54,41 +54,48 @@ Deno.serve(async (req) => {
   const supabase = createClient(supabaseUrl, serviceKey, { auth: { persistSession: false } });
 
   try {
-    const authHeader = req.headers.get("Authorization");
-    if (!authHeader) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), {
-        status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-    const { data: u, error: uErr } = await supabase.auth.getUser(
-      authHeader.replace("Bearer ", ""),
-    );
-    if (uErr || !u.user) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), {
-        status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-    const { data: roleRow } = await supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", u.user.id)
-      .eq("role", "admin")
-      .maybeSingle();
-    if (!roleRow) {
-      return new Response(JSON.stringify({ error: "Admin only" }), {
-        status: 403,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+    const body = await req.json().catch(() => ({}));
+    const internalSecret = req.headers.get("x-amzing-internal-secret") ||
+      (body as Record<string, unknown>).internal_secret;
+    const expectedSecret = Deno.env.get("AMZING_WEBHOOK_SECRET");
+    const isInternal = !!internalSecret && !!expectedSecret && internalSecret === expectedSecret;
+
+    if (!isInternal) {
+      const authHeader = req.headers.get("Authorization");
+      if (!authHeader) {
+        return new Response(JSON.stringify({ error: "Unauthorized" }), {
+          status: 401,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      const { data: u, error: uErr } = await supabase.auth.getUser(
+        authHeader.replace("Bearer ", ""),
+      );
+      if (uErr || !u.user) {
+        return new Response(JSON.stringify({ error: "Unauthorized" }), {
+          status: 401,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      const { data: roleRow } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", u.user.id)
+        .eq("role", "admin")
+        .maybeSingle();
+      if (!roleRow) {
+        return new Response(JSON.stringify({ error: "Admin only" }), {
+          status: 403,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
     }
 
-    const body = await req.json().catch(() => ({}));
-    const userId = body.user_id as string | undefined;
-    const event = (body.event as string | undefined) || "dossier.create_manual";
-    const isTest = !!body.test;
+    const userId = (body as Record<string, unknown>).user_id as string | undefined;
+    const event = ((body as Record<string, unknown>).event as string | undefined) || "dossier.create_manual";
+    const isTest = !!(body as Record<string, unknown>).test;
     const externalId =
-      (body.external_id as string | undefined) ||
+      ((body as Record<string, unknown>).external_id as string | undefined) ||
       (isTest ? `test_${Date.now()}` : `evt_amzing_${crypto.randomUUID()}`);
 
     if (!userId && !isTest) {
