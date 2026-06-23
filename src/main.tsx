@@ -4,17 +4,25 @@ import App from "./App.tsx";
 import "./index.css";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 
-// Enregistrement du Service Worker pour optimiser le cache et les performances
+// Service Worker désactivé : on désinscrit toute ancienne installation
+// et on purge les caches pour éviter les bundles obsolètes (erreurs
+// "Invalid character: '#'" et MIME octet-stream sur les chunks JS).
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker
-      .register('/sw.js')
-      .then((registration) => {
-        console.log('SW registered:', registration);
-      })
-      .catch((error) => {
-        console.log('SW registration failed:', error);
-      });
+  window.addEventListener('load', async () => {
+    try {
+      const regs = await navigator.serviceWorker.getRegistrations();
+      if (regs.length > 0) {
+        // Charge la version kill-switch puis on la désinscrira au prochain tour.
+        await navigator.serviceWorker.register('/sw.js').catch(() => {});
+        await Promise.all(regs.map((r) => r.unregister().catch(() => {})));
+      }
+      if ('caches' in window) {
+        const keys = await caches.keys();
+        await Promise.all(keys.map((k) => caches.delete(k)));
+      }
+    } catch (e) {
+      // silent
+    }
   });
 }
 
