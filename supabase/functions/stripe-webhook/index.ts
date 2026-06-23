@@ -7,6 +7,45 @@ const logStep = (step: string, details?: any) => {
   console.log(`[STRIPE-WEBHOOK] ${step}${detailsStr}`);
 };
 
+// Fire-and-forget call to notify-credaris (signed HMAC + retry handled there).
+async function notifyCredaris(event: string, externalId: string, payload: Record<string, unknown>, userId?: string | null) {
+  try {
+    const url = `${Deno.env.get("SUPABASE_URL")}/functions/v1/notify-credaris`;
+    const key = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
+    await fetch(url, {
+      method: "POST",
+      headers: { "content-type": "application/json", authorization: `Bearer ${key}`, apikey: key },
+      body: JSON.stringify({ event, external_id: externalId, user_id: userId ?? null, payload }),
+    });
+    logStep("→ Credaris notified", { event, externalId });
+  } catch (e) {
+    logStep("Credaris notify failed", { error: e instanceof Error ? e.message : String(e) });
+  }
+}
+
+function buildCredarisClient(profile: any, customerEmail: string, sub?: any) {
+  const [prenom, ...rest] = (profile?.full_name || "").trim().split(/\s+/);
+  const fullAddress = [
+    profile?.billing_address_street, profile?.billing_address_zip,
+    profile?.billing_address_city, profile?.billing_address_country,
+  ].filter(Boolean).join(", ");
+  return {
+    ref: profile?.client_ref || `AMZ-CL-${(profile?.id || "").slice(0,8).toUpperCase()}`,
+    nom: rest.join(" "),
+    prenom: prenom || "",
+    societe: profile?.company_name || "",
+    email: customerEmail,
+    telephone: profile?.phone_e164 || profile?.phone || "",
+    siret: profile?.siren || "",
+    forme_juridique: profile?.legal_form || "",
+    adresse: fullAddress,
+    adresse_facturation: fullAddress,
+    adresse_livraison: fullAddress,
+    cree_le: profile?.created_at || null,
+    statut: sub?.status === "active" ? "actif" : sub?.status === "canceled" || sub?.status === "expired" ? "resilie" : "suspendu",
+  };
+}
+
 // Tradedoubler server-side tracking (Server to Server)
 async function trackTradedoublerConversion(data: {
   transactionId: string;
