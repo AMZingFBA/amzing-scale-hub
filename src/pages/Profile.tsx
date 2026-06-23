@@ -65,15 +65,15 @@ const Profile = () => {
   const [isVerifying, setIsVerifying] = useState(false);
   const [subscription, setSubscription] = useState<any>(null);
   const [isLoadingSubscription, setIsLoadingSubscription] = useState(true);
-  const [profileData, setProfileData] = useState<ProfileData>({
-    full_name: '',
-    nickname: '',
-    phone: '',
-    avatar_url: '',
-    email: '',
-    siren: '',
-    company_name: '',
+  const emptyProfile = (email = ''): ProfileData => ({
+    full_name: '', first_name: '', last_name: '', nickname: '', phone: '', phone_e164: '',
+    avatar_url: '', email, siren: '', siret: '', vat_number: '', legal_form: '',
+    company_name: '', billing_address_street: '', billing_address_zip: '',
+    billing_address_city: '', billing_address_country: 'FR', shipping_same_as_billing: true,
+    shipping_address_street: '', shipping_address_zip: '', shipping_address_city: '',
+    shipping_address_country: 'FR', client_ref: '',
   });
+  const [profileData, setProfileData] = useState<ProfileData>(emptyProfile());
   const isNativeApp = Capacitor.isNativePlatform();
 
   // Reset code state when dialogs are opened
