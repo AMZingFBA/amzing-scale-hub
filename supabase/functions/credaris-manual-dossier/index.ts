@@ -91,12 +91,11 @@ Deno.serve(async (req) => {
       }
     }
 
-    const body = await req.json().catch(() => ({}));
-    const userId = body.user_id as string | undefined;
-    const event = (body.event as string | undefined) || "dossier.create_manual";
-    const isTest = !!body.test;
+    const userId = (body as Record<string, unknown>).user_id as string | undefined;
+    const event = ((body as Record<string, unknown>).event as string | undefined) || "dossier.create_manual";
+    const isTest = !!(body as Record<string, unknown>).test;
     const externalId =
-      (body.external_id as string | undefined) ||
+      ((body as Record<string, unknown>).external_id as string | undefined) ||
       (isTest ? `test_${Date.now()}` : `evt_amzing_${crypto.randomUUID()}`);
 
     if (!userId && !isTest) {
