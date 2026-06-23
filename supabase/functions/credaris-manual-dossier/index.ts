@@ -1,6 +1,8 @@
 // Manual or automatic Credaris dossier creation.
-// - Builds the full payload from profile/subscription/failed_payments/payment_attempts
-// - Delegates the signed POST to the notify-credaris function
+// Builds a complete payload per the Credaris INTEGRATION_AMZING.md spec:
+//   client, abonnement, payment, documents (3 PDFs with 7-day signed URLs).
+// Delegates the signed POST to the notify-credaris function.
+//
 // Body: { user_id: string, event?: string, external_id?: string, test?: boolean }
 import { createClient } from "npm:@supabase/supabase-js@2.57.2";
 
@@ -12,6 +14,8 @@ const corsHeaders = {
 
 const log = (s: string, d?: unknown) =>
   console.log(`[CREDARIS-MANUAL] ${s}${d ? " - " + JSON.stringify(d) : ""}`);
+
+const SIGNED_URL_TTL_SEC = 60 * 60 * 24 * 14; // 14 days (spec demands >= 7 days)
 
 async function callNotify(supabaseUrl: string, serviceKey: string, body: unknown) {
   return await fetch(`${supabaseUrl}/functions/v1/notify-credaris`, {
@@ -25,6 +29,23 @@ async function callNotify(supabaseUrl: string, serviceKey: string, body: unknown
   });
 }
 
+function mapStatut(status?: string | null) {
+  switch (status) {
+    case "active":
+    case "trialing":
+      return "actif";
+    case "unpaid":
+    case "past_due":
+    case "incomplete":
+      return "suspendu";
+    case "canceled":
+    case "expired":
+      return "resilie";
+    default:
+      return "actif";
+  }
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
@@ -33,7 +54,6 @@ Deno.serve(async (req) => {
   const supabase = createClient(supabaseUrl, serviceKey, { auth: { persistSession: false } });
 
   try {
-    // Admin-only auth check
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
@@ -78,43 +98,29 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Test mode: send a minimal dossier with a fake client to validate the integration
+    // Minimal smoke-test payload (kept for legacy admin "Test integration" button).
     if (isTest && !userId) {
-      const testPayload = {
-        client: {
-          ref: "AMZ-CL-TEST01",
-          nom: "TEST",
-          prenom: "Credaris",
-          societe: "Amzing FBA Test",
-          email: "test@amzingfba.com",
-          telephone: "+33600000000",
-          adresse: "",
-          adresse_facturation: "",
-          adresse_livraison: "",
-          cree_le: new Date().toISOString(),
-          statut: "actif",
-        },
-        abonnement: {
-          offre: "Test Pack",
-          date_souscription: new Date().toISOString().slice(0, 10),
-          duree_mois: 12,
-          prix_mensuel_eur: 0,
-          total_engagement_eur: 0,
-          stripe_customer_id: "cus_test",
-          stripe_subscription_id: "sub_test",
-          payment_link_url: "",
-          cgv_version: "test",
-          cgv_acceptees_le: new Date().toISOString(),
-          cgv_ip: "127.0.0.1",
-          cgv_user_agent: "test",
-        },
-        payment: {},
-        documents: [],
-      };
       const r = await callNotify(supabaseUrl, serviceKey, {
         event,
         external_id: externalId,
-        payload: testPayload,
+        payload: {
+          client: {
+            ref: "AMZ-CL-TEST01",
+            nom: "TEST",
+            prenom: "Credaris",
+            societe: "Amzing FBA Test",
+            email: "test@amzingfba.com",
+            telephone: "+33600000000",
+            adresse: "",
+            adresse_facturation: "",
+            adresse_livraison: "",
+            cree_le: new Date().toISOString(),
+            statut: "actif",
+          },
+          abonnement: {},
+          payment: {},
+          documents: [],
+        },
       });
       const txt = await r.text();
       return new Response(txt, {
@@ -123,14 +129,15 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Build payload from DB
+    // ---------- Load client data ----------
     const { data: profile } = await supabase
       .from("profiles")
       .select(
-        "id, email, full_name, phone, phone_e164, siren, company_name, legal_form, client_ref, billing_address_street, billing_address_zip, billing_address_city, billing_address_country, cgv_version, cgv_accepted_at, cgv_ip, cgv_user_agent, created_at",
+        "id, email, full_name, phone, phone_e164, siren, company_name, legal_form, client_ref, billing_address_street, billing_address_zip, billing_address_city, billing_address_country, cgv_version, cgv_accepted_at, cgv_ip, cgv_user_agent, created_at, previous_emails",
       )
       .eq("id", userId!)
       .maybeSingle();
+
     if (!profile) {
       return new Response(JSON.stringify({ error: "Profile not found" }), {
         status: 404,
@@ -160,6 +167,13 @@ Deno.serve(async (req) => {
       .limit(1)
       .maybeSingle();
 
+    const { data: docsRows } = await supabase
+      .from("client_documents")
+      .select("doc_type, title, url, storage_path, metadata, created_at")
+      .eq("user_id", userId!)
+      .order("created_at", { ascending: true });
+
+    // ---------- Client ----------
     const [prenom, ...rest] = (profile.full_name || "").trim().split(/\s+/);
     const nom = rest.join(" ");
     const fullAddress = [
@@ -171,63 +185,81 @@ Deno.serve(async (req) => {
       .filter(Boolean)
       .join(", ");
 
-    const payload = {
-      client: {
-        ref: profile.client_ref || `AMZ-CL-${userId!.slice(0, 8).toUpperCase()}`,
-        nom: nom || profile.full_name || "",
-        prenom: prenom || "",
-        societe: profile.company_name || "",
-        email: profile.email || "",
-        telephone: profile.phone_e164 || profile.phone || "",
-        siret: profile.siren || "",
-        forme_juridique: profile.legal_form || "",
-        adresse: fullAddress,
-        adresse_facturation: fullAddress,
-        adresse_livraison: fullAddress,
-        cree_le: profile.created_at,
-        statut:
-          sub?.status === "active"
-            ? "actif"
-            : sub?.status === "unpaid" || sub?.status === "past_due"
-            ? "suspendu"
-            : sub?.status === "canceled" || sub?.status === "expired"
-            ? "resilie"
-            : "actif",
-      },
-      abonnement: {
-        offre: sub?.offer_label || sub?.plan_type || "VIP Annuel",
-        date_souscription: sub?.started_at?.slice(0, 10) || null,
-        duree_mois: sub?.commitment_months || 12,
-        prix_mensuel_eur: sub?.price_monthly_eur || null,
-        total_engagement_eur:
-          sub?.price_monthly_eur && sub?.commitment_months
-            ? Number(sub.price_monthly_eur) * Number(sub.commitment_months)
-            : null,
-        stripe_customer_id: sub?.stripe_customer_id || "",
-        stripe_subscription_id: sub?.stripe_subscription_id || "",
-        payment_link_url: sub?.payment_link_url || "",
-        cgv_version: sub?.cgv_version || profile.cgv_version || "",
-        cgv_acceptees_le: sub?.cgv_accepted_at || profile.cgv_accepted_at || null,
-        cgv_ip: sub?.cgv_ip || profile.cgv_ip || "",
-        cgv_user_agent: sub?.cgv_user_agent || profile.cgv_user_agent || "",
-      },
-      payment: lastFail || lastAttempt
-        ? {
-            transaction_id: lastAttempt?.transaction_id || lastFail?.stripe_invoice_id || "",
-            montant_eur: lastFail?.amount || lastAttempt?.amount_eur || null,
-            moyen: lastAttempt?.method || "card",
-            message_erreur:
-              lastFail?.failure_reason || lastAttempt?.error_message || "",
-            numero_echeance:
-              lastAttempt?.installment_number || sub?.consecutive_failed_count || null,
-            date_echec:
-              lastFail?.created_at || lastAttempt?.attempted_at || null,
-          }
-        : {},
-      documents: [],
+    const client = {
+      ref: profile.client_ref || `AMZ-CL-${userId!.slice(0, 8).toUpperCase()}`,
+      nom: nom || profile.full_name || "",
+      prenom: prenom || "",
+      societe: profile.company_name || "",
+      email: profile.email || "",
+      email_precedents: profile.previous_emails || [],
+      telephone: profile.phone_e164 || profile.phone || "",
+      siret: profile.siren || "",
+      forme_juridique: profile.legal_form || "",
+      adresse: fullAddress,
+      adresse_facturation: fullAddress,
+      adresse_livraison: fullAddress,
+      cree_le: profile.created_at,
+      statut: mapStatut(sub?.status),
     };
 
-    log("Sending dossier", { userId, externalId, event });
+    // ---------- Abonnement ----------
+    const prix = sub?.price_monthly_eur != null ? Number(sub.price_monthly_eur) : null;
+    const duree = sub?.commitment_months != null ? Number(sub.commitment_months) : null;
+    const abonnement = {
+      offre: sub?.offer_label || (sub?.plan_type === "vip" ? "VIP Annuel" : sub?.plan_type) || "VIP Annuel",
+      date_souscription: sub?.started_at ? String(sub.started_at).slice(0, 10) : null,
+      duree_mois: duree,
+      prix_mensuel_eur: prix,
+      total_engagement_eur: prix != null && duree != null ? Number((prix * duree).toFixed(2)) : null,
+      stripe_customer_id: sub?.stripe_customer_id || "",
+      stripe_subscription_id: sub?.stripe_subscription_id || "",
+      payment_link_url: sub?.payment_link_url || "",
+      cgv_version: sub?.cgv_version || profile.cgv_version || "",
+      cgv_acceptees_le: sub?.cgv_accepted_at || profile.cgv_accepted_at || null,
+      cgv_ip: sub?.cgv_ip || profile.cgv_ip || "",
+      cgv_user_agent: sub?.cgv_user_agent || profile.cgv_user_agent || "",
+    };
+
+    // ---------- Payment ----------
+    const payment: Record<string, unknown> = lastFail || lastAttempt
+      ? {
+          transaction_id: lastAttempt?.transaction_id || lastFail?.stripe_invoice_id || "",
+          montant_eur:
+            (lastAttempt?.amount_eur != null ? Number(lastAttempt.amount_eur) : null) ??
+            (lastFail?.amount != null ? Number(lastFail.amount) : null) ??
+            prix,
+          moyen: lastAttempt?.method || "card",
+          message_erreur: lastFail?.failure_reason || lastAttempt?.error_message || "",
+          numero_echeance:
+            lastAttempt?.installment_number || lastFail?.attempt_count || sub?.consecutive_failed_count || null,
+          date_echec: lastFail?.created_at || lastAttempt?.attempted_at || null,
+        }
+      : {};
+
+    // ---------- Documents (signed URLs valid for 14 days) ----------
+    const documents: Array<{ type: string; nom: string; mime: string; url: string }> = [];
+    for (const d of docsRows || []) {
+      let url = d.url as string | null;
+      const meta = (d.metadata as Record<string, unknown>) || {};
+      const mime = (meta.mime as string) || "application/pdf";
+      if (!url && d.storage_path) {
+        const { data: signed } = await supabase.storage
+          .from("invoices")
+          .createSignedUrl(d.storage_path as string, SIGNED_URL_TTL_SEC);
+        url = signed?.signedUrl || null;
+      }
+      if (!url) continue;
+      documents.push({
+        type: d.doc_type as string,
+        nom: (d.title as string) || (d.storage_path as string)?.split("/").pop() || "document.pdf",
+        mime,
+        url,
+      });
+    }
+
+    const payload = { client, abonnement, payment, documents };
+
+    log("Sending dossier", { userId, externalId, event, docs: documents.length });
     const r = await callNotify(supabaseUrl, serviceKey, {
       event,
       external_id: externalId,
