@@ -57,15 +57,25 @@ Deno.serve(async (req) => {
 
     const userId = userData.user.id;
 
-    await supabase
+    // Also stamp signup_ip / signup_user_agent if missing (first acceptance = signup proof)
+    const { data: existing } = await supabase
       .from("profiles")
-      .update({
-        cgv_version: version,
-        cgv_accepted_at: now,
-        cgv_ip: ip,
-        cgv_user_agent: ua,
-      })
-      .eq("id", userId);
+      .select("signup_ip, signup_user_agent")
+      .eq("id", userId)
+      .maybeSingle();
+
+    const profileUpdate: Record<string, unknown> = {
+      cgv_version: version,
+      cgv_accepted_at: now,
+      cgv_ip: ip,
+      cgv_user_agent: ua,
+      last_login_ip: ip,
+      last_login_at: now,
+    };
+    if (!existing?.signup_ip) profileUpdate.signup_ip = ip;
+    if (!existing?.signup_user_agent) profileUpdate.signup_user_agent = ua;
+
+    await supabase.from("profiles").update(profileUpdate).eq("id", userId);
 
     await supabase
       .from("subscriptions")
