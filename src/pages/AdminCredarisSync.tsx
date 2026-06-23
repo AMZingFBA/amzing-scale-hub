@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "@/hooks/use-toast";
 import { Loader2, RefreshCw, Eye, Send } from "lucide-react";
-import { SEO } from "@/components/SEO";
+import SEO from "@/components/SEO";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
