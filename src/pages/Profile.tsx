@@ -128,37 +128,39 @@ const Profile = () => {
       if (error) throw error;
 
       if (data) {
+        const d = data as any;
         setProfileData({
-          full_name: data.full_name || '',
-          nickname: data.nickname || '',
-          phone: data.phone || '',
-          avatar_url: data.avatar_url || '',
-          email: data.email || user.email || '',
-          siren: (data as any).siren || '',
-          company_name: (data as any).company_name || '',
+          ...emptyProfile(d.email || user.email || ''),
+          full_name: d.full_name || '',
+          first_name: d.first_name || '',
+          last_name: d.last_name || '',
+          nickname: d.nickname || '',
+          phone: d.phone || '',
+          phone_e164: d.phone_e164 || '',
+          avatar_url: d.avatar_url || '',
+          siren: d.siren || '',
+          siret: d.siret || '',
+          vat_number: d.vat_number || '',
+          legal_form: d.legal_form || '',
+          company_name: d.company_name || '',
+          billing_address_street: d.billing_address_street || '',
+          billing_address_zip: d.billing_address_zip || '',
+          billing_address_city: d.billing_address_city || '',
+          billing_address_country: d.billing_address_country || 'FR',
+          shipping_same_as_billing: d.shipping_same_as_billing ?? true,
+          shipping_address_street: d.shipping_address_street || '',
+          shipping_address_zip: d.shipping_address_zip || '',
+          shipping_address_city: d.shipping_address_city || '',
+          shipping_address_country: d.shipping_address_country || 'FR',
+          client_ref: d.client_ref || '',
         });
       } else {
         // Create profile if it doesn't exist
         const { error: insertError } = await supabase
           .from('profiles')
-          .insert([
-            {
-              id: user.id,
-              email: user.email || '',
-            },
-          ]);
-
+          .insert([{ id: user.id, email: user.email || '' }]);
         if (insertError) throw insertError;
-
-        setProfileData({
-          full_name: '',
-          nickname: '',
-          phone: '',
-          avatar_url: '',
-          email: user.email || '',
-          siren: '',
-          company_name: '',
-        });
+        setProfileData(emptyProfile(user.email || ''));
       }
     } catch (error) {
       console.error('Error loading profile:', error);
