@@ -156,10 +156,15 @@ const AdminFailedPayments = () => {
             <h1 className="text-2xl font-bold text-foreground">💰 Gestion des Impayés</h1>
             <p className="text-muted-foreground mt-1">Suivi automatique des paiements échoués et recouvrement Rubypayeur</p>
           </div>
-          <Button onClick={fetchPayments} variant="outline" size="sm">
-            <RefreshCw className="h-4 w-4 mr-2" />
-            Actualiser
-          </Button>
+          <div className="flex gap-2">
+            <Button onClick={() => navigate("/admin/credaris-sync")} variant="outline" size="sm">
+              Sync Credaris
+            </Button>
+            <Button onClick={fetchPayments} variant="outline" size="sm">
+              <RefreshCw className="h-4 w-4 mr-2" />
+              Actualiser
+            </Button>
+          </div>
         </div>
 
         {/* Stats */}
