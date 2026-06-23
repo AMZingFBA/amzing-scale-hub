@@ -1283,12 +1283,141 @@ serve(async (req) => {
         logStep("🏦 Rubypayeur case created", { ref: rubypayeurRef, email: customerEmail });
       }
 
-      logStep("✅ Automated recovery completed", { 
-        email: customerEmail, 
-        emailSent, 
-        rubypayeurRef: rubypayeurRef || 'failed',
-        amount 
+      // Record payment attempt + increment consecutive counter
+      await supabaseClient.from("payment_attempts").insert({
+        user_id: profile.id,
+        email: customerEmail,
+        stripe_event_id: event.id,
+        stripe_invoice_id: invoice.id,
+        stripe_subscription_id: invoice.subscription || null,
+        stripe_customer_id: invoice.customer as string,
+        transaction_id: invoice.payment_intent as string || invoice.id,
+        amount_eur: amount,
+        currency: (invoice.currency || "eur").toUpperCase(),
+        method: "card",
+        status: "failed",
+        error_code: invoice.last_finalization_error?.code || null,
+        error_message: failureReason,
+        raw_psp_response: { invoice: invoice as any },
+        attempted_at: now.toISOString(),
       });
+
+      const { data: subRow } = await supabaseClient.from("subscriptions")
+        .select("consecutive_failed_count").eq("user_id", profile.id).maybeSingle();
+      const newCount = (subRow?.consecutive_failed_count || 0) + 1;
+      await supabaseClient.from("subscriptions")
+        .update({ consecutive_failed_count: newCount, last_failure_at: now.toISOString() })
+        .eq("user_id", profile.id);
+
+      // Notify Credaris on EVERY failure (Credaris decides at 2nd consecutive)
+      const { data: pFail } = await supabaseClient.from("profiles")
+        .select("id,email,full_name,phone,phone_e164,siren,company_name,legal_form,client_ref,billing_address_street,billing_address_zip,billing_address_city,billing_address_country,created_at,cgv_version,cgv_accepted_at,cgv_ip,cgv_user_agent")
+        .eq("id", profile.id).maybeSingle();
+      const { data: sFail } = await supabaseClient.from("subscriptions").select("*").eq("user_id", profile.id).maybeSingle();
+      await notifyCredaris(
+        "payment.failed",
+        `evt_amzing_payfail_${invoice.id}_${event.id}`,
+        {
+          client: buildCredarisClient(pFail, customerEmail, sFail),
+          abonnement: {
+            offre: sFail?.offer_label || "VIP Annuel",
+            date_souscription: sFail?.started_at?.slice(0,10) || null,
+            duree_mois: sFail?.commitment_months || 12,
+            prix_mensuel_eur: sFail?.price_monthly_eur || amount,
+            total_engagement_eur: sFail?.price_monthly_eur && sFail?.commitment_months
+              ? Number(sFail.price_monthly_eur) * Number(sFail.commitment_months) : null,
+            stripe_customer_id: invoice.customer,
+            stripe_subscription_id: invoice.subscription || null,
+            payment_link_url: sFail?.payment_link_url || "",
+            cgv_version: sFail?.cgv_version || pFail?.cgv_version || "",
+            cgv_acceptees_le: sFail?.cgv_accepted_at || pFail?.cgv_accepted_at || null,
+            cgv_ip: sFail?.cgv_ip || pFail?.cgv_ip || "",
+            cgv_user_agent: sFail?.cgv_user_agent || pFail?.cgv_user_agent || "",
+          },
+          payment: {
+            transaction_id: invoice.payment_intent || invoice.id,
+            montant_eur: amount,
+            moyen: "card",
+            message_erreur: failureReason,
+            numero_echeance: newCount,
+            date_echec: now.toISOString(),
+            stripe_invoice_id: invoice.id,
+            invoice_number: invoice.number || null,
+            hosted_invoice_url: invoice.hosted_invoice_url || null,
+          },
+          documents: invoice.invoice_pdf
+            ? [{ type: "facture", nom: `${invoice.number || invoice.id}.pdf`, mime: "application/pdf", url: invoice.invoice_pdf }]
+            : [],
+        },
+        profile.id,
+      );
+
+      logStep("✅ Automated recovery completed", {
+        email: customerEmail,
+        emailSent,
+        rubypayeurRef: rubypayeurRef || 'failed',
+        amount,
+        credarisNotified: true,
+        consecutiveFailures: newCount,
+      });
+    }
+
+    // ============================================================
+    // INVOICE PAYMENT SUCCEEDED — reset counter + notify Credaris
+    // ============================================================
+    if (event.type === "invoice.payment_succeeded") {
+      const invoice = event.data.object as Stripe.Invoice;
+      const customer = await stripe.customers.retrieve(invoice.customer as string);
+      if (!customer.deleted && customer.email) {
+        const { data: profile } = await supabaseClient.from("profiles")
+          .select("id,email,full_name,phone,phone_e164,siren,company_name,legal_form,client_ref,billing_address_street,billing_address_zip,billing_address_city,billing_address_country,created_at,cgv_version,cgv_accepted_at,cgv_ip,cgv_user_agent")
+          .eq("email", customer.email).maybeSingle();
+        if (profile) {
+          const amount = invoice.amount_paid ? invoice.amount_paid / 100 : 0;
+          await supabaseClient.from("payment_attempts").insert({
+            user_id: profile.id,
+            email: customer.email,
+            stripe_event_id: event.id,
+            stripe_invoice_id: invoice.id,
+            stripe_subscription_id: invoice.subscription || null,
+            stripe_customer_id: invoice.customer as string,
+            transaction_id: invoice.payment_intent as string || invoice.id,
+            amount_eur: amount,
+            currency: (invoice.currency || "eur").toUpperCase(),
+            method: "card",
+            status: "succeeded",
+            raw_psp_response: { invoice: invoice as any },
+            attempted_at: new Date().toISOString(),
+          });
+          await supabaseClient.from("subscriptions")
+            .update({ consecutive_failed_count: 0 }).eq("user_id", profile.id);
+          const { data: sOk } = await supabaseClient.from("subscriptions").select("*").eq("user_id", profile.id).maybeSingle();
+          await notifyCredaris(
+            "payment.succeeded",
+            `evt_amzing_paysucc_${invoice.id}_${event.id}`,
+            {
+              client: buildCredarisClient(profile, customer.email, sOk),
+              abonnement: {
+                stripe_customer_id: invoice.customer,
+                stripe_subscription_id: invoice.subscription || null,
+              },
+              payment: {
+                transaction_id: invoice.payment_intent || invoice.id,
+                montant_eur: amount,
+                moyen: "card",
+                date_paiement: new Date().toISOString(),
+                stripe_invoice_id: invoice.id,
+                invoice_number: invoice.number || null,
+                hosted_invoice_url: invoice.hosted_invoice_url || null,
+              },
+              documents: invoice.invoice_pdf
+                ? [{ type: "facture", nom: `${invoice.number || invoice.id}.pdf`, mime: "application/pdf", url: invoice.invoice_pdf }]
+                : [],
+            },
+            profile.id,
+          );
+        }
+      }
     }
 
     return new Response(JSON.stringify({ received: true }), {
