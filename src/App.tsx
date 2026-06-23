@@ -257,6 +257,7 @@ const App = () => (
             <Route path="/admin/subscriptions" element={<AdminSubscriptions />} />
             <Route path="/admin/whatsapp" element={<Navigate to="/admin/whatsapp-crm" replace />} />
             <Route path="/admin/failed-payments" element={<AdminFailedPayments />} />
+            <Route path="/admin/credaris-sync" element={<AdminCredarisSync />} />
             <Route path="/admin/whatsapp-bulk" element={<AdminWhatsAppBulk />} />
             <Route path="/admin/imessage-bulk" element={<AdminIMessageBulk />} />
             <Route path="/admin/prospection" element={<AdminProspection />} />
