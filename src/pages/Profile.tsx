@@ -179,16 +179,29 @@ const Profile = () => {
 
     setIsSaving(true);
     try {
-      const { error } = await supabase
-        .from('profiles')
-        .update({
-          full_name: profileData.full_name || null,
-          nickname: profileData.nickname || null,
-          phone: profileData.phone || null,
-          siren: profileData.siren || null,
-          company_name: profileData.company_name || null,
-        } as any)
-        .eq('id', user.id);
+      const payload: any = {
+        full_name: profileData.full_name || null,
+        first_name: profileData.first_name || null,
+        last_name: profileData.last_name || null,
+        nickname: profileData.nickname || null,
+        phone: profileData.phone || null,
+        phone_e164: profileData.phone_e164 || profileData.phone || null,
+        siren: profileData.siren || null,
+        siret: profileData.siret || null,
+        vat_number: profileData.vat_number || null,
+        legal_form: profileData.legal_form || null,
+        company_name: profileData.company_name || null,
+        billing_address_street: profileData.billing_address_street || null,
+        billing_address_zip: profileData.billing_address_zip || null,
+        billing_address_city: profileData.billing_address_city || null,
+        billing_address_country: profileData.billing_address_country || null,
+        shipping_same_as_billing: profileData.shipping_same_as_billing,
+        shipping_address_street: profileData.shipping_same_as_billing ? null : (profileData.shipping_address_street || null),
+        shipping_address_zip: profileData.shipping_same_as_billing ? null : (profileData.shipping_address_zip || null),
+        shipping_address_city: profileData.shipping_same_as_billing ? null : (profileData.shipping_address_city || null),
+        shipping_address_country: profileData.shipping_same_as_billing ? null : (profileData.shipping_address_country || null),
+      };
+      const { error } = await supabase.from('profiles').update(payload).eq('id', user.id);
 
       if (error) throw error;
 
