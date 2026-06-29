@@ -4,7 +4,7 @@
 
 set -e
 SSH_KEY="/Users/noazaghdoun/.ssh/id_ed25519_hetzner"
-SERVER="root@37.27.190.92"
+SERVER="root@95.216.218.56"
 SSH_OPTS="-i $SSH_KEY -o StrictHostKeyChecking=no -o ConnectTimeout=15"
 
 # Attendre que le serveur soit accessible (jusqu'à 120s)
@@ -26,7 +26,7 @@ echo "Envoi des fichiers sur Hetzner..."
 rsync -av -e "ssh $SSH_OPTS" \
   --exclude="node_modules" --exclude="dist" --exclude="debug-*" \
   --exclude="*.png" --exclude="*.html" --exclude="error-screenshot.png" \
-  "/Users/noazaghdoun/Downloads/AMZing FBA /amzing-scale-hub/actorio-bridge/" \
+  "/Users/noazaghdoun/Downloads/AMZing FBA /B.H amzing-scale-hub/actorio-bridge/" \
   "$SERVER:/opt/actorio-bridge/"
 
 echo "Build + reset session + redemarrage..."
