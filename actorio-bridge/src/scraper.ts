@@ -406,20 +406,29 @@ export async function search(filters: ActorioFilters, maxResults = Infinity): Pr
         await page.goto(pageUrl, { waitUntil: 'domcontentloaded', timeout: 30000 });
       }
 
-      // Wait for table rows — poll every 200ms instead of fixed 2s waits
+      // Wait for #main-table (real results) OR explicit "0 results" indicator.
+      // The page has `#amazon_filters` table immediately on load with 8 filter rows —
+      // we must NOT accept that as "loaded", otherwise scraping starts before
+      // real results render and returns 0 even when results exist.
       let loaded = false;
+      let zeroResults = false;
       try {
-        await page.waitForFunction(() => {
+        const status = await page.waitForFunction(() => {
           const mainTbl = document.querySelector('table#main-table') as HTMLTableElement | null;
-          if (mainTbl && mainTbl.tBodies[0] && mainTbl.tBodies[0].rows.length > 0) return true;
-          const tables = Array.from(document.querySelectorAll('table') as NodeListOf<HTMLTableElement>);
-          return tables.some(t => t.tBodies[0] && t.tBodies[0].rows.length > 0);
-        }, { timeout: 10000, polling: 200 });
-        loaded = true;
+          if (mainTbl && mainTbl.tBodies[0] && mainTbl.tBodies[0].rows.length > 0) return 'loaded';
+          // Detect explicit "0 results" to break early
+          const bodyText = document.body?.innerText ?? '';
+          if (/^\s*0\s*results?\b/im.test(bodyText) || /\bno\s+results?\s+found\b/i.test(bodyText)) return 'empty';
+          return false;
+        }, { timeout: 60000, polling: 500 });
+        const value = await status.jsonValue();
+        if (value === 'loaded') loaded = true;
+        else if (value === 'empty') { zeroResults = true; console.log('[scraper] Page reports 0 results'); }
       } catch {
-        console.log('[scraper] No rows found, stopping');
+        console.log('[scraper] No results table appeared within 60s — stopping');
       }
 
+      if (zeroResults) break;
       if (!loaded) break;
 
       const pageRows = await scrapeFromDom(page, filters.marketplace ?? 'amazon.fr', pricesByAsin);
@@ -644,22 +653,14 @@ function parseRowObject(row: Record<string, any>): ActorioProduct {
 async function scrapeFromDom(page: Page, marketplace: string, pricesByAsin: Map<string, number> = new Map()): Promise<ActorioProduct[]> {
   // Quick diagnostic: check main-table row and cell counts
   const diag = await page.evaluate((): any => {
-    // Try #main-table first, then best-rows table
-    let table = document.querySelector('table#main-table') as HTMLTableElement | null;
-    if (!table) {
-      let best: HTMLTableElement | null = null;
-      let bestCount = 0;
-      Array.from(document.querySelectorAll('table') as NodeListOf<HTMLTableElement>).forEach(function(t) {
-        const tb = t.tBodies[0];
-        if (tb && tb.rows.length > bestCount) { bestCount = tb.rows.length; best = t; }
-      });
-      table = best;
-    }
+    // Only consider #main-table — never fall back to other tables (e.g. amazon_filters)
+    // which would mislead the scraper into parsing filter rows as products.
+    const table = document.querySelector('table#main-table') as HTMLTableElement | null;
     if (!table) return { found: false, id: null };
-    const tbody = (table as HTMLTableElement).tBodies[0];
+    const tbody = table.tBodies[0];
     const rows = tbody ? tbody.rows.length : 0;
     const firstRowCells = (tbody && tbody.rows[0]) ? (tbody.rows[0] as HTMLTableRowElement).cells.length : 0;
-    return { found: true, id: (table as HTMLTableElement).id || '(no id)', rows, firstRowCells };
+    return { found: true, id: table.id || '(no id)', rows, firstRowCells };
   });
   console.log(`[scraper] table diag: ${JSON.stringify(diag)}`);
 
@@ -701,19 +702,10 @@ async function scrapeFromDom(page: Page, marketplace: string, pricesByAsin: Map<
     var code = mpToCode[mktplace] ?? mktplace.toUpperCase().replace('AMAZON.', '');
     var countryIdx = DB_AMZ.indexOf(code);
     if (countryIdx < 0) countryIdx = 0; // fallback to first country
-    // Find the product table: try #main-table, then best-rows
-    let table = document.querySelector('table#main-table') as HTMLTableElement | null;
-    if (!table) {
-      let best: HTMLTableElement | null = null;
-      let bestCount = 0;
-      Array.from(document.querySelectorAll('table') as NodeListOf<HTMLTableElement>).forEach(function(t) {
-        const tbody = t.tBodies[0];
-        if (tbody && tbody.rows.length > bestCount) { bestCount = tbody.rows.length; best = t; }
-      });
-      table = best;
-    }
+    // Only parse #main-table — never fall back to other tables.
+    const table = document.querySelector('table#main-table') as HTMLTableElement | null;
     if (!table) return [];
-    const tbody = (table as HTMLTableElement).tBodies[0];
+    const tbody = table.tBodies[0];
     if (!tbody) return [];
     const results: any[] = [];
 
