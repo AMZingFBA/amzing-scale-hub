@@ -90,6 +90,7 @@ const ProductSearch = () => {
     // Fallback: check results_summary.results
     const summary = search.results_summary as any;
     if (summary && Array.isArray(summary.results) && summary.results.length > 0) {
+      setLastFilters((search.filters as SearchFilters) || null);
       setCurrentResults(summary.results);
       setLastResponse({
         search_id: search.id,
