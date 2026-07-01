@@ -185,13 +185,13 @@ const ProductSearch = () => {
             )}
 
             {/* Results */}
-            {currentResults.length > 0 && (
+            {displayedResults.length > 0 && (
               <div className="mb-5" ref={resultsRef}>
                 <SearchResults
-                  results={currentResults}
+                  results={displayedResults}
                   cacheHit={lastResponse?.cache_hit}
                   processingDuration={lastResponse?.processing_duration_ms}
-                  resultsCount={lastResponse?.results_count}
+                  resultsCount={displayedResults.length}
                 />
               </div>
             )}
