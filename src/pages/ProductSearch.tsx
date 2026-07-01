@@ -118,6 +118,7 @@ const ProductSearch = () => {
 
   const handleSubmit = async (filters: SearchFilters) => {
     setError(null);
+    setLastFilters(filters);
     const response = await submitSearch(filters);
     if (response) setLastResponse(response);
   };
