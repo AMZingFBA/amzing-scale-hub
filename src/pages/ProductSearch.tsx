@@ -35,7 +35,25 @@ const ProductSearch = () => {
   } = useProductSearch();
 
   const [lastResponse, setLastResponse] = useState<SearchResponse | null>(null);
+  const [lastFilters, setLastFilters] = useState<SearchFilters | null>(null);
   const resultsRef = useRef<HTMLDivElement>(null);
+
+  // Client-side guard : n'affiche que les lignes qui respectent les filtres min/max
+  // (le worker renvoie parfois des lignes hors critères — on les masque ici)
+  const applyClientFilters = (rows: any[], f: SearchFilters | null): any[] => {
+    if (!f || !Array.isArray(rows)) return rows || [];
+    return rows.filter((r) => {
+      const roi = Number(r?.roi ?? 0);
+      const sales = Number(r?.monthly_sales ?? 0);
+      if (f.roi_min != null && roi < f.roi_min) return false;
+      if (f.roi_max != null && roi > f.roi_max) return false;
+      if (f.monthly_sales_min != null && sales < f.monthly_sales_min) return false;
+      if (f.monthly_sales_max != null && sales > f.monthly_sales_max) return false;
+      return true;
+    });
+  };
+
+  const displayedResults = applyClientFilters(currentResults, lastFilters);
 
   // Auto-scroll vers les résultats quand ils apparaissent
   useEffect(() => {
