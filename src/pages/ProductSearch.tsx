@@ -73,6 +73,7 @@ const ProductSearch = () => {
       .maybeSingle();
 
     if (cached && Array.isArray((cached as any).results)) {
+      setLastFilters((search.filters as SearchFilters) || null);
       setCurrentResults((cached as any).results);
       setLastResponse({
         search_id: search.id,
