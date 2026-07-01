@@ -35,7 +35,25 @@ const ProductSearch = () => {
   } = useProductSearch();
 
   const [lastResponse, setLastResponse] = useState<SearchResponse | null>(null);
+  const [lastFilters, setLastFilters] = useState<SearchFilters | null>(null);
   const resultsRef = useRef<HTMLDivElement>(null);
+
+  // Client-side guard : n'affiche que les lignes qui respectent les filtres min/max
+  // (le worker renvoie parfois des lignes hors critères — on les masque ici)
+  const applyClientFilters = (rows: any[], f: SearchFilters | null): any[] => {
+    if (!f || !Array.isArray(rows)) return rows || [];
+    return rows.filter((r) => {
+      const roi = Number(r?.roi ?? 0);
+      const sales = Number(r?.monthly_sales ?? 0);
+      if (f.roi_min != null && roi < f.roi_min) return false;
+      if (f.roi_max != null && roi > f.roi_max) return false;
+      if (f.monthly_sales_min != null && sales < f.monthly_sales_min) return false;
+      if (f.monthly_sales_max != null && sales > f.monthly_sales_max) return false;
+      return true;
+    });
+  };
+
+  const displayedResults = applyClientFilters(currentResults, lastFilters);
 
   // Auto-scroll vers les résultats quand ils apparaissent
   useEffect(() => {
@@ -55,6 +73,7 @@ const ProductSearch = () => {
       .maybeSingle();
 
     if (cached && Array.isArray((cached as any).results)) {
+      setLastFilters((search.filters as SearchFilters) || null);
       setCurrentResults((cached as any).results);
       setLastResponse({
         search_id: search.id,
@@ -71,6 +90,7 @@ const ProductSearch = () => {
     // Fallback: check results_summary.results
     const summary = search.results_summary as any;
     if (summary && Array.isArray(summary.results) && summary.results.length > 0) {
+      setLastFilters((search.filters as SearchFilters) || null);
       setCurrentResults(summary.results);
       setLastResponse({
         search_id: search.id,
@@ -100,6 +120,7 @@ const ProductSearch = () => {
 
   const handleSubmit = async (filters: SearchFilters) => {
     setError(null);
+    setLastFilters(filters);
     const response = await submitSearch(filters);
     if (response) setLastResponse(response);
   };
@@ -164,13 +185,13 @@ const ProductSearch = () => {
             )}
 
             {/* Results */}
-            {currentResults.length > 0 && (
+            {displayedResults.length > 0 && (
               <div className="mb-5" ref={resultsRef}>
                 <SearchResults
-                  results={currentResults}
+                  results={displayedResults}
                   cacheHit={lastResponse?.cache_hit}
                   processingDuration={lastResponse?.processing_duration_ms}
-                  resultsCount={lastResponse?.results_count}
+                  resultsCount={displayedResults.length}
                 />
               </div>
             )}
