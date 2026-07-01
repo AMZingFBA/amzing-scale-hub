@@ -6,16 +6,15 @@ import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import {
   Search, Save, RotateCcw, FolderOpen, Loader2,
-  ShoppingCart, Truck, SlidersHorizontal, X,
+  ShoppingCart, Truck, X,
 } from 'lucide-react';
 import type { SearchFilters, SearchPreset } from '@/lib/product-search-types';
 import {
-  MARKETPLACE_OPTIONS, CATEGORY_OPTIONS, DEFAULT_FILTERS,
+  DEFAULT_FILTERS,
   COUNTRY_OPTIONS, SUPPLIER_TYPE_OPTIONS, SUPPLIER_OPTIONS,
   UPDATED_RECENTLY_OPTIONS,
 } from '@/lib/product-search-types';
@@ -131,155 +130,33 @@ export default function SearchForm({
               </CardTitle>
             </CardHeader>
             <CardContent className="px-4 pb-4 space-y-4">
-
-              {/* Toggles */}
-              <div className="flex flex-wrap gap-4">
-                <label className="flex items-center gap-2 text-sm cursor-pointer">
-                  <Switch
-                    checked={filters.exclude_incomplete || false}
-                    onCheckedChange={v => update('exclude_incomplete', v)}
-                  />
-                  Exclure incomplets
-                </label>
-                <label className="flex items-center gap-2 text-sm cursor-pointer">
-                  <Switch
-                    checked={filters.exclude_multipacks || false}
-                    onCheckedChange={v => update('exclude_multipacks', v)}
-                  />
-                  Exclure multipacks
-                </label>
-                <label className="flex items-center gap-2 text-sm cursor-pointer">
-                  <Switch
-                    checked={filters.exclude_hazmat || false}
-                    onCheckedChange={v => update('exclude_hazmat', v)}
-                  />
-                  Exclure Hazmat
-                </label>
-              </div>
-
-              {/* Marketplace */}
+              {/* ROI minimum uniquement */}
               <div className="space-y-1">
-                <Label className="text-xs font-medium text-muted-foreground">Marketplace</Label>
-                <Select
-                  value={filters.marketplace || 'amazon.fr'}
-                  onValueChange={v => update('marketplace', v)}
-                >
-                  <SelectTrigger className="h-8 text-sm">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {MARKETPLACE_OPTIONS.map(mp => (
-                      <SelectItem key={mp.value} value={mp.value}>{mp.label}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* Numeric ranges */}
-              <NumericRange
-                label="Prix Amazon (€)"
-                minVal={filters.amazon_price_min}
-                maxVal={filters.amazon_price_max}
-                onMinChange={v => update('amazon_price_min', v)}
-                onMaxChange={v => update('amazon_price_max', v)}
-                step={1}
-              />
-              <NumericRange
-                label="Bénéfice unitaire (€)"
-                minVal={filters.unit_profit_min}
-                maxVal={filters.unit_profit_max}
-                onMinChange={v => update('unit_profit_min', v)}
-                onMaxChange={v => update('unit_profit_max', v)}
-                step={0.5}
-              />
-              <NumericRange
-                label="ROI unitaire (%)"
-                minVal={filters.roi_min}
-                maxVal={filters.roi_max}
-                onMinChange={v => update('roi_min', v)}
-                onMaxChange={v => update('roi_max', v)}
-                step={1}
-              />
-              <NumericRange
-                label="Bénéfice mensuel total (€)"
-                minVal={filters.monthly_profit_min}
-                maxVal={filters.monthly_profit_max}
-                onMinChange={v => update('monthly_profit_min', v)}
-                onMaxChange={v => update('monthly_profit_max', v)}
-                step={10}
-              />
-              <NumericRange
-                label="Ventes mensuelles total"
-                minVal={filters.monthly_sales_min}
-                maxVal={filters.monthly_sales_max}
-                onMinChange={v => update('monthly_sales_min', v)}
-                onMaxChange={v => update('monthly_sales_max', v)}
-                step={1}
-              />
-
-              {/* ASIN list */}
-              <div className="space-y-1">
-                <Label className="text-xs font-medium text-muted-foreground">Liste ASIN</Label>
-                <Textarea
-                  placeholder="Collez une liste d'ASIN (un par ligne)..."
-                  value={filters.asin_list || ''}
-                  onChange={e => update('asin_list', e.target.value || undefined)}
-                  className="h-16 text-sm resize-none"
+                <Label className="text-xs font-medium text-muted-foreground">ROI unitaire minimum (%)</Label>
+                <Input
+                  type="number"
+                  placeholder="Ex: 30"
+                  value={filters.roi_min ?? ''}
+                  onChange={e => update('roi_min', e.target.value ? Number(e.target.value) : undefined)}
+                  className="h-8 text-sm"
+                  min={0}
+                  step={1}
                 />
               </div>
 
-              {/* Advanced Amazon */}
-              <Accordion type="single" collapsible>
-                <AccordionItem value="amazon-advanced" className="border-none">
-                  <AccordionTrigger className="py-1 text-xs text-muted-foreground hover:no-underline">
-                    <span className="flex items-center gap-1">
-                      <SlidersHorizontal className="w-3 h-3" />
-                      Filtres avancés Amazon
-                    </span>
-                  </AccordionTrigger>
-                  <AccordionContent className="space-y-3 pt-2">
-                    <div className="space-y-1">
-                      <Label className="text-xs font-medium text-muted-foreground">BSR maximum</Label>
-                      <Input
-                        type="number"
-                        placeholder="100000"
-                        value={filters.bsr_max ?? ''}
-                        onChange={e => update('bsr_max', e.target.value ? Number(e.target.value) : undefined)}
-                        className="h-8 text-sm"
-                        min={0}
-                        step={1000}
-                      />
-                    </div>
-                    <div className="space-y-1">
-                      <Label className="text-xs font-medium text-muted-foreground">Catégorie</Label>
-                      <Select
-                        value={filters.category || 'all'}
-                        onValueChange={v => update('category', v === 'all' ? undefined : v)}
-                      >
-                        <SelectTrigger className="h-8 text-sm">
-                          <SelectValue placeholder="Toutes" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="all">Toutes</SelectItem>
-                          {CATEGORY_OPTIONS.map(cat => (
-                            <SelectItem key={cat} value={cat}>{cat}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="space-y-1">
-                      <Label className="text-xs font-medium text-muted-foreground">Mots-clés</Label>
-                      <Input
-                        placeholder="lego, drone, écouteurs..."
-                        value={filters.keywords || ''}
-                        onChange={e => update('keywords', e.target.value || undefined)}
-                        className="h-8 text-sm"
-                        maxLength={500}
-                      />
-                    </div>
-                  </AccordionContent>
-                </AccordionItem>
-              </Accordion>
+              {/* Ventes mensuelles minimum uniquement */}
+              <div className="space-y-1">
+                <Label className="text-xs font-medium text-muted-foreground">Ventes mensuelles total minimum</Label>
+                <Input
+                  type="number"
+                  placeholder="Ex: 10"
+                  value={filters.monthly_sales_min ?? ''}
+                  onChange={e => update('monthly_sales_min', e.target.value ? Number(e.target.value) : undefined)}
+                  className="h-8 text-sm"
+                  min={0}
+                  step={1}
+                />
+              </div>
             </CardContent>
           </Card>
 
