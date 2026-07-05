@@ -333,9 +333,9 @@ const BlogPost = () => {
 
         {/* Contenu principal */}
         <div className="container mx-auto px-4 pb-16">
-          <div className="grid lg:grid-cols-[1fr_320px] gap-12">
+          <div className="grid lg:grid-cols-[minmax(0,1fr)_320px] gap-12">
             {/* Article */}
-            <div className="max-w-none">
+            <div className="min-w-0 max-w-none overflow-hidden">
               <BlogArticleContent article={article} />
 
               {/* Bloc de conversion principal */}
