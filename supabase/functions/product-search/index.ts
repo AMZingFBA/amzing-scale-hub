@@ -65,8 +65,9 @@ function generateFiltersHash(filters: SearchFilters): string {
         return acc;
       }, {})
   );
-  // Simple hash using built-in crypto
-  return btoa(normalized).replace(/[^a-zA-Z0-9]/g, '').substring(0, 64);
+  // Encode en UTF-8 avant btoa pour éviter "Invalid character" avec accents/emojis/#
+  const utf8 = Array.from(new TextEncoder().encode(normalized), (b) => String.fromCharCode(b)).join('');
+  return btoa(utf8).replace(/[^a-zA-Z0-9]/g, '').substring(0, 64);
 }
 
 // Validate filters
