@@ -9,22 +9,44 @@ interface Props {
 interface State {
   hasError: boolean;
   error: Error | null;
+  isRecovering: boolean;
+}
+
+const INVALID_CHARACTER_RECOVERY_KEY = 'amzing-invalid-character-recovered-v1';
+
+async function clearBrowserCachesAndWorkers() {
+  if ('caches' in window) {
+    const keys = await caches.keys();
+    await Promise.all(keys.map((k) => caches.delete(k)));
+  }
+  if ('serviceWorker' in navigator) {
+    const regs = await navigator.serviceWorker.getRegistrations();
+    await Promise.all(regs.map((r) => r.unregister()));
+  }
 }
 
 export class ErrorBoundary extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
-    this.state = { hasError: false, error: null };
+    this.state = { hasError: false, error: null, isRecovering: false };
   }
 
   static getDerivedStateFromError(error: Error): State {
-    return { hasError: true, error };
+    return { hasError: true, error, isRecovering: false };
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     console.error('ErrorBoundary caught an error:', error, errorInfo);
     console.error('Stack:', error.stack);
     console.error('Component stack:', errorInfo.componentStack);
+
+    if (error.message?.includes('Invalid character') && sessionStorage.getItem(INVALID_CHARACTER_RECOVERY_KEY) !== '1') {
+      sessionStorage.setItem(INVALID_CHARACTER_RECOVERY_KEY, '1');
+      this.setState({ isRecovering: true });
+      clearBrowserCachesAndWorkers()
+        .catch((e) => console.error('Automatic cache recovery failed', e))
+        .finally(() => window.location.replace(`${window.location.pathname}${window.location.search}`));
+    }
   }
 
   render() {
@@ -36,7 +58,9 @@ export class ErrorBoundary extends React.Component<Props, State> {
             <AlertCircle className="h-12 w-12 text-destructive mx-auto" />
             <h2 className="text-2xl font-bold">Une erreur est survenue</h2>
             <p className="text-muted-foreground">
-              {this.state.error?.message || "Une erreur inattendue s'est produite"}
+              {this.state.isRecovering
+                ? 'Correction automatique en cours…'
+                : this.state.error?.message || "Une erreur inattendue s'est produite"}
             </p>
             {isInvalidCharError && (
               <p className="text-sm text-muted-foreground">
@@ -52,7 +76,8 @@ export class ErrorBoundary extends React.Component<Props, State> {
             <div className="flex gap-2 justify-center">
               <Button
                 onClick={() => {
-                  this.setState({ hasError: false, error: null });
+                  sessionStorage.removeItem(INVALID_CHARACTER_RECOVERY_KEY);
+                  this.setState({ hasError: false, error: null, isRecovering: false });
                   window.location.reload();
                 }}
                 variant="default"
@@ -62,18 +87,12 @@ export class ErrorBoundary extends React.Component<Props, State> {
               <Button
                 onClick={async () => {
                   try {
-                    if ('caches' in window) {
-                      const keys = await caches.keys();
-                      await Promise.all(keys.map((k) => caches.delete(k)));
-                    }
-                    if ('serviceWorker' in navigator) {
-                      const regs = await navigator.serviceWorker.getRegistrations();
-                      await Promise.all(regs.map((r) => r.unregister()));
-                    }
+                    sessionStorage.removeItem(INVALID_CHARACTER_RECOVERY_KEY);
+                    await clearBrowserCachesAndWorkers();
                   } catch (e) {
                     console.error('Cache clear failed', e);
                   }
-                  window.location.reload();
+                  window.location.replace(`${window.location.pathname}${window.location.search}`);
                 }}
                 variant="outline"
               >

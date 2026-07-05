@@ -2,6 +2,18 @@
   Content-Type: application/x-apple-aspen-config
   Content-Disposition: attachment; filename="AMZing-Sender.shortcut"
 
+/sw.js
+  Cache-Control: no-store, no-cache, must-revalidate, max-age=0
+
+/manifest.json
+  Cache-Control: no-cache, must-revalidate
+
+/*.html
+  Cache-Control: no-cache, must-revalidate
+
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
 /media2/*.opus
   Content-Type: audio/ogg; codecs=opus
   Access-Control-Allow-Origin: *
