@@ -26,7 +26,11 @@ function generateFiltersHash(filters: SearchFilters): string {
         return acc;
       }, {})
   );
-  return btoa(normalized).replace(/[^a-zA-Z0-9]/g, '').substring(0, 64);
+  // Encode en UTF-8 avant btoa pour éviter "Invalid character" sur accents/emojis/#
+  const utf8 = typeof TextEncoder !== 'undefined'
+    ? Array.from(new TextEncoder().encode(normalized), (b) => String.fromCharCode(b)).join('')
+    : unescape(encodeURIComponent(normalized));
+  return btoa(utf8).replace(/[^a-zA-Z0-9]/g, '').substring(0, 64);
 }
 
 function generateMockResults(filters: SearchFilters): ProductResult[] {
