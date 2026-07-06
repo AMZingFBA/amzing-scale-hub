@@ -71,13 +71,29 @@ class SellerAmpClient:
                     return {}
                 await asyncio.sleep(2)
 
+        # SellerAmp returns null body when session expired / ASIN invalid / rate-limited
+        if not isinstance(result, dict):
+            print(f"[SellerAmp] Non-dict response ({type(result).__name__}) — attempting re-login")
+            try:
+                await self._login()
+                async with self.session.post(
+                    f"{SAS_BASE}/api/do", data={"data": json.dumps(payload)},
+                    headers={**headers, 'X-CSRF-Token': self.csrf},
+                    timeout=aiohttp.ClientTimeout(total=60)
+                ) as resp:
+                    result = await resp.json(content_type=None)
+            except Exception as e:
+                print(f"[SellerAmp] Re-login/retry failed: {e}")
+            if not isinstance(result, dict):
+                return {}
+
         data_map = {}
         for asin in asins:
-            kpl = result.get('kpls', {}).get(asin, {})
+            kpl = (result.get('kpls') or {}).get(asin) or {}
             if not isinstance(kpl, dict):
                 continue
 
-            cur = kpl.get('current', {})
+            cur = kpl.get('current') or {}
             prix_new = int(cur.get('18', '-1'))
             prix_amz = int(cur.get('0', '-1'))
             prix_fba = int(cur.get('7', '-1'))
