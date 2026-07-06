@@ -37,14 +37,56 @@ const ProductSearch = () => {
   const [lastResponse, setLastResponse] = useState<SearchResponse | null>(null);
   const resultsRef = useRef<HTMLDivElement>(null);
 
-  // Auto-scroll vers les résultats quand ils apparaissent
+  // Auto-scroll vers les résultats quand ils apparaissent.
+  // requestAnimationFrame garantit que le DOM des résultats est peint AVANT le scroll,
+  // sinon on peut scroller vers une position obsolète.
   useEffect(() => {
     if (currentResults.length > 0 && resultsRef.current) {
-      resultsRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      requestAnimationFrame(() => {
+        resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
     }
   }, [currentResults]);
 
   const handleViewResults = useCallback(async (search: ProductSearchType) => {
+    // Reset immediately so the user gets visual feedback that something is happening
+    setCurrentResults([]);
+    setLastResponse(null);
+
+    // Normalize results shape: Older cached rows or edge-function outputs may lack
+    // the fields SearchResults expects (id, price, marketplace, ...). Remap so the
+    // table always has something to render.
+    const normalize = (raw: any[], marketplace?: string): any[] =>
+      (Array.isArray(raw) ? raw : []).map((item: any) => ({
+        id:               item.id ?? crypto.randomUUID(),
+        title:            item.title || '',
+        asin:             item.asin || '',
+        ean:              item.ean || '',
+        image_url:        item.image_url || '',
+        price:            item.price ?? item.amazon_price ?? item.sale_price ?? 0,
+        sale_price:       item.sale_price ?? item.amazon_price ?? item.price ?? 0,
+        roi:              Number(item.roi ?? 0),
+        margin:           Number(item.margin ?? 0),
+        profit:           Number(item.profit ?? 0),
+        monthly_sales:    Number(item.monthly_sales ?? 0),
+        monthly_profit:   Number(item.monthly_profit ?? 0),
+        bsr:              Number(item.bsr ?? 0),
+        category:         item.category || '',
+        brand:            item.brand || '',
+        marketplace:      item.marketplace || marketplace || 'amazon.fr',
+        supplier:         item.supplier || '',
+        supplier_price:   Number(item.supplier_price ?? 0),
+        supplier_price_ht: !!item.supplier_price_ht,
+        supplier_url:     item.supplier_url || '',
+        amazon_url:       item.amazon_url || '',
+        keepa_url:        item.keepa_url || '',
+        keepa_b64:        item.keepa_b64 || '',
+        correspondance:   item.correspondance || '',
+        competition_level: item.competition_level || '',
+        source:           item.source || 'actorio',
+        found_at:         item.found_at || new Date().toISOString(),
+      }));
+
     // Try loading from search_results_cache first
     const { data: cached } = await supabase
       .from('search_results_cache')
@@ -54,33 +96,37 @@ const ProductSearch = () => {
       .limit(1)
       .maybeSingle();
 
-    if (cached && Array.isArray((cached as any).results)) {
-      setCurrentResults((cached as any).results);
+    const mp = (search.filters as any)?.marketplace;
+
+    if (cached && Array.isArray((cached as any).results) && (cached as any).results.length > 0) {
+      const normalized = normalize((cached as any).results, mp);
+      setCurrentResults(normalized);
       setLastResponse({
         search_id: search.id,
         status: 'completed',
         cache_hit: true,
-        results: (cached as any).results,
-        results_count: (cached as any).results_count || (cached as any).results.length,
+        results: normalized,
+        results_count: (cached as any).results_count || normalized.length,
         processing_duration_ms: search.processing_duration_ms || 0,
       });
-      toast.success(`${(cached as any).results.length} résultats chargés`);
+      toast.success(`${normalized.length} résultats chargés`);
       return;
     }
 
     // Fallback: check results_summary.results
     const summary = search.results_summary as any;
     if (summary && Array.isArray(summary.results) && summary.results.length > 0) {
-      setCurrentResults(summary.results);
+      const normalized = normalize(summary.results, mp);
+      setCurrentResults(normalized);
       setLastResponse({
         search_id: search.id,
         status: 'completed',
         cache_hit: false,
-        results: summary.results,
-        results_count: summary.results.length,
+        results: normalized,
+        results_count: normalized.length,
         processing_duration_ms: search.processing_duration_ms || 0,
       });
-      toast.success(`${summary.results.length} résultats chargés`);
+      toast.success(`${normalized.length} résultats chargés`);
       return;
     }
 
@@ -165,7 +211,7 @@ const ProductSearch = () => {
 
             {/* Results */}
             {currentResults.length > 0 && (
-              <div className="mb-5" ref={resultsRef}>
+              <div className="mb-5 scroll-mt-24" ref={resultsRef}>
                 <SearchResults
                   results={currentResults}
                   cacheHit={lastResponse?.cache_hit}
