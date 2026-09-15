@@ -1,9 +1,7 @@
-import { Check, Shield, Zap, CreditCard, Loader2 } from 'lucide-react';
-import { useSuiteCheckout } from '@/hooks/use-suite-checkout';
+import { Check, Shield, Zap, PhoneCall } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const SuitePricing = () => {
-  const { startCheckout, isLoading } = useSuiteCheckout();
-
   const includedFeatures = [
     "Produits rentables envoyés chaque semaine",
     "ROI et marges calculés automatiquement",
@@ -24,10 +22,10 @@ const SuitePricing = () => {
       <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-            Accès à vie — <span className="text-suite-orange">Paiement unique</span>
+            Accès <span className="text-suite-orange">sur devis</span>
           </h2>
           <p className="text-suite-gray text-lg">
-            Un seul paiement, accès illimité à vie
+            Un accompagnement sur mesure, discuté ensemble lors d'un appel
           </p>
         </div>
 
@@ -48,57 +46,45 @@ const SuitePricing = () => {
             </ul>
           </div>
 
-          {/* Right column - Price card */}
+          {/* Right column - Appel de diagnostic card */}
           <div className="relative">
             <div className="bg-gradient-to-br from-suite-card to-suite-bg border-2 border-suite-orange/50 rounded-2xl p-8 relative overflow-hidden">
-              {/* Popular badge */}
+              {/* Badge */}
               <div className="absolute top-0 right-0 bg-suite-orange text-white text-xs font-bold px-4 py-1.5 rounded-bl-xl">
-                ACCÈS À VIE
+                TARIF SUR MESURE
               </div>
 
-              {/* Price */}
+              {/* Pitch */}
               <div className="mb-8">
-                <p className="text-suite-gray text-sm mb-2 line-through">Valeur réelle : 2 500€</p>
+                <p className="text-suite-gray text-sm mb-2">
+                  Chaque projet est différent : ton offre est ajustée à tes objectifs et ton niveau.
+                </p>
                 <div className="flex items-baseline gap-2 mb-1">
-                  <span className="text-5xl font-bold text-white">1 499,99</span>
-                  <span className="text-2xl text-white">€</span>
+                  <span className="text-3xl font-bold text-white">Sur devis</span>
                 </div>
                 <p className="text-suite-gray">
-                  Paiement unique • <span className="text-white font-semibold">Accès à vie</span>
-                  <span className="ml-2 bg-green-500/20 text-green-400 text-xs font-bold px-2 py-0.5 rounded">-40%</span>
+                  Après un <span className="text-white font-semibold">appel de diagnostic gratuit</span>
                 </p>
               </div>
 
-
               {/* CTA Button */}
-              <button
-                onClick={startCheckout}
-                disabled={isLoading}
-                className="w-full bg-gradient-to-r from-suite-orange to-suite-orange/80 hover:from-suite-orange/90 hover:to-suite-orange text-white font-bold py-4 px-6 rounded-xl transition-all duration-300 hover:shadow-xl hover:shadow-suite-orange/30 text-lg mb-6 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              <Link
+                to="/demander-rappel"
+                className="w-full bg-gradient-to-r from-suite-orange to-suite-orange/80 hover:from-suite-orange/90 hover:to-suite-orange text-white font-bold py-4 px-6 rounded-xl transition-all duration-300 hover:shadow-xl hover:shadow-suite-orange/30 text-lg mb-6 flex items-center justify-center gap-2"
               >
-                {isLoading ? (
-                  <>
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                    Chargement...
-                  </>
-                ) : (
-                  "Nous rejoindre maintenant"
-                )}
-              </button>
+                <PhoneCall className="w-5 h-5" />
+                Demander un rappel
+              </Link>
 
               {/* Trust badges */}
               <div className="flex flex-wrap items-center justify-center gap-4 text-sm text-suite-gray">
                 <div className="flex items-center gap-1.5">
                   <Shield className="w-4 h-4 text-green-400" />
-                  <span>Paiement sécurisé</span>
+                  <span>Appel sans engagement</span>
                 </div>
                 <div className="flex items-center gap-1.5">
                   <Zap className="w-4 h-4 text-yellow-400" />
-                  <span>Accès immédiat</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <CreditCard className="w-4 h-4 text-suite-blue" />
-                  <span>Facture disponible</span>
+                  <span>Réponse rapide</span>
                 </div>
               </div>
             </div>

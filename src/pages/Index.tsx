@@ -452,14 +452,14 @@ const Index = () => {
           <div className="max-w-3xl mx-auto">
             <Accordion type="single" collapsible className="space-y-3">
               {[
-                { q: "Qu'est-ce qu'AMZing FBA exactement ?", a: "Une plateforme tout-en-un qui combine outils de sourcing, formation Amazon FBA complète, catalogue de fournisseurs vérifiés, communauté privée et coaching hebdomadaire. Tout est inclus dans un seul abonnement." },
-                { q: "Combien coûte l'accès ?", a: "500€ TTC en offre de lancement (au lieu de 700€), ou 64€/mois sur 12 mois. Aucun frais caché, l'accès dure 12 mois complets." },
+                { q: "Qu'est-ce qu'AMZing FBA exactement ?", a: "Une plateforme tout-en-un qui combine outils de sourcing, formation Amazon FBA complète, catalogue de fournisseurs vérifiés, communauté privée et coaching hebdomadaire. Tout est inclus dans un seul programme." },
+                { q: "Combien coûte l'accès ?", a: "Le tarif est défini lors d'un échange téléphonique gratuit, selon votre projet, vos objectifs et le niveau d'accompagnement souhaité. Demandez un rappel pour en discuter sans engagement." },
                 { q: "C'est adapté aux débutants ?", a: "Oui. La formation reprend depuis zéro : création de société, ouverture de compte vendeur, premier produit, expédition. Le support et le coaching sont là pour vous accompagner." },
                 { q: "Combien de temps avant les premiers résultats ?", a: "La plupart de nos membres lancent leur premier produit entre 3 et 8 semaines après l'inscription. Les résultats dépendent de votre implication et de votre budget de départ." },
-                { q: "Quel budget pour démarrer en plus de l'abonnement ?", a: "Comptez 500 à 2 000€ de stock initial selon les produits choisis. La méthode privilégie les produits à faible mise de fonds pour limiter le risque." },
-                { q: "Puis-je payer en plusieurs fois ?", a: "Oui, le paiement en 12 fois sans frais est disponible (64€/mois). Paiement sécurisé via Stripe." },
+                { q: "Quel budget pour démarrer en plus du programme ?", a: "Comptez 500 à 2 000€ de stock initial selon les produits choisis. La méthode privilégie les produits à faible mise de fonds pour limiter le risque." },
+                { q: "Quelles sont les modalités de règlement ?", a: "Les modalités sont adaptées à chaque projet et discutées ensemble lors de l'appel de diagnostic gratuit." },
                 { q: "Y a-t-il une application mobile ?", a: "Oui, AMZing FBA est disponible en application iOS native (App Store) et Android. Vous suivez vos alertes et la communauté depuis votre smartphone." },
-                { q: "Comment résilier ?", a: "L'abonnement est annuel et engage sur 12 mois. À l'issue, vous pouvez ne pas renouveler en 2 clics depuis votre espace." },
+                { q: "Comment se déroule l'accompagnement ?", a: "Après l'appel de diagnostic, on définit ensemble la durée et le format de l'accompagnement le mieux adapté à votre projet." },
               ].map((item, i) => (
                 <AccordionItem key={i} value={`item-${i}`} className="bg-background rounded-xl border border-border px-5">
                   <AccordionTrigger className="text-left font-semibold hover:no-underline py-5">
