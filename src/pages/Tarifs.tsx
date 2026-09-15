@@ -1,61 +1,97 @@
-import { Check, Star, ArrowLeft } from "lucide-react";
+import { Check, ArrowLeft, PhoneCall, Clock, ShieldCheck, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Checkbox } from "@/components/ui/checkbox";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SEO from "@/components/SEO";
+import LeadForm from "@/components/lead/LeadForm";
 import { Link, useNavigate } from "react-router-dom";
 import { Capacitor } from "@capacitor/core";
-import { useTrial } from "@/hooks/use-trial";
-import { useAuth } from "@/hooks/use-auth";
-import { seoData, schemas } from "@/lib/seo-data";
-import { useState } from "react";
-import PromoCountdown from "@/components/PromoCountdown";
+import { schemas } from "@/lib/seo-data";
+
+// Service schema sans prix : nos tarifs sont communiqués après un appel de diagnostic.
+const serviceSchema = {
+  "@context": "https://schema.org",
+  "@type": "Service",
+  "name": "Accompagnement AMZing FBA",
+  "description": "Programme d'accompagnement Amazon FBA sur mesure : formation, outils, catalogue fournisseurs et communauté. Tarif communiqué après un appel de diagnostic gratuit.",
+  "provider": {
+    "@type": "Organization",
+    "name": "AMZing FBA",
+    "url": "https://amzingfba.com"
+  },
+  "areaServed": "FR",
+  "url": "https://amzingfba.com/tarifs"
+};
+
+const inclus = [
+  "Moniteurs automatiques : robots qui notifient dès qu'un produit rentable est détecté",
+  "Guides complets Amazon FBA : formation pas à pas de 0 aux premières ventes",
+  "Fournisseurs privés : listing exclusif de produits sourcés et testés",
+  "Analyses de marché : tendances et opportunités du marché Amazon",
+  "Notifications produits : alertes instore et online pour opportunités",
+  "Conseils niches privées : investissements stratégiques et opportunités exclusives",
+  "Réductions exclusives : tarifs préférentiels sur emballages et bordereaux",
+  "Service logistique : stockage et expédition disponibles",
+];
+
+const faq = [
+  {
+    q: "Pourquoi les tarifs ne sont-ils pas affichés directement ?",
+    a: "Chaque projet est différent : niveau d'expérience, objectifs, budget disponible. Nous préférons comprendre ta situation lors d'un court appel avant de te proposer un programme réellement adapté, plutôt qu'une offre standard qui ne te correspond pas.",
+  },
+  {
+    q: "Comment se déroule l'appel de diagnostic ?",
+    a: "C'est un échange téléphonique d'environ 15 minutes, gratuit et sans engagement. On fait le point sur ton profil, tes objectifs et ton budget, on répond à tes questions, et si l'accompagnement AMZing FBA est pertinent pour toi, on te présente une proposition sur mesure.",
+  },
+  {
+    q: "Suis-je engagé après l'appel ?",
+    a: "Non. L'appel de diagnostic ne t'engage à rien. Tu repars avec une vision claire de ce qui est possible et, si tu le souhaites, une proposition personnalisée à étudier à ton rythme.",
+  },
+  {
+    q: "Que comprend l'accompagnement AMZing FBA ?",
+    a: "Selon le programme retenu, l'accompagnement peut inclure la formation complète, les moniteurs de produits rentables, le catalogue fournisseurs, la communauté et le support, ainsi que des services logistiques. Le détail exact est défini avec toi selon tes besoins.",
+  },
+  {
+    q: "Quel budget prévoir pour démarrer sur Amazon FBA ?",
+    a: "Au-delà de l'accompagnement, prévois un budget de stock pour tester quelques produits (souvent entre 500 et 1000 € pour un premier test). Ce montant dépend du modèle choisi (wholesale, retail, private label) et sera discuté ensemble lors de l'appel.",
+  },
+];
 
 const Tarifs = () => {
   const navigate = useNavigate();
-  const { startFreeTrial, isStarting, showCGVModal, setShowCGVModal, acceptedCGV, setAcceptedCGV, handleConfirmPayment } = useTrial();
-  const { user } = useAuth();
 
   return (
     <div className="min-h-screen relative overflow-hidden">
       <SEO
-        title={seoData.tarifs.title}
-        description={seoData.tarifs.description}
-        keywords={seoData.tarifs.keywords}
-        schema={schemas.product}
+        title="Tarifs sur devis – Programme AMZing FBA après appel de diagnostic"
+        description="Les tarifs AMZing FBA sont personnalisés selon ton projet. Réserve un appel de diagnostic gratuit de 15 minutes, sans engagement, et reçois une proposition sur mesure."
+        keywords="tarif formation amazon fba, devis amazon fba, accompagnement amazon fba sur mesure"
+        schema={serviceSchema}
       />
       <Navbar />
-      
-      {/* SEO H1/H2 - Invisible */}
+
       <h1 className="sr-only">
-        Tarifs et abonnements AMZing FBA pour vendeurs Amazon FBA et FBM
+        Tarifs sur mesure AMZing FBA pour vendeurs Amazon FBA et FBM
       </h1>
-      <h2 className="sr-only">
-        Comparaison des offres, abonnements et formules AMZing FBA pour accompagner les vendeurs Amazon
-      </h2>
-      
+
       {Capacitor.isNativePlatform() && (
         <div className="fixed top-[46px] left-[18px] z-50">
           <Button
             variant="outline"
             size="icon"
             onClick={() => navigate('/')}
-            className="rounded-full shadow-lg bg-background/80 backdrop-blur-sm hover:bg-primary hover:text-white border-2 border-primary/20 hover:border-primary transition-all duration-300 hover:scale-110"
+            className="rounded-full shadow-lg bg-background/80 backdrop-blur-sm hover:bg-primary hover:text-primary-foreground border-2 border-primary/20 hover:border-primary transition-all duration-300 hover:scale-110"
           >
             <ArrowLeft className="h-5 w-5" />
           </Button>
         </div>
       )}
-      
-      {/* Animated background elements */}
+
       <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-20">
         <div className="absolute top-20 left-10 w-64 h-64 bg-primary/30 rounded-full blur-3xl animate-float" style={{ animationDelay: '0s' }}></div>
         <div className="absolute bottom-40 right-20 w-96 h-96 bg-secondary/30 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }}></div>
-        <div className="absolute top-1/2 left-1/3 w-48 h-48 bg-accent/20 rounded-full blur-3xl animate-float" style={{ animationDelay: '4s' }}></div>
       </div>
 
       <div className="pt-32 pb-20 relative z-10">
@@ -63,243 +99,122 @@ const Tarifs = () => {
           {/* Hero */}
           <div className="text-center mb-16">
             <Badge className="mb-4 bg-primary/10 text-primary border-primary/20 animate-fade-in">
-              Une seule offre, tout inclus
+              Programme sur mesure
             </Badge>
-            <h1 className="text-5xl md:text-6xl font-bold mb-6 animate-fade-in" style={{ animationDelay: '0.1s' }}>
-              Accès VIP AMZing FBA
-            </h1>
+            <h2 className="text-5xl md:text-6xl font-bold mb-6 animate-fade-in" style={{ animationDelay: '0.1s' }}>
+              Un tarif sur devis, adapté à ton projet
+            </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto animate-fade-in" style={{ animationDelay: '0.2s' }}>
-              Tout ce dont tu as besoin pour réussir sur Amazon FBA en un seul abonnement
+              Nous n'affichons pas de prix figé : chaque accompagnement est construit après un appel de diagnostic gratuit et sans engagement, pour te proposer un programme réellement adapté à ton niveau et à ton budget.
             </p>
           </div>
 
-          {/* Single Pricing Card */}
-          <div className="max-w-2xl mx-auto mb-16 animate-fade-in" style={{ animationDelay: '0.3s' }}>
-            <Card className="border-2 border-primary shadow-2xl relative group hover:scale-[1.02] hover:shadow-primary/30 transition-all duration-500">
-              <CardHeader className="text-center pb-8 pt-8">
-                <CardTitle className="text-4xl mb-4 group-hover:text-primary transition-colors">Espace VIP AMZing FBA</CardTitle>
-                <CardDescription className="text-lg">Accès complet à tous les outils et services</CardDescription>
-                <PromoCountdown />
-                <p className="text-lg text-muted-foreground mt-4">ou ~64€/mois × 12 mois</p>
-              </CardHeader>
-              <CardContent className="px-8">
-                <div className="space-y-4 mb-8">
-                  <div className="flex items-start gap-3 group/item hover:translate-x-2 transition-transform duration-300 animate-fade-in" style={{ animationDelay: '0.4s' }}>
-                    <Check className="w-6 h-6 text-primary flex-shrink-0 mt-1 group-hover/item:scale-110 transition-transform" />
-                    <div>
-                      <span className="font-semibold text-lg">Moniteurs automatiques</span>
-                      <p className="text-muted-foreground text-sm">Robots qui notifient dès qu'un produit rentable est détecté (Qogita, Auchan, King Jouet...)</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3 group/item hover:translate-x-2 transition-transform duration-300 animate-fade-in" style={{ animationDelay: '0.5s' }}>
-                    <Check className="w-6 h-6 text-primary flex-shrink-0 mt-1 group-hover/item:scale-110 transition-transform" />
-                    <div>
-                      <span className="font-semibold text-lg">Guides complets Amazon FBA</span>
-                      <p className="text-muted-foreground text-sm">Formation pas à pas de 0 aux premières ventes</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3 group/item hover:translate-x-2 transition-transform duration-300 animate-fade-in" style={{ animationDelay: '0.6s' }}>
-                    <Check className="w-6 h-6 text-primary flex-shrink-0 mt-1 group-hover/item:scale-110 transition-transform" />
-                    <div>
-                      <span className="font-semibold text-lg">Fournisseurs privés</span>
-                      <p className="text-muted-foreground text-sm">Listing exclusif de produits sourcés et testés</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3 group/item hover:translate-x-2 transition-transform duration-300 animate-fade-in" style={{ animationDelay: '0.7s' }}>
-                    <Check className="w-6 h-6 text-primary flex-shrink-0 mt-1 group-hover/item:scale-110 transition-transform" />
-                    <div>
-                      <span className="font-semibold text-lg">Analyses de marché</span>
-                      <p className="text-muted-foreground text-sm">Tendances et opportunités du marché Amazon</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3 group/item hover:translate-x-2 transition-transform duration-300 animate-fade-in" style={{ animationDelay: '0.8s' }}>
-                    <Check className="w-6 h-6 text-primary flex-shrink-0 mt-1 group-hover/item:scale-110 transition-transform" />
-                    <div>
-                      <span className="font-semibold text-lg">Notifications produits</span>
-                      <p className="text-muted-foreground text-sm">Alertes instore et online pour opportunités</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3 group/item hover:translate-x-2 transition-transform duration-300 animate-fade-in" style={{ animationDelay: '0.9s' }}>
-                    <Check className="w-6 h-6 text-primary flex-shrink-0 mt-1 group-hover/item:scale-110 transition-transform" />
-                    <div>
-                      <span className="font-semibold text-lg">Conseils niches privées</span>
-                      <p className="text-muted-foreground text-sm">Investissements stratégiques et opportunités exclusives</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3 group/item hover:translate-x-2 transition-transform duration-300 animate-fade-in" style={{ animationDelay: '1s' }}>
-                    <Check className="w-6 h-6 text-primary flex-shrink-0 mt-1 group-hover/item:scale-110 transition-transform" />
-                    <div>
-                      <span className="font-semibold text-lg">Réductions exclusives</span>
-                      <p className="text-muted-foreground text-sm">Tarifs préférentiels sur emballages et bordereaux</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3 group/item hover:translate-x-2 transition-transform duration-300 animate-fade-in" style={{ animationDelay: '1.1s' }}>
-                    <Check className="w-6 h-6 text-primary flex-shrink-0 mt-1 group-hover/item:scale-110 transition-transform" />
-                    <div>
-                      <span className="font-semibold text-lg">Service logistique</span>
-                      <p className="text-muted-foreground text-sm">Stockage et expédition sous 24h disponibles</p>
-                    </div>
-                  </div>
+          {/* Comment ça marche */}
+          <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto mb-16">
+            <Card className="text-center hover:shadow-lg transition-all">
+              <CardContent className="pt-8 pb-6">
+                <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                  <PhoneCall className="w-7 h-7 text-primary" />
                 </div>
+                <h3 className="font-bold text-lg mb-2">1. Appel de diagnostic</h3>
+                <p className="text-sm text-muted-foreground">15 minutes au téléphone pour comprendre ton profil, tes objectifs et ton budget.</p>
               </CardContent>
-              <CardFooter className="px-8 pb-8">
-                <Button 
-                  variant="hero" 
-                  className="w-full text-lg py-6 hover:scale-105 transition-transform" 
-                  size="lg"
-                  onClick={startFreeTrial}
-                  disabled={isStarting}
-                >
-                  {isStarting ? 'Chargement...' : 'S\'abonner maintenant'}
-                </Button>
-              </CardFooter>
+            </Card>
+            <Card className="text-center hover:shadow-lg transition-all">
+              <CardContent className="pt-8 pb-6">
+                <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                  <ShieldCheck className="w-7 h-7 text-primary" />
+                </div>
+                <h3 className="font-bold text-lg mb-2">2. Proposition sur mesure</h3>
+                <p className="text-sm text-muted-foreground">Un programme et un tarif adaptés à ta situation, sans engagement de ta part.</p>
+              </CardContent>
+            </Card>
+            <Card className="text-center hover:shadow-lg transition-all">
+              <CardContent className="pt-8 pb-6">
+                <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                  <Clock className="w-7 h-7 text-primary" />
+                </div>
+                <h3 className="font-bold text-lg mb-2">3. Tu décides</h3>
+                <p className="text-sm text-muted-foreground">Tu prends le temps de réfléchir avant de te lancer. Aucune pression commerciale.</p>
+              </CardContent>
             </Card>
           </div>
 
-          {/* Trust Section */}
-          <Card className="mb-16 bg-gradient-to-r from-primary/10 via-secondary/10 to-primary/10 border-2 border-primary/20">
-            <CardContent className="p-8 text-center">
-              <h3 className="text-2xl font-bold mb-2">Accès annuel (12 mois)</h3>
-              <p className="text-muted-foreground mb-4">
-                Payez à l'année et profitez de l'accès pendant 12 mois complets.
-              </p>
-              <div className="flex flex-wrap justify-center gap-4">
-                <Badge className="bg-primary/20 text-primary border-primary/30">Paiement sécurisé</Badge>
-                <Badge className="bg-primary/20 text-primary border-primary/30">Accès 12 mois</Badge>
-                <Badge className="bg-primary/20 text-primary border-primary/30">Support réactif</Badge>
-              </div>
-            </CardContent>
-          </Card>
+          {/* Ce qui est inclus */}
+          <div className="max-w-3xl mx-auto mb-16 animate-fade-in">
+            <Card className="border-2 border-primary/30 shadow-xl">
+              <CardHeader className="text-center pb-4 pt-8">
+                <CardTitle className="text-3xl mb-2">Ce que peut comprendre ton accompagnement</CardTitle>
+                <CardDescription className="text-lg">Le contenu exact est défini avec toi selon tes besoins</CardDescription>
+              </CardHeader>
+              <CardContent className="px-8 pb-8">
+                <div className="space-y-4">
+                  {inclus.map((item, i) => (
+                    <div key={i} className="flex items-start gap-3">
+                      <Check className="w-5 h-5 text-primary flex-shrink-0 mt-1" />
+                      <p className="text-muted-foreground">{item}</p>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Lead form */}
+          <div id="devis" className="max-w-2xl mx-auto mb-16 scroll-mt-24">
+            <Card className="border-2 border-primary/40 shadow-2xl">
+              <CardHeader className="text-center">
+                <MessageCircle className="w-10 h-10 text-primary mx-auto mb-2" />
+                <CardTitle className="text-2xl">Demande ton appel de diagnostic gratuit</CardTitle>
+                <CardDescription>15 minutes, sans engagement. On te rappelle rapidement.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <LeadForm id="tarifs-lead-form" submitLabel="Demander mon appel de diagnostic" />
+              </CardContent>
+            </Card>
+          </div>
 
           {/* FAQ Pricing */}
           <div className="max-w-3xl mx-auto">
-            <h2 className="text-3xl font-bold text-center mb-8 animate-fade-in">Questions Fréquentes</h2>
-            
+            <h2 className="text-3xl font-bold text-center mb-8 animate-fade-in">Questions sur les tarifs</h2>
+
             <div className="space-y-4">
-              <Card className="group hover:shadow-lg hover:shadow-primary/10 hover:scale-[1.02] hover:border-primary/30 transition-all duration-300 animate-fade-in" style={{ animationDelay: '0.1s' }}>
-                <CardHeader>
-                  <CardTitle className="text-lg group-hover:text-primary transition-colors">Y a-t-il un engagement ?</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground group-hover:translate-x-1 transition-transform duration-300">
-                    Oui, l{"'"}abonnement est sur 12 mois. Cela vous permet de bénéficier du meilleur tarif annuel et d{"'"}un accès complet à tous nos services pendant une année entière.
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card className="group hover:shadow-lg hover:shadow-secondary/10 hover:scale-[1.02] hover:border-secondary/30 transition-all duration-300 animate-fade-in" style={{ animationDelay: '0.2s' }}>
-                <CardHeader>
-                  <CardTitle className="text-lg group-hover:text-secondary transition-colors">Quels moyens de paiement acceptez-vous ?</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground group-hover:translate-x-1 transition-transform duration-300">
-                    Nous acceptons les cartes bancaires (Visa, Mastercard, Amex) via notre plateforme de paiement sécurisée.
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card className="group hover:shadow-lg hover:shadow-primary/10 hover:scale-[1.02] hover:border-primary/30 transition-all duration-300 animate-fade-in" style={{ animationDelay: '0.3s' }}>
-                <CardHeader>
-                  <CardTitle className="text-lg group-hover:text-primary transition-colors">Que comprend l{"'"}abonnement ?</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground group-hover:translate-x-1 transition-transform duration-300">
-                    L{"'"}abonnement vous donne accès complet à tous les services : formation, catalogue produits, outils et communauté Discord VIP.
-                  </p>
-                </CardContent>
-              </Card>
+              {faq.map((item, i) => (
+                <Card key={i} className="group hover:shadow-lg hover:scale-[1.01] hover:border-primary/30 transition-all duration-300 animate-fade-in" style={{ animationDelay: `${i * 0.1}s` }}>
+                  <CardHeader>
+                    <CardTitle className="text-lg group-hover:text-primary transition-colors">{item.q}</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground">{item.a}</p>
+                  </CardContent>
+                </Card>
+              ))}
             </div>
           </div>
 
           {/* CTA */}
-          <Card className="mt-16 bg-gradient-to-r from-primary to-secondary text-white border-none animate-fade-in hover:shadow-2xl hover:shadow-primary/30 transition-all duration-500 animate-gradient-shift group">
+          <Card className="mt-16 bg-gradient-to-r from-primary to-secondary text-primary-foreground border-none animate-fade-in hover:shadow-2xl hover:shadow-primary/30 transition-all duration-500 group">
             <CardContent className="p-12 text-center relative overflow-hidden">
-              {/* Animated floating elements inside the card */}
               <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-20">
-                <div className="absolute top-10 left-10 w-32 h-32 bg-white/20 rounded-full blur-2xl animate-float"></div>
-                <div className="absolute bottom-10 right-10 w-40 h-40 bg-white/10 rounded-full blur-2xl animate-float" style={{ animationDelay: '2s' }}></div>
+                <div className="absolute top-10 left-10 w-32 h-32 bg-primary-foreground/20 rounded-full blur-2xl animate-float"></div>
+                <div className="absolute bottom-10 right-10 w-40 h-40 bg-primary-foreground/10 rounded-full blur-2xl animate-float" style={{ animationDelay: '2s' }}></div>
               </div>
-              
+
               <div className="relative z-10">
-                <h2 className="text-3xl md:text-4xl font-bold mb-4 animate-fade-in group-hover:scale-105 transition-transform">
-                  Besoin d{"'"}un Devis Personnalisé ?
+                <h2 className="text-3xl md:text-4xl font-bold mb-4 group-hover:scale-105 transition-transform">
+                  Prêt à en discuter ?
                 </h2>
-                <p className="text-xl mb-8 text-white/90 max-w-2xl mx-auto animate-fade-in" style={{ animationDelay: '0.1s' }}>
-                  Contactez-nous pour discuter de vos besoins spécifiques
+                <p className="text-xl mb-8 text-primary-foreground/90 max-w-2xl mx-auto">
+                  Réserve ton appel de diagnostic gratuit de 15 minutes, sans engagement.
                 </p>
-                <Link to="/contact">
-                  <Button variant="hero" size="xl" className="hover:scale-105 transition-all duration-300 animate-fade-in" style={{ animationDelay: '0.2s' }}>
-                    Nous contacter
-                  </Button>
-                </Link>
+                <Button variant="hero" size="xl" asChild className="hover:scale-105 transition-all duration-300">
+                  <Link to="/demander-rappel">Demander un rappel</Link>
+                </Button>
               </div>
             </CardContent>
           </Card>
         </div>
       </div>
-
-      {/* CGV Modal */}
-      <Dialog open={showCGVModal} onOpenChange={setShowCGVModal}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>Confirmation d'abonnement</DialogTitle>
-            <DialogDescription>
-              Veuillez accepter les conditions avant de continuer
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="space-y-4 py-4">
-            <div className="bg-primary/5 p-4 rounded-lg border border-primary/20">
-              <p className="text-sm font-semibold mb-2">Abonnement VIP AMZing FBA - Annuel</p>
-              <Badge className="bg-red-500 text-white border-0 text-xs mb-2">🔥 OFFRE FLASH -200€</Badge>
-              <p className="text-2xl font-bold">
-                <span className="line-through text-muted-foreground text-lg mr-2">700€</span>
-                <span className="bg-gradient-to-r from-red-500 via-orange-500 to-yellow-500 bg-clip-text text-transparent">500€</span>
-                <span className="text-sm font-normal text-muted-foreground">/an TTC</span>
-              </p>
-              <p className="text-sm text-muted-foreground">ou ~64€/mois × 12 mois</p>
-              <p className="text-xs text-muted-foreground mt-2">Accès pendant 12 mois</p>
-            </div>
-
-            <div className="flex items-start space-x-3">
-              <Checkbox 
-                id="cgv-payment" 
-                checked={acceptedCGV}
-                onCheckedChange={(checked) => setAcceptedCGV(checked === true)}
-                className="mt-1"
-              />
-              <label htmlFor="cgv-payment" className="text-sm leading-relaxed cursor-pointer select-none">
-                Je reconnais avoir lu et accepté les{" "}
-                <Link 
-                  to="/cgv" 
-                  target="_blank"
-                  className="text-primary hover:underline font-medium"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  Conditions Générales de Vente
-                </Link>
-                {" "}et je demande l'exécution immédiate du service.
-              </label>
-            </div>
-          </div>
-
-          <DialogFooter>
-            <Button 
-              variant="outline" 
-              onClick={() => setShowCGVModal(false)}
-            >
-              Annuler
-            </Button>
-            <Button 
-              onClick={handleConfirmPayment}
-              disabled={!acceptedCGV || isStarting}
-              className="bg-gradient-to-r from-primary to-secondary"
-            >
-              {isStarting ? 'Traitement...' : 'Confirmer le paiement'}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
 
       <Footer />
     </div>
