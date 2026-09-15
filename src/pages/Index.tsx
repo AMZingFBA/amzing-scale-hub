@@ -489,88 +489,41 @@ const Index = () => {
 
         <div className="container mx-auto px-4 relative text-center text-white">
           <Badge className="mb-6 bg-white/15 text-white border-white/25 hover:bg-white/20 backdrop-blur">
-            <Sparkles className="w-3 h-3 mr-1" /> Offre de lancement -29%
+            <Sparkles className="w-3 h-3 mr-1" /> Appel de diagnostic gratuit
           </Badge>
           <h2 className="text-3xl lg:text-5xl font-bold mb-5 max-w-3xl mx-auto leading-tight">
             Prêt à lancer votre business Amazon FBA ?
           </h2>
           <p className="text-lg lg:text-xl text-white/90 mb-8 max-w-2xl mx-auto">
             Rejoignez les 500+ vendeurs qui utilisent AMZing FBA pour sourcer, vendre et scaler chaque mois.
+            Réservez un appel gratuit de 15 min pour définir le programme adapté à votre projet.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
             <Button
               size="xl"
-              onClick={startFreeTrial}
-              disabled={isStarting}
+              asChild
               className="bg-white text-primary hover:bg-white/95 min-w-[260px] shadow-2xl font-semibold"
             >
-              {isStarting ? "Activation..." : "Accéder à AMZing FBA"} <ArrowRight className="ml-1" />
+              <Link to="/demander-rappel">Demander un rappel <ArrowRight className="ml-1" /></Link>
             </Button>
             <Button size="xl" variant="outline" asChild className="bg-transparent border-2 border-white/60 text-white hover:bg-white/10 hover:text-white min-w-[220px]">
               <Link to="/formation">Voir la formation</Link>
             </Button>
           </div>
 
-          <p className="mt-6 text-white/95">
-            <span className="line-through opacity-70 mr-1">700€</span>
-            <span className="font-bold text-xl">500€ TTC</span>
-            <span className="mx-2 opacity-70">·</span>
-            <span>ou 64€/mois × 12 sans frais</span>
+          <p className="mt-6 text-white/95 font-semibold text-xl">
+            Tarif sur mesure — défini ensemble lors de l'appel
           </p>
           <div className="mt-3 flex flex-wrap items-center justify-center gap-x-5 gap-y-1 text-sm text-white/85">
-            <span className="inline-flex items-center gap-1"><ShieldCheck className="w-4 h-4" /> Paiement sécurisé Stripe</span>
-            <span className="inline-flex items-center gap-1"><Zap className="w-4 h-4" /> Accès immédiat</span>
+            <span className="inline-flex items-center gap-1"><ShieldCheck className="w-4 h-4" /> Appel gratuit et sans engagement</span>
+            <span className="inline-flex items-center gap-1"><Zap className="w-4 h-4" /> Réponse rapide</span>
             <span className="inline-flex items-center gap-1"><BadgeCheck className="w-4 h-4" /> Société française</span>
           </div>
         </div>
       </section>
 
       <Footer />
-
-      {/* CGV Modal */}
-      <Dialog open={showCGVModal} onOpenChange={setShowCGVModal}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>Confirmation d'abonnement</DialogTitle>
-            <DialogDescription>Veuillez accepter les conditions avant de continuer</DialogDescription>
-          </DialogHeader>
-
-          <div className="space-y-4 py-4">
-            <div className="bg-primary/5 p-4 rounded-lg border border-primary/20">
-              <p className="text-sm font-semibold mb-2">Abonnement VIP AMZing FBA — Annuel</p>
-              <p className="text-2xl font-bold text-primary">
-                700€<span className="text-sm font-normal text-muted-foreground">/an TTC</span>
-              </p>
-              <p className="text-sm text-muted-foreground">ou ~64€/mois × 12 mois</p>
-              <p className="text-xs text-muted-foreground mt-2">Accès pendant 12 mois</p>
-            </div>
-
-            <div className="flex items-start space-x-3">
-              <Checkbox
-                id="cgv-payment"
-                checked={acceptedCGV}
-                onCheckedChange={(checked) => setAcceptedCGV(checked === true)}
-                className="mt-1"
-              />
-              <label htmlFor="cgv-payment" className="text-sm leading-relaxed cursor-pointer select-none">
-                Je reconnais avoir lu et accepté les{" "}
-                <Link to="/cgv" target="_blank" className="text-primary hover:underline font-medium" onClick={(e) => e.stopPropagation()}>
-                  Conditions Générales de Vente
-                </Link>{" "}
-                et je demande l'exécution immédiate du service.
-              </label>
-            </div>
-          </div>
-
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowCGVModal(false)}>Annuler</Button>
-            <Button onClick={handleConfirmPayment} disabled={!acceptedCGV || isStarting} className="bg-gradient-to-r from-primary to-secondary">
-              {isStarting ? "Traitement..." : "Confirmer le paiement"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };
