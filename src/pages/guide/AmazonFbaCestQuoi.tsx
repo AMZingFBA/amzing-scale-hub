@@ -473,11 +473,11 @@ const AmazonFbaCestQuoi = () => {
                     un catalogue fournisseurs et une communauté active.
                   </p>
                   <Button variant="hero" size="lg" asChild>
-                    <Link to="/formation">
-                      Accéder à la formation Amazon FBA <ArrowRight className="ml-2" />
+                    <Link to="/demander-rappel">
+                      Réserver mon appel gratuit <ArrowRight className="ml-2" />
                     </Link>
                   </Button>
-                  <p className="text-sm text-muted-foreground mt-3">700€/an TTC • Accès 12 mois</p>
+                  <p className="text-sm text-muted-foreground mt-3">Programme sur devis • Appel de diagnostic gratuit, sans engagement</p>
                 </CardContent>
               </Card>
             </div>

@@ -33,7 +33,7 @@ const FormationAmazonFbaDebutant = () => {
     },
     {
       question: "Combien coûte une formation Amazon FBA ?",
-      answer: "Les formations varient de 0€ (YouTube, articles) à 2000€+ (coaching premium). Les formations classiques coûtent généralement 300-800€ en one-shot. AMZing FBA propose une approche différente : 64€/mois × 12 ou 700€ TTC en une fois (-10%), avec formation + outils + communauté inclus."
+      answer: "Les formations varient de 0€ (YouTube, articles) à 2000€+ (coaching premium). Les formations classiques coûtent généralement 300-800€ en one-shot. AMZing FBA propose une approche différente : un programme sur mesure (formation + outils + communauté) au tarif défini lors d'un appel de diagnostic gratuit, sans engagement."
     },
     {
       question: "Combien de temps dure une formation ?",
@@ -408,7 +408,7 @@ const FormationAmazonFbaDebutant = () => {
                     <td className="py-3 px-4 font-medium">Tarif</td>
                     <td className="py-3 px-4 text-center">Gratuit</td>
                     <td className="py-3 px-4 text-center">500-2000€</td>
-                    <td className="py-3 px-4 text-center bg-primary/5 font-semibold text-primary">700€/an</td>
+                    <td className="py-3 px-4 text-center bg-primary/5 font-semibold text-primary">Sur devis</td>
                   </tr>
                 </tbody>
               </table>
@@ -445,11 +445,11 @@ const FormationAmazonFbaDebutant = () => {
                     </div>
                     
                     <Button variant="hero" size="lg" asChild>
-                      <Link to="/formation">
-                        Accéder à la formation Amazon FBA <ArrowRight className="ml-2" />
+                      <Link to="/demander-rappel">
+                        Réserver mon appel gratuit <ArrowRight className="ml-2" />
                       </Link>
                     </Button>
-                    <p className="text-lg font-semibold text-primary mt-4">700€/an TTC • Accès 12 mois</p>
+                    <p className="text-lg font-semibold text-primary mt-4">Programme sur devis • Appel de diagnostic gratuit, sans engagement</p>
                   </div>
                 </CardContent>
               </Card>

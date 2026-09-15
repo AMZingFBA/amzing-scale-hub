@@ -494,15 +494,12 @@ const CombienCouteAmazonFba = () => {
                     et une communauté pour valider tes décisions avant d'investir.
                   </p>
                   <Button variant="hero" size="lg" asChild>
-                    <Link to="/formation">
-                      Accéder à la formation Amazon FBA <ArrowRight className="ml-2" />
+                    <Link to="/demander-rappel">
+                      Réserver mon appel gratuit <ArrowRight className="ml-2" />
                     </Link>
                   </Button>
                   <p className="text-sm text-muted-foreground mt-3">
-                    <span className="line-through">700€</span>{" "}
-                    <span className="text-red-500 font-semibold">500€/an TTC</span>{" "}
-                    <span className="bg-red-500/20 text-red-500 text-xs px-2 py-0.5 rounded">🔥 OFFRE FLASH</span>
-                    • Accès 12 mois
+                    Programme sur devis • Appel de diagnostic gratuit, sans engagement
                   </p>
                 </CardContent>
               </Card>
