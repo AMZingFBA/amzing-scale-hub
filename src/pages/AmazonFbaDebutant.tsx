@@ -864,13 +864,13 @@ const AmazonFbaDebutant = () => {
                     </li>
                     <li>
                       <Link 
-                        to="/tarifs" 
+                        to="/demander-rappel" 
                         className="text-primary hover:underline font-medium inline-flex items-center gap-2"
                       >
                         <ArrowRight className="w-4 h-4" />
-                        Découvrir les offres AMZing FBA
+                        Demander un rappel
                       </Link>
-                      <p className="text-sm text-muted-foreground ml-6">Abonnements et tarifs</p>
+                      <p className="text-sm text-muted-foreground ml-6">Appel de diagnostic gratuit, sans engagement</p>
                     </li>
                   </ul>
                 </CardContent>
