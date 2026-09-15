@@ -338,65 +338,36 @@ const AffiliateLanding = () => {
               </CardTitle>
             </div>
             <CardContent className="p-8">
-              <p className="text-sm text-muted-foreground mb-4 text-center">Exemple avec paiement mensuel (12,80€/mois par filleul)</p>
+              <p className="text-sm text-muted-foreground mb-4 text-center">
+                Plus tu parraines de filleuls, plus tes commissions cumulées augmentent — sans limite.
+              </p>
               <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 <div className="bg-gradient-to-br from-muted/50 to-muted/20 rounded-2xl p-6 text-center border border-border hover:border-primary/30 transition-all">
                   <div className="text-5xl font-bold mb-2">1</div>
                   <div className="text-sm text-muted-foreground mb-3">filleul</div>
-                  <div className="text-2xl font-bold text-primary">12,80 €</div>
-                  <div className="text-xs text-muted-foreground mt-1">par mois</div>
+                  <div className="text-2xl font-bold text-primary">20%</div>
+                  <div className="text-xs text-muted-foreground mt-1">de commission</div>
                 </div>
                 
                 <div className="bg-gradient-to-br from-primary/10 to-primary/5 rounded-2xl p-6 text-center border-2 border-primary/30 hover:border-primary/50 transition-all">
                   <div className="text-5xl font-bold mb-2">5</div>
                   <div className="text-sm text-muted-foreground mb-3">filleuls</div>
-                  <div className="text-2xl font-bold text-primary">64 €</div>
-                  <div className="text-xs text-muted-foreground mt-1">par mois</div>
+                  <div className="text-2xl font-bold text-primary">20%</div>
+                  <div className="text-xs text-muted-foreground mt-1">par filleul</div>
                 </div>
                 
                 <div className="bg-gradient-to-br from-secondary/10 to-secondary/5 rounded-2xl p-6 text-center border-2 border-secondary/30 hover:border-secondary/50 transition-all">
                   <div className="text-5xl font-bold mb-2">10</div>
                   <div className="text-sm text-muted-foreground mb-3">filleuls</div>
-                  <div className="text-2xl font-bold text-secondary">128 €</div>
-                  <div className="text-xs text-muted-foreground mt-1">par mois</div>
+                  <div className="text-2xl font-bold text-secondary">20%</div>
+                  <div className="text-xs text-muted-foreground mt-1">par filleul</div>
                 </div>
                 
                 <div className="bg-gradient-to-br from-primary/20 to-secondary/20 rounded-2xl p-6 text-center border-2 border-primary/50 hover:border-primary transition-all shadow-glow">
                   <div className="text-5xl font-bold mb-2">20</div>
                   <div className="text-sm text-muted-foreground mb-3">filleuls</div>
-                  <div className="text-3xl font-bold text-gradient">256 €</div>
-                  <div className="text-xs text-muted-foreground mt-1">par mois</div>
-                </div>
-              </div>
-
-              <p className="text-sm text-muted-foreground my-4 text-center">Ou avec paiement annuel (140€ par filleul)</p>
-              <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div className="bg-gradient-to-br from-muted/50 to-muted/20 rounded-2xl p-6 text-center border border-border hover:border-primary/30 transition-all">
-                  <div className="text-5xl font-bold mb-2">1</div>
-                  <div className="text-sm text-muted-foreground mb-3">filleul</div>
-                  <div className="text-2xl font-bold text-primary">140 €</div>
-                  <div className="text-xs text-muted-foreground mt-1">en une fois</div>
-                </div>
-                
-                <div className="bg-gradient-to-br from-primary/10 to-primary/5 rounded-2xl p-6 text-center border-2 border-primary/30 hover:border-primary/50 transition-all">
-                  <div className="text-5xl font-bold mb-2">5</div>
-                  <div className="text-sm text-muted-foreground mb-3">filleuls</div>
-                  <div className="text-2xl font-bold text-primary">700 €</div>
-                  <div className="text-xs text-muted-foreground mt-1">en une fois</div>
-                </div>
-                
-                <div className="bg-gradient-to-br from-secondary/10 to-secondary/5 rounded-2xl p-6 text-center border-2 border-secondary/30 hover:border-secondary/50 transition-all">
-                  <div className="text-5xl font-bold mb-2">10</div>
-                  <div className="text-sm text-muted-foreground mb-3">filleuls</div>
-                  <div className="text-2xl font-bold text-secondary">1 400 €</div>
-                  <div className="text-xs text-muted-foreground mt-1">en une fois</div>
-                </div>
-                
-                <div className="bg-gradient-to-br from-primary/20 to-secondary/20 rounded-2xl p-6 text-center border-2 border-primary/50 hover:border-primary transition-all shadow-glow">
-                  <div className="text-5xl font-bold mb-2">20</div>
-                  <div className="text-sm text-muted-foreground mb-3">filleuls</div>
-                  <div className="text-3xl font-bold text-gradient">2 800 €</div>
-                  <div className="text-xs text-muted-foreground mt-1">en une fois</div>
+                  <div className="text-3xl font-bold text-gradient">20%</div>
+                  <div className="text-xs text-muted-foreground mt-1">par filleul</div>
                 </div>
               </div>
               
