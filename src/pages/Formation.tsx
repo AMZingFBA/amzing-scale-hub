@@ -255,7 +255,7 @@ const Formation = () => {
     },
     {
       objection: "C'est trop cher pour commencer",
-      response: "L'abonnement annuel est accessible en plusieurs fois (~64€/mois sur 12 mois). Pour le stock, tu peux démarrer avec 500-1000€ et tester quelques produits avant de réinvestir."
+      response: "L'accompagnement est proposé sur devis, avec possibilité de paiement échelonné : on définit ensemble le programme adapté lors d'un appel gratuit de 15 min. Pour le stock, tu peux démarrer avec 500-1000€ et tester quelques produits avant de réinvestir."
     },
     {
       objection: "J'ai déjà essayé et ça n'a pas marché",
@@ -284,7 +284,7 @@ const Formation = () => {
     },
     {
       question: "Combien faut-il investir pour commencer ?",
-      answer: "L'abonnement AMZing FBA est à 64€/mois × 12 ou 500€ TTC en une fois (🔥 OFFRE FLASH -200€). Pour le stock initial, tu peux démarrer avec 500-1000€ pour tester quelques produits. L'important n'est pas d'avoir un gros budget mais de bien choisir tes produits. Les moniteurs t'aident à optimiser chaque euro investi."
+      answer: "Le programme AMZing FBA est proposé sur devis : le tarif est défini lors d'un appel de diagnostic gratuit de 15 min, selon ton niveau et tes objectifs, avec paiement échelonné possible. Pour le stock initial, tu peux démarrer avec 500-1000€ pour tester quelques produits. L'important n'est pas d'avoir un gros budget mais de bien choisir tes produits."
     },
     {
       question: "Combien de temps pour faire ses premières ventes ?",
@@ -316,11 +316,11 @@ const Formation = () => {
     },
     {
       question: "Est-ce une formation CPF ?",
-      answer: "Non, AMZing FBA n'est pas éligible au CPF. L'abonnement est à 500€/an TTC (🔥 OFFRE FLASH) ou payable en 12 fois (~64€/mois), ce qui te permet d'étaler le coût."
+      answer: "Non, AMZing FBA n'est pas éligible au CPF. L'accompagnement est proposé sur devis, avec une facilité de paiement en plusieurs fois pour étaler le coût : le détail t'est communiqué lors de l'appel gratuit."
     },
     {
       question: "Pourquoi vous plutôt qu'une formation classique ?",
-      answer: "Les formations classiques coûtent souvent 500-2000€ et te donnent des vidéos sans outils concrets. AMZing FBA combine une méthode structurée + des moniteurs automatisés + un catalogue fournisseurs + une communauté active. Tu as tout ce qu'il faut pour passer de la théorie à l'action, pour 64€/mois × 12 ou 500€ TTC (🔥 OFFRE FLASH -200€)."
+      answer: "Les formations classiques coûtent souvent 500-2000€ et te donnent des vidéos sans outils concrets. AMZing FBA combine une méthode structurée + des moniteurs automatisés + un catalogue fournisseurs + une communauté active, avec un programme construit sur mesure après un appel de diagnostic gratuit."
     },
     {
       question: "Amazon FBA est-il toujours rentable en 2026 ?",
