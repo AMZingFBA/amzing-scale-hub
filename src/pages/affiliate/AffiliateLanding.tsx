@@ -231,15 +231,15 @@ const AffiliateLanding = () => {
                     <Award className="h-8 w-8 text-white" />
                   </div>
                   <div>
-                    <CardTitle className="text-2xl md:text-3xl">700 € / an</CardTitle>
-                    <CardDescription className="text-base mt-1">Paiement annuel unique</CardDescription>
+                    <CardTitle className="text-2xl md:text-3xl">Paiement annuel</CardTitle>
+                    <CardDescription className="text-base mt-1">Tarif sur devis, réglé en une fois</CardDescription>
                   </div>
                 </div>
               </CardHeader>
               <CardContent className="relative z-10 space-y-2">
                 <div className="flex items-center gap-2 text-sm">
                   <CheckCircle className="h-4 w-4 text-primary" />
-                  <span className="font-semibold text-primary">Ta commission : 140 €</span>
+                  <span className="font-semibold text-primary">Ta commission : 20% du montant</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <CheckCircle className="h-4 w-4 text-primary" />
@@ -257,19 +257,19 @@ const AffiliateLanding = () => {
                     <Euro className="h-8 w-8 text-white" />
                   </div>
                   <div>
-                    <CardTitle className="text-2xl md:text-3xl">64 € / mois × 12</CardTitle>
-                    <CardDescription className="text-base mt-1">Paiement mensuel</CardDescription>
+                    <CardTitle className="text-2xl md:text-3xl">Paiement mensuel</CardTitle>
+                    <CardDescription className="text-base mt-1">Tarif sur devis, réglé sur 12 mois</CardDescription>
                   </div>
                 </div>
               </CardHeader>
               <CardContent className="relative z-10 space-y-2">
                 <div className="flex items-center gap-2 text-sm">
                   <CheckCircle className="h-4 w-4 text-secondary" />
-                  <span className="font-semibold text-secondary">Ta commission : 12,80 € / mois</span>
+                  <span className="font-semibold text-secondary">Ta commission : 20% par mois</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <CheckCircle className="h-4 w-4 text-secondary" />
-                  <span>Pendant 12 mois (153,60 € total)</span>
+                  <span>Pendant toute la durée de l'abonnement</span>
                 </div>
               </CardContent>
             </Card>
@@ -289,24 +289,22 @@ const AffiliateLanding = () => {
               <div className="grid md:grid-cols-2 gap-6 mb-6">
                 {/* Commission paiement annuel */}
                 <div className="bg-gradient-to-br from-primary/5 to-transparent rounded-2xl p-6 border-2 border-primary/20">
-                  <div className="text-sm text-muted-foreground mb-2">💰 Si paiement annuel (500€ 🔥 OFFRE FLASH)</div>
+                  <div className="text-sm text-muted-foreground mb-2">💰 Si paiement annuel</div>
                   <div className="flex items-center gap-3">
                     <div className="text-3xl font-bold text-gradient">20%</div>
-                    <div className="text-3xl font-bold text-primary">=</div>
-                    <div className="text-3xl font-bold text-primary">100 €</div>
+                    <div className="text-3xl font-bold text-primary">de commission</div>
                   </div>
                   <div className="text-sm text-muted-foreground mt-2">Commission unique par filleul</div>
                 </div>
                 
                 {/* Commission paiement mensuel */}
                 <div className="bg-gradient-to-br from-secondary/5 to-transparent rounded-2xl p-6 border-2 border-secondary/20">
-                  <div className="text-sm text-muted-foreground mb-2">📅 Si paiement mensuel (64€/mois)</div>
+                  <div className="text-sm text-muted-foreground mb-2">📅 Si paiement mensuel</div>
                   <div className="flex items-center gap-3">
                     <div className="text-3xl font-bold text-gradient">20%</div>
-                    <div className="text-3xl font-bold text-secondary">=</div>
-                    <div className="text-3xl font-bold text-secondary">12,80 €/mois</div>
+                    <div className="text-3xl font-bold text-secondary">de commission</div>
                   </div>
-                  <div className="text-sm text-muted-foreground mt-2">Pendant 12 mois (153,60 € total)</div>
+                  <div className="text-sm text-muted-foreground mt-2">Chaque mois, pendant toute la durée de l'abonnement</div>
                 </div>
               </div>
               
