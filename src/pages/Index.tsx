@@ -11,14 +11,11 @@ import TestimonialsCarousel from "@/components/TestimonialsCarousel";
 import TestimonialsMobile from "@/components/TestimonialsMobile";
 import AppInstallBanner from "@/components/AppInstallBanner";
 import SEO from "@/components/SEO";
-import { useTrial } from "@/hooks/use-trial";
 import { useAuth } from "@/hooks/use-auth";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Capacitor } from "@capacitor/core";
 import { supabase } from "@/integrations/supabase/client";
 import { seoData, schemas } from "@/lib/seo-data";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Checkbox } from "@/components/ui/checkbox";
 import { useRegistrationSource } from "@/hooks/use-registration-source";
 import HomeDashboardPreview from "@/components/home/HomeDashboardPreview";
 import MultiDeviceMockup from "@/components/home/MultiDeviceMockup";
@@ -26,15 +23,6 @@ import AISourcingSpotlight from "@/components/home/AISourcingSpotlight";
 
 
 const Index = () => {
-  const {
-    startFreeTrial,
-    isStarting,
-    showCGVModal,
-    setShowCGVModal,
-    acceptedCGV,
-    setAcceptedCGV,
-    handleConfirmPayment,
-  } = useTrial();
   const { isVIP, isLoading, user, subscription } = useAuth();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
@@ -106,12 +94,13 @@ const Index = () => {
             <div className="flex flex-col sm:flex-row gap-3 justify-center items-center pt-2">
               <Button
                 size="xl"
-                onClick={startFreeTrial}
-                disabled={isStarting}
+                asChild
                 className="w-full sm:w-auto min-w-[260px] bg-[#FF9900] hover:bg-[#FFA826] text-white font-bold rounded-xl shadow-[0_8px_30px_rgba(255,153,0,0.25)] hover:shadow-[0_12px_40px_rgba(255,153,0,0.35)] hover:-translate-y-0.5 transition-all"
               >
-                {isStarting ? "Activation..." : "Accéder à la plateforme"}
-                <ArrowRight className="ml-1" />
+                <Link to="/demander-rappel">
+                  Demander un rappel
+                  <ArrowRight className="ml-1" />
+                </Link>
               </Button>
               <Button
                 variant="outline"
@@ -125,14 +114,10 @@ const Index = () => {
               </Button>
             </div>
 
-            {/* Price */}
+            {/* Lead pitch */}
             <div className="space-y-1 pt-2">
-              <div className="flex items-center justify-center gap-3">
-                <span className="text-slate-400 line-through text-lg">700€</span>
-                <span className="text-2xl font-extrabold text-slate-900">500€ TTC</span>
-              </div>
               <p className="text-sm font-medium text-slate-500">
-                Ou seulement <span className="text-slate-900 font-semibold">64€/mois</span> × 12 mois sans frais
+                <span className="text-slate-900 font-semibold">Tarif sur mesure</span> — défini ensemble lors d'un appel de diagnostic gratuit et sans engagement.
               </p>
             </div>
 
@@ -170,7 +155,7 @@ const Index = () => {
 
                 <div className="flex items-center gap-2 text-slate-500">
                   <Lock className="w-5 h-5 opacity-60" />
-                  <span className="text-xs font-medium">Paiement Stripe sécurisé</span>
+                  <span className="text-xs font-medium">Échange confidentiel et sans engagement</span>
                 </div>
               </div>
             </div>
@@ -185,7 +170,7 @@ const Index = () => {
             Conçu pour les vendeurs actifs sur
           </p>
           <div className="flex flex-wrap items-center justify-center gap-x-10 gap-y-3 text-slate-500">
-            {["Amazon Seller", "Stripe", "Discord", "App Store", "Google Play", "Keepa"].map((name) => (
+            {["Amazon Seller", "Discord", "App Store", "Google Play", "Keepa"].map((name) => (
               <span key={name} className="text-sm font-semibold tracking-wide hover:text-slate-900 transition-colors">
                 {name}
               </span>
