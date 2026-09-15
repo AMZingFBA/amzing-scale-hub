@@ -238,9 +238,9 @@ Amazon FBA n'est pas compliqué, mais il est **piégeux** : restrictions de marq
 
 ## AMZing FBA : notre approche
 
-64 €/mois avec engagement 12 mois = **768 €** pour formation + alertes produits + accompagnement Discord + appels mensuels. Pas de cours bidons, du concret.
+Un accompagnement **sur mesure**, construit avec toi lors d'un appel de diagnostic gratuit de 15 minutes : formation + alertes produits + accompagnement Discord + appels de suivi. Pas de cours bidons, du concret.
 
-👉 [Découvre notre formation](/formation)
+👉 [Demande un rappel gratuit](/demander-rappel)
 `,
     faqs: [
       { question: "Combien coûte une bonne formation Amazon FBA ?", answer: "Entre 500 € et 2000 € pour quelque chose de sérieux. Méfiance des formations à 5000 € qui ne tiennent pas leurs promesses." },
@@ -313,7 +313,7 @@ Amazon FBA n'est pas compliqué, mais il est **piégeux** : restrictions de marq
 
 ## Les formations sérieuses en France
 
-Il en existe une poignée. **AMZing FBA** en fait partie : 64 €/mois, 12 mois d'engagement, communauté active, formateurs vendeurs actifs, transparent sur les résultats.
+Il en existe une poignée. **AMZing FBA** en fait partie : accompagnement sur devis adapté à ton projet, communauté active, formateurs vendeurs actifs, transparent sur les résultats.
 
 👉 [Voir les avis sur AMZing FBA](/avis)
 `,
@@ -348,9 +348,9 @@ Une formation utile doit te rapporter **au moins 5x son prix** en 12 mois. Pour 
 
 ## Notre offre
 
-**AMZing FBA : 64 €/mois (engagement 12 mois)**. Soit **768 € l'année** pour : formation complète + alertes produits quotidiennes + Discord actif + appels mensuels.
+**AMZing FBA : accompagnement sur mesure**, défini avec toi lors d'un appel gratuit : formation complète + alertes produits quotidiennes + Discord actif + appels de suivi.
 
-👉 [Découvre l'offre complète](/formation)
+👉 [Demande un rappel gratuit](/demander-rappel)
 `,
     faqs: [
       { question: "Une formation gratuite peut-elle suffire ?", answer: "Pour comprendre les bases oui. Pour aller au-delà et éviter les pièges, non." },
