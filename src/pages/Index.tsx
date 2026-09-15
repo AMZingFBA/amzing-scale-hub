@@ -358,30 +358,27 @@ const Index = () => {
         </div>
       </section>
 
-      {/* ============== PRICING ============== */}
+      {/* ============== TARIF SUR MESURE / APPEL DE DIAGNOSTIC ============== */}
       <section id="pricing" className="py-20 lg:py-28 bg-muted/30 border-y border-border">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center mb-12">
             <Badge variant="outline" className="mb-4">Tarif</Badge>
-            <h2 className="text-3xl lg:text-4xl font-bold mb-4">Un tarif, tout inclus</h2>
+            <h2 className="text-3xl lg:text-4xl font-bold mb-4">Un programme sur mesure, pas un forfait générique</h2>
             <p className="text-lg text-muted-foreground">
-              Accès 12 mois à la plateforme, à la formation, aux fournisseurs et au coaching.
+              Chaque projet est différent. On définit ensemble le programme adapté à votre situation
+              lors d'un appel de diagnostic gratuit et sans engagement — le tarif est fixé à cette occasion.
             </p>
           </div>
 
           <Card className="max-w-2xl mx-auto border-2 border-primary/40 shadow-glow relative overflow-hidden">
             <div className="absolute top-0 right-0 bg-gradient-to-r from-primary to-secondary text-primary-foreground text-xs font-bold px-4 py-1.5 rounded-bl-xl">
-              OFFRE LANCEMENT -29%
+              Appel gratuit
             </div>
             <CardContent className="p-8 lg:p-10">
               <div className="flex flex-col items-center text-center">
                 <Badge className="mb-4 bg-primary/15 text-primary border-primary/30 hover:bg-primary/20">Accès complet AMZing FBA</Badge>
-                <div className="flex items-baseline gap-3 mb-2">
-                  <span className="text-2xl text-muted-foreground line-through">700€</span>
-                  <span className="text-5xl lg:text-6xl font-bold">500€</span>
-                  <span className="text-muted-foreground">TTC</span>
-                </div>
-                <p className="text-muted-foreground mb-6">ou <span className="font-semibold text-foreground">64€/mois × 12</span> sans frais cachés</p>
+                <p className="text-2xl lg:text-3xl font-bold mb-2">Tarif sur mesure</p>
+                <p className="text-muted-foreground mb-6">Défini avec vous lors d'un appel de 15 min, selon votre projet et vos objectifs</p>
 
                 <div className="w-full border-t border-border pt-6 mb-6">
                   <ul className="grid sm:grid-cols-2 gap-3 text-left">
@@ -403,13 +400,13 @@ const Index = () => {
                   </ul>
                 </div>
 
-                <Button variant="hero" size="xl" className="w-full sm:w-auto min-w-[280px]" onClick={startFreeTrial} disabled={isStarting}>
-                  {isStarting ? "Activation..." : "Accéder maintenant"} <ArrowRight className="ml-1" />
+                <Button variant="hero" size="xl" className="w-full sm:w-auto min-w-[280px]" asChild>
+                  <Link to="/demander-rappel">Demander un rappel <ArrowRight className="ml-1" /></Link>
                 </Button>
                 <div className="mt-4 flex items-center gap-2 text-xs text-muted-foreground">
-                  <ShieldCheck className="w-4 h-4" /> Paiement sécurisé Stripe · Accès immédiat
+                  <ShieldCheck className="w-4 h-4" /> Appel de diagnostic gratuit · Sans engagement
                 </div>
-                
+
               </div>
             </CardContent>
           </Card>
@@ -435,7 +432,7 @@ const Index = () => {
                   <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-muted-foreground">
                     <span className="inline-flex items-center gap-1.5"><Smartphone className="w-4 h-4 text-primary" /> Apps iOS & Android</span>
                     <span className="inline-flex items-center gap-1.5"><Clock className="w-4 h-4 text-primary" /> Support 7j/7</span>
-                    <span className="inline-flex items-center gap-1.5"><ShieldCheck className="w-4 h-4 text-primary" /> Paiement Stripe sécurisé</span>
+                    <span className="inline-flex items-center gap-1.5"><ShieldCheck className="w-4 h-4 text-primary" /> Appel de diagnostic gratuit</span>
                   </div>
                 </div>
               </div>
