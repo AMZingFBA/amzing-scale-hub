@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 
 /**
  * Gros bloc de conversion à placer en fin d'article de blog.
- * Design premium "masterclass" pour justifier 700€.
+ * Design premium "masterclass" sans prix — conversion vers un appel de diagnostic gratuit.
  */
 const BlogConversionCTA = () => {
   return (
@@ -63,17 +63,17 @@ const BlogConversionCTA = () => {
                 ))}
               </div>
 
-              {/* CTA + prix */}
+              {/* CTA + diagnostic gratuit */}
               <div className="flex flex-col sm:flex-row gap-3 sm:items-center">
                 <Button asChild size="lg" className="font-bold text-base shadow-lg hover:shadow-xl transition-shadow px-8">
-                  <Link to="/auth?tab=signup">
+                  <Link to="/demander-rappel">
                     <Zap className="w-5 h-5 mr-2" />
-                    Rejoindre la Formation
+                    Réserver mon appel gratuit
                     <ArrowRight className="w-5 h-5 ml-2" />
                   </Link>
                 </Button>
                 <Button asChild size="lg" variant="outline" className="font-semibold">
-                  <Link to="/tarifs">Voir les tarifs</Link>
+                  <Link to="/demander-rappel">Demander un rappel</Link>
                 </Button>
               </div>
 
@@ -100,16 +100,16 @@ const BlogConversionCTA = () => {
                 </div>
               </div>
               <div className="bg-muted/50 rounded-xl p-6 border border-border/50 text-center">
-                <div className="text-5xl font-extrabold text-foreground">64€</div>
+                <div className="text-2xl font-extrabold text-foreground">Programme sur mesure</div>
                 <div className="text-xs text-muted-foreground mt-1 uppercase tracking-wide font-medium">
-                  Par mois
+                  Tarif sur devis
                 </div>
               </div>
               <div className="bg-muted/50 rounded-xl p-4 border border-border/50 flex items-center gap-3">
                 <Lock className="w-5 h-5 text-primary shrink-0" />
                 <div className="text-xs text-muted-foreground leading-tight">
-                  <strong className="text-foreground">Paiement sécurisé</strong><br />
-                  SSL 256-bit · Accès immédiat
+                  <strong className="text-foreground">Appel de diagnostic gratuit</strong><br />
+                  Sans engagement · Places limitées
                 </div>
               </div>
             </div>
