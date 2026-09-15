@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 
 const SuiteNavbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -10,13 +11,6 @@ const SuiteNavbar = () => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-
-  const scrollToPricing = () => {
-    const pricingSection = document.getElementById('pricing');
-    if (pricingSection) {
-      pricingSection.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
 
   return (
     <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
@@ -33,14 +27,12 @@ const SuiteNavbar = () => {
           </div>
 
           {/* CTA Button */}
-          <a
-            href="https://calendly.com/amzingfba26/30min"
-            target="_blank"
-            rel="noopener noreferrer"
+          <Link
+            to="/demander-rappel"
             className="hidden md:block bg-suite-orange hover:bg-suite-orange/90 text-white font-semibold px-6 py-2.5 rounded-lg transition-all duration-300 hover:shadow-lg hover:shadow-suite-orange/20"
           >
-            Réserver un appel
-          </a>
+            Demander un rappel
+          </Link>
         </div>
       </div>
     </nav>

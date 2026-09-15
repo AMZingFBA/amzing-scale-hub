@@ -1,4 +1,5 @@
 import { ArrowRight, Check } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const SuiteFinalCTA = () => {
   const benefits = [
@@ -7,13 +8,6 @@ const SuiteFinalCTA = () => {
     "Support + Coaching hebdomadaire",
     "Accès à vie, nouveaux produits inclus"
   ];
-
-  const scrollToPricing = () => {
-    const pricingSection = document.getElementById('pricing');
-    if (pricingSection) {
-      pricingSection.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
 
   return (
     <section className="py-20 lg:py-28 relative overflow-hidden">
@@ -40,18 +34,16 @@ const SuiteFinalCTA = () => {
         </div>
 
         {/* CTA Button */}
-        <a
-          href="https://calendly.com/amzingfba26/30min"
-          target="_blank"
-          rel="noopener noreferrer"
+        <Link
+          to="/demander-rappel"
           className="group inline-flex items-center gap-3 bg-gradient-to-r from-suite-orange to-suite-orange/80 hover:from-suite-orange/90 hover:to-suite-orange text-white font-bold py-5 px-10 rounded-xl transition-all duration-300 hover:shadow-xl hover:shadow-suite-orange/30 text-xl"
         >
-          Réserver un appel
+          Demander un rappel
           <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-        </a>
+        </Link>
 
         <p className="mt-6 text-suite-gray">
-          1 499,99 € — Paiement unique
+          Tarif sur mesure — discuté lors de l'appel
         </p>
       </div>
     </section>

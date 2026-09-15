@@ -11,14 +11,11 @@ import TestimonialsCarousel from "@/components/TestimonialsCarousel";
 import TestimonialsMobile from "@/components/TestimonialsMobile";
 import AppInstallBanner from "@/components/AppInstallBanner";
 import SEO from "@/components/SEO";
-import { useTrial } from "@/hooks/use-trial";
 import { useAuth } from "@/hooks/use-auth";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Capacitor } from "@capacitor/core";
 import { supabase } from "@/integrations/supabase/client";
 import { seoData, schemas } from "@/lib/seo-data";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Checkbox } from "@/components/ui/checkbox";
 import { useRegistrationSource } from "@/hooks/use-registration-source";
 import HomeDashboardPreview from "@/components/home/HomeDashboardPreview";
 import MultiDeviceMockup from "@/components/home/MultiDeviceMockup";
@@ -26,15 +23,6 @@ import AISourcingSpotlight from "@/components/home/AISourcingSpotlight";
 
 
 const Index = () => {
-  const {
-    startFreeTrial,
-    isStarting,
-    showCGVModal,
-    setShowCGVModal,
-    acceptedCGV,
-    setAcceptedCGV,
-    handleConfirmPayment,
-  } = useTrial();
   const { isVIP, isLoading, user, subscription } = useAuth();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
@@ -106,12 +94,13 @@ const Index = () => {
             <div className="flex flex-col sm:flex-row gap-3 justify-center items-center pt-2">
               <Button
                 size="xl"
-                onClick={startFreeTrial}
-                disabled={isStarting}
+                asChild
                 className="w-full sm:w-auto min-w-[260px] bg-[#FF9900] hover:bg-[#FFA826] text-white font-bold rounded-xl shadow-[0_8px_30px_rgba(255,153,0,0.25)] hover:shadow-[0_12px_40px_rgba(255,153,0,0.35)] hover:-translate-y-0.5 transition-all"
               >
-                {isStarting ? "Activation..." : "Accéder à la plateforme"}
-                <ArrowRight className="ml-1" />
+                <Link to="/demander-rappel">
+                  Demander un rappel
+                  <ArrowRight className="ml-1" />
+                </Link>
               </Button>
               <Button
                 variant="outline"
@@ -125,14 +114,10 @@ const Index = () => {
               </Button>
             </div>
 
-            {/* Price */}
+            {/* Lead pitch */}
             <div className="space-y-1 pt-2">
-              <div className="flex items-center justify-center gap-3">
-                <span className="text-slate-400 line-through text-lg">700€</span>
-                <span className="text-2xl font-extrabold text-slate-900">500€ TTC</span>
-              </div>
               <p className="text-sm font-medium text-slate-500">
-                Ou seulement <span className="text-slate-900 font-semibold">64€/mois</span> × 12 mois sans frais
+                <span className="text-slate-900 font-semibold">Tarif sur mesure</span> — défini ensemble lors d'un appel de diagnostic gratuit et sans engagement.
               </p>
             </div>
 
@@ -170,7 +155,7 @@ const Index = () => {
 
                 <div className="flex items-center gap-2 text-slate-500">
                   <Lock className="w-5 h-5 opacity-60" />
-                  <span className="text-xs font-medium">Paiement Stripe sécurisé</span>
+                  <span className="text-xs font-medium">Échange confidentiel et sans engagement</span>
                 </div>
               </div>
             </div>
@@ -185,7 +170,7 @@ const Index = () => {
             Conçu pour les vendeurs actifs sur
           </p>
           <div className="flex flex-wrap items-center justify-center gap-x-10 gap-y-3 text-slate-500">
-            {["Amazon Seller", "Stripe", "Discord", "App Store", "Google Play", "Keepa"].map((name) => (
+            {["Amazon Seller", "Discord", "App Store", "Google Play", "Keepa"].map((name) => (
               <span key={name} className="text-sm font-semibold tracking-wide hover:text-slate-900 transition-colors">
                 {name}
               </span>
@@ -373,30 +358,27 @@ const Index = () => {
         </div>
       </section>
 
-      {/* ============== PRICING ============== */}
+      {/* ============== TARIF SUR MESURE / APPEL DE DIAGNOSTIC ============== */}
       <section id="pricing" className="py-20 lg:py-28 bg-muted/30 border-y border-border">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center mb-12">
             <Badge variant="outline" className="mb-4">Tarif</Badge>
-            <h2 className="text-3xl lg:text-4xl font-bold mb-4">Un tarif, tout inclus</h2>
+            <h2 className="text-3xl lg:text-4xl font-bold mb-4">Un programme sur mesure, pas un forfait générique</h2>
             <p className="text-lg text-muted-foreground">
-              Accès 12 mois à la plateforme, à la formation, aux fournisseurs et au coaching.
+              Chaque projet est différent. On définit ensemble le programme adapté à votre situation
+              lors d'un appel de diagnostic gratuit et sans engagement — le tarif est fixé à cette occasion.
             </p>
           </div>
 
           <Card className="max-w-2xl mx-auto border-2 border-primary/40 shadow-glow relative overflow-hidden">
             <div className="absolute top-0 right-0 bg-gradient-to-r from-primary to-secondary text-primary-foreground text-xs font-bold px-4 py-1.5 rounded-bl-xl">
-              OFFRE LANCEMENT -29%
+              Appel gratuit
             </div>
             <CardContent className="p-8 lg:p-10">
               <div className="flex flex-col items-center text-center">
                 <Badge className="mb-4 bg-primary/15 text-primary border-primary/30 hover:bg-primary/20">Accès complet AMZing FBA</Badge>
-                <div className="flex items-baseline gap-3 mb-2">
-                  <span className="text-2xl text-muted-foreground line-through">700€</span>
-                  <span className="text-5xl lg:text-6xl font-bold">500€</span>
-                  <span className="text-muted-foreground">TTC</span>
-                </div>
-                <p className="text-muted-foreground mb-6">ou <span className="font-semibold text-foreground">64€/mois × 12</span> sans frais cachés</p>
+                <p className="text-2xl lg:text-3xl font-bold mb-2">Tarif sur mesure</p>
+                <p className="text-muted-foreground mb-6">Défini avec vous lors d'un appel de 15 min, selon votre projet et vos objectifs</p>
 
                 <div className="w-full border-t border-border pt-6 mb-6">
                   <ul className="grid sm:grid-cols-2 gap-3 text-left">
@@ -418,13 +400,13 @@ const Index = () => {
                   </ul>
                 </div>
 
-                <Button variant="hero" size="xl" className="w-full sm:w-auto min-w-[280px]" onClick={startFreeTrial} disabled={isStarting}>
-                  {isStarting ? "Activation..." : "Accéder maintenant"} <ArrowRight className="ml-1" />
+                <Button variant="hero" size="xl" className="w-full sm:w-auto min-w-[280px]" asChild>
+                  <Link to="/demander-rappel">Demander un rappel <ArrowRight className="ml-1" /></Link>
                 </Button>
                 <div className="mt-4 flex items-center gap-2 text-xs text-muted-foreground">
-                  <ShieldCheck className="w-4 h-4" /> Paiement sécurisé Stripe · Accès immédiat
+                  <ShieldCheck className="w-4 h-4" /> Appel de diagnostic gratuit · Sans engagement
                 </div>
-                
+
               </div>
             </CardContent>
           </Card>
@@ -450,7 +432,7 @@ const Index = () => {
                   <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-muted-foreground">
                     <span className="inline-flex items-center gap-1.5"><Smartphone className="w-4 h-4 text-primary" /> Apps iOS & Android</span>
                     <span className="inline-flex items-center gap-1.5"><Clock className="w-4 h-4 text-primary" /> Support 7j/7</span>
-                    <span className="inline-flex items-center gap-1.5"><ShieldCheck className="w-4 h-4 text-primary" /> Paiement Stripe sécurisé</span>
+                    <span className="inline-flex items-center gap-1.5"><ShieldCheck className="w-4 h-4 text-primary" /> Appel de diagnostic gratuit</span>
                   </div>
                 </div>
               </div>
@@ -470,14 +452,14 @@ const Index = () => {
           <div className="max-w-3xl mx-auto">
             <Accordion type="single" collapsible className="space-y-3">
               {[
-                { q: "Qu'est-ce qu'AMZing FBA exactement ?", a: "Une plateforme tout-en-un qui combine outils de sourcing, formation Amazon FBA complète, catalogue de fournisseurs vérifiés, communauté privée et coaching hebdomadaire. Tout est inclus dans un seul abonnement." },
-                { q: "Combien coûte l'accès ?", a: "500€ TTC en offre de lancement (au lieu de 700€), ou 64€/mois sur 12 mois. Aucun frais caché, l'accès dure 12 mois complets." },
+                { q: "Qu'est-ce qu'AMZing FBA exactement ?", a: "Une plateforme tout-en-un qui combine outils de sourcing, formation Amazon FBA complète, catalogue de fournisseurs vérifiés, communauté privée et coaching hebdomadaire. Tout est inclus dans un seul programme." },
+                { q: "Combien coûte l'accès ?", a: "Le tarif est défini lors d'un échange téléphonique gratuit, selon votre projet, vos objectifs et le niveau d'accompagnement souhaité. Demandez un rappel pour en discuter sans engagement." },
                 { q: "C'est adapté aux débutants ?", a: "Oui. La formation reprend depuis zéro : création de société, ouverture de compte vendeur, premier produit, expédition. Le support et le coaching sont là pour vous accompagner." },
                 { q: "Combien de temps avant les premiers résultats ?", a: "La plupart de nos membres lancent leur premier produit entre 3 et 8 semaines après l'inscription. Les résultats dépendent de votre implication et de votre budget de départ." },
-                { q: "Quel budget pour démarrer en plus de l'abonnement ?", a: "Comptez 500 à 2 000€ de stock initial selon les produits choisis. La méthode privilégie les produits à faible mise de fonds pour limiter le risque." },
-                { q: "Puis-je payer en plusieurs fois ?", a: "Oui, le paiement en 12 fois sans frais est disponible (64€/mois). Paiement sécurisé via Stripe." },
+                { q: "Quel budget pour démarrer en plus du programme ?", a: "Comptez 500 à 2 000€ de stock initial selon les produits choisis. La méthode privilégie les produits à faible mise de fonds pour limiter le risque." },
+                { q: "Quelles sont les modalités de règlement ?", a: "Les modalités sont adaptées à chaque projet et discutées ensemble lors de l'appel de diagnostic gratuit." },
                 { q: "Y a-t-il une application mobile ?", a: "Oui, AMZing FBA est disponible en application iOS native (App Store) et Android. Vous suivez vos alertes et la communauté depuis votre smartphone." },
-                { q: "Comment résilier ?", a: "L'abonnement est annuel et engage sur 12 mois. À l'issue, vous pouvez ne pas renouveler en 2 clics depuis votre espace." },
+                { q: "Comment se déroule l'accompagnement ?", a: "Après l'appel de diagnostic, on définit ensemble la durée et le format de l'accompagnement le mieux adapté à votre projet." },
               ].map((item, i) => (
                 <AccordionItem key={i} value={`item-${i}`} className="bg-background rounded-xl border border-border px-5">
                   <AccordionTrigger className="text-left font-semibold hover:no-underline py-5">
@@ -507,88 +489,41 @@ const Index = () => {
 
         <div className="container mx-auto px-4 relative text-center text-white">
           <Badge className="mb-6 bg-white/15 text-white border-white/25 hover:bg-white/20 backdrop-blur">
-            <Sparkles className="w-3 h-3 mr-1" /> Offre de lancement -29%
+            <Sparkles className="w-3 h-3 mr-1" /> Appel de diagnostic gratuit
           </Badge>
           <h2 className="text-3xl lg:text-5xl font-bold mb-5 max-w-3xl mx-auto leading-tight">
             Prêt à lancer votre business Amazon FBA ?
           </h2>
           <p className="text-lg lg:text-xl text-white/90 mb-8 max-w-2xl mx-auto">
             Rejoignez les 500+ vendeurs qui utilisent AMZing FBA pour sourcer, vendre et scaler chaque mois.
+            Réservez un appel gratuit de 15 min pour définir le programme adapté à votre projet.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
             <Button
               size="xl"
-              onClick={startFreeTrial}
-              disabled={isStarting}
+              asChild
               className="bg-white text-primary hover:bg-white/95 min-w-[260px] shadow-2xl font-semibold"
             >
-              {isStarting ? "Activation..." : "Accéder à AMZing FBA"} <ArrowRight className="ml-1" />
+              <Link to="/demander-rappel">Demander un rappel <ArrowRight className="ml-1" /></Link>
             </Button>
             <Button size="xl" variant="outline" asChild className="bg-transparent border-2 border-white/60 text-white hover:bg-white/10 hover:text-white min-w-[220px]">
               <Link to="/formation">Voir la formation</Link>
             </Button>
           </div>
 
-          <p className="mt-6 text-white/95">
-            <span className="line-through opacity-70 mr-1">700€</span>
-            <span className="font-bold text-xl">500€ TTC</span>
-            <span className="mx-2 opacity-70">·</span>
-            <span>ou 64€/mois × 12 sans frais</span>
+          <p className="mt-6 text-white/95 font-semibold text-xl">
+            Tarif sur mesure — défini ensemble lors de l'appel
           </p>
           <div className="mt-3 flex flex-wrap items-center justify-center gap-x-5 gap-y-1 text-sm text-white/85">
-            <span className="inline-flex items-center gap-1"><ShieldCheck className="w-4 h-4" /> Paiement sécurisé Stripe</span>
-            <span className="inline-flex items-center gap-1"><Zap className="w-4 h-4" /> Accès immédiat</span>
+            <span className="inline-flex items-center gap-1"><ShieldCheck className="w-4 h-4" /> Appel gratuit et sans engagement</span>
+            <span className="inline-flex items-center gap-1"><Zap className="w-4 h-4" /> Réponse rapide</span>
             <span className="inline-flex items-center gap-1"><BadgeCheck className="w-4 h-4" /> Société française</span>
           </div>
         </div>
       </section>
 
       <Footer />
-
-      {/* CGV Modal */}
-      <Dialog open={showCGVModal} onOpenChange={setShowCGVModal}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>Confirmation d'abonnement</DialogTitle>
-            <DialogDescription>Veuillez accepter les conditions avant de continuer</DialogDescription>
-          </DialogHeader>
-
-          <div className="space-y-4 py-4">
-            <div className="bg-primary/5 p-4 rounded-lg border border-primary/20">
-              <p className="text-sm font-semibold mb-2">Abonnement VIP AMZing FBA — Annuel</p>
-              <p className="text-2xl font-bold text-primary">
-                700€<span className="text-sm font-normal text-muted-foreground">/an TTC</span>
-              </p>
-              <p className="text-sm text-muted-foreground">ou ~64€/mois × 12 mois</p>
-              <p className="text-xs text-muted-foreground mt-2">Accès pendant 12 mois</p>
-            </div>
-
-            <div className="flex items-start space-x-3">
-              <Checkbox
-                id="cgv-payment"
-                checked={acceptedCGV}
-                onCheckedChange={(checked) => setAcceptedCGV(checked === true)}
-                className="mt-1"
-              />
-              <label htmlFor="cgv-payment" className="text-sm leading-relaxed cursor-pointer select-none">
-                Je reconnais avoir lu et accepté les{" "}
-                <Link to="/cgv" target="_blank" className="text-primary hover:underline font-medium" onClick={(e) => e.stopPropagation()}>
-                  Conditions Générales de Vente
-                </Link>{" "}
-                et je demande l'exécution immédiate du service.
-              </label>
-            </div>
-          </div>
-
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowCGVModal(false)}>Annuler</Button>
-            <Button onClick={handleConfirmPayment} disabled={!acceptedCGV || isStarting} className="bg-gradient-to-r from-primary to-secondary">
-              {isStarting ? "Traitement..." : "Confirmer le paiement"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };

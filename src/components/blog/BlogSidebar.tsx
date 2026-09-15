@@ -28,7 +28,7 @@ const BlogSidebar = ({ currentArticle }: BlogSidebarProps) => {
               </span>
             </div>
             <Badge className="bg-primary text-primary-foreground border-0 text-xs font-bold shadow-lg">
-              64€/mois
+              Appel gratuit 15 min
             </Badge>
           </div>
         </div>
@@ -90,15 +90,15 @@ const BlogSidebar = ({ currentArticle }: BlogSidebarProps) => {
 
           {/* CTA Principal */}
           <Button asChild size="lg" className="w-full font-bold text-base shadow-lg hover:shadow-xl transition-shadow">
-            <Link to="/auth?tab=signup">
+            <Link to="/demander-rappel">
               <Zap className="w-4 h-4 mr-2" />
-              Rejoindre la Formation
+              Réserver mon appel gratuit
               <ArrowRight className="w-4 h-4 ml-2" />
             </Link>
           </Button>
 
           <p className="text-[11px] text-center text-muted-foreground">
-            Paiement sécurisé · Accès immédiat · Support 7j/7
+            Sans engagement · Places limitées · Support 7j/7
           </p>
         </div>
       </div>

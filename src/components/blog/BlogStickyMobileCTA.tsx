@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 
 /**
  * Barre CTA collante en bas d'écran sur mobile uniquement.
- * Design premium pour justifier 700€.
+ * Design premium sans prix — conversion vers un appel de diagnostic gratuit.
  */
 const BlogStickyMobileCTA = () => {
   const [visible, setVisible] = useState(false);
@@ -53,13 +53,13 @@ const BlogStickyMobileCTA = () => {
             </div>
             <div className="text-[10px] text-muted-foreground flex items-center gap-1">
               <Shield className="w-3 h-3 text-primary" />
-              Garantie 30j · 64€/mois · Accès immédiat
+              Appel gratuit 15 min · Sans engagement
             </div>
           </div>
           <Button asChild size="sm" className="font-bold shadow-lg shrink-0 px-4">
-            <Link to="/auth?tab=signup">
+            <Link to="/demander-rappel">
               <Zap className="w-4 h-4 mr-1.5" />
-              Rejoindre
+              Rappel gratuit
               <ArrowRight className="w-4 h-4 ml-1.5" />
             </Link>
           </Button>

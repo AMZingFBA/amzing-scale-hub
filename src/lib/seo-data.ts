@@ -568,10 +568,10 @@ export const schemas = {
       },
       {
         "@type": "Question",
-        "name": "Combien coûte la formation Amazon FBA AMZing FBA ?",
+        "name": "Comment connaître le tarif de la formation Amazon FBA AMZing FBA ?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "L'abonnement AMZing FBA est à 700€/an TTC ou environ 64€/mois sur 12 mois. Il inclut l'accès à la formation complète, aux moniteurs de produits rentables, au catalogue fournisseurs, au cashback et à la communauté pendant 12 mois."
+          "text": "L'accompagnement AMZing FBA est proposé sur devis : le programme et le tarif sont définis lors d'un appel de diagnostic gratuit de 15 minutes, selon votre projet. Il inclut la formation complète, les moniteurs de produits rentables, le catalogue fournisseurs, le cashback et la communauté."
         }
       },
       {
@@ -772,10 +772,10 @@ export const schemas = {
       },
       {
         "@type": "Question",
-        "name": "Combien coûte l'abonnement AMZing FBA ?",
+        "name": "Comment obtenir le tarif AMZing FBA ?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "L'abonnement VIP avec accès à la formation, aux moniteurs et à tous les outils est à 64€/mois × 12 ou 700€ TTC en une fois (-10%)."
+          "text": "L'accès VIP (formation, moniteurs et outils) est proposé sur devis. Demandez un rappel : lors d'un appel gratuit de 15 minutes, nous définissons le programme adapté et vous recevez une proposition personnalisée, sans engagement."
         }
       },
       {
@@ -1107,10 +1107,10 @@ export const schemas = {
       },
       {
         "@type": "Question",
-        "name": "Combien coûte l'abonnement AMZing FBA ?",
+        "name": "Comment obtenir le tarif de l'accompagnement AMZing FBA ?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "L'abonnement AMZing FBA est à 700€/an TTC ou environ 64€/mois sur 12 mois. C'est un accès annuel qui inclut tous les outils, moniteurs, ressources et la communauté pendant 12 mois complets."
+          "text": "Le tarif est établi sur devis après un appel de diagnostic gratuit de 15 minutes. L'accompagnement inclut tous les outils, moniteurs, ressources et la communauté."
         }
       },
       {

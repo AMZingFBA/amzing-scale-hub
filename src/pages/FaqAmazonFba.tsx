@@ -23,7 +23,7 @@ const faqs = [
   },
   {
     q: "Comment fonctionne le paiement ?",
-    a: "L'accès annuel est à 700 € TTC/an, ou en 12 mensualités d'environ 64 €/mois, soit un engagement annuel de 12 mois.",
+    a: "Le tarif est sur mesure et défini avec vous lors d'un appel de diagnostic gratuit, sans engagement, selon votre profil et vos objectifs.",
   },
   {
     q: "Que se passe-t-il après ma demande de rappel ?",

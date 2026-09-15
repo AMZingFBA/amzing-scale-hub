@@ -170,14 +170,14 @@ const CGV = () => {
                       Les prix sont indiqués en euros (€), hors TVA (TVA non applicable – article 293 B du CGI).
                     </p>
                     <p className="text-muted-foreground leading-relaxed mb-3">
-                      Le prix de l'abonnement annuel est fixé :
+                      Le prix de l'abonnement est établi sur devis, en fonction du périmètre d'accompagnement retenu et des
+                      besoins du Client identifiés lors de l'échange préalable. Une facilité de paiement en douze (12)
+                      échéances mensuelles peut être proposée ; le montant total dû dans ce cas est précisé au devis.
                     </p>
-                    <ul className="list-disc pl-6 space-y-2 text-muted-foreground mb-3">
-                      <li>à 700 € en cas de paiement comptant annuel,</li>
-                      <li>ou à 770 €, correspondant au prix annuel total, lorsque le Client opte pour une facilité de paiement en douze (12) échéances mensuelles.</li>
-                    </ul>
                     <p className="text-muted-foreground leading-relaxed">
-                      Des offres promotionnelles temporaires peuvent être proposées. Le prix applicable est celui affiché au moment de la commande.
+                      Le prix applicable est celui figurant sur le devis accepté par le Client et rappelé dans le
+                      récapitulatif de commande ainsi que sur la facture. Des offres promotionnelles temporaires peuvent
+                      être proposées dans les mêmes conditions.
                     </p>
                   </section>
 

@@ -95,16 +95,16 @@ export default function HomeAISearchPromo() {
                   Réservé aux membres AMZing
                 </div>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <Link to="/tarifs">
+                  <Link to="/demander-rappel">
                     <Button size="lg" className="group gap-2 text-base font-bold shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all px-8">
                       <Search className="w-5 h-5" />
-                      Débloquer la recherche IA
+                      Demander un rappel
                       <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
                     </Button>
                   </Link>
                 </div>
                 <p className="mt-4 text-sm text-muted-foreground">
-                  Inclus dans l'abonnement AMZing — accès illimité
+                  Inclus dans le programme AMZing — accès illimité
                 </p>
               </div>
             </div>

@@ -436,11 +436,11 @@ const AmazonFbaVsFbm = () => {
                     calculateurs de rentabilité et communauté pour t'aider à faire les bons choix.
                   </p>
                   <Button variant="hero" size="lg" asChild>
-                    <Link to="/formation">
-                      Accéder à la formation Amazon FBA <ArrowRight className="ml-2" />
+                    <Link to="/demander-rappel">
+                      Réserver mon appel gratuit <ArrowRight className="ml-2" />
                     </Link>
                   </Button>
-                  <p className="text-sm text-muted-foreground mt-3">34,99€/mois • Sans engagement</p>
+                  <p className="text-sm text-muted-foreground mt-3">Programme sur devis • Sans engagement</p>
                 </CardContent>
               </Card>
             </div>

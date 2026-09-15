@@ -422,7 +422,7 @@ const AccompagnementAmazonFba = () => {
 
                 <div className="rounded-lg border border-border/60 bg-background px-4 py-4 sm:px-5">
                   <p className="text-sm font-semibold text-foreground sm:text-base">
-                    Accès annuel : 700 € TTC/an, ou paiement en 12 mensualités d’environ 64 €/mois, soit un engagement annuel de 12 mois.
+                    Tarif sur mesure, défini avec vous lors d’un appel de diagnostic gratuit, sans engagement. Places limitées.
                   </p>
                 </div>
               </div>

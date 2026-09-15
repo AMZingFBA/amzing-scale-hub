@@ -250,7 +250,7 @@ const Temoignages = () => {
                   </Link>
                 </Button>
                 <Button asChild size="lg" variant="outline">
-                  <Link to="/tarifs">Voir les tarifs</Link>
+                  <Link to="/demander-rappel">Demander un rappel</Link>
                 </Button>
               </div>
             </CardContent>

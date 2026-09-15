@@ -57,7 +57,6 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { useState, useEffect } from "react";
-import PromoCountdown from "@/components/PromoCountdown";
 
 const Formation = () => {
   const navigate = useNavigate();
@@ -256,7 +255,7 @@ const Formation = () => {
     },
     {
       objection: "C'est trop cher pour commencer",
-      response: "L'abonnement annuel est accessible en plusieurs fois (~64€/mois sur 12 mois). Pour le stock, tu peux démarrer avec 500-1000€ et tester quelques produits avant de réinvestir."
+      response: "L'accompagnement est proposé sur devis, avec possibilité de paiement échelonné : on définit ensemble le programme adapté lors d'un appel gratuit de 15 min. Pour le stock, tu peux démarrer avec 500-1000€ et tester quelques produits avant de réinvestir."
     },
     {
       objection: "J'ai déjà essayé et ça n'a pas marché",
@@ -271,7 +270,7 @@ const Formation = () => {
     { feature: "Communauté active", youtube: false, formation: "Parfois", amzing: true },
     { feature: "Support réactif", youtube: false, formation: "Variable", amzing: true },
     { feature: "Mises à jour régulières", youtube: false, formation: "Variable", amzing: true },
-    { feature: "Tarif", youtube: "Gratuit", formation: "500-2000€", amzing: "500€/an" },
+    { feature: "Tarif", youtube: "Gratuit", formation: "500-2000€", amzing: "Sur devis" },
   ];
 
   const faqItems = [
@@ -285,7 +284,7 @@ const Formation = () => {
     },
     {
       question: "Combien faut-il investir pour commencer ?",
-      answer: "L'abonnement AMZing FBA est à 64€/mois × 12 ou 500€ TTC en une fois (🔥 OFFRE FLASH -200€). Pour le stock initial, tu peux démarrer avec 500-1000€ pour tester quelques produits. L'important n'est pas d'avoir un gros budget mais de bien choisir tes produits. Les moniteurs t'aident à optimiser chaque euro investi."
+      answer: "Le programme AMZing FBA est proposé sur devis : le tarif est défini lors d'un appel de diagnostic gratuit de 15 min, selon ton niveau et tes objectifs, avec paiement échelonné possible. Pour le stock initial, tu peux démarrer avec 500-1000€ pour tester quelques produits. L'important n'est pas d'avoir un gros budget mais de bien choisir tes produits."
     },
     {
       question: "Combien de temps pour faire ses premières ventes ?",
@@ -317,11 +316,11 @@ const Formation = () => {
     },
     {
       question: "Est-ce une formation CPF ?",
-      answer: "Non, AMZing FBA n'est pas éligible au CPF. L'abonnement est à 500€/an TTC (🔥 OFFRE FLASH) ou payable en 12 fois (~64€/mois), ce qui te permet d'étaler le coût."
+      answer: "Non, AMZing FBA n'est pas éligible au CPF. L'accompagnement est proposé sur devis, avec une facilité de paiement en plusieurs fois pour étaler le coût : le détail t'est communiqué lors de l'appel gratuit."
     },
     {
       question: "Pourquoi vous plutôt qu'une formation classique ?",
-      answer: "Les formations classiques coûtent souvent 500-2000€ et te donnent des vidéos sans outils concrets. AMZing FBA combine une méthode structurée + des moniteurs automatisés + un catalogue fournisseurs + une communauté active. Tu as tout ce qu'il faut pour passer de la théorie à l'action, pour 64€/mois × 12 ou 500€ TTC (🔥 OFFRE FLASH -200€)."
+      answer: "Les formations classiques coûtent souvent 500-2000€ et te donnent des vidéos sans outils concrets. AMZing FBA combine une méthode structurée + des moniteurs automatisés + un catalogue fournisseurs + une communauté active, avec un programme construit sur mesure après un appel de diagnostic gratuit."
     },
     {
       question: "Amazon FBA est-il toujours rentable en 2026 ?",
@@ -347,8 +346,28 @@ const Formation = () => {
     }))
   };
 
+  const courseSchemaNoPrice = {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    "name": "Formation Amazon FBA (2026) : Méthode + Outils | AMZing FBA",
+    "description": "Formation Amazon FBA complète : méthode pas à pas + moniteurs produits rentables + fournisseurs + communauté. Tarif communiqué après un appel de diagnostic.",
+    "provider": {
+      "@type": "Organization",
+      "name": "AMZing FBA",
+      "sameAs": "https://amzingfba.com",
+      "url": "https://amzingfba.com"
+    },
+    "hasCourseInstance": {
+      "@type": "CourseInstance",
+      "courseMode": "online",
+      "courseWorkload": "PT20H"
+    },
+    "inLanguage": "fr",
+    "url": "https://amzingfba.com/formation"
+  };
+
   const combinedSchema = [
-    schemas.course,
+    courseSchemaNoPrice,
     faqSchema,
     schemas.organization,
     schemas.breadcrumbList([
@@ -382,13 +401,13 @@ const Formation = () => {
       <div className={`hidden lg:block fixed right-6 top-1/2 -translate-y-1/2 z-40 transition-all duration-300 ${showStickyCta ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-10'}`}>
         <div className="bg-card border rounded-xl shadow-xl p-4 space-y-3 max-w-[200px]">
           <p className="text-sm font-semibold text-center">Formation + Outils</p>
-          <p className="text-2xl font-bold text-center text-primary">700€<span className="text-sm font-normal text-muted-foreground">/an</span></p>
+          <p className="text-sm font-medium text-center text-primary">Tarif sur devis</p>
           <Button variant="hero" size="sm" asChild className="w-full">
-            <Link to="/tarifs">
-              Accéder <ArrowRight className="ml-1 h-4 w-4" />
+            <Link to="/demander-rappel">
+              Demander un rappel <ArrowRight className="ml-1 h-4 w-4" />
             </Link>
           </Button>
-          <p className="text-xs text-muted-foreground text-center">Accès 12 mois</p>
+          <p className="text-xs text-muted-foreground text-center">Appel de 15 min, sans engagement</p>
         </div>
       </div>
 
@@ -396,13 +415,12 @@ const Formation = () => {
       <div className={`lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-t shadow-lg p-4 transition-all duration-300 ${showStickyCta ? 'translate-y-0' : 'translate-y-full'}`}>
         <div className="flex items-center justify-between gap-4 max-w-lg mx-auto">
           <div>
-            <p className="text-xs text-muted-foreground line-through">700€</p>
-            <p className="font-semibold bg-gradient-to-r from-red-500 via-orange-500 to-yellow-500 bg-clip-text text-transparent">500€/an TTC <span className="text-xs bg-red-500 text-white px-1.5 py-0.5 rounded ml-1">🔥 -200€</span></p>
-            <p className="text-xs text-muted-foreground">ou ~64€/mois × 12</p>
+            <p className="font-semibold text-foreground">Tarif sur devis</p>
+            <p className="text-xs text-muted-foreground">Appel de 15 min gratuit</p>
           </div>
           <Button variant="hero" asChild>
-            <Link to="/tarifs">
-              Accéder à la plateforme <ArrowRight className="ml-2 h-4 w-4" />
+            <Link to="/demander-rappel">
+              Demander un rappel <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
           </Button>
         </div>
@@ -485,8 +503,8 @@ const Formation = () => {
             {/* CTA haut de page */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
               <Button variant="hero" size="xl" asChild>
-                <Link to="/tarifs">
-                  Accéder à la plateforme (70€/mois)
+                <Link to="/demander-rappel">
+                  Demander un appel de diagnostic gratuit
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
               </Button>
@@ -717,7 +735,7 @@ const Formation = () => {
                 </div>
                 <div className="flex items-start gap-3">
                   <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                  <span className="text-sm">700€/an TTC, accès 12 mois</span>
+                  <span className="text-sm">Tarif sur devis, sans engagement</span>
                 </div>
                 <div className="flex items-start gap-3">
                   <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
@@ -1092,17 +1110,14 @@ const Formation = () => {
             <div className="max-w-lg mx-auto">
               <Card className="border-2 border-primary shadow-xl">
                 <CardHeader className="text-center pb-2">
-                  <Badge className="mb-2 mx-auto bg-red-500 text-white border-0 animate-pulse">
-                    🔥 OFFRE FLASH -200€
+                  <Badge className="mb-2 mx-auto bg-primary/10 text-primary border-primary/20">
+                    Tarif sur devis
                   </Badge>
                   <CardTitle className="text-3xl">AMZing FBA VIP</CardTitle>
                   <div className="mt-4">
-                    <span className="text-2xl text-muted-foreground line-through">700€</span>
-                    <span className="text-5xl font-bold bg-gradient-to-r from-red-500 via-orange-500 to-yellow-500 bg-clip-text text-transparent ml-2">500€</span>
-                    <span className="text-muted-foreground">/an TTC</span>
+                    <span className="text-2xl font-semibold">Programme sur mesure</span>
                   </div>
-                  <p className="text-sm text-muted-foreground mt-2">ou ~64€/mois × 12 • Accès annuel</p>
-                  <PromoCountdown />
+                  <p className="text-sm text-muted-foreground mt-2">Après un appel de diagnostic gratuit de 15 min, sans engagement</p>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <ul className="space-y-3">
@@ -1137,8 +1152,8 @@ const Formation = () => {
                   </ul>
 
                   <Button variant="hero" size="xl" asChild className="w-full">
-                    <Link to="/tarifs">
-                      Voir les détails des tarifs
+                    <Link to="/demander-rappel">
+                      Demander un rappel
                       <ArrowRight className="ml-2 h-5 w-5" />
                     </Link>
                   </Button>
@@ -1275,12 +1290,12 @@ const Formation = () => {
             {/* CTA final */}
             <div className="text-center mt-12">
               <Button variant="hero" size="xl" asChild>
-                <Link to="/tarifs">
-                  Accéder à la plateforme (700€/mois)
+                <Link to="/demander-rappel">
+                  Demander un devis personnalisé
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
               </Button>
-              <p className="text-sm text-muted-foreground mt-4">Accès annuel (12 mois)</p>
+              <p className="text-sm text-muted-foreground mt-4">Appel de diagnostic gratuit, sans engagement</p>
             </div>
           </div>
         </section>

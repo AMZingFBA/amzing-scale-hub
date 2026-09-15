@@ -475,14 +475,14 @@ const Debuter = () => {
                     <p className="text-lg">
                       Accède à notre formation complète pour maîtriser chaque aspect d'Amazon FBA : sourcing, logistique, optimisation et stratégies avancées.
                     </p>
-                    <a href="https://systeme.io/dashboard/share?hash=547932924ce9666693f6a671df31f5d1ff9884&type=course" target="_blank" rel="noopener noreferrer">
+                    <Link to="/demander-rappel">
                       <button className="w-full border border-primary hover:bg-primary/10 py-4 rounded-lg transition-colors">
                         <div className="flex flex-col items-center gap-1 w-full px-4">
-                          <span className="font-semibold text-lg">🎓 Accéder à la formation</span>
-                          <span className="text-xs text-muted-foreground">Formation Amazon FBA complète</span>
+                          <span className="font-semibold text-lg">🎓 Demander un rappel</span>
+                          <span className="text-xs text-muted-foreground">Appel de diagnostic gratuit, sans engagement</span>
                         </div>
                       </button>
-                    </a>
+                    </Link>
                   </CardContent>
                 </Card>
               </section>
