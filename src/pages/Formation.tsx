@@ -57,7 +57,6 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { useState, useEffect } from "react";
-import PromoCountdown from "@/components/PromoCountdown";
 
 const Formation = () => {
   const navigate = useNavigate();
@@ -382,13 +381,13 @@ const Formation = () => {
       <div className={`hidden lg:block fixed right-6 top-1/2 -translate-y-1/2 z-40 transition-all duration-300 ${showStickyCta ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-10'}`}>
         <div className="bg-card border rounded-xl shadow-xl p-4 space-y-3 max-w-[200px]">
           <p className="text-sm font-semibold text-center">Formation + Outils</p>
-          <p className="text-2xl font-bold text-center text-primary">700€<span className="text-sm font-normal text-muted-foreground">/an</span></p>
+          <p className="text-sm font-medium text-center text-primary">Tarif sur devis</p>
           <Button variant="hero" size="sm" asChild className="w-full">
-            <Link to="/tarifs">
-              Accéder <ArrowRight className="ml-1 h-4 w-4" />
+            <Link to="/demander-rappel">
+              Demander un rappel <ArrowRight className="ml-1 h-4 w-4" />
             </Link>
           </Button>
-          <p className="text-xs text-muted-foreground text-center">Accès 12 mois</p>
+          <p className="text-xs text-muted-foreground text-center">Appel de 15 min, sans engagement</p>
         </div>
       </div>
 
@@ -396,13 +395,12 @@ const Formation = () => {
       <div className={`lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-t shadow-lg p-4 transition-all duration-300 ${showStickyCta ? 'translate-y-0' : 'translate-y-full'}`}>
         <div className="flex items-center justify-between gap-4 max-w-lg mx-auto">
           <div>
-            <p className="text-xs text-muted-foreground line-through">700€</p>
-            <p className="font-semibold bg-gradient-to-r from-red-500 via-orange-500 to-yellow-500 bg-clip-text text-transparent">500€/an TTC <span className="text-xs bg-red-500 text-white px-1.5 py-0.5 rounded ml-1">🔥 -200€</span></p>
-            <p className="text-xs text-muted-foreground">ou ~64€/mois × 12</p>
+            <p className="font-semibold text-foreground">Tarif sur devis</p>
+            <p className="text-xs text-muted-foreground">Appel de 15 min gratuit</p>
           </div>
           <Button variant="hero" asChild>
-            <Link to="/tarifs">
-              Accéder à la plateforme <ArrowRight className="ml-2 h-4 w-4" />
+            <Link to="/demander-rappel">
+              Demander un rappel <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
           </Button>
         </div>
@@ -485,8 +483,8 @@ const Formation = () => {
             {/* CTA haut de page */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
               <Button variant="hero" size="xl" asChild>
-                <Link to="/tarifs">
-                  Accéder à la plateforme (70€/mois)
+                <Link to="/demander-rappel">
+                  Demander un appel de diagnostic gratuit
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
               </Button>
@@ -717,7 +715,7 @@ const Formation = () => {
                 </div>
                 <div className="flex items-start gap-3">
                   <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                  <span className="text-sm">700€/an TTC, accès 12 mois</span>
+                  <span className="text-sm">Tarif sur devis, sans engagement</span>
                 </div>
                 <div className="flex items-start gap-3">
                   <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
@@ -1102,7 +1100,6 @@ const Formation = () => {
                     <span className="text-muted-foreground">/an TTC</span>
                   </div>
                   <p className="text-sm text-muted-foreground mt-2">ou ~64€/mois × 12 • Accès annuel</p>
-                  <PromoCountdown />
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <ul className="space-y-3">
