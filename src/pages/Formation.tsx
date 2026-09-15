@@ -270,7 +270,7 @@ const Formation = () => {
     { feature: "Communauté active", youtube: false, formation: "Parfois", amzing: true },
     { feature: "Support réactif", youtube: false, formation: "Variable", amzing: true },
     { feature: "Mises à jour régulières", youtube: false, formation: "Variable", amzing: true },
-    { feature: "Tarif", youtube: "Gratuit", formation: "500-2000€", amzing: "500€/an" },
+    { feature: "Tarif", youtube: "Gratuit", formation: "500-2000€", amzing: "Sur devis" },
   ];
 
   const faqItems = [
@@ -346,8 +346,28 @@ const Formation = () => {
     }))
   };
 
+  const courseSchemaNoPrice = {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    "name": "Formation Amazon FBA (2026) : Méthode + Outils | AMZing FBA",
+    "description": "Formation Amazon FBA complète : méthode pas à pas + moniteurs produits rentables + fournisseurs + communauté. Tarif communiqué après un appel de diagnostic.",
+    "provider": {
+      "@type": "Organization",
+      "name": "AMZing FBA",
+      "sameAs": "https://amzingfba.com",
+      "url": "https://amzingfba.com"
+    },
+    "hasCourseInstance": {
+      "@type": "CourseInstance",
+      "courseMode": "online",
+      "courseWorkload": "PT20H"
+    },
+    "inLanguage": "fr",
+    "url": "https://amzingfba.com/formation"
+  };
+
   const combinedSchema = [
-    schemas.course,
+    courseSchemaNoPrice,
     faqSchema,
     schemas.organization,
     schemas.breadcrumbList([
@@ -1090,16 +1110,14 @@ const Formation = () => {
             <div className="max-w-lg mx-auto">
               <Card className="border-2 border-primary shadow-xl">
                 <CardHeader className="text-center pb-2">
-                  <Badge className="mb-2 mx-auto bg-red-500 text-white border-0 animate-pulse">
-                    🔥 OFFRE FLASH -200€
+                  <Badge className="mb-2 mx-auto bg-primary/10 text-primary border-primary/20">
+                    Tarif sur devis
                   </Badge>
                   <CardTitle className="text-3xl">AMZing FBA VIP</CardTitle>
                   <div className="mt-4">
-                    <span className="text-2xl text-muted-foreground line-through">700€</span>
-                    <span className="text-5xl font-bold bg-gradient-to-r from-red-500 via-orange-500 to-yellow-500 bg-clip-text text-transparent ml-2">500€</span>
-                    <span className="text-muted-foreground">/an TTC</span>
+                    <span className="text-2xl font-semibold">Programme sur mesure</span>
                   </div>
-                  <p className="text-sm text-muted-foreground mt-2">ou ~64€/mois × 12 • Accès annuel</p>
+                  <p className="text-sm text-muted-foreground mt-2">Après un appel de diagnostic gratuit de 15 min, sans engagement</p>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <ul className="space-y-3">
@@ -1134,8 +1152,8 @@ const Formation = () => {
                   </ul>
 
                   <Button variant="hero" size="xl" asChild className="w-full">
-                    <Link to="/tarifs">
-                      Voir les détails des tarifs
+                    <Link to="/demander-rappel">
+                      Demander un rappel
                       <ArrowRight className="ml-2 h-5 w-5" />
                     </Link>
                   </Button>
@@ -1272,12 +1290,12 @@ const Formation = () => {
             {/* CTA final */}
             <div className="text-center mt-12">
               <Button variant="hero" size="xl" asChild>
-                <Link to="/tarifs">
-                  Accéder à la plateforme (700€/mois)
+                <Link to="/demander-rappel">
+                  Demander un devis personnalisé
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
               </Button>
-              <p className="text-sm text-muted-foreground mt-4">Accès annuel (12 mois)</p>
+              <p className="text-sm text-muted-foreground mt-4">Appel de diagnostic gratuit, sans engagement</p>
             </div>
           </div>
         </section>

@@ -82,7 +82,7 @@ const Services = () => {
               Ce Que Tu Obtiens
             </h1>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Accès complet à tous les outils, ressources et services — <span className="text-foreground font-semibold">64€/mois × 12</span> ou <span className="line-through text-muted-foreground/70">700€</span> <span className="text-foreground font-semibold bg-gradient-to-r from-red-500 via-orange-500 to-yellow-500 bg-clip-text text-transparent">500€ TTC</span> <span className="ml-1 bg-red-500/20 text-red-500 text-xs font-bold px-2 py-0.5 rounded animate-pulse">🔥 -200€</span>
+              Accès complet à tous les outils, ressources et services — <span className="text-foreground font-semibold">tarif sur devis</span> après un appel de diagnostic gratuit et sans engagement.
             </p>
           </div>
 
@@ -498,21 +498,21 @@ const Services = () => {
           </Card>
 
           {/* CTA */}
-          <Card className="bg-gradient-to-r from-primary to-secondary text-white border-none">
+          <Card className="bg-gradient-to-r from-primary to-secondary text-primary-foreground border-none">
             <CardContent className="p-12 text-center">
               <h2 className="text-3xl md:text-4xl font-bold mb-4">
                 Prêt à Démarrer ?
               </h2>
-              <p className="text-xl mb-8 text-white/90 max-w-2xl mx-auto">
-                Rejoins l'espace VIP — <span className="font-semibold">64€/mois × 12</span> ou <span className="line-through opacity-70">700€</span> <span className="font-semibold text-yellow-300">500€ TTC</span> <span className="ml-1 bg-yellow-500/30 text-yellow-200 text-xs font-bold px-2 py-0.5 rounded animate-pulse">🔥 OFFRE FLASH -200€</span>
+              <p className="text-xl mb-8 text-primary-foreground/90 max-w-2xl mx-auto">
+                Rejoins l'espace VIP — tarif sur devis après un appel de diagnostic gratuit de 15 min, sans engagement.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button variant="hero" size="xl" asChild>
-                  <Link to="/tarifs">
-                    S'abonner maintenant
+                  <Link to="/demander-rappel">
+                    Demander un rappel
                   </Link>
                 </Button>
-                <Button variant="outline" size="xl" className="border-white text-white hover:bg-white/10" asChild>
+                <Button variant="outline" size="xl" className="border-primary-foreground text-primary-foreground hover:bg-primary-foreground/10" asChild>
                   <Link to="/contact">
                     Nous contacter
                   </Link>
